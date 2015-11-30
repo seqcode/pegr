@@ -18,7 +18,7 @@ environments {
         dataSource {
             dbCreate = "update" // one of 'create', 'create-drop', 'update', 'validate', ''
             url = "jdbc:mysql://localhost/pegr"
-			username="admin"
+			username="root"
 			password="admin"
         }
     }
@@ -26,7 +26,7 @@ environments {
         dataSource {
             dbCreate = "update"
             url = "jdbc:mysql://localhost/pegr_test"
-			username="admin"
+			username="root"
 			password="admin"
         }
     }

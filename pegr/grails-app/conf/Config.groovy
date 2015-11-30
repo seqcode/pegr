@@ -99,9 +99,12 @@ environments {
 log4j.main = {
     // Example of changing the log pattern for the default console appender:
     //
-    //appenders {
+    appenders {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
-    //}
+		
+		// limit the size of file 'stacktrace.log'
+		rollingFile name:'stacktrace', file:'stacktrace.log', maxFileSize:'5MB', maxBackupIndex:2
+    }
 
     error  'org.codehaus.groovy.grails.web.servlet',        // controllers
            'org.codehaus.groovy.grails.web.pages',          // GSP

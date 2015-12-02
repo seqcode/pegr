@@ -11,7 +11,7 @@ class User implements Serializable {
 	String fullName
 	String email
 	String phone
-	Organization organization
+	Lab lab
 	Address address
 	
 	static hasMany = [projectUsers: ProjectUser]
@@ -51,9 +51,11 @@ class User implements Serializable {
 	static constraints = {
 		username blank: false, unique: true
 		password blank: false
-		fullName blank: false		
-		email email: true, blank: false
-		address: nullable: true
+		fullName nullable: true, maxSize: 30
+		email email: true, nullable: true
+		phone nullable: true, maxSize: 20
+		lab nullable: true
+		address nullable: true
 	}
 
 	static mapping = {

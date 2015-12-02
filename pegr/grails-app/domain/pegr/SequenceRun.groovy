@@ -14,4 +14,10 @@ class SequenceRun {
 	
     static constraints = {
     }
+	
+	static mapping = {
+		read1Cycle defaultValue: 40
+		read2Cycle defaultValue: 40
+		indexCycle defaultValue: 12
+   }
 }

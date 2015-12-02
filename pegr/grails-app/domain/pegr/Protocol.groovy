@@ -7,6 +7,8 @@ class Protocol {
 	String url
 	
     static constraints = {
-    	url url:true
+		name unique: true, size: 2..30
+		description maxSize: 200
+    	url url:true, nullable: true
 	}
 }

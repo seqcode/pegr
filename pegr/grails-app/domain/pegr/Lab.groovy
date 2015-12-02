@@ -6,5 +6,6 @@ class Lab extends Organization{
 	User billingContact
 	
     static constraints = {
+		billingContact nullable: true
     }
 }

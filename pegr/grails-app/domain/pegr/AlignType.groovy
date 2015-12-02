@@ -5,5 +5,7 @@ class AlignType {
 	String shortName
 	
     static constraints = {
+		name maxSize: 30, unique: true
+		shortName nullable: true, maxSize:20, unique: true
     }
 }

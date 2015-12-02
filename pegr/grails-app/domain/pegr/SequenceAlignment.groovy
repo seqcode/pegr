@@ -14,7 +14,7 @@ class SequenceAlignment {
 	int totalPair
 	String bamFilePath
 	String idxFilePath
-	CorePipelineDescription corePipelineDescription
+	CorePipeline corePipelineDescription
 	Date alignmentDate
 	boolean isPreferredVersion
 	

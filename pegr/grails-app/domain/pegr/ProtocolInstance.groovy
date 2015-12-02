@@ -8,5 +8,7 @@ class ProtocolInstance {
 	Reagent reagent
 	
     static constraints = {
+		biologicalMaterial nullable: true, maxSize: 30
+		note nullable: true, maxSize: 200
     }
 }

@@ -7,5 +7,8 @@ class ExperimentType {
 	String note
 	
     static constraints = {
+		name maxSize: 30, unique: true
+		code maxSize:10, unique: true
+		note maxSize: 200, nullable: true
     }
 }

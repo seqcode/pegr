@@ -12,5 +12,8 @@ class FileMetadata {
 	String note
 	
     static constraints = {
+		name maxSize: 30, unique:'fileType'
+		md5CheckSum maxSize: 50
+		note maxSize: 200, nullable: true
     }
 }

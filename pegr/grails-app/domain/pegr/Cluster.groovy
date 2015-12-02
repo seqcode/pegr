@@ -1,10 +1,10 @@
 package pegr
 
-class Platform {
+class Cluster {
 
 	String name
 	
     static constraints = {
-    	name unique: true
+    	name unique: true, maxSize: 20
 	}
 }

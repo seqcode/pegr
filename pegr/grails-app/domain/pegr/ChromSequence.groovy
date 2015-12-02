@@ -7,5 +7,6 @@ class ChromSequence {
 	String sequence
 	
     static constraints = {
+		sequence maxSize: 1000
     }
 }

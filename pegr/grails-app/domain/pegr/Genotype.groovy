@@ -6,5 +6,7 @@ class Genotype {
 	String note
 	
     static constraints = {
+		name maxSize:30, unique: true
+		note nullable: true, maxSize: 200
     }
 }

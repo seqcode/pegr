@@ -10,7 +10,7 @@ class Sample {
 	CellSource cellSource
 	Antibody antibody
 	Target target
-	Protocol protocol
+	ProtocolInstance protocolInstance
 	int biologicalReplicate
 	int technicalReplicate
 	double libraryConcentration // in ng/ul
@@ -31,6 +31,9 @@ class Sample {
     static constraints = {
 		publicationReference nullable: true
 		spikeInSample nullable: true
-		
+		libraryConcentration scale: 4
+		publicationReference nullable: true, maxSize: 30
+		spikeInSample nullable: true
+		note nullable: true, maxSize: 200
     }
 }

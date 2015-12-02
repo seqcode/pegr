@@ -9,7 +9,8 @@ class Organization {
 	
     static constraints = {
 		parent nullable: true
-		note nullable: true
+		name unique: true, maxSize: 50
+		note nullable: true, maxSize: 200
 		address nullable: true
 		website url: true, nullable: true
     }

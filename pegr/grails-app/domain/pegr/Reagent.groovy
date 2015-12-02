@@ -7,5 +7,8 @@ class Reagent {
 	Chemical chemical
 	
     static constraints = {
-    }
+    	name size: 2..20
+		inventoryId maxSize: 30
+		
+	}
 }

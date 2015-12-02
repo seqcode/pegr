@@ -8,7 +8,7 @@ class SequencingExperiment {
 	SequenceRun sequenceRun
 	Pool pool
 	double poolConcentration // ng/ul
-	SequenceIndex sequenceIndex
+	SeqId sequenceIndex
 	int numberReads
 	String fastqFilePath
 	String fastQCReportPath
@@ -18,6 +18,6 @@ class SequencingExperiment {
     static constraints = {
     	fastqFilePath url: true
 		fastQCReportPath url: true
-		note nullable: true
+		note nullable: true, maxSize: 200
 	}
 }

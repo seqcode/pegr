@@ -1,13 +1,11 @@
 package pegr
 
-class Target {
-	
-	String name
-	String nTermTag
-	String cTermTag
-	String note
-	TargetType targetType
+class FileType {
 
+	String name
+	String description
+	String note
+	
     static constraints = {
     }
 }

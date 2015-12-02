@@ -10,7 +10,11 @@ class User implements Serializable {
 	String password
 	String fullName
 	String email
+	String phone
 	Organization organization
+	Address address
+	
+	static hasMany = [projectUsers: ProjectUser]
 	
 	boolean enabled = true
 	boolean accountExpired
@@ -49,6 +53,7 @@ class User implements Serializable {
 		password blank: false
 		fullName blank: false		
 		email email: true, blank: false
+		address: nullable: true
 	}
 
 	static mapping = {

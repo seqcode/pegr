@@ -1,13 +1,11 @@
 package pegr
 
-class Target {
-	
-	String name
-	String nTermTag
-	String cTermTag
-	String note
-	TargetType targetType
+class ExperimentType {
 
+	String name
+	String code
+	String note
+	
     static constraints = {
     }
 }

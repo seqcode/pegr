@@ -1,13 +1,10 @@
 package pegr
 
-class Target {
-	
+class Chemical {
 	String name
-	String nTermTag
-	String cTermTag
+	String inventoryId
 	String note
-	TargetType targetType
-
+	
     static constraints = {
     }
 }

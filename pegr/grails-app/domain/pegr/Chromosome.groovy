@@ -1,13 +1,11 @@
 package pegr
 
-class Target {
-	
-	String name
-	String nTermTag
-	String cTermTag
-	String note
-	TargetType targetType
+class Chromosome {
 
+	String name
+	Genome genome
+	String note
+	
     static constraints = {
     }
 }

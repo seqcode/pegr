@@ -1,13 +1,10 @@
 package pegr
 
-class Target {
-	
+class Species {
 	String name
-	String nTermTag
-	String cTermTag
+	String genusName
 	String note
-	TargetType targetType
-
+	
     static constraints = {
     }
 }

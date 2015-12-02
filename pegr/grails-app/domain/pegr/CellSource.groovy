@@ -1,12 +1,6 @@
 package pegr
 
 class CellSource {
-	enum Sex {
-		MALE, FEMALE, HERMAPHRODITE
-	}
-	enum Tissue {
-		LIVER, BLOOD
-	}
 	
 	User providerUser
 	Organization provierLab

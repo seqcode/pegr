@@ -25,6 +25,9 @@ class Sample {
 	CellSource spikeInSample
 	String note
 	
+	static hasMany = [projects: Project]
+	static belongsTo = [Project]
+	
     static constraints = {
 		publicationReference nullable: true
 		spikeInSample nullable: true

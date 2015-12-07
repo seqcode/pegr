@@ -2,7 +2,7 @@ package pegr
 
 class TaskInfo {
 	enum Status {
-		E, Q
+		E, Q, C
 	}
 	
 	int taskId

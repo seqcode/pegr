@@ -2,10 +2,10 @@ package pegr
 
 class BaseCalling {
 	String name
-	String version
+	String baseCallingVersion
 	
     static constraints = {
 		name maxSize: 30, unique: 'version'
-		version maxSize: 10, nullable: true
+		baseCallingVersion maxSize: 10, nullable: true
     }
 }

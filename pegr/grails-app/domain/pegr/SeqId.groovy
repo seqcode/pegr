@@ -4,7 +4,7 @@ class SeqId {
 
 	Platform platform
 	int run
-	Index index
+	SequenceIndex sequenceIndex
 	
     static constraints = {
     }

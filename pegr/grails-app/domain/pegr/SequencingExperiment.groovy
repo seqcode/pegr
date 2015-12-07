@@ -8,7 +8,7 @@ class SequencingExperiment {
 	SequenceRun sequenceRun
 	Pool pool
 	double poolConcentration // ng/ul
-	SeqId sequenceIndex
+	SeqId seqId
 	int numberReads
 	String fastqFilePath
 	String fastQCReportPath

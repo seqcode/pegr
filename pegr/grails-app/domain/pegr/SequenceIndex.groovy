@@ -1,15 +1,17 @@
 package pegr
 
-class Index {
-	String version
-	int id
+class SequenceIndex {
+	String indexVersion
+	int indexId
 	String sequence 
 	String oligo
 	
     static constraints = {    
-		version maxSize: 2
+		indexVersion maxSize: 2
 		sequence maxSize: 30 
-		id unique: 'version'
+		indexId unique: 'indexVersion'
 		oligo maxSize: 200
 	}
+	
+	
 }

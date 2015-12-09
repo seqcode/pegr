@@ -128,12 +128,18 @@ grails.plugin.springsecurity.requestMap.className = 'pegr.Requestmap'
 grails.plugin.springsecurity.securityConfigType = 'Requestmap'
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	'/':                ['permitAll'],
-	'/index':           ['permitAll'],
-	'/index.gsp':       ['permitAll'],
 	'/assets/**':       ['permitAll'],
 	'/**/js/**':        ['permitAll'],
 	'/**/css/**':       ['permitAll'],
 	'/**/images/**':    ['permitAll'],
-	'/**/favicon.ico':  ['permitAll']
+	'/**/favicon.ico':  ['permitAll'],
+	'/user/**': ['hasRole("ROLE_ADMIN")'],
+	'/role/**': ['hasRole("ROLE_ADMIN")'],
+	'/login/**': ['permitAll'],
+	'/logout/**': ['permitAll'],
+	'/**': ['isAuthenticated()'] // everything else requires authenticated user
 ]
+grails.plugin.springsecurity.auth.loginFormUrl = "/login/form"
+grails.plugin.springsecurity.failureHandler.defaultFailureUrl = "/login/form"
+grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/dashboard"
 

@@ -7,6 +7,16 @@ class UrlMappings {
             }
         }
 
+		"/login/form"{
+			controller = "auth"
+			 action = "form"
+		}
+		
+		"/dashboard"{
+			controller = "dashboard"
+			action = "index"
+		}
+		
         "/"(view:"/index")
         "500"(view:'/error')
 	}

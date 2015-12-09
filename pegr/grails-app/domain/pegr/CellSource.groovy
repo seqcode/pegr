@@ -10,7 +10,7 @@ class CellSource {
 	Sex sex
 	String age
 	Tissue tissue
-	Protocol protocol
+	ProtocolInstance protocolInstance
 	GrowthMedia growthMedia
 	Treatment treatment
 	Histology histology

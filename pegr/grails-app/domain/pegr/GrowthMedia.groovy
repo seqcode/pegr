@@ -3,7 +3,7 @@ package pegr
 class GrowthMedia {
 	
 	String name
-	Protocol protocol
+	ProtocolInstance protocolInstance
 	String note
 	
     static constraints = {

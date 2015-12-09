@@ -13,7 +13,7 @@ class Sample {
 	ProtocolInstance protocolInstance
 	int biologicalReplicate
 	int technicalReplicate
-	double libraryConcentration // in ng/ul
+	double concentration // in ng/ul
 	int requestedTagNumber
 	int chromosomeAmount // in ug
 	int cellNumber // in M
@@ -31,7 +31,7 @@ class Sample {
     static constraints = {
 		publicationReference nullable: true
 		spikeInSample nullable: true
-		libraryConcentration scale: 4
+		concentration scale: 4
 		publicationReference nullable: true, maxSize: 30
 		spikeInSample nullable: true
 		note nullable: true, maxSize: 200

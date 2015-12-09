@@ -2,7 +2,7 @@ package pegr
 
 class Protocol {
 	String name
-	ExperimentType experimentType
+	Assay experimentType
 	String description
 	String url
 	

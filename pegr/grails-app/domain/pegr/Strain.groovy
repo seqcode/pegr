@@ -2,7 +2,7 @@ package pegr
 
 class Strain {
 	String name
-	Species species
+	Genotype genotype
 	Strain parent
 	String geneticModifications
 	Lab sourceLab

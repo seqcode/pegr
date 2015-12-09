@@ -9,6 +9,7 @@ class Project {
 	String note
 	Date dateCreated
 	Date lastUpdated
+	Funding funding
 	
     static constraints = {
 		name unique: true

@@ -1,6 +1,6 @@
 package pegr
 
-class ExperimentType {
+class Assay {
 
 	String name
 	String code

@@ -3,7 +3,7 @@
         <title>
             Dashboard 
         </title> 
-        <meta name="layout" content="main"/>
+        <meta name="layout" content="dashboard_main"/>
     </head>
     <body>
         <div id="allProjects">

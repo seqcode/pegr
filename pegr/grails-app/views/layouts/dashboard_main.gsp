@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">  
   <asset:javascript src="application.js"/>
   <asset:stylesheet href="application.css"/>
+
   <g:layoutHead/>
 </head>
 <body>
@@ -24,8 +25,8 @@
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Admin</a></li>
-        <li><a href="#">Site</a></li>
+        <li class="active"><a href="#">Home</a></li>
+        <li><a href="#">About</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
   <li class="dropdown">
@@ -44,11 +45,9 @@
 <div class="container-fluid text-center">    
   <div class="row content">
     <div class="col-sm-2 sidenav">
-		<g:each var="c" in="${grailsApplication.controllerClasses.sort { it.fullName } }">
-			<g:if test="${ c.getStaticPropertyValue('scaffold', Boolean)}">
-				<p><g:link controller="${c.logicalPropertyName}">${c.logicalPropertyName}</g:link></p>
-			</g:if>
-		</g:each>
+      <p><a href="#">Project</a></p>
+      <p><a href="#">Link</a></p>
+      <p><a href="#">Link</a></p>
     </div>
     <div class="col-sm-8 text-left">
     <g:layoutBody/>

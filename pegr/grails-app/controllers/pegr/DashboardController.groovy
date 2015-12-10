@@ -2,5 +2,10 @@ package pegr
 
 class DashboardController {
 
-    def index() { }
+	def springSecurityService
+	
+    def index() { 
+		def user = springSecurityService.currentUser
+		render view: "dashboard"
+	}
 }

@@ -1,7 +1,31 @@
-class BootStrap {
+import pegr.*
 
-    def init = { servletContext ->
-    }
-    def destroy = {
-    }
+class BootStrap {
+	def springSecurityService
+	
+		def init = { servletContext ->
+			createAdminUserIfRequired()
+		}
+			
+			
+		private createAdminUserIfRequired() {
+			println "Creating admin user"
+			if (!User.findByUsername("admin")) {
+				println "Fresh Database. Creating ADMIN user."
+	
+			def adminRole = new Role(authority: "ROLE_ADMIN").save(failOnError: true)
+			def adminUser = new User(
+						username: "admin",
+						password: springSecurityService.encodePassword("admin"),
+						enabled: true).save(failOnError: true)
+				UserRole.create adminUser, adminRole
+			}
+			else {
+				println "Existing admin user, skipping creation"
+			}
+		}
+		
+		def destroy = {
+		}
+
 }

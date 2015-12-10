@@ -125,14 +125,13 @@ grails.plugin.springsecurity.userLookup.userDomainClassName = 'pegr.User'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'pegr.UserRole'
 grails.plugin.springsecurity.authority.className = 'pegr.Role'
 grails.plugin.springsecurity.requestMap.className = 'pegr.Requestmap'
-grails.plugin.springsecurity.securityConfigType = 'Requestmap'
-grails.plugin.springsecurity.controllerAnnotations.staticRules = [
+grails.plugin.springsecurity.securityConfigType = 'InterceptUrlMap'
+grails.plugin.springsecurity.interceptUrlMap = [
 	'/':                ['permitAll'],
 	'/assets/**':       ['permitAll'],
 	'/**/js/**':        ['permitAll'],
 	'/**/css/**':       ['permitAll'],
 	'/**/images/**':    ['permitAll'],
-	'/**/favicon.ico':  ['permitAll'],
 	'/user/**': ['hasRole("ROLE_ADMIN")'],
 	'/role/**': ['hasRole("ROLE_ADMIN")'],
 	'/login/**': ['permitAll'],

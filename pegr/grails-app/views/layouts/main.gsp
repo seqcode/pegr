@@ -4,8 +4,9 @@
   <title>PEGR</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">  
-  <asset:stylesheet src="application.css"/>
   <asset:javascript src="application.js"/>
+  <asset:stylesheet href="application.css"/>
+
   <g:layoutHead/>
 </head>
 <body>
@@ -41,7 +42,9 @@
       <p><a href="#">Link</a></p>
       <p><a href="#">Link</a></p>
     </div>
+    <div class="col-sm-8 text-left">
     <g:layoutBody/>
+    </div>
     <div class="col-sm-2 sidenav">
       <div class="well">
         <p>ADS</p>

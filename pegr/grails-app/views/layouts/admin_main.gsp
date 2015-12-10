@@ -25,7 +25,7 @@
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
         <li class="active"><a href="#">Admin</a></li>
-        <li><a href="#">Site</a></li>
+        <li><g:link controller='dashboard' action='index'/>Site</g:link></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
   <li class="dropdown">
@@ -45,7 +45,7 @@
   <div class="row content">
     <div class="col-sm-2 sidenav">
 		<g:each var="c" in="${grailsApplication.controllerClasses.sort { it.fullName } }">
-			<g:if test="${ c.getStaticPropertyValue('scaffold', Boolean)}">
+			<g:if test="${ c.getStaticPropertyValue('showInAdmin', Boolean)}">
 				<p><g:link controller="${c.logicalPropertyName}">${c.logicalPropertyName}</g:link></p>
 			</g:if>
 		</g:each>

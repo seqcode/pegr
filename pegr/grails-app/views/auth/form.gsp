@@ -1,13 +1,9 @@
 <html>
 <head>
     <title>Sign into Pegr</title>
-    <
+    <meta name="layout" content="main"/>
 </head>
 <body>
-	<div class="container-fluid text-center">
-	  	<h1>Platform for Eukaryotic Gene Regulation</h1>
-	</div>
-
 	<div class="container-fluid" id="login">
 	<g:form uri="/j_spring_security_check" method="POST" role="form">
 		<div class="form-group">

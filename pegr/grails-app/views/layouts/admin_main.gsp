@@ -1,4 +1,4 @@
-<<g:applyLayout name="main">
+<g:applyLayout name="main">
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,7 +27,7 @@
 		    <span class="caret"></span></a>
 		    <ul class="dropdown-menu" style="min-width:100px">
 		      <li><a href="#"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
-		      <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+	      	  <li><g:remoteLink class="logout" controller="logout" method="post" asynchronous="false" onSuccess="location.reload()"><span class="glyphicon glyphicon-log-out"></span>Logout</g:remoteLink></li>
 		    </ul>
 		  </li>
       </ul>

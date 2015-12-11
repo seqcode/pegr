@@ -22,14 +22,14 @@
         <li><a href="#">About</a></li>
       </ul>
     <ul class="nav navbar-nav navbar-right">
-	<sec:ifAllGranted roles="ROLE_ADMIN"><li><a href="#">Admin</a></li></sec:ifAllGranted>
+	<sec:ifAllGranted roles="ROLE_ADMIN"><li><g:link controller="admin">Admin</g:link></li></sec:ifAllGranted>
 	  <li class="dropdown">
 	    <a class="dropdown-toggle"  data-toggle="dropdown">
 	    	<span class="glyphicon glyphicon-user"></span> User<span class="caret"></span>
 	    </a>
 	    <ul class="dropdown-menu" style="min-width:100px">
 	      <li><a href="#"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
-	      <li><form name="logout" method="POST" action="${createLink(controller:'logout')}" ><span class="glyphicon glyphicon-log-out"></span> <input type="submit" value="logout"></form></li>
+	      <li><g:remoteLink class="logout" controller="logout" method="post" asynchronous="false" onSuccess="location.reload()"><span class="glyphicon glyphicon-log-out"></span> Logout</g:remoteLink></li>
 	    </ul>
 	  </li>
       </ul>

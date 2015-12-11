@@ -9,7 +9,7 @@
   <g:layoutHead/>
 </head>
 <body>
-	<div>
+	<div class="text-center">
 		<h1>Platform for Eukaryotic Gene Regulation</h1>
 	</div>
 	<g:layoutBody/>

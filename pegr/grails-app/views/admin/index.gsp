@@ -2,7 +2,6 @@
 <html>
 	<head>
 		<meta name="layout" content="admin_main"/>
-		<title>Admin</title>
 	</head>
 	<body>
         <g:each in="${controllers}">

@@ -1,18 +1,11 @@
+<g:applyLayout name="main">
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>PEGR</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">  
-  <asset:javascript src="application.js"/>
-  <asset:stylesheet href="application.css"/>
-
+  <title>PEGR-Dashboard</title>
   <g:layoutHead/>
 </head>
 <body>
-<div class="container-fluid text-center">
-  	<h1>Platform for Eukaryotic Gene Regulation</h1>
-</div>
 <nav class="navbar navbar-inverse">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -64,10 +57,7 @@
     </div>
   </div>
 </div>
-
-<footer class="container-fluid text-center">
-  <p>Footer Text</p>
-</footer>
-
 </body>
 </html>
+</g:applyLayout>
+

@@ -10,6 +10,6 @@ class DashboardController {
 		// query the user's the projects
 
 		
-		render view: "dashboard"
+		render view: "index"
 	}
 }

@@ -33,3 +33,8 @@
       }
       .row.content {height:auto;} 
     }
+
+ #login {
+  max-width:330px; 
+  padding: 80px 10px;
+ }

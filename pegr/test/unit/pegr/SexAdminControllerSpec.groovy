@@ -6,8 +6,8 @@ import spock.lang.Specification
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
-@TestFor(SexController)
-class SexControllerSpec extends Specification {
+@TestFor(SexAdminController)
+class SexAdminControllerSpec extends Specification {
 
     def setup() {
     }

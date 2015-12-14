@@ -2,39 +2,75 @@
 	margin-top: 10px;
 }
 
-    /* Remove the navbar's default margin-bottom and rounded borders */ 
-    .navbar {
-      margin-bottom: 0;
-      border-radius: 0;
-    }
-    
-    /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
-    .row.content {height: 450px}
-    
-    /* Set gray background color and 100% height */
-    .sidenav {
-      padding-top: 20px;
-      background-color: #f1f1f1;
-      height: 100%;
-    }
-    
-    /* Set black background color, white text and some padding */
-    footer {
-      background-color: #555;
-      color: white;
-      padding: 15px;
-    }
-    
-    /* On small screens, set height to 'auto' for sidenav and grid */
-    @media screen and (max-width: 767px) {
-      .sidenav {
-        height: auto;
-        padding: 15px;
-      }
-      .row.content {height:auto;} 
-    }
+/* Remove the navbar's default margin-bottom and rounded borders */ 
+.navbar {
+  margin-bottom: 0;
+  border-radius: 0;
+  background-color: #2c5986;
+  z-index: +200;
+}
+
+.affix {
+  top: 0;
+  width: 100%;
+}
+
+.navbar a {
+  color: white;
+}
+
+.navbar .icon-bar {
+	background-color:white;
+}
+
+#myNavbar a:visited {
+  background-color: #2c5986;
+}
+
+#myNavbar a:hover {
+  background-color: #3f7fc0;
+}
+
+#myNavbar .active {
+  background-color: #3973ad;
+}
+
+/* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+.row.content {height: 450px}
+
+/* Set gray background color and 100% height */
+.sidenav {
+  padding-top: 20px;
+  background-color: #f1f1f1;
+  height: 100%;
+}
+
+/* Set black background color, white text and some padding */
+footer {
+  background-color: #dbdbdb;
+  color: white;
+  padding: 15px;
+}
+
+/* On small screens, set height to 'auto' for sidenav and grid */
+@media screen and (max-width: 767px) {
+  .sidenav {
+    height: auto;
+    padding: 15px;
+  }
+  .row.content {height:auto;} 
+}
 
  #login {
   max-width:330px; 
   padding: 80px 10px;
+ }
+ 
+ #search input {
+  	margin-top: 10px;
+  	border-radius: 0
+ }
+ 
+ #search button {
+ 	border-radius: 0;
  }

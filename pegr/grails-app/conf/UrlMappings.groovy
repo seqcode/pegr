@@ -14,7 +14,7 @@ class UrlMappings {
 		}
 		
         "/"{
-			controller = "dashboard"
+			controller = "projects"
 			action = "index"
 		}
 		

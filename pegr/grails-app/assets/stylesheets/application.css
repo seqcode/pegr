@@ -12,4 +12,5 @@
 *= require_self
 *= require bootstrap
 *= require pegr
+*= require diagrams
 */

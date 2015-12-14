@@ -1,6 +1,6 @@
 package pegr
 
-class DashboardController {
+class ProjectsController {
 
 	def springSecurityService
 	
@@ -11,5 +11,9 @@ class DashboardController {
 
 		
 		render view: "index"
+	}
+	
+	def show() {
+		render view: "show"
 	}
 }

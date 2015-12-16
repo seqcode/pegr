@@ -5,8 +5,8 @@ class Sample {
 		SUCCESS, PENDING, FAILED
 	}
 		
-	User user
-	Date prepareDate
+	User chipUser
+	Date chipDate
 	CellSource cellSource
 	Antibody antibody
 	Target target
@@ -22,18 +22,17 @@ class Sample {
 	Resin resin
 	String publicationReference
 	SampleQC sampleQC
-	CellSource spikeInSample
+	CellSource spikeInCellSource
 	String note
 	
 	static hasMany = [projects: Project]
 	static belongsTo = [Project]
-	
+
     static constraints = {
 		publicationReference nullable: true
-		spikeInSample nullable: true
+		spikeInCellSource nullable: true
 		concentration scale: 4
 		publicationReference nullable: true, maxSize: 30
-		spikeInSample nullable: true
 		note nullable: true, maxSize: 200
     }
 }

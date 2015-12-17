@@ -12,6 +12,9 @@ class CellSource {
 	String age
 	Tissue tissue
 	Histology histology
+	ProtocolInstance protocolInstance
+	BiologicalReplicateSet biologicalReplicateSet
+	int biologicalReplicateId
 	String note
 		
 	static hasMany = [treatments: Treatment]

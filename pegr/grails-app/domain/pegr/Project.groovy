@@ -4,7 +4,6 @@ class Project {
 
 	String name
 	String description
-	String note
 	Date dateCreated
 	Date lastUpdated
 	Funding funding
@@ -13,7 +12,7 @@ class Project {
 
     static constraints = {
 		name unique: true
-		description nullable: true, maxSize: 200
-		note nullable: true, maxSize: 200
+		description nullable: true, blank: true, maxSize: 1000
     }
+	
 }

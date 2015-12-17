@@ -4,9 +4,9 @@ class Strain {
 	String name
 	Genotype genotype
 	Strain parent
-	String geneticModifications
 	Lab sourceLab
 	
+	static hasMany = [geneticModifications: GeneticModification]
 	
     static constraints = {
     }

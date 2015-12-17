@@ -6,7 +6,7 @@ class ChromSequence {
 	int length
 	String sequence
 	
-    static constraints = {
-		sequence maxSize: 1000
-    }
+	static mapping = {
+		sequence type: 'text'
+	  }
 }

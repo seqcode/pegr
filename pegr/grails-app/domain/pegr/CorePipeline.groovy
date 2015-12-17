@@ -3,7 +3,7 @@ package pegr
 class CorePipeline {
 	
 	String name
-	String version
+	String corePipelineVersion
 	BaseCalling baseCalling
 	DataProcessing dataProcessing
 	PeakFinding peakFinding
@@ -11,8 +11,8 @@ class CorePipeline {
 	String note
 	
     static constraints = {
-		name maxSize: 30, unique: 'version'
-		version nullable: true, maxSize:10
+		name maxSize: 30, unique: 'corePipelineVersion'
+		corePipelineVersion nullable: true, maxSize:10
 		downstreamAnalysis nullable: true
 		note nullable: true, maxSize: 200
     }

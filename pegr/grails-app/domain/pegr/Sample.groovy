@@ -11,8 +11,8 @@ class Sample {
 	Antibody antibody
 	Target target
 	ProtocolInstance protocolInstance
-	int biologicalReplicate
-	int technicalReplicate
+	TechnicalReplicateSet technicalReplicateSet
+	int technicalReplicateId
 	double concentration // in ng/ul
 	int requestedTagNumber
 	int chromosomeAmount // in ug

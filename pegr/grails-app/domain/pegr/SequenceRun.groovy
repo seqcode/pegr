@@ -2,6 +2,7 @@ package pegr
 
 class SequenceRun {
 	
+	int runNum
 	String name
 	User sequencingTechnician
 	String fcId

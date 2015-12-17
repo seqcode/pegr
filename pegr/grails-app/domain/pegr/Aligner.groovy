@@ -5,7 +5,7 @@ class Aligner {
 	String alignerVersion
 	
     static constraints = {
-		software size: 2..30, unique: 'version'
+		software size: 2..30, unique: 'alignerVersion'
 		alignerVersion nullable: true, maxSize:10
     }
 }

@@ -1,11 +1,7 @@
 package pegr
 
-class Pool {
+class TechnicalReplicateSet {
 
-	Date timestamp
-	User user
-	
     static constraints = {
-		
     }
 }

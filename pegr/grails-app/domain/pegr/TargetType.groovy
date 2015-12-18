@@ -6,6 +6,6 @@ class TargetType {
 	
     static constraints = {
 		name unique: true, size: 2..30
-		description nullable: true, maxSize: 200
+		description nullable: true, blank: true
     }
 }

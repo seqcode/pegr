@@ -3,18 +3,19 @@ package pegr
 class SequenceAlignment {
 	SequencingExperiment sequencingExperiment
 	Genome genome
-	String alignId
 	int readDbId
 	Aligner aligner
+	AlignType alignType
+	String alignmentParams
 	int numberTags1
 	int numberTags2
-	int totalType1Weight
-	int totalType2Weight
+	double totalType1Weight
+	double totalType2Weight
 	int numberPairs
-	int totalPair
+	double totalPairWeight
 	String bamFilePath
 	String idxFilePath
-	CorePipeline corePipelineDescription
+	CorePipeline corePipeline
 	Date alignmentDate
 	boolean isPreferredVersion
 	

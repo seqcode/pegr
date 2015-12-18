@@ -1,18 +1,13 @@
 package pegr
 
 class SequencingExperiment {
+	String seqId
 	Sample sample
-	User contact
-	int sequencingReplicateId
-	int lane
 	SequenceRun sequenceRun
-	Pool pool
 	int numberReads
-	String fastqFilePath
-	String fastQCReportPath
+	String fastqFilePaths
+	String fastQCReportPaths
 	String publicDbId
-	Platform platform
-	SequenceIndex sequenceIndex
 	String note
 	ReadType readType
 	

@@ -8,6 +8,6 @@ class Chromosome {
 	
     static constraints = {
 		name size: 2..30
-		note nullable: true, maxSize: 200
+		note nullable: true, blank: true
     }
 }

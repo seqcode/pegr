@@ -12,6 +12,6 @@ class Target {
 		name unique: true, size: 2..30
 		nTermTag nullable: true
 		cTermTag nullable:true
-		note nullable: true, maxSize: 200
+		note nullable: true, blank: true
     }
 }

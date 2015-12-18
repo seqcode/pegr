@@ -6,6 +6,6 @@ class Pool {
 	User user
 	
     static constraints = {
-		
+		sequenceRun nullable: true
     }
 }

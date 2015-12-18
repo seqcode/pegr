@@ -5,21 +5,17 @@ class Sample {
 		SUCCESS, PENDING, FAILED
 	}
 		
-	User chipUser
-	Date chipDate
 	CellSource cellSource
 	Antibody antibody
 	Target target
 	ProtocolInstance protocolInstance
+	BiologicalReplicateSet biologicalReplicateSet
 	TechnicalReplicateSet technicalReplicateSet
-	int technicalReplicateId
 	double concentration // in ng/ul
 	int requestedTagNumber
 	int chromosomeAmount // in ug
 	int cellNumber // in M
 	int quantityReceived //ul per aliqu used for the assay
-	int pcrCycle
-	Resin resin
 	String publicationReference
 	SampleQC sampleQC
 	CellSource spikeInCellSource
@@ -33,6 +29,6 @@ class Sample {
 		spikeInCellSource nullable: true
 		concentration scale: 4
 		publicationReference nullable: true, maxSize: 30
-		note nullable: true, maxSize: 200
+		note nullable: true, blank: true
     }
 }

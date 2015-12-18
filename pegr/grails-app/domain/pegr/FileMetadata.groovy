@@ -4,8 +4,7 @@ class FileMetadata {
 	
 	String name
 	FileType fileType
-	Sample sample
-	DataProcessing dataProcessing
+	SequenceAlignment sequenceAlignment
 	int insertionSize
 	double standardDeviation
 	String md5CheckSum
@@ -14,6 +13,6 @@ class FileMetadata {
     static constraints = {
 		name maxSize: 30, unique:'fileType'
 		md5CheckSum maxSize: 50
-		note maxSize: 200, nullable: true
+		note nullable: true, blank: true
     }
 }

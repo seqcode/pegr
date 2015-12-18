@@ -5,7 +5,11 @@ class SampleInPool {
 	Sample sample
 	Pool pool
 	double volumeToPool
+	double qubitReading
+	double qubitDilutionFactor
+	double poolDilution
 	double concentration
+	SequenceIndex sequenceIndex
 	
     static constraints = {
     }

@@ -14,6 +14,6 @@ class CorePipeline {
 		name maxSize: 30, unique: 'corePipelineVersion'
 		corePipelineVersion nullable: true, maxSize:10
 		downstreamAnalysis nullable: true
-		note nullable: true, maxSize: 200
+		note nullable: true, blank: true
     }
 }

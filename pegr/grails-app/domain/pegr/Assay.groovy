@@ -9,6 +9,6 @@ class Assay {
     static constraints = {
 		name maxSize: 30, unique: true
 		code maxSize:10, unique: true
-		note maxSize: 200, nullable: true
+		note nullable: true, blank: true
     }
 }

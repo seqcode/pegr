@@ -27,6 +27,6 @@ class Antibody {
 		lotNumber nullable: true
 		encodeId nullable: true
 		inventoryId nullable: true
-		note nullable: true, maxSize: 200
+		note nullable: true, blank: true
     }
 }

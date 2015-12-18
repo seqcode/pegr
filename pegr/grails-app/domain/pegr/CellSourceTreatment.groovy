@@ -1,10 +1,10 @@
 package pegr
 
-class Treatment {
+class CellSourceTreatment {
 	String name
 	String compound
-	String unit
-	Date time
+	String quantity
+	String duration
 	
 	static hasMany = [cellSources: CellSource]
 	static belongsTo = CellSource
@@ -12,6 +12,7 @@ class Treatment {
     static constraints = {
     	name unique: true, size: 2..30
 		compound size: 2..30
-		unit size: 2..30
+		quantity maxSize: 20, nullable: true, blank: true
+		duration maxSize: 20, nullable: true, blank: true
 	}
 }

@@ -4,20 +4,15 @@ class CellSource {
 	
 	User providerUser
 	Lab providerLab
-	User chromatinUser
 	String biologicalSourceId
 	Strain strain
-	Date collectionDate
 	Sex sex
 	String age
 	Tissue tissue
 	Histology histology
-	ProtocolInstance protocolInstance
-	BiologicalReplicateSet biologicalReplicateSet
-	int biologicalReplicateId
 	String note
 		
-	static hasMany = [treatments: Treatment]
+	static hasMany = [cellSourceTreatments: CellSourceTreatment]
 	
     static constraints = {
 		biologicalSourceId maxSize: 50, nullable: true
@@ -25,7 +20,8 @@ class CellSource {
 		age nullable: true, maxSize: 30
 		tissue nullable: true
 		histology nullable: true
-		note nullable: true, maxSize: 200
-		
+		note nullable: true, blank: true
+		providerUser nullable: true
+		providerLab nullable: true
     }
 }

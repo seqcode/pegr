@@ -3,13 +3,16 @@ package pegr
 class ProtocolItem {
 
 	Protocol protocol
+	String type
 	String name
-	String field1
-	String field2
+	String quantity
+	String note
 	ProtocolItem parent
+	boolean isBarcoded
 	
     static constraints = {
-		field2 nullable: true, blank: true
+		quantity nullable: true, blank: true
+		note nullable: true, blank: true
 		parent nullable: true
     }
 }

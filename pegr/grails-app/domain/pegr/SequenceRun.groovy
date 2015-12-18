@@ -3,8 +3,9 @@ package pegr
 class SequenceRun {
 	
 	int runNum
-	String name
+	int lane
 	User sequencingTechnician
+	Platform platform
 	String fcId
 	Date sequencingDate
 	int read1Cycle
@@ -12,8 +13,10 @@ class SequenceRun {
 	int read2Cycle
 	String directoryName
 	String note
+	Pool pool
 	
     static constraints = {
+		note nullable: true, blank: true
     }
 	
 	static mapping = {

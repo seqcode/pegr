@@ -12,8 +12,6 @@ class SequencingExperiment {
 	ReadType readType
 	
     static constraints = {
-    	fastqFilePath url: true
-		fastQCReportPath url: true
-		note nullable: true
+		note nullable: true, blank: true
 	}
 }

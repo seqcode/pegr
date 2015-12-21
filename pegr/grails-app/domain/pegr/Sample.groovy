@@ -1,14 +1,11 @@
 package pegr
 
 class Sample {
-	enum SampleQC {
-		SUCCESS, PENDING, FAILED
-	}
 		
 	CellSource cellSource
 	Antibody antibody
 	Target target
-	ProtocolInstance protocolInstance
+	ProtocolGroup protocolGroup
 	BiologicalReplicateSet biologicalReplicateSet
 	TechnicalReplicateSet technicalReplicateSet
 	double concentration // in ng/ul
@@ -17,7 +14,7 @@ class Sample {
 	int cellNumber // in M
 	int quantityReceived //ul per aliqu used for the assay
 	String publicationReference
-	SampleQC sampleQC
+	SampleStatus status
 	CellSource spikeInCellSource
 	String note
 	

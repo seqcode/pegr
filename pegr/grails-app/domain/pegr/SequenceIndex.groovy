@@ -6,6 +6,10 @@ class SequenceIndex {
 	String sequence 
 	String oligo
 	
+	static hasMany = [samples: Sample]
+	
+	static belongsTo = [Sample]
+	
     static constraints = {    
 		indexVersion maxSize: 10
 		sequence maxSize: 30 

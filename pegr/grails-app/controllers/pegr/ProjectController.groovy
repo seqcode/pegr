@@ -1,6 +1,6 @@
 package pegr
 
-class ProjectsController {
+class ProjectController {
 
 	def springSecurityService
 	

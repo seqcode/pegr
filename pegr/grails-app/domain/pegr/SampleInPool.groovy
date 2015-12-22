@@ -9,7 +9,6 @@ class SampleInPool {
 	double qubitDilutionFactor
 	double poolDilution
 	double concentration
-	SequenceIndex sequenceIndex
 	
     static constraints = {
     }

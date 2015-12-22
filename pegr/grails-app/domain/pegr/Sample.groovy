@@ -18,7 +18,7 @@ class Sample {
 	CellSource spikeInCellSource
 	String note
 	
-	static hasMany = [projects: Project]
+	static hasMany = [projects: Project, sequenceIndices: SequenceIndex]
 	static belongsTo = [Project]
 
     static constraints = {

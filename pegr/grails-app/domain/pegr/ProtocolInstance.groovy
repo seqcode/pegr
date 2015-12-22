@@ -2,7 +2,6 @@ package pegr
 
 class ProtocolInstance {
 
-	Sample sample
 	Protocol protocol
 	User user
 	Date dateTime

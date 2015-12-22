@@ -7,6 +7,6 @@ class Definition {
 	
     static constraints = {
 		name unique: true
-		content maxSize: 2000 
+		content maxSize: 5000 
     }
 }

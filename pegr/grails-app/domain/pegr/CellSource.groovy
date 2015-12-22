@@ -15,9 +15,9 @@ class CellSource {
 	static hasMany = [cellSourceTreatments: CellSourceTreatment]
 	
     static constraints = {
-		biologicalSourceId maxSize: 50, nullable: true
+		biologicalSourceId maxSize: 50, nullable: true, blank: true
 		sex nullable: true
-		age nullable: true, maxSize: 30
+		age nullable: true, blank: true, maxSize: 30
 		tissue nullable: true
 		histology nullable: true
 		note nullable: true, blank: true

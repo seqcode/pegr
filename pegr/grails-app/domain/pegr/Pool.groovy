@@ -2,7 +2,7 @@ package pegr
 
 class Pool {
 
-	Date timestamp
+	Date dateTime
 	User user
 	
     static constraints = {

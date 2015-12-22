@@ -12,8 +12,9 @@ class Protocol {
 	
     static constraints = {
 		name unique: 'protocolVersion', size: 2..30
-		protocolVersion nullable: true, maxSize: 10
+		protocolVersion nullable: true, blank: false, maxSize: 10
 		description nullable: true, blank: true
+		details nullable: true, blank: true
 	}
 	
 	static mapping = {

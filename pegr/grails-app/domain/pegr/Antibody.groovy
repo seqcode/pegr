@@ -23,10 +23,13 @@ class Antibody {
     static constraints = {
 		name maxSize: 30, unique: true
 		company nullable: true
-		catalogNumber nullable: true
-		lotNumber nullable: true
-		encodeId nullable: true
-		inventoryId nullable: true
+		catalogNumber nullable: true, blank: true
+		lotNumber nullable: true, blank: true
+		clonal nullable: true
+		igType nullable: true
+		immunogene nullable: true, blank: true
+		encodeId nullable: true, blank: true
+		inventoryId nullable: true, blank: true
 		note nullable: true, blank: true
     }
 }

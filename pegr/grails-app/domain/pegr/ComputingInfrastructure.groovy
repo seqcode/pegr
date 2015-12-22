@@ -1,6 +1,6 @@
 package pegr
 
-class Cluster {
+class ComputingInfrastructure {
 
 	String name
 	

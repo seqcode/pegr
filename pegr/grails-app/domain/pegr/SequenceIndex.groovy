@@ -7,10 +7,10 @@ class SequenceIndex {
 	String oligo
 	
     static constraints = {    
-		indexVersion maxSize: 2
+		indexVersion maxSize: 10
 		sequence maxSize: 30 
 		indexId unique: 'indexVersion'
-		oligo maxSize: 200
+		oligo nullable: true, blank: true
 	}
 	
 	

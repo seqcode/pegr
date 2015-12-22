@@ -22,10 +22,15 @@ class Sample {
 	static belongsTo = [Project]
 
     static constraints = {
-		publicationReference nullable: true
+		cellSource nullable: true
+		antibody nullable: true
+		target nullable: true
+		protocolGroup nullable: true
+		biologicalReplicateSet nullable: true
+		technicalReplicateSet nullable: true
 		spikeInCellSource nullable: true
 		concentration scale: 4
-		publicationReference nullable: true, maxSize: 30
+		publicationReference nullable: true, blank: true, maxSize: 30
 		note nullable: true, blank: true
     }
 }

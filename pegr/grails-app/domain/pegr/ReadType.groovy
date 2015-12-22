@@ -8,6 +8,6 @@ class ReadType {
     static constraints = {
     	name size: 2..20, unique: true
 		shortName size: 2..10, unique: true
-		note nullable: true, black: true
+		note nullable: true, blank: true
 	}
 }

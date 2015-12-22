@@ -10,7 +10,7 @@ class Address {
 	
     static constraints = {
 		line1 maxSize:100
-		line2 nullable: true
+		line2 nullable: true, blank: true
 		city maxSize: 30
 		state maxSize: 20
 		country size: 2..20

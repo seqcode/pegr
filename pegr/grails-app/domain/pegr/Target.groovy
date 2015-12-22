@@ -10,8 +10,8 @@ class Target {
 
     static constraints = {
 		name unique: true, size: 2..30
-		nTermTag nullable: true
-		cTermTag nullable:true
+		nTermTag nullable: true, blank: true
+		cTermTag nullable:true, blank: true
 		note nullable: true, blank: true
     }
 }

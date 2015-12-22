@@ -7,6 +7,6 @@ class Histology {
 	
     static constraints = {
 		parent nullable: true
-		name size: 2..30
+		name size: 2..30, unique: true
     }
 }

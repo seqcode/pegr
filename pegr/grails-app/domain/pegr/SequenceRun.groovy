@@ -3,11 +3,11 @@ package pegr
 class SequenceRun {
 	
 	int runNum
-	int lane
-	User sequencingTechnician
+	int lane	
 	Platform platform
 	String fcId
-	Date sequencingDate
+	User user
+	Date dateTime
 	int read1Cycle
 	int indexCycle
 	int read2Cycle
@@ -17,6 +17,8 @@ class SequenceRun {
 	
     static constraints = {
 		note nullable: true, blank: true
+		fcId nullable: true, blank: true
+		directoryName nullable: true, blank: true
     }
 	
 	static mapping = {

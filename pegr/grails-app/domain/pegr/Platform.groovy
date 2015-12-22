@@ -5,6 +5,6 @@ class Platform {
 	String name
 	
     static constraints = {
-    	name unique: true
+    	name unique: true, maxSize: 30
 	}
 }

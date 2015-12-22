@@ -11,7 +11,10 @@ class Strain {
 	static hasMany = [geneticModifications: GeneticModification]
 	
     static constraints = {
-		note nullable: true, blank: true
+		name unique: true
+		parent nullable: true
+		sourceLab nullable: true
 		tag nullable: true, blank: true
+		note nullable: true, blank: true
     }
 }

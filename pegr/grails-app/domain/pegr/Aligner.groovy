@@ -6,6 +6,6 @@ class Aligner {
 	
     static constraints = {
 		software size: 2..30, unique: 'alignerVersion'
-		alignerVersion nullable: true, maxSize:10
+		alignerVersion nullable: true, blank: false, maxSize:10
     }
 }

@@ -13,6 +13,7 @@ class Project {
     static constraints = {
 		name unique: true
 		description nullable: true, blank: true, maxSize: 1000
+		funding nullable: true
     }
 	
 }

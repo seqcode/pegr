@@ -13,5 +13,6 @@ class SequencingExperiment {
 	
     static constraints = {
 		note nullable: true, blank: true
+		publicDbId nullable: true, blank: true
 	}
 }

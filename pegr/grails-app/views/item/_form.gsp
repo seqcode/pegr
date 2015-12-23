@@ -15,7 +15,7 @@
 		
 	</label>
 	<g:textField id="barcode" name="barcode" value="${itemInstance?.barcode}"/>
-	<input style="width:100px;height:100px" type=button value="Scan" onclick="getScan();">
+	<input type=button value="Scan" onclick="getScan();">
 </div>
 
 <div class="fieldcontain ${hasErrors(bean: itemInstance, field: 'imagePath', 'error')} ">

@@ -1,11 +1,30 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta name="layout" content="admin_main">
+
 		<g:set var="entityName" value="${message(code: 'item.label', default: 'Item')}" />
 		<title><g:message code="default.create.label" args="[entityName]" /></title>
 		<script type="text/javascript" >
-			var changingHash=false;
+		function getScan(){
+		    var href=window.location.href;
+		    var ptr=href.lastIndexOf("#");
+		    if(ptr>0){
+		        href=href.substr(0,ptr);
+		    }
+		    window.location.href="zxing://scan/?ret="+escape(href+"#{CODE}");
+		}
+		
+		var changingHash=false;
+		function getHash(){
+		    if(!changingHash){
+		        changingHash=true;
+		        var hash=window.location.hash.substr(1);
+		        document.getElementById('barcode').value=unescape(hash);
+		        changingHash=false;
+		    }else{
+		        //Do something with barcode here
+		    }
+		}
 		</script>
 	</head>
 	<body onhashchange="getHash()">

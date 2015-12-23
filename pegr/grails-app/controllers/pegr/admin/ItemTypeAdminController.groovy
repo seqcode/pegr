@@ -1,4 +1,5 @@
-package pegr
+package pegr.admin
+import pegr.ItemType
 
 class ItemTypeAdminController {
 

@@ -1,4 +1,4 @@
-package pegr
+package pegr.admin
 
 class AdminController {
 

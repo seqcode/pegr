@@ -34,14 +34,10 @@ class ${className}Controller {
         }
 
         ${propertyName}.save flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])
-                redirect ${propertyName}
-            }
-            '*' { respond ${propertyName}, [status: CREATED] }
-        }
+		
+		flash.message = message(code: 'default.created.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])
+		redirect(controller: '${className}Admin', action: 'index') 
+		
     }
 
     def edit(${className} ${propertyName}) {
@@ -81,13 +77,8 @@ class ${className}Controller {
 
         ${propertyName}.delete flush:true
 
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: '${className}.label', default: '${className}'), ${propertyName}.id])
-                redirect action:"index", method:"GET"
-            }
-            '*'{ render status: NO_CONTENT }
-        }
+		flash.message = message(code: 'default.deleted.message', args: [message(code: '${className}.label', default: '${className}'), ${propertyName}.id])
+		redirect(controller: '${className}Admin', action: 'index')
     }
 
     protected void notFound() {

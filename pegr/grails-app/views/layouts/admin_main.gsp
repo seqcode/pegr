@@ -9,12 +9,7 @@
 
 <div class="container-fluid text-center">    
   <div class="row content">
-    <div class="col-sm-2 sidenav">
-        <g:each in="${controllers}">
-            <li><g:link controller="${it.key}">${it.value}</g:link></li>
-        </g:each>		
-    </div>
-    <div class="col-sm-8 text-left">
+    <div class="col-sm-10 text-left">
     <g:layoutBody/>
     </div>
     <div class="col-sm-2 sidenav">

@@ -12,7 +12,7 @@
 	<div class="text-center">
 		<h1>Platform for Eukaryotic Gene Regulation</h1>
 	</div>
-	<nav class="navbar" data-spy="affix" data-offset-top="400" id="affix-nav">
+	<nav class="navbar">
 	  <div class="container-fluid">
 	    <div class="navbar-header">
 	      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
@@ -52,9 +52,5 @@
 	  <p>Contact</p>
 	</footer>	
 	
-	<script>
-		$('#affix-nav').affix({
-			});
-	</script>
 </body>
 </html>

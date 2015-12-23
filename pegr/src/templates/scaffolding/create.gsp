@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta name="layout" content="admin_main">
+		<meta name="layout" content="main">
 		<g:set var="entityName" value="\${message(code: '${domainClass.propertyName}.label', default: '${className}')}" />
 		<title><g:message code="default.create.label" args="[entityName]" /></title>
 	</head>
 	<body>
-		<p>
-			<g:link class="list btn btn-primary" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link>
-		</p>
+		<ul class="nav nav-pills">
+			<li><a class="home" href="\${createLink(uri: '/admin/')}"><g:message code="default.home.label"/></a></li>
+			<li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
+		</ul>
 		<div id="create-${domainClass.propertyName}" class="content scaffold-create" role="main">
 			<h1><g:message code="default.create.label" args="[entityName]" /></h1>
 			<g:if test="\${flash.message}">
@@ -21,7 +22,7 @@
 				</g:eachError>
 			</ul>
 			</g:hasErrors>
-			<g:form url="[resource:${propertyName}, action:'save']" <%= multiPart ? ' enctype="multipart/form-data"' : '' %>>
+			<g:form action='save' <%= multiPart ? ' enctype="multipart/form-data"' : '' %>>
 				<fieldset class="form">
 					<g:render template="form"/>
 				</fieldset>

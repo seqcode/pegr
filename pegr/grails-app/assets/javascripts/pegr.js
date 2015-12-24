@@ -12,8 +12,7 @@ function getHash(){
     if(!changingHash){
         changingHash=true;
         var hash=window.location.hash.substr(1);
-        document.getElementById('barcode').value=unescape(hash);
-        window.location.hash="";   
+        document.getElementById('barcode').value=unescape(hash);  
         changingHash=false;
     }else{
         //Do something with barcode here

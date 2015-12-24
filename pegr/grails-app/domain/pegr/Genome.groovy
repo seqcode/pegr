@@ -6,8 +6,12 @@ class Genome {
 	Species species
 	String genomeBuild
 	
+	String toString() {
+		name + "-" + genomeBuild
+	}
+	
     static constraints = {
-		name size: 2..30, unqiue: true
+		name size: 2..30, unqiue: 'genomeBuild'
 		genomeBuild size: 2..30
     }
 }

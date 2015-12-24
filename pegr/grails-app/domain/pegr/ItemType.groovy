@@ -6,6 +6,10 @@ class ItemType {
 	String objectType
 	String fields
 	
+	String toString() {
+		name
+	}
+	
     static constraints = {
 		name maxSize: 30, unique: true
 		objectType nullable: true, blank: true, maxSize: 30

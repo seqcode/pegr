@@ -7,6 +7,10 @@ class Organization {
 	String note
 	String website
 	
+	String toString() {
+		name
+	}
+	
     static constraints = {
 		parent nullable: true
 		name unique: true, maxSize: 50

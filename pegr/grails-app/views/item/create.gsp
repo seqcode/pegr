@@ -1,30 +1,11 @@
 <!DOCTYPE html>
 <html>
 	<head>
-
+		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: 'item.label', default: 'Item')}" />
 		<title><g:message code="default.create.label" args="[entityName]" /></title>
 		<script type="text/javascript" >
-		function getScan(){
-		    var href=window.location.href;
-		    var ptr=href.lastIndexOf("#");
-		    if(ptr>0){
-		        href=href.substr(0,ptr);
-		    }
-		    window.location.href="zxing://scan/?ret="+escape(href+"#{CODE}");
-		}
-		
-		var changingHash=false;
-		function getHash(){
-		    if(!changingHash){
-		        changingHash=true;
-		        var hash=window.location.hash.substr(1);
-		        document.getElementById('barcode').value=unescape(hash);
-		        changingHash=false;
-		    }else{
-		        //Do something with barcode here
-		    }
-		}
+			var changingHash=false;
 		</script>
 	</head>
 	<body onhashchange="getHash()">
@@ -33,7 +14,7 @@
 			<li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
 		</ul>
 		<div id="create-item" class="content scaffold-create" role="main">
-			<h1><g:message code="default.create.label" args="[entityName]" /></h1>
+			<h3><g:message code="default.create.label" args="[entityName]" /></h3>
 			<g:if test="${flash.message}">
 			<div class="message" role="status">${flash.message}</div>
 			</g:if>

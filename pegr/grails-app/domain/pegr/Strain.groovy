@@ -8,6 +8,10 @@ class Strain {
 	Lab sourceLab
 	String note
 	
+	String toString() {
+		name
+	}
+	
 	static hasMany = [geneticModifications: GeneticModification]
 	
     static constraints = {

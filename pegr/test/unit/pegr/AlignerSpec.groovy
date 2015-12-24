@@ -8,13 +8,17 @@ import spock.lang.Specification
  */
 @TestFor(Aligner)
 class AlignerSpec extends Specification {
+	def "Get the string given an aligner instance" () {
+		given: "an alinger instance with software and alignerVersion"
+		Aligner aligner = new Aligner(
+			software: "AlignerSoftware",
+			alignerVersion: "1.0.0")
+		
+		when: "toString is invoked"
+		def s = aligner.toString()
+		
+		then: "the returned string is correct"
+		s == "AlignerSoftware1.0.0"
+	}
 
-    def setup() {
-    }
-
-    def cleanup() {
-    }
-
-    void "test something"() {
-    }
 }

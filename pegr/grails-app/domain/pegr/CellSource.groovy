@@ -11,7 +11,12 @@ class CellSource {
 	Tissue tissue
 	Histology histology
 	String note
-		
+	Item item	
+	
+	String toString() {
+		strain + item.barcode
+	}
+	
 	static hasMany = [cellSourceTreatments: CellSourceTreatment]
 	
     static constraints = {

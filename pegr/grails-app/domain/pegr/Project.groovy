@@ -6,14 +6,14 @@ class Project {
 	String description
 	Date dateCreated
 	Date lastUpdated
-	Funding funding
+	String funding
 
 	static hasMany = [samples: Sample, projectUsers: ProjectUser]
 
     static constraints = {
 		name unique: true
 		description nullable: true, blank: true, maxSize: 1000
-		funding nullable: true
+		funding nullable: true, blank: true, maxSize:50
     }
 	
 }

@@ -6,6 +6,17 @@ class CellSourceTreatment {
 	String quantity
 	String duration
 	
+	String toString() {
+		String s = name + " " + compound
+		if (quantity) {
+			 s += " " + quantity 
+		}
+		if (duration) {
+			 s += " " + duration
+		}
+		return s
+	}
+	
 	static hasMany = [cellSources: CellSource]
 	static belongsTo = CellSource
 	

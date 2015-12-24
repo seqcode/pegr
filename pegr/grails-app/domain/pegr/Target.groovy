@@ -8,6 +8,10 @@ class Target {
 	String note
 	TargetType targetType
 
+	String toString() {
+		name
+	}
+	
     static constraints = {
 		name unique: true, size: 2..30
 		nTermTag nullable: true, blank: true

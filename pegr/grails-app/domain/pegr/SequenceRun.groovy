@@ -4,7 +4,7 @@ class SequenceRun {
 	
 	int runNum
 	int lane	
-	Platform platform
+	SequencingPlatform platform
 	String fcId
 	User user
 	Date dateTime

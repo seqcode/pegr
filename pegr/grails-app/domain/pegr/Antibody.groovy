@@ -20,6 +20,13 @@ class Antibody {
 	String inventoryId
 	String note
 	
+	String toString() {
+		String s = name
+		if(inventoryId)
+			s += inventoryId
+		return s
+	}
+	
     static constraints = {
 		name maxSize: 30, unique: true
 		company nullable: true

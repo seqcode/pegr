@@ -5,6 +5,10 @@ class Species {
 	String genusName
 	String note
 	
+	String toString() {
+		name
+	}
+	
     static constraints = {
 		name unique: true, maxSize: 50
 		genusName maxSize: 50 

@@ -7,7 +7,7 @@ class AdminController {
 	    grailsApplication.controllerClasses.each{ controller ->
 	        def name = controller.name
 	        if(name.endsWith('Admin') && name != 'Admin') {
-	            controllers[controller.logicalPropertyName] = controller.naturalName.replace('Admin Controller', 'Manager')
+	            controllers[controller.logicalPropertyName] = controller.naturalName.replace('Admin Controller', '')
             }
         }
         [controllers: controllers.sort()]

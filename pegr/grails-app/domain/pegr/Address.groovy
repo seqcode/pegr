@@ -8,6 +8,10 @@ class Address {
 	String country
 	String postalCode
 	
+	String toString() {
+		line1
+	}
+	
     static constraints = {
 		line1 maxSize:100
 		line2 nullable: true, blank: true

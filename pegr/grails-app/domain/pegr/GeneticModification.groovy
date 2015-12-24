@@ -4,6 +4,10 @@ class GeneticModification {
 
 	String name
 	
+	String toString() {
+		name
+	}
+	
 	static hasMany = [strains: Strain]
 	static belongsTo = [Strain]
 	

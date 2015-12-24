@@ -6,6 +6,10 @@ class Protocol {
 	String description
 	String details
 	
+	String toString() {
+		name + protocolVersion
+	}
+	
 	static hasMany = [protocolGroups: ProtocolGroup]	
 	
 	static belongsTo = [ProtocolGroup]

@@ -17,7 +17,8 @@
 			<g:if test="\${flash.message}">
 				<div class="message" role="status">\${flash.message}</div>
 			</g:if>
-			<table>
+			<div class="table-responsive">
+			<table class="table">
 			<thead>
 					<tr>
 					<%  excludedProps = Event.allEvents.toList() << 'id' << 'version'
@@ -51,6 +52,7 @@
 				</g:each>
 				</tbody>
 			</table>
+			</div>
 			<div class="pagination">
 				<g:paginate total="\${${propertyName}Count ?: 0}" />
 			</div>

@@ -17,24 +17,24 @@ environments {
     development {
         dataSource {
             dbCreate = "update" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:mysql://localhost/pegr"
-			username="root"
-			password="admin"
+            url = ""
+			username=""
+			password=""
         }
     }
     test {
         dataSource {
             dbCreate = "update"
-            url = "jdbc:mysql://localhost/pegr_test"
-			username="root"
-			password="admin"
+            url = ""
+			username=""
+			password=""
         }
     }
     production {
         dataSource {
             dbCreate = "update"
 			// use JNDI datasource with Tomcat
-            jndiName="java:comp/env/exampleDatasource"
+            jndiName="java:comp/env/pegrDatasource"
         }
     }
 }

@@ -2,7 +2,7 @@ package pegr
 
 class SequenceIndex {
 	String indexVersion
-	int indexId
+	Integer indexId
 	String sequence 
 	String oligo
 	

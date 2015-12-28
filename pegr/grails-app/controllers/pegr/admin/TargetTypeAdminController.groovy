@@ -1,9 +1,9 @@
 package pegr.admin
 import pegr.AdminCategory;
-import pegr.Target
+import pegr.TargetType
 
 class TargetTypeAdminController {
 
-    static scaffold = Target
+    static scaffold = TargetType
 	public static AdminCategory category = AdminCategory.BIO_MATERIAL
 }

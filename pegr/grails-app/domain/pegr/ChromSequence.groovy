@@ -3,7 +3,7 @@ package pegr
 class ChromSequence {
 
 	Chromosome chromosome
-	int length
+	Integer length
 	String sequence
 	
 	static mapping = {

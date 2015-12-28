@@ -129,20 +129,19 @@ grails.plugin.springsecurity.authority.className = 'pegr.Role'
 grails.plugin.springsecurity.requestMap.className = 'pegr.Requestmap'
 grails.plugin.springsecurity.securityConfigType = 'InterceptUrlMap'
 grails.plugin.springsecurity.interceptUrlMap = [
-	'/':                ['permitAll'],
 	'/assets/**':       ['permitAll'],
 	'/**/js/**':        ['permitAll'],
 	'/**/css/**':       ['permitAll'],
 	'/**/images/**':    ['permitAll'],
+    '/user/register': ['permitAll'],
+    '/login/**': ['permitAll'],
+	'/logout/**': ['permitAll'],
 	'/admin/**': ['hasRole("ROLE_ADMIN")'],
 	'/*Admin/**': ['hasRole("ROLE_ADMIN")'],
-	'/user/**': ['hasRole("ROLE_ADMIN")'],
-	'/role/**': ['hasRole("ROLE_ADMIN")'],
-	'/login/**': ['permitAll'],
-	'/logout/**': ['permitAll'],
 	'/**': ['isAuthenticated()'] // everything else requires authenticated user
 ]
 grails.plugin.springsecurity.auth.loginFormUrl = "/login/form"
+grails.plugin.springsecurity.logout.afterLogoutUrl = "/login/form"
 grails.plugin.springsecurity.failureHandler.defaultFailureUrl = "/login/form"
-grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/dashboard"
+grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
 

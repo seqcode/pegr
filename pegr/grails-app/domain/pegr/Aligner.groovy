@@ -5,7 +5,7 @@ class Aligner {
 	String alignerVersion
 	
 	String toString() {
-		software + alignerVersion
+		software + " " + alignerVersion
 	}
 	
     static constraints = {

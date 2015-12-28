@@ -2,10 +2,14 @@ package pegr
 
 class Pool {
 
-	Date dateTime
+	Date dateCreated
 	User user
 	
     static constraints = {
 
+    }
+    
+    static mapping = {
+        sort dateCreated:"desc"
     }
 }

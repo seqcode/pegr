@@ -1,13 +1,13 @@
 <html>
 <head>
     <title>Sign into Pegr</title>
-    <meta name="layout" content="main"/>
+    <meta name="layout" content="base"/>
 </head>
 <body>
-	<div class="container-fluid" id="login">
+	<div class="container-fluid" id="login-form">
 	<g:form uri="/j_spring_security_check" method="POST" role="form">
 		<div class="form-group">
-			<label class="for="j_username">Username </label> 
+			<label for="j_username">Username </label> 
 			<g:textField class="form-control" name="j_username" value="${username}" placeholder="Enter Username"/>
 		</div>
 		<div class="form-group">

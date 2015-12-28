@@ -4,7 +4,7 @@ class SequencingExperiment {
 	String seqId
 	Sample sample
 	SequenceRun sequenceRun
-	int numberReads
+	Integer numberReads
 	String fastqFilePaths
 	String fastQCReportPaths
 	String publicDbId

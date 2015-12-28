@@ -4,7 +4,8 @@ class ProtocolGroup {
 
 	String name
 	List protocols
-	
+	Date dateCreated
+    
 	String toString() {
 		name
 	}
@@ -14,4 +15,8 @@ class ProtocolGroup {
     static constraints = {
     	name maxSize: 30, unique: true
 	}
+    
+    static mapping = {
+        sort dateCreated:"desc"
+    }
 }

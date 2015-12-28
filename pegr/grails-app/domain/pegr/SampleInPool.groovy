@@ -4,11 +4,11 @@ class SampleInPool {
 
 	Sample sample
 	Pool pool
-	double volumeToPool
-	double qubitReading
-	double qubitDilutionFactor
-	double poolDilution
-	double concentration
+	Float volumeToPool
+	Float qubitReading
+	Float qubitDilutionFactor
+	Float poolDilution
+	Float concentration
 	
     static constraints = {
     }

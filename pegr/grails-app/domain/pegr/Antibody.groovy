@@ -15,16 +15,13 @@ class Antibody {
 	AbHost abHost
 	IgType igType
 	String immunogene
-	double concentration
+	Float concentration
 	String encodeId
 	String inventoryId
 	String note
 	
 	String toString() {
-		String s = name
-		if(inventoryId)
-			s += inventoryId
-		return s
+		name
 	}
 	
     static constraints = {

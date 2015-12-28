@@ -5,8 +5,8 @@ class FileMetadata {
 	String name
 	FileType fileType
 	SequenceAlignment sequenceAlignment
-	int insertionSize
-	double standardDeviation
+	Integer insertionSize
+	Float standardDeviation
 	String md5CheckSum
 	String note
 	

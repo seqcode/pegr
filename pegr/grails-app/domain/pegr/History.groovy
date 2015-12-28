@@ -3,9 +3,9 @@ package pegr
 class History {
 
 	User user
-	Date timestamp
+	Date dateCreated
 	Project project
-	int objectId
+	Integer objectId
 	String objectType
 	String action
 	String log

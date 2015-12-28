@@ -22,10 +22,9 @@
     </div>
   </div>
 </div>
-
-</body>
-</html>
-</g:applyLayout>
  <script>
 	$("#nav-admin").addClass("active");
  </script>
+</body>
+</html>
+</g:applyLayout>

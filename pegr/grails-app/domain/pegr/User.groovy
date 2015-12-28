@@ -14,7 +14,7 @@ class User implements Serializable {
 	Lab lab
 	Address address
 	
-	static hasMany = [projectUsers: ProjectUser]
+	static hasMany = [userProjects: ProjectUser]
 	
 	boolean enabled = true
 	boolean accountExpired

@@ -8,13 +8,14 @@ class Sample {
 	ProtocolGroup protocolGroup
 	BiologicalReplicateSet biologicalReplicateSet
 	TechnicalReplicateSet technicalReplicateSet
-	double concentration // in ng/ul
-	int requestedTagNumber
-	int chromosomeAmount // in ug
-	int cellNumber // in M
-	int quantityReceived //ul per aliqu used for the assay
+	Float concentration // in ng/ul
+	Integer requestedTagNumber
+	Integer chromosomeAmount // in ug
+	Integer cellNumber // in M
+	Integer quantityReceived //ul per aliqu used for the assay
 	String publicationReference
 	SampleStatus status
+    Date lastUpdated
 	CellSource spikeInCellSource
 	String note
 	
@@ -32,5 +33,9 @@ class Sample {
 		concentration scale: 4
 		publicationReference nullable: true, blank: true, maxSize: 30
 		note nullable: true, blank: true
+    }
+    
+    static mapping = {
+        sort lastUpdated:"desc"
     }
 }

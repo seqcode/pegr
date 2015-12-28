@@ -4,7 +4,7 @@ class ProtocolInstance {
 
 	Protocol protocol
 	User user
-	Date dateTime
+	Date dateCreated
 	String note
 	ProtocolInstance prior
 		

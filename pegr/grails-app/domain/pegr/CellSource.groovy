@@ -10,11 +10,10 @@ class CellSource {
 	String age
 	Tissue tissue
 	Histology histology
-	String note
-	Item item	
+	String note	
 	
 	String toString() {
-		strain + item.barcode
+		strain
 	}
 	
 	static hasMany = [cellSourceTreatments: CellSourceTreatment]

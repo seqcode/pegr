@@ -12,4 +12,5 @@ class Definition {
 		name unique: true
 		content maxSize: 5000 
     }
+
 }

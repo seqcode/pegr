@@ -3,23 +3,24 @@ package pegr
 class SequenceAlignment {
 	SequencingExperiment sequencingExperiment
 	Genome genome
-	int readDbId
+	Integer readDbId
 	Aligner aligner
 	AlignType alignType
 	String alignmentParams
-	int numberTags1
-	int numberTags2
-	double totalType1Weight
-	double totalType2Weight
-	int numberPairs
-	double totalPairWeight
+	Integer numberTags1
+	Integer numberTags2
+	Float totalType1Weight
+	Float totalType2Weight
+	Integer numberPairs
+	Float totalPairWeight
 	String bamFilePath
 	String idxFilePath
 	CorePipeline corePipeline
-	Date alignmentDate
+	Date dateCreated
 	boolean isPreferredVersion
 	
     static constraints = {
+		readDbId nullable: true
 		bamFilePath url: true
 		idxFilePath url: true
     }

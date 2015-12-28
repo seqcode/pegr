@@ -1,17 +1,10 @@
+<g:applyLayout name="base">
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title><g:layoutTitle default="PEGR"/></title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">  
-  <asset:javascript src="application.js"/>
-  <asset:stylesheet href="application.css"/>
   <g:layoutHead/>
 </head>
-<body  onhashchange="${pageProperty(name:'body.onhashchange')}">
-	<div class="text-center visible-xs-block, hidden-xs">
-		<h1>Platform for Eukaryotic Gene Regulation</h1>
-	</div>
+<body  onhashchange="${pageProperty(name:'body.onhashchange')}">	
 	<nav class="navbar">
 	  <div class="container-fluid">
 	    <div class="navbar-header">
@@ -24,16 +17,16 @@
 	    </div>
 	    <div class="collapse navbar-collapse" id="myNavbar">
 	      <ul class="nav navbar-nav">
+	        <li id="nav-projects"><g:link controller="project">My Projects</g:link></li>
 	        <li id="nav-metadata"><g:link controller="sample">Metadata</g:link></li>
 	        <li id="nav-analysis"><a href="#">Analysis</a></li>
- 	        <li id="nav-projects"><g:link controller="project">My Projects</g:link></li>
 	       	<sec:ifAllGranted roles="ROLE_ADMIN"><li id="nav-admin"><g:link controller="admin">Admin</g:link></li></sec:ifAllGranted>
 	      </ul>
 	    <ul class="nav navbar-nav navbar-right">
 		  <li><a href="#"><span class="glyphicon glyphicon-envelope"></span> Message</a></li>
 		  <li class="dropdown">
 		    <a class="dropdown-toggle"  data-toggle="dropdown">
-		    	<span class="glyphicon glyphicon-user"></span> User<span class="caret"></span>
+		    	<span class="glyphicon glyphicon-user"></span>${sec.username()}<span class="caret"></span>
 		    </a>
 		    <ul class="dropdown-menu" style="min-width:100px">
 		      <li><a href="#"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
@@ -44,13 +37,9 @@
 	    </div>
 	  </div>
 	</nav>
-
-	<div class="container-fluid text-left">
+	<div class="container-fluid text-left" id="main-content">
 	<g:layoutBody/>
-	</div>
-	<footer class="container-fluid text-center">
-	  <p>Contact</p>
-	</footer>	
-	
+	</div>	
 </body>
 </html>
+</g:applyLayout>

@@ -2,15 +2,15 @@ package pegr
 
 class SequenceRun {
 	
-	int runNum
-	int lane	
+	Integer runNum
+	Integer lane	
 	SequencingPlatform platform
 	String fcId
 	User user
-	Date dateTime
-	int read1Cycle
-	int indexCycle
-	int read2Cycle
+	Date dateCreated
+	Integer read1Cycle
+	Integer indexCycle
+	Integer read2Cycle
 	String directoryName
 	String note
 	Pool pool

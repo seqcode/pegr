@@ -1,14 +1,5 @@
 <%@ page import="pegr.Item" %>
 
-<div class="fieldcontain ${hasErrors(bean: itemInstance, field: 'location', 'error')} ">
-	<label for="location">
-		<g:message code="item.location.label" default="Location" />
-		
-	</label>
-	<g:textField name="location" value="${itemInstance?.location}"/>
-
-</div>
-
 <div class="fieldcontain ${hasErrors(bean: itemInstance, field: 'barcode', 'error')} ">
 	<label for="barcode">
 		<g:message code="item.barcode.label" default="Barcode" />
@@ -16,6 +7,15 @@
 	</label>
 	<g:textField id="barcode" name="barcode" value="${itemInstance?.barcode}"/>
 	<input type=button value="Scan" onclick="getScan();">
+</div>
+
+<div class="fieldcontain ${hasErrors(bean: itemInstance, field: 'location', 'error')} ">
+	<label for="location">
+		<g:message code="item.location.label" default="Location" />
+		
+	</label>
+	<g:textField name="location" value="${itemInstance?.location}"/>
+
 </div>
 
 <div class="fieldcontain ${hasErrors(bean: itemInstance, field: 'imagePath', 'error')} ">

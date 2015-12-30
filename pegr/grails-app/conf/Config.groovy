@@ -145,3 +145,6 @@ grails.plugin.springsecurity.logout.afterLogoutUrl = "/login/form"
 grails.plugin.springsecurity.failureHandler.defaultFailureUrl = "/login/form"
 grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
 
+// Database-migration
+grails.plugin.databasemigration.updateOnStart = true
+grails.plugin.databasemigration.updateOnStartFileNames = ['changelog.groovy']

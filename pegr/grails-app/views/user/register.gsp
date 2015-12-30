@@ -13,15 +13,15 @@
     <g:form action="register" method="POST"  role="form">
         <div class="form-group ${hasErrors(bean: user, field: 'username', 'error')}">
             <label for="username">Username</label>
-            <g:textField class="form-control" id="username" name="username" value="${user?.username}"></g:textField>
+            <g:textField class="form-control" required="required" id="username" name="username" value="${user?.username}"></g:textField>
         </div>
         <div class="form-group ${hasErrors(bean: user, field: 'password', 'error')}">
             <label for="pwd">Password</label>
-            <g:passwordField class="form-control" id="pwd" name="password"></g:passwordField>
+            <g:passwordField class="form-control" required="required" id="pwd" name="password" required="required"></g:passwordField>
         </div>
         <div class="form-group ${hasErrors(bean: user, field: 'passwordRepeat', 'error')} ">
             <label for="pwd2">Re-enter password</label>
-            <g:passwordField class="form-control" id="pwd2" name="passwordRepeat"></g:passwordField>
+            <g:passwordField class="form-control" required="required" id="pwd2" name="passwordRepeat"></g:passwordField>
         </div>
         <div class="form-group ${hasErrors(bean: user, field: 'fullname', 'error')}">
             <label for="fullname">Full name</label>
@@ -35,7 +35,7 @@
             <label for="phone">Phone</label>
             <g:textField type="tel" class="form-control" id="phone" name="phone"></g:textField>
         </div>
-        <g:submitButton name="register" value="Register" class="btn btn-default"/>
+        <g:submitButton name="register" value="Register" class="btn btn-primary"/>
     </g:form>
     </div>
 </body>

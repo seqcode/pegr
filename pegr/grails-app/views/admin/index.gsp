@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta name="layout" content="admin_main"/>
+	<meta name="layout" content="admin"/>
 </head>
 <body>
 	<div class="panel-group">

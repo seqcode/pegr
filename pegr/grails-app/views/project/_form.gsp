@@ -6,7 +6,7 @@
 
 <div class="form-group">
     <label for="description">Description:</label>
-    <g:textArea name="description" id="description" class="form-control" value="${project?.description}"></g:textArea>
+    <g:textArea name="description" id="description" class="form-control" value="${project?.description}" rows="3"></g:textArea>
 </div>
 
 <div class="form-group">

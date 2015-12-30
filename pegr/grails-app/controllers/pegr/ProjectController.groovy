@@ -7,19 +7,21 @@ class ProjectController {
 
 	def springSecurityService
 	
-    def index() { 
+    def index() {
+        def max = Math.min(params.max ?:10, 100)
         // get the current login user
 		def currentUser = springSecurityService.currentUser
 		// query the user's the projects
+        // TODO: offset, max
         def userProjects = ProjectUser.where {user==currentUser}
             .list(fetch: [project: 'eager'])
-        userProjects.sort{a,b->b.project.lastUpdated<=>a.project.lastUpdated}
-		
-		[userProjects: userProjects]
+       // userProjects.sort{a,b->b.project.lastUpdated<=>a.project.lastUpdated}
+		def projectCount = ProjectUser.where {user==currentUser}.count()
+		[userProjects: userProjects, projectCount: projectCount]
 	}
 	
     @Transactional
-    def create() {
+    def save() {
         def user = springSecurityService.currentUser
         // create new project
         def project = new Project(params)
@@ -29,6 +31,7 @@ class ProjectController {
                                                       project: project, 
                                                       projectRole: ProjectRole.OWNER)) 
             flash.message = "Successfully  created project ${project.name}"
+            redirect(action:"index")
         } else {
             flash.message = "Invalid project"
         }
@@ -40,7 +43,7 @@ class ProjectController {
 	
 	def show() {
         
-		[project: project]
+		
 	}
 	
 	def addUser(project, newUser) {

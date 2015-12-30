@@ -16,7 +16,7 @@ hibernate {
 environments {
     development {
         dataSource {
-            dbCreate = "update" // one of 'create', 'create-drop', 'update', 'validate', ''
+            dbCreate = "none" // one of 'create', 'create-drop', 'update', 'validate', ''
             url = ""
 			username=""
 			password=""
@@ -24,7 +24,7 @@ environments {
     }
     test {
         dataSource {
-            dbCreate = "update"
+            dbCreate = "none"
             url = ""
 			username=""
 			password=""
@@ -32,7 +32,7 @@ environments {
     }
     production {
         dataSource {
-            dbCreate = "update"
+            dbCreate = "none"
 			// use JNDI datasource with Tomcat
             jndiName="java:comp/env/pegrDatasource"
         }

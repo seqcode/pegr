@@ -1,9 +1,8 @@
 package pegr
 
-
-
 import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
+import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 @Transactional(readOnly = true)
 class ItemController {
@@ -23,6 +22,17 @@ class ItemController {
         respond new Item(params)
     }
 
+    def upload() {
+        MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  
+        def mpf = mpr.getFile("image");
+
+        if(!mpf?.empty && mpf.size < 1024 * 1024) {
+            def webrootDir = servletContext.getRealPath("/")
+            File fileDest = new File(webrootDir, "images/items.png") 
+            mpf.transferTo(fileDest)
+        }
+    }
+    
     @Transactional
     def save(Item itemInstance) {
         if (itemInstance == null) {

@@ -8,7 +8,6 @@ function getScan(){
 }
 
 function getHash(){
-	document.getElementById('barcode').value="1234";
     if(!changingHash){
         changingHash=true;
         var hash=window.location.hash.substr(1);
@@ -18,3 +17,4 @@ function getHash(){
         //Do something with barcode here
     }
 }
+

@@ -1,6 +1,3 @@
-.btn{
-	margin-top: 10px;
-}
 
 /* Remove the navbar's default margin-bottom and rounded borders */ 
 .navbar {
@@ -78,3 +75,12 @@ footer {
  #search button {
  	border-radius: 0;
  }
+
+#addProject {
+    margin-top: 1em;
+}
+
+#profile,#addProject form{
+    max-width: 660px;
+    margin: 10px 0;
+}

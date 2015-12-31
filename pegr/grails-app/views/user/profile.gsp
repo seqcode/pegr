@@ -5,43 +5,56 @@
 </head>
 <body>
     <h2>Profile</h2>
-    <div id="profile" class="content">
-        <h3>Basic Information</h3>
-        
-        <g:hasErrors>
-            <div class="errors">
-                <g:renderErrors bean="${user}" as="list"/>
-            </div>
-        </g:hasErrors>
-        <g:form class="form-horizontal" action="save" method="POST" role="form">   
-            
-            
-            <div class="form-group ${hasErrors(bean: user, field: 'fullname', 'error')}">            
-                <label class="control-label col-sm-3" for="fullname">Full name</label>      
-                <div class="col-sm-9">
-                    <g:textField class="form-control"  required="required" id="fullname" name="fullname" value="${user?.fullName}"></g:textField>
-                </div>
-            </div>
-            <div class="form-group ${hasErrors(bean: user, field: 'email', 'error')}">
-                <label class="control-label col-sm-3"  for="email">Email</label>
-                <div class="col-sm-9">
-                    <g:textField type="email" class="form-control" id="email" name="email" value="${user?.email}"></g:textField>
-                </div>
-            </div>
-            <div class="form-group ${hasErrors(bean: user, field: 'phone', 'error')}">
-                <label class="control-label col-sm-3" for="phone">Phone</label>
-                <div class="col-sm-9">
-                    <g:textField type="tel" class="form-control" id="phone" name="phone"></g:textField>
-                </div>
-            </div>
-        </g:form>
-        <h3>Password</h3>
-        <h3>Affiliation</h3>
-        
+    <div class="profile">
+        <g:if test="${flash.message}">
+			<div class="message" role="status">${flash.message}</div>
+        </g:if>
+        <h3>Basic Information </h3>        
+        <div id="info">
+            <ul>
+                <li>Username: ${user?.username}</li>
+                <li>Full name: ${user?.fullName}</li>
+                <li>Email: ${user?.email}</li>
+                <li>Phone: ${user?.phone}</li>
+                <g:link action='editInfo' class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil">Edit</span></g:link>
+            </ul>
+        </div>
         <h3>Address</h3>
-    
-
-        
+        <div id="profile-address">
+            <ul>
+                <g:if test="${user?.address}">
+                <li>${user.address.line1}</li>
+                <g:if test="${user.address.line2}">
+                    <li>${user.address.line2}</li>
+                </g:if>
+                <li>${user.address.city}, ${user.address.state} ${user.address.postalCode}</li>
+                <li>${user.address.country.toUpperCase()}</li>
+                    <span>
+                    <g:link action='editAddress' id="${user?.address?.id}" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil">Edit</span></g:link>
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#deleteAddress"><span class="glyphicon glyphicon-trash">Delete</span></button>
+<div id="deleteAddress" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body">
+        <p>Are you sure that you want to delete this address?</p>
+      </div>
+      <div class="modal-footer">
+          <g:link action='deleteAddress' id="${user.address.id}" class="btn btn-default">Yes, delete</g:link>
+          <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+      </div>
+    </div>
+  </div>
+</div>
+            </g:if>
+            <g:else>
+                <g:link action='editAddress' class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil">Add</span></g:link>
+            </g:else>
+            </ul>
+        </div>
+        <h3>Password</h3>
+        <ul>
+        <g:link action='updatePassword' class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil">Change</span></g:link>
+        </ul>
     </div>
 </body>
 </html>

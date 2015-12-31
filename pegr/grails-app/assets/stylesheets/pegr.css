@@ -1,3 +1,7 @@
+ul {
+    list-style-type: none;
+    padding-left: 10px;
+}
 
 /* Remove the navbar's default margin-bottom and rounded borders */ 
 .navbar {
@@ -80,7 +84,16 @@ footer {
     margin-top: 1em;
 }
 
-#profile,#addProject form{
+#addProject form{
     max-width: 660px;
     margin: 10px 0;
+}
+
+.profile form{
+    max-width: 330px;
+    margin: 10px 0;
+}
+
+.profile .btn-info {
+    padding: 1px 10px;
 }

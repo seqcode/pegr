@@ -23,18 +23,6 @@
             <label for="pwd2">Re-enter password</label>
             <g:passwordField class="form-control" required="required" id="pwd2" name="passwordRepeat"></g:passwordField>
         </div>
-        <div class="form-group ${hasErrors(bean: user, field: 'fullname', 'error')}">
-            <label for="fullname">Full name</label>
-            <g:textField class="form-control" id="fullname" name="fullname" value="${user?.fullName}"></g:textField>
-        </div>
-        <div class="form-group ${hasErrors(bean: user, field: 'email', 'error')}">
-            <label for="email">Email</label>
-            <g:textField type="email" class="form-control" id="email" name="email" value="${user?.email}"></g:textField>
-        </div>
-        <div class="form-group ${hasErrors(bean: user, field: 'phone', 'error')}">
-            <label for="phone">Phone</label>
-            <g:textField type="tel" class="form-control" id="phone" name="phone"></g:textField>
-        </div>
         <g:submitButton name="register" value="Register" class="btn btn-primary"/>
     </g:form>
     </div>

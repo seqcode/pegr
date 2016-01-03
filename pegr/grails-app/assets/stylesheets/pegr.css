@@ -42,6 +42,7 @@ ul {
 /* Set gray background color and 100% height */
 .sidenav {
   padding-top: 20px;
+  padding-right: 0;
   background-color: #f1f1f1;
   height: 100%;
 }
@@ -57,9 +58,9 @@ footer {
 @media screen and (max-width: 767px) {
   .sidenav {
     height: auto;
-    padding: 15px;
+    padding: 0;
   }
-  .row.content {height:auto;} 
+  .row .content {height:auto;} 
 }
 
 #main-content {
@@ -84,7 +85,7 @@ footer {
     margin-top: 1em;
 }
 
-#addProject form{
+#projectForm{
     max-width: 660px;
     margin: 10px 0;
 }
@@ -96,4 +97,34 @@ footer {
 
 .profile .btn-info {
     padding: 1px 10px;
+}
+
+.fields div {
+    margin: 5px;
+}
+
+#sample-nav-header h3{
+    margin:0 10px; 
+    line-height:50px;
+}
+
+#sample-nav-header button {
+    background-color:black;
+}
+
+#sample-nav-header .icon-bar {
+    background-color: white;
+}
+
+#sample-nav {
+    padding: 0;
+}
+#sample-nav ul {
+    clear: left;
+}
+#sample-nav a:hover {
+    background-color: #E0E0E0; 
+}
+#sample-nav .active {
+    background-color: white;
 }

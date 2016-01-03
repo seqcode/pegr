@@ -5,5 +5,5 @@ import pegr.GeneticModification
 class GeneticModificationAdminController {
 
     static scaffold = GeneticModification
-	public static AdminCategory category = AdminCategory.BIO_MATERIAL
+	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS
 }

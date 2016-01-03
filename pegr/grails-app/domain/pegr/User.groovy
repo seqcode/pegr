@@ -11,7 +11,7 @@ class User implements Serializable {
 	String fullName
 	String email
 	String phone
-	Lab lab
+	Organization affiliation
 	Address address
 	
 	static hasMany = [userProjects: ProjectUser]
@@ -54,7 +54,7 @@ class User implements Serializable {
 		fullName nullable: true, blank: true, maxSize: 50
 		email email: true, nullable: true
 		phone nullable: true, maxSize: 20
-		lab nullable: true
+		affiliation nullable: true
 		address nullable: true
 	}
 

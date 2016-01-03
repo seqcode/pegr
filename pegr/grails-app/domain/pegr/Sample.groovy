@@ -30,7 +30,11 @@ class Sample {
 		biologicalReplicateSet nullable: true
 		technicalReplicateSet nullable: true
 		spikeInCellSource nullable: true
-		concentration scale: 4
+		concentration scale: 4, nullable: true
+        cellNumber nullable: true
+        chromosomeAmount nullable: true
+        quantityReceived nullable: true
+        requestedTagNumber nullable: true
 		publicationReference nullable: true, blank: true, maxSize: 30
 		note nullable: true, blank: true
     }

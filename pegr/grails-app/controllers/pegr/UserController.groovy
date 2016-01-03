@@ -93,10 +93,10 @@ class UserController {
             if (urc.hasErrors()) {
                 [user: urc]
             } else {
-                user = new User(urc.properties)
+                def user = new User(urc.properties)
                 user.password = springSecurityService.encodePassword(urc.password)
                 if (user.save()) {
-                    redirect(uri: '/')
+                    redirect(action: "profile")
                 }else {
                     [user: urc]
                 }

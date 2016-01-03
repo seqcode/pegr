@@ -5,5 +5,5 @@ import pegr.IgType
 class IgTypeAdminController {
 
     static scaffold = IgType
-	public static AdminCategory category = AdminCategory.BIO_MATERIAL
+	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS
 }

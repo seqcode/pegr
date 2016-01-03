@@ -1,9 +1,9 @@
 package pegr.admin
-import pegr.AbHost
 import pegr.AdminCategory
+import pegr.Genotype	
 
-class AbHostAdminController {
+class GenotypeAdminController {
 
-    static scaffold = AbHost 
+	static scaffold = Genotype
 	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS
 }

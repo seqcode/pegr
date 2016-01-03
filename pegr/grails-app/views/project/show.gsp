@@ -4,36 +4,23 @@
     <meta name="layout" content="main"/>
 </head>
 <body>
-	<div><g:link controler="projects">My Projects</g:link>> -> Project xxx-xxxx </div>
+	<div><g:link action='index'>My Projects</g:link> -> Project ${project?.name} </div>
 	<div class="col-sm-8">
-		<h2>Project: xxx-xxxx </h2>
-		<p>Created: 12/12/2015, updated: 12/15/2015</p>
-		<p>some description here...</p>
-		<h3>Users</h3>
-		<p>xxx, xxx</p>
+		<h3>Project: ${project?.name} <g:link action="edit" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-plus">Edit</span></g:link></h3>
+		<p>Created: ${project?.dateCreated}, updated: ${project?.lastUpdated}</p>
+		<p>Description: ${project?.description}</p>
+        <p>Funding: ${project?.funding}</p>
+        
+		<h3>Users <g:link action="addUser" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-plus">Add</span></g:link></h3>
+        <g:render template="userTable" bean="${projectUsers}" />
+        
 		<h3>Samples</h3>
-		<button class="btn">New Sample</button>
+        <g:link controller="sample" action="create" params="[projectId: project?.id]" class="btn btn-info">Create New Sample</g:link>
+        <g:link action="addSample" class="btn btn-info">Add Existing Sample</g:link>
+        <g:render template="/sample/table" bean="${project?.samples}" />
+        
 		<p>B: <abbr title="What is biological replication">biological replication</abbr>; 
 		T: <abbr title="What is technical replication">technical replication</abbr>.</p>
-		<div class="tree"><span class="bio-rep node">B</span>
-		  <ul>
-		    <li><span class="tech-rep node">T</span>      
-		      <ul>
-		        <li><span class="node">S-1 <button>Status</button> 
-		        <a href="#"><span class="glyphicon glyphicon-pencil"></span></a> 
-		        <a href="#"><span class="glyphicon glyphicon-registration-mark"></span></a>
-		        <a href="#"><span class="glyphicon glyphicon-remove"></span></a>
-		        </span></li>
-		        <li><span class="node">S-2 </span></li>
-		      </ul></li>
-		    <li><span class="tech-rep node">T</span>
-		      <ul>
-		        <li><span class="node">S-3 </span></li>
-		        <li><span class="node">S-4 </span></li>
-		      </ul>
-		    </li>
-		  </ul>
-		</div>
 		
 	</div>
     <div class="col-sm-4" style="padding: 10px 0">

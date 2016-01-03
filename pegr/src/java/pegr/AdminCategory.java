@@ -1,7 +1,8 @@
 package pegr;
 
 public enum AdminCategory {
-	BIO_MATERIAL("Biological Material"),
+	BIO_SPECIFICATIONS("Biological Specifications"),
+	ITEMS("Barcoded Items"),
 	PROTOCOLS("Protocol"),
 	ALIGNMENT_ANALYSIS("Alignment and Analysis"),
 	OTHER("Other")

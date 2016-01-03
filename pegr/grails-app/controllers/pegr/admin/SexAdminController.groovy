@@ -5,5 +5,5 @@ import pegr.Sex
 class SexAdminController {
 
     static scaffold = Sex
-	public static AdminCategory category = AdminCategory.BIO_MATERIAL
+	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS
 }

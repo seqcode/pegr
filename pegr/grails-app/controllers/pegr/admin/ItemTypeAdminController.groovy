@@ -5,5 +5,5 @@ import pegr.ItemType
 class ItemTypeAdminController {
 
     static scaffold = ItemType
-	public static AdminCategory category = AdminCategory.PROTOCOLS
+	public static AdminCategory category = AdminCategory.ITEMS
 }

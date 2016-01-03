@@ -2,7 +2,7 @@
 
 .content h3 {
 	border-bottom: 1px solid #CCCCCC;
-	margin: 0.8em 1em 0.3em;
+	margin: 0.8em 0em 0.3em;
 	padding: 0 0.25em;
 }
 
@@ -107,8 +107,8 @@ select[multiple] {
 }
 
 textarea {
-	width: 250px;
-	height: 150px;
+	width: 330px;
+	height: 60px;
 	overflow: auto; /* IE always renders vertical scrollbar without this */
 	vertical-align: top;
 }

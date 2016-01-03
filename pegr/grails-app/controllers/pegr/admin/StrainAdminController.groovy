@@ -5,5 +5,5 @@ import pegr.Strain
 class StrainAdminController {
 
     static scaffold = Strain
-	public static AdminCategory category = AdminCategory.BIO_MATERIAL
+	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS
 }

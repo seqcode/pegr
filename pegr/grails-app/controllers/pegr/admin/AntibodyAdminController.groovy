@@ -5,6 +5,6 @@ import pegr.Antibody
 class AntibodyAdminController {
 
     static scaffold = Antibody 
-	public static AdminCategory category = AdminCategory.BIO_MATERIAL
+	public static AdminCategory category = AdminCategory.ITEMS
 	
 }

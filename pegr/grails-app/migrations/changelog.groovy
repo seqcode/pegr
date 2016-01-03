@@ -2528,4 +2528,10 @@ databaseChangeLog = {
 		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "user_role", constraintName: "FK_apcc8lxk2xnug8377fatvbn04", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
 
+
+	include file: 'changeUserAffiliation.groovy'
+
+	include file: 'sampleNullableFields.groovy'
+
+	include file: 'changeSampleStatus.groovy'
 }

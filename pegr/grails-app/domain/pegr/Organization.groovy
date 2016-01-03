@@ -5,7 +5,7 @@ class Organization {
 	String name
 	Address address
 	String note
-	URL website
+	String website
 	
 	String toString() {
 		name

@@ -8,7 +8,7 @@
   <asset:stylesheet href="application.css"/>
   <g:layoutHead/>
 </head>
-<body>
+<body  onhashchange="${pageProperty(name:'body.onhashchange')}">
 	<div class="text-center visible-xs-block, hidden-xs">
 		<h1>Platform for Eukaryotic Gene Regulation</h1>
 	</div>

@@ -5,8 +5,25 @@ class BootStrap {
 	
 		def init = { servletContext ->
 			createAdminUserIfRequired()
+			
+			createItemTypeIfRequired()
 		}
 			
+		private createItemTypeIfRequired() {			
+			if (!ItemType.findByName("Cell Source")) {
+				println "Creating ItemType for Cell Source"
+				def itemType = new ItemType(name: "Cell Source",
+					objectType: "CellSource")
+				itemType.save()
+			}
+			
+			if (!ItemType.findByName("Antibody")) {
+				println "Creating ItemType for Antibody"
+				def itemType = new ItemType(name: "Antibody",
+					objectType: "Antibody")
+				itemType.save()
+			}
+		}
 			
 		private createAdminUserIfRequired() {
 			println "Creating admin user"

@@ -1,5 +1,5 @@
 package pegr.admin
-import pegr.AdminCategory;
+import pegr.AdminCategory
 import pegr.Role
 
 class RoleAdminController {

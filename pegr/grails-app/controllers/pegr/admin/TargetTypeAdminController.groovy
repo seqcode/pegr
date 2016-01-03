@@ -5,5 +5,5 @@ import pegr.TargetType
 class TargetTypeAdminController {
 
     static scaffold = TargetType
-	public static AdminCategory category = AdminCategory.BIO_MATERIAL
+	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS
 }

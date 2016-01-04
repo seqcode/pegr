@@ -10,8 +10,8 @@
 <div class="collapse navbar-collapse" id="sample-nav">
     <div class="panel-heading"></div>
     <ul class="nav nav-stacked">
-        <li id="nav-sample-overview"><g:link action="show" id="$sampleId">Overview</g:link></li>
-        <li id="nav-sample-cellsource"><g:link action="showCellSource" params="[sampleId:sampleId]">Cell Source</g:link></li>
+        <li id="nav-sample-overview"><g:link controller="sample" action="show" id="$sampleId">Overview</g:link></li>
+        <li id="nav-sample-cellsource"><g:link controller="sample" action="showCellSource" params="[sampleId:sampleId]">Cell Source</g:link></li>
         <li id="nav-sample-antibody"><g:link>Antibody &amp; Target</g:link></li>
         <li id="nav-sample-protocols"><g:link action="protocols" id="$sampleId">Protocols</g:link>
         <li id="nav-sample-replicates"><g:link>Replicates</g:link>

@@ -83,8 +83,23 @@ class SampleController {
 	}
 	
 	def protocols(Integer id) {
-		def sample = Sample.get(id) 
-		[protocolGroup: sample.protocolGroup, sampleId: sample.id]
+		def sample = Sample.get(id)
+		
+		// fetch protocol instances
+		def protocolInstances 
+		def n = 0
+		if(sample.latestProtocolInstance) {
+			def ProtocolInstance p = sample.latestProtocolInstance
+			protocolInstances = [p]
+			n++
+			while(p.prior) {
+				p = p.prior
+				protocolInstances.add(0, p)
+				n++
+			}
+		}
+		
+		[protocolGroup: sample.protocolGroup, protocolInstances: protocolInstances, protInstCount: n, sampleId: sample.id]
 	}
     
 	def addProtocolGroupAjax() {

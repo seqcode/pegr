@@ -4,8 +4,6 @@ import grails.transaction.Transactional
 @Transactional(readOnly = true)
 class UserController {
 
-	static showInAdmin = true
-
 	def springSecurityService	
 	
 	def profile(){

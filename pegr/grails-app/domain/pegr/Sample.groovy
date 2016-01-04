@@ -14,6 +14,7 @@ class Sample {
 	Integer cellNumber // in M
 	Integer quantityReceived //ul per aliqu used for the assay
 	String publicationReference
+	ProtocolInstance latestProtocolInstance
 	SampleStatus status
     Date lastUpdated
 	CellSource spikeInCellSource
@@ -37,6 +38,7 @@ class Sample {
         requestedTagNumber nullable: true
 		publicationReference nullable: true, blank: true, maxSize: 30
 		note nullable: true, blank: true
+		latestProtocolInstance nullable: true
     }
     
     static mapping = {

@@ -11,7 +11,7 @@
         </div>
         <div class="col-sm-10 content">
             <h3>Cell Source</h3>
-			<g:render template="/cellSourceAdmin/details" 
+			<g:render template="cellSourceDetails" 
 						model="['cellSourceInstance': cellSourceInstance, 
 						'itemInstance': itemInstance]" />
 			<g:link class="btn btn-primary" >Edit</g:link>

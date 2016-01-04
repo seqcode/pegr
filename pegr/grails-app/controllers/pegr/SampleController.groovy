@@ -20,7 +20,7 @@ class SampleController {
 		}else {
 			sample.save(flush: true)
 		}
-		redirect(action: "createCellSource", id: "${sample.id}")
+		redirect(action: "createCellSource", params: [sampleId: sample.id])
 
     }
     
@@ -82,10 +82,23 @@ class SampleController {
 		}
 	}
 	
-	
+	def protocols(Integer id) {
+		def sample = Sample.get(id) 
+		[protocolGroup: sample.protocolGroup, sampleId: sample.id]
+	}
     
-	def addProtocolGroup() {
-		
+	def addProtocolGroupAjax() {
+		def sample = Sample.get(params.sampleId)
+		if(sample) {
+			sample.properties = params
+			if (sample.protocolGroup && sample.save(flush:true)) {
+				render template: 'protocolsDetails', bean: sample.protocolGroup
+			} else {
+				render { div("Please choose a protocol group!")}
+			}
+		}else {
+			render {div("Missing sample ID!")}
+		}
 		
 	}
 	

@@ -1,5 +1,7 @@
 package pegr
+import grails.transaction.Transactional
 
+@Transactional(readOnly = true)
 class SampleController {
 
     static scaffold = true
@@ -9,6 +11,7 @@ class SampleController {
         respond Sample.list(params), model:[sampleCount: Sample.count()]
     }
 	
+    @Transactional
     def create() {
 		def sample = new Sample(status: SampleStatus.CREATED)
 		if(params.projectId) {
@@ -20,7 +23,7 @@ class SampleController {
 		}else {
 			sample.save(flush: true)
 		}
-		redirect(action: "createCellSource", params: [sampleId: sample.id])
+		redirect(controller: "CellSource", action: "createCellSourceForSample", params: [sampleId: sample.id])
 
     }
     
@@ -29,98 +32,6 @@ class SampleController {
 		[sampleInstance:sample, sampleId: sample.id]
 	}
 	
-    def showCellSource(Integer sampleId) {
-        def sample = Sample.get(sampleId)
-		
-		if (sample.cellSource) {
-			def item = Item.where {
-				(type.name=="Cell Source") && (referenceId == sample.cellSource.id)
-			}.get(max: 1)
-			[cellSourceInstance: sample.cellSource, itemInstance: item, sampleId: sampleId]
-		} else {
-			redirect(action:"createCellSource", params: [sampleId: sampleId])
-		}
-    }
-	
-	def createCellSource() {
-		if (params.sampleId) {
-			if(request.method != "POST") {
-				render(view: "createCellSource", model:[sampleId: params.sampleId]) 
-			}else{
-				withForm {
-					def sample = Sample.get(params.sampleId)
-					if(sample) {
-						def cellSource = new CellSource(params)
-						def itemType = ItemType.findByName("Cell Source")
-						def item = new Item(type: itemType)
-						item.properties['barcode', 'location'] = params
-						if (cellSource.validate() && cellSource.save(flush:true)) {
-							sample.cellSource = cellSource
-							sample.save()
-							
-							item.referenceId = cellSource.id
-							if (item.validate()){
-								item.save(flush:true)
-								redirect(action: "showCellSource", params: [sampleId: params.sampleId])
-							}else {
-								flash.message = "Invalid inputs"
-								render( model: [cellSourceInstance: cellSource,
-																	itemInstance: item,
-																	sampleId: sample.id])
-							}
-						} else {
-							flash.message = "Invalid inputs"
-							render( model: [cellSourceInstance: cellSource,
-																	itemInstance: item,
-																	sampleId: sample.id])
-						}
-					}
-				}
-			}
-		}else {
-			render "Missing Sample ID!"
-		}
-	}
-	
-	def protocols(Integer id) {
-		def sample = Sample.get(id)
-		
-		// fetch protocol instances
-		def protocolInstances 
-		def n = 0
-		if(sample.latestProtocolInstance) {
-			def ProtocolInstance p = sample.latestProtocolInstance
-			protocolInstances = [p]
-			n++
-			while(p.prior) {
-				p = p.prior
-				protocolInstances.add(0, p)
-				n++
-			}
-		}
-		
-		[protocolGroup: sample.protocolGroup, protocolInstances: protocolInstances, protInstCount: n, sampleId: sample.id]
-	}
-    
-	def addProtocolGroupAjax() {
-		def sample = Sample.get(params.sampleId)
-		if(sample) {
-			sample.properties = params
-			if (sample.protocolGroup && sample.save(flush:true)) {
-				render template: 'protocolsDetails', bean: sample.protocolGroup
-			} else {
-				render { div("Please choose a protocol group!")}
-			}
-		}else {
-			render {div("Missing sample ID!")}
-		}
-		
-	}
-	
-	def addProtocolInstance() {
-		
-	}
-    
     def search() {       
         def sampleProps = Sample.metaClass.properties*.name
         def samples = Sample.withCriteria {
@@ -135,10 +46,12 @@ class SampleController {
         [samples: samples]
     }
     
+    @Transactional
     def createTechnicalReplicate(){
         
     }
     
+    @Transactional
     def createBiologicalReplicate(){
         
     }

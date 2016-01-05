@@ -10,7 +10,7 @@
 <body onhashchange="getHash()">
     <div class="row">
         <div class="col-sm-2 sidenav">
-             <g:render template="nav" />
+             <g:render template="/sample/nav" />
         </div>
         <div class="col-sm-10 content">
             <h3>Cell Source ${cellSourceId}</h3>
@@ -34,8 +34,8 @@
 			                <g:renderErrors bean="${ItemInstance}" as="list"/>
 			            </div>
 			        </g:hasErrors>
-                    <g:form method="POST" action="createCellSource" role="form" useToken="true">
-						<g:render template="/cellSourceAdmin/form" />
+                    <g:form method="POST" action="createCellSourceForSample" role="form" useToken="true">
+						<g:render template="form" />
 						<input type="hidden" name="sampleId" value="${sampleId}">
 						<g:submitButton name="Save" class="btn btn-primary" />
                     </g:form>

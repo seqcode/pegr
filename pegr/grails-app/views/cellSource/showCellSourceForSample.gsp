@@ -7,15 +7,15 @@
 <body>
     <div class="row">
         <div class="col-sm-2 sidenav">
-             <g:render template="nav" />
+             <g:render template="/sample/nav" />
         </div>
         <div class="col-sm-10 content">
             <h3>Cell Source</h3>
-			<g:render template="cellSourceDetails" 
+			<g:render template="details" 
 						model="['cellSourceInstance': cellSourceInstance, 
 						'itemInstance': itemInstance]" />
-			<g:link class="btn btn-primary" >Edit</g:link>
-			<g:link class="btn btn-primary">Delete</g:link>
+            <span class="btn btn-primary">Edit</span>
+            <span class="btn btn-primary">Delete</span>
         </div>
     </div>
     <script>

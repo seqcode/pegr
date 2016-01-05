@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta name="layout" content="admin">
+		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: 'sample.label', default: 'Sample')}" />
 		<title><g:message code="default.show.label" args="[entityName]" /></title>
 	</head>
@@ -202,5 +202,9 @@
 			</g:form>
 		</div>
 		</div>
+        <script>
+            $("#nav-sample-summary").addClass("active");
+            $("#nav-projects").addClass("active");        
+        </script>
 	</body>
 </html>

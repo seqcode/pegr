@@ -11,7 +11,7 @@
         </div>
         <div class="col-sm-10 content">
             <h3>Protocols</h3>
-            <g:link action="updateProtocolGroupForSample" params="[sampleId: sampleId]" class="btn btn-primary">Edit</g:link>
+            
 			<div id="protocols">
 			<g:render template="protocolsDetails" bean="${protocolGroup}" />
 			</div>

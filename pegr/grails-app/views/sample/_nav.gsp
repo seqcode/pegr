@@ -1,5 +1,5 @@
 <div class="navbar-header" id="sample-nav-header">
-    <h3>Sample
+    <h3>Sample ${sampleId}
     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#sample-nav">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>

@@ -26,6 +26,7 @@
 			</ul>
 			</g:hasErrors>
 			<g:form action='update' method="PUT" <%= multiPart ? ' enctype="multipart/form-data"' : '' %>>
+                <g:hiddenField name="id" value="\${${propertyName}?.id}" />
 				<g:hiddenField name="version" value="\${${propertyName}?.version}" />
 				<fieldset class="form">
 					<g:render template="form"/>

@@ -49,20 +49,7 @@
 			<g:textField name="biologicalSourceId" maxlength="50" value="${cellSourceInstance?.biologicalSourceId}"/>
 		</div>
 		
-		<div class=" ${hasErrors(bean: itemInstance, field: 'barcode', 'error')} ">
-			<label for="barcode">Barcode</label>
-			<g:textField id="barcode" name="barcode" value="${itemInstance?.barcode}"/>
-			<input type=button value="Scan" onclick="getScan();">
-		</div>
-		
-		<div class=" ${hasErrors(bean: itemInstance, field: 'location', 'error')} ">
-			<label for="location">Location</label>
-			<g:textField name="location" value="${itemInstance?.location}"/>
-		</div>
-		
-		<div class=" ${hasErrors(bean: cellSourceInstance, field: 'note', 'error')} ">
-			<label for="note">Note</label>
-			<g:textArea name="note" value="${cellSourceInstance?.note}"/>
-		</div>
+        <g:render template="/item/form" bean="${itemInstance}" />
+        
 	</div>
 </div>

@@ -61,7 +61,7 @@ class ${className}Controller {
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.updated.message', args: [message(code: '${className}.label', default: '${className}'), ${propertyName}.id])
-                redirect ${propertyName}
+                redirect(id: ${propertyName}.id, controller: '${className}Admin', action: 'show')
             }
             '*'{ respond ${propertyName}, [status: OK] }
         }

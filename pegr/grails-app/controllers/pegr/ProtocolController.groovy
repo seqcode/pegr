@@ -40,7 +40,9 @@ class ProtocolController {
      
 	def showProtocolsForSample(Integer sampleId) {
 		def sample = Sample.get(sampleId)
-		
+        if (!sample.protocolGroup){
+            redirect(action: "updateProtocolGroupForSample", params: [sampleId: params.sampleId])
+        }
 		// fetch protocol instances
 		def protocolInstances 
 		def n = 0
@@ -59,7 +61,7 @@ class ProtocolController {
 	}
     
 	@Transactional
-	def createForSample() {
+	def createInstanceForSample() {
 		def user = springSecurityService.currentUser
 		def priorProtInst = null
 		if (params.priorProtInstId) {
@@ -76,7 +78,7 @@ class ProtocolController {
 			if (sample){
 				sample.latestProtocolInstance = protocolInstance
 				sample.save(flush: true)
-				render(view: "edit", 
+				render(view: "editInstanceForSample", 
 					model: [protocolInstance: protocolInstance, sampleId: params.sampleId])
 			} else {
 				render status: 500
@@ -87,7 +89,8 @@ class ProtocolController {
 	}
 		
     @Transactional
-	def editForSample() {
-		[]
+	def editInstanceForSample(Integer prtclInstanceId, Integer sampleId) {
+        def protocolInstance = ProtocolInstance.get(prtclInstanceId)
+		[protocolInstance:protocolInstance, sampleId: sampleId]
 	}
 }

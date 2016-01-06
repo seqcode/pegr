@@ -35,7 +35,7 @@
 			            </div>
 			        </g:hasErrors>
                     <g:form method="POST" action="createCellSourceForSample" role="form" useToken="true">
-						<g:render template="form" />
+						<g:render template="form" model="['cellSourceInstance': cellSourceInstance, 'itemInstance': itemInstance]"/>
 						<input type="hidden" name="sampleId" value="${sampleId}">
 						<g:submitButton name="Save" class="btn btn-primary" />
                     </g:form>

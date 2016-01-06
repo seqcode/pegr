@@ -29,7 +29,7 @@ class CellSourceController {
 						def cellSource = new CellSource(params)
 						def itemType = ItemType.findByName("Cell Source")
 						def item = new Item(type: itemType)
-						item.properties['barcode', 'location'] = params
+						item.properties['barcode', 'location', 'note'] = params
 						if (cellSource.validate() && cellSource.save(flush:true)) {
 							sample.cellSource = cellSource
 							sample.save()

@@ -3,7 +3,7 @@
 <g:each in="${it.protocols}" var="protocol" status="count">
     <g:if test="${count < protInstCount}">
         <li class="list-group-item list-group-item-info">${protocol.name}
-            <g:link class="btn btn-info" controller="protocol" action="editInstanceForSample" params="[prtclInstanceId: protocolInstances[count].id, sampleId: sampleId]">Edit</g:link>
+            <g:link class="btn btn-info" controller="protocol" action="showInstanceForSample" params="[prtclInstanceId: protocolInstances[count].id, sampleId: sampleId]">Details</g:link>
         </li>
 	</g:if>
 	<g:else>

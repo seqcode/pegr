@@ -89,8 +89,24 @@ class ProtocolController {
 	}
 		
     @Transactional
-	def editInstanceForSample(Integer prtclInstanceId, Integer sampleId) {
+	def showInstanceForSample(Integer prtclInstanceId, Integer sampleId) {
         def protocolInstance = ProtocolInstance.get(prtclInstanceId)
-		[protocolInstance:protocolInstance, sampleId: sampleId]
+        if (protocolInstance) {
+		  [protocolInstance:protocolInstance, sampleId: sampleId]
+        } else {
+            render status: 500
+        }
 	}
+    
+    @Transactional
+    def addItemToPrtclInstanceAjax(){
+        withForm {
+            def item = new Item(params)
+            if (item.validate() && item.save(flush: true)) {
+                render template: '/item/details', bean: item, var: 'itemInstance'
+            } else {
+                render "Invalid inputs for the new item!"
+            }
+        }
+    }
 }

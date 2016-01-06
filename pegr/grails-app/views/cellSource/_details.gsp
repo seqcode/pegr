@@ -38,17 +38,7 @@
 	<g:if test="${cellSourceInstance?.biologicalSourceId}">
 	<li>Biological Source ID: ${cellSourceInstance.biologicalSourceId}</li>
 	</g:if>
-
-	<g:if test="${itemInstance?.barcode}">
-	<li>Barcode: ${itemInstance.barcode }</li>
-	</g:if>	
-
-	<g:if test="${itemInstance?.location}">
-	<li>Barcode: ${itemInstance.location}</li>
-	</g:if>	
-
-	<g:if test="${cellSourceInstance?.note}">
-	<li>Note: ${cellSourceInstance.note}</li>
-	</g:if>
+    
+    <g:render template="/item/details" bean="${itemInstance}"
 		
 </ul>

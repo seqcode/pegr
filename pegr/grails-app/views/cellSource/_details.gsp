@@ -39,6 +39,6 @@
 	<li>Biological Source ID: ${cellSourceInstance.biologicalSourceId}</li>
 	</g:if>
     
-    <g:render template="/item/details" bean="${itemInstance}"
+    <g:render template="/item/details" bean="${itemInstance}" />
 		
 </ul>

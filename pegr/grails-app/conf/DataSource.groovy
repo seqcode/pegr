@@ -34,7 +34,11 @@ environments {
         dataSource {
             dbCreate = "none"
 			// use JNDI datasource with Tomcat
-            jndiName="java:comp/env/pegrDatasource"
+            // jndiName="java:comp/env/pegrDatasource"
+            
+            url = ""
+			username=""
+			password=""
         }
     }
 }

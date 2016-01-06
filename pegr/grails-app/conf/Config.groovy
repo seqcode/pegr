@@ -2,10 +2,12 @@
 // config files can be ConfigSlurper scripts, Java properties files, or classes
 // in the classpath in ConfigSlurper format
 
-// grails.config.locations = [ "classpath:${appName}-config.properties",
-//                             "classpath:${appName}-config.groovy",
-//                             "file:${userHome}/.grails/${appName}-config.properties",
-//                             "file:${userHome}/.grails/${appName}-config.groovy"]
+
+
+grails.config.locations = [ "classpath:${appName}-config.properties",
+                             "classpath:${appName}-config.groovy",
+                             "file:${userHome}/.grails/${appName}-config.properties",
+                             "file:${userHome}/.grails/${appName}-config.groovy"]
 
 // if (System.properties["${appName}.config.location"]) {
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
@@ -99,9 +101,12 @@ environments {
 log4j.main = {
     // Example of changing the log pattern for the default console appender:
     //
-    //appenders {
+    appenders {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
-    //}
+		
+		// limit the size of file 'stacktrace.log'
+		rollingFile name:'stacktrace', file:'stacktrace.log', maxFileSize:'5MB', maxBackupIndex:2
+    }
 
     error  'org.codehaus.groovy.grails.web.servlet',        // controllers
            'org.codehaus.groovy.grails.web.pages',          // GSP
@@ -115,3 +120,31 @@ log4j.main = {
            'org.hibernate',
            'net.sf.ehcache.hibernate'
 }
+
+
+// Added by the Spring Security Core plugin:
+grails.plugin.springsecurity.userLookup.userDomainClassName = 'pegr.User'
+grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'pegr.UserRole'
+grails.plugin.springsecurity.authority.className = 'pegr.Role'
+grails.plugin.springsecurity.requestMap.className = 'pegr.Requestmap'
+grails.plugin.springsecurity.securityConfigType = 'InterceptUrlMap'
+grails.plugin.springsecurity.interceptUrlMap = [
+	'/assets/**':       ['permitAll'],
+	'/**/js/**':        ['permitAll'],
+	'/**/css/**':       ['permitAll'],
+	'/**/images/**':    ['permitAll'],
+    '/user/register': ['permitAll'],
+    '/login/**': ['permitAll'],
+	'/logout/**': ['permitAll'],
+	'/admin/**': ['hasRole("ROLE_ADMIN")'],
+	'/*Admin/**': ['hasRole("ROLE_ADMIN")'],
+	'/**': ['isAuthenticated()'] // everything else requires authenticated user
+]
+grails.plugin.springsecurity.auth.loginFormUrl = "/login/form"
+grails.plugin.springsecurity.logout.afterLogoutUrl = "/login/form"
+grails.plugin.springsecurity.failureHandler.defaultFailureUrl = "/login/form"
+grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
+
+// Database-migration
+grails.plugin.databasemigration.updateOnStart = true
+grails.plugin.databasemigration.updateOnStartFileNames = ['changelog.groovy']

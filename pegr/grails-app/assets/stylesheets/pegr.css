@@ -1,0 +1,130 @@
+ul {
+    list-style-type: none;
+    padding-left: 10px;
+}
+
+/* Remove the navbar's default margin-bottom and rounded borders */ 
+.navbar {
+  margin-bottom: 0;
+  border-radius: 0;
+  background-color: #2c5986;
+  z-index: +200;
+}
+
+.affix {
+  top: 0;
+  width: 100%;
+}
+
+.navbar a {
+  color: white;
+}
+
+.navbar .icon-bar {
+	background-color:white;
+}
+
+#myNavbar a:visited {
+  background-color: #2c5986;
+}
+
+#myNavbar a:hover {
+  background-color: #3f7fc0;
+}
+
+#myNavbar .active {
+  background-color: #3973ad;
+}
+
+/* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+.row.content {height: 450px}
+
+/* Set gray background color and 100% height */
+.sidenav {
+  padding-top: 20px;
+  padding-right: 0;
+  background-color: #f1f1f1;
+  height: 100%;
+}
+
+/* Set black background color, white text and some padding */
+footer {
+  background-color: #dbdbdb;
+  color: white;
+  padding: 15px;
+}
+
+/* On small screens, set height to 'auto' for sidenav and grid */
+@media screen and (max-width: 767px) {
+  .sidenav {
+    height: auto;
+    padding: 0;
+  }
+  .row .content {height:auto;} 
+}
+
+#main-content {
+    min-height: 480px;
+}
+
+ #login-form, #register-form {
+  max-width:330px; 
+  padding: 40px 10px;
+ }
+
+ #search input {
+  	margin-top: 10px;
+  	border-radius: 0
+ }
+ 
+ #search button {
+ 	border-radius: 0;
+ }
+
+#addProject {
+    margin-top: 1em;
+}
+
+#projectForm{
+    max-width: 660px;
+    margin: 10px 0;
+}
+
+.profile form{
+    max-width: 330px;
+    margin: 10px 0;
+}
+
+.profile .btn-info {
+    padding: 1px 10px;
+}
+
+.fields div {
+    margin: 5px;
+}
+
+#sample-nav-header h3{
+    margin:0 10px; 
+    line-height:50px;
+}
+
+#sample-nav-header button {
+    background-color:black;
+}
+
+#sample-nav-header .icon-bar {
+    background-color: white;
+}
+
+#sample-nav {
+    padding: 0;
+}
+#sample-nav ul {
+    clear: left;
+}
+#sample-nav a:hover {
+    background-color: #E0E0E0; 
+}
+#sample-nav .active {
+    background-color: white;
+}

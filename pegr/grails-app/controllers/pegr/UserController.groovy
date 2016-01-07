@@ -13,20 +13,27 @@ class UserController {
     
     @Transactional
     def editInfo() {
+        def user = springSecurityService.currentUser.attach()
         if(request.method=='POST'){
-            withForm {
-                def user = springSecurityService.currentUser?.attach()
-                user.properties = params
-                if (user.validate() && user.save()) {
-                    flash.message = "Successfully updated basic information!"
-                    redirect(action: "profile")
-                } else {
-                    flash.message = "Invalid input!" 
-                    render(view:'editInfo', model:[user: user])
-                }
+            withForm {                
+				try {    				
+                    if(params.int('version') < user.version) {
+                        throw new Exception() 
+                    }
+					user.properties = params
+	                if (user.save(flush:true)) {
+	                    flash.message = "Successfully updated basic information!"
+	                    redirect(action: "profile")
+	                } else {
+	                    flash.message = "Invalid input!" 
+	                    render(view:'editInfo', model:[user: user])
+	                }
+				} catch(Exception e) {
+					flash.message = "Please try again!"
+					render(view:'editInfo', model:[user: user])
+				}
             }
         }else{
-            def user = springSecurityService.currentUser
             [user: user]
         }
     }

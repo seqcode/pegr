@@ -47,7 +47,7 @@
 			<%  } %>
 			</ol>
 			
-			<g:form  action='delete' method="DELETE">
+			<g:form  action='delete' method="DELETE" useToken="true">
 				<g:hiddenField name="id" value="\${${propertyName}?.id}" />
 				<fieldset class="buttons">
 					<g:link class="edit" action="edit"  id="\${${propertyName}?.id}"><g:message code="default.button.edit.label" default="Edit" /></g:link>

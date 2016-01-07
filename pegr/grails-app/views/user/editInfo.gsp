@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>Profile-Basic Infomation</title>
+    <title>Profile-Basic Information</title>
     <meta name="layout" content="main" />
 </head>
 <body>
@@ -16,6 +16,7 @@
             </div>
         </g:hasErrors>
         <g:form action="editInfo" method="POST" role="form" useToken="true">
+			<g:hiddenField name="version" value="${user?.version}"/>
             <div class="form-group ${hasErrors(bean: user, field: 'fullName', 'error')}">
                 <label for="fullName">Full name</label>
                 <g:textField class="form-control" id="fullName" name="fullName" value="${user?.fullName}"></g:textField>
@@ -29,7 +30,7 @@
                 <g:textField type="tel" class="form-control" id="phone" name="phone"></g:textField>
             </div>
             <span>
-                <g:submitButton name="update" value="Update" class="btn btn-primary"/>                   <g:link action='profile' class="btn btn-primary ">Cancel</g:link>
+                <g:submitButton name="update" value="Update" class="btn btn-primary"/> <g:link action='profile' class="btn btn-primary ">Cancel</g:link>
             </span>
         </g:form>
     </div>

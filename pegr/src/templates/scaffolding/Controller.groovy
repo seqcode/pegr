@@ -23,21 +23,22 @@ class ${className}Controller {
 
     @Transactional
     def save(${className} ${propertyName}) {
-        if (${propertyName} == null) {
-            notFound()
-            return
-        }
+        withForm {
+            if (${propertyName} == null) {
+                notFound()
+                return
+            }
 
-        if (${propertyName}.hasErrors()) {
-            respond ${propertyName}.errors, view:'create'
-            return
-        }
+            if (${propertyName}.hasErrors()) {
+                respond ${propertyName}.errors, view:'create'
+                return
+            }
 
-        ${propertyName}.save flush:true
-		
-		flash.message = message(code: 'default.created.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])
-		redirect(controller: '${className}Admin', action: 'index') 
-		
+            ${propertyName}.save flush:true
+
+            flash.message = message(code: 'default.created.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])
+            redirect(controller: '${className}Admin', action: 'index') 
+        }
     }
 
     def edit(${className} ${propertyName}) {
@@ -46,39 +47,42 @@ class ${className}Controller {
 
     @Transactional
     def update(${className} ${propertyName}) {
-        if (${propertyName} == null) {
-            notFound()
-            return
-        }
-
-        if (${propertyName}.hasErrors()) {
-            respond ${propertyName}.errors, view:'edit'
-            return
-        }
-
-        ${propertyName}.save flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: '${className}.label', default: '${className}'), ${propertyName}.id])
-                redirect(id: ${propertyName}.id, controller: '${className}Admin', action: 'show')
+        withForm {
+            if (${propertyName} == null) {
+                notFound()
+                return
             }
-            '*'{ respond ${propertyName}, [status: OK] }
+
+            if (${propertyName}.hasErrors()) {
+                respond ${propertyName}.errors, view:'edit'
+                return
+            }
+
+            ${propertyName}.save flush:true
+
+            request.withFormat {
+                form multipartForm {
+                    flash.message = message(code: 'default.updated.message', args: [message(code: '${className}.label', default: '${className}'), ${propertyName}.id])
+                    redirect(id: ${propertyName}.id, controller: '${className}Admin', action: 'show')
+                }
+                '*'{ respond ${propertyName}, [status: OK] }
+            }
         }
     }
 
     @Transactional
     def delete(${className} ${propertyName}) {
+        withForm {
+            if (${propertyName} == null) {
+                notFound()
+                return
+            }
 
-        if (${propertyName} == null) {
-            notFound()
-            return
+            ${propertyName}.delete flush:true
+
+            flash.message = message(code: 'default.deleted.message', args: [message(code: '${className}.label', default: '${className}'), ${propertyName}.id])
+            redirect(controller: '${className}Admin', action: 'index')
         }
-
-        ${propertyName}.delete flush:true
-
-		flash.message = message(code: 'default.deleted.message', args: [message(code: '${className}.label', default: '${className}'), ${propertyName}.id])
-		redirect(controller: '${className}Admin', action: 'index')
     }
 
     protected void notFound() {

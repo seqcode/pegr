@@ -16,7 +16,6 @@
             </div>
         </g:hasErrors>
         <g:form action="editInfo" method="POST" role="form" useToken="true">
-			<g:hiddenField name="version" value="${user?.version}"/>
             <div class="form-group ${hasErrors(bean: user, field: 'fullName', 'error')}">
                 <label for="fullName">Full name</label>
                 <g:textField class="form-control" id="fullName" name="fullName" value="${user?.fullName}"></g:textField>

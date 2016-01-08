@@ -1,40 +1,33 @@
 package pegr
 import grails.transaction.Transactional
 
-@Transactional(readOnly = true)
 class UserController {
 
 	def springSecurityService	
-	
+	def userService
+    
 	def profile(){
         def user = springSecurityService.currentUser
         [user:user]
 	}
     
-    @Transactional
-    def editInfo() {
-        def user = springSecurityService.currentUser.attach()
+    def editInfo(UserInfoCommand uic) {
         if(request.method=='POST'){
             withForm {                
-				try {    				
-                    if(params.int('version') < user.version) {
-                        throw new Exception() 
-                    }
-					user.properties = params
-	                if (user.save(flush:true)) {
-	                    flash.message = "Successfully updated basic information!"
-	                    redirect(action: "profile")
-	                } else {
-	                    flash.message = "Invalid input!" 
-	                    render(view:'editInfo', model:[user: user])
-	                }
-				} catch(Exception e) {
-					flash.message = "Please try again!"
-					render(view:'editInfo', model:[user: user])
+				try {
+                    int id = springSecurityService.currentUser.id
+				    userService.updateUser(uic, id)
+                    flash.message = "Successfully updated basic information!"
+	                redirect(action: "profile")
+				} catch(UserException e) {
+					flash.message = e.message
+					render(view:'editInfo', model:[user: uic])
 				}
             }
         }else{
-            [user: user]
+            def user = springSecurityService.currentUser
+            uic = new UserInfoCommand(user.properties['fullName', 'email', 'phone'])
+            [user: uic]
         }
     }
     
@@ -124,4 +117,13 @@ class UserRegistrationCommand {
 			   return passwd2 == urc.password ?: 'validation.reenterSamePassword'
 		   }
 	}
+}
+
+class UserInfoCommand {
+    String fullName
+    String email
+    String phone
+    static constraints = {
+		importFrom User
+    }
 }

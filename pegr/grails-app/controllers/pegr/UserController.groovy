@@ -8,7 +8,11 @@ class UserController {
     
 	def profile(){
         def user = springSecurityService.currentUser
-        [user:user]
+        if (!user) {
+            redirect(uri: "/login/form")
+        } else {
+            [user:user]
+        }
 	}
     
     def editInfo(UserInfoCommand uic) {
@@ -20,7 +24,7 @@ class UserController {
                     flash.message = "Successfully updated basic information!"
 	                redirect(action: "profile")
 				} catch(UserException e) {
-					flash.message = e.message
+					request.message = e.message
 					render(view:'editInfo', model:[user: uic])
 				}
             }

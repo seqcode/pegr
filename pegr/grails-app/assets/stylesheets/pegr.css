@@ -99,7 +99,7 @@ footer {
     padding: 1px 10px;
 }
 
-.fields div {
+.fields > div {
     margin: 5px;
 }
 

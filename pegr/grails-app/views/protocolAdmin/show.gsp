@@ -49,21 +49,9 @@
 			
 				<g:if test="${protocolInstance?.details}">
 				<li class="fieldcontain">
-					<span id="details-label" class="property-label"><g:message code="protocol.details.label" default="Details" /></span>
-					
-						<span class="property-value" aria-labelledby="details-label"><g:fieldValue bean="${protocolInstance}" field="details"/></span>
-					
-				</li>
-				</g:if>
-			
-				<g:if test="${protocolInstance?.protocolGroups}">
-				<li class="fieldcontain">
-					<span id="protocolGroups-label" class="property-label"><g:message code="protocol.protocolGroups.label" default="Protocol Groups" /></span>
-					
-						<g:each in="${protocolInstance.protocolGroups}" var="p">
-						<span class="property-value" aria-labelledby="protocolGroups-label"><g:link controller="protocolGroupAdmin" action="show" id="${p.id}">${p?.encodeAsHTML()}</g:link></span>
-						</g:each>
-					
+					<span id="details-label" class="property-label">Details</span>
+						<span class="property-value" aria-labelledby="details-label">${raw(protocolInstance.details)}</span>
+
 				</li>
 				</g:if>
 			

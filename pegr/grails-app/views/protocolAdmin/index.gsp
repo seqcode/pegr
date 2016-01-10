@@ -20,30 +20,18 @@
 			<div class="table-responsive">
 			<table class="table">
 			<thead>
-					<tr>
-					
-						<g:sortableColumn property="name" title="${message(code: 'protocol.name.label', default: 'Name')}" />
-					
-						<g:sortableColumn property="protocolVersion" title="${message(code: 'protocol.protocolVersion.label', default: 'Protocol Version')}" />
-					
-						<g:sortableColumn property="description" title="${message(code: 'protocol.description.label', default: 'Description')}" />
-					
-						<g:sortableColumn property="details" title="${message(code: 'protocol.details.label', default: 'Details')}" />
-					
+					<tr>					
+						<g:sortableColumn property="name" title="Name" />					
+						<g:sortableColumn property="protocolVersion" title="Version" />
+						<g:sortableColumn property="description" title="Description" />
 					</tr>
 				</thead>
 				<tbody>
 				<g:each in="${protocolInstanceList}" status="i" var="protocolInstance">
-					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-					
-						<td><g:link action="show" id="${protocolInstance.id}">${fieldValue(bean: protocolInstance, field: "name")}</g:link></td>
-					
-						<td>${fieldValue(bean: protocolInstance, field: "protocolVersion")}</td>
-					
-						<td>${fieldValue(bean: protocolInstance, field: "description")}</td>
-					
-						<td>${fieldValue(bean: protocolInstance, field: "details")}</td>
-					
+					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">					
+						<td><g:link action="show" id="${protocolInstance.id}">${fieldValue(bean: protocolInstance, field: "name")}</g:link></td>					
+						<td>${fieldValue(bean: protocolInstance, field: "protocolVersion")}</td>					
+						<td>${fieldValue(bean: protocolInstance, field: "description")}</td>					
 					</tr>
 				</g:each>
 				</tbody>

@@ -10,7 +10,7 @@
 //= require_self
 //= require bootstrap
 //= require pegr
-//= require jquery-te
+
 
 if (typeof jQuery !== 'undefined') {
 	(function($) {

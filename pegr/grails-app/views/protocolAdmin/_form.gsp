@@ -21,7 +21,7 @@
 <div class=" ${hasErrors(bean: protocolInstance, field: 'details', 'error')} ">
 	<label for="details">Details</label>
 	<g:textArea id="protocol-details" name="details" value="${protocolInstance?.details}"/>
-	<script>$("#protocol-details").jqte();</script>
+	<script>$("#protocol-details").cleditor();</script>
 </div>
 
 

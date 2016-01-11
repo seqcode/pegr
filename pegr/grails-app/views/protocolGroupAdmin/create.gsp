@@ -11,7 +11,7 @@
 			<li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
 		</ul>
 		<div id="create-protocolGroup" class="content scaffold-create" role="main">
-			<h3><g:message code="default.create.label" args="[entityName]" /></h3>
+			<h3>Create Protocol Group</h3>
 			<g:if test="${flash.message}">
 			<div class="message" role="status">${flash.message}</div>
 			</g:if>

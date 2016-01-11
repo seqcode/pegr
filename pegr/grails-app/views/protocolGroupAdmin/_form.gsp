@@ -13,9 +13,15 @@
     <div class="col-sm-2">
         <button type="button" id="search_rightSelected" class="btn btn-block"><i class="glyphicon glyphicon-chevron-right"></i></button>
 		<button type="button" id="search_leftSelected" class="btn btn-block"><i class="glyphicon glyphicon-chevron-left"></i></button>
+        <button type="button" id="up" class="btn btn-block"><i class="glyphicon glyphicon-arrow-up"></i></button>
+		<button type="button" id="down" class="btn btn-block"><i class="glyphicon glyphicon-arrow-down"></i></button>
     </div>
     <div class="col-sm-5">
-        <select name="protocols" id="search_to" class="form-control" size="8" multiple="multiple" ></select>
+        <select name="protocols" id="search_to" class="form-control" size="8" multiple="multiple">
+            <g:each in="${protocolGroupInstance.protocols}">
+            <option value="${it.id}" >${it}</option>
+            </g:each>
+        </select>
     </div>
 </div>
 
@@ -25,7 +31,16 @@ jQuery(document).ready(function($) {
 		search: {
 			left: '<input type="text" name="q" class="form-control" placeholder="Search..." />',
 			right: '<input type="text" name="q" class="form-control" placeholder="Search..." />',
-		}
-	});
+		},        
+		sort: false
+	});    
+});
+    
+$("#up").click(function(){
+	$("select").moveSelectedUp();
+});
+    
+$("#down").click(function(){
+	$("select").moveSelectedDown();
 });
 </script>

@@ -10,7 +10,7 @@
 //= require_self
 //= require bootstrap
 //= require pegr
-
+//= require multiselect
 
 if (typeof jQuery !== 'undefined') {
 	(function($) {

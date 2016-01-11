@@ -12,7 +12,7 @@
 			<li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
 			<li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
 		</ul>
-		</div>
+
 		<div id="edit-${domainClass.propertyName}" class="content scaffold-edit" role="main">
 			<h3><g:message code="default.edit.label" args="[entityName]" /></h3>
 			<g:if test="\${flash.message}">

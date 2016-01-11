@@ -7,7 +7,7 @@ class Protocol {
 	String details
 	
 	String toString() {
-		name + protocolVersion
+		name + " " +protocolVersion
 	}
 	
 	static hasMany = [protocolGroups: ProtocolGroup]	

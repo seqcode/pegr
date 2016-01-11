@@ -27,7 +27,7 @@
 
 <script type="text/javascript">
 jQuery(document).ready(function($) {
-	$('#search').multiselect({
+	$('#search').multipleselect({
 		search: {
 			left: '<input type="text" name="q" class="form-control" placeholder="Search..." />',
 		},        

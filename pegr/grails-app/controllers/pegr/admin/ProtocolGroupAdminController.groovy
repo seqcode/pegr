@@ -9,28 +9,30 @@ class ProtocolGroupAdminController {
 	public static AdminCategory category = AdminCategory.PROTOCOLS
     
     @Transactional
-    def update(ProtocolGroup protocolGroupInstance, List newProtocolList) {
+    def update() {
         withForm {
-            if (protocolGroupInstance == null) {
-                notFound()
-                return
-            }
-
-            if (protocolGroupInstance.hasErrors()) {
-                respond protocolGroupInstance.errors, view:'edit'
-                return
-            }
-
-			int count = ProtocolGroup.get(protocolGroupInstance.id).protocols?.size()
-            protocolGroupInstance.protocols.drop(count)
-            protocolGroupInstance.save flush:true
-
-            request.withFormat {
-                form multipartForm {
-                    flash.message = message(code: 'default.updated.message', args: [message(code: 'ProtocolGroup.label', default: 'ProtocolGroup'), protocolGroupInstance.id])
-                    redirect(id: protocolGroupInstance.id, controller: 'ProtocolGroupAdmin', action: 'show')
+            def protocolGroupInstance = ProtocolGroup.get(params.id)
+            
+            if (protocolGroupInstance) {
+                //remove old protocols
+                protocolGroupInstance.protocols.clear()
+                
+                // update with new input
+                protocolGroupInstance.properties = params
+                try {
+                    if (protocolGroupInstance.save(flush: true)) {
+                        flash.message = "Protocol Group ${protocolGroupInstance.name} has been updated!"
+                        redirect(id: protocolGroupInstance.id, action: 'show')
+                    } else {
+                        flash.message = "Invalid inputs!"
+                        redirect(id: protocolGroupInstance.id, action: 'edit', params:[protocolGroupInstance: protocolGroupInstance])
+                    }
+                } catch(org.springframework.dao.OptimisticLockingFailureException e) {
+                    flash.message = "Oops! Please try again!"
+                    redirect(id: protocolGroupInstance.id, action: 'edit', params:[protocolGroupInstance: protocolGroupInstance])
                 }
-                '*'{ respond protocolGroupInstance, [status: OK] }
+            } else {
+                render status: 404
             }
         }
     }

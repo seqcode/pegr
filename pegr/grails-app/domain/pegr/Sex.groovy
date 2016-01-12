@@ -7,6 +7,6 @@ class Sex {
 		name
 	}
     static constraints = {
-		name unique: true, size: 2..20	
+		name unique: true
     }
 }

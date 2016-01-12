@@ -12,7 +12,7 @@ class SequenceIndex {
 	
     static constraints = {    
 		indexVersion maxSize: 10
-		sequence maxSize: 30 
+		sequence
 		indexId unique: 'indexVersion'
 		oligo nullable: true, blank: true
 	}

@@ -13,7 +13,7 @@ class ProtocolGroup {
 	static hasMany = [protocols: Protocol]
 	
     static constraints = {
-    	name maxSize: 30, unique: true
+    	name unique: true
 	}
     
     static mapping = {

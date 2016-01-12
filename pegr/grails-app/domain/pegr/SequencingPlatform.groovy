@@ -9,6 +9,6 @@ class SequencingPlatform {
 	}
 	
     static constraints = {
-    	name unique: true, maxSize: 30
+    	name unique: true
 	}
 }

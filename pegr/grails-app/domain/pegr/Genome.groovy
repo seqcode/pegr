@@ -11,7 +11,6 @@ class Genome {
 	}
 	
     static constraints = {
-		name size: 2..30, unqiue: 'genomeBuild'
-		genomeBuild size: 2..30
+		name unqiue: 'genomeBuild'
     }
 }

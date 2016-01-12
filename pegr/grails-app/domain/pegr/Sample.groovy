@@ -36,7 +36,7 @@ class Sample {
         chromosomeAmount nullable: true
         quantityReceived nullable: true
         requestedTagNumber nullable: true
-		publicationReference nullable: true, blank: true, maxSize: 30
+		publicationReference nullable: true, blank: true
 		note nullable: true, blank: true
 		latestProtocolInstance nullable: true
     }

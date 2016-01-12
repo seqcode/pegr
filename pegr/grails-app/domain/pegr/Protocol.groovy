@@ -19,7 +19,7 @@ class Protocol {
 	static belongsTo = [ProtocolGroup]
 	
     static constraints = {
-		name unique: 'protocolVersion', size: 2..30
+		name unique: 'protocolVersion'
 		protocolVersion nullable: true, blank: false, maxSize: 10
 		description nullable: true, blank: true
 		details nullable: true, blank: true

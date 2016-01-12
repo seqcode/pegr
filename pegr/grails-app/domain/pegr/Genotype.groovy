@@ -10,7 +10,7 @@ class Genotype {
 	}
 	
     static constraints = {
-		name maxSize:30, unique: true
+		name unique: true
 		note nullable: true, blank: true
     }
 }

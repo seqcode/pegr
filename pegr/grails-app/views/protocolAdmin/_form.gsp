@@ -2,7 +2,7 @@
 
 <div class=" ${hasErrors(bean: protocolInstance, field: 'name', 'error')} required">
 	<label for="name">Name <span class="required-indicator">*</span></label>
-	<g:textField name="name" maxlength="30" required="" value="${protocolInstance?.name}"/>
+	<g:textField name="name" required="" value="${protocolInstance?.name}"/>
 
 </div>
 

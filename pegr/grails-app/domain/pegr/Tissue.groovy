@@ -8,6 +8,6 @@ class Tissue {
 	}
 	
     static constraints = {
-		name unique: true, size: 2..30
+		name unique: true
     }
 }

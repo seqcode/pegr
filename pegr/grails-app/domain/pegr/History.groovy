@@ -12,8 +12,6 @@ class History {
 
     static constraints = {
 		project nullable: true
-		objectType maxsize: 30
-		action maxsize: 20
 		log nullable: true, blank: true
     }
 }

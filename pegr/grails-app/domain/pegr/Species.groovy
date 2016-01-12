@@ -10,8 +10,7 @@ class Species {
 	}
 	
     static constraints = {
-		name unique: true, maxSize: 50
-		genusName maxSize: 50 
+		name unique: true
 		note nullable: true, blank: true
     }
 }

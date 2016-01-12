@@ -9,6 +9,6 @@ class AbHost {
 	}
 	
     static constraints = {
-		name maxSize: 30, unique: true
+		name unique: true
     }
 }

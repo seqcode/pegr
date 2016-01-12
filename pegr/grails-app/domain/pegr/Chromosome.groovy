@@ -10,7 +10,7 @@ class Chromosome {
 		name
 	}
     static constraints = {
-		name size: 2..30, unique: true
+		name unique: true
 		note nullable: true, blank: true
     }
 }

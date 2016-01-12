@@ -11,8 +11,8 @@ class ItemType {
 	}
 	
     static constraints = {
-		name maxSize: 30, unique: true
-		objectType nullable: true, blank: true, maxSize: 30
+		name unique: true
+		objectType nullable: true, blank: true
 		fields nullable: true, blank: true
     }
 }

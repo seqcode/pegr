@@ -14,48 +14,20 @@
 			<li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
 		</ul>
 		<div id="show-protocol" class="content scaffold-show" role="main">
-			<h3><g:message code="default.show.label" args="[entityName]" /></h3>
+			<h3>Protocol: ${protocolInstance?.name} ${protocolInstance?.protocolVersion}</h3>
 			<g:if test="${flash.message}">
 			<div class="message" role="status">${flash.message}</div>
 			</g:if>
-			<ol class="property-list protocol">
 			
-				<g:if test="${protocolInstance?.name}">
-				<li class="fieldcontain">
-					<span id="name-label" class="property-label"><g:message code="protocol.name.label" default="Name" /></span>
-					
-						<span class="property-value" aria-labelledby="name-label"><g:fieldValue bean="${protocolInstance}" field="name"/></span>
-					
-				</li>
-				</g:if>
+            <g:if test="${protocolInstance?.description}">
+                <h4>Description</h4>
+                ${protocolInstance?.description}
+            </g:if>
 			
-				<g:if test="${protocolInstance?.protocolVersion}">
-				<li class="fieldcontain">
-					<span id="protocolVersion-label" class="property-label"><g:message code="protocol.protocolVersion.label" default="Protocol Version" /></span>
-					
-						<span class="property-value" aria-labelledby="protocolVersion-label"><g:fieldValue bean="${protocolInstance}" field="protocolVersion"/></span>
-					
-				</li>
-				</g:if>
-			
-				<g:if test="${protocolInstance?.description}">
-				<li class="fieldcontain">
-					<span id="description-label" class="property-label"><g:message code="protocol.description.label" default="Description" /></span>
-					
-						<span class="property-value" aria-labelledby="description-label"><g:fieldValue bean="${protocolInstance}" field="description"/></span>
-					
-				</li>
-				</g:if>
-			
-				<g:if test="${protocolInstance?.details}">
-				<li class="fieldcontain">
-					<span id="details-label" class="property-label">Details</span>
-						<span class="property-value" aria-labelledby="details-label">${raw(protocolInstance.details)}</span>
-
-				</li>
-				</g:if>
-			
-			</ol>
+            <g:if test="${protocolInstance?.details}">
+                <h4>Details</h4>
+                ${raw(protocolInstance.details)}
+            </g:if>
 			
 			<g:form  action='delete' method="DELETE" useToken="true">
 				<g:hiddenField name="id" value="${protocolInstance?.id}" />

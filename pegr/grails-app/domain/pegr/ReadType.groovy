@@ -10,7 +10,7 @@ class ReadType {
 	}
 	
     static constraints = {
-    	name size: 2..20, unique: true
+    	name unique: true
 		shortName size: 2..10, unique: true
 		note nullable: true, blank: true
 	}

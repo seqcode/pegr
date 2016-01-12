@@ -15,8 +15,7 @@ class FileMetadata {
 	}
 	
     static constraints = {
-		name maxSize: 30, unique:'fileType'
-		md5CheckSum maxSize: 50
+		name unique:'fileType'
 		note nullable: true, blank: true
     }
 }

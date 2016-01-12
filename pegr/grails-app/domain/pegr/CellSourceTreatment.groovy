@@ -21,9 +21,8 @@ class CellSourceTreatment {
 	static belongsTo = CellSource
 	
     static constraints = {
-    	name unique: true, size: 2..30
-		compound size: 2..30
-		quantity maxSize: 20, nullable: true, blank: true
-		duration maxSize: 20, nullable: true, blank: true
+    	name unique: true
+		quantity nullable: true, blank: true
+		duration nullable: true, blank: true
 	}
 }

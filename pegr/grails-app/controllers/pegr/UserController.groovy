@@ -97,10 +97,15 @@ class UserController {
             } else {
                 def user = new User(urc.properties)
                 user.password = springSecurityService.encodePassword(urc.password)
-                if (user.save()) {
-                    redirect(action: "profile")
-                }else {
-                    [user: urc]
+                try {
+                    if (user.save(flush:true)) {
+                        redirect(controller: "auth", action: "form")
+                    }else {
+                        [user: urc]
+                    }
+                } catch(Exception e) {
+                    log.error "Error: ${e.message}", e
+                    render status: 404
                 }
             }
         }

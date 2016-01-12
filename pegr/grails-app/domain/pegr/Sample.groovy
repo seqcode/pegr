@@ -43,5 +43,6 @@ class Sample {
     
     static mapping = {
         sort lastUpdated:"desc"
+        dynamicUpdate: true
     }
 }

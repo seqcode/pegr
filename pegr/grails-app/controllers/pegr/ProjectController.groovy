@@ -27,21 +27,57 @@ class ProjectController {
                 def user = springSecurityService.currentUser
                 // create new project
                 def project = new Project(params)
-                if (project.validate() && project.save()) {
-                    // add current user as owner
-                    project.addToProjectUsers(new ProjectUser(user: user, 
-                                                              project: project, 
-                                                              projectRole: ProjectRole.OWNER)) 
-                    flash.message = "Successfully  created project ${project.name}"
-                    redirect(action:"show", id:"${project.id}")
-                } else {
-                    flash.message = "Invalid project"
+                try {
+                    if (project.save(flush: true)) {
+                        // add current user as owner
+                        project.addToProjectUsers(new ProjectUser(user: user, 
+                                                                  project: project, 
+                                                                  projectRole: ProjectRole.OWNER)) 
+                        flash.message = "Successfully  created project ${project.name}"
+                        redirect(action:"show", id:"${project.id}")
+                    } else {
+                        reqeust.message = "Invalid inputs!"
+                        render(view:'create', model:[project: project])
+                }
+                }catch(Exception e) {
+                    log.error "Error: ${e.message}", e
+                    request.message ="Oops! Please try again."
                     render(view:'create', model:[project: project])
                 }
             }        
         }
     }
 	
+    @Transactional
+    def edit() {
+        def project = Project.get(params.id)
+        if (!project) {
+            flash.message = "Project no longer exists!"
+            redirect(action:"index")
+        }
+
+        if(request.method == 'POST') {
+            withForm{
+                project.properties = params
+                try {
+                    if (project.save(flush: true)) {
+                        flash.message = "Successfully  updated information for project ${project.name}"
+                        redirect(action:"show", id:"${project.id}")
+                    } else {
+                        reqeust.message = "Invalid inputs!"
+                        [project: project]
+                    }
+                } catch(Exception e) {
+                    log.error "Error: ${e.message}", e
+                    request.message ="Oops! Please try again."
+                    [project: project]
+                }
+            }
+        }else {
+            [project: project]
+        }
+    }
+    
 	def show() {
 		def currentProject = Project.get(params.id)
         def projectUsers = ProjectUser.where { project==currentProject}.list()

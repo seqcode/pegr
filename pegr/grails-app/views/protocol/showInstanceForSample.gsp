@@ -11,7 +11,7 @@
         </div>
         <div class="col-sm-10 content">
             <h3>Protocol ${protocolInstance?.protocol?.name} ${protocolInstance?.protocol?.version}</h3>
-            <p>${protocolInstance?.protocol?.description }</p>
+            <p>Description: ${protocolInstance?.protocol?.description }</p>
             <p>${protocolInstance?.protocol?.details }</p>
             <ul id="itemList">
                 <g:each in="${protocolInstance?.items}" var="itemInstance">

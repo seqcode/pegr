@@ -18,7 +18,7 @@
 			<label><g:checkBox name="_spring_security_remember_me" value="true"/> Remember me</label>
 		</div>
 		<div class="form-group">
-			<g:submitButton name="signIn" value="Sign in" class="btn btn-default"/>
+			<g:submitButton name="signIn" value="Sign in" class="btn btn-primary"/>
 			<g:link controller="user" action="register" class="btn btn-default">Register</g:link>
 		</div>
 	</g:form>

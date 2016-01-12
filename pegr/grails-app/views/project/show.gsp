@@ -6,7 +6,7 @@
 <body>
 	<div><g:link action='index'>My Projects</g:link> -> Project ${project?.name} </div>
 	<div class="col-sm-8">
-		<h3>Project: ${project?.name} <g:link action="edit" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-plus">Edit</span></g:link></h3>
+		<h3>Project: ${project?.name} <g:link action="edit" id="${project?.id}" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-plus">Edit</span></g:link></h3>
 		<p>Created: ${project?.dateCreated}, updated: ${project?.lastUpdated}</p>
 		<p>Description: ${project?.description}</p>
         <p>Funding: ${project?.funding}</p>

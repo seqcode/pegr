@@ -38,6 +38,7 @@
 			this.callbacks = settings;
 			
 			this.init();
+            this.candidates = this.left.find('option').clone()
 		}
 		
 		Multipleselect.prototype = {
@@ -72,13 +73,11 @@
 				// append left filter
                 self.options.search.left.on('keyup', function(e) {
                     var regex = new RegExp(this.value,"ig");
-
-                    self.left.find('option').each(function(i, option) {
+                    self.left.empty();
+                    self.candidates.each(function(i, option) {
                         if (option.text.search(regex) >= 0) {
-                            $(option).show();
-                        } else {
-                            $(option).hide();
-                        }
+                            self.left.append(option)
+                        } 
                     });
                 });
 

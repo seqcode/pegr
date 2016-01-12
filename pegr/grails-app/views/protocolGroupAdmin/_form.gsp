@@ -2,7 +2,7 @@
 
 <div class="${hasErrors(bean: protocolGroupInstance, field: 'name', 'error')} required">
 	<label for="name">Name	<span class="required-indicator">*</span></label>
-	<g:textField name="name" maxlength="30" required="" value="${protocolGroupInstance?.name}"/>
+	<g:textField name="name" required="" value="${protocolGroupInstance?.name}"/>
 </div>
 
 <h4>Protocols</h4>
@@ -31,7 +31,6 @@ jQuery(document).ready(function($) {
 		search: {
 			left: '<input type="text" name="q" class="form-control" placeholder="Search..." />',
 		},        
-		sort: false
 	});    
 });
     

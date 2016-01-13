@@ -10,8 +10,11 @@
              <g:render template="/sample/nav" />
         </div>
         <div class="col-sm-10 content">
-            <h3>Protocols</h3>
             
+            <h3>Protocols</h3>
+            <g:if test="${flash.message}">
+			<div class="message" role="status">${flash.message}</div>
+			</g:if>
 			<div id="protocols">
 			<g:render template="protocolsDetails" bean="${protocolGroup}" />
 			</div>

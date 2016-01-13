@@ -18,10 +18,9 @@
         <g:link controller="sample" action="create" params="[projectId: project?.id]" class="btn btn-info">Create New Sample</g:link>
         <g:link action="addSample" class="btn btn-info">Add Existing Sample</g:link>
         <g:render template="/sample/table" bean="${project?.samples}" />
-        
-		<p>B: <abbr title="What is biological replication">biological replication</abbr>; 
-		T: <abbr title="What is technical replication">technical replication</abbr>.</p>
-		
+		<div class="pagination">
+            <g:paginate total="${sampleCount ?: 0}" />
+        </div>
 	</div>
     <div class="col-sm-4" style="padding: 10px 0">
       <div class="well">

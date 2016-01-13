@@ -81,7 +81,7 @@ class ProjectController {
 	def show() {
 		def currentProject = Project.get(params.id)
         def projectUsers = ProjectUser.where { project==currentProject}.list()
-        [project: currentProject, projectUsers: projectUsers]
+        [project: currentProject, projectUsers: projectUsers, sampleCount: currentProject.samples.size()]
 	}
 	
 	def addUser(project, newUser) {

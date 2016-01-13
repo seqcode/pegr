@@ -83,22 +83,26 @@ class ProtocolController {
     
     @Transactional
     def addItemToPrtclInstanceAjax(){
-        withForm {
-            def item = new Item(params)
+                   
             try {
+                def item = new Item(params)
                 def protocolInstance = ProtocolInstance.get(params.prtclInstId)
-                
-                if (item.save(flush:true) ) {
-                    protocolInstance.addToItems(item).save(flush: true)
-                    render template: '/item/detailSquare', collection: protocolInstance.items, var: 'itemInstance'
-                } else {
-                    render "Invalid inputs for item!"
+                if (protocolInstance) {
+                    if (item.save(flush:true) ) {
+                        protocolInstance.addToItems(item).save(flush: true)
+                        
+                        render template: '/item/detailSquare', collection: protocolInstance.items, var: 'itemInstance'
+                    } else {
+                        render "Invalid inputs for item!"
+                    }
+                }else {
+                    render "Protocol Instance not found!"
                 }
             }catch(Exception e) {
                 log.error "Error saving item", e
                 render "Error saving this item!"
             }
-        }
+        
     }
     
     @Transactional

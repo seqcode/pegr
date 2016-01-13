@@ -182,14 +182,10 @@
 				</li>
 				</g:if>
 			
-				<g:if test="${sampleInstance?.status}">
-				<li class="fieldcontain">
-					<span id="status-label" class="property-label"><g:message code="sample.status.label" default="Status" /></span>
-					
-						sampleInstance.status
-					
+
+				<li class="fieldcontain">								
+					Status:	${ sampleInstance.status}					
 				</li>
-				</g:if>
 			
 			</ol>
 			

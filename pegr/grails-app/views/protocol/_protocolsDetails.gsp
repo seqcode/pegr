@@ -2,8 +2,15 @@
 <ol class="list-group">
 <g:each in="${it.protocols}" var="protocol" status="count">
     <g:if test="${count < protInstCount}">
-        <li class="list-group-item list-group-item-info">${protocol.name}
-            <g:link class="btn btn-info" controller="protocol" action="showInstanceForSample" params="[prtclInstanceId: protocolInstances[count].id, sampleId: sampleId]">Details</g:link>
+        <li class="list-group-item list-group-item-info">
+            <g:link controller="protocol" action="showInstanceForSample" params="[prtclInstanceId: protocolInstances[count].id, sampleId: sampleId]">${protocol.name}
+                <g:if test="${protocolInstances[count].completed}">
+                    <span class="badge">Completed</span>
+                </g:if>
+                <g:else>
+                    <span class="badge">In progress</span>
+                </g:else>
+            </g:link>
         </li>
 	</g:if>
 	<g:else>

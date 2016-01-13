@@ -52,7 +52,7 @@
 			                <g:renderErrors bean="${ItemInstance}" as="list"/>
 			            </div>
 			        </g:hasErrors>
-                    <g:form class="fields" role="form" useToken="true" >
+                    <g:form class="fields" role="form" >
                         <g:hiddenField name="prtclInstId" value="${protocolInstance.id}"/>
                         <div class=" ${hasErrors(bean: itemInstance, field: 'type', 'error')} ">
                             <label for="type">Type</label>
@@ -79,7 +79,7 @@
                 </div>
             </div>
             <div class="row well text-center">
-            <g:link action="completePrtclInst" params="sampleId: ${sampleId}, prtclInstId: ${protocolInstance.id}" class="btn btn-success">Complete <span class="glyphicon glyphicon-ok"></span> </g:link>
+            <g:link action="completePrtclInst" params="[sampleId: sampleId, prtclInstId: protocolInstance.id]" class="btn btn-success">Complete <span class="glyphicon glyphicon-ok"></span> </g:link>
             </div>
         </div>
     </div>

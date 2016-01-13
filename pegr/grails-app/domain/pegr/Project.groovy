@@ -7,9 +7,13 @@ class Project {
 	Date dateCreated
 	Date lastUpdated
 	String funding
-
+	
 	static hasMany = [samples: Sample, projectUsers: ProjectUser]
 
+	String toString() {
+		name
+	}
+	
     static constraints = {
 		name unique: true
 		description nullable: true, blank: true, maxSize: 1000

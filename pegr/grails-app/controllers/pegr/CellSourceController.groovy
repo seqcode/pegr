@@ -41,7 +41,7 @@ class CellSourceController {
 							}
 						}
 					    flash.message = "Invalid inputs"
-                        render( model: [cellSourceInstance: cellSource,												                                               itemInstance: item,
+                        render( model: [cellSourceInstance: cellSource, itemInstance: item,
                                     sampleId: sample.id])
 						
                     } else {
@@ -52,6 +52,11 @@ class CellSourceController {
 		}else {
 			render status: 500
 		}
+	}
+	
+	@Transactional 
+	def editCellSourceForSample() {
+		
 	}
 	
 }

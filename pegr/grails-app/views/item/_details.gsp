@@ -1,4 +1,4 @@
-<h5>${itemInstance?.type?.name}</h5>
+
 <ul>
     <g:if test="${itemInstance?.barcode}">
     <li>Barcode: ${itemInstance.barcode }</li>

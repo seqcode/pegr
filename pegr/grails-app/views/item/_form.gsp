@@ -1,7 +1,7 @@
 		<div class=" ${hasErrors(bean: itemInstance, field: 'barcode', 'error')} ">
 			<label for="barcode">Barcode</label>
 			<g:textField id="barcode" name="barcode" value="${itemInstance?.barcode}"/>
-			<input type=button value="Scan" onclick="getScan();">
+            <button type="button" onclick="getScan();"><span class="glyphicon glyphicon-qrcode"></span> Scan</button>
 		</div>
 		
 		<div class=" ${hasErrors(bean: itemInstance, field: 'location', 'error')} ">

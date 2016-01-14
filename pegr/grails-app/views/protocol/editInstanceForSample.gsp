@@ -37,7 +37,6 @@
              <div>
                 <ul class="nav nav-tabs">
                   <li class="active"><a data-toggle="tab" href="#new-item"><span class="glyphicon glyphicon-plus"></span> New</a></li>
-                  <li><a data-toggle="tab" href="#scan-item"><span class="glyphicon glyphicon-qrcode"></span> Scan</a></li>
                   <li><a data-toggle="tab" href="#search-item"><span class="glyphicon glyphicon-search"></span> Search</a></li>
                 </ul>
                 
@@ -65,16 +64,19 @@
                             onSuccess="clearForm(data)"/>
                     </g:form>
                   </div>
-                  
-                  <div id="scan-item" class="tab-pane fade">
-                    <h4>Scan </h4>
-                    <span class="glyphicon glyphicon-qrcode"></span>
-                    <p>Some content in menu 2.</p>
-                  </div>
                     
                   <div id="search-item" class="tab-pane fade">
-                    <h4>Search </h4>
-                    <p>Some content in menu 3.</p>
+                    <h4>Search Item</h4>
+                    <g:form class="fields" role="form" >
+                        <label for="type">Type</label>
+                        <g:select id="type" name="type.id" optionKey="id" from="${pegr.ItemType.list()}" noSelection="['null': '-- choose --']" />
+                        <g:render template="/item/form" bean="${itemInstance}"/>
+                        <g:submitToRemote class="btn btn-primary" value="Search"
+                            url="[action: 'searchAjax']"
+                            update="itemPreview"/>
+                    </g:form>
+                    <div id="itemPreview"></div>  
+                    <div id="linkItem" class="hidden"></div>
                   </div>
                 </div>
             </div>
@@ -87,8 +89,15 @@
         function clearForm(e) {
             $('form').trigger("reset");
         }
+        
+        function createItemPreview(data) {
+            $.each(data, function(index, value) {
+                $('itemPreview').append(value.barcode)
+            });
+        }
         $("#nav-sample-protocols").addClass("active");
-        $("#nav-projects").addClass("active");        
+        $("#nav-projects").addClass("active"); 
+        
     </script>
 </body>
 </html>

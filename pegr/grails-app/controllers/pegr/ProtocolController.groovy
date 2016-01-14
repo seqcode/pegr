@@ -83,26 +83,58 @@ class ProtocolController {
     
     @Transactional
     def addItemToPrtclInstanceAjax(){
-                   
-            try {
-                def item = new Item(params)
-                def protocolInstance = ProtocolInstance.get(params.prtclInstId)
-                if (protocolInstance) {
-                    if (item.save(flush:true) ) {
-                        protocolInstance.addToItems(item).save(flush: true)
-                        
-                        render template: '/item/detailSquare', collection: protocolInstance.items, var: 'itemInstance'
-                    } else {
-                        render "Invalid inputs for item!"
-                    }
-                }else {
-                    render "Protocol Instance not found!"
+        try {
+            def item = new Item(params)
+            def protocolInstance = ProtocolInstance.get(params.prtclInstId)
+            if (protocolInstance) {
+                if (item.save(flush:true) ) {
+                    protocolInstance.addToItems(item).save(flush: true)
+
+                    render template: '/item/detailSquare', collection: protocolInstance.items, var: 'itemInstance'
+                } else {
+                    render template: '/layouts/error', bean: item
                 }
-            }catch(Exception e) {
-                log.error "Error saving item", e
-                render "Error saving this item!"
+            }else {
+                render "Protocol Instance not found!"
             }
-        
+        }catch(Exception e) {
+            log.error "Error saving item", e
+            render "Error saving this item!"
+        }   
+    }
+    
+    @Transactional
+    def linkItemToPrtclInstanceAjax() {
+        try {
+            def item = Item.get(params.itemId)
+            def protocolInstance = ProtocolInstance.get(params.prtclInstId)
+            if (protocolInstance && item) {    
+                protocolInstance.addToItems(item).save(flush: true)
+                render template: '/item/detailSquare', collection: protocolInstance.items, var: 'itemInstance'                
+            }else {
+                throw new Exception()
+            }
+        }catch(Exception e) {
+            log.error "Error linking item to protocol instance", e
+            render "Error linking this item to the protocol instance!"
+        }   
+    }
+    
+    
+
+
+    def searchAjax() {
+        def itemProps = ["ItemType", ]
+        def items = Item.withCriteria {
+            "${params.queryType}" {
+                params.each { field, value ->
+                    if (itemProps.contains(field) && value) {
+                        ilike field, "%{value}%"
+                    }
+                }
+            }
+        }
+        render template: "detailSquare", bean: items
     }
     
     @Transactional

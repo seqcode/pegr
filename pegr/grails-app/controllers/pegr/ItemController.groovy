@@ -4,11 +4,8 @@ import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 import org.springframework.web.multipart.MultipartHttpServletRequest 
 
-@Transactional(readOnly = true)
 class ItemController {
-
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
-
+    
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         respond Item.list(params), model:[itemInstanceCount: Item.count()]

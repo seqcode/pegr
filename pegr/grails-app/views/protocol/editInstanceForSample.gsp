@@ -67,16 +67,22 @@
                     
                   <div id="search-item" class="tab-pane fade">
                     <h4>Search Item</h4>
-                    <g:form class="fields" role="form" >
-                        <label for="type">Type</label>
-                        <g:select id="type" name="type.id" optionKey="id" from="${pegr.ItemType.list()}" noSelection="['null': '-- choose --']" />
-                        <g:render template="/item/form" bean="${itemInstance}"/>
+                    <form class="fields" role="form" id="search-form" method="post">
+                        <g:hiddenField name="prtclInstId" value="${protocolInstance.id}"/>
+                        <div class="form-group">
+                            <label for="type">Type</label>
+                            <g:select id="type" name="typeId" optionKey="id" from="${pegr.ItemType.list()}" noSelection="['null': '-- choose --']" />
+                        </div>
+                        <div class="form-group">
+                            <label for="barcode">Barcode</label>
+                             <g:textField id="barcode" name="barcode" />
+                            <button type="button" onclick="getScan();"><span class="glyphicon glyphicon-qrcode"></span> Scan</button>
+                        </div>
                         <g:submitToRemote class="btn btn-primary" value="Search"
                             url="[action: 'searchAjax']"
-                            update="itemPreview"/>
-                    </g:form>
-                    <div id="itemPreview"></div>  
-                    <div id="linkItem" class="hidden"></div>
+                            update="itemPreview" onSuccess="clearSearchForm(data)"/>
+                      </form>
+                    <div id="itemPreview"></div>                      
                   </div>
                 </div>
             </div>
@@ -98,6 +104,14 @@
         $("#nav-sample-protocols").addClass("active");
         $("#nav-projects").addClass("active"); 
         
+        function resetSearchForm() {
+            $('#itemPreview').empty();
+            $('#search-form').show();
+        }
+        
+       function clearSearchForm(e) {
+            $('#search-form').hide();
+        }
     </script>
 </body>
 </html>

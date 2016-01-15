@@ -128,3 +128,9 @@ footer {
 #sample-nav .active {
     background-color: white;
 }
+
+.item {
+    border: 1px solid; 
+    margin: 5px;
+    border-style: outset;
+}

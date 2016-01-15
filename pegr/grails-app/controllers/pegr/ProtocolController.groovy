@@ -114,27 +114,20 @@ class ProtocolController {
             }else {
                 throw new Exception()
             }
-        }catch(Exception e) {
+        }catch(Exception e) { 
             log.error "Error linking item to protocol instance", e
             render "Error linking this item to the protocol instance!"
         }   
     }
     
-    
-
-
-    def searchAjax() {
-        def itemProps = ["ItemType", ]
+    def searchAjax() {        
         def items = Item.withCriteria {
-            "${params.queryType}" {
-                params.each { field, value ->
-                    if (itemProps.contains(field) && value) {
-                        ilike field, "%{value}%"
-                    }
+            and {
+                    eq "type.id", Long.parseLong(params.typeId)
+                    eq "barcode", params.barcode                    
                 }
-            }
         }
-        render template: "detailSquare", bean: items
+        render template: "searchItems", model: [items:items, prtclInstId:params.prtclInstId]
     }
     
     @Transactional

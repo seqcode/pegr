@@ -31,7 +31,7 @@
             <h3>Items</h3>                
             <div id="itemList" class="row">
                 <g:each in="${protocolInstance?.items}" var="itemInstance">
-                    <g:render template="/item/detailSquare" bean="${itemInstance}" var="itemInstance" />
+                    <g:render template="item" model="['itemInstance': itemInstance, 'prtclInstId': protocolInstance.id]" />
                 </g:each>
             </div>
              <div>
@@ -81,6 +81,7 @@
                         <g:submitToRemote class="btn btn-primary" value="Search"
                             url="[action: 'searchAjax']"
                             update="itemPreview" onSuccess="clearSearchForm(data)"/>
+                        <button class="btn btn-default" onClick="clearItemPreview(); return false;">Cancel</button>
                       </form>
                     <div id="itemPreview"></div>                      
                   </div>
@@ -104,13 +105,12 @@
         $("#nav-sample-protocols").addClass("active");
         $("#nav-projects").addClass("active"); 
         
-        function resetSearchForm() {
+        function clearItemPreview() {
             $('#itemPreview').empty();
-            $('#search-form').show();
         }
         
        function clearSearchForm(e) {
-            $('#search-form').hide();
+
         }
     </script>
 </body>

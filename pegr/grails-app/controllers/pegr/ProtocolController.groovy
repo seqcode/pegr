@@ -120,14 +120,43 @@ class ProtocolController {
         }   
     }
     
-    def searchAjax() {        
-        def items = Item.withCriteria {
-            and {
-                    eq "type.id", Long.parseLong(params.typeId)
-                    eq "barcode", params.barcode                    
-                }
+    @Transactional
+    def removeItemFromPrtclInstanceAjax(){
+        try {
+            def item = Item.get(params.itemId)
+            def protocolInstance = ProtocolInstance.get(params.prtclInstId)
+            if (protocolInstance && item) {    
+                protocolInstance.removeFromItems(item).save(flush: true)
+                render template: 'item', collection: protocolInstance.items, var: 'itemInstance'                
+            }else {
+                throw new Exception()
+            }
+        }catch(Exception e) { 
+            log.error "Error linking item to protocol instance", e
+            render "Error linking this item to the protocol instance!"
         }
-        render template: "searchItems", model: [items:items, prtclInstId:params.prtclInstId]
+    }
+    
+    def searchAjax() {        
+        try {
+            def items = Item.withCriteria {
+                and {
+                        eq "type.id", Long.parseLong(params.typeId)
+                        eq "barcode", params.barcode                    
+                    }
+            }
+            if (items && items.size()) {
+                def protocolInstance = ProtocolInstance.get(params.prtclInstId)
+                def linkedItemIds = protocolInstance.items*.id
+                render template: "searchItems", model: [items:items, prtclInstId:params.prtclInstId, linkedItemIds: linkedItemIds]
+                
+            } else {
+                render "<div class='errors'>No item found!</div>"
+            }
+        }catch(Exception e) {
+            log.error "Error searching item within protocol instance", e
+            render status: 404
+        }
     }
     
     @Transactional

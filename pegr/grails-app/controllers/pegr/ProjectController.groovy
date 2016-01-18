@@ -84,11 +84,32 @@ class ProjectController {
         [project: currentProject, projectUsers: projectUsers, sampleCount: currentProject.samples.size()]
 	}
 	
-	def addUser(project, newUser) {
-		
+    @Transactional
+	def addUserAjax() {
+        try {
+            def projectUser = new ProjectUser(params)
+            projectUser.save(flush: true)			
+			def projectUsers = ProjectUser.where { project.id==params.project.id}.list()
+			render template:"userTable", bean: projectUsers
+        }catch(Exception e){
+            log.error "Error: ${e.message}", e
+			render status: 500
+            render "<div class='errors'>An error has occurred</div>"
+        }
 	}
-	
-	def removeUser() {
-		
+
+    @Transactional
+	def removeUserAjax(int projectId, int userId) {
+		try {
+			def projectUser = ProjectUser.where{project.id == projectId && user.id == userId}.first()
+			projectUser.delete(flush: true)
+			def projectUsers = ProjectUser.where { project.id==projectId}.list()
+			render template:"userTable", bean: projectUsers
+		}catch(Exception e) {
+			log.error "Error: ${e.message}", e
+			render status: 500
+			render "<div class='errors'>An error has occurred</div>"
+		}
+				
 	}
 }

@@ -109,8 +109,9 @@
             $('#itemPreview').empty();
         }
         
-       function clearSearchForm(e) {
-
+       function clearModal() {
+           $('body').removeClass('modal-open');
+           $('.modal-backdrop').remove();
         }
     </script>
 </body>

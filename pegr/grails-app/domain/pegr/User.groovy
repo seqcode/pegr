@@ -39,7 +39,11 @@ class User implements Serializable {
 
 	@Override
 	String toString() {
-		return "$fullName ($username)" 
+        if (fullName) {
+            return "$username($fullName)" 
+        } else {
+            return "${username}"
+        }
 	}
 
 	Set<Role> getAuthorities() {

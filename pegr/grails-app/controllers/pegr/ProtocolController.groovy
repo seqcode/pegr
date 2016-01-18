@@ -10,7 +10,7 @@ class ProtocolController {
 			def protocolGroup = ProtocolGroup.get(params.id)
             render template: 'protocolsDetails', bean: protocolGroup
         } else{
-            render "Please select a protocol group."
+            render "<div class='errors'>Please select a protocol group.</div>"
         }
 	
     }
@@ -95,11 +95,11 @@ class ProtocolController {
                     render template: '/layouts/error', bean: item
                 }
             }else {
-                render "Protocol Instance not found!"
+                render "<div class='errors'>Protocol Instance not found!</div>"
             }
         }catch(Exception e) {
             log.error "Error saving item", e
-            render "Error saving this item!"
+            render "<div class='errors'>Error saving this item!</div>"
         }   
     }
     
@@ -116,7 +116,7 @@ class ProtocolController {
             }
         }catch(Exception e) { 
             log.error "Error linking item to protocol instance", e
-            render "Error linking this item to the protocol instance!"
+            render "<div class='errors'>Error linking this item to the protocol instance!</div>"
         }   
     }
     
@@ -133,7 +133,7 @@ class ProtocolController {
             }
         }catch(Exception e) { 
             log.error "Error linking item to protocol instance", e
-            render "Error linking this item to the protocol instance!"
+            render "<div class='errors'>Error linking this item to the protocol instance!</div>"
         }
     }
     

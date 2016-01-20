@@ -14,12 +14,13 @@ class Sample {
 	Integer cellNumber // in M
 	Integer quantityReceived //ul per aliqu used for the assay
 	String publicationReference
-	ProtocolInstance latestProtocolInstance
+	ProtocolInstanceBag prtcolInstBag
 	SampleStatus status
     Date lastUpdated
 	CellSource spikeInCellSource
 	String note
-	
+	Assay assay
+    
 	static hasMany = [projects: Project, sequenceIndices: SequenceIndex]
 	static belongsTo = [Project]
 
@@ -39,6 +40,7 @@ class Sample {
 		publicationReference nullable: true, blank: true
 		note nullable: true, blank: true
 		latestProtocolInstance nullable: true
+        prtcolInstBag nullable: true
     }
     
     static mapping = {

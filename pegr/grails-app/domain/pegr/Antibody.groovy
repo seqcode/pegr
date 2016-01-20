@@ -16,7 +16,7 @@ class Antibody {
 	IgType igType
 	String immunogene
 	Float concentration
-	String encodeId
+	String externalId
 	String inventoryId
 	String note
 	
@@ -32,7 +32,7 @@ class Antibody {
 		clonal nullable: true
 		igType nullable: true
 		immunogene nullable: true, blank: true
-		encodeId nullable: true, blank: true
+		externalId nullable: true, blank: true
 		inventoryId nullable: true, blank: true
 		note nullable: true, blank: true
     }

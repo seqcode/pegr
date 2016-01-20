@@ -4,8 +4,8 @@ class Strain {
 	String name
 	Genotype genotype
 	Strain parent
-	String tag
 	Lab sourceLab
+    Sex sex
 	String note
 	
 	String toString() {
@@ -16,9 +16,10 @@ class Strain {
 	
     static constraints = {
 		name unique: true
-		parent nullable: true
+		genotype nullable: true
+        parent nullable: true
+        sex nullable: true
 		sourceLab nullable: true
-		tag nullable: true, blank: true
 		note nullable: true, blank: true
     }
 }

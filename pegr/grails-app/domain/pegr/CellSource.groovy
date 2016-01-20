@@ -6,12 +6,11 @@ class CellSource {
 	Lab providerLab
 	String biologicalSourceId
 	Strain strain
-	Sex sex
-	String age
-	Tissue tissue
-	Histology histology
 	String note	
-	
+    GrowthMedia growthMedia
+    CellSourceStatus status
+    ProtocolInstanceBag prtclInstBag
+    
 	String toString() {
 		strain
 	}
@@ -19,13 +18,11 @@ class CellSource {
 	static hasMany = [cellSourceTreatments: CellSourceTreatment]
 	
     static constraints = {
-		biologicalSourceId nullable: true, blank: true
-		sex nullable: true
-		age nullable: true, blank: true
-		tissue nullable: true
-		histology nullable: true
-		note nullable: true, blank: true
-		providerUser nullable: true
+        providerUser nullable: true
 		providerLab nullable: true
+		biologicalSourceId nullable: true, blank: true
+		note nullable: true, blank: true
+        growthMedia nullable: true
+        prtclInstBag nullable: true
     }
 }

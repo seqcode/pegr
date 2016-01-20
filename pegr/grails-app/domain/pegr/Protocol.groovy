@@ -5,6 +5,7 @@ class Protocol {
 	String protocolVersion
 	String description
 	String details
+    User user
 	
 	String toString() {
         String s = name
@@ -23,6 +24,7 @@ class Protocol {
 		protocolVersion nullable: true, blank: false, maxSize: 10
 		description nullable: true, blank: true
 		details nullable: true, blank: true
+        user nullable: true
 	}
 	
 	static mapping = {

@@ -6,14 +6,14 @@ class ProtocolInstance {
 	User user
 	Date dateCreated
 	String note
-	ProtocolInstance prior
-	Boolean completed
-		
+	ProtocolStatus status
+	ProtocolInstanceBag prtclInstBag	
+    
 	static hasMany = [items: Item]
 	
     static constraints = {
 		note nullable: true, blank: true
-		prior nullable: true
+        prtclInstBag nullable: true
     }
 	
 }

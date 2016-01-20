@@ -5,6 +5,7 @@ class ProtocolGroup {
 	String name
 	List protocols
 	Date dateCreated
+    User user
     
 	String toString() {
 		name
@@ -14,6 +15,7 @@ class ProtocolGroup {
 	
     static constraints = {
     	name unique: true
+        user nullable: true
 	}
     
     static mapping = {

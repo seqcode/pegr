@@ -8,6 +8,7 @@ class Item {
 	Long referenceId
 	String imagePath
 	String notes
+    Item parent
 	
     static hasMany = [protocolInstances: ProtocolInstance]
     static belongsTo = [ProtocolInstance]
@@ -18,5 +19,6 @@ class Item {
 		barcode unique: 'type', nullable: true, blank: true
 		imagePath nullable: true, blank: true
 		notes nullable: true, blank: true
+        parent nullable: true
     }
 }

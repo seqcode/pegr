@@ -1,13 +1,14 @@
 package pegr
 
-class Tissue {
-	String name
-	
+class Assay {
+
+    String name
+    
 	String toString() {
 		name
 	}
-	
+    
     static constraints = {
-		name unique: true
+        name unique: true
     }
 }

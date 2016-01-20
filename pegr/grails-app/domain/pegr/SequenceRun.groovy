@@ -8,9 +8,6 @@ class SequenceRun {
 	String fcId
 	User user
 	Date dateCreated
-	Integer read1Cycle
-	Integer indexCycle
-	Integer read2Cycle
 	String directoryName
 	String note
 	Pool pool
@@ -20,10 +17,5 @@ class SequenceRun {
 		fcId nullable: true, blank: true
 		directoryName nullable: true, blank: true
     }
-	
-	static mapping = {
-		read1Cycle defaultValue: 40
-		read2Cycle defaultValue: 40
-		indexCycle defaultValue: 12
-   }
+
 }

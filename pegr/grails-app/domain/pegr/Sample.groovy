@@ -2,7 +2,7 @@ package pegr
 
 class Sample {
 		
-	CellSource cellSource
+	CellCulture cellCulture
 	Antibody antibody
 	Target target
 	ProtocolGroup protocolGroup
@@ -17,7 +17,7 @@ class Sample {
 	ProtocolInstanceBag prtcolInstBag
 	SampleStatus status
     Date lastUpdated
-	CellSource spikeInCellSource
+	CellCulture spikeInCellCulture
 	String note
 	Assay assay
     
@@ -25,13 +25,13 @@ class Sample {
 	static belongsTo = [Project]
 
     static constraints = {
-		cellSource nullable: true
+		cellCulture nullable: true
 		antibody nullable: true
 		target nullable: true
 		protocolGroup nullable: true
 		biologicalReplicateSet nullable: true
 		technicalReplicateSet nullable: true
-		spikeInCellSource nullable: true
+		spikeInCellCulture nullable: true
 		concentration scale: 4, nullable: true
         cellNumber nullable: true
         chromosomeAmount nullable: true
@@ -39,7 +39,6 @@ class Sample {
         requestedTagNumber nullable: true
 		publicationReference nullable: true, blank: true
 		note nullable: true, blank: true
-		latestProtocolInstance nullable: true
         prtcolInstBag nullable: true
     }
     

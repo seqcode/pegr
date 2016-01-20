@@ -3,7 +3,7 @@
         <thead>
             <tr>
                 <g:sortableColumn property="Id" title="ID" />
-                <g:sortableColumn property="CellSource" title="Cell Source" />
+                <g:sortableColumn property="CellCulture" title="Cell Culture" />
                 <g:sortableColumn property="Antibody" title="Antibody" />
                 <g:sortableColumn property="ProtocolGroup" title="Protocols" />
                 <td></td>
@@ -13,7 +13,7 @@
             <g:each var="sample" in="${it}">
             <tr>
             	<td><g:link controller="sample" action="show" id="${sample.id}">${sample.id}</g:link></td>
-            	<td>${sample.cellSource}</td>            
+            	<td>${sample.cellCulture}</td>            
                 <td>${sample.antibody}</td>
                 <td>${sample.protocolGroup}</td>
                 <td><g:link><span class="glyphicon glyphicon-remove"></span></g:link></td>

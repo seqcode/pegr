@@ -4,7 +4,7 @@ class ProtocolInstance {
 
 	Protocol protocol
 	User user
-	Date dateCreated
+	Date lastUpdated
 	String note
 	ProtocolStatus status
 	ProtocolInstanceBag prtclInstBag	
@@ -14,6 +14,7 @@ class ProtocolInstance {
     static constraints = {
 		note nullable: true, blank: true
         prtclInstBag nullable: true
+        user nullable: true
     }
 	
 }

@@ -6,8 +6,8 @@ import spock.lang.Specification
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
-@TestFor(CellSourceController)
-class CellSourceControllerSpec extends Specification {
+@TestFor(CellCultureController)
+class CellCultureControllerSpec extends Specification {
 
     def setup() {
     }

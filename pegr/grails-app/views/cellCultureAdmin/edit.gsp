@@ -1,9 +1,9 @@
-<%@ page import="pegr.CellSource" %>
+<%@ page import="pegr.CellCulture" %>
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta name="layout" content="admin">
-		<g:set var="entityName" value="${message(code: 'cellSource.label', default: 'CellSource')}" />
+		<g:set var="entityName" value="${message(code: 'cellCulture.label', default: 'CellCulture')}" />
 		<title><g:message code="default.edit.label" args="[entityName]" /></title>
 	</head>
 	<body>
@@ -13,20 +13,20 @@
 			<li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
 		</ul>
 		</div>
-		<div id="edit-cellSource" class="content scaffold-edit" role="main">
+		<div id="edit-cellCulture" class="content scaffold-edit" role="main">
 			<h3><g:message code="default.edit.label" args="[entityName]" /></h3>
 			<g:if test="${flash.message}">
 			<div class="message" role="status">${flash.message}</div>
 			</g:if>
-			<g:hasErrors bean="${cellSourceInstance}">
+			<g:hasErrors bean="${cellCultureInstance}">
 			<ul class="errors" role="alert">
-				<g:eachError bean="${cellSourceInstance}" var="error">
+				<g:eachError bean="${cellCultureInstance}" var="error">
 				<li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
 				</g:eachError>
 			</ul>
 			</g:hasErrors>
 			<g:form action='update' method="PUT" >
-				<g:hiddenField name="version" value="${cellSourceInstance?.version}" />
+				<g:hiddenField name="version" value="${cellCultureInstance?.version}" />
 				<fieldset class="form">
 					<g:render template="form"/>
 				</fieldset>

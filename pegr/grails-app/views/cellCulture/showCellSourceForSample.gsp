@@ -10,18 +10,16 @@
              <g:render template="/sample/nav" />
         </div>
         <div class="col-sm-10 content">
-            
-            <h3>Protocols</h3>
-            <g:if test="${flash.message}">
-			<div class="message" role="status">${flash.message}</div>
-			</g:if>
-			<div id="protocols">
-			<g:render template="protocolsDetails" bean="${protocolGroup}" />
-			</div>
+            <h3>Cell Culture</h3>
+			<g:render template="details" 
+						model="['cellCultureInstance': cellCultureInstance, 
+						'itemInstance': itemInstance]" />
+            <span class="btn btn-primary">Edit</span>
+            <span class="btn btn-primary">Delete</span>
         </div>
     </div>
     <script>
-        $("#nav-sample-protocols").addClass("active");
+        $("#nav-sample-cellculture").addClass("active");
         $("#nav-projects").addClass("active");        
     </script>
 </body>

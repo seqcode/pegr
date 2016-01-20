@@ -1,9 +1,9 @@
 package pegr.admin
 import pegr.AdminCategory
-import pegr.CellSource
+import pegr.CellCulture
 
-class CellSourceAdminController {
+class CellCultureAdminController {
 
-    static scaffold = CellSource
+    static scaffold = CellCulture
 	public static AdminCategory category = AdminCategory.ITEMS
 }

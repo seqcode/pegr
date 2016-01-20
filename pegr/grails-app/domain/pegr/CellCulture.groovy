@@ -1,6 +1,6 @@
 package pegr
 
-class CellSource {
+class CellCulture {
 	
 	User providerUser
 	Lab providerLab
@@ -8,14 +8,14 @@ class CellSource {
 	Strain strain
 	String note	
     GrowthMedia growthMedia
-    CellSourceStatus status
+    CellCultureStatus status
     ProtocolInstanceBag prtclInstBag
     
 	String toString() {
 		strain
 	}
 	
-	static hasMany = [cellSourceTreatments: CellSourceTreatment]
+	static hasMany = [cellCultureTreatments: CellCultureTreatment]
 	
     static constraints = {
         providerUser nullable: true

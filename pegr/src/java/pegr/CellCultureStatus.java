@@ -1,6 +1,6 @@
 package pegr;
 
-public enum CellSourceStatus {
+public enum CellCultureStatus {
 	PREP,
     COMPLETED,
     FAILED

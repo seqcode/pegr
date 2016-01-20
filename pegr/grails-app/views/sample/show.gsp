@@ -25,11 +25,11 @@
 			</g:if>
 			<ol class="property-list sample">
 			
-				<g:if test="${sampleInstance?.cellSource}">
+				<g:if test="${sampleInstance?.cellCulture}">
 				<li class="fieldcontain">
-					<span id="cellSource-label" class="property-label"><g:message code="sample.cellSource.label" default="Cell Source" /></span>
+					<span id="cellCulture-label" class="property-label"><g:message code="sample.cellCulture.label" default="Cell Culture" /></span>
 					
-						<span class="property-value" aria-labelledby="cellSource-label"><g:link controller="cellSourceAdmin" action="show" id="${sampleInstance?.cellSource?.id}">${sampleInstance?.cellSource?.encodeAsHTML()}</g:link></span>
+						<span class="property-value" aria-labelledby="cellCulture-label"><g:link controller="cellCultureAdmin" action="show" id="${sampleInstance?.cellCulture?.id}">${sampleInstance?.cellCulture?.encodeAsHTML()}</g:link></span>
 					
 				</li>
 				</g:if>
@@ -79,11 +79,11 @@
 				</li>
 				</g:if>
 			
-				<g:if test="${sampleInstance?.spikeInCellSource}">
+				<g:if test="${sampleInstance?.spikeInCellCulture}">
 				<li class="fieldcontain">
-					<span id="spikeInCellSource-label" class="property-label"><g:message code="sample.spikeInCellSource.label" default="Spike In Cell Source" /></span>
+					<span id="spikeInCellCulture-label" class="property-label"><g:message code="sample.spikeInCellCulture.label" default="Spike In Cell Culture" /></span>
 					
-						<span class="property-value" aria-labelledby="spikeInCellSource-label"><g:link controller="cellSourceAdmin" action="show" id="${sampleInstance?.spikeInCellSource?.id}">${sampleInstance?.spikeInCellSource?.encodeAsHTML()}</g:link></span>
+						<span class="property-value" aria-labelledby="spikeInCellCulture-label"><g:link controller="cellCultureAdmin" action="show" id="${sampleInstance?.spikeInCellCulture?.id}">${sampleInstance?.spikeInCellCulture?.encodeAsHTML()}</g:link></span>
 					
 				</li>
 				</g:if>

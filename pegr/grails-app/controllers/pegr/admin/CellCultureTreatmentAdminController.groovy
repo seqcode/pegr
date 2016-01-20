@@ -1,9 +1,9 @@
 package pegr.admin
 import pegr.AdminCategory;
-import pegr.Tissue
+import pegr.CellCultureTreatment
 
-class TissueAdminController {
+class CellCultureTreatmentAdminController {
 
-    static scaffold = Tissue
+    static scaffold = CellCultureTreatment
 	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS
 }

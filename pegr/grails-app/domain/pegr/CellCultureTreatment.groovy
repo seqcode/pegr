@@ -1,6 +1,6 @@
 package pegr
 
-class CellSourceTreatment {
+class CellCultureTreatment {
 	String name
 	String compound
 	String quantity
@@ -17,8 +17,8 @@ class CellSourceTreatment {
 		return s
 	}
 	
-	static hasMany = [cellSources: CellSource]
-	static belongsTo = CellSource
+	static hasMany = [cellCultures: CellCulture]
+	static belongsTo = CellCulture
 	
     static constraints = {
     	name unique: true

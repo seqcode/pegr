@@ -17,9 +17,9 @@
 	    </div>
 	    <div class="collapse navbar-collapse" id="myNavbar">
 	      <ul class="nav navbar-nav">
+  	        <li id="nav-metadata"><g:link controller="sample">Metadata</g:link></li>
 	        <li id="nav-projects"><g:link controller="project">My Projects</g:link></li>
-	        <li id="nav-metadata"><g:link controller="sample">Metadata</g:link></li>
-	        <li id="nav-analysis"><a href="#">Analysis</a></li>
+  	        <li id="nav-cell-culture"><g:link controller="cellCulture">Cell Culture</g:link></li>
 	       	<sec:ifAllGranted roles="ROLE_ADMIN"><li id="nav-admin"><g:link controller="admin">Admin</g:link></li></sec:ifAllGranted>
 	      </ul>
 	    <ul class="nav navbar-nav navbar-right">

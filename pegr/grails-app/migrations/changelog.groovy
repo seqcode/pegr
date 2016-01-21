@@ -2589,4 +2589,6 @@ databaseChangeLog = {
 	include file: 'addPrtclInstBagStatus.groovy'
 
 	include file: 'addPrtclInstBagName.groovy'
+
+	include file: 'changePrtclInstBag.groovy'
 }

@@ -5,25 +5,10 @@
 			<label for="strain">Strain * </label>
 			<g:select id="strain" name="strain.id" from="${pegr.Strain.list()}" optionKey="id" required="" value="${cellCultureInstance?.strain?.id}" class="many-to-one"/>
 		</div>
-		
-		<div class=" ${hasErrors(bean: cellCultureInstance, field: 'tissue', 'error')} ">
-			<label for="tissue">Tissue	</label>
-			<g:select id="tissue" name="tissue.id" from="${pegr.Tissue.list()}" optionKey="id" value="${cellCultureInstance?.tissue?.id}" class="many-to-one" noSelection="['null': '']"/>
-		</div>
-		
+
 		<div class=" ${hasErrors(bean: cellCultureInstance, field: 'sex', 'error')} ">
 			<label for="sex">Sex </label>
 			<g:select id="sex" name="sex.id" from="${pegr.Sex.list()}" optionKey="id" value="${cellCultureInstance?.sex?.id}" class="many-to-one" noSelection="['null': '']"/>
-		</div>
-		
-		<div class=" ${hasErrors(bean: cellCultureInstance, field: 'age', 'error')} ">
-			<label for="age">Age </label>
-			<g:textField name="age" maxlength="30" value="${cellCultureInstance?.age}"/>
-		</div>
-		
-		<div class=" ${hasErrors(bean: cellCultureInstance, field: 'histology', 'error')} ">
-			<label for="histology">Histology</label>
-			<g:select id="histology" name="histology.id" from="${pegr.Histology.list()}" optionKey="id" value="${cellCultureInstance?.histology?.id}" class="many-to-one" noSelection="['null': '']"/>
 		</div>
 		
 		<div class=" ${hasErrors(bean: cellCultureInstance, field: 'cellCultureTreatments', 'error')} ">

@@ -2,16 +2,9 @@ package pegr
 
 class ProtocolInstanceBagController {
 
-    def show(Long id) {
-        def bag = ProtocolInstanceBag.get(id)
-        def count = bag.protocolInstances.count{it.status == ProtocolStatus.COMPLETED}
-        if (bag) {
-            [bag:bag, count: count]
-        }else {
-            render status: 404
-        }
-    }
-    
+    def springSecurityService
+    def protocolInstanceBagService
+
     def showInstance(Long prtclInstanceId) {
         def protocolInstance = ProtocolInstance.get(prtclInstanceId)
         if (protocolInstance) {
@@ -20,4 +13,18 @@ class ProtocolInstanceBagController {
             render status: 404
         }
     }
+    
+    def showProtocolsInGroupAjax(Long id){
+        try{
+			def protocolGroup = ProtocolGroup.get(id)
+            if (protocolGroup) {
+                render template: 'protocolsInGroup', bean: protocolGroup
+            } else {
+                render "<div class='errors'>Protocol group not found.</div>"    
+            }
+        } catch(Exception e){
+            render "<div class='errors'>Please select a protocol group.</div>"
+        }
+    }
+    
 }

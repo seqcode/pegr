@@ -20,14 +20,14 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    ProtocolInstanceBag savePrtclInstBag(Long protocolGroupId, String name) {
+    ProtocolInstanceBag savePrtclInstBag(Long protocolGroupId, PrtclInstBagType bagType) {
         def protocolGroup = ProtocolGroup.get(protocolGroupId)
         if(protocolGroup == null) {
             throw new ProtocolInstanceBagException(message: "protocol Group not found!")
         }
-        def prtclInstBag = new ProtocolInstanceBag(type: PrtclInstBagType.CELL_CULTURE,
+        def prtclInstBag = new ProtocolInstanceBag(type: bagType,
                                                   status: ProtocolStatus.INACTIVE,
-                                                  name: name)
+                                                  protocolGroup: protocolGroup)
         protocolGroup.protocols.each {
             prtclInstBag.addToProtocolInstances(new ProtocolInstance(protocol: it,
                                                 status: ProtocolStatus.INACTIVE))

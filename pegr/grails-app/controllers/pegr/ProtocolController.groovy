@@ -5,16 +5,6 @@ class ProtocolController {
 	def springSecurityService
 	def protocolService
     
-    def showProtocolsAjax(){
-        if (params.id.isInteger()){
-			def protocolGroup = ProtocolGroup.get(params.id)
-            render template: 'protocolsDetails', bean: protocolGroup
-        } else{
-            render "<div class='errors'>Please select a protocol group.</div>"
-        }
-	
-    }
-    
     @Transactional
 	def updateProtocolGroupForSample() {
         if(request.method=="POST") {

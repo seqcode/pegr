@@ -23,7 +23,7 @@ class SampleController {
 		}else {
 			sample.save(flush: true)
 		}
-		redirect(controller: "CellCulture", action: "createCellCultureForSample", params: [sampleId: sample.id])
+		redirect(controller: "CellSource", action: "createCellSourceForSample", params: [sampleId: sample.id])
 
     }
     

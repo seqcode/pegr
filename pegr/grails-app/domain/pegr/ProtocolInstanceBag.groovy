@@ -2,31 +2,25 @@ package pegr
 
 class ProtocolInstanceBag {
 
-    PrtclInstBagType type
+    String name
     ProtocolGroup protocolGroup
-    List protocolInstances
-    Date dateCreated
-	Date lastUpdated
+    Date startTime
+	Date endTime
 	ProtocolStatus status
+    ProtocolInstanceBag superBag
     
-    String getProtocolsDisplay() {
-        if(protocolGroup){
-            return protocolGroup
-        }else {
-            String s=""
-            protocolInstances.each{
-                s.append(it.name + "+")
-            }
-            if(s.size>0) {
-                s = s[0..-1]
-            } 
-            return s
-        }
-	}
+    static hasMany = [tracedItems: Item]
     
-    static hasMany = [protocolInstances: ProtocolInstance]
+    static belongsTo = [Item]
+    
+    String toString() {
+        name
+    }
     
     static constraints = {
         protocolGroup nullable: true
+        name nullable: true, blank: true
+        startTime nullable: true
+        endTime nullable: true
     }
 }

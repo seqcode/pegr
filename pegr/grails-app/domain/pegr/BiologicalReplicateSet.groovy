@@ -2,8 +2,9 @@ package pegr
 
 class BiologicalReplicateSet {
 
-    static hasMany = [samples: Sample]
+    Project project
     
     static constraints = {
+        project nullable: true
     }
 }

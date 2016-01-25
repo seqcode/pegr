@@ -9,35 +9,78 @@ class ProtocolInstanceBagException extends RuntimeException {
 class ProtocolInstanceBagService {
     def springSecurityService
     
-    List fetchIncomplete(PrtclInstBagType requestedType) {
-        def bags = ProtocolInstanceBag.where { type == requestedType && status != ProtocolStatus.COMPLETED }.list(sort: "lastUpdated", order: "desc")
+    List fetchProcessingBags() {
+        def bags = ProtocolInstanceBag.where { status != ProtocolStatus.COMPLETED }.list(sort: "startTime", order: "desc")
         return bags
     }
     
-    List fetchCompleted(PrtclInstBagType requestedType) {
-        def bags = ProtocolInstanceBag.where { type == requestedType && status == ProtocolStatus.COMPLETED }.list(sort: "lastUpdated", order: "desc")
+    List fetchCompletedBags() {
+        def bags = ProtocolInstanceBag.where { status == ProtocolStatus.COMPLETED }.list(sort: "startTime", order: "desc")
         return bags
     }
     
     @Transactional
-    ProtocolInstanceBag savePrtclInstBag(Long protocolGroupId, PrtclInstBagType bagType) {
+    ProtocolInstanceBag savePrtclInstBag(Long protocolGroupId, String name, Date startTime) {
         def protocolGroup = ProtocolGroup.get(protocolGroupId)
         if(protocolGroup == null) {
             throw new ProtocolInstanceBagException(message: "protocol Group not found!")
         }
-        def prtclInstBag = new ProtocolInstanceBag(type: bagType,
+        def prtclInstBag = new ProtocolInstanceBag(name: name,
                                                   status: ProtocolStatus.INACTIVE,
-                                                  protocolGroup: protocolGroup)
-        protocolGroup.protocols.each {
-            prtclInstBag.addToProtocolInstances(new ProtocolInstance(protocol: it,
-                                                status: ProtocolStatus.INACTIVE))
-        }
+                                                  protocolGroup: protocolGroup,
+                                                  startTime: startTime)
         try {
             prtclInstBag.save(flush: true)
-            return prtclInstBag
+            protocolGroup.protocols.eachWithIndex { it, n ->
+            new ProtocolInstance(protocol: it, bag: prtclInstBag, bagIdx: n, status: ProtocolStatus.INACTIVE).save(flush: true)
+            }
         } catch (Exception e) {         
             log.error "Error: ${e.message}", e
             throw new ProtocolInstanceBagException(message: "Error saving this protocol instance bag!")
+        }
+
+        return prtclInstBag
+    }
+    
+    @Transactional
+    void addItemToBag(Long itemId, Long bagId){
+        try {
+            def item = Item.get(itemId)
+            def bag = Bag.get(bagId)
+            item.AddToBags(bag).save(flush: true)
+        }catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            throw new ProtocolInstanceBagException(message: "Error adding this item!")
+        }
+    }
+    
+    @Transactional
+    void addSubBagToBag(Long subBagId, Long bagId){
+        try {
+            def subBag = Bag.get(subBagId)
+            def bag = Bag.get(bagId)
+            subBag.superBag = bag
+            subBag.save(flush: true)
+        }catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            throw new ProtocolInstanceBagException(message: "Error adding this bag!")
+        }
+    }
+    
+    @Transactional
+    void saveItemInBag(Item item, Long parentTypeId, String parentBarcode, Long bagId) {
+        def parent = Item.where{type.id == parentTypeId && barcode == parentBarcode}.get(max: 1)
+        if (!parent) {
+            throw new ProtocolInstanceBagException(message: "Parent item not found!")
+        }
+        try {
+            item.parent = parent
+            def bag = ProtocolInstanceBag.get(bagId)
+            item.addToBags(bag).save(flush: true)
+        }
+        catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            throw new ProtocolInstanceBagException(message: "Error saving this item!")
         }
     }
 }

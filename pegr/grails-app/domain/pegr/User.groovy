@@ -14,8 +14,6 @@ class User implements Serializable {
 	Organization affiliation
 	Address address
 	
-	static hasMany = [userProjects: ProjectUser]
-	
 	boolean enabled = true
 	boolean accountExpired
 	boolean accountLocked

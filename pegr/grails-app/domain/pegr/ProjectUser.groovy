@@ -7,8 +7,7 @@ class ProjectUser {
 	User user
 	ProjectRole projectRole	
 	
-	static belongsTo = [Project]
-	
     static constraints = {
+        project unique: "user"
     }
 }

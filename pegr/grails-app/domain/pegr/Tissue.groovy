@@ -1,6 +1,6 @@
 package pegr
 
-class GeneticModification {
+class Tissue {
 
 	String name
 	

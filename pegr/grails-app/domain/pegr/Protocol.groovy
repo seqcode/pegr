@@ -14,10 +14,9 @@ class Protocol {
         }
         return s
 	}
-	
-	static hasMany = [protocolGroups: ProtocolGroup]	
-	
-	static belongsTo = [ProtocolGroup]
+    
+    static hasMany = [protocolGroups: ProtocolGroup]
+    static belongsTo = [ProtocolGroup]
 	
     static constraints = {
 		name unique: 'protocolVersion'

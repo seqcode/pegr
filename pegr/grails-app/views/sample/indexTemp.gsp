@@ -22,7 +22,7 @@
 			<thead>
 					<tr>
 					
-						<th><g:message code="sample.cellCulture.label" default="Cell Culture" /></th>
+						<th><g:message code="sample.cellSource.label" default="Cell Source" /></th>
 					
 						<th><g:message code="sample.antibody.label" default="Antibody" /></th>
 					
@@ -40,7 +40,7 @@
 				<g:each in="${sampleInstanceList}" status="i" var="sampleInstance">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 					
-						<td><g:link action="show" id="${sampleInstance.id}">${fieldValue(bean: sampleInstance, field: "cellCulture")}</g:link></td>
+						<td><g:link action="show" id="${sampleInstance.id}">${fieldValue(bean: sampleInstance, field: "cellSource")}</g:link></td>
 					
 						<td>${fieldValue(bean: sampleInstance, field: "antibody")}</td>
 					

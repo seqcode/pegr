@@ -1,10 +1,10 @@
 
-<%@ page import="pegr.CellCulture" %>
+<%@ page import="pegr.CellSource" %>
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta name="layout" content="admin">
-		<g:set var="entityName" value="${message(code: 'cellCulture.label', default: 'CellCulture')}" />
+		<g:set var="entityName" value="${message(code: 'cellSource.label', default: 'CellSource')}" />
 		<title><g:message code="default.list.label" args="[entityName]" /></title>
 	</head>
 	<body>
@@ -12,7 +12,7 @@
 			<li><a class="home" href="${createLink(uri: '/admin/')}"><g:message code="default.home.label"/></a></li>
 			<li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
 		</ul>
-		<div id="list-cellCulture" class="content scaffold-list" role="main">
+		<div id="list-cellSource" class="content scaffold-list" role="main">
 			<h3><g:message code="default.list.label" args="[entityName]" /></h3>
 			<g:if test="${flash.message}">
 				<div class="message" role="status">${flash.message}</div>
@@ -22,35 +22,35 @@
 			<thead>
 					<tr>
 					
-						<g:sortableColumn property="biologicalSourceId" title="${message(code: 'cellCulture.biologicalSourceId.label', default: 'Biological Source Id')}" />
+						<g:sortableColumn property="biologicalSourceId" title="${message(code: 'cellSource.biologicalSourceId.label', default: 'Biological Source Id')}" />
 					
-						<th><g:message code="cellCulture.sex.label" default="Sex" /></th>
+						<th><g:message code="cellSource.sex.label" default="Sex" /></th>
 					
-						<g:sortableColumn property="age" title="${message(code: 'cellCulture.age.label', default: 'Age')}" />
+						<g:sortableColumn property="age" title="${message(code: 'cellSource.age.label', default: 'Age')}" />
 					
-						<th><g:message code="cellCulture.tissue.label" default="Tissue" /></th>
+						<th><g:message code="cellSource.tissue.label" default="Tissue" /></th>
 					
-						<th><g:message code="cellCulture.histology.label" default="Histology" /></th>
+						<th><g:message code="cellSource.histology.label" default="Histology" /></th>
 					
-						<g:sortableColumn property="note" title="${message(code: 'cellCulture.note.label', default: 'Note')}" />
+						<g:sortableColumn property="note" title="${message(code: 'cellSource.note.label', default: 'Note')}" />
 					
 					</tr>
 				</thead>
 				<tbody>
-				<g:each in="${cellCultureInstanceList}" status="i" var="cellCultureInstance">
+				<g:each in="${cellSourceInstanceList}" status="i" var="cellSourceInstance">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 					
-						<td><g:link action="show" id="${cellCultureInstance.id}">${fieldValue(bean: cellCultureInstance, field: "biologicalSourceId")}</g:link></td>
+						<td><g:link action="show" id="${cellSourceInstance.id}">${fieldValue(bean: cellSourceInstance, field: "biologicalSourceId")}</g:link></td>
 					
-						<td>${fieldValue(bean: cellCultureInstance, field: "sex")}</td>
+						<td>${fieldValue(bean: cellSourceInstance, field: "sex")}</td>
 					
-						<td>${fieldValue(bean: cellCultureInstance, field: "age")}</td>
+						<td>${fieldValue(bean: cellSourceInstance, field: "age")}</td>
 					
-						<td>${fieldValue(bean: cellCultureInstance, field: "tissue")}</td>
+						<td>${fieldValue(bean: cellSourceInstance, field: "tissue")}</td>
 					
-						<td>${fieldValue(bean: cellCultureInstance, field: "histology")}</td>
+						<td>${fieldValue(bean: cellSourceInstance, field: "histology")}</td>
 					
-						<td>${fieldValue(bean: cellCultureInstance, field: "note")}</td>
+						<td>${fieldValue(bean: cellSourceInstance, field: "note")}</td>
 					
 					</tr>
 				</g:each>
@@ -58,7 +58,7 @@
 			</table>
 			</div>
 			<div class="pagination">
-				<g:paginate total="${cellCultureInstanceCount ?: 0}" />
+				<g:paginate total="${cellSourceInstanceCount ?: 0}" />
 			</div>
 		</div>
 	</body>

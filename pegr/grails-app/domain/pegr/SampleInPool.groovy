@@ -11,5 +11,6 @@ class SampleInPool {
 	Float concentration
 	
     static constraints = {
+        sample unique: 'pool'
     }
 }

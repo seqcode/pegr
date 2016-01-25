@@ -12,13 +12,13 @@
             <g:render template="form"/>
             <g:submitButton name="save" value="Save" />
         </g:form>
-        <div class=" ${hasErrors(bean: sampleInstance, field: 'cellCulture', 'error')} ">
-            <label for="cellCulture">Cell Culture</label>
-            <g:select id="cellCulture" name="cellCulture.id" from="${pegr.CellCulture.list()}" optionKey="id" value="${sampleInstance?.cellCulture?.id}" class="many-to-one" noSelection="['null': '']"/>
+        <div class=" ${hasErrors(bean: sampleInstance, field: 'cellSource', 'error')} ">
+            <label for="cellSource">Cell Source</label>
+            <g:select id="cellSource" name="cellSource.id" from="${pegr.CellSource.list()}" optionKey="id" value="${sampleInstance?.cellSource?.id}" class="many-to-one" noSelection="['null': '']"/>
         </div>
-        <div class=" ${hasErrors(bean: sampleInstance, field: 'spikeInCellCulture', 'error')} ">
-            <label for="spikeInCellCulture">Spike In Cell Culture</label>
-            <g:select id="spikeInCellCulture" name="spikeInCellCulture.id" from="${pegr.CellCulture.list()}" optionKey="id" value="${sampleInstance?.spikeInCellCulture?.id}" class="many-to-one" noSelection="['null': '']"/>
+        <div class=" ${hasErrors(bean: sampleInstance, field: 'spikeInCellSource', 'error')} ">
+            <label for="spikeInCellSource">Spike In Cell Source</label>
+            <g:select id="spikeInCellSource" name="spikeInCellSource.id" from="${pegr.CellSource.list()}" optionKey="id" value="${sampleInstance?.spikeInCellSource?.id}" class="many-to-one" noSelection="['null': '']"/>
         </div>
 
         <div class=" ${hasErrors(bean: sampleInstance, field: 'antibody', 'error')} ">

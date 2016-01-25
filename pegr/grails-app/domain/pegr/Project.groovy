@@ -7,8 +7,6 @@ class Project {
 	Date dateCreated
 	Date lastUpdated
 	String funding
-	
-	static hasMany = [samples: Sample, projectUsers: ProjectUser]
 
 	String toString() {
 		name

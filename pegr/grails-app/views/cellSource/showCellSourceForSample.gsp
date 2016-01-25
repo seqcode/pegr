@@ -10,9 +10,9 @@
              <g:render template="/sample/nav" />
         </div>
         <div class="col-sm-10 content">
-            <h3>Cell Culture</h3>
+            <h3>Cell Source</h3>
 			<g:render template="details" 
-						model="['cellCultureInstance': cellCultureInstance, 
+						model="['cellSourceInstance': cellSourceInstance, 
 						'itemInstance': itemInstance]" />
             <span class="btn btn-primary">Edit</span>
             <span class="btn btn-primary">Delete</span>

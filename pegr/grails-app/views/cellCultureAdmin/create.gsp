@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta name="layout" content="admin">
-		<g:set var="entityName" value="${message(code: 'cellCulture.label', default: 'CellCulture')}" />
+		<g:set var="entityName" value="${message(code: 'cellSource.label', default: 'CellSource')}" />
 		<title><g:message code="default.create.label" args="[entityName]" /></title>
 	</head>
 	<body>
@@ -10,14 +10,14 @@
 			<li><a class="home" href="${createLink(uri: '/admin/')}"><g:message code="default.home.label"/></a></li>
 			<li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
 		</ul>
-		<div id="create-cellCulture" class="content scaffold-create" role="main">
+		<div id="create-cellSource" class="content scaffold-create" role="main">
 			<h3><g:message code="default.create.label" args="[entityName]" /></h3>
 			<g:if test="${flash.message}">
 			<div class="message" role="status">${flash.message}</div>
 			</g:if>
-			<g:hasErrors bean="${cellCultureInstance}">
+			<g:hasErrors bean="${cellSourceInstance}">
 			<ul class="errors" role="alert">
-				<g:eachError bean="${cellCultureInstance}" var="error">
+				<g:eachError bean="${cellSourceInstance}" var="error">
 				<li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
 				</g:eachError>
 			</ul>

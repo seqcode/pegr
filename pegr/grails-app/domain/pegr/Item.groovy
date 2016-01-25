@@ -2,6 +2,7 @@ package pegr
 
 class Item {
 
+    String name
 	String location
 	String barcode
 	ItemType type
@@ -9,11 +10,12 @@ class Item {
 	String imagePath
 	String notes
     Item parent
-	
-    static hasMany = [protocolInstances: ProtocolInstance]
-    static belongsTo = [ProtocolInstance]
+    List bags
     
+    static hasMany = [bags: ProtocolInstanceBag]
+
     static constraints = {
+        name nullable: true, blank: true
 		referenceId nullable: true
 		location nullable: true, blank: true
 		barcode unique: 'type', nullable: true, blank: true

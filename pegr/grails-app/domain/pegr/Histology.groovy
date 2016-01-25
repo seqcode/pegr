@@ -1,7 +1,8 @@
 package pegr
 
-class GeneticModification {
+class Histology {
 
+    Histology parent
 	String name
 	
 	String toString() {
@@ -10,5 +11,6 @@ class GeneticModification {
 	
     static constraints = {
 		name unique: true
+        parent nullable: true
     }
 }

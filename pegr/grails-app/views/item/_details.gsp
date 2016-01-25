@@ -1,5 +1,13 @@
 
 <ul>
+    <g:if test="${itemInstance?.name}">
+    <li>Name: ${itemInstance.name}</li>
+    </g:if>
+    
+    <g:if test="${itemInstance?.type}">
+    <li>Name: ${itemInstance.type}</li>
+    </g:if>
+    
     <g:if test="${itemInstance?.barcode}">
     <li>Barcode: ${itemInstance.barcode }</li>
     </g:if>	

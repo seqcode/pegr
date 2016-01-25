@@ -57,8 +57,8 @@ class ProtocolInstanceBagService {
     @Transactional
     void addSubBagToBag(Long subBagId, Long bagId){
         try {
-            def subBag = Bag.get(subBagId)
-            def bag = Bag.get(bagId)
+            def subBag = ProtocolInstanceBag.get(subBagId)
+            def bag = ProtocolInstanceBag.get(bagId)
             subBag.superBag = bag
             subBag.save(flush: true)
         }catch(Exception e) {

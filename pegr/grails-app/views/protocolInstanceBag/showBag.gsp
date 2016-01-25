@@ -32,11 +32,6 @@
     </div>
     <script>
         $("#nav-bench").addClass("active");
-
-        function asd(url){
-            window.open(url,'', 'width=300,height=400');
-        }
-
      </script>
 </body>
 </html>

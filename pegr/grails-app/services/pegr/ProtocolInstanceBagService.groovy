@@ -86,4 +86,40 @@ class ProtocolInstanceBagService {
             throw new ProtocolInstanceBagException(message: "Error saving this item!")
         }
     }
+    
+    @Transactional
+    void addItemToInstance(Long itemId, Long instanceId){
+        try {
+            def item = Item.get(itemId)
+            def instance = Instance.get(instanceId)
+            def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance)
+            instanceItem.save(flush: true)
+        }catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            throw new ProtocolInstanceBagException(message: "Error adding this item!")
+        }
+    }
+    
+    @Transactional
+    void saveItemInInstance(Item item, String parentTypeId, String parentBarcode, Long instanceId) {
+		if (parentBarcode?.trim()) {
+			def typeId = Long.parseLong(parentTypeId)
+	        def parent = Item.where{type.id == typeId && barcode == parentBarcode}.get(max: 1)
+	        if (!parent) {
+	            throw new ProtocolInstanceBagException(message: "Parent item not found!")
+	        }
+			item.parent = parent
+		}
+        try {            
+            def instance = Instance.get(instanceId)
+            def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance)
+            instanceItem.save(flush: true)
+        }
+        catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            throw new ProtocolInstanceBagException(message: "Error saving this item!")
+        }
+    }
+    
+    
 }

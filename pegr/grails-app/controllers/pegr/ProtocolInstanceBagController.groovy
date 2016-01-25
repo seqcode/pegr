@@ -96,12 +96,51 @@ class ProtocolInstanceBagController {
         }
     }
     
-    def showInstance(Long prtclInstanceId) {
-        def protocolInstance = ProtocolInstance.get(prtclInstanceId)
+    def showInstance(Long id) {
+        def protocolInstance = ProtocolInstance.get(id)
         if (protocolInstance) {
-            [protocolInstance:protocolInstance]
+            def items = ProtocolInstanceItems.where {protocolInstance.id == id}.collect {it.item}
+            [protocolInstance:protocolInstance, items: items]
         }else {
             render status: 404
+        }
+    }
+    
+    def searchItemForInstance(Long id){
+        [instanceId: id]       
+    }
+    
+    def previewItemInInstance(Long typeId, String barcode, Long instanceId) {
+        def itemType = ItemType.get(typeId)
+        def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
+        if (item) {
+            render(view:"previewItemInInstance", model: [item: item, instanceId: instanceId])
+        }else {
+            item = new Item(type: itemType, barcode: barcode)
+            render(view: "createItemInInstance", model: [instanceId: instanceId, item:item])
+        }
+    }
+    
+    def addItemToInstance(Long itemId, Long instanceId) {
+        try {
+            protocolInstanceBagService.addItemToInstance(itemId, instanceId)
+            redirect(action: "showInstance", id: instanceId)
+        }catch(ProtocolInstanceBagException e){
+            flash.message = e.message
+            redirect(action: "searchItemForInstance", params: [instanceId: instanceId])
+        }
+    }
+    
+    def saveItemInInstance() {
+        
+        def item = new Item(params)
+		def instanceId = Long.parseLong(params.instanceId)
+        try {
+            protocolInstanceBagService.saveItemInInstance(item, params.parentTypeId, params.parentBarcode, instanceId)
+            redirect(action: "showInstance", id: instanceId)
+        }catch(ProtocolInstanceBagException e) {
+            flash.message = e.message
+            redirect(action: "searchItemForInstance", params: [instanceId: instanceId])
         }
     }
     
@@ -116,12 +155,6 @@ class ProtocolInstanceBagController {
         } catch(Exception e){
             render "<div class='errors'>Please select a protocol group.</div>"
         }
-    }
-    
-    def showBaggedItemsAjax(Long id) {
-        def bag = ProtocolInstanceBag.get(id)
-        def subBags = ProtocolInstanceBag.where{superBag.id == id} 
-        render template: 'baggedItems', model:[ items:bag.tracedItems,subBags:subBags]
     }
     
 }

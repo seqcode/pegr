@@ -14,11 +14,6 @@ class ItemController {
     def show(Item item) {
         respond item
     }
-
-    def showAjax(Long id) {
-        def item = Item.get(id)
-        render template: '/item/showModal', bean: item, var: "itemInstance"
-    }
     
     def create() {
         respond new Item(params)

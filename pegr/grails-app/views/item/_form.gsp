@@ -8,7 +8,7 @@
 <div class=" ${hasErrors(bean: item, field: 'type', 'error')} ">
     <label>Type</label>
     <g:select name="type.id" from="${pegr.ItemType.list()}" 
-              optionKey="id" oprtionValue="name" value="${item?.type?.name}" />
+              optionKey="id" oprtionValue="name" value="${item?.type?.id}" noSelection="${['null':'--Choose--']}" />
 </div>
 
 <div class=" ${hasErrors(bean: item, field: 'barcode', 'error')} ">
@@ -29,7 +29,7 @@
 <div >
     <label>Parent Type</label>
     <g:select name="parentTypeId" from="${pegr.ItemType.list()}" 
-              optionKey="id" oprtionValue="name"/>
+              optionKey="id" oprtionValue="name" noSelection="${['null':'--Choose--']}"/>
 </div>
 
 <div>

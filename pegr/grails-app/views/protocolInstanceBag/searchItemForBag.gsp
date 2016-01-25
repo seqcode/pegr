@@ -14,7 +14,7 @@
     <g:if test="${flash.message}">
 			<div class="message" role="status">${flash.message}</div>
     </g:if>
-    <form class="fields" role="form" action="previewItemAndBag" method="post">
+    <g:form class="fields" role="form" action="previewItemAndBag" >
         <g:hiddenField name="bagId" value="${bagId}"/>
         <div class="form-group">
             <label for="type">Type</label>
@@ -26,7 +26,7 @@
             <button type="button" onclick="getScan();"><span class="glyphicon glyphicon-qrcode"></span> Scan</button>
         </div>
         <g:submitButton class="btn btn-primary" name="search" value="Search Or Create"/>
-    </form>                     
+    </g:form>                    
 
     <script>
         $("#nav-bench").addClass("active");

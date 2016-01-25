@@ -68,13 +68,16 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    void saveItemInBag(Item item, Long parentTypeId, String parentBarcode, Long bagId) {
-        def parent = Item.where{type.id == parentTypeId && barcode == parentBarcode}.get(max: 1)
-        if (!parent) {
-            throw new ProtocolInstanceBagException(message: "Parent item not found!")
-        }
-        try {
-            item.parent = parent
+    void saveItemInBag(Item item, String parentTypeId, String parentBarcode, Long bagId) {
+		if (parentBarcode?.trim()) {
+			def typeId = Long.parseLong(parentTypeId)
+	        def parent = Item.where{type.id == typeId && barcode == parentBarcode}.get(max: 1)
+	        if (!parent) {
+	            throw new ProtocolInstanceBagException(message: "Parent item not found!")
+	        }
+			item.parent = parent
+		}
+        try {            
             def bag = ProtocolInstanceBag.get(bagId)
             item.addToBags(bag).save(flush: true)
         }

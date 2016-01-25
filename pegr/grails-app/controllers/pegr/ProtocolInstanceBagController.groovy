@@ -55,7 +55,7 @@ class ProtocolInstanceBagController {
         def itemType = ItemType.get(typeId)
         def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
         if (item) {
-            subBag = item.bags.last()
+            def subBag = item.bags.last()
             render(view:"previewItemAndBag", model: [item: item, subBag: subBag, bagId: bagId])
         }else {
             item = new Item(type: itemType, barcode: barcode)
@@ -86,10 +86,9 @@ class ProtocolInstanceBagController {
     def saveItemInBag() {
         
         def item = new Item(params)
-        def bagId = Long.parseLong(params.bagId)
-        def parentTypeId = Long.parseLong(params.parentTypeId)
+		def bagId = Long.parseLong(params.bagId)
         try {
-            protocolInstanceBagService.saveItemInBag(item, parentTypeId, parentBarcode, bagId)
+            protocolInstanceBagService.saveItemInBag(item, params.parentTypeId, params.parentBarcode, bagId)
             redirect(action: "showBag", id: bagId)
         }catch(ProtocolInstanceBagException e) {
             flash.message = e.message

@@ -39,9 +39,11 @@ class ProtocolInstanceBagController {
         def bag = ProtocolInstanceBag.get(id)
         def protocolInstances = ProtocolInstance.where { bag.id == id}.list(sort: "bagIdx", order: "asc")
         def count = protocolInstances.count{it.status == ProtocolStatus.COMPLETED}
-        def subBags = ProtocolInstanceBag.where{superBag.id == id}        
+        def subBags = ProtocolInstanceBag.where{superBag.id == id}       
+        def completed = (bag.status == ProtocolStatus.COMPLETED)
+        def toBeCompleted = (bag.status != ProtocolStatus.COMPLETED && protocolInstances.last().status == ProtocolStatus.COMPLETED)
         if (bag) {
-            [bag:bag, count: count, protocolInstances: protocolInstances, subBags: subBags]
+            [bag:bag, count: count, protocolInstances: protocolInstances, subBags: subBags, completed: completed, toBeCompleted: toBeCompleted]
         }else {
             render status: 404
         }
@@ -95,6 +97,24 @@ class ProtocolInstanceBagController {
             redirect(action: "searchItemForBag", id: bagId)
         }
     }
+    
+    def removeItemFromBag(Long itemId, Long bagId) {
+        try {
+            protocolInstanceBagService.removeItemFromBag(itemId, bagId)
+        } catch(ProtocolInstanceBagException e) {
+            flash.message = e.message
+        }
+        redirect(action: "showBag", id: bagId)
+    }
+    
+    def removeBagFromBag(Long subBagId, Long bagId) {        
+        try {
+            protocolInstanceBagService.removeBagFromBag(subBagId)
+        } catch(ProtocolInstanceBagException e) {
+            flash.message = e.message
+        }
+        redirect(action: "showBag", id: bagId)
+    }
 
     def startInstance(Long id) {
         try {
@@ -109,7 +129,8 @@ class ProtocolInstanceBagController {
         def protocolInstance = ProtocolInstance.get(id)
         if (protocolInstance) {
             def items = ProtocolInstanceItems.where {protocolInstance.id == id}.collect {it.item}
-            [protocolInstance:protocolInstance, items: items]
+            def completed = (protocolInstance.bag.status == ProtocolStatus.COMPLETED)
+            [protocolInstance:protocolInstance, items: items, completed: completed]
         }else {
             render status: 404
         }
@@ -182,6 +203,17 @@ class ProtocolInstanceBagController {
         } catch(ProtocolInstanceBagException e){
             flash.message = e.message
             redirect(action: "showInstance", id: instanceId)
+        }
+
+    }
+    
+    def completeBag(Long bagId) {
+        try {
+            protocolInstanceBagService.completeBag(bagId)
+            redirect(action:"index")
+        } catch(ProtocolInstanceBagException e){
+            flash.message = e.message
+            redirect(action: "showBag", id: bagId)
         }
 
     }

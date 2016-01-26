@@ -22,7 +22,11 @@
                 ${raw(protocolInstance?.protocol?.details)}
             </g:if>
         </div>
-        <h3>Items <g:link action="searchItemForInstance" id="${protocolInstance.id}" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-plus"></span> Add</g:link> </h3>                
+        <h3>Items 
+            <g:if test="${!completed}">
+                <g:link action="searchItemForInstance" id="${protocolInstance.id}" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-plus"></span> Add</g:link> 
+            </g:if>
+        </h3>                
         <div id="itemList" class="row">
             <g:each in="${items}" var="item">
                 <g:render template="itemInInstance" model="['item': item, 'instanceId': protocolInstance.id]" />
@@ -36,6 +40,7 @@
     </div>
     <script>
         $("#nav-bench").addClass("active"); 
+        $(".confirm").confirm();
     </script>
 </body>
 </html>

@@ -26,7 +26,7 @@ class ProtocolInstanceBagService {
             throw new ProtocolInstanceBagException(message: "protocol Group not found!")
         }
         def prtclInstBag = new ProtocolInstanceBag(name: name,
-                                                  status: ProtocolStatus.INACTIVE,
+                                                  status: ProtocolStatus.PROCESSING,
                                                   protocolGroup: protocolGroup,
                                                   startTime: startTime)
         try {
@@ -46,8 +46,8 @@ class ProtocolInstanceBagService {
     void addItemToBag(Long itemId, Long bagId){
         try {
             def item = Item.get(itemId)
-            def bag = Bag.get(bagId)
-            item.AddToBags(bag).save(flush: true)
+            def bag = ProtocolInstanceBag.get(bagId)
+            item.addToBags(bag).save(flush: true)
         }catch(Exception e) {
             log.error "Error: ${e.message}", e
             throw new ProtocolInstanceBagException(message: "Error adding this item!")
@@ -88,11 +88,36 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
+    def removeItemFromBag(Long itemId, Long bagId) {
+        try {
+            def item = Item.get(itemId)
+            def bag = ProtocolInstanceBag.get(bagId)
+            item.removeFromBags(bag).save(flush: true)
+        }catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            throw new ProtocolInstanceBagException(message: "Error removing this item!")
+        }
+        
+    }
+    
+    @Transactional
+    def removeBagFromBag(Long subBagId) {
+        try {
+            def subBag = ProtocolInstanceBag.get(subBagId)
+            subBag.superBag = null
+            subBag.save(flush: true)
+        }catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            throw new ProtocolInstanceBagException(message: "Error removing this bag!")
+        }
+    }
+    
+    @Transactional
     void startInstance(Long id) {
         try {
             def instance = ProtocolInstance.get(id)
             instance.user = springSecurityService.currentUser
-            instance.status = ProtocolStatus.PREP
+            instance.status = ProtocolStatus.PROCESSING
             instance.startTime = new Date()
             instance.save(flush: true)
         }catch(Exception e) {
@@ -163,6 +188,22 @@ class ProtocolInstanceBagService {
         }catch(Exception e) { 
             log.error "Error: ${e.message}", e
             throw new ProtocolInstanceBagException(message: "Error saving the status for protocol instance!")
+        }
+    }
+    
+    @Transactional
+    void completeBag(Long bagId) {
+        def protocolInstanceBag = ProtocolInstanceBag.get(bagId)
+        if (!protocolInstanceBag) {
+            throw new ProtocolInstanceBagException(message: "Protocol Instance Bag not found!")
+        }
+        try {
+            protocolInstanceBag.status = ProtocolStatus.COMPLETED
+            protocolInstanceBag.endTime = new Date()
+            protocolInstanceBag.save(flush:true)
+        }catch(Exception e) { 
+            log.error "Error: ${e.message}", e
+            throw new ProtocolInstanceBagException(message: "Error saving the status for protocol instance bag!")
         }
     }
 }

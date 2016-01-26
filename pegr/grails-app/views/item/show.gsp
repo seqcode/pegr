@@ -1,3 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="layout" content="main"/>
+<title>Item</title>
+</head>
+<body>
 <g:if test="${itemInstance?.name}">
     <h4>Name: ${itemInstance.name}</h4>
 </g:if>
@@ -22,3 +29,5 @@
     <li>Parent: <g:link controller="item" action="show" id="${itemInstance.parent.id}">${itemInstance.parent.name}</g:link></li>
     </g:if>
 </ul>
+</body>
+</html>

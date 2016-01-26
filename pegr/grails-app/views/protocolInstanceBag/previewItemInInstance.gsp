@@ -8,13 +8,13 @@
 </head>
 <body  onhashchange="getHash()">
 <div class="container-fluid">
-    <h4>Add Traced Item</h4>
+    <h3>Add Item</h3>
     <g:render template="/item/details" bean="${item}" var="item"></g:render>
 
     <g:link action="addItemToInstance" params="[itemId: item.id,
-                               instanceId: instanceId]" class="btn btn-primary">Add Item Only</g:link>
+                               instanceId: instanceId]" class="btn btn-primary">Add</g:link>
 
-    <g:link action="searchItemForInstance" id="${instanceId}" class="btn btn-primary"><span class="glyphicon glyphicon-menu-left"></span> Cancel</g:link>
+    <g:link action="searchItemForInstance" id="${instanceId}" class="btn btn-primary">Cancel</g:link>
     <script>
         $("#nav-bench").addClass("active");
      </script>

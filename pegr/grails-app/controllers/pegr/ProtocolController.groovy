@@ -110,23 +110,6 @@ class ProtocolController {
         }   
     }
     
-    @Transactional
-    def removeItemFromPrtclInstanceAjax(){
-        try {
-            def item = Item.get(params.itemId)
-            def protocolInstance = ProtocolInstance.get(params.prtclInstId)
-            if (protocolInstance && item) {    
-                protocolInstance.removeFromItems(item).save(flush: true)
-                render template: 'item', collection: protocolInstance.items, var: 'itemInstance'                
-            }else {
-                throw new Exception()
-            }
-        }catch(Exception e) { 
-            log.error "Error linking item to protocol instance", e
-            render "<div class='errors'>Error linking this item to the protocol instance!</div>"
-        }
-    }
-    
     def searchAjax() {        
         try {
             def items = Item.withCriteria {
@@ -147,13 +130,5 @@ class ProtocolController {
             log.error "Error searching item within protocol instance", e
             render status: 404
         }
-    }
-    
-    @Transactional
-    def completePrtclInst() {
-        def protocolInstance = ProtocolInstance.get(params.prtclInstId)
-        protocolInstance.completed = true
-        protocolInstance.save(flush:true)
-        redirect(action:"showProtocolsForSample", params: [sampleId: params.sampleId])
     }
 }

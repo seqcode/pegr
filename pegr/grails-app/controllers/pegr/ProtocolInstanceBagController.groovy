@@ -69,7 +69,7 @@ class ProtocolInstanceBagController {
             redirect(action: "showBag", id: bagId)
         }catch(ProtocolInstanceBagException e){
             flash.message = e.message
-            redirect(action: "searchItemForBag", params: [bagId: bagId])
+            redirect(action: "searchItemForBag", id: bagId)
         }
     }
     
@@ -79,7 +79,7 @@ class ProtocolInstanceBagController {
             redirect(action: "showBag", id: bagId)
         } catch(ProtocolInstanceBagException e) {
             flash.message = e.message
-            redirect(action: "searchItemForBag", params: [bagId: bagId])
+            redirect(action: "searchItemForBag", id: bagId)
         }
     }
     
@@ -92,7 +92,16 @@ class ProtocolInstanceBagController {
             redirect(action: "showBag", id: bagId)
         }catch(ProtocolInstanceBagException e) {
             flash.message = e.message
-            redirect(action: "searchItemForBag", params: [bagId: bagId])
+            redirect(action: "searchItemForBag", id: bagId)
+        }
+    }
+
+    def startInstance(Long id) {
+        try {
+            protocolInstanceBagService.startInstance(id)
+            redirect(action: "showInstance", id: id)
+        }catch(ProtocolInstanceBagException e){
+            render status: 404
         }
     }
     
@@ -127,7 +136,7 @@ class ProtocolInstanceBagController {
             redirect(action: "showInstance", id: instanceId)
         }catch(ProtocolInstanceBagException e){
             flash.message = e.message
-            redirect(action: "searchItemForInstance", params: [instanceId: instanceId])
+            redirect(action: "searchItemForInstance", id: instanceId)
         }
     }
     
@@ -140,7 +149,7 @@ class ProtocolInstanceBagController {
             redirect(action: "showInstance", id: instanceId)
         }catch(ProtocolInstanceBagException e) {
             flash.message = e.message
-            redirect(action: "searchItemForInstance", params: [instanceId: instanceId])
+            redirect(action: "searchItemForInstance", id: instanceId)
         }
     }
     
@@ -157,4 +166,23 @@ class ProtocolInstanceBagController {
         }
     }
     
+    def removeItemFromInstance(Long itemId, Long instanceId){
+        try {
+            protocolInstanceBagService.removeItemFromInstance(itemId, instanceId)
+        }catch(ProtocolInstanceBagException e) { 
+            flash.message = e.message
+        }
+        redirect(action: "showInstance", id: instanceId)
+    }
+    
+    def completeInstance(Long instanceId, Long bagId) {
+        try {
+            protocolInstanceBagService.completeInstance(instanceId)
+            redirect(action:"showBag", id: bagId)
+        } catch(ProtocolInstanceBagException e){
+            flash.message = e.message
+            redirect(action: "showInstance", id: instanceId)
+        }
+
+    }
 }

@@ -16,15 +16,7 @@
     </g:if>
     <g:form class="fields" role="form" action="previewItemAndBag" >
         <g:hiddenField name="bagId" value="${bagId}"/>
-        <div class="form-group">
-            <label for="type">Type</label>
-            <g:select id="type" name="typeId" optionKey="id" from="${pegr.ItemType.list()}" noSelection="['null': '-- choose --']" />
-        </div>        
-        <div class="form-group">
-            <label for="barcode">Barcode</label>
-             <g:textField id="barcode" name="barcode" />
-            <button type="button" onclick="getScan();"><span class="glyphicon glyphicon-qrcode"></span> Scan</button>
-        </div>
+        <g:render template="/item/search"></g:render>
         <g:submitButton class="btn btn-primary" name="search" value="Search Or Create"/>
     </g:form>                    
 

@@ -1,21 +1,24 @@
+<g:if test="${item?.name}">
+<h4>Name: ${item.name}</h4>
+</g:if>
 <ul>
-    <g:if test="${itemInstance?.name}">
-    <li>Name: ${itemInstance.name}</li>
+    <g:if test="${item?.type}">
+    <li>Type: ${item.type}</li>
     </g:if>
     
-    <g:if test="${itemInstance?.type}">
-    <li>Name: ${itemInstance.type}</li>
+    <g:if test="${item?.barcode}">
+    <li>Barcode: ${item.barcode }</li>
+    </g:if>	
+
+    <g:if test="${item?.location}">
+    <li>Location: ${item.location}</li>
+    </g:if>	
+
+    <g:if test="${item?.notes}">
+    <li>Notes: ${item.notes}</li>
     </g:if>
     
-    <g:if test="${itemInstance?.barcode}">
-    <li>Barcode: ${itemInstance.barcode }</li>
-    </g:if>	
-
-    <g:if test="${itemInstance?.location}">
-    <li>Location: ${itemInstance.location}</li>
-    </g:if>	
-
-    <g:if test="${itemInstance?.notes}">
-    <li>Notes: ${itemInstance.notes}</li>
+    <g:if test="${item?.parent}">
+    <li>Parent: <g:link controller="item" action="show" id="${item.parent.id}">${item.parent.name}</g:link></li>
     </g:if>
 </ul>

@@ -88,10 +88,24 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
+    void startInstance(Long id) {
+        try {
+            def instance = ProtocolInstance.get(id)
+            instance.user = springSecurityService.currentUser
+            instance.status = ProtocolStatus.PREP
+            instance.startTime = new Date()
+            instance.save(flush: true)
+        }catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            throw new ProtocolInstanceBagException()
+        }
+    }
+    
+    @Transactional
     void addItemToInstance(Long itemId, Long instanceId){
         try {
             def item = Item.get(itemId)
-            def instance = Instance.get(instanceId)
+            def instance = ProtocolInstance.get(instanceId)
             def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance)
             instanceItem.save(flush: true)
         }catch(Exception e) {
@@ -111,7 +125,8 @@ class ProtocolInstanceBagService {
 			item.parent = parent
 		}
         try {            
-            def instance = Instance.get(instanceId)
+            item.save(flush: true)
+            def instance = ProtocolInstance.get(instanceId)
             def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance)
             instanceItem.save(flush: true)
         }
@@ -121,5 +136,33 @@ class ProtocolInstanceBagService {
         }
     }
     
+    @Transactional
+    void removeItemFromInstance(Long itemId, Long instanceId) {
+        def protocolItem = ProtocolInstanceItems.where {protocolInstance.id == instanceId && item.id == itemId}.get(max:1)
+        if (!protocolItem) {
+            throw new ProtocolInstanceBagException(message: "Item not found in the protocol instance!")
+        }
+        try {            
+            protocolItem.delete(flush: true)
+        }catch(Exception e) { 
+            log.error "Error: ${e.message}", e
+            throw new ProtocolInstanceBagException(message: "Error removing the item!")
+        }
+    }
     
+    @Transactional
+    void completeInstance(Long instanceId) {
+        def protocolInstance = ProtocolInstance.get(instanceId)
+        if (!protocolInstance) {
+            throw new ProtocolInstanceBagException(message: "Protocol Instance not found!")
+        }
+        try {
+            protocolInstance.status = ProtocolStatus.COMPLETED
+            protocolInstance.endTime = new Date()
+            protocolInstance.save(flush:true)
+        }catch(Exception e) { 
+            log.error "Error: ${e.message}", e
+            throw new ProtocolInstanceBagException(message: "Error saving the status for protocol instance!")
+        }
+    }
 }

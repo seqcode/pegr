@@ -8,7 +8,7 @@
 </head>
 <body  onhashchange="getHash()">
 <div class="container-fluid">
-    <h4>Add Traced Item </h4>
+    <h4>Add Item </h4>
     <p>Item not found! Do you want to add it as a new item?</p>
     <button class="btn btn-primary" onClick="$('form').show()">Yes</button>
     <g:link class="btn btn-default" action="searchItemForInstance" id="${instanceId}">No</g:link>

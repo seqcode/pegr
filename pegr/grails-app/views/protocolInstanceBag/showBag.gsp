@@ -5,6 +5,7 @@
 </head>
 <body>                
     <div class="container-fluid">
+        <g:link action="index"><span class="glyphicon glyphicon-home"></span> Home</g:link>
         <g:render template="/protocolInstanceBag/overview" bean="${bag}"></g:render>       
         <div class="row">
             <div class="col-md-6">

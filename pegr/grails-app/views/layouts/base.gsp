@@ -12,9 +12,6 @@
 	<div class="text-center visible-xs-block, hidden-xs">
 		<h1>Platform for Eukaryotic Gene Regulation</h1>
 	</div>
-    <g:layoutBody/>
-	<footer class="container-fluid text-center">
-	  <p>Contact</p>
-	</footer>	
+    <g:layoutBody/>	
 </body>
 </html>

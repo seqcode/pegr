@@ -27,18 +27,18 @@
 					</tr>
 				</thead>
 				<tbody>
-				<g:each in="${protocolInstanceList}" status="i" var="protocolInstance">
+				<g:each in="${protocolList}" status="i" var="protocol">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">					
-						<td><g:link action="show" id="${protocolInstance.id}">${fieldValue(bean: protocolInstance, field: "name")}</g:link></td>					
-						<td>${fieldValue(bean: protocolInstance, field: "protocolVersion")}</td>					
-						<td>${fieldValue(bean: protocolInstance, field: "description")}</td>					
+						<td><g:link action="show" id="${protocol.id}">${fieldValue(bean: protocol, field: "name")}</g:link></td>					
+						<td>${fieldValue(bean: protocol, field: "protocolVersion")}</td>					
+						<td>${fieldValue(bean: protocol, field: "description")}</td>					
 					</tr>
 				</g:each>
 				</tbody>
 			</table>
 			</div>
 			<div class="pagination">
-				<g:paginate total="${protocolInstanceCount ?: 0}" />
+				<g:paginate total="${protocolCount ?: 0}" />
 			</div>
 		</div>
 	</body>

@@ -6,7 +6,8 @@ class Protocol {
 	String description
 	String details
     User user
-	
+	Assay assay
+    
 	String toString() {
         String s = name
         if (protocolVersion) {
@@ -24,6 +25,7 @@ class Protocol {
 		description nullable: true, blank: true
 		details nullable: true, blank: true
         user nullable: true
+        assay nullable: true
 	}
 	
 	static mapping = {

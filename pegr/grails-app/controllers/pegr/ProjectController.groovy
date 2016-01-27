@@ -36,7 +36,7 @@ class ProjectController {
                         flash.message = "Successfully  created project ${project.name}"
                         redirect(action:"show", id:"${project.id}")
                     } else {
-                        reqeust.message = "Invalid inputs!"
+                        request.message = "Invalid inputs!"
                         render(view:'create', model:[project: project])
                 }
                 }catch(Exception e) {

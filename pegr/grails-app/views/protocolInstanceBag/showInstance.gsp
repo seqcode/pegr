@@ -22,15 +22,49 @@
                 ${raw(protocolInstance?.protocol?.details)}
             </g:if>
         </div>
-        <h3>Items 
-            <g:if test="${!completed}">
-                <g:link action="searchItemForInstance" id="${protocolInstance.id}" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-plus"></span> Add</g:link> 
-            </g:if>
-        </h3>                
-        <div id="itemList" class="row">
-            <g:each in="${items}" var="item">
-                <g:render template="itemInInstance" model="['item': item, 'instanceId': protocolInstance.id]" />
-            </g:each>
+        <h3>Items</h3>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Barcode</th>
+                        <th>Notes</th>
+                        <g:if test="${!completed}">
+                            <th></th>
+                        </g:if>
+                    </tr>
+                </thead>
+                <tbody>
+                    <g:each in="${itemList}">
+                    <tr>
+                        <td class="col-sm-2" rowspan="${Math.max(1, it.items.size())}">${it.type} <g:if test="${!completed}"><g:link action="searchItemForTypeInstance" params="[instanceId:protocolInstance.id, typeId:it?.type?.id]"><span class="glyphicon glyphicon-plus"></span></g:link></g:if> </td>
+                        <g:each in="${it.items}" var="item"  status="counter">
+                            <g:if test="${counter>0}"><tr></g:if>
+                            <td class="col-sm-2"><g:link controller="item" action="show" id="${item.id}" target="_blank">${item.name}</g:link></td>
+                            <td class="col-sm-2">${item.location}</td>
+                            <td class="col-sm-2">${item.barcode}</td>
+                            <td class="col-sm-2">${item.notes}</td>
+                            <g:if test="${!completed}">
+                                <td>
+                                <g:link class="confirm" action="removeItemFromInstance" params="[itemId: item.id, instanceId: protocolInstance.id]"><span class="glyphicon glyphicon-remove"></span></g:link></td>
+                            </g:if>
+                            </tr>
+                        </g:each>
+                </g:each>
+                <tr>
+                    <td colspan="5"><g:if test="${!completed}"><g:link action="searchItemForInstance" params="[id:protocolInstance.id]">Add <span class="glyphicon glyphicon-plus"></span></g:link></g:if></td>
+                    <g:if test="${!completed}">
+                        <td></td>
+                    </g:if>
+                </tr>
+                <tr>
+                    <td colspan="5"></td>
+                </tr>
+                </tbody>
+              </table>
         </div>
         <g:if test="${protocolInstance.status != pegr.ProtocolStatus.COMPLETED}">
         <div class="row well text-center">

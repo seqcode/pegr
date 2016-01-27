@@ -127,10 +127,29 @@ class ProtocolInstanceBagController {
     
     def showInstance(Long id) {
         def protocolInstance = ProtocolInstance.get(id)
+
         if (protocolInstance) {
-            def items = ProtocolInstanceItems.where {protocolInstance.id == id}.collect {it.item}
+            // get the required item types
+            def requiredItemTypes = ProtocolItemTypes.where {protocol.id == protocolInstance.protocol.id}.collect{it.itemType}
+            // get the existing items
+            def protocolItems = ProtocolInstanceItems.where {protocolInstance.id == id}.collect {it.item}
+            // initiate item list
+            def itemList = []
+            requiredItemTypes.each{ t ->
+                itemList.add([type: t, items: []])
+            }
+            // insert items to the list
+            protocolItems.each{ item ->
+                def itemsInType = itemList.find{it.type == item.type}
+                if (itemsInType) {
+                    itemsInType.items.add(item)
+                }else {
+                    itemList.add([type: item.type, items: [item]])
+                }
+            }
+            
             def completed = (protocolInstance.bag.status == ProtocolStatus.COMPLETED)
-            [protocolInstance:protocolInstance, items: items, completed: completed]
+            [protocolInstance:protocolInstance, itemList: itemList, completed: completed]
         }else {
             render status: 404
         }
@@ -138,6 +157,11 @@ class ProtocolInstanceBagController {
     
     def searchItemForInstance(Long id){
         [instanceId: id]       
+    }
+    
+    def searchItemForTypeInstance(Long instanceId, Long typeId){
+        def itemType = ItemType.get(typeId)
+        [instanceId: instanceId, itemType: itemType]       
     }
     
     def previewItemInInstance(Long typeId, String barcode, Long instanceId) {

@@ -7,13 +7,14 @@
 
 <div class=" ${hasErrors(bean: item, field: 'type', 'error')} ">
     <label>Type</label>
-    <g:select name="type.id" from="${pegr.ItemType.list()}" 
-              optionKey="id" oprtionValue="name" value="${item?.type?.id}" noSelection="${['null':'--Choose--']}" />
+    <select id="type" name="type.id">
+        <option value="${item?.type?.id}" selected>${item?.type?.name}</option>
+    </select>
 </div>
 
 <div class=" ${hasErrors(bean: item, field: 'barcode', 'error')} ">
     <label>Barcode</label>
-    <g:textField name="barcode" value="${item?.barcode}"/>
+    <g:field name="barcode" value="${item?.barcode}" readonly="readonly" />
 </div>
 
 <div class=" ${hasErrors(bean: item, field: 'location', 'error')} ">

@@ -6,10 +6,39 @@ class ProtocolException extends RuntimeException {
     String message
 }
 
-@Transactional
 class ProtocolService {
     def springSecurityService
     
+    List getRequiredItemTypes(Long id) {
+        def requiredItemTypes = ProtocolItemTypes.where {protocol.id == id}.collect {it.itemType}
+        return requiredItemTypes
+    }
+    
+    @Transactional
+    void save(Protocol protocol, List requiredItemTypes) {
+        try {
+            protocol.save(flush: true)
+            requiredItemTypes.each{
+                new ProtocolItemTypes(protocol:protocol, itemType: it).save(flush: true)}
+        }catch(Exception e){
+            log.error "Error: ${e.message}", e
+            throw new ProtocolException(message: "Error saving the protocol!")
+        }
+    }
+    
+    @Transactional
+    void delete(Long id) {
+        try {
+            ProtocolItemTypes.executeUpdate("delete ProtocolItemTypes t where t.protocol.id == :protocolId", [protocolId: id])
+            Protocol.executeUpdate("delete Protocol t where t.id == :protocolId", [protocolId: id])
+        }catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            throw new ProtocolException(message: "Error deleting the protocol!")
+        }
+    }
+        
+                                        
+    @Transactional
     ProtocolInstance createInstanceForSample(String protocolId, String sampleId, String priorProtInstId) {
         def user = springSecurityService.currentUser
 		def priorProtInst = null

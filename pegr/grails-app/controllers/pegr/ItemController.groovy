@@ -68,17 +68,30 @@ class ItemController {
         }
     }
     
-
-    
     def upload() {
-        MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  
-        def mpf = mpr.getFile("image");
+        def allowedTypes = ['image/png', 'image/jpeg', 'gif', 'jpg', 'tiff']
+        
+        try {
+            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  
+            def mpf = mpr.getFile("image");
+            String fileName = mpf.getOriginalFilename();
+            String fileType = mpf.getContentType();
 
-        if(!mpf?.empty && mpf.size < 1024 * 1024) {
-            def webrootDir = servletContext.getRealPath("/")
-            File fileDest = new File(webrootDir, "images/items.png") 
-            mpf.transferTo(fileDest)
+            if(!mpf?.empty && mpf.size < 15 * 1024 * 1024 && fileType in allowedTypes) {
+                def webrootDir = servletContext.getRealPath("/")
+                File fileDest = File.createTempFile("item/${params.itemId}-", fileType, webrootDir)//new File(webrootDir, "files/items") 
+                mpf.transferTo(fileDest)
+                def item = Item.get(params.long('itemId'))
+                item.imagePath = fileDest
+                item.save(flush: true)
+                flash.message = "Image uploaded!"
+            }
+            flash.message = "${fileType}"
+        } catch(Exception e) {
+            flash.message = "Error uploading the file!"
         }
+
+        redirect(action: "show", id: params.itemId)
     }
     
     

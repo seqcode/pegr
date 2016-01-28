@@ -1,37 +1,21 @@
-<!DOCTYPE html>
 <html>
 <head>
-<meta name="layout" content="main"/>
-<title>Item</title>
+    <title>Workbench</title> 
+    <meta name="layout" content="main"/>
 </head>
 <body>
-<g:if test="${item?.name}">
-    <h4>Name: ${item.name}</h4>
-</g:if>
-<ul>    
-    <g:if test="${item?.type}">
-    <li>Type: ${item.type}</li>
-    </g:if>
+<div class="container-fluid">
+     <ul class="nav nav-tabs">
+        <li><g:link action="list">List</g:link></li>
+        <li><g:link action="edit" id="${item.id}">Edit</g:link></li>
+        <li><g:link action="delete" id="${item.id}">Delete</g:link></li>   
+    </ul>
 
-    <g:if test="${item?.barcode}">
-    <li>Barcode: ${item.barcode }</li>
-    </g:if>	
+    <g:render template="/${itemController}/details" model="['item':item, 'object': object]"></g:render>   
 
-    <g:if test="${item?.location}">
-    <li>Location: ${item.location}</li>
-    </g:if>	
-
-    <g:if test="${item?.notes}">
-    <li>Notes: ${item.notes}</li>
-    </g:if>
-
-    <g:if test="${item?.parent}">
-    <li>Parent: <g:link controller="item" action="show" id="${item.parent.id}">${item.parent.name}</g:link></li>
-    </g:if>
-</ul>
-    
     <script>
-        $("#nav-bench").addClass("active");     
-    </script>
+        $("#nav-bench").addClass("active");
+     </script>
+</div>
 </body>
 </html>

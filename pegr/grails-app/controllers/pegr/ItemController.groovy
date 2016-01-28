@@ -1,13 +1,33 @@
 package pegr
 
 import static org.springframework.http.HttpStatus.*
-import grails.transaction.Transactional
 import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 class ItemController {
 
+    def itemService
+    
     def index(){}
     
+    def list(Integer max, Long typeId) {
+        params.max = Math.min(max ?: 10, 100)
+        def items = Item.where{
+            if(typeId) {type.id == typeId}
+        }
+
+        [itemList: items.list(params), itemCount: items.count()]
+    }
+    
+    def show(Long id) {
+        def item = Item.get(id)
+        if(!item) {
+            render status: 404
+        }
+        def object = itemService.getObjectFromItem(item.type.objectType, item.referenceId)
+        def itemController = item.type.objectType ?: "item"
+        [item: item, object: object, itemController: itemController]
+    }
+  
     def preview(Long typeId, String barcode) {
         def itemType = ItemType.get(typeId)
         def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
@@ -15,30 +35,41 @@ class ItemController {
             redirect(action: "show", id: item.id)
         }else {
             item = new Item(type: itemType, barcode: barcode)
-            redirect(action: "edit", params: [typeId:typeId, barcode:barcode])
+            def itemController = itemType.objectType ?: "item"
+            render(view: "create", model: [item:item, itemController: itemController])
         }
     }
     
-        // TODO
-    def antibodyList(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
-        respond Item.list(params), model:[itemInstanceCount: Item.count()]
+    def save() {
+        try {
+            itemService.save(params)
+            flash.message = "New item added!"
+            redirect(action: "index")
+        }catch(ItemException e) {
+            flash.message = e.message
+            redirect(action: "index")
+        }
     }
+
+    def edit(Item item) {
+        def object = itemService.getObjectFromItem(item.type.objectType, item.referenceId)
+        def itemController = item.type.objectType ?: "item"
+        [item: item, object: object, itemController: itemController]
+    }
+    
+    def update() {
+        try {
+            itemService.update(params)
+            flash.message = "Item update!"
+            redirect(action: "show", id: params.itemId)
+        }catch(ItemException e) {
+            flash.message = e.message
+            redirect(action: "index")
+        }
+    }
+    
 
     
-    def show(Long id) {
-        def item = Item.get(id)
-        if(!item) {
-            render status: 404
-        }
-        if(item.type.objectType && item.referenceId){
-            def dc = grailsApplication.getDomainClass(item.type.objectType)            
-            render(view: item.type.objectType, model: [item: item, object: dc.get(item.referenceId)])   
-        } else {
-            [item:item]
-        }
-    }
-
     def upload() {
         MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  
         def mpf = mpr.getFile("image");
@@ -50,30 +81,7 @@ class ItemController {
         }
     }
     
-    @Transactional
-    def save() {
-		def item = new Item(params)
-        item.save(flush: true)
-        if(item.type.objectType){
-            def dc = grailsApplication.getDomainClass(item.type.objectType) 
-            def object = dc.clazz.newInstance(params)
-            object.save(flush: true)
-        }
-        flash.message = "New item added!"
-        redirect(action: "index")
-    }
-
-    def edit(Item item) {
-        if(item.type.objectType){
-            def dc = grailsApplication.getDomainClass(item.type.objectType) 
-            def object = item.referenceId ? dc.get(item.referenceId) : null
-            render(view: "edit" + item.type.objectType, model: [item: item, object: object]) 
-        }else{
-            render(view: "edit", model: [item: item])
-        }
-    }
-
-    @Transactional
+    
     def delete(Item itemInstance) {
 
         if (itemInstance == null) {

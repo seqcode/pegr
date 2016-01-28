@@ -10,9 +10,7 @@
 <ul class="nav nav-tabs">
     <li><g:link controller="protocolInstanceBag" action="index"><span class="glyphicon glyphicon-home"></span> Home</g:link></li>
     <li class="active"><a href="#">Search</a></li>
-    <li><g:link action="antibodyList">Antibody</g:link></li>   
-    <li><g:link action='cellSourceList'></span>Cell Source</g:link></li>
-    <li><g:link controller="sampleList" action="index">Sample</g:link></li>
+    <li><g:link action="list">List</g:link></li>   
 </ul>
     <g:if test="${flash.message}">
 			<div class="message" role="status">${flash.message}</div>

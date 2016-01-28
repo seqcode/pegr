@@ -13,11 +13,11 @@
     <button class="btn btn-primary" onClick="$('form').show()">Yes</button>
     <g:link class="btn btn-default" action="searchItemForInstance" id="${instanceId}">No</g:link>
 
-    <form action="saveItemInInstance" class="fields" role="form" method="post">
+    <g:form action="saveItemInInstance" class="fields" role="form" method="post">
         <g:hiddenField name="instanceId" value="${instanceId}"/>
         <g:render template="/item/form" bean="${item}" var="item"></g:render>
         <g:submitButton class="btn btn-primary" name="save" value="Save"/>
-    </form>
+    </g:form>
 
     <script>
         $("#nav-bench").addClass("active");

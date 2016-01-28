@@ -20,6 +20,7 @@
                 onChange="${remoteFunction(controller: 'protocolInstanceBag', action: 'showProtocolsInGroupAjax', update:'protocols', params: '\'id=\'+this.value')}"/>
             </div>
             <g:submitButton class="btn btn-primary" name="Save"/>
+            <g:link action="index" class="btn btn-default">Cancel</g:link>
         </form>
         <g:if test="${flash.message}">
             <div class="message" role="status">${flash.message}</div>

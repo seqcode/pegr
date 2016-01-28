@@ -5,18 +5,38 @@ import grails.transaction.Transactional
 import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 class ItemController {
+
+    def index(){}
     
-    def index(Integer max) {
+    def preview(Long typeId, String barcode) {
+        def itemType = ItemType.get(typeId)
+        def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
+        if (item) {
+            redirect(action: "show", id: item.id)
+        }else {
+            item = new Item(type: itemType, barcode: barcode)
+            redirect(action: "edit", params: [typeId:typeId, barcode:barcode])
+        }
+    }
+    
+        // TODO
+    def antibodyList(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         respond Item.list(params), model:[itemInstanceCount: Item.count()]
     }
 
-    def show(Item item) {
-        respond item
-    }
     
-    def create() {
-        respond new Item(params)
+    def show(Long id) {
+        def item = Item.get(id)
+        if(!item) {
+            render status: 404
+        }
+        if(item.type.objectType && item.referenceId){
+            def dc = grailsApplication.getDomainClass(item.type.objectType)            
+            render(view: item.type.objectType, model: [item: item, object: dc.get(item.referenceId)])   
+        } else {
+            [item:item]
+        }
     }
 
     def upload() {
@@ -31,48 +51,25 @@ class ItemController {
     }
     
     @Transactional
-    def save(Item itemInstance) {
-        if (itemInstance == null) {
-            notFound()
-            return
+    def save() {
+		def item = new Item(params)
+        item.save(flush: true)
+        if(item.type.objectType){
+            def dc = grailsApplication.getDomainClass(item.type.objectType) 
+            def object = dc.clazz.newInstance(params)
+            object.save(flush: true)
         }
-
-        if (itemInstance.hasErrors()) {
-            respond itemInstance.errors, view:'create'
-            return
-        }
-
-        itemInstance.save flush:true
-		
-		flash.message = message(code: 'default.created.message', args: [message(code: 'item.label', default: 'Item'), itemInstance.id])
-		redirect(controller: 'ItemAdmin', action: 'index') 
-		
+        flash.message = "New item added!"
+        redirect(action: "index")
     }
 
-    def edit(Item itemInstance) {
-        respond itemInstance
-    }
-
-    @Transactional
-    def update(Item itemInstance) {
-        if (itemInstance == null) {
-            notFound()
-            return
-        }
-
-        if (itemInstance.hasErrors()) {
-            respond itemInstance.errors, view:'edit'
-            return
-        }
-
-        itemInstance.save flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'Item.label', default: 'Item'), itemInstance.id])
-                redirect itemInstance
-            }
-            '*'{ respond itemInstance, [status: OK] }
+    def edit(Item item) {
+        if(item.type.objectType){
+            def dc = grailsApplication.getDomainClass(item.type.objectType) 
+            def object = item.referenceId ? dc.get(item.referenceId) : null
+            render(view: "edit" + item.type.objectType, model: [item: item, object: object]) 
+        }else{
+            render(view: "edit", model: [item: item])
         }
     }
 

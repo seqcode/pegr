@@ -5,7 +5,7 @@
 </head>
 <body>                
     <div class="container-fluid">
-        <g:link action="index"><span class="glyphicon glyphicon-home"></span> Home</g:link>
+        <h5><g:link action="index"><span class="glyphicon glyphicon-home"></span> Home</g:link></h5>
         <g:render template="/protocolInstanceBag/overview" bean="${bag}"></g:render>       
         <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>

@@ -7,6 +7,8 @@
     <ul class="nav nav-tabs">
         <li><g:link action="index">Processing</g:link></li>
         <li class="active"><a href="#">Completed</a></li>        
+        <li><g:link action='create'>New</g:link></li>
+        <li><g:link controller="item" action="index"><span class="glyphicon glyphicon-qrcode"></span> Items</g:link></li>
     </ul>
     <ul class="list-group" id="pendingCellSources">
         <g:each in="${bags}">

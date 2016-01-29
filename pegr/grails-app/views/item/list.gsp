@@ -2,21 +2,31 @@
 <head>
   <title>Cell Source</title> 
   <meta name="layout" content="main"/>
+    <script type="text/javascript" >
+        var changingHash=false;
+    </script>
 </head>
-<body>
-<div class="container-fluid">
-<ul class="nav nav-tabs">
-    <li><g:link controller="protocolInstanceBag" action="index"><span class="glyphicon glyphicon-home"></span> Home</g:link></li>
-    <li><g:link action="index">Search</g:link></li>
-    <li class="active"><g:link>List</g:link></li>   
-</ul>
+<body onhashchange="getHash()">
+
+<g:link controller="protocolInstanceBag" action="index"><span class="glyphicon glyphicon-home"></span> Home</g:link>
 <div class="row">
 
     <div class="col-md-10 text-left">
         <g:if test="${flash.message}">
             <div class="message" role="status">${flash.message}</div>
         </g:if>
-        
+        <g:form class="fields form-inline well well-sm" role="form" action="preview" >
+        <div class="form-group">
+            <label for="type">Type</label>
+            <g:select id="type" name="typeId" optionKey="id" from="${pegr.ItemType.list()}" noSelection="['null': '-- choose --']" />
+        </div>        
+        <div class="form-group">
+            <label for="barcode">Barcode</label>
+             <g:textField id="barcode" name="barcode" />
+            <button type="button" onclick="getScan();"><span class="glyphicon glyphicon-qrcode"></span></button>
+        </div>
+        <g:submitButton class="btn btn-primary btn-sm" name="search" value="Search/Create"/>
+    </g:form>    
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
@@ -57,7 +67,7 @@
         </g:each>
         </ul>
     </div>
-</div>
+
 </div>
 <script>
 $("#nav-bench").addClass("active");

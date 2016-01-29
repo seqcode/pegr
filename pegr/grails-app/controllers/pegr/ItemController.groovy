@@ -9,7 +9,9 @@ class ItemController {
     
     def itemService
     
-    def index(){}
+    def index(){
+        redirect(action: "list")
+    }
     
     def list(Integer max, Long typeId) {
         params.max = Math.min(max ?: 10, 100)
@@ -40,18 +42,26 @@ class ItemController {
         }else {
             item = new Item(type: itemType, barcode: barcode)
             def itemController = itemType.objectType ?: "item"
-            render(view: "create", model: [item:item, itemController: itemController])
+            redirect(action: "create", params: [item:item, itemController: itemController])
         }
+    }
+    
+    def create(Item item, Object object, String itemController) {
+        [item:item, itemController: itemController]
     }
     
     def save() {
         try {
             itemService.save(params)
             flash.message = "New item added!"
-            redirect(action: "index")
+            redirect(action: "list")
         }catch(ItemException e) {
             flash.message = e.message
-            redirect(action: "index")
+            redirect(action: "create", params: [item:item, itemController: itemController])
+        }catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            flash.message = "Error saving this item!"
+            redirect(action: "create", params: [item:item, itemController: itemController])
         }
     }
 
@@ -62,13 +72,41 @@ class ItemController {
     }
     
     def update() {
+        def item = Item.get(params.long('itemId'))
+        item.properties = params
+        def object = null
+        if(item.type.objectType) {
+            object = itemService.getObjectFromItem(item.type.objectType, item.referenceId)
+            if (object) {
+                object.properties = params
+            }else {
+                def dc = itemService.getClassFromObjectType(item.type.objectType)
+                object = dc.clazz.newInstance(params)
+            }
+        }  
         try {
-            itemService.update(params)
+            itemService.update(item, object)
             flash.message = "Item update!"
             redirect(action: "show", id: params.itemId)
         }catch(ItemException e) {
-            flash.message = e.message
-            redirect(action: "index")
+            request.message = e.message
+			def itemController = item.type.objectType ?: "item"
+            render(view:'edit', model:[item: item, object: object, itemController: itemController])
+        }
+    }
+    
+    def changeBarcode() {
+        def item = Item.get(params.long('id'))
+        if(request.method=='POST') {            
+            try {
+                itemService.changeBarcode(item, params.barcode)
+                flash.message = "Barcode updated!"
+            }catch(ItemException e) {
+                flash.message = e.message
+            }
+            redirect(action: "show", id: params.id)
+        } else {
+            [item: item]
         }
     }
     
@@ -121,9 +159,21 @@ class ItemController {
         }
     }
     
+    def deleteImage(String img, Long itemId) {
+        try {
+            File folder = getImageFolder(itemId); 
+            File image = new File(folder.getAbsolutePath() + File.separator + img)
+            image.delete()
+            flash.message = "Image deleted!"
+        }catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            flash.message = "Image cannot be deleted!"
+        }
+        redirect(action: "show", id: params.itemId)
+    }
+    
     def getImageFolder(Long itemId){
-        def webrootDir = servletContext.getRealPath("/")
-        File folder = new File(webrootDir, "files/items/${itemId}"); 
+        File folder = new File("files/items/${itemId}"); 
     }
     
     def getFileExtension(String s) {
@@ -141,5 +191,15 @@ class ItemController {
             flash.message = e.message
             redirect(action: 'show', id: id)
         }
+    }
+    
+    def strainChangedAjax(Long strainId) {
+        def strain = Strain.get(strainId)
+        def growthMedias = GrowthMedia.where{
+            if(strain?.genotype?.species) {
+                (species == null) || (species == strain?.genotype?.species)
+            }
+        }.list()
+        render g.select(id: 'growthMedia', name:'growthMedia.id', from: growthMedias, optionKey: 'id', noSelection:[null:''])
     }
 }

@@ -13,14 +13,32 @@ class ItemService {
     
     @Transactional
     def save(GrailsParameterMap params){
-        try {
-            def item = new Item(params)
-            def itemType = ItemType.get(item.type.id)
-            if(itemType?.objectType){
-                def dc = getClassFromObjectType(itemType.objectType)
-                def object = dc.clazz.newInstance(params)
-                object.save(flush: true)
+        def item = new Item(params)
+        def itemType = ItemType.get(item.type.id)
+        if(itemType?.objectType){
+            def dc = getClassFromObjectType(itemType.objectType)
+            def object = dc.clazz.newInstance(params)
+            if (object.save(flush: true)) {
                 item.referenceId = object.id
+            }else {
+                throw new ItemException(message: "Invalid inputs!")
+            }
+        }
+        if(!item.save(flush: true)){
+            throw new ItemException(message: "Invalid inputs!")
+        }
+    }
+    
+    @Transactional
+    def update(Item item, Object object){
+        try {
+            if (object ){
+				if (object.validate()) {
+					object.save(flush: true)   
+					item.referenceId = object.id
+				} else {
+					throw new ItemException()
+				}
             }
             item.save(flush: true)
         }catch(Exception e) {
@@ -30,18 +48,16 @@ class ItemService {
     }
     
     @Transactional
-    def update(GrailsParameterMap params){
+    def changeBarcode(Item item, String newBarcode) {
+        if (Item.where{type.id == item.type.id && barcode == newBarcode}.get(max:1)){
+            throw new ItemException(message: "This barcode has already been used!")
+        } 
         try {
-            def item = Item.get(params.long('itemId'))
-            item.properties = params
-            def object = getObjectFromItem(item.type.objectType, item.referenceId)
-            object.properties = params
-            object.save(flush: true)   
+            item.barcode = newBarcode
             item.save(flush: true)
         }catch(Exception e) {
-            log.error "Error: ${e.message}", e
-            throw new ItemException(message: "Error saving this item!")
-        }
+            throw new ItemException(message: "Barcode cannot be saved!")
+        }        
     }
     
     @Transactional

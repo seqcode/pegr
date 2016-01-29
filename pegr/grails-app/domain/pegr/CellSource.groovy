@@ -16,6 +16,11 @@ class CellSource {
 	String toString() {
 		strain
 	}
+    
+    List getCellSourceTreatments() {
+        def treatments = TreatmentsInCellSource.where{cellSource == this}.list()
+        return treatments
+    }
 	
     static constraints = {
         providerUser nullable: true

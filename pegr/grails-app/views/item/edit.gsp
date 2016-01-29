@@ -7,8 +7,16 @@
     </script>
 </head>
 <body  onhashchange="getHash()">
-<div class="container-fluid">
-
+<div >
+    <g:if test="${request.message}">
+        <div class="message" role="status">${request.message}</div>
+    </g:if>
+    <g:hasErrors>
+        <div class="errors">
+            <g:renderErrors bean="${item}" as="list"/>
+            <g:renderErrors bean="${object}" as="list"/>
+        </div>
+    </g:hasErrors>
     <g:form action="update" class="fields" role="form" method="post">
         <g:hiddenField name="itemId" value="${item.id}"></g:hiddenField>
         <g:render template="/${itemController}/form" model="['item': item, 'object': object]"></g:render>

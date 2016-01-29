@@ -70,7 +70,7 @@
 
 <div class="fieldcontain ${hasErrors(bean: item, field: 'barcode', 'error')} ">
     <label>Barcode</label>
-    <g:field name="barcode" value="${item?.barcode}" readonly="readonly" />
+    <g:field name="barcode" value="${item?.barcode}" readonly="readonly" /> 
 </div>
 
 <div class="fieldcontain $ ${hasErrors(bean: item, field: 'location', 'error')} ">

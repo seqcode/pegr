@@ -1,32 +1,56 @@
+<g:if test="${item?.name}">
+<h4>Name: ${item.name}</h4>
+</g:if>
 <ul class="property-list">
-	<g:if test="${cellSource?.strain?.name}">
-	<li>Strain: ${cellSource.strain.name}</li>
+    <g:if test="${item?.type}">
+    <li>Type: ${item.type}</li>
+    </g:if>
+    
+	<g:if test="${object?.strain?.name}">
+	<li>Strain: ${object.strain.name}</li>
+        <ul>
+            <li>Species: ${object?.strain?.genotype?.species}</li>
+            <li>Genotype: ${object?.strain?.genotype}</li>
+            <li>Genetic Modifications: <g:each in="${object?.strain?.geneticModifications}">${it} </g:each></li>
+            <li>Parent Strain: ${object?.parent}</li>
+        </ul>
 	</g:if>
 	
-	<g:if test="${cellSource?.sex}">
-	<li>Sex:${cellSource.sex}	</li>
+	<g:if test="${object?.sex}">
+	<li>Sex:${object.sex}	</li>
 	</g:if>
 	
-	<g:if test="${cellSource?.cellSourceTreatments}">
+	<g:if test="${object?.objectTreatments}">
 	<li>Treatments: 
-        <g:each in="${cellSource.cellSourceTreatments}" var="c">
+        <g:each in="${object.objectTreatments}" var="c">
 			${c}
         </g:each>
 	</li>
 	</g:if>
 	
-	<g:if test="${cellSource?.providerUser}">
-	<li>Provider User: ${cellSource.providerUser}</li>
+    <li>Provider: 
+	<g:if test="${object?.providerUser}">
+	   ${object.providerUser}
 	</g:if>
-
-	<g:if test="${cellSource?.providerLab}">
-	<li>Provider User: ${cellSource.providerLab}</li>
+	<g:if test="${object?.providerLab}">
+        ${object.providerLab}
 	</g:if>
-
-	<g:if test="${cellSource?.biologicalSourceId}">
-	<li>Biological Source ID: ${cellSource.biologicalSourceId}</li>
+    </li>
+    
+	<g:if test="${object?.biologicalSourceId}">
+	<li>Biological Source ID: ${object.biologicalSourceId}</li>
 	</g:if>
     
-    <g:render template="/item/details" bean="${itemInstance}" />
+    <g:if test="${item?.barcode}">
+    <li>Barcode: ${item.barcode }</li>
+    </g:if>	
+
+    <g:if test="${item?.location}">
+    <li>Location: ${item.location}</li>
+    </g:if>	
+
+    <g:if test="${item?.notes}">
+    <li>Notes: ${item.notes}</li>
+    </g:if>
 		
 </ul>

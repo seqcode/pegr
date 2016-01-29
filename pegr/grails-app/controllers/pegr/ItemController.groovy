@@ -1,10 +1,12 @@
 package pegr
-
+import javax.imageio.ImageIO
+import java.awt.image.BufferedImage
 import static org.springframework.http.HttpStatus.*
 import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 class ItemController {
-
+    def private final allowedTypes = ['image/png':'png', 'image/jpeg':'jpg', 'image/jpg':'jpg', 'image/gif':'gif']
+    
     def itemService
     
     def index(){}
@@ -25,7 +27,9 @@ class ItemController {
         }
         def object = itemService.getObjectFromItem(item.type.objectType, item.referenceId)
         def itemController = item.type.objectType ?: "item"
-        [item: item, object: object, itemController: itemController]
+        def folder = getImageFolder(id)
+        def images = folder.listFiles().findAll{getFileExtension(it.name) in allowedTypes.values()}
+        [item: item, object: object, itemController: itemController, images: images]
     }
   
     def preview(Long typeId, String barcode) {
@@ -68,26 +72,30 @@ class ItemController {
         }
     }
     
-    def upload() {
-        def allowedTypes = ['image/png', 'image/jpeg', 'gif', 'jpg', 'tiff']
-        
+    def upload() {        
         try {
             MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  
             def mpf = mpr.getFile("image");
             String fileName = mpf.getOriginalFilename();
             String fileType = mpf.getContentType();
 
-            if(!mpf?.empty && mpf.size < 15 * 1024 * 1024 && fileType in allowedTypes) {
-                def webrootDir = servletContext.getRealPath("/")
-                File fileDest = File.createTempFile("item/${params.itemId}-", fileType, webrootDir)//new File(webrootDir, "files/items") 
+            if(!mpf?.empty && mpf.size < 15 * 1024 * 1024 && allowedTypes.containsKey(fileType)) {
+                
+                File folder = getImageFolder(params.long('itemId')); 
+                if (!folder.exists()) { 
+                    folder.mkdirs(); 
+                } 
+                def n = 1
+                File fileDest = new File(folder, n + "." + allowedTypes[fileType]) 
+                while(fileDest.exists()) {
+                    n++
+                    fileDest = new File(folder, n + "." + allowedTypes[fileType]) 
+                } 
                 mpf.transferTo(fileDest)
-                def item = Item.get(params.long('itemId'))
-                item.imagePath = fileDest
-                item.save(flush: true)
                 flash.message = "Image uploaded!"
             }
-            flash.message = "${fileType}"
         } catch(Exception e) {
+            log.error "Error: ${e.message}", e
             flash.message = "Error uploading the file!"
         }
 
@@ -95,26 +103,43 @@ class ItemController {
     }
     
     
-    def delete(Item itemInstance) {
-
-        if (itemInstance == null) {
-            notFound()
-            return
+    def displayImage(String img, Long itemId) {
+        File folder = getImageFolder(itemId); 
+        File image = new File(folder.getAbsolutePath() + File.separator + img)
+        if(!image.exists()) {
+            response.status = 404
+        } else {
+            BufferedImage originalImage = ImageIO.read(image)
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+            def fileType = getFileExtension(img)
+            ImageIO.write(originalImage, fileType, outputStream)
+            byte[] imageInByte = outputStream.toByteArray()
+            response.setHeader("Content-Length", imageInByte.length.toString())
+            response.contentType = "image/"+fileType
+            response.outputStream << imageInByte
+            response.outputStream.flush()
         }
-
-        itemInstance.delete flush:true
-
-		flash.message = message(code: 'default.deleted.message', args: [message(code: 'Item.label', default: 'Item'), itemInstance.id])
-		redirect(controller: 'ItemAdmin', action: 'index')
     }
+    
+    def getImageFolder(Long itemId){
+        def webrootDir = servletContext.getRealPath("/")
+        File folder = new File(webrootDir, "files/items/${itemId}"); 
+    }
+    
+    def getFileExtension(String s) {
+        return s.substring(s.lastIndexOf('.') + 1)
+    }
+    
+    def delete(Long id) {
 
-    protected void notFound() {
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.not.found.message', args: [message(code: 'item.label', default: 'Item'), params.id])
-                redirect action: "index", method: "GET"
-            }
-            '*'{ render status: NOT_FOUND }
+        try {
+            def folder = getImageFolder(id)
+            itemService.delete(id, folder)
+            flash.message = "Item deleted!"
+    		redirect(action: 'list')
+        } catch(ItemException e) {
+            flash.message = e.message
+            redirect(action: 'show', id: id)
         }
     }
 }

@@ -44,6 +44,27 @@ class ItemService {
         }
     }
     
+    @Transactional
+    def delete(Long id, File folder) {
+        def item = Item.get(id)
+        if(!item) {
+            throw new ItemException(message: "Item not found!")
+        }
+        def instance = ProtocolInstanceItems.findByItem(item)
+        if (instance || item.bags.size()) {
+            throw new ItemException(message: "Item cannot be deleted because it has been used in protocols!")
+        }
+        
+        try {
+            item.delete(flush: true)
+            if (folder.exists())
+            folder.deleteDir()
+        }catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            throw new ItemException(message: "Item cannot be deleted!")
+        }
+    }
+    
     def getClassFromObjectType(String type) {
         return grailsApplication.getDomainClass(grails.util.Metadata.current.getApplicationName()+ "." + type)
     }

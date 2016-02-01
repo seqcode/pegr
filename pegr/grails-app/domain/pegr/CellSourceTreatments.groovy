@@ -1,6 +1,6 @@
 package pegr
 
-class TreatmentsInCellSource {
+class CellSourceTreatments {
 
     CellSource cellSource
     CellSourceTreatment treatment

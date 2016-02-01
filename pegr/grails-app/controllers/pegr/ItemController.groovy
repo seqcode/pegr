@@ -35,33 +35,47 @@ class ItemController {
     }
   
     def preview(Long typeId, String barcode) {
-        def itemType = ItemType.get(typeId)
-        def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
-        if (item) {
-            redirect(action: "show", id: item.id)
+        if (barcode.trim()){
+            def itemType = typeId ? ItemType.get(typeId):null
+            if (itemType) { 
+                def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
+                if (item) {
+                    redirect(action: "show", id: item.id)
+                }else {
+                    item = new Item(type: itemType, barcode: barcode)
+                    def itemController = itemType.objectType ?: "item"
+                    render(view: "create", model: [item:item, itemController: itemController])
+                }
+            }else {
+                flash.message = "Item type not found!"
+                redirect(action: "list")
+            }
         }else {
-            item = new Item(type: itemType, barcode: barcode)
-            def itemController = itemType.objectType ?: "item"
-            redirect(action: "create", params: [item:item, itemController: itemController])
+            flash.message = "Barcode cannot be empty!"
+            redirect(action: "list")
         }
     }
     
-    def create(Item item, Object object, String itemController) {
-        [item:item, itemController: itemController]
+    def create(item, object, itemController) {
+        [item:item, object: object, itemController:itemController]
     }
     
     def save() {
-        try {
-            itemService.save(params)
-            flash.message = "New item added!"
-            redirect(action: "list")
-        }catch(ItemException e) {
-            flash.message = e.message
-            redirect(action: "create", params: [item:item, itemController: itemController])
-        }catch(Exception e) {
-            log.error "Error: ${e.message}", e
-            flash.message = "Error saving this item!"
-            redirect(action: "create", params: [item:item, itemController: itemController])
+        withForm{
+            def item = new Item(params)
+            def object = (params.itemController != "item") ? itemService.getClassFromObjectType(params.itemController).clazz.newInstance(params) : null
+            try {
+                itemService.save(item, object)
+                flash.message = "New item added!"
+                redirect(action: "list")
+            }catch(ItemException e) {
+                request.message = e.message
+                render(view: "create", model: [item:item, object: object, itemController: params.itemController])
+            }catch(Exception e) {
+                log.error "Error: ${e.message}", e
+                request.message = "Error saving this item!"
+                render(view: "create", model: [item:item, object: object, itemController: params.itemController])
+            }
         }
     }
 

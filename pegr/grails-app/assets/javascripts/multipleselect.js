@@ -30,10 +30,12 @@
 			delete settings.rightSelected;
 
 			this.options = {
-				search: 			settings.search,
+				search: settings.search,
+                unique: settings.unique,
 			};
 
 			delete settings.search;
+            delete settings.unique;
 
 			this.callbacks = settings;
 			
@@ -48,7 +50,7 @@
 				var self = this;
                 
 				if ( typeof self.callbacks.startUp == 'function' ) {
-					self.callbacks.startUp( self.left, self.right );
+					self.callbacks.startUp( self.left, self.right, self.options );
 				}
 
                 self.options.search.left = $(self.options.search.left);
@@ -128,9 +130,12 @@
 
 				if ( typeof self.callbacks.moveToRight == 'function' ) {
 					return self.callbacks.moveToRight( self, options, event, silent, skipStack );
-				} else {					
-					self.right.append(options.clone());
-					
+				} else {	
+                    if (self.options.unique) {
+                        self.right.append(options); 
+                    }else{
+					   self.right.append(options.clone());
+                    }
 					return self;
 				}
 			},
@@ -140,9 +145,12 @@
 				
 				if ( typeof self.callbacks.moveToLeft == 'function' ) {
 					return self.callbacks.moveToLeft( self, options, event, silent, skipStack );
-				} else {						
-					options.remove();
-					
+				} else {		
+                    if (self.options.unique) {
+                        self.left.append(options); 
+                    }else{
+				        options.remove();
+                    }
 					return self;
 				}
 			},
@@ -157,11 +165,12 @@
 			 *
 			 *	@method startUp
 			**/
-			startUp: function( $left, $right ) {
-				
+			startUp: function( $left, $right, $options ) {
+                if ($options.unique) {
+                    $right.find('option').each(function(index, option) {
+                        $left.find('option[value="' + option.value + '"]').remove();});
+                }
 			},
-
-			
 		}
 	};
 

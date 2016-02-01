@@ -47,7 +47,7 @@ jQuery(document).ready(function($) {
 	$('#search').multipleselect({
 		search: {
 			left: '<input type="text" name="q" class="form-control" placeholder="Search..." />',
-		},        
+		},         unique: "true",
 	});    
 });
 </script>

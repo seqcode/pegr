@@ -25,10 +25,10 @@ class Antibody {
 	}
 	
     static constraints = {
-		name unique: true
+		name unique: true, matches: '^[0-9A-Za-z -]+$'
 		company nullable: true
 		catalogNumber nullable: true, blank: true
-		lotNumber nullable: true, blank: true
+		lotNumber nullable: true, blank: true, matches: '^[0-9A-Za-z -]+$'
 		clonal nullable: true
 		igType nullable: true
 		immunogene nullable: true, blank: true

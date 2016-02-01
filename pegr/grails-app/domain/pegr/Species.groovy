@@ -10,7 +10,8 @@ class Species {
 	}
 	
     static constraints = {
-		name unique: true
+		name unique: true, matches: '^[0-9A-Za-z -.]+$'
+        genusName matches: '^[0-9A-Za-z -]+$'
 		note nullable: true, blank: true
     }
 }

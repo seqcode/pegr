@@ -9,6 +9,6 @@ class Assay {
 	}
     
     static constraints = {
-        name unique: true
+        name unique: true, matches: '^[0-9A-Za-z -]+$'
     }
 }

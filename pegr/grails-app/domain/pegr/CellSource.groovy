@@ -17,8 +17,8 @@ class CellSource {
 		strain
 	}
     
-    List getCellSourceTreatments() {
-        def treatments = TreatmentsInCellSource.where{cellSource == this}.list()
+    List getTreatments() {
+        def treatments = CellSourceTreatments.where{cellSource == this}.list()
         return treatments
     }
 	

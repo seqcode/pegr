@@ -12,12 +12,8 @@ class ItemService {
     def grailsApplication
     
     @Transactional
-    def save(GrailsParameterMap params){
-        def item = new Item(params)
-        def itemType = ItemType.get(item.type.id)
-        if(itemType?.objectType){
-            def dc = getClassFromObjectType(itemType.objectType)
-            def object = dc.clazz.newInstance(params)
+    def save(item, object){
+        if(object){
             if (object.save(flush: true)) {
                 item.referenceId = object.id
             }else {

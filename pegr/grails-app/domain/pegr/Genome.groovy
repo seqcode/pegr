@@ -11,6 +11,6 @@ class Genome {
 	}
 	
     static constraints = {
-		name unqiue: 'genomeBuild'
+		name unqiue: 'genomeBuild', matches: '^[0-9A-Za-z -]+$'
     }
 }

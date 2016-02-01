@@ -18,8 +18,9 @@ class ProtocolService {
     void save(Protocol protocol, List requiredItemTypes) {
         try {
             protocol.save(flush: true)
+            ProtocolItemTypes.executeUpdate("delete ProtocolItemTypes c where c.protocol.id = :protocolId", [protocolId:protocol.id])
             requiredItemTypes.each{
-                new ProtocolItemTypes(protocol:protocol, itemType: it).save(flush: true)}
+                new ProtocolItemTypes(protocol:protocol, itemType: it).save()}
         }catch(Exception e){
             log.error "Error: ${e.message}", e
             throw new ProtocolException(message: "Error saving the protocol!")

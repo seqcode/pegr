@@ -6,23 +6,41 @@
     <li>Type: ${item.type}</li>
     </g:if>
     
-	<g:if test="${object?.strain?.name}">
-	<li>Strain: ${object.strain.name}</li>
+	<li>Strain: ${object?.strain?.name}</li>
         <ul>
             <li>Species: ${object?.strain?.genotype?.species}</li>
             <li>Genotype: ${object?.strain?.genotype}</li>
-            <li>Genetic Modifications: <g:each in="${object?.strain?.geneticModifications}">${it} </g:each></li>
-            <li>Parent Strain: ${object?.parent}</li>
+            <g:if test="${object?.strain?.geneticModifications}">
+                <li>Genetic Modifications: <g:each in="${object?.strain?.geneticModifications}">${it} </g:each></li>
+            </g:if>
+            <g:if test="${object?.strain?.parent}">
+                <li>Parent Strain: ${object?.strain?.parent}</li>
+            </g:if>
         </ul>
-	</g:if>
 	
 	<g:if test="${object?.sex}">
 	<li>Sex:${object.sex}	</li>
 	</g:if>
+    
+    <g:if test="${object?.age}">
+	<li>Age:${object.age}	</li>
+	</g:if>
+    
+    <g:if test="${object?.tissue}">
+	<li>Tissue:${object.tissue}	</li>
+	</g:if>
 	
-	<g:if test="${object?.objectTreatments}">
+    <g:if test="${object?.histology}">
+	<li>Histology:${object.histology}	</li>
+	</g:if>
+    
+    <g:if test="${object?.growthMedia}">
+	<li>Growth Media:${object.growthMedia}	</li>
+	</g:if>
+    
+    <g:if test="${object?.treatments}">
 	<li>Treatments: 
-        <g:each in="${object.objectTreatments}" var="c">
+        <g:each in="${object.treatments}" var="c">
 			${c}
         </g:each>
 	</li>
@@ -33,7 +51,7 @@
 	   ${object.providerUser}
 	</g:if>
 	<g:if test="${object?.providerLab}">
-        ${object.providerLab}
+        , ${object.providerLab}
 	</g:if>
     </li>
     

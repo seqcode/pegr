@@ -38,8 +38,8 @@ class StrainService {
     @Transactional
     void delete(Long id) {
         try {
-            StrainGeneticModifications.executeUpdate("delete StrainItemTypes t where t.strain.id == :strainId", [strainId: id])
-            Strain.executeUpdate("delete Strain t where t.id == :strainId", [strainId: id])
+            StrainGeneticModifications.executeUpdate("delete StrainGeneticModifications t where t.strain.id = :strainId", [strainId: id])
+            Strain.executeUpdate("delete Strain t where t.id = :strainId", [strainId: id])
         }catch(Exception e) {
             log.error "Error: ${e.message}", e
             throw new StrainException(message: "Error deleting the strain!")

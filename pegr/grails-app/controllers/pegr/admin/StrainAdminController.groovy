@@ -17,6 +17,7 @@ class StrainAdminController {
     
     def show(Long id) {
         def strain = Strain.get(id)
+        
         [strain: strain, geneticModifications:strain.geneticModifications]
     }
     
@@ -42,7 +43,7 @@ class StrainAdminController {
     }
     
     def edit() {
-        def strain = Strain.get(params.id)
+        def strain = Strain.get(params.long('id'))
         if (!strain) {
             flash.message = "Strain does not exist!"
             redirect(action: "index")
@@ -50,18 +51,22 @@ class StrainAdminController {
         if(request.method == "POST") {
             withForm{
                 strain.properties = params
+                def geneticModifications = params.list('geneticModifications')
                 try {
-                    strainService.save(strain, params.list('geneticModifications'))
+                    strainService.save(strain, geneticModifications)
                     flash.message = "Strain update!"
                     redirect(action: "show", id: strain.id)
+                }catch(StrainException e) {
+                    request.message = e.message
+                    render(view: "edit", model: [strain: strain, geneticModifications: strain.geneticModifications])
                 }catch(Exception e) {
                     request.message = e.message
-                    render(view: "edit", model: [strain: strain, geneticModifications: params.list('geneticModifications')])
+                    log.error "Error: ${e.message}", e
+                    render(view: "edit", model: [strain: strain, geneticModifications: strain.geneticModifications])
                 }
             }
         }else {
-            def geneticModifications = strain.geneticModifications
-            [strain: strain, geneticModifications:geneticModifications]
+            [strain: strain, geneticModifications: strain.geneticModifications]
         }
     }
     
@@ -72,7 +77,7 @@ class StrainAdminController {
             flash.message = "Strain deleted!"
             redirect(action: "index")
         }catch(Exception e) {
-            request.message = e.message
+            flash.message = e.message
             redirect(action: "show", id: id)
         }
     }

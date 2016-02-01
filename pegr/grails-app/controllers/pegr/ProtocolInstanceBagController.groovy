@@ -57,7 +57,7 @@ class ProtocolInstanceBagController {
         def itemType = ItemType.get(typeId)
         def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
         if (item) {
-            def subBag = item.bags.last()
+            def subBag = (item.bags.empty)? null : item.bags.last()
             render(view:"previewItemAndBag", model: [item: item, subBag: subBag, bagId: bagId])
         }else {
             item = new Item(type: itemType, barcode: barcode)
@@ -149,7 +149,8 @@ class ProtocolInstanceBagController {
             }
             
             def completed = (protocolInstance.bag.status == ProtocolStatus.COMPLETED)
-            [protocolInstance:protocolInstance, itemList: itemList, completed: completed]
+            def toBeCompleted = itemList.every{ !it.items.empty } && (protocolInstance.status != ProtocolStatus.COMPLETED)
+            [protocolInstance:protocolInstance, itemList: itemList, completed: completed, toBeCompleted: toBeCompleted]
         }else {
             render status: 404
         }

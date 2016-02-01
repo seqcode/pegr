@@ -19,7 +19,14 @@
 	      <ul class="nav navbar-nav">
   	        <li id="nav-metadata"><g:link controller="sample">Metadata</g:link></li>
 	        <li id="nav-projects"><g:link controller="project">My Projects</g:link></li>
-  	        <li id="nav-bench"><g:link controller="ProtocolInstanceBag" action="processingBags">Work Bench</g:link></li>
+  	        <li id="nav-bench" class="dropdown">
+                <g:link class="dropdown-toggle" data-toggle="dropdown">Work Bench</g:link>
+                <ul class="dropdown-menu" style="min-width:100px">
+                    <li><g:link controller="ProtocolInstanceBag" action="processingBags" >Sample Prep</g:link></li>
+                    <li><g:link controller="item" method="post" asynchronous="false" onSuccess="location.reload()">Items</g:link></li>
+                    <li><g:link >Sequencing</g:link></li>
+                </ul>
+            </li>
 	       	<sec:ifAllGranted roles="ROLE_ADMIN"><li id="nav-admin"><g:link controller="admin">Admin</g:link></li></sec:ifAllGranted>
 	      </ul>
 	    <ul class="nav navbar-nav navbar-right">

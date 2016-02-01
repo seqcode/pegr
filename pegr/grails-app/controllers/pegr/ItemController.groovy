@@ -99,7 +99,7 @@ class ItemController {
             }
         }  
         try {
-            itemService.update(item, object)
+            itemService.save(item, object)
             flash.message = "Item update!"
             redirect(action: "show", id: params.itemId)
         }catch(ItemException e) {

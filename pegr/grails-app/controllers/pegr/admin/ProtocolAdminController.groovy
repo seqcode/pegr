@@ -15,28 +15,33 @@ class ProtocolAdminController {
     
     def show(Long id) {
         def protocol = Protocol.get(id)
-        def requiredItemTypes = protocolService.getRequiredItemTypes(id)
-        [protocol: protocol, requiredItemTypes:requiredItemTypes]
+        
+        [protocol: protocol, requiredItemTypes: protocol.requiredItemTypes]
     }
     
     def create() {
         if(request.method == "POST") {
             withForm{
                 def protocol = new Protocol(params)
+                def itemTypeIds = params.list('requiredItemTypes')
                 try {
-                    protocolService.save(protocol, params.list('requiredItemTypes'))
+                    protocolService.save(protocol, itemTypeIds)
                     flash.message = "New protocol saved!"
                     redirect(action: "show", id: protocol.id)
                 }catch(ProtocolException e) {
                     request.message = e.message
-                    render(view: "create", model: [protocol: protocol, requiredItemTypes: params.requiredItemTypes])
+                    render(view: "create", model: [protocol: protocol])
+                }catch(Exception e) {
+                    request.message = "Error saving this protocol!"
+                    log.error "Error: ${e.message}", e
+                    render(view: "create", model: [protocol: protocol])
                 }
             }
         }
     }
     
     def edit() {
-        def protocol = Protocol.get(params.id)
+        def protocol = Protocol.get(params.long('id'))
         if (!protocol) {
             flash.message = "Protocol does not exist!"
             redirect(action: "index")
@@ -44,18 +49,22 @@ class ProtocolAdminController {
         if(request.method == "POST") {
             withForm{
                 protocol.properties = params
+                def itemTypes = params.list('requiredItemTypes')
                 try {
-                    protocolService.save(protocol, params.list('requiredItemTypes'))
+                    protocolService.save(protocol, itemTypes)
                     flash.message = "Protocol update!"
                     redirect(action: "show", id: protocol.id)
                 }catch(ProtocolException e) {
                     request.message = e.message
-                    render(view: "edit", model: [protocol: protocol, requiredItemTypes: params.list('requiredItemTypes')])
+                    render(view: "edit", model: [protocol: protocol, requiredItemTypes: protocol.requiredItemTypes])
+                }catch(Exception e) {
+                    request.message = "Error updateing this protocol!"
+                    log.error "Error: ${e.message}", e
+                    render(view: "edit", model: [protocol: protocol, requiredItemTypes: protocol.requiredItemTypes])
                 }
             }
         }else {
-            def requiredItemTypes = protocolService.getRequiredItemTypes(params.long('id'))
-            [protocol: protocol, requiredItemTypes:requiredItemTypes]
+            [protocol: protocol, requiredItemTypes: protocol.requiredItemTypes]
         }
     }
     

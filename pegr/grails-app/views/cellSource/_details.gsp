@@ -37,14 +37,6 @@
     <g:if test="${object?.growthMedia}">
 	<li>Growth Media:${object.growthMedia}	</li>
 	</g:if>
-    
-    <g:if test="${object?.treatments}">
-	<li>Treatments: 
-        <g:each in="${object.treatments}" var="c">
-			${c}
-        </g:each>
-	</li>
-	</g:if>
 	
     <li>Provider: 
 	<g:if test="${object?.providerUser}">
@@ -70,5 +62,11 @@
     <g:if test="${item?.notes}">
     <li>Notes: ${item.notes}</li>
     </g:if>
-		
+    <li>Cell Source Treatments:
+        <g:each in="${object.treatments}" var="c">
+            ${c}
+        </g:each>	
+         <g:link controller="cellSource" action="updateTreatments" params="[cellSourceId: object.id, itemId: item.id]">(update)</g:link>
+    </li>
 </ul>
+

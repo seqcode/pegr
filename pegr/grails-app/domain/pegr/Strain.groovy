@@ -13,7 +13,7 @@ class Strain {
 	}
 	
     List getGeneticModifications(){
-        return StrainGeneticModifications.where{strain == this}.list()
+        return StrainGeneticModifications.where{strain == this}.collect{it.geneticModification}
     }
     
     static constraints = {

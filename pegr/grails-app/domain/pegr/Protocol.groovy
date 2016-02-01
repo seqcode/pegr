@@ -19,6 +19,10 @@ class Protocol {
     static hasMany = [protocolGroups: ProtocolGroup]
     static belongsTo = [ProtocolGroup]
 	
+    List getRequiredItemTypes(){
+        return ProtocolItemTypes.where{protocol == this}.collect{it.itemType}
+    }
+    
     static constraints = {
 		name unique: 'protocolVersion'
 		protocolVersion nullable: true, blank: false, maxSize: 10

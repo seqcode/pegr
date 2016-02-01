@@ -75,36 +75,11 @@
     <g:textArea name="notes" value="${item?.notes}"/>
 </div>
 
-<label>Cell Source Treatments</label>
-<div class="row">
-    <div class="col-sm-4">
-	   <g:select name="from[]" id="search" class="form-control" multiple="multiple" from="${pegr.CellSourceTreatment.list()}" optionKey="id"></g:select>
-	</div>
-    <div class="col-sm-1">
-        <button type="button" id="search_rightSelected" class="btn btn-block"><i class="glyphicon glyphicon-chevron-right"></i></button>
-		<button type="button" id="search_leftSelected" class="btn btn-block"><i class="glyphicon glyphicon-chevron-left"></i></button>
-    </div>
-    <div class="col-sm-4">
-        <select name="treatments" id="search_to" class="form-control" size="5" multiple="multiple">
-            <g:each in="${object?.treatments}">
-            <option value="${it.id}" >${it}</option>
-            </g:each>
-        </select>
-    </div>
-</div>
 <script>
     function strainChanged(strainId) {
         <g:remoteFunction controller="item" action="strainChangedAjax"
             update="growthMedia"
             params="'strainId='+strainId"/>
     }
-
-jQuery(document).ready(function($) {
-	$('#search').multipleselect({
-		search: {
-			left: '<input type="text" name="q" class="form-control" placeholder="Search..." />',
-		}, unique: "true",
-	});    
-});
 
 </script>

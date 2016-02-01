@@ -8,7 +8,6 @@
 </head>
 <body onhashchange="getHash()">
 
-<g:link controller="protocolInstanceBag" action="index"><span class="glyphicon glyphicon-home"></span> Home</g:link>
 <div class="row">
 
     <div class="col-md-10 text-left">

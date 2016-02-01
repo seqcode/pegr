@@ -43,7 +43,7 @@
                         <td class="col-sm-2" rowspan="${Math.max(1, it.items.size())}">${it.type} <g:if test="${!completed}"><g:link action="searchItemForTypeInstance" params="[instanceId:protocolInstance.id, typeId:it?.type?.id]"><span class="glyphicon glyphicon-plus"></span></g:link></g:if> </td>
                         <g:each in="${it.items}" var="item"  status="counter">
                             <g:if test="${counter>0}"><tr></g:if>
-                            <td class="col-sm-2"><g:link controller="item" action="show" id="${item.id}" target="_blank">${item.name}</g:link></td>
+                            <td class="col-sm-2"><g:link controller="item" action="show" id="${item.id}" target="_blank">${item.name} </g:link></td>
                             <td class="col-sm-2">${item.location}</td>
                             <td class="col-sm-2">${item.barcode}</td>
                             <td class="col-sm-2">${item.notes}</td>
@@ -66,7 +66,7 @@
                 </tbody>
               </table>
         </div>
-        <g:if test="${protocolInstance.status != pegr.ProtocolStatus.COMPLETED}">
+        <g:if test="${toBeCompleted}">
         <div class="row well text-center">
         <g:link action="completeInstance" params="[instanceId: protocolInstance?.id, bagId: protocolInstance?.bag?.id]" class="btn btn-success">Complete <span class="glyphicon glyphicon-ok"></span> </g:link>
         </div>

@@ -22,7 +22,7 @@
     </g:if>
 
     <g:if test="${object?.igType}">
-    <li>Ig Type:${object?.igType}</li>
+    <li>Ig Type: ${object?.igType}</li>
     </g:if>  
     
     <g:if test="${object?.company}">

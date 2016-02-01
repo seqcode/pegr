@@ -26,24 +26,6 @@ class ItemService {
     }
     
     @Transactional
-    def update(Item item, Object object){
-        try {
-            if (object ){
-				if (object.validate()) {
-					object.save(flush: true)   
-					item.referenceId = object.id
-				} else {
-					throw new ItemException()
-				}
-            }
-            item.save(flush: true)
-        }catch(Exception e) {
-            log.error "Error: ${e.message}", e
-            throw new ItemException(message: "Error saving this item!")
-        }
-    }
-    
-    @Transactional
     def changeBarcode(Item item, String newBarcode) {
         if (Item.where{type.id == item.type.id && barcode == newBarcode}.get(max:1)){
             throw new ItemException(message: "This barcode has already been used!")

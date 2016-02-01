@@ -18,8 +18,7 @@ class CellSource {
 	}
     
     List getTreatments() {
-        def treatments = CellSourceTreatments.where{cellSource == this}.list()
-        return treatments
+        return CellSourceTreatments.where{cellSource == this}.collect{it.treatment}
     }
 	
     static constraints = {

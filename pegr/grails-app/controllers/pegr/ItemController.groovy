@@ -61,7 +61,7 @@ class ItemController {
     }
     
     def save() {
-        withForm{
+        withForm{        
             def item = new Item(params)
             def object = (params.itemController != "item") ? itemService.getClassFromObjectType(params.itemController).clazz.newInstance(params) : null
             try {
@@ -117,10 +117,29 @@ class ItemController {
                 flash.message = "Barcode updated!"
             }catch(ItemException e) {
                 flash.message = e.message
+            }catch(Exception e) {
+                log.error "Error: ${e.message}", e
+                flash.message = "Error updating the barcode!"
             }
             redirect(action: "show", id: params.id)
         } else {
             [item: item]
+        }
+    }
+    
+    def updateParent(Long itemId, Long parentTypeId, String parentBarcode) {
+        if(request.method == "POST") {
+            try {
+                itemService.updateParent(itemId, parentTypeId, parentBarcode)
+            }catch(ItemException e) {
+                flash.message = e.message
+            }catch(Exception e) {
+                log.error "Error: ${e.message}", e
+                flash.message = "Error updating the parent!"
+            }
+            redirect(action: "show", id: itemId)
+        } else {
+            [itemId: itemId]
         }
     }
     

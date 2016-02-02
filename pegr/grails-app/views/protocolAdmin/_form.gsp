@@ -3,13 +3,16 @@
 <div class=" ${hasErrors(bean: protocol, field: 'name', 'error')} required">
 	<label for="name">Name <span class="required-indicator">*</span></label>
 	<g:textField name="name" required="" value="${protocol?.name}"/>
-
 </div>
 
 <div class=" ${hasErrors(bean: protocol, field: 'protocolVersion', 'error')} ">
 	<label for="protocolVersion">Version</label>
 	<g:textField name="protocolVersion" maxlength="10" value="${protocol?.protocolVersion}"/>
+</div>
 
+<div class=" ${hasErrors(bean: protocol, field: 'assay', 'error')} ">
+	<label for="assay">Assay</label>
+	<g:select name="assay.id" id="assay" from="${pegr.Assay.list()}" optionKey="id" value="${protocol?.assay?.id}" noSelection="['null': '']"/>
 </div>
 
 <div class=" ${hasErrors(bean: protocol, field: 'description', 'error')} ">

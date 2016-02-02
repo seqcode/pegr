@@ -18,7 +18,7 @@
     <li>Notes: ${item.notes}</li>
     </g:if>
     
-    <g:if test="${item?.parent}">
-    <li>Parent: <g:link controller="item" action="show" id="${item.parent.id}">${item.parent.name}</g:link></li>
-    </g:if>
+    
+    <li>Parent: <g:if test="${item?.parent}"><g:link controller="item" action="show" id="${item.parent.id}">${item.parent.name}</g:link></g:if> (<g:link action="updateParent" params="[itemId: item.id]">Update</g:link>)</li>
+    
 </ul>

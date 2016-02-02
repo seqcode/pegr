@@ -27,15 +27,3 @@
     <g:textArea name="notes" value="${item?.notes}"/>
 </div>
 
-<div >
-    <label>Parent Type</label>
-    <g:select name="parentTypeId" from="${pegr.ItemType.list()}" 
-              optionKey="id" oprtionValue="name" noSelection="${['null':'--Choose--']}"/>
-</div>
-
-<div>
-    <label>Parent Barcode</label>
-    <g:textField id="barcode" name="parentBarcode"/>
-    <button type="button" onclick="getScan();"><span class="glyphicon glyphicon-qrcode"></span> Scan</button>
-</div>
-

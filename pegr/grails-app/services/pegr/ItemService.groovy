@@ -30,12 +30,22 @@ class ItemService {
         if (Item.where{type.id == item.type.id && barcode == newBarcode}.get(max:1)){
             throw new ItemException(message: "This barcode has already been used!")
         } 
-        try {
-            item.barcode = newBarcode
-            item.save(flush: true)
-        }catch(Exception e) {
-            throw new ItemException(message: "Barcode cannot be saved!")
-        }        
+        item.barcode = newBarcode
+        item.save()       
+    }
+    
+    @Transactional
+    def updateParent(Long itemId, Long parentTypeId, String parentBarcode) {
+        def item = Item.get(itemId)
+        if (!item) {
+            throw new ItemException(message: "Item not found!")
+        }
+        def parent = Item.where{type.id == parentTypeId && barcode == parentBarcode}.get(max:1)
+        if (!parent) {
+            throw new ItemException(message: "Parent not found!")
+        }
+        item.parent = parent
+        item.save()
     }
     
     @Transactional

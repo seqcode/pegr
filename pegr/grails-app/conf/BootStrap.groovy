@@ -30,6 +30,22 @@ class BootStrap {
 					objectType: "Sample")
 				itemType.save()
 			}
+            
+            if (!SequencingPlatform.findByName("SOLiD")) {
+                new SequencingPlatform(name: "SOLiD").save(flush: true)
+            }
+
+            if (!SequencingPlatform.findByName("Illumina GA")) {
+                new SequencingPlatform(name: "Illumina GA").save(flush: true)
+            }
+
+            if (!SequencingPlatform.findByName("HiSeq 2000")) {
+                new SequencingPlatform(name: "HiSeq 2000").save(flush: true)
+            }
+
+            if (!SequencingPlatform.findByName("NextSeq 500")) {
+                new SequencingPlatform(name: "NextSeq 500").save(flush: true)
+            }
 		}
 			
 		private createAdminUserIfRequired() {

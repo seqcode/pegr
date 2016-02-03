@@ -2909,4 +2909,6 @@ databaseChangeLog = {
 	changeSet(author: "danyingshao (generated)", id: "1454293004279-162") {
 		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "user_role", constraintName: "FK_apcc8lxk2xnug8377fatvbn04", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
+
+	include file: 'runPoolNullable.groovy'
 }

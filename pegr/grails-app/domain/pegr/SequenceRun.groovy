@@ -16,6 +16,9 @@ class SequenceRun {
 		note nullable: true, blank: true
 		fcId nullable: true, blank: true
 		directoryName nullable: true, blank: true
+        user nullable: true
+        pool nullable: true
+        lane nullable: true
     }
 
 }

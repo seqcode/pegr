@@ -16,6 +16,7 @@ class Sample {
 	CellSource spikeInCellSource
 	String note
 	Assay assay
+    User sendDataTo
 
     static constraints = {
 		cellSource nullable: true
@@ -29,6 +30,7 @@ class Sample {
         requestedTagNumber nullable: true
 		publicationReference nullable: true, blank: true
 		note nullable: true, blank: true
+        sendDataTo nullable: true
     }
     
     static mapping = {

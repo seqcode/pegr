@@ -17,6 +17,7 @@ class Sample {
 	String note
 	Assay assay
     User sendDataTo
+    Invoice invoice
 
     static constraints = {
 		cellSource nullable: true
@@ -31,6 +32,7 @@ class Sample {
 		publicationReference nullable: true, blank: true
 		note nullable: true, blank: true
         sendDataTo nullable: true
+        invoice nullable: true
     }
     
     static mapping = {

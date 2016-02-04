@@ -1,20 +1,25 @@
 package pegr
 
 def file = new File("files/samplesTest.csv")
+def startLine = 5
+def endLine = 7
 def lineNo = 0
 def line
 file.withReader { reader ->
      while ((line = reader.readLine())!=null) {
          ++lineNo
-         if (lineNo < 5) {
+         if (lineNo < startLine) {
              continue
-         } else if (lineNo > 7) {
+         } else if (lineNo > endLine) {
              break
          }
          try {
              String[] rawData = line.split(",")*.trim()
              def data = getNamedData(rawData)
-             def run = getSequenceRun(data.runStr, data.laneStr, data.dateStr, data.fcidStr, data.userStr)
+             
+             //user
+             
+             def seqExp = getSequenceRun(data.runStr, data.laneStr, data.dateStr, data.fcidStr, data.userStr, data.indexIdStr)
 
 
                     // def cellSource
@@ -24,7 +29,7 @@ file.withReader { reader ->
                     //                         seqId: seqId).save(flush: true)
 
          }catch(Exception e) {
-             println "Error: line ${lineNo}. " + e
+             log.error("Error: line ${lineNo}. " + e)
              continue
          }
      }
@@ -34,53 +39,63 @@ def getUser(String username, String fullName, String emailStr, String phoneStr) 
     
 }
 
-def getSequenceRun(String runStr, String laneStr, String dateStr, String fcidStr, String userStr) {
-    def runNum
-    def platform    
+def getSequenceRun(String runStr, String laneStr, String dateStr, String fcidStr, String userStr, String indexIdStr) {
+    int runNum
+    def platform
+    def seqId
     if (runStr.take(1) == "S") {
          runNum = runStr.substring(1).toInteger()
          platform = SequencingPlatform.findByName("SOLiD")
-     } else if (runStr.take(1) == "G") {
+         seqId = runStr + laneStr + indexIdStr
+    } else if (runStr.take(1) == "G") {
          runNum = runStr.substring(1).toInteger()
          platform = SequencingPlatform.findByName("Illumina GA")
-     } else {
+        seqId = runStr + laneStr + indexIdStr
+    } else {
          runNum = runStr.toInteger() 
          if (runNum < 500){
              platform = SequencingPlatform.findByName("HiSeq 2000")
+             seqId = runStr + laneStr + indexIdStr
          } else {
              platform = SequencingPlatform.findByName("NextSeq 500")
+             seqId = runStr + indexIdStr
          }
-     }
-    
-    def exp = SequencingExperiment.findBySeqId(seqId)    
-     def run = SequenceRun.findByPlatformAndRunNum(platform, runNum)
-     if (!run) {                     
+    }
+
+    if (SequencingExperiment.findBySeqId(seqId)) {
+        throw new Exception("SeqId ${seqId} already exists!")
+    }
+
+    def run = SequenceRun.findByPlatformAndRunNum(platform, runNum)
+    if (!run) {                     
          run = new SequenceRun(runNum: runNum, platform: platform)
+
          // lane
-         if (laneStr.trim()) {
-             run.lane = laneStr.toInteger()
-         }
+         run.lane = laneStr.toInteger()
+
          // date
          if (dateStr.size() == 5) {
              dateStr = "0" + dateStr
-         }
-         
+         }         
          def date = Date.parse("yyMMdd", dateStr)
          run.dateCreated = date
-         
+
          // fcId
          run.fcId = fcidStr
-         
+
          // user
-         def user = User.findByUsername(userStr) {
-             
-         }   
-         
-         if (run.save(flush: true)) {
-             println runStr
-         }
-     }
-     return run
+         def user = findUser(userStr) 
+
+         run.save(flush: true)) 
+    }
+    
+    def seqExp = SequencingExperiment(sequenceRun: run, seqId: seqId)    
+    return seqExp
+}
+
+def findUser(String userStr) {
+    def user = User.findByUsername(userStr) ?: User.findByFullnameIlike("%${userStr}%")
+    return user
 }
 
 def getNamedData(String[] data) {

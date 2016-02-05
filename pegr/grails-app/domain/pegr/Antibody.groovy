@@ -8,7 +8,6 @@ class Antibody {
 	
 	String name
 	Company company
-	Target target
 	String catalogNumber
 	String lotNumber
 	MonoPolyClonal clonal
@@ -30,6 +29,7 @@ class Antibody {
 		catalogNumber nullable: true, blank: true
 		lotNumber nullable: true, blank: true, matches: '^[0-9A-Za-z -]+$'
 		clonal nullable: true
+        abHost nullable: true
 		igType nullable: true
 		immunogene nullable: true, blank: true
 		externalId nullable: true, blank: true

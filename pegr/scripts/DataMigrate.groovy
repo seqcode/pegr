@@ -1,6 +1,7 @@
 package pegr
 import com.opencsv.CSVParser
 import com.opencsv.CSVReader
+import groovy.json.*
 
 def springSecurityService	
 def file = new FileReader("files/samples.csv")
@@ -19,7 +20,7 @@ while ((rawData = reader.readNext()) != null) {
     }
     try {
         rawData.each{ 
-            if(it == "-" || it == "." || it == "?" || it == "Not applicable" || it == "not applicable") 
+            if(it == "-" || it == "." || it == "?" || it == "Not applicable" || it == "not applicable" || it == "None") 
                 it = ""
          }
 
@@ -32,8 +33,23 @@ while ((rawData = reader.readNext()) != null) {
 
          def invoice = getInvoice(data.service, data.invoice)
 
-         def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.ulSampleSent, data.abConc, data.amountUserUg, data.amountUserUl, data.abName, data.target, data.targetType, data.nTag, data.cTag)
+         def target = getTarget(data.target, data.targetType, data.nTag, data.cTag)
+        
+         def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.ulSampleSent, data.abConc, data.amountUserUg, data.amountUserUl, data.abName, target)
 
+         def strain = getStrain(data.genus, data.species, data.strain, data.parentStrain, data.genotype, data.mutation)
+        
+         def growthMedia = getGrowthMedia(data.growthMedia, strain?.species)
+        
+         def cellSource = getCellSource(data.samplePrepUser, growthMedia, data.sampleNotes, strain, cellProvider)
+        
+         addTreatment(cellSource, data.perturbation1)
+         addTreatment(cellSource, data.perturbation2)
+        
+         
+        
+         getBioReplicate(data.bioRep)
+        
          def seqExp = getSequenceRun(data.runStr, data.laneStr, data.dateStr, data.fcidStr, data.userStr, data.indexIdStr)
 
     }catch(Exception e) {
@@ -106,8 +122,11 @@ def getInvoice(String service, String invoiceNum) {
     return invoice
 }
 
-def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNotes, String abClonal, String abAnimal, String ig, String antigen, String ulSampleSent, String abConc, String amountUseUg, String amountUseUl, String abName, String targetStr, String targetTypeStr, String nTag, String cTag) {
-    def name = abCompName abAnimal ig antigen targetStr abClonal abCatNum abLotNum
+def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNotes, String abClonal, String abAnimal, String ig, String antigen, String ulSampleSent, String abConc, String amountUseUg, String amountUseUl, String abName) {
+    def name = "${abCompName}-${abCatNum}-${abLotNum}-${abClonal}-${abAnimal}-${ig}-${antigen}-${abConc}"
+    if(name=="-------") {
+        return null
+    }
     def antibody = Antibody.findByName(name)
     if (!antibody) {
         def company = getCompany(abCompName)
@@ -115,18 +134,132 @@ def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNo
         def target = getTarget(targetStr, targetTypeStr)
         def clonal = getClonal(abClonal)
         def igType = getIgType(ig)
+        def concentration = getFloat(abConc)
         
-        def concentration
-        def notes
+        def noteMap = [:]
+        if (abNotes != "") {
+            noteMap['note'] = abNotes
+        }
+        if (ulPerSample != "") {
+            noteMap['ulPerSample'] = ulPerSample
+        }
+        if (ugPerChIP != "") {
+            noteMap['ugPerChIP'] = ugPerChIP
+        }
+        if (ulPerChIP != "") {
+            noteMap['ulPerChIP'] = ulPerChIP
+        }
         
-        antibody = new Antibody(company: company, catalogNumber: abCatNum, abHost: abHost, clonal: clonal, concentration: concentration, igType: igType, immunogene: antigen, lotNum: abLotNum, name: name, note: abNotes, target: target).save(flush: true)
+        def notes = JsonOutput.toJson(noteMap)
+        
+        antibody = new Antibody(company: company, catalogNumber: abCatNum, abHost: abHost, clonal: clonal, concentration: concentration, igType: igType, immunogene: antigen, lotNum: abLotNum, name: name, note: notes).save(flush: true)
         
         return antibody
     }
 }
 
+def getStrain(String genus, String speciesStr, String strainStr, String parentStrainStr, String genotypeStr, String mutationStr) {
+    if (strainStr == "") {
+        return null
+    }
+    def strain = Strain.findByName(strainStr)
+    if (!strain) {
+        def species = getSpecies(genus, speciesStr)
+        def genotype = getGenotype(genotypeStr, species)
+        def parentStrain = Stain.findByName(parentStrainStr)
+        strain = new Strain(name: strainStr, species: species, genotype: genotype, parent: parentStrain).save(flush: true)
+        def mutation = getMutation(mutationStr)
+        if(strain && mutation) {
+            new StrainGeneticModifications(strain: strain, geneticModification: mutation).save(flush: true)
+        }
+    }
+    return strain
+}
+
+def getMutation(mutationStr) {
+    if(mutationStr == "") {
+        return null
+    }
+    def mutation = GeneticModification.findByName(mutationStr)
+    if(!mutation) {
+        mutation = new GeneticModification(name: mutationStr).save(flush: true)
+    }
+    return mutation
+}
+
+def getSpecies(String genusStr, String speciesStr) {
+    if(genusStr=="" && speciesStr == "") {
+        return null
+    }
+    def species = Species.findByName(speciesStr)
+    if(!species) {
+        species = new Species(name: speciesStr, genusName: genusStr).save(flush: true)
+    }
+    return species
+}
+
+def getGenotype(String genotypeStr, species) {
+    if(genotypeStr == "") {
+        return null
+    }
+    def genotype = Genotype.findByName(genotypeStr)
+    if(!genotype) {
+        genotype = new Genotype(name: genotypeStr, species: species).save(flush: true)
+    }
+    return genotype
+}
+
+def getGrowthMedia(String mediaStr, Species species) {
+    if(mediaStr == "") {
+        return null
+    }
+    def media = GrowthMedia.findByName(mediaStr)
+    if(!media) {
+        media = new GrowthMedia(name: mediaStr, species: species).save(flush: true)
+    } else {
+        if(media.species != species) {
+            media.species = null
+        }
+    }
+    return species
+}
+
+
+def getCellSource( String samplePrepUser, GrowthMedia growthMedia, String sampleNotes, Strain strain, User provider) {
+    if (!strain) {
+        return null
+    }
+    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, prepUser: samplePrepUser).save(flush: true)
+    return null
+}
+
+def addTreatment(CellSource cellSource, String perturbation) {
+    if(perturbation == "") {
+        return null
+    }
+    def perturbation = CellSourceTreatment.findByName(perturbation)
+    if(!perturbation) {
+        perturbation = new CellSourceTreatment(name: perturbation).save(flush: true)
+    }
+    return mutation
+}
+
+def getBioReplicate(String bioRep) {
+    
+}
+
+def getFloat(String s) {
+    def f
+    try {
+        f = Float.parseFloat(s)
+    } catch(Exception e) {
+        f = 0
+    }
+    return f
+}
+
 def getClonal(String clonalStr) {
-    def clonal
+    def clonal = null
     if (clonalStr ilike "%mono%") {
         clonal = MonoPolyClonal.Mono
     } else if (clonalStr ilike "%poly%") {
@@ -136,6 +269,9 @@ def getClonal(String clonalStr) {
 }
 
 deg getIgType(String igStr) {
+    if (igStr == "") {
+        return null
+    }
     def igType = IgType.findByName(igStr)
     if (!igType) {
         igType = new IgType(name: igStr).save(flush: true)
@@ -144,12 +280,20 @@ deg getIgType(String igStr) {
 }
 
 def getTarget(String targetStr, String targetTypeStr, String nTag, String cTag) {
-    def target = Target.findByName(targetStr)
+    if ([targetStr, cTag, nTag].every{ it == "" }) {
+        return null
+    }
+    def target = Target.findByNameAndCTermTagAndNTermTag(targetStr, cTag, nTag)
     if (!target) {
-    new Target(name: targetStr)
+        target = new Target(name: targetStr, cTermTag: cTag, nTermTag: nTag).save(flush: true)
+    }
+    return target
 }
 
 def getAbHost(String abHostName) {
+    if (abHostName == "") {
+        return null
+    }
     def abHost = AbHost.createCriteria().get{
         eq("name", abHostName, [ignoreCase: true])
         maxResults(1)
@@ -161,12 +305,12 @@ def getAbHost(String abHostName) {
 }
 
 def getCompany(String companyStr) {
+    if (company == "") {
+        return null
+    }    
     def company = Company.findByName(companyStr)
     if(!company) {
         company = new Company(name: companyStr).save(flush: true)
-    }
-    if (!company) {
-        company = new Company(name: "Unknown").save(flush: true)
     }
     return company
 }
@@ -281,7 +425,7 @@ def getNamedData(String[] data) {
      growthMedia: data[36],
      perturbation1: data[37],
      perturbation2: data[38],
-     targetType: data[39],
+     targetType: data[39], // changed
      // data[40],
      bioRep: data[41],
      // data[42],

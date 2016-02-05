@@ -1,3 +1,5 @@
+import groovy.json.*
+    
 includeTargets << grailsScript("_GrailsInit")
 
 target(tests: "Simple tests") {
@@ -17,6 +19,15 @@ target(tests: "Simple tests") {
     date = "091212"
     println "date: " + Date.parse("yyMMdd", date)
     
+    // println Float.parseFloat("")
+    
+    def s = JsonOutput.toJson([name: 'John Doe', age: 42])
+
+    println s
+    
+    def jsonSlurper = new JsonSlurper()
+    def object = jsonSlurper.parseText(s)
+    println object.name
 }
 
 setDefaultTarget(tests)

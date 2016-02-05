@@ -13,7 +13,7 @@ class Target {
 	}
 	
     static constraints = {
-		name unique: true, matches: '^[0-9A-Za-z -]+$'
+		name unique: ['nTermTag', 'cTermTag'], matches: '^[0-9A-Za-z -]+$'
 		nTermTag nullable: true, blank: true
 		cTermTag nullable:true, blank: true
 		note nullable: true, blank: true

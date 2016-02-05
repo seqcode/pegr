@@ -12,6 +12,7 @@ class CellSource {
     Sex sex
     Tissue tissue
     Histology histology
+    User prepUser
     
 	String toString() {
 		strain
@@ -31,5 +32,6 @@ class CellSource {
         sex nullable: true
         tissue nullable: true
         histology nullable: true
+        prepUser nullable: true
     }
 }

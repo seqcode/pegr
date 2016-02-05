@@ -12,12 +12,16 @@ class ProtocolInstance {
     Integer bagIdx
 	
     static constraints = {
+        protocol nullable: true
 		note nullable: true, blank: true
         bag nullable: true
         user nullable: true
         startTime nullable: true
         endTime nullable: true
-        bagIdx nullable: true
+    }
+    
+    static mapping = {
+        bagIdx defaultValue: 0
     }
 	
 }

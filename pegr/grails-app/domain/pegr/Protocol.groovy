@@ -25,7 +25,7 @@ class Protocol {
     
     static constraints = {
 		name unique: 'protocolVersion'
-		protocolVersion nullable: true, blank: false, maxSize: 10
+		protocolVersion nullable: true, blank: true, maxSize: 10
 		description nullable: true, blank: true
 		details nullable: true, blank: true
         user nullable: true

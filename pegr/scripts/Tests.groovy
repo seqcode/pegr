@@ -20,14 +20,20 @@ target(tests: "Simple tests") {
     println "date: " + Date.parse("yyMMdd", date)
     
     // println Float.parseFloat("")
-    
-    def s = JsonOutput.toJson([name: 'John Doe', age: 42])
+    map = [name: 'John Doe', age: [42, 24]]
+    map['sampleId'] = "123"
+    def s = JsonOutput.toJson(map)
 
     println s
     
     def jsonSlurper = new JsonSlurper()
     def object = jsonSlurper.parseText(s)
     println object.name
+    
+    def monoStr = "monolla"
+    if(monoStr.contains("mono")) {
+        println monoStr
+    }
 }
 
 setDefaultTarget(tests)

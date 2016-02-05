@@ -2911,4 +2911,6 @@ databaseChangeLog = {
 	}
 
 	include file: 'runPoolNullable.groovy'
+
+	include file: 'removePool.groovy'
 }

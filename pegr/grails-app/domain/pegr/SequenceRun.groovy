@@ -10,15 +10,15 @@ class SequenceRun {
 	Date dateCreated
 	String directoryName
 	String note
-	Pool pool
+	String pool
 	
     static constraints = {
 		note nullable: true, blank: true
 		fcId nullable: true, blank: true
 		directoryName nullable: true, blank: true
         user nullable: true
-        pool nullable: true
-        lane nullable: true
+        pool nullable: true, blank: true
+        lane nullable: true, blank: true
     }
 
 }

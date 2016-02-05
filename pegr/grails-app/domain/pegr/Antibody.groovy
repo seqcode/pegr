@@ -1,10 +1,6 @@
 package pegr
 
 class Antibody {
-
-	enum MonoPolyClonal {
-		Mono, Poly
-	}
 	
 	String name
 	Company company

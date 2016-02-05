@@ -6,22 +6,22 @@ class SequenceAlignment {
 	Integer readDbId
 	Aligner aligner
 	AlignType alignType
-	String alignmentParams
-	Integer numberTags1
-	Integer numberTags2
-	Float totalType1Weight
-	Float totalType2Weight
-	Integer numberPairs
-	Float totalPairWeight
-	String bamFilePath
-	String idxFilePath
+	String params
+	String filePaths
 	CorePipeline corePipeline
 	Date dateCreated
-	boolean isPreferredVersion
+	boolean isPreferred
 	
     static constraints = {
 		readDbId nullable: true
-		bamFilePath url: true
-		idxFilePath url: true
+        aligner nullable: true
+        alignType nullable: true
+        params nullable: true, blank: true, maxSize: 2000
+		filePaths nullable: true, blank: true, maxSize: 1000
+        corePipeline nullable: true
     }
+    
+    static mapping = {
+        isPreferred  defaultValue: false  
+     } 
 }

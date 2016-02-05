@@ -4,13 +4,12 @@ class Genome {
 
 	String name
 	Species species
-	String genomeBuild
 	
 	String toString() {
-		name + "-" + genomeBuild
+		name
 	}
 	
     static constraints = {
-		name unqiue: 'genomeBuild', matches: '^[0-9A-Za-z -]+$'
+		name unqiue: true, matches: '^[0-9A-Za-z -]+$'
     }
 }

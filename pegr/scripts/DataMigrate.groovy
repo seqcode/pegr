@@ -3,11 +3,10 @@ import com.opencsv.CSVParser
 import com.opencsv.CSVReader
 import groovy.json.*
 
-def springSecurityService	
 def file = new FileReader("files/samples.csv")
 def startLine = 305
-def endLine = 307
-def lineNo = 0
+def endLine = 305
+def lineNo = 0    
 
 CSVReader reader = new CSVReader(file);
 String [] rawData;
@@ -18,47 +17,58 @@ while ((rawData = reader.readNext()) != null) {
     } else if (lineNo > endLine) {
         break
     }
-    try {
+    //try {
         rawData.each{ 
             if(it == "-" || it == "." || it == "?" || it == "Not applicable" || it == "not applicable" || it == "None") 
                 it = ""
          }
 
-         def data = getNamedData(rawData)
+        def data = getNamedData(rawData)
 
-         def cellProvider = getUser(data.senderNameStr, data.senderEmail, data.senderPhone)
-         def cellReceiver = getUser(data.receiverName, data.receiverEmail, null)
+        def cellProvider = getUser(data.senderNameStr, data.senderEmail, data.senderPhone)
+        def dataTo = getUser(data.dataToUser, data.dataToEmail, null)
 
-         def project = getProject(data.projectName, data.projectUser, data.projectUserEmail)
+        def project = getProject(data.projectName, data.projectUser, data.projectUserEmail)
 
-         def invoice = getInvoice(data.service, data.invoice)
+        def invoice = getInvoice(data.service, data.invoice)
 
-         def target = getTarget(data.target, data.targetType, data.nTag, data.cTag)
-        
-         def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.ulSampleSent, data.abConc, data.amountUserUg, data.amountUserUl, data.abName, target)
+        def target = getTarget(data.target, data.targetType, data.nTag, data.cTag)
 
-         def strain = getStrain(data.genus, data.species, data.strain, data.parentStrain, data.genotype, data.mutation)
-        
-         def growthMedia = getGrowthMedia(data.growthMedia, strain?.species)
-        
-         def cellSource = getCellSource(data.samplePrepUser, growthMedia, data.sampleNotes, strain, cellProvider)
-        
-         addTreatment(cellSource, data.perturbation1)
-         addTreatment(cellSource, data.perturbation2)
-        
-         
-        
-         getBioReplicate(data.bioRep)
-        
-         def seqExp = getSequenceRun(data.runStr, data.laneStr, data.dateStr, data.fcidStr, data.userStr, data.indexIdStr)
+        def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.ulSampleSent, data.abConc, data.amountUserUg, data.amountUserUl, data.abName)
 
-    }catch(Exception e) {
-        log.error("Error: line ${lineNo}. " + e)
-        continue
-    }
+        def species = getSpecies(data.genus, data.species)
+        
+        def strain = getStrain(species, data.strain, data.parentStrain, data.genotype, data.mutation)
 
+        def growthMedia = getGrowthMedia(data.growthMedia, species)
+
+        def cellSource = getCellSource(data.samplePrepUser, growthMedia, strain, cellProvider)
+
+        addTreatment(cellSource, data.perturbation1)
+        addTreatment(cellSource, data.perturbation2)
+
+        def assay = getAssay(data.assay)
+        def sample = getSample(cellSource, antibody, target, assay, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr)
+        
+        def item = getInventory(sample, dateReceived, receivingUser, inOrExternal, inventoryNotes)
+             
+        getProtocolInstance(item, chipUser, chipDate, protocolVersion, resin, PCRCycle, assay)
+
+        def results = getSequenceRun(data.runStr, data.laneStr, data.dateStr, data.fcidStr, data.userStr, data.indexIdStr)
+        
+        getPool(sample, results.run, data.pool, data.volToPool, data.poolDate, data.quibitReading, data.quibitDilution, data.concentration, data.poolDilution)
+        
+        def seqExp = getSeqExperiment(sample, results.run, results.seqId, data.rd1Start, data.rd1End, data.indexStart, data.indexEnd, data.rd2Start, data.rd2End)
+        
+        [data.genomeBuild1, data.genomeBuild2, data.genomeBuild3].each{ getSeqAlign(it, seqExp, species) }
+
+   // }catch(Exception e) {
+    //    println "Error: line ${lineNo}. " + e
+    //    continue
+//    }
 }
 
+Sample.list().each{ getBioReplicate(it) }
 
 def getUser(String userStr, String emailStr, String phoneStr) {
     if(userStr == "") {
@@ -86,7 +96,9 @@ def getUser(String userStr, String emailStr, String phoneStr) {
             username += i
         }
         
-        password = springSecurityService.encodePassword(userStr)
+        def admin = User.get(1)
+        
+        password = admin.password
             
         user = new User(username: username, password: password, fullName: userStr, email: emailStr, phone: phoneStr).save(flush:true)
     }
@@ -94,7 +106,7 @@ def getUser(String userStr, String emailStr, String phoneStr) {
 }
 
 def getProject(String projectName, String projectUser, String projectUserEmail) {
-    if (pprojectName == "") {
+    if (projectName == "") {
         return null
     }
     def project = Project.findByName(projectName)
@@ -114,7 +126,7 @@ def getInvoice(String service, String invoiceNum) {
         return null
     }
     
-    def invoice = Invoice.findBySericeIdAndInvoiceNum(service, invoiceNum)
+    def invoice = Invoice.findByServiceIdAndInvoiceNum(service, invoiceNum)
     if (!invoice) {
         def date = getDate(invoiceNum)
         invoice = new Invoice(serviceId: service, invoiceNum: invoiceNum, date: date).save(flush: true)
@@ -122,7 +134,7 @@ def getInvoice(String service, String invoiceNum) {
     return invoice
 }
 
-def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNotes, String abClonal, String abAnimal, String ig, String antigen, String ulSampleSent, String abConc, String amountUseUg, String amountUseUl, String abName) {
+def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNotes, String abClonal, String abAnimal, String ig, String antigen, String ulSent, String abConc, String ugPerChIP, String ulPerChIP, String abName) {
     def name = "${abCompName}-${abCatNum}-${abLotNum}-${abClonal}-${abAnimal}-${ig}-${antigen}-${abConc}"
     if(name=="-------") {
         return null
@@ -131,7 +143,6 @@ def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNo
     if (!antibody) {
         def company = getCompany(abCompName)
         def abHost = getAbHost(abAnimal)
-        def target = getTarget(targetStr, targetTypeStr)
         def clonal = getClonal(abClonal)
         def igType = getIgType(ig)
         def concentration = getFloat(abConc)
@@ -140,8 +151,8 @@ def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNo
         if (abNotes != "") {
             noteMap['note'] = abNotes
         }
-        if (ulPerSample != "") {
-            noteMap['ulPerSample'] = ulPerSample
+        if (ulSent != "") {
+            noteMap['ulSent'] = ulSent
         }
         if (ugPerChIP != "") {
             noteMap['ugPerChIP'] = ugPerChIP
@@ -158,13 +169,12 @@ def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNo
     }
 }
 
-def getStrain(String genus, String speciesStr, String strainStr, String parentStrainStr, String genotypeStr, String mutationStr) {
+def getStrain(Species species, String strainStr, String parentStrainStr, String genotypeStr, String mutationStr) {
     if (strainStr == "") {
         return null
     }
     def strain = Strain.findByName(strainStr)
     if (!strain) {
-        def species = getSpecies(genus, speciesStr)
         def genotype = getGenotype(genotypeStr, species)
         def parentStrain = Stain.findByName(parentStrainStr)
         strain = new Strain(name: strainStr, species: species, genotype: genotype, parent: parentStrain).save(flush: true)
@@ -198,7 +208,7 @@ def getSpecies(String genusStr, String speciesStr) {
     return species
 }
 
-def getGenotype(String genotypeStr, species) {
+def getGenotype(String genotypeStr, Species species) {
     if(genotypeStr == "") {
         return null
     }
@@ -233,19 +243,181 @@ def getCellSource( String samplePrepUser, GrowthMedia growthMedia, String sample
     return null
 }
 
-def addTreatment(CellSource cellSource, String perturbation) {
-    if(perturbation == "") {
+def addTreatment(CellSource cellSource, String perturbStr) {
+    if(perturbStr == "") {
         return null
     }
-    def perturbation = CellSourceTreatment.findByName(perturbation)
+    def perturbation = CellSourceTreatment.findByName(perturbStr)
     if(!perturbation) {
-        perturbation = new CellSourceTreatment(name: perturbation).save(flush: true)
+        perturbation = new CellSourceTreatment(name: perturbStr).save(flush: true)
     }
-    return mutation
+    return perturbation
 }
 
-def getBioReplicate(String bioRep) {
+def getSample(CellSource cellSource, Antibody antibody, Target target, Assay assay, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String date) {
+    def note = [:]
+    if (sampleNotes != "") {
+        note['note'] = sampleNote
+    }
+    if (bioRep1SampleId != "") {
+        note['bioRep1'] = bioRep1SampleId
+    }
+    if (bioRep1SampleId != "") {
+        note['bioRep2'] = bioRep2SampleId
+    }
     
+    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, assay: assay, requestedTagNumber: getFloat(requestedTagNumber), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, lastUpdate: getDate(date), sendDataTo: dataTo, invoice: invoice).save(flush: true)
+    return sample
+}
+
+def getBioReplicate(Sample sample) {    
+    if(sample) {
+        def jsonSlurper = new JsonSlurper()
+        def note = jsonSlurper.parseText(sample.note)
+
+        def sample2 = getSampleFromSampleId(note.bioRep2)
+        def sample1 = getSampleFromSampleId(note.bioRep1)
+        if (sample2 != null || sample1 != null) {
+            def set = BiologicalReplicateSamples.findBySample(sample)?.set  
+            if (!set) {
+                set = new BiologicalReplicateSet().save(flush: true)
+                new BiologicalReplicateSamples(set: set, sample: sample).save(flush: true)
+            }
+            if (set && sample2) {
+                new BiologicalReplicateSamples(set: set, sample: sample2).save(flush: true)
+            }
+            if (set && sample1) {
+                new BiologicalReplicateSamples(set: set, sample: sample1).save(flush: true)
+            }
+        }
+        sample.note = note.note
+        sample.save(flush: true)
+    }
+}
+
+def getSampleFromSampleId(String sampleId) {
+    if (sampleId == "") {
+        return null
+    }
+    def samples = Sample.where{note == '%"sampleId":"${sampleId}"%'}.list()
+    if (samples.size() > 1){
+        return null
+    } else {
+        return sample[0]
+    }
+    
+}
+
+def getInventory(Sample sample, String dateReceived, String receivingUser, String inOrExternal, String inventoryNotes) {
+    if(!sample) {
+        return null
+    }
+    def type = ItemType.findByName("Sample")
+    
+    def notes = [:]    
+    if (dateReceived != ""){
+        notes['dateReceived'] = getDate(dateReceived)
+    }    
+    if (receivingUser != ""){
+        notes['receivingUser'] = findUser(receivingUser)?.username
+    }
+    if (inOrExternal != ""){
+        notes['IorE'] = inOrExternal
+    }
+    if (inventoryNotes != ""){
+        notes['note'] = inventoryNotes
+    }
+    
+    def item = new Item(type: type, reerenceId: sample.id, notes: JsonOutput.toJson(notes)).save(flush: true)
+    return item
+}
+             
+def getAssay(String assayStr) {
+    if(assayStr == "") {
+        return null
+    }
+    
+    def assay= Assay.findByName(assayStr)
+    if(!assay) {
+        assay = new Assay(name: assayStr).save(flush: true)
+    }
+    return assay
+}
+
+def getProtocolInstance(Item item, String chipUser, String chipDate, String protocolVersion, String resin, String PCRCycle, Assay assay) {
+    if (!item) {
+        return
+    }    
+    // get protocol
+    def protocol
+    if (assay) {
+        protocol = Protocol.findByNameAndProtocolVersion(assay, protocolVersion)  
+        if (!protocol) {
+            protocol = new Protocol(name: assay.name, protocolVersion: protocolVersion).save(flush: true)
+        }
+    }
+    // get note
+    def note = [:]
+    if (resin != "") {
+        note['resin'] = resin
+    }
+    if (PCRCycle != "") {
+        note['PCRCycle'] = PCRCycle
+    }
+    
+    def bag = new ProtocolInstanceBag(status: ProtocolStatus.COMPLETED) 
+    def date = getDate(chipDate)
+    def instance = new ProtocolInstance(bag: bag, protocol: protocol, user: findUser(chipUser), startTime: date, endTime: date, note: JsonOutput.toJson(note), bagIdx).save(flush: true)
+    item.addTobags(bag)
+    item.save(flush: true)    
+}
+             
+def getPool(Sample sample, SequenceRun run, String pool, String volToPool, String poolDateStr, String quibitReading, String quibitDilution, String concentration, String poolDilution) {
+    if (sample && run) {
+        def poolDate = getDate(poolDateStr)
+        
+        def map = [:]
+        if (concentration != ""){
+            map['concentration'] = concentration
+        }
+        if (quibitReading != "") {
+            map['quibitReading'] = quibitReading
+        }
+        if (quibitDilution != "") {
+            map['quibitDilution'] = quibitDilution
+        }
+        if (concentration != "") {
+            map['concentration'] = concentration
+        }
+        
+        params = JsonOutput.toJson(map)
+        vol = getFloat(volToPool)
+        new SampleInRun(poolDate: poolDate, sample: sample, run: run, pool: pool, params: params, volumneToPool: vol).save(flush: true)
+    }
+}
+        
+def getSeqExperiment(Sample sample, SequenceRun seqRun, String seqId, String rd1Start, String rd1End, String indexStart, String indexEnd, String rd2Start, String rd2End) {
+    def readPositions = JsonOutput.toJson([rd1: [rd1Start, rd1End], index: [indexStart, indexEnd], rd2: [rd2Start, rd2End]])
+    seqExp = new SequencingExperiment(seqId: seqId, sample: sample, sequenceRun: seqRun, readPositions: readPositions).save(flush: true)
+    return seqExp
+}
+        
+def getSeqAlign(String genomBuild, SequencingExperiment seqExp, Species species) {
+    def genome = getGenome(genomeBuild, species)
+    if (seqExp && genome) {
+        new SequenceAlignment(sequencingExperiment: seqExp, genome: genome).save(flush: true)
+    }
+}
+
+def getGenome(String genomeStr, Species species) {
+    if (genomeStr == "") {
+        return null
+    }
+    def genome = Genome.findByName(genomeStr)
+    if (!genome) {
+        genome = new Genome(name: genomeStr, species: species).save(flush: true)
+    }
+    return genome
 }
 
 def getFloat(String s) {
@@ -260,15 +432,15 @@ def getFloat(String s) {
 
 def getClonal(String clonalStr) {
     def clonal = null
-    if (clonalStr ilike "%mono%") {
+    if (clonalStr.contains("mono")) {
         clonal = MonoPolyClonal.Mono
-    } else if (clonalStr ilike "%poly%") {
+    } else if (clonalStr.contains("poly")) {
         clonal = MonoPolyClonal.Poly
     }
     return clonal
 }
 
-deg getIgType(String igStr) {
+def getIgType(String igStr) {
     if (igStr == "") {
         return null
     }
@@ -305,7 +477,7 @@ def getAbHost(String abHostName) {
 }
 
 def getCompany(String companyStr) {
-    if (company == "") {
+    if (companyStr == "") {
         return null
     }    
     def company = Company.findByName(companyStr)
@@ -350,7 +522,7 @@ def getSequenceRun(String runStr, String laneStr, String dateStr, String fcidStr
          run.lane = laneStr.toInteger()
 
          // date
-         run.dateCreated = getDate(dateString)
+         run.dateCreated = getDate(dateStr)
 
          // fcId
          run.fcId = fcidStr
@@ -361,11 +533,11 @@ def getSequenceRun(String runStr, String laneStr, String dateStr, String fcidStr
          run.save(flush: true)
     }
     
-    def seqExp = SequencingExperiment(sequenceRun: run, seqId: seqId)    
-    return seqExp
+    [sequenceRun: run, seqId: seqId]
+
 }
 
-def getDate(String dateString) {
+def getDate(String dateStr) {
     def date = null
     if (dateStr.size() == 5) {
          dateStr = "0" + dateStr
@@ -381,7 +553,7 @@ def getDate(String dateString) {
 }
 
 def findUser(String userStr) {
-    def user = User.findByFullnameIlike("%${userStr}%") ?: User.findByUsername(userStr)
+    def user = User.findByFullNameIlike("%${userStr}%") ?: User.findByUsername(userStr)
     return user
 }
 
@@ -393,8 +565,8 @@ def getNamedData(String[] data) {
      senderNameStr: data[4],
      senderEmail: data[5],
      senderPhone: data[6],
-     receiverName: data[7],
-     receiverEmail: data[8],
+     dataToUser: data[7],
+     dataToEmail: data[8],
      projectName: data[9],
      projectUser: data[10],
      projectUserEmail: data[11],     
@@ -427,17 +599,17 @@ def getNamedData(String[] data) {
      perturbation2: data[38],
      targetType: data[39], // changed
      // data[40],
-     bioRep: data[41],
-     // data[42],
-     // data[43],
-     // data[44],
+     //bioRep: data[41],
+     sampleId: data[42],
+     bioRep1SampleId: data[43],
+     bioRep2SampleId: data[44],
      sampleNotes: data[45],
      nTag: data[46],
      target: data[47],
      cTag: data[48],     
      chromAmount: data[49],
      cellNum: data[50],
-     quantityReceived: data[51],
+     volume: data[51],
      assay: data[52],
      genomeBuild1: data[53],
      genomeBuild2: data[54],
@@ -455,22 +627,22 @@ def getNamedData(String[] data) {
      protocolVersion: data[66],
      techRep: data[67],
      requestedTagNum: data[68],
-     cellNum: data[69],
+     // cellNum: data[69],
      // data[70],
      // data[71],
-     chipQubit: data[72],
+     // chipQubit: data[72],
      // : data[73],
      // : data[74],
      resin: data[75],
      pool: data[76],
-     volToPool1: data[77],
+     volToPool: data[77],
      poolDate: data[78],
      PCRCycle: data[79],
      quibitReading: data[80],
      quibitDilution: data[81],
      concentration: data[82],
      poolDilution: data[83],
-     volToPool2: data[84],
+     // data[84],
      seqRepNum: data[85],
      seqRepId: data[86],
      rd1Start: data[87],

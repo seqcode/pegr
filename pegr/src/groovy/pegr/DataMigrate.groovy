@@ -11,21 +11,27 @@ class DataMigrate {
 		def lineNo = 0    
 		
 		CSVReader reader = new CSVReader(file);
-		String [] rawData;
-		while ((rawData = reader.readNext()) != null) {
+		String [] rawdata;
+		while ((rawdata = reader.readNext()) != null) {
 		    ++lineNo
 		    if (lineNo < startLine) {
 		        continue
 		    } else if (lineNo > endLine) {
 		        break
 		    }
-		    //try {
-		        rawData.each{ 
-		            if(it == "-" || it == "." || it == "?" || it == "Not applicable" || it == "not applicable" || it == "None") 
-		                it = ""
-		         }
-		
-		        def data = getNamedData(rawData)
+		    try {
+                String[] cells = new String[rawdata.size()]
+                rawdata.eachWithIndex{ d, idx -> 
+                    def td = d.trim()
+                    if(td == "-" || td == "." || td == "?" || td == "Not applicable" || td == "not applicable" || td == "None") {
+                        cells[idx] = ""
+                    }else {
+                        cells[idx] = td
+                    }
+                 }
+		        def data = getNamedData(cells)
+				
+				def results = getSequenceRun(data.runStr, data.laneStr, data.dateStr, data.fcidStr, data.indexIdStr)
 		
 		        def cellProvider = getUser(data.senderNameStr, data.senderEmail, data.senderPhone)
 		        def dataTo = getUser(data.dataToUser, data.dataToEmail, null)
@@ -36,7 +42,7 @@ class DataMigrate {
 		
 		        def target = getTarget(data.target, data.targetType, data.nTag, data.cTag)
 		
-		        def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.ulSampleSent, data.abConc, data.amountUserUg, data.amountUserUl, data.abName)
+		        def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.ulSampleSent, data.abConc, data.amountUseUg, data.amountUseUl, data.abName)
 		
 		        def species = getSpecies(data.genus, data.species)
 		        
@@ -56,19 +62,17 @@ class DataMigrate {
 		        def item = getInventory(sample, data.dateReceived, data.receivingUser, data.inOrExternal, data.inventoryNotes)
 		             
 		        getProtocolInstance(item, data.chipUser, data.chipDate, data.protocolVersion, data.resin, data.PCRCycle, assay)
-		
-		        def results = getSequenceRun(data.runStr, data.laneStr, data.dateStr, data.fcidStr, data.userStr, data.indexIdStr)
 		        
-		        getPool(sample, results.run, data.pool, data.volToPool, data.poolDate, data.quibitReading, data.quibitDilution, data.concentration, data.poolDilution)
+		        getPool(sample, results.sequenceRun, data.pool, data.volToPool, data.poolDate, data.quibitReading, data.quibitDilution, data.concentration, data.poolDilution)
 		        
-		        def seqExp = getSeqExperiment(sample, results.run, results.seqId, data.rd1Start, data.rd1End, data.indexStart, data.indexEnd, data.rd2Start, data.rd2End)
+		        def seqExp = getSeqExperiment(sample, results.sequenceRun, results.seqId, data.rd1Start, data.rd1End, data.indexStart, data.indexEnd, data.rd2Start, data.rd2End)
 		        
 		        [data.genomeBuild1, data.genomeBuild2, data.genomeBuild3].each{ getSeqAlign(it, seqExp, species) }
 		
-		   // }catch(Exception e) {
-		    //    println "Error: line ${lineNo}. " + e
-		    //    continue
-		//    }
+		    }catch(Exception e) {
+		        println "Error: line ${lineNo}. " + e
+		        continue
+		    }
 		}
 		
 		Sample.list().each{ getBioReplicate(it) }
@@ -76,7 +80,7 @@ class DataMigrate {
 	
 	def addSampleToProject(Project project, Sample sample) {
 	    if(project && sample) {
-	        new ProjectSamples(project: project, sample: sample).save(flush: true)
+	        new ProjectSamples(project: project, sample: sample).save(failOnError: true)
 	    }
 	}
 	
@@ -110,7 +114,7 @@ class DataMigrate {
 	        
 	        def password = admin.password
 	            
-	        user = new User(username: username, password: password, fullName: userStr, email: emailStr, phone: phoneStr).save(flush:true)
+	        user = new User(username: username, password: password, fullName: userStr, email: emailStr, phone: phoneStr).save(failOnError: true)
 	    }
 	    return user
 	}
@@ -121,11 +125,11 @@ class DataMigrate {
 	    }
 	    def project = Project.findByName(projectName)
 	    if (!project) {
-	        project = new Project(name: projectName).save(flush: true)
+	        project = new Project(name: projectName).save(failOnError: true)
 	    }
 	    def user = getUser(projectUser, projectUserEmail, null)
 	    if (user && project) {
-	        new ProjectUser(project: project, user: user, projectRole: ProjectRole.OWNER).save(flush: true)
+	        new ProjectUser(project: project, user: user, projectRole: ProjectRole.OWNER).save(failOnError: true)
 	    }
 	    
 	    return project
@@ -135,11 +139,12 @@ class DataMigrate {
 	    if (service == "" && invoiceNum == "") {
 	        return null
 	    }
-	    
-	    def invoice = Invoice.findByServiceIdAndInvoiceNum(service, invoiceNum)
+	    def invoice = Invoice.where{
+			serviceId == service && invoiceNum == invoiceNum
+		}.get(max:1)
 	    if (!invoice) {
 	        def date = getDate(invoiceNum)
-	        invoice = new Invoice(serviceId: service, invoiceNum: invoiceNum, date: date).save(flush: true)
+	        invoice = new Invoice(serviceId: service, invoiceNum: invoiceNum, date: date).save(failOnError: true)
 	    } 
 	    return invoice
 	}
@@ -173,7 +178,7 @@ class DataMigrate {
 	        
 	        def notes = JsonOutput.toJson(noteMap)
 	        
-	        antibody = new Antibody(company: company, catalogNumber: abCatNum, abHost: abHost, clonal: clonal, concentration: concentration, igType: igType, immunogene: antigen, lotNum: abLotNum, name: name, note: notes).save(flush: true)
+	        antibody = new Antibody(company: company, catalogNumber: abCatNum, abHost: abHost, clonal: clonal, concentration: concentration, igType: igType, immunogene: antigen, lotNum: abLotNum, name: name, note: notes).save(failOnError: true)
 	        
 	        return antibody
 	    }
@@ -187,10 +192,10 @@ class DataMigrate {
 	    if (!strain) {
 	        def genotype = getGenotype(genotypeStr, species)
 	        def parentStrain = Strain.findByName(parentStrainStr)
-	        strain = new Strain(name: strainStr, species: species, genotype: genotype, parent: parentStrain).save(flush: true)
+	        strain = new Strain(name: strainStr, species: species, genotype: genotype, parent: parentStrain).save(failOnError: true)
 	        def mutation = getMutation(mutationStr)
 	        if(strain && mutation) {
-	            new StrainGeneticModifications(strain: strain, geneticModification: mutation).save(flush: true)
+	            new StrainGeneticModifications(strain: strain, geneticModification: mutation).save(failOnError: true)
 	        }
 	    }
 	    return strain
@@ -202,7 +207,7 @@ class DataMigrate {
 	    }
 	    def mutation = GeneticModification.findByName(mutationStr)
 	    if(!mutation) {
-	        mutation = new GeneticModification(name: mutationStr).save(flush: true)
+	        mutation = new GeneticModification(name: mutationStr).save(failOnError: true)
 	    }
 	    return mutation
 	}
@@ -211,9 +216,15 @@ class DataMigrate {
 	    if(genusStr=="" && speciesStr == "") {
 	        return null
 	    }
-	    def species = Species.findByName(speciesStr)
+		if (genusStr == "") {
+			genusStr = "Unknown"
+		}
+		if (speciesStr == "") {
+			speciesStr = "Unknown"
+		}
+	    def species = Species.findByNameAndGenusName(speciesStr, genusStr)
 	    if(!species) {
-	        species = new Species(name: speciesStr, genusName: genusStr).save(flush: true)
+	        species = new Species(name: speciesStr, genusName: genusStr).save(failOnError: true)
 	    }
 	    return species
 	}
@@ -224,7 +235,7 @@ class DataMigrate {
 	    }
 	    def genotype = Genotype.findByName(genotypeStr)
 	    if(!genotype) {
-	        genotype = new Genotype(name: genotypeStr, species: species).save(flush: true)
+	        genotype = new Genotype(name: genotypeStr, species: species).save(failOnError: true)
 	    }
 	    return genotype
 	}
@@ -235,11 +246,11 @@ class DataMigrate {
 	    }
 	    def media = GrowthMedia.findByName(mediaStr)
 	    if(!media) {
-	        media = new GrowthMedia(name: mediaStr, species: species).save(flush: true)
+	        media = new GrowthMedia(name: mediaStr, species: species).save(failOnError: true)
 	    } else {
 	        if(media.species != species) {
 	            media.species = null
-				media.save(flush: true)
+				media.save(failOnError: true)
 	        }
 	    }
 	    return media
@@ -250,8 +261,9 @@ class DataMigrate {
 	    if (!strain) {
 	        return null
 	    }
-	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, prepUser: samplePrepUser).save(flush: true)
-	    return null
+		def prepUser = findUser(samplePrepUser)
+	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, prepUser: prepUser).save(failOnError: true)
+	    return cellSource
 	}
 	
 	def addTreatment(CellSource cellSource, String perturbStr) {
@@ -260,7 +272,7 @@ class DataMigrate {
 	    }
 	    def perturbation = CellSourceTreatment.findByName(perturbStr)
 	    if(!perturbation) {
-	        perturbation = new CellSourceTreatment(name: perturbStr).save(flush: true)
+	        perturbation = new CellSourceTreatment(name: perturbStr).save(failOnError: true)
 	    }
 	    return perturbation
 	}
@@ -273,41 +285,45 @@ class DataMigrate {
 	    if (bioRep1SampleId != "") {
 	        note['bioRep1'] = bioRep1SampleId
 	    }
-	    if (bioRep1SampleId != "") {
+	    if (bioRep2SampleId != "") {
 	        note['bioRep2'] = bioRep2SampleId
 	    }
 	    
-	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, assay: assay, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, lastUpdate: getDate(date), sendDataTo: dataTo, invoice: invoice).save(flush: true)
+	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, assay: assay, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, lastUpdate: getDate(date), sendDataTo: dataTo, invoice: invoice).save(failOnError: true)
 	    return sample
 	}
 	
 	def getBioReplicate(Sample sample) {    
 	    if(sample) {
 	        def jsonSlurper = new JsonSlurper()
-	        def note = jsonSlurper.parseText(sample.note)
+			try {
+				def note = jsonSlurper.parseText(sample.note)
 	
-	        def sample2 = getSampleFromSampleId(note.bioRep2)
-	        def sample1 = getSampleFromSampleId(note.bioRep1)
-	        if (sample2 != null || sample1 != null) {
-	            def set = BiologicalReplicateSamples.findBySample(sample)?.set  
-	            if (!set) {
-	                set = new BiologicalReplicateSet().save(flush: true)
-	                new BiologicalReplicateSamples(set: set, sample: sample).save(flush: true)
-	            }
-	            if (set && sample2) {
-	                new BiologicalReplicateSamples(set: set, sample: sample2).save(flush: true)
-	            }
-	            if (set && sample1) {
-	                new BiologicalReplicateSamples(set: set, sample: sample1).save(flush: true)
-	            }
-	        }
-	        sample.note = note.note
-	        sample.save(flush: true)
+		        def sample2 = getSampleFromSampleId(note.bioRep2)
+		        def sample1 = getSampleFromSampleId(note.bioRep1)
+		        if (sample2 != null || sample1 != null) {
+		            def set = BiologicalReplicateSamples.findBySample(sample)?.set  
+		            if (!set) {
+		                set = new BiologicalReplicateSet().save(failOnError: true)
+		                new BiologicalReplicateSamples(set: set, sample: sample).save(failOnError: true)
+		            }
+		            if (set && sample2) {
+		                new BiologicalReplicateSamples(set: set, sample: sample2).save(failOnError: true)
+		            }
+		            if (set && sample1) {
+		                new BiologicalReplicateSamples(set: set, sample: sample1).save(failOnError: true)
+		            }
+		        }
+		        sample.note = note.note
+		        sample.save(failOnError: true)
+			}catch(Exception e) {
+				return
+		    }
 	    }
 	}
 	
 	def getSampleFromSampleId(String sampleId) {
-	    if (sampleId == "") {
+	    if (sampleId == null || sampleId == "") {
 	        return null
 	    }
 	    def samples = Sample.where{note == '%"sampleId":"${sampleId}"%'}.list()
@@ -339,7 +355,7 @@ class DataMigrate {
 	        notes['note'] = inventoryNotes
 	    }
 	    
-	    def item = new Item(type: type, reerenceId: sample.id, notes: JsonOutput.toJson(notes)).save(flush: true)
+	    def item = new Item(type: type, referenceId: sample.id, notes: JsonOutput.toJson(notes)).save(failOnError: true)
 	    return item
 	}
 	             
@@ -350,7 +366,7 @@ class DataMigrate {
 	    
 	    def assay= Assay.findByName(assayStr)
 	    if(!assay) {
-	        assay = new Assay(name: assayStr).save(flush: true)
+	        assay = new Assay(name: assayStr).save(failOnError: true)
 	    }
 	    return assay
 	}
@@ -364,7 +380,7 @@ class DataMigrate {
 	    if (assay) {
 	        protocol = Protocol.findByNameAndProtocolVersion(assay, protocolVersion)  
 	        if (!protocol) {
-	            protocol = new Protocol(name: assay.name, protocolVersion: protocolVersion).save(flush: true)
+	            protocol = new Protocol(name: assay.name, protocolVersion: protocolVersion).save(failOnError: true)
 	        }
 	    }
 	    // get note
@@ -376,13 +392,13 @@ class DataMigrate {
 	        note['PCRCycle'] = PCRCycle
 	    }
 	    
-	    def bag = new ProtocolInstanceBag(status: ProtocolStatus.COMPLETED) 
+	    def bag = new ProtocolInstanceBag(status: ProtocolStatus.COMPLETED).save(failOnError: true) 
 	    def date = getDate(chipDate)
-	    def instance = new ProtocolInstance(bag: bag, protocol: protocol, user: findUser(chipUser), startTime: date, endTime: date, note: JsonOutput.toJson(note)).save(flush: true)
+	    def instance = new ProtocolInstance(bag: bag, protocol: protocol, user: findUser(chipUser), startTime: date, endTime: date, note: JsonOutput.toJson(note), status: ProtocolStatus.COMPLETED, bagIdx: 0).save(failOnError: true)
         if (!bag) {
-            item.addTobags(bag)
+            item.addToBags(bag)
         }
-	    item.save(flush: true)    
+	    item.save(failOnError: true)    
 	}
 	             
 	def getPool(Sample sample, SequenceRun run, String pool, String volToPool, String poolDateStr, String quibitReading, String quibitDilution, String concentration, String poolDilution) {
@@ -405,20 +421,30 @@ class DataMigrate {
 	        
 	        def params = JsonOutput.toJson(map)
 	        def vol = getFloat(volToPool)
-	        new SampleInRun(poolDate: poolDate, sample: sample, run: run, pool: pool, params: params, volumneToPool: vol).save(flush: true)
+	        new SampleInRun(poolDate: poolDate, sample: sample, run: run, pool: pool, params: params, volumneToPool: vol).save(failOnError: true)
 	    }
 	}
 	        
 	def getSeqExperiment(Sample sample, SequenceRun seqRun, String seqId, String rd1Start, String rd1End, String indexStart, String indexEnd, String rd2Start, String rd2End) {
-	    def readPositions = JsonOutput.toJson([rd1: [rd1Start, rd1End], index: [indexStart, indexEnd], rd2: [rd2Start, rd2End]])
-	    def seqExp = new SequencingExperiment(seqId: seqId, sample: sample, sequenceRun: seqRun, readPositions: readPositions).save(flush: true)
+		def map = [:]
+		if(rd1Start != "" || rd1End != "") {
+			map['rd1'] = [rd1Start, rd1End]
+		}
+		if(indexStart != "" || indexEnd != "") {
+			map['index'] = [indexStart, indexEnd]
+		}
+		if(rd2Start != "" || rd2End != "") {
+			map['rd2'] = [rd2Start, rd2End]
+		}
+	    def readPositions = JsonOutput.toJson(map)
+	    def seqExp = new SequencingExperiment(seqId: seqId, sample: sample, sequenceRun: seqRun, readPositions: readPositions).save(failOnError: true)
 	    return seqExp
 	}
 	        
 	def getSeqAlign(String genomeBuild, SequencingExperiment seqExp, Species species) {
 	    def genome = getGenome(genomeBuild, species)
 	    if (seqExp && genome) {
-	        new SequenceAlignment(sequencingExperiment: seqExp, genome: genome).save(flush: true)
+	        new SequenceAlignment(sequencingExperiment: seqExp, genome: genome).save(failOnError: true)
 	    }
 	}
 	
@@ -428,7 +454,7 @@ class DataMigrate {
 	    }
 	    def genome = Genome.findByName(genomeStr)
 	    if (!genome) {
-	        genome = new Genome(name: genomeStr, species: species).save(flush: true)
+	        genome = new Genome(name: genomeStr, species: species).save(failOnError: true)
 	    }
 	    return genome
 	}
@@ -459,7 +485,7 @@ class DataMigrate {
 	    }
 	    def igType = IgType.findByName(igStr)
 	    if (!igType) {
-	        igType = new IgType(name: igStr).save(flush: true)
+	        igType = new IgType(name: igStr).save(failOnError: true)
 	    }
 	    return igType
 	}
@@ -471,7 +497,7 @@ class DataMigrate {
 	    def target = Target.findByNameAndCTermTagAndNTermTag(targetStr, cTag, nTag)
 	    if (!target) {
 	        def type = getTargetType(targetTypeStr)
-	        target = new Target(name: targetStr, cTermTag: cTag, nTermTag: nTag, targetType: type).save(flush: true)
+	        target = new Target(name: targetStr, cTermTag: cTag, nTermTag: nTag, targetType: type).save(failOnError: true)
 	    }
 	    return target
 	}
@@ -482,7 +508,7 @@ class DataMigrate {
 	    }
 	    def type = TargetType.findByName(str)
 	    if (!str) {
-	        type = new TargetType(name: str).save(flush: true)
+	        type = new TargetType(name: str).save(failOnError: true)
 	    }
 	    return type
 	}
@@ -496,7 +522,7 @@ class DataMigrate {
 	        maxResults(1)
 	    }
 	    if(!abHost) {
-	        abHost = new AbHost(name: abHostName).save(flush: true)
+	        abHost = new AbHost(name: abHostName).save(failOnError: true)
 	    }
 	    return abHost
 	}
@@ -507,12 +533,12 @@ class DataMigrate {
 	    }    
 	    def company = Company.findByName(companyStr)
 	    if(!company) {
-	        company = new Company(name: companyStr).save(flush: true)
+	        company = new Company(name: companyStr).save(failOnError: true)
 	    }
 	    return company
 	}
 	
-	def getSequenceRun(String runStr, String laneStr, String dateStr, String fcidStr, String userStr, String indexIdStr) {
+	def getSequenceRun(String runStr, String laneStr, String dateStr, String fcidStr, String indexIdStr) {
 	    int runNum
 	    def platform
 	    def seqId
@@ -547,15 +573,12 @@ class DataMigrate {
 	         run.lane = laneStr.toInteger()
 	
 	         // date
-	         run.dateCreated = getDate(dateStr)
+	         run.date = getDate(dateStr)
 	
 	         // fcId
 	         run.fcId = fcidStr
 	
-	         // user
-	         def user = findUser(userStr) 
-	
-	         run.save(flush: true)
+	         run = run.save(failOnError: true)
 	    }
 	    
 	    [sequenceRun: run, seqId: seqId]

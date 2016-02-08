@@ -22,5 +22,6 @@ class ProtocolInstanceBag {
         name nullable: true, blank: true
         startTime nullable: true
         endTime nullable: true
+        superBag nullable: true
     }
 }

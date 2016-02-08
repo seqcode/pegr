@@ -6,7 +6,7 @@ class Species {
 	String note
 	
 	String toString() {
-		name
+        "${genusName} ${name}"
 	}
 	
     static constraints = {

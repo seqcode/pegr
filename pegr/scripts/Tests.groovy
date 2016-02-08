@@ -3,8 +3,17 @@ import groovy.json.*
 includeTargets << grailsScript("_GrailsInit")
 
 target(tests: "Simple tests") {
-    s = 'A,, C  ,"Venters, Bryan"'
-    String[] data = s.split(",")*.trim()
+    s = 'A,, C  ,- '
+    String[] rawdata = s.split(",")
+    def data = new String[rawdata.size()]
+    rawdata.eachWithIndex{ d, idx -> 
+        def td = d.trim()
+		if(td == "-" || td == "." || td == "?" || td == "Not applicable" || td == "not applicable" || td == "None") {
+		    data[idx] = ""
+        }else {
+            data[idx] = td
+        }
+     }
     println "1.${data[0]};"
     println "2.${data[1]};"
     println "3.${data[2]};"
@@ -16,7 +25,7 @@ target(tests: "Simple tests") {
         println emailStr[0..<at]
     }
 
-    date = "091212"
+    date = "100510"
     println "date: " + Date.parse("yyMMdd", date)
     
     // println Float.parseFloat("")

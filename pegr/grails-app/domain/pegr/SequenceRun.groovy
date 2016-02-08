@@ -7,7 +7,7 @@ class SequenceRun {
 	SequencingPlatform platform
 	String fcId
 	User user
-	Date dateCreated
+	Date date
 	String directoryName
 	String note
 	String pool
@@ -19,6 +19,7 @@ class SequenceRun {
         user nullable: true
         pool nullable: true, blank: true
         lane nullable: true, blank: true
+        date nullable: true
     }
 
 }

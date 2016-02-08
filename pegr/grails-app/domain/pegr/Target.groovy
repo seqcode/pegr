@@ -17,5 +17,6 @@ class Target {
 		nTermTag nullable: true, blank: true
 		cTermTag nullable:true, blank: true
 		note nullable: true, blank: true
+        targetType nullable: true
     }
 }

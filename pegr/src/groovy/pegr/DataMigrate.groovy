@@ -50,18 +50,19 @@ class DataMigrate {
 		
 		        def growthMedia = getGrowthMedia(data.growthMedia, species)
 		
-		        def cellSource = getCellSource(data.samplePrepUser, growthMedia, strain, cellProvider)
+                def inventory = getInventory(data.dateReceived, data.receivingUser, data.inOrExternal, data.inventoryNotes)
+		        def cellSource = getCellSource(data.samplePrepUser, growthMedia, strain, cellProvider, inventory)
 		
 		        addTreatment(cellSource, data.perturbation1)
 		        addTreatment(cellSource, data.perturbation2)
 		
 		        def assay = getAssay(data.assay)
-		        def sample = getSample(cellSource, antibody, target, assay, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr)
-		        addSampleToProject(project, sample)
-		        
-		        def item = getInventory(sample, data.dateReceived, data.receivingUser, data.inOrExternal, data.inventoryNotes)
 		             
-		        getProtocolInstance(item, data.chipUser, data.chipDate, data.protocolVersion, data.resin, data.PCRCycle, assay)
+		        def prtcl = getProtocolInstanceSummary(data.chipUser, data.chipDate, data.protocolVersion, data.resin, data.PCRCycle, assay)
+                
+		        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl)
+                
+		        addSampleToProject(project, sample)
 		        
 		        getPool(sample, results.sequenceRun, data.pool, data.volToPool, data.poolDate, data.quibitReading, data.quibitDilution, data.concentration, data.poolDilution)
 		        
@@ -139,9 +140,21 @@ class DataMigrate {
 	    if (service == "" && invoiceNum == "") {
 	        return null
 	    }
-	    def invoice = Invoice.where{
-			serviceId == service && invoiceNum == invoiceNum
-		}.get(max:1)
+		
+		def invoice = null
+		if (service == "") {
+			invoice = Invoice.where{
+				serviceId == null && invoiceNum == invoiceNum
+			}.get(max:1)
+		} else if(invoiceNum == "") {
+			invoice = Invoice.where{
+				serviceId == service && invoiceNum == null
+			}.get(max:1)
+		} else {
+			invoice = Invoice.where{
+				serviceId == service && invoiceNum == invoiceNum
+			}.get(max:1)
+		}
 	    if (!invoice) {
 	        def date = getDate(invoiceNum)
 	        invoice = new Invoice(serviceId: service, invoiceNum: invoiceNum, date: date).save(failOnError: true)
@@ -257,12 +270,12 @@ class DataMigrate {
 	}
 	
 	
-	def getCellSource( String samplePrepUser, GrowthMedia growthMedia, Strain strain, User provider) {
+	def getCellSource( String samplePrepUser, GrowthMedia growthMedia, Strain strain, User provider, Inventory inventory) {
 	    if (!strain) {
 	        return null
 	    }
 		def prepUser = findUser(samplePrepUser)
-	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, prepUser: prepUser).save(failOnError: true)
+	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, prepUser: prepUser, inventory: inventory).save(failOnError: true)
 	    return cellSource
 	}
 	
@@ -274,10 +287,34 @@ class DataMigrate {
 	    if(!perturbation) {
 	        perturbation = new CellSourceTreatment(name: perturbStr).save(failOnError: true)
 	    }
-	    return perturbation
+	    if(perturbation && cellSource) {
+			new CellSourceTreatments(cellSource: cellSource, treatment: perturbation).save(failOnError: true)
+		} 
 	}
+    
+    def getProtocolInstanceSummary(String chipUser, String chipDate, String protocolVersion, String resin, String PCRCycle, Assay assay){
+        def protocol = null
+        if (assay) {
+	        protocol = Protocol.findByNameAndProtocolVersion(assay.name, protocolVersion)  
+	        if (!protocol) {
+	            protocol = new Protocol(name: assay.name, protocolVersion: protocolVersion).save(failOnError: true)
+	        }
+	    }
+	    // get note
+	    def note = [:]
+	    if (resin != "") {
+	        note['resin'] = resin
+	    }
+	    if (PCRCycle != "") {
+	        note['PCRCycle'] = PCRCycle
+	    }
+	    
+	    def date = getDate(chipDate)
+	    def prtcl = new ProtocolInstanceSummary(protocol: protocol, user: findUser(chipUser), startTime: date, endTime: date, note: JsonOutput.toJson(note)).save(failOnError: true)
+        return prtcl
+    }
 	
-	def getSample(CellSource cellSource, Antibody antibody, Target target, Assay assay, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String date) {
+	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl) {
 	    def note = [:]
 	    if (sampleNotes != "") {
 	        note['note'] = sampleNotes
@@ -288,8 +325,8 @@ class DataMigrate {
 	    if (bioRep2SampleId != "") {
 	        note['bioRep2'] = bioRep2SampleId
 	    }
-	    
-	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, assay: assay, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, lastUpdate: getDate(date), sendDataTo: dataTo, invoice: invoice).save(failOnError: true)
+	    def date = getDate(dateStr)
+	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl).save(failOnError: true)
 	    return sample
 	}
 	
@@ -335,28 +372,20 @@ class DataMigrate {
 	    
 	}
 	
-	def getInventory(Sample sample, String dateReceived, String receivingUser, String inOrExternal, String inventoryNotes) {
-	    if(!sample) {
-	        return null
-	    }
-	    def type = ItemType.findByName("Sample")
+	def getInventory(String dateReceived, String receivingUser, String inOrExternal, String inventoryNotes) {
+   
+        def source = null
+        if (inOrExternal == "I") {
+            source = SourceType.INTERNAL
+        }else if (inOrExternal == "E") {
+            source = SourceType.EXTERNAL
+        }
+        
+	    def date = getDate(dateReceived)
+	    def user = findUser(receivingUser)
 	    
-	    def notes = [:]    
-	    if (dateReceived != ""){
-	        notes['dateReceived'] = getDate(dateReceived)
-	    }    
-	    if (receivingUser != ""){
-	        notes['receivingUser'] = findUser(receivingUser)?.username
-	    }
-	    if (inOrExternal != ""){
-	        notes['IorE'] = inOrExternal
-	    }
-	    if (inventoryNotes != ""){
-	        notes['note'] = inventoryNotes
-	    }
-	    
-	    def item = new Item(type: type, referenceId: sample.id, notes: JsonOutput.toJson(notes)).save(failOnError: true)
-	    return item
+	    def inventory = new Inventory(dateReceived: date, receivingUser:user, sourceType: source, notes: inventoryNotes).save(failOnError: true)
+	    return inventory
 	}
 	             
 	def getAssay(String assayStr) {
@@ -369,36 +398,6 @@ class DataMigrate {
 	        assay = new Assay(name: assayStr).save(failOnError: true)
 	    }
 	    return assay
-	}
-	
-	def getProtocolInstance(Item item, String chipUser, String chipDate, String protocolVersion, String resin, String PCRCycle, Assay assay) {
-	    if (!item) {
-	        return
-	    }    
-	    // get protocol
-	    def protocol
-	    if (assay) {
-	        protocol = Protocol.findByNameAndProtocolVersion(assay, protocolVersion)  
-	        if (!protocol) {
-	            protocol = new Protocol(name: assay.name, protocolVersion: protocolVersion).save(failOnError: true)
-	        }
-	    }
-	    // get note
-	    def note = [:]
-	    if (resin != "") {
-	        note['resin'] = resin
-	    }
-	    if (PCRCycle != "") {
-	        note['PCRCycle'] = PCRCycle
-	    }
-	    
-	    def bag = new ProtocolInstanceBag(status: ProtocolStatus.COMPLETED).save(failOnError: true) 
-	    def date = getDate(chipDate)
-	    def instance = new ProtocolInstance(bag: bag, protocol: protocol, user: findUser(chipUser), startTime: date, endTime: date, note: JsonOutput.toJson(note), status: ProtocolStatus.COMPLETED, bagIdx: 0).save(failOnError: true)
-        if (!bag) {
-            item.addToBags(bag)
-        }
-	    item.save(failOnError: true)    
 	}
 	             
 	def getPool(Sample sample, SequenceRun run, String pool, String volToPool, String poolDateStr, String quibitReading, String quibitDilution, String concentration, String poolDilution) {

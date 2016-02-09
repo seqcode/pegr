@@ -13,6 +13,7 @@ class CellSource {
     Tissue tissue
     Histology histology
     User prepUser
+	Inventory inventory
     
 	String toString() {
 		strain
@@ -23,6 +24,7 @@ class CellSource {
     }
 	
     static constraints = {
+		inventory nullable: true
         providerUser nullable: true
 		providerLab nullable: true
 		biologicalSourceId nullable: true, blank: true

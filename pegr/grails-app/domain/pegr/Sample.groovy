@@ -11,12 +11,12 @@ class Sample {
 	Integer volume //ul per aliqu used for the assay
 	String publicationReference
 	SampleStatus status
-    Date lastUpdated
+    Date date
 	CellSource spikeInCellSource
 	String note
-	Assay assay
     User sendDataTo
     Invoice invoice
+	ProtocolInstanceSummary prtclInstSummary
 
     static constraints = {
 		cellSource nullable: true
@@ -31,10 +31,12 @@ class Sample {
 		note nullable: true, blank: true
         sendDataTo nullable: true
         invoice nullable: true
+		prtclInstSummary nullable: true
+        date nullable: true
     }
     
     static mapping = {
-        sort lastUpdated:"desc"
+        sort date:"desc"
         dynamicUpdate: true
     }
 }

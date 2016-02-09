@@ -3,6 +3,21 @@ import groovy.json.*
 includeTargets << grailsScript("_GrailsInit")
 
 target(tests: "Simple tests") {
+    String str = "1"
+    str = "0" + str
+    println str
+    
+    String c = "A"
+    println c.toLowerCase()
+    
+    String name = "Frank, B.Pugh"
+    def names = name.split(",|\\.")
+    println names[0] + names[1] + names[2]
+    
+    def phone = "(814)000-1234"
+    phone =  phone.replaceAll("\\p{P}","");
+    println phone
+    
     s = 'A,, C  ,- '
     String[] rawdata = s.split(",")
     def data = new String[rawdata.size()]
@@ -25,8 +40,8 @@ target(tests: "Simple tests") {
         println emailStr[0..<at]
     }
 
-    date = "100510"
-    println "date: " + Date.parse("yyMMdd", date)
+    date = "2010.05.10"
+    println "date: " + Date.parse("yyyy.MM.dd", date)
     
     // println Float.parseFloat("")
     map = [name: 'John Doe', age: [42, 24]]

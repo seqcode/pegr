@@ -7,6 +7,7 @@ class DataMigrate {
 	DataMigrate() {}
 	
 	def migrate(String filename, int startLine, int endLine){
+        def timeStart = new Date()
 		def file = new FileReader(filename)
 		def lineNo = 0    
 		
@@ -33,13 +34,15 @@ class DataMigrate {
 				
 				def results = getSequenceRun(data.runStr, data.laneStr, data.dateStr, data.fcidStr, data.indexIdStr)
 		
+                getDefaultUser()
+                
 		        def cellProvider = getUser(data.senderNameStr, data.senderEmail, data.senderPhone)
 		        def dataTo = getUser(data.dataToUser, data.dataToEmail, null)
 		
 		        def project = getProject(data.projectName, data.projectUser, data.projectUserEmail)
 		
 		        def invoice = getInvoice(data.service, data.invoice)
-		
+                
 		        def target = getTarget(data.target, data.targetType, data.nTag, data.cTag)
 		
 		        def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.ulSampleSent, data.abConc, data.amountUseUg, data.amountUseUl, data.abName)
@@ -77,6 +80,10 @@ class DataMigrate {
 		}
 		
 		Sample.list().each{ getBioReplicate(it) }
+        
+        def timeStop = new Date()
+        TimeDuration duration = TimeCategory.minus(timeStop, timeStart)
+        println "Time: " + duration
 	}
 	
 	def addSampleToProject(Project project, Sample sample) {
@@ -101,9 +108,9 @@ class DataMigrate {
 	            }
 	        }
 	        if (username == null) {
-	            def names = userStr.split(",")*.trim()
+	            def names = userStr.split(",|\\.")*.trim()
 	            username = "" 
-	            names.each{username += it[0]}
+	            names.each{username += it[0].toLowerCase()}
 	            int i = 100
 	            while(User.findByUsername(username + i)) {
 	                ++i
@@ -114,9 +121,18 @@ class DataMigrate {
 	        def admin = User.get(1)
 	        
 	        def password = admin.password
-	            
+            phoneStr =  phoneStr.replaceAll("\\p{P}","");
 	        user = new User(username: username, password: password, fullName: userStr, email: emailStr, phone: phoneStr).save(failOnError: true)
-	    }
+        } else {
+            if (user.email == null && emailStr != null && emailStr != 'bfp2@psu.edu') {
+                user.email = emailStr
+                def at = emailStr.indexOf('@')
+	            if (at != -1) {
+	                user.username = emailStr[0..<at]
+	            }
+                user.save(failOnError: true)
+            }
+        }
 	    return user
 	}
 	
@@ -130,7 +146,9 @@ class DataMigrate {
 	    }
 	    def user = getUser(projectUser, projectUserEmail, null)
 	    if (user && project) {
-	        new ProjectUser(project: project, user: user, projectRole: ProjectRole.OWNER).save(failOnError: true)
+            if ( !ProjectUser.findByProjectAndUser(project, user)) {
+                new ProjectUser(project: project, user: user, projectRole: ProjectRole.OWNER).save(failOnError: true)
+            }
 	    }
 	    
 	    return project
@@ -274,7 +292,7 @@ class DataMigrate {
 	    if (!strain) {
 	        return null
 	    }
-		def prepUser = findUser(samplePrepUser)
+		def prepUser = getUser(samplePrepUser)
 	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, prepUser: prepUser, inventory: inventory).save(failOnError: true)
 	    return cellSource
 	}
@@ -294,6 +312,10 @@ class DataMigrate {
     
     def getProtocolInstanceSummary(String chipUser, String chipDate, String protocolVersion, String resin, String PCRCycle, Assay assay){
         def protocol = null
+        if (protocolVersion == "") {
+            protocolVersion = null
+        }
+        
         if (assay) {
 	        protocol = Protocol.findByNameAndProtocolVersion(assay.name, protocolVersion)  
 	        if (!protocol) {
@@ -310,7 +332,7 @@ class DataMigrate {
 	    }
 	    
 	    def date = getDate(chipDate)
-	    def prtcl = new ProtocolInstanceSummary(protocol: protocol, user: findUser(chipUser), startTime: date, endTime: date, note: JsonOutput.toJson(note)).save(failOnError: true)
+	    def prtcl = new ProtocolInstanceSummary(protocol: protocol, user: getUser(chipUser), startTime: date, endTime: date, note: JsonOutput.toJson(note)).save(failOnError: true)
         return prtcl
     }
 	
@@ -382,7 +404,7 @@ class DataMigrate {
         }
         
 	    def date = getDate(dateReceived)
-	    def user = findUser(receivingUser)
+	    def user = getUser(receivingUser)
 	    
 	    def inventory = new Inventory(dateReceived: date, receivingUser:user, sourceType: source, notes: inventoryNotes).save(failOnError: true)
 	    return inventory
@@ -420,7 +442,7 @@ class DataMigrate {
 	        
 	        def params = JsonOutput.toJson(map)
 	        def vol = getFloat(volToPool)
-	        new SampleInRun(poolDate: poolDate, sample: sample, run: run, pool: pool, params: params, volumneToPool: vol).save(failOnError: true)
+	        new SampleInRun(poolDate: poolDate, sample: sample, run: run, pool: pool, params: params, volumeToPool: vol).save(failOnError: true)
 	    }
 	}
 	        
@@ -493,6 +515,16 @@ class DataMigrate {
 	    if ([targetStr, cTag, nTag].every{ it == "" }) {
 	        return null
 	    }
+        if (targetStr == "") {
+            targetStr = null
+        }
+        if (nTag == "") {
+            nTag = null
+        }
+        if (cTag == "") {
+            cTag = null
+        }
+
 	    def target = Target.findByNameAndCTermTagAndNTermTag(targetStr, cTag, nTag)
 	    if (!target) {
 	        def type = getTargetType(targetTypeStr)
@@ -506,7 +538,7 @@ class DataMigrate {
 	        return null
 	    }
 	    def type = TargetType.findByName(str)
-	    if (!str) {
+	    if (!type) {
 	        type = new TargetType(name: str).save(failOnError: true)
 	    }
 	    return type
@@ -541,6 +573,18 @@ class DataMigrate {
 	    int runNum
 	    def platform
 	    def seqId
+        if (runStr == "") {
+            runStr = "00"
+        } else if (runStr.length() == 1) {
+            runStr = "0" + runStr
+        }
+        
+        if (indexIdStr == ""){
+            indexIdStr = "00" + indexIdStr
+        } else if (indexIdStr.length() == 1) {
+            indexIdStr = "0" + indexIdStr
+        }
+        
 	    if (runStr.take(1) == "S") {
 	         runNum = runStr.substring(1).toInteger()
 	         platform = SequencingPlatform.findByName("SOLiD")
@@ -596,6 +640,13 @@ class DataMigrate {
 	            date = null
 	        }
 	    }
+        if (dateStr.size() == 10) {
+            try {
+	            date = Date.parse("yyyy.MM.dd", dateStr)
+	        }catch(Exception) {
+	            date = null
+	        }
+        }
 	    return date
 	}
 	
@@ -603,6 +654,15 @@ class DataMigrate {
 	    def user = User.findByFullNameIlike("%${userStr}%") ?: User.findByUsername(userStr)
 	    return user
 	}
+    
+    def getDefaultUser() {
+        def user = User.findByUsername("bfp2")
+        if (!user) {
+            def admin = User.get(1)	        
+	        def password = admin.password
+            new User(username: "bfp2", email: "bfp2@psu.edu", fullName: "Pugh, B. Franklin", password: password).save(failOnError:true) 
+        }
+    }
 	
 	def getNamedData(String[] data) {
 	    [laneStr: data[0],         

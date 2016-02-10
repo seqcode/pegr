@@ -3,9 +3,17 @@ import groovy.json.*
 includeTargets << grailsScript("_GrailsInit")
 
 target(tests: "Simple tests") {
+    String estr = "9.00E10"
+    println new BigDecimal(estr).toPlainString(); 
+    
     String str = "1"
     str = "0" + str
     println str
+    
+    String a = "Messi  Leo"
+    def userStr = a.split()*.toLowerCase()*.capitalize()
+    def b = [userStr[-1], userStr[0]].join(', ')
+    println b
     
     String c = "A"
     println c.toLowerCase()

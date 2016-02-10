@@ -10,11 +10,13 @@ class Strain {
 	Lab sourceLab
 	String note
 	
+    static mappedBy = [parent: 'none', backgroundStrain: 'none']
+    
 	String toString() {
         if (name != null && name != ""){
             name
         } else {
-            "${backGroundStrain?.name}-${geneticModification}"
+            "${backgroundStrain?.name}-${geneticModification}"
         }
 	}
     

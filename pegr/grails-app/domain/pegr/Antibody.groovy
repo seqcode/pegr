@@ -1,8 +1,7 @@
 package pegr
 
 class Antibody {
-	
-	String name
+
 	Company company
 	String catalogNumber
 	String lotNumber
@@ -16,14 +15,13 @@ class Antibody {
 	String note
 	
 	String toString() {
-		name
+		catalogNumber
 	}
 	
     static constraints = {
-		name unique: true, matches: '^[0-9A-Za-z -]+$'
 		company nullable: true
-		catalogNumber nullable: true, blank: true
-		lotNumber nullable: true, blank: true, matches: '^[0-9A-Za-z -]+$'
+		catalogNumber nullable: true, blank: true, matches: '^[0-9A-Za-z -]+$'
+		lotNumber nullable: true, blank: true
 		clonal nullable: true
         abHost nullable: true
 		igType nullable: true

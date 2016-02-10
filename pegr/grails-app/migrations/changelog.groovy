@@ -1,6 +1,6 @@
 databaseChangeLog = {
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-1") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-1") {
 		createTable(tableName: "ab_host") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "ab_hostPK")
@@ -16,7 +16,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-2") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-2") {
 		createTable(tableName: "address") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "addressPK")
@@ -50,7 +50,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-3") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-3") {
 		createTable(tableName: "align_type") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "align_typePK")
@@ -68,7 +68,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-4") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-4") {
 		createTable(tableName: "aligner") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "alignerPK")
@@ -86,7 +86,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-5") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-5") {
 		createTable(tableName: "antibody") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "antibodyPK")
@@ -126,7 +126,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-6") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-6") {
 		createTable(tableName: "assay") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "assayPK")
@@ -142,7 +142,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-7") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-7") {
 		createTable(tableName: "base_calling") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "base_callingPK")
@@ -160,7 +160,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-8") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-8") {
 		createTable(tableName: "biological_replicate_samples") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "biological_rePK")
@@ -176,7 +176,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-9") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-9") {
 		createTable(tableName: "biological_replicate_set") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "biological_rePK")
@@ -190,7 +190,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-10") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-10") {
 		createTable(tableName: "cell_source") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "cell_sourcePK")
@@ -228,7 +228,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-11") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-11") {
 		createTable(tableName: "cell_source_treatment") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "cell_source_tPK")
@@ -250,7 +250,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-12") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-12") {
 		createTable(tableName: "cell_source_treatments") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "cell_source_tPK")
@@ -266,7 +266,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-13") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-13") {
 		createTable(tableName: "chrom_sequence") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "chrom_sequencPK")
@@ -290,7 +290,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-14") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-14") {
 		createTable(tableName: "chromosome") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "chromosomePK")
@@ -312,7 +312,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-15") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-15") {
 		createTable(tableName: "computing_infrastructure") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "computing_infPK")
@@ -328,7 +328,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-16") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-16") {
 		createTable(tableName: "core_pipeline") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "core_pipelinePK")
@@ -362,7 +362,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-17") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-17") {
 		createTable(tableName: "data_processing") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "data_processiPK")
@@ -378,7 +378,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-18") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-18") {
 		createTable(tableName: "definition") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "definitionPK")
@@ -398,7 +398,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-19") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-19") {
 		createTable(tableName: "downstream_analysis") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "downstream_anPK")
@@ -414,7 +414,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-20") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-20") {
 		createTable(tableName: "file_metadata") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "file_metadataPK")
@@ -452,7 +452,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-21") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-21") {
 		createTable(tableName: "file_type") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "file_typePK")
@@ -472,23 +472,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-22") {
-		createTable(tableName: "genetic_modification") {
-			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "genetic_modifPK")
-			}
-
-			column(name: "version", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "name", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-		}
-	}
-
-	changeSet(author: "dus73 (generated)", id: "1455036489854-23") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-22") {
 		createTable(tableName: "genome") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "genomePK")
@@ -508,29 +492,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-24") {
-		createTable(tableName: "genotype") {
-			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "genotypePK")
-			}
-
-			column(name: "version", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "name", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "note", type: "varchar(255)")
-
-			column(name: "species_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
-		}
-	}
-
-	changeSet(author: "dus73 (generated)", id: "1455036489854-25") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-23") {
 		createTable(tableName: "growth_media") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "growth_mediaPK")
@@ -548,7 +510,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-26") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-24") {
 		createTable(tableName: "histology") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "histologyPK")
@@ -566,7 +528,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-27") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-25") {
 		createTable(tableName: "history") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "historyPK")
@@ -602,7 +564,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-28") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-26") {
 		createTable(tableName: "ig_type") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "ig_typePK")
@@ -618,7 +580,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-29") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-27") {
 		createTable(tableName: "inventory") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "inventoryPK")
@@ -638,7 +600,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-30") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-28") {
 		createTable(tableName: "invoice") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "invoicePK")
@@ -656,7 +618,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-31") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-29") {
 		createTable(tableName: "item") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "itemPK")
@@ -686,7 +648,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-32") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-30") {
 		createTable(tableName: "item_bags") {
 			column(name: "item_id", type: "bigint") {
 				constraints(nullable: "false")
@@ -700,7 +662,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-33") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-31") {
 		createTable(tableName: "item_type") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "item_typePK")
@@ -720,7 +682,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-34") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-32") {
 		createTable(tableName: "organization") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "organizationPK")
@@ -752,7 +714,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-35") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-33") {
 		createTable(tableName: "peak_finding") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "peak_findingPK")
@@ -768,7 +730,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-36") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-34") {
 		createTable(tableName: "project") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "projectPK")
@@ -796,7 +758,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-37") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-35") {
 		createTable(tableName: "project_samples") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "project_samplPK")
@@ -812,7 +774,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-38") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-36") {
 		createTable(tableName: "project_user") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "project_userPK")
@@ -836,7 +798,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-39") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-37") {
 		createTable(tableName: "protocol") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "protocolPK")
@@ -862,7 +824,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-40") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-38") {
 		createTable(tableName: "protocol_group") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "protocol_grouPK")
@@ -884,13 +846,13 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-41") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-39") {
 		createTable(tableName: "protocol_group_protocols") {
-			column(name: "protocol_id", type: "bigint") {
+			column(name: "protocol_group_id", type: "bigint") {
 				constraints(nullable: "false")
 			}
 
-			column(name: "protocol_group_id", type: "bigint") {
+			column(name: "protocol_id", type: "bigint") {
 				constraints(nullable: "false")
 			}
 
@@ -898,7 +860,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-42") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-40") {
 		createTable(tableName: "protocol_instance") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "protocol_instPK")
@@ -930,7 +892,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-43") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-41") {
 		createTable(tableName: "protocol_instance_bag") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "protocol_instPK")
@@ -956,7 +918,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-44") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-42") {
 		createTable(tableName: "protocol_instance_items") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "protocol_instPK")
@@ -972,7 +934,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-45") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-43") {
 		createTable(tableName: "protocol_instance_summary") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "protocol_instPK")
@@ -994,7 +956,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-46") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-44") {
 		createTable(tableName: "protocol_item_types") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "protocol_itemPK")
@@ -1014,7 +976,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-47") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-45") {
 		createTable(tableName: "read_type") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "read_typePK")
@@ -1036,7 +998,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-48") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-46") {
 		createTable(tableName: "requestmap") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "requestmapPK")
@@ -1058,7 +1020,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-49") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-47") {
 		createTable(tableName: "role") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "rolePK")
@@ -1074,7 +1036,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-50") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-48") {
 		createTable(tableName: "sample") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "samplePK")
@@ -1118,7 +1080,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-51") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-49") {
 		createTable(tableName: "sample_in_run") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "sample_in_runPK")
@@ -1146,7 +1108,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-52") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-50") {
 		createTable(tableName: "sample_sequence_indices") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "sample_sequenPK")
@@ -1162,7 +1124,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-53") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-51") {
 		createTable(tableName: "sequence_alignment") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "sequence_aligPK")
@@ -1202,7 +1164,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-54") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-52") {
 		createTable(tableName: "sequence_index") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "sequence_indePK")
@@ -1228,7 +1190,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-55") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-53") {
 		createTable(tableName: "sequence_run") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "sequence_runPK")
@@ -1262,7 +1224,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-56") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-54") {
 		createTable(tableName: "sequencing_experiment") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "sequencing_exPK")
@@ -1294,7 +1256,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-57") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-55") {
 		createTable(tableName: "sequencing_platform") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "sequencing_plPK")
@@ -1310,7 +1272,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-58") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-56") {
 		createTable(tableName: "sex") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "sexPK")
@@ -1326,7 +1288,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-59") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-57") {
 		createTable(tableName: "species") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "speciesPK")
@@ -1348,7 +1310,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-60") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-58") {
 		createTable(tableName: "strain") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "strainPK")
@@ -1358,11 +1320,13 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "genotype_id", type: "bigint")
+			column(name: "background_strain_id", type: "bigint")
 
-			column(name: "name", type: "varchar(255)") {
-				constraints(nullable: "false")
-			}
+			column(name: "genetic_modification", type: "varchar(255)")
+
+			column(name: "genotype", type: "varchar(255)")
+
+			column(name: "name", type: "varchar(255)")
 
 			column(name: "note", type: "varchar(255)")
 
@@ -1370,33 +1334,11 @@ databaseChangeLog = {
 
 			column(name: "source_lab_id", type: "bigint")
 
-			column(name: "species_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
+			column(name: "species_id", type: "bigint")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-61") {
-		createTable(tableName: "strain_genetic_modifications") {
-			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "strain_genetiPK")
-			}
-
-			column(name: "version", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "genetic_modification_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
-
-			column(name: "strain_id", type: "bigint") {
-				constraints(nullable: "false")
-			}
-		}
-	}
-
-	changeSet(author: "dus73 (generated)", id: "1455036489854-62") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-59") {
 		createTable(tableName: "target") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "targetPK")
@@ -1420,7 +1362,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-63") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-60") {
 		createTable(tableName: "target_type") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "target_typePK")
@@ -1438,7 +1380,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-64") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-61") {
 		createTable(tableName: "task") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "taskPK")
@@ -1482,7 +1424,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-65") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-62") {
 		createTable(tableName: "technical_replicate_samples") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "technical_repPK")
@@ -1498,7 +1440,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-66") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-63") {
 		createTable(tableName: "technical_replicate_set") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "technical_repPK")
@@ -1512,7 +1454,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-67") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-64") {
 		createTable(tableName: "tissue") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "tissuePK")
@@ -1528,7 +1470,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-68") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-65") {
 		createTable(tableName: "user") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "userPK")
@@ -1574,7 +1516,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-69") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-66") {
 		createTable(tableName: "user_role") {
 			column(name: "user_id", type: "bigint") {
 				constraints(nullable: "false")
@@ -1586,29 +1528,29 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-70") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-67") {
 		addPrimaryKey(columnNames: "user_id, role_id", constraintName: "user_rolePK", tableName: "user_role")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-169") {
-		createIndex(indexName: "name_uniq_1455036489717", tableName: "ab_host", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-163") {
+		createIndex(indexName: "name_uniq_1455077523692", tableName: "ab_host", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-170") {
-		createIndex(indexName: "name_uniq_1455036489721", tableName: "align_type", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-164") {
+		createIndex(indexName: "name_uniq_1455077523703", tableName: "align_type", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-171") {
-		createIndex(indexName: "short_name_uniq_1455036489721", tableName: "align_type", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-165") {
+		createIndex(indexName: "short_name_uniq_1455077523703", tableName: "align_type", unique: "true") {
 			column(name: "short_name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-172") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-166") {
 		createIndex(indexName: "unique_software", tableName: "aligner", unique: "true") {
 			column(name: "aligner_version")
 
@@ -1616,37 +1558,37 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-173") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-167") {
 		createIndex(indexName: "FK_5bpi6ah0csjh4g0n8ln93wx3h", tableName: "antibody") {
 			column(name: "ig_type_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-174") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-168") {
 		createIndex(indexName: "FK_qjuxd91ddd77fufu1em86n2gb", tableName: "antibody") {
 			column(name: "ab_host_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-175") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-169") {
 		createIndex(indexName: "FK_rhc520eoim7txw9d7kqpb90fw", tableName: "antibody") {
 			column(name: "company_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-176") {
-		createIndex(indexName: "name_uniq_1455036489731", tableName: "antibody", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-170") {
+		createIndex(indexName: "name_uniq_1455077523730", tableName: "antibody", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-177") {
-		createIndex(indexName: "name_uniq_1455036489732", tableName: "assay", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-171") {
+		createIndex(indexName: "name_uniq_1455077523732", tableName: "assay", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-178") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-172") {
 		createIndex(indexName: "unique_name", tableName: "base_calling", unique: "true") {
 			column(name: "base_calling_version")
 
@@ -1654,19 +1596,19 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-179") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-173") {
 		createIndex(indexName: "FK_5cfsjvfvqbjtcx7t6ftka65pu", tableName: "biological_replicate_samples") {
 			column(name: "set_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-180") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-174") {
 		createIndex(indexName: "FK_hlaud14xiftoss51nv2k9mp9n", tableName: "biological_replicate_samples") {
 			column(name: "sample_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-181") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-175") {
 		createIndex(indexName: "unique_set_id", tableName: "biological_replicate_samples", unique: "true") {
 			column(name: "sample_id")
 
@@ -1674,85 +1616,85 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-182") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-176") {
 		createIndex(indexName: "FK_giwv376p7duup0ii9vm5a41vt", tableName: "biological_replicate_set") {
 			column(name: "project_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-183") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-177") {
 		createIndex(indexName: "FK_318alqytpqfjhixa0xumta27", tableName: "cell_source") {
 			column(name: "provider_lab_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-184") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-178") {
 		createIndex(indexName: "FK_3j4empi718wbs6weggsvx0vxf", tableName: "cell_source") {
 			column(name: "sex_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-185") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-179") {
 		createIndex(indexName: "FK_71fd478uakc4ikgvf7jkqrbic", tableName: "cell_source") {
 			column(name: "inventory_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-186") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-180") {
 		createIndex(indexName: "FK_7i3q0e2js5j13ybv0fpn6wsdj", tableName: "cell_source") {
 			column(name: "strain_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-187") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-181") {
 		createIndex(indexName: "FK_abm2plajs5iecdn4xw32iiq98", tableName: "cell_source") {
 			column(name: "histology_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-188") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-182") {
 		createIndex(indexName: "FK_dyakrl2jrduv34rm8abrpdpea", tableName: "cell_source") {
 			column(name: "growth_media_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-189") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-183") {
 		createIndex(indexName: "FK_fvxkssmfdikktj0688ybb3tbh", tableName: "cell_source") {
 			column(name: "tissue_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-190") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-184") {
 		createIndex(indexName: "FK_js2v7lu898c0p8ortg5xgxb0q", tableName: "cell_source") {
 			column(name: "provider_user_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-191") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-185") {
 		createIndex(indexName: "FK_osoanky7172r4r5skdfatpr2n", tableName: "cell_source") {
 			column(name: "prep_user_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-192") {
-		createIndex(indexName: "name_uniq_1455036489735", tableName: "cell_source_treatment", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-186") {
+		createIndex(indexName: "name_uniq_1455077523742", tableName: "cell_source_treatment", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-193") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-187") {
 		createIndex(indexName: "FK_jggm0quygtml4729ct1v2li8q", tableName: "cell_source_treatments") {
 			column(name: "treatment_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-194") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-188") {
 		createIndex(indexName: "FK_xht7d6039ax9kbh4gmdceh5k", tableName: "cell_source_treatments") {
 			column(name: "cell_source_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-195") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-189") {
 		createIndex(indexName: "unique_cell_source_id", tableName: "cell_source_treatments", unique: "true") {
 			column(name: "treatment_id")
 
@@ -1760,55 +1702,55 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-196") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-190") {
 		createIndex(indexName: "FK_lese17egs9gkqmyudn2wh5il2", tableName: "chrom_sequence") {
 			column(name: "chromosome_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-197") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-191") {
 		createIndex(indexName: "FK_qtx5yloqyq7hc1efournhys5u", tableName: "chromosome") {
 			column(name: "genome_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-198") {
-		createIndex(indexName: "name_uniq_1455036489738", tableName: "chromosome", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-192") {
+		createIndex(indexName: "name_uniq_1455077523747", tableName: "chromosome", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-199") {
-		createIndex(indexName: "name_uniq_1455036489738", tableName: "computing_infrastructure", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-193") {
+		createIndex(indexName: "name_uniq_1455077523748", tableName: "computing_infrastructure", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-200") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-194") {
 		createIndex(indexName: "FK_ceyrkr3xuabv7koe9ro018awy", tableName: "core_pipeline") {
 			column(name: "downstream_analysis_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-201") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-195") {
 		createIndex(indexName: "FK_mpgn6hl6vvbrcq3dd3tp130lx", tableName: "core_pipeline") {
 			column(name: "data_processing_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-202") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-196") {
 		createIndex(indexName: "FK_qhv857uuhkmcorb4pio2vhpy3", tableName: "core_pipeline") {
 			column(name: "base_calling_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-203") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-197") {
 		createIndex(indexName: "FK_rm79jw9v0buyydkoy0nv05o52", tableName: "core_pipeline") {
 			column(name: "peak_finding_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-204") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-198") {
 		createIndex(indexName: "unique_name", tableName: "core_pipeline", unique: "true") {
 			column(name: "core_pipeline_version")
 
@@ -1816,37 +1758,37 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-205") {
-		createIndex(indexName: "name_uniq_1455036489742", tableName: "data_processing", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-199") {
+		createIndex(indexName: "name_uniq_1455077523757", tableName: "data_processing", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-206") {
-		createIndex(indexName: "name_uniq_1455036489742", tableName: "definition", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-200") {
+		createIndex(indexName: "name_uniq_1455077523758", tableName: "definition", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-207") {
-		createIndex(indexName: "name_uniq_1455036489742", tableName: "downstream_analysis", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-201") {
+		createIndex(indexName: "name_uniq_1455077523759", tableName: "downstream_analysis", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-208") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-202") {
 		createIndex(indexName: "FK_8ei1cybnbixggmxfhwril3vac", tableName: "file_metadata") {
 			column(name: "file_type_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-209") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-203") {
 		createIndex(indexName: "FK_p0dwk23v4mpuph7bvybfimjn9", tableName: "file_metadata") {
 			column(name: "sequence_alignment_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-210") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-204") {
 		createIndex(indexName: "unique_name", tableName: "file_metadata", unique: "true") {
 			column(name: "file_type_id")
 
@@ -1854,97 +1796,79 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-211") {
-		createIndex(indexName: "name_uniq_1455036489745", tableName: "file_type", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-205") {
+		createIndex(indexName: "name_uniq_1455077523765", tableName: "file_type", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-212") {
-		createIndex(indexName: "name_uniq_1455036489745", tableName: "genetic_modification", unique: "true") {
-			column(name: "name")
-		}
-	}
-
-	changeSet(author: "dus73 (generated)", id: "1455036489854-213") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-206") {
 		createIndex(indexName: "FK_8qyh94lw1ucpnn89d4dl4e5dr", tableName: "genome") {
 			column(name: "species_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-214") {
-		createIndex(indexName: "FK_ag1m8bhk8on25x3thx4edhu34", tableName: "genotype") {
-			column(name: "species_id")
-		}
-	}
-
-	changeSet(author: "dus73 (generated)", id: "1455036489854-215") {
-		createIndex(indexName: "name_uniq_1455036489746", tableName: "genotype", unique: "true") {
-			column(name: "name")
-		}
-	}
-
-	changeSet(author: "dus73 (generated)", id: "1455036489854-216") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-207") {
 		createIndex(indexName: "FK_d67vskwe5phnwub9cqiokalkx", tableName: "growth_media") {
 			column(name: "species_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-217") {
-		createIndex(indexName: "name_uniq_1455036489747", tableName: "growth_media", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-208") {
+		createIndex(indexName: "name_uniq_1455077523767", tableName: "growth_media", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-218") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-209") {
 		createIndex(indexName: "FK_jrq8s9u4ujdq8durk95ilfebo", tableName: "histology") {
 			column(name: "parent_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-219") {
-		createIndex(indexName: "name_uniq_1455036489747", tableName: "histology", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-210") {
+		createIndex(indexName: "name_uniq_1455077523768", tableName: "histology", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-220") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-211") {
 		createIndex(indexName: "FK_fej8h317q2acuy144kav1oyxc", tableName: "history") {
 			column(name: "project_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-221") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-212") {
 		createIndex(indexName: "FK_fuutexvtx28fs971iq0kbfbmp", tableName: "history") {
 			column(name: "user_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-222") {
-		createIndex(indexName: "name_uniq_1455036489749", tableName: "ig_type", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-213") {
+		createIndex(indexName: "name_uniq_1455077523772", tableName: "ig_type", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-223") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-214") {
 		createIndex(indexName: "FK_mnah8ybq73nyl126do8agmk08", tableName: "inventory") {
 			column(name: "receiving_user_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-224") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-215") {
 		createIndex(indexName: "FK_ccldfsomwnlcfqys42su71de3", tableName: "item") {
 			column(name: "parent_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-225") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-216") {
 		createIndex(indexName: "FK_qxnbu16tlqfmub9pgfj3h2e41", tableName: "item") {
 			column(name: "type_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-226") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-217") {
 		createIndex(indexName: "unique_barcode", tableName: "item", unique: "true") {
 			column(name: "type_id")
 
@@ -1952,79 +1876,79 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-227") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-218") {
 		createIndex(indexName: "FK_8cx51q97y1kfc9xpv1uxokl3a", tableName: "item_bags") {
 			column(name: "protocol_instance_bag_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-228") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-219") {
 		createIndex(indexName: "FK_n2qqb9a3kp6jjh4um4vl1g0jg", tableName: "item_bags") {
 			column(name: "item_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-229") {
-		createIndex(indexName: "name_uniq_1455036489755", tableName: "item_type", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-220") {
+		createIndex(indexName: "name_uniq_1455077523787", tableName: "item_type", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-230") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-221") {
 		createIndex(indexName: "FK_57byxcy430qbl2gl7liup0py1", tableName: "organization") {
 			column(name: "parent_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-231") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-222") {
 		createIndex(indexName: "FK_6w4r8gx2jdvy193esigbpxxx6", tableName: "organization") {
 			column(name: "billing_contact_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-232") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-223") {
 		createIndex(indexName: "FK_l070gahmlj4g2sqbm72btw64e", tableName: "organization") {
 			column(name: "address_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-233") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-224") {
 		createIndex(indexName: "FK_shncwjk67uss09ivcrpvlv8xg", tableName: "organization") {
 			column(name: "pi_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-234") {
-		createIndex(indexName: "name_uniq_1455036489755", tableName: "organization", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-225") {
+		createIndex(indexName: "name_uniq_1455077523789", tableName: "organization", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-235") {
-		createIndex(indexName: "name_uniq_1455036489757", tableName: "peak_finding", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-226") {
+		createIndex(indexName: "name_uniq_1455077523792", tableName: "peak_finding", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-236") {
-		createIndex(indexName: "name_uniq_1455036489758", tableName: "project", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-227") {
+		createIndex(indexName: "name_uniq_1455077523795", tableName: "project", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-237") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-228") {
 		createIndex(indexName: "FK_bcuquxjs68mn5vyq7d0yphn8p", tableName: "project_samples") {
 			column(name: "project_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-238") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-229") {
 		createIndex(indexName: "FK_qfu2n2hwoukibpvvx51eftp9y", tableName: "project_samples") {
 			column(name: "sample_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-239") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-230") {
 		createIndex(indexName: "unique_project_id", tableName: "project_samples", unique: "true") {
 			column(name: "sample_id")
 
@@ -2032,19 +1956,19 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-240") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-231") {
 		createIndex(indexName: "FK_d6kfrxuqknbxrlxhwmn66a3kg", tableName: "project_user") {
 			column(name: "user_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-241") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-232") {
 		createIndex(indexName: "FK_ptwhmsh2vocln8sffhyvr2ohm", tableName: "project_user") {
 			column(name: "project_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-242") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-233") {
 		createIndex(indexName: "unique_project_id", tableName: "project_user", unique: "true") {
 			column(name: "user_id")
 
@@ -2052,19 +1976,19 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-243") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-234") {
 		createIndex(indexName: "FK_f2u9282jbe9eiy0fggmrvrt16", tableName: "protocol") {
 			column(name: "assay_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-244") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-235") {
 		createIndex(indexName: "FK_mpt4h4wrqjngorh2706rvsqk2", tableName: "protocol") {
 			column(name: "user_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-245") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-236") {
 		createIndex(indexName: "unique_name", tableName: "protocol", unique: "true") {
 			column(name: "protocol_version")
 
@@ -2072,73 +1996,73 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-246") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-237") {
 		createIndex(indexName: "FK_mm7fvjt84dbnbsnsbe9ik36xh", tableName: "protocol_group") {
 			column(name: "user_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-247") {
-		createIndex(indexName: "name_uniq_1455036489761", tableName: "protocol_group", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-238") {
+		createIndex(indexName: "name_uniq_1455077523805", tableName: "protocol_group", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-248") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-239") {
 		createIndex(indexName: "FK_6i86p4hqvh803hqeam63pf0fo", tableName: "protocol_group_protocols") {
 			column(name: "protocol_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-249") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-240") {
 		createIndex(indexName: "FK_6sjm1imt3f4b8rd492wm9vt7e", tableName: "protocol_group_protocols") {
 			column(name: "protocol_group_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-250") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-241") {
 		createIndex(indexName: "FK_d4v22o39k3xu8m216w8r1nyx1", tableName: "protocol_instance") {
 			column(name: "protocol_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-251") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-242") {
 		createIndex(indexName: "FK_j952d9eb9yjue4b2xggu8ehib", tableName: "protocol_instance") {
 			column(name: "bag_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-252") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-243") {
 		createIndex(indexName: "FK_sgj3vhj59cxyb10md7ybwmtm7", tableName: "protocol_instance") {
 			column(name: "user_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-253") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-244") {
 		createIndex(indexName: "FK_issvbm80chseeymqst1rurxxd", tableName: "protocol_instance_bag") {
 			column(name: "super_bag_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-254") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-245") {
 		createIndex(indexName: "FK_r1uxlmgfs4nieck8kad4wo79q", tableName: "protocol_instance_bag") {
 			column(name: "protocol_group_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-255") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-246") {
 		createIndex(indexName: "FK_2ehrfoqmnyg7wc3sv0owshi8l", tableName: "protocol_instance_items") {
 			column(name: "item_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-256") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-247") {
 		createIndex(indexName: "FK_dmt3slumwfqinb5qicjdvrilr", tableName: "protocol_instance_items") {
 			column(name: "protocol_instance_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-257") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-248") {
 		createIndex(indexName: "unique_protocol_instance_id", tableName: "protocol_instance_items", unique: "true") {
 			column(name: "item_id")
 
@@ -2146,31 +2070,31 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-258") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-249") {
 		createIndex(indexName: "FK_5v0brjc04upo9ksqnq3bivxni", tableName: "protocol_instance_summary") {
 			column(name: "protocol_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-259") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-250") {
 		createIndex(indexName: "FK_8idyxguxexanjiixc15ylqewv", tableName: "protocol_instance_summary") {
 			column(name: "user_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-260") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-251") {
 		createIndex(indexName: "FK_mi8fvx3awmigchnxb1s8keinu", tableName: "protocol_item_types") {
 			column(name: "item_type_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-261") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-252") {
 		createIndex(indexName: "FK_p1p3edd8llir9a0qp24sj5cql", tableName: "protocol_item_types") {
 			column(name: "protocol_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-262") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-253") {
 		createIndex(indexName: "unique_protocol_id", tableName: "protocol_item_types", unique: "true") {
 			column(name: "item_type_id")
 
@@ -2178,19 +2102,19 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-263") {
-		createIndex(indexName: "name_uniq_1455036489766", tableName: "read_type", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-254") {
+		createIndex(indexName: "name_uniq_1455077523816", tableName: "read_type", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-264") {
-		createIndex(indexName: "short_name_uniq_1455036489766", tableName: "read_type", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-255") {
+		createIndex(indexName: "short_name_uniq_1455077523817", tableName: "read_type", unique: "true") {
 			column(name: "short_name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-265") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-256") {
 		createIndex(indexName: "unique_url", tableName: "requestmap", unique: "true") {
 			column(name: "http_method")
 
@@ -2198,67 +2122,67 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-266") {
-		createIndex(indexName: "authority_uniq_1455036489767", tableName: "role", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-257") {
+		createIndex(indexName: "authority_uniq_1455077523819", tableName: "role", unique: "true") {
 			column(name: "authority")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-267") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-258") {
 		createIndex(indexName: "FK_4lb993olybjsa6bqlbt90as3c", tableName: "sample") {
 			column(name: "antibody_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-268") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-259") {
 		createIndex(indexName: "FK_a1ro7uobsoyc87a51ssw7n5sw", tableName: "sample") {
 			column(name: "cell_source_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-269") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-260") {
 		createIndex(indexName: "FK_bcdouyjpgn9hqcd947o1f28jq", tableName: "sample") {
 			column(name: "prtcl_inst_summary_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-270") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-261") {
 		createIndex(indexName: "FK_cfxg067kqgsk55rjibh2pbnso", tableName: "sample") {
 			column(name: "target_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-271") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-262") {
 		createIndex(indexName: "FK_iab90bxgihv46lqg7ib51kmwn", tableName: "sample") {
 			column(name: "spike_in_cell_source_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-272") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-263") {
 		createIndex(indexName: "FK_psm0kim6hte7fy0577fwsbdi", tableName: "sample") {
 			column(name: "send_data_to_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-273") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-264") {
 		createIndex(indexName: "FK_tqw4ka9uvmywhb4gw0ib7nxy9", tableName: "sample") {
 			column(name: "invoice_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-274") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-265") {
 		createIndex(indexName: "FK_993bhxmuyjlul88wourwo5eyw", tableName: "sample_in_run") {
 			column(name: "run_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-275") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-266") {
 		createIndex(indexName: "FK_fsayjgiqhlt7cctq8n1escwvk", tableName: "sample_in_run") {
 			column(name: "sample_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-276") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-267") {
 		createIndex(indexName: "unique_sample_id", tableName: "sample_in_run", unique: "true") {
 			column(name: "run_id")
 
@@ -2266,19 +2190,19 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-277") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-268") {
 		createIndex(indexName: "FK_flne19kx2tprlhpbxh9a3xk8r", tableName: "sample_sequence_indices") {
 			column(name: "index_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-278") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-269") {
 		createIndex(indexName: "FK_qh0akbm1a3893iwxbwqps9xmn", tableName: "sample_sequence_indices") {
 			column(name: "sample_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-279") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-270") {
 		createIndex(indexName: "unique_sample_id", tableName: "sample_sequence_indices", unique: "true") {
 			column(name: "index_id")
 
@@ -2286,37 +2210,37 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-280") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-271") {
 		createIndex(indexName: "FK_5tdpednm424bwlyaygxb91cj8", tableName: "sequence_alignment") {
 			column(name: "genome_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-281") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-272") {
 		createIndex(indexName: "FK_8gcis40hwme6s7ywn4jikodd2", tableName: "sequence_alignment") {
 			column(name: "align_type_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-282") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-273") {
 		createIndex(indexName: "FK_fee47iwmejna7h55jp8dpkowd", tableName: "sequence_alignment") {
 			column(name: "aligner_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-283") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-274") {
 		createIndex(indexName: "FK_hc4f4br571qwgavrswy22w5wo", tableName: "sequence_alignment") {
 			column(name: "core_pipeline_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-284") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-275") {
 		createIndex(indexName: "FK_js0whth80fyna834brwbbo8v0", tableName: "sequence_alignment") {
 			column(name: "sequencing_experiment_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-285") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-276") {
 		createIndex(indexName: "unique_index_id", tableName: "sequence_index", unique: "true") {
 			column(name: "index_version")
 
@@ -2324,111 +2248,85 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-286") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-277") {
 		createIndex(indexName: "FK_gerfjuiu4n7m0iukeud2wrux7", tableName: "sequence_run") {
 			column(name: "user_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-287") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-278") {
 		createIndex(indexName: "FK_l1ofj1csp7k439e52l32soay9", tableName: "sequence_run") {
 			column(name: "platform_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-288") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-279") {
 		createIndex(indexName: "FK_3mx03u80x4ynhsx1i65yrrxcq", tableName: "sequencing_experiment") {
 			column(name: "sequence_run_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-289") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-280") {
 		createIndex(indexName: "FK_3s9e144d345uyhay28toy8jwg", tableName: "sequencing_experiment") {
 			column(name: "read_type_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-290") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-281") {
 		createIndex(indexName: "FK_7gsumwrx4h3nji2g2q5htn098", tableName: "sequencing_experiment") {
 			column(name: "sample_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-291") {
-		createIndex(indexName: "name_uniq_1455036489773", tableName: "sequencing_platform", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-282") {
+		createIndex(indexName: "name_uniq_1455077523840", tableName: "sequencing_platform", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-292") {
-		createIndex(indexName: "name_uniq_1455036489773", tableName: "sex", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-283") {
+		createIndex(indexName: "name_uniq_1455077523840", tableName: "sex", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-293") {
-		createIndex(indexName: "name_uniq_1455036489774", tableName: "species", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-284") {
+		createIndex(indexName: "name_uniq_1455077523841", tableName: "species", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-294") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-285") {
 		createIndex(indexName: "FK_4shdjcf8qcywolsnrmi3djhmu", tableName: "strain") {
 			column(name: "parent_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-295") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-286") {
+		createIndex(indexName: "FK_9fvgan0aoydiscvx11nhdhn98", tableName: "strain") {
+			column(name: "background_strain_id")
+		}
+	}
+
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-287") {
 		createIndex(indexName: "FK_bd07vlra9sn9vs8po73rw89wg", tableName: "strain") {
 			column(name: "source_lab_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-296") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-288") {
 		createIndex(indexName: "FK_c5gb45n5okxh7bqig1nouw76t", tableName: "strain") {
 			column(name: "species_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-297") {
-		createIndex(indexName: "FK_ob705eavs6i60ngs0imotqc5n", tableName: "strain") {
-			column(name: "genotype_id")
-		}
-	}
-
-	changeSet(author: "dus73 (generated)", id: "1455036489854-298") {
-		createIndex(indexName: "name_uniq_1455036489774", tableName: "strain", unique: "true") {
-			column(name: "name")
-		}
-	}
-
-	changeSet(author: "dus73 (generated)", id: "1455036489854-299") {
-		createIndex(indexName: "FK_bybku3lrkjee3jdtq8sixm2if", tableName: "strain_genetic_modifications") {
-			column(name: "genetic_modification_id")
-		}
-	}
-
-	changeSet(author: "dus73 (generated)", id: "1455036489854-300") {
-		createIndex(indexName: "FK_tfjl1k0206qdhf4x28xx5fxal", tableName: "strain_genetic_modifications") {
-			column(name: "strain_id")
-		}
-	}
-
-	changeSet(author: "dus73 (generated)", id: "1455036489854-301") {
-		createIndex(indexName: "unique_strain_id", tableName: "strain_genetic_modifications", unique: "true") {
-			column(name: "genetic_modification_id")
-
-			column(name: "strain_id")
-		}
-	}
-
-	changeSet(author: "dus73 (generated)", id: "1455036489854-302") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-289") {
 		createIndex(indexName: "FK_e5wo7j1f9so6mcll9vwtn6005", tableName: "target") {
 			column(name: "target_type_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-303") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-290") {
 		createIndex(indexName: "unique_name", tableName: "target", unique: "true") {
 			column(name: "c_term_tag")
 
@@ -2438,43 +2336,43 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-304") {
-		createIndex(indexName: "name_uniq_1455036489776", tableName: "target_type", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-291") {
+		createIndex(indexName: "name_uniq_1455077523846", tableName: "target_type", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-305") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-292") {
 		createIndex(indexName: "FK_2ovu0g1rssdjbpgb6fj0l2vwy", tableName: "task") {
 			column(name: "computing_infrastructure_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-306") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-293") {
 		createIndex(indexName: "FK_4fmjedju7b35tb5cr71n3ntb0", tableName: "task") {
 			column(name: "user_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-307") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-294") {
 		createIndex(indexName: "FK_89y9w7ykrtfvr9quf0acepu0k", tableName: "task") {
 			column(name: "core_pipe_line_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-308") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-295") {
 		createIndex(indexName: "FK_bxc886ht20h9dyioee4mvtuhg", tableName: "technical_replicate_samples") {
 			column(name: "set_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-309") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-296") {
 		createIndex(indexName: "FK_pgfytkmfc7o8hujxpm27nrupx", tableName: "technical_replicate_samples") {
 			column(name: "sample_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-310") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-297") {
 		createIndex(indexName: "unique_set_id", tableName: "technical_replicate_samples", unique: "true") {
 			column(name: "sample_id")
 
@@ -2482,437 +2380,425 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-311") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-298") {
 		createIndex(indexName: "FK_9qiur0k1ju7xinurh5sy074fr", tableName: "technical_replicate_set") {
 			column(name: "project_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-312") {
-		createIndex(indexName: "name_uniq_1455036489778", tableName: "tissue", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-299") {
+		createIndex(indexName: "name_uniq_1455077523850", tableName: "tissue", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-313") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-300") {
 		createIndex(indexName: "FK_dhlcfg8h1drrgu0irs1ro3ohb", tableName: "user") {
 			column(name: "address_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-314") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-301") {
 		createIndex(indexName: "FK_qdusuaq6oge31t7nlq10wm6ku", tableName: "user") {
 			column(name: "affiliation_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-315") {
-		createIndex(indexName: "username_uniq_1455036489779", tableName: "user", unique: "true") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-302") {
+		createIndex(indexName: "username_uniq_1455077523853", tableName: "user", unique: "true") {
 			column(name: "username")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-316") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-303") {
 		createIndex(indexName: "FK_apcc8lxk2xnug8377fatvbn04", tableName: "user_role") {
 			column(name: "user_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-317") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-304") {
 		createIndex(indexName: "FK_it77eq964jhfqtu54081ebtio", tableName: "user_role") {
 			column(name: "role_id")
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-71") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-68") {
 		addForeignKeyConstraint(baseColumnNames: "ab_host_id", baseTableName: "antibody", constraintName: "FK_qjuxd91ddd77fufu1em86n2gb", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "ab_host", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-72") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-69") {
 		addForeignKeyConstraint(baseColumnNames: "company_id", baseTableName: "antibody", constraintName: "FK_rhc520eoim7txw9d7kqpb90fw", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "organization", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-73") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-70") {
 		addForeignKeyConstraint(baseColumnNames: "ig_type_id", baseTableName: "antibody", constraintName: "FK_5bpi6ah0csjh4g0n8ln93wx3h", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "ig_type", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-74") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-71") {
 		addForeignKeyConstraint(baseColumnNames: "sample_id", baseTableName: "biological_replicate_samples", constraintName: "FK_hlaud14xiftoss51nv2k9mp9n", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "sample", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-75") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-72") {
 		addForeignKeyConstraint(baseColumnNames: "set_id", baseTableName: "biological_replicate_samples", constraintName: "FK_5cfsjvfvqbjtcx7t6ftka65pu", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "biological_replicate_set", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-76") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-73") {
 		addForeignKeyConstraint(baseColumnNames: "project_id", baseTableName: "biological_replicate_set", constraintName: "FK_giwv376p7duup0ii9vm5a41vt", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "project", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-77") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-74") {
 		addForeignKeyConstraint(baseColumnNames: "growth_media_id", baseTableName: "cell_source", constraintName: "FK_dyakrl2jrduv34rm8abrpdpea", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "growth_media", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-78") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-75") {
 		addForeignKeyConstraint(baseColumnNames: "histology_id", baseTableName: "cell_source", constraintName: "FK_abm2plajs5iecdn4xw32iiq98", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "histology", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-79") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-76") {
 		addForeignKeyConstraint(baseColumnNames: "inventory_id", baseTableName: "cell_source", constraintName: "FK_71fd478uakc4ikgvf7jkqrbic", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "inventory", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-80") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-77") {
 		addForeignKeyConstraint(baseColumnNames: "prep_user_id", baseTableName: "cell_source", constraintName: "FK_osoanky7172r4r5skdfatpr2n", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-81") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-78") {
 		addForeignKeyConstraint(baseColumnNames: "provider_lab_id", baseTableName: "cell_source", constraintName: "FK_318alqytpqfjhixa0xumta27", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "organization", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-82") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-79") {
 		addForeignKeyConstraint(baseColumnNames: "provider_user_id", baseTableName: "cell_source", constraintName: "FK_js2v7lu898c0p8ortg5xgxb0q", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-83") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-80") {
 		addForeignKeyConstraint(baseColumnNames: "sex_id", baseTableName: "cell_source", constraintName: "FK_3j4empi718wbs6weggsvx0vxf", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "sex", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-84") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-81") {
 		addForeignKeyConstraint(baseColumnNames: "strain_id", baseTableName: "cell_source", constraintName: "FK_7i3q0e2js5j13ybv0fpn6wsdj", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "strain", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-85") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-82") {
 		addForeignKeyConstraint(baseColumnNames: "tissue_id", baseTableName: "cell_source", constraintName: "FK_fvxkssmfdikktj0688ybb3tbh", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "tissue", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-86") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-83") {
 		addForeignKeyConstraint(baseColumnNames: "cell_source_id", baseTableName: "cell_source_treatments", constraintName: "FK_xht7d6039ax9kbh4gmdceh5k", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "cell_source", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-87") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-84") {
 		addForeignKeyConstraint(baseColumnNames: "treatment_id", baseTableName: "cell_source_treatments", constraintName: "FK_jggm0quygtml4729ct1v2li8q", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "cell_source_treatment", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-88") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-85") {
 		addForeignKeyConstraint(baseColumnNames: "chromosome_id", baseTableName: "chrom_sequence", constraintName: "FK_lese17egs9gkqmyudn2wh5il2", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "chromosome", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-89") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-86") {
 		addForeignKeyConstraint(baseColumnNames: "genome_id", baseTableName: "chromosome", constraintName: "FK_qtx5yloqyq7hc1efournhys5u", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "genome", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-90") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-87") {
 		addForeignKeyConstraint(baseColumnNames: "base_calling_id", baseTableName: "core_pipeline", constraintName: "FK_qhv857uuhkmcorb4pio2vhpy3", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "base_calling", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-91") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-88") {
 		addForeignKeyConstraint(baseColumnNames: "data_processing_id", baseTableName: "core_pipeline", constraintName: "FK_mpgn6hl6vvbrcq3dd3tp130lx", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "data_processing", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-92") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-89") {
 		addForeignKeyConstraint(baseColumnNames: "downstream_analysis_id", baseTableName: "core_pipeline", constraintName: "FK_ceyrkr3xuabv7koe9ro018awy", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "downstream_analysis", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-93") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-90") {
 		addForeignKeyConstraint(baseColumnNames: "peak_finding_id", baseTableName: "core_pipeline", constraintName: "FK_rm79jw9v0buyydkoy0nv05o52", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "peak_finding", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-94") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-91") {
 		addForeignKeyConstraint(baseColumnNames: "file_type_id", baseTableName: "file_metadata", constraintName: "FK_8ei1cybnbixggmxfhwril3vac", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "file_type", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-95") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-92") {
 		addForeignKeyConstraint(baseColumnNames: "sequence_alignment_id", baseTableName: "file_metadata", constraintName: "FK_p0dwk23v4mpuph7bvybfimjn9", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "sequence_alignment", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-96") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-93") {
 		addForeignKeyConstraint(baseColumnNames: "species_id", baseTableName: "genome", constraintName: "FK_8qyh94lw1ucpnn89d4dl4e5dr", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "species", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-97") {
-		addForeignKeyConstraint(baseColumnNames: "species_id", baseTableName: "genotype", constraintName: "FK_ag1m8bhk8on25x3thx4edhu34", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "species", referencesUniqueColumn: "false")
-	}
-
-	changeSet(author: "dus73 (generated)", id: "1455036489854-98") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-94") {
 		addForeignKeyConstraint(baseColumnNames: "species_id", baseTableName: "growth_media", constraintName: "FK_d67vskwe5phnwub9cqiokalkx", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "species", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-99") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-95") {
 		addForeignKeyConstraint(baseColumnNames: "parent_id", baseTableName: "histology", constraintName: "FK_jrq8s9u4ujdq8durk95ilfebo", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "histology", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-100") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-96") {
 		addForeignKeyConstraint(baseColumnNames: "project_id", baseTableName: "history", constraintName: "FK_fej8h317q2acuy144kav1oyxc", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "project", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-101") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-97") {
 		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "history", constraintName: "FK_fuutexvtx28fs971iq0kbfbmp", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-102") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-98") {
 		addForeignKeyConstraint(baseColumnNames: "receiving_user_id", baseTableName: "inventory", constraintName: "FK_mnah8ybq73nyl126do8agmk08", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-103") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-99") {
 		addForeignKeyConstraint(baseColumnNames: "parent_id", baseTableName: "item", constraintName: "FK_ccldfsomwnlcfqys42su71de3", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "item", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-104") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-100") {
 		addForeignKeyConstraint(baseColumnNames: "type_id", baseTableName: "item", constraintName: "FK_qxnbu16tlqfmub9pgfj3h2e41", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "item_type", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-105") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-101") {
 		addForeignKeyConstraint(baseColumnNames: "item_id", baseTableName: "item_bags", constraintName: "FK_n2qqb9a3kp6jjh4um4vl1g0jg", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "item", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-106") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-102") {
 		addForeignKeyConstraint(baseColumnNames: "protocol_instance_bag_id", baseTableName: "item_bags", constraintName: "FK_8cx51q97y1kfc9xpv1uxokl3a", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "protocol_instance_bag", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-107") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-103") {
 		addForeignKeyConstraint(baseColumnNames: "address_id", baseTableName: "organization", constraintName: "FK_l070gahmlj4g2sqbm72btw64e", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "address", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-108") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-104") {
 		addForeignKeyConstraint(baseColumnNames: "billing_contact_id", baseTableName: "organization", constraintName: "FK_6w4r8gx2jdvy193esigbpxxx6", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-109") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-105") {
 		addForeignKeyConstraint(baseColumnNames: "parent_id", baseTableName: "organization", constraintName: "FK_57byxcy430qbl2gl7liup0py1", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "organization", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-110") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-106") {
 		addForeignKeyConstraint(baseColumnNames: "pi_id", baseTableName: "organization", constraintName: "FK_shncwjk67uss09ivcrpvlv8xg", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-111") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-107") {
 		addForeignKeyConstraint(baseColumnNames: "project_id", baseTableName: "project_samples", constraintName: "FK_bcuquxjs68mn5vyq7d0yphn8p", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "project", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-112") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-108") {
 		addForeignKeyConstraint(baseColumnNames: "sample_id", baseTableName: "project_samples", constraintName: "FK_qfu2n2hwoukibpvvx51eftp9y", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "sample", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-113") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-109") {
 		addForeignKeyConstraint(baseColumnNames: "project_id", baseTableName: "project_user", constraintName: "FK_ptwhmsh2vocln8sffhyvr2ohm", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "project", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-114") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-110") {
 		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "project_user", constraintName: "FK_d6kfrxuqknbxrlxhwmn66a3kg", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-115") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-111") {
 		addForeignKeyConstraint(baseColumnNames: "assay_id", baseTableName: "protocol", constraintName: "FK_f2u9282jbe9eiy0fggmrvrt16", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "assay", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-116") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-112") {
 		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "protocol", constraintName: "FK_mpt4h4wrqjngorh2706rvsqk2", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-117") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-113") {
 		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "protocol_group", constraintName: "FK_mm7fvjt84dbnbsnsbe9ik36xh", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-118") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-114") {
 		addForeignKeyConstraint(baseColumnNames: "protocol_group_id", baseTableName: "protocol_group_protocols", constraintName: "FK_6sjm1imt3f4b8rd492wm9vt7e", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "protocol_group", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-119") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-115") {
 		addForeignKeyConstraint(baseColumnNames: "protocol_id", baseTableName: "protocol_group_protocols", constraintName: "FK_6i86p4hqvh803hqeam63pf0fo", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "protocol", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-120") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-116") {
 		addForeignKeyConstraint(baseColumnNames: "bag_id", baseTableName: "protocol_instance", constraintName: "FK_j952d9eb9yjue4b2xggu8ehib", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "protocol_instance_bag", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-121") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-117") {
 		addForeignKeyConstraint(baseColumnNames: "protocol_id", baseTableName: "protocol_instance", constraintName: "FK_d4v22o39k3xu8m216w8r1nyx1", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "protocol", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-122") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-118") {
 		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "protocol_instance", constraintName: "FK_sgj3vhj59cxyb10md7ybwmtm7", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-123") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-119") {
 		addForeignKeyConstraint(baseColumnNames: "protocol_group_id", baseTableName: "protocol_instance_bag", constraintName: "FK_r1uxlmgfs4nieck8kad4wo79q", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "protocol_group", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-124") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-120") {
 		addForeignKeyConstraint(baseColumnNames: "super_bag_id", baseTableName: "protocol_instance_bag", constraintName: "FK_issvbm80chseeymqst1rurxxd", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "protocol_instance_bag", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-125") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-121") {
 		addForeignKeyConstraint(baseColumnNames: "item_id", baseTableName: "protocol_instance_items", constraintName: "FK_2ehrfoqmnyg7wc3sv0owshi8l", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "item", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-126") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-122") {
 		addForeignKeyConstraint(baseColumnNames: "protocol_instance_id", baseTableName: "protocol_instance_items", constraintName: "FK_dmt3slumwfqinb5qicjdvrilr", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "protocol_instance", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-127") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-123") {
 		addForeignKeyConstraint(baseColumnNames: "protocol_id", baseTableName: "protocol_instance_summary", constraintName: "FK_5v0brjc04upo9ksqnq3bivxni", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "protocol", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-128") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-124") {
 		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "protocol_instance_summary", constraintName: "FK_8idyxguxexanjiixc15ylqewv", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-129") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-125") {
 		addForeignKeyConstraint(baseColumnNames: "item_type_id", baseTableName: "protocol_item_types", constraintName: "FK_mi8fvx3awmigchnxb1s8keinu", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "item_type", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-130") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-126") {
 		addForeignKeyConstraint(baseColumnNames: "protocol_id", baseTableName: "protocol_item_types", constraintName: "FK_p1p3edd8llir9a0qp24sj5cql", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "protocol", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-131") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-127") {
 		addForeignKeyConstraint(baseColumnNames: "antibody_id", baseTableName: "sample", constraintName: "FK_4lb993olybjsa6bqlbt90as3c", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "antibody", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-132") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-128") {
 		addForeignKeyConstraint(baseColumnNames: "cell_source_id", baseTableName: "sample", constraintName: "FK_a1ro7uobsoyc87a51ssw7n5sw", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "cell_source", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-133") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-129") {
 		addForeignKeyConstraint(baseColumnNames: "invoice_id", baseTableName: "sample", constraintName: "FK_tqw4ka9uvmywhb4gw0ib7nxy9", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "invoice", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-134") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-130") {
 		addForeignKeyConstraint(baseColumnNames: "prtcl_inst_summary_id", baseTableName: "sample", constraintName: "FK_bcdouyjpgn9hqcd947o1f28jq", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "protocol_instance_summary", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-135") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-131") {
 		addForeignKeyConstraint(baseColumnNames: "send_data_to_id", baseTableName: "sample", constraintName: "FK_psm0kim6hte7fy0577fwsbdi", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-136") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-132") {
 		addForeignKeyConstraint(baseColumnNames: "spike_in_cell_source_id", baseTableName: "sample", constraintName: "FK_iab90bxgihv46lqg7ib51kmwn", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "cell_source", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-137") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-133") {
 		addForeignKeyConstraint(baseColumnNames: "target_id", baseTableName: "sample", constraintName: "FK_cfxg067kqgsk55rjibh2pbnso", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "target", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-138") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-134") {
 		addForeignKeyConstraint(baseColumnNames: "run_id", baseTableName: "sample_in_run", constraintName: "FK_993bhxmuyjlul88wourwo5eyw", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "sequence_run", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-139") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-135") {
 		addForeignKeyConstraint(baseColumnNames: "sample_id", baseTableName: "sample_in_run", constraintName: "FK_fsayjgiqhlt7cctq8n1escwvk", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "sample", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-140") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-136") {
 		addForeignKeyConstraint(baseColumnNames: "index_id", baseTableName: "sample_sequence_indices", constraintName: "FK_flne19kx2tprlhpbxh9a3xk8r", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "sequence_index", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-141") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-137") {
 		addForeignKeyConstraint(baseColumnNames: "sample_id", baseTableName: "sample_sequence_indices", constraintName: "FK_qh0akbm1a3893iwxbwqps9xmn", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "sample", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-142") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-138") {
 		addForeignKeyConstraint(baseColumnNames: "align_type_id", baseTableName: "sequence_alignment", constraintName: "FK_8gcis40hwme6s7ywn4jikodd2", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "align_type", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-143") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-139") {
 		addForeignKeyConstraint(baseColumnNames: "aligner_id", baseTableName: "sequence_alignment", constraintName: "FK_fee47iwmejna7h55jp8dpkowd", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "aligner", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-144") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-140") {
 		addForeignKeyConstraint(baseColumnNames: "core_pipeline_id", baseTableName: "sequence_alignment", constraintName: "FK_hc4f4br571qwgavrswy22w5wo", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "core_pipeline", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-145") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-141") {
 		addForeignKeyConstraint(baseColumnNames: "genome_id", baseTableName: "sequence_alignment", constraintName: "FK_5tdpednm424bwlyaygxb91cj8", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "genome", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-146") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-142") {
 		addForeignKeyConstraint(baseColumnNames: "sequencing_experiment_id", baseTableName: "sequence_alignment", constraintName: "FK_js0whth80fyna834brwbbo8v0", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "sequencing_experiment", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-147") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-143") {
 		addForeignKeyConstraint(baseColumnNames: "platform_id", baseTableName: "sequence_run", constraintName: "FK_l1ofj1csp7k439e52l32soay9", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "sequencing_platform", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-148") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-144") {
 		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "sequence_run", constraintName: "FK_gerfjuiu4n7m0iukeud2wrux7", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-149") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-145") {
 		addForeignKeyConstraint(baseColumnNames: "read_type_id", baseTableName: "sequencing_experiment", constraintName: "FK_3s9e144d345uyhay28toy8jwg", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "read_type", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-150") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-146") {
 		addForeignKeyConstraint(baseColumnNames: "sample_id", baseTableName: "sequencing_experiment", constraintName: "FK_7gsumwrx4h3nji2g2q5htn098", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "sample", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-151") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-147") {
 		addForeignKeyConstraint(baseColumnNames: "sequence_run_id", baseTableName: "sequencing_experiment", constraintName: "FK_3mx03u80x4ynhsx1i65yrrxcq", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "sequence_run", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-152") {
-		addForeignKeyConstraint(baseColumnNames: "genotype_id", baseTableName: "strain", constraintName: "FK_ob705eavs6i60ngs0imotqc5n", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "genotype", referencesUniqueColumn: "false")
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-148") {
+		addForeignKeyConstraint(baseColumnNames: "background_strain_id", baseTableName: "strain", constraintName: "FK_9fvgan0aoydiscvx11nhdhn98", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "strain", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-153") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-149") {
 		addForeignKeyConstraint(baseColumnNames: "parent_id", baseTableName: "strain", constraintName: "FK_4shdjcf8qcywolsnrmi3djhmu", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "strain", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-154") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-150") {
 		addForeignKeyConstraint(baseColumnNames: "source_lab_id", baseTableName: "strain", constraintName: "FK_bd07vlra9sn9vs8po73rw89wg", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "organization", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-155") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-151") {
 		addForeignKeyConstraint(baseColumnNames: "species_id", baseTableName: "strain", constraintName: "FK_c5gb45n5okxh7bqig1nouw76t", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "species", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-156") {
-		addForeignKeyConstraint(baseColumnNames: "genetic_modification_id", baseTableName: "strain_genetic_modifications", constraintName: "FK_bybku3lrkjee3jdtq8sixm2if", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "genetic_modification", referencesUniqueColumn: "false")
-	}
-
-	changeSet(author: "dus73 (generated)", id: "1455036489854-157") {
-		addForeignKeyConstraint(baseColumnNames: "strain_id", baseTableName: "strain_genetic_modifications", constraintName: "FK_tfjl1k0206qdhf4x28xx5fxal", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "strain", referencesUniqueColumn: "false")
-	}
-
-	changeSet(author: "dus73 (generated)", id: "1455036489854-158") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-152") {
 		addForeignKeyConstraint(baseColumnNames: "target_type_id", baseTableName: "target", constraintName: "FK_e5wo7j1f9so6mcll9vwtn6005", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "target_type", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-159") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-153") {
 		addForeignKeyConstraint(baseColumnNames: "computing_infrastructure_id", baseTableName: "task", constraintName: "FK_2ovu0g1rssdjbpgb6fj0l2vwy", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "computing_infrastructure", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-160") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-154") {
 		addForeignKeyConstraint(baseColumnNames: "core_pipe_line_id", baseTableName: "task", constraintName: "FK_89y9w7ykrtfvr9quf0acepu0k", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "core_pipeline", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-161") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-155") {
 		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "task", constraintName: "FK_4fmjedju7b35tb5cr71n3ntb0", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-162") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-156") {
 		addForeignKeyConstraint(baseColumnNames: "sample_id", baseTableName: "technical_replicate_samples", constraintName: "FK_pgfytkmfc7o8hujxpm27nrupx", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "sample", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-163") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-157") {
 		addForeignKeyConstraint(baseColumnNames: "set_id", baseTableName: "technical_replicate_samples", constraintName: "FK_bxc886ht20h9dyioee4mvtuhg", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "technical_replicate_set", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-164") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-158") {
 		addForeignKeyConstraint(baseColumnNames: "project_id", baseTableName: "technical_replicate_set", constraintName: "FK_9qiur0k1ju7xinurh5sy074fr", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "project", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-165") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-159") {
 		addForeignKeyConstraint(baseColumnNames: "address_id", baseTableName: "user", constraintName: "FK_dhlcfg8h1drrgu0irs1ro3ohb", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "address", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-166") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-160") {
 		addForeignKeyConstraint(baseColumnNames: "affiliation_id", baseTableName: "user", constraintName: "FK_qdusuaq6oge31t7nlq10wm6ku", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "organization", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-167") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-161") {
 		addForeignKeyConstraint(baseColumnNames: "role_id", baseTableName: "user_role", constraintName: "FK_it77eq964jhfqtu54081ebtio", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "role", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1455036489854-168") {
+	changeSet(author: "danyingshao (generated)", id: "1455077526232-162") {
 		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "user_role", constraintName: "FK_apcc8lxk2xnug8377fatvbn04", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
 }

@@ -24,19 +24,22 @@
 				<li>Name: ${strain.name}</li>
 				</g:if>
 							
+				<g:if test="${strain?.backgroundStrain}">
+				<li>Background Strain:<g:link controller="strainAdmin" action="show" id="${strain?.backgroundStrain?.id}">${strain?.backgroundStrain?.encodeAsHTML()}</g:link></li>
+				</g:if>
+                
                 <g:if test="${strain?.species}">
 				<li>Species: <g:link controller="speciesAdmin" action="show" id="${strain?.species?.id}">${strain?.species?.encodeAsHTML()}</g:link>					
 				</li>
 				</g:if>	
                 
 				<g:if test="${strain?.genotype}">
-				<li>Genotype: <g:link controller="genotypeAdmin" action="show" id="${strain?.genotype?.id}">${strain?.genotype?.encodeAsHTML()}</g:link>
+				<li>Genotype: ${strain?.genotype}
 				</li>
 				</g:if>
                 
-                <g:if test="${geneticModifications}">
-				    <li>GeneticModifications: 
-                        <g:each in="${geneticModifications}"><g:link controller="geneticModificationAdmin" action="show" id="${it.id}">${it.name}</g:link> </g:each>
+                <g:if test="${strain?.geneticModification}">
+				    <li>GeneticModification: ${strain.geneticModification}                
                     </li>
 				</g:if>
                 

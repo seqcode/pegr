@@ -1,7 +1,6 @@
 package pegr.admin
 import pegr.AdminCategory
 import pegr.Strain
-import pegr.Genotype
 import pegr.StrainException
 
 class StrainAdminController {
@@ -82,10 +81,4 @@ class StrainAdminController {
         }
     }
     
-    def speciesChangedAjax(Long speciesId) {
-        def genotypes = Genotype.where{
-                species.id == speciesId
-            }.list()
-        render g.select(id: 'genotype', name:'genotype.id', from: genotypes, optionKey: 'id', noSelection:[null:''])
-    }
 }

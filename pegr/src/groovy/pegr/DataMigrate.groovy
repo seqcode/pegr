@@ -2,6 +2,7 @@ package pegr
 import com.opencsv.CSVParser
 import com.opencsv.CSVReader
 import groovy.json.*
+import groovy.time.*
 
 class DataMigrate {
 	DataMigrate() {}
@@ -49,12 +50,14 @@ class DataMigrate {
 		
 		        def species = getSpecies(data.genus, data.species)
 		        
-		        def strain = getStrain(species, data.strain, data.parentStrain, data.genotype, data.mutation)
+		        def strainAndTissue = getStrainTissue(species, data.strain, data.parentStrain, data.genotype, data.mutation)
+                def strain = strainAndTissue.strain
+                def tissue = strainAndTissue.tissue
 		
 		        def growthMedia = getGrowthMedia(data.growthMedia, species)
 		
                 def inventory = getInventory(data.dateReceived, data.receivingUser, data.inOrExternal, data.inventoryNotes)
-		        def cellSource = getCellSource(data.samplePrepUser, growthMedia, strain, cellProvider, inventory)
+		        def cellSource = getCellSource(data.samplePrepUser, growthMedia, strain, cellProvider, inventory, tissue)
 		
 		        addTreatment(cellSource, data.perturbation1)
 		        addTreatment(cellSource, data.perturbation2)
@@ -92,6 +95,9 @@ class DataMigrate {
 	    }
 	}
 	
+    def getUser(String userStr) {
+        return getUser(userStr, null, null)
+    }
 	def getUser(String userStr, String emailStr, String phoneStr) {
 	    if(userStr == "") {
 	        return null
@@ -121,7 +127,9 @@ class DataMigrate {
 	        def admin = User.get(1)
 	        
 	        def password = admin.password
-            phoneStr =  phoneStr.replaceAll("\\p{P}","");
+            if (phoneStr) {
+                phoneStr =  phoneStr.replaceAll("\\p{P}","");
+            }
 	        user = new User(username: username, password: password, fullName: userStr, email: emailStr, phone: phoneStr).save(failOnError: true)
         } else {
             if (user.email == null && emailStr != null && emailStr != 'bfp2@psu.edu') {
@@ -214,33 +222,50 @@ class DataMigrate {
 	        return antibody
 	    }
 	}
+    
+    def getStrainTissueByName(String name, Species species) {
+        def strain = null
+        def tissue = null
+        if (name && name != "") {
+            if (name == "InVitro" || name == "Liver" || name.contains("tissue") || name.contains("cells") || name.contains("leukemia")) {
+                tissue = Tissue.findByName(name)
+                if (!tissue) {
+                    tissue = new Tissue(name: name).save(failOnError: true)
+                }
+            } else{
+                strain = Strain.findByName(name) 
+                if (!strain) {
+                    strain = new Strain(name: name, species: species).save(faliOnError: true)    
+                }
+            }
+        }
+        return [strain: strain, tissue: tissue]
+    }
 	
-	def getStrain(Species species, String strainStr, String parentStrainStr, String genotypeStr, String mutationStr) {
-	    if (strainStr == "") {
-	        return null
+	def getStrainTissue(Species species, String strainStr, String parentStrainStr, String genotypeStr, String mutationStr) {
+        if (mutationStr == "") {
+            mutationStr = null
+        }
+        def backResult = getStrainTissueByName(strainStr, species)
+        def backStrain = backResult.strain
+        def tissue = backResult.tissue
+        
+        def parentResult = getStrainTissueByName(parentStrainStr, species)        
+        def parentStrain = parentResult.strain
+        if (!tissue) {
+            tissue = parentResult.tissue
+        }
+        
+	    def strain = Strain.findByBackgroundStrainAndGenotypeAndGeneticModification(backStrain, genotypeStr, mutationStr)
+	    
+        if (!strain) {
+            if (parentStrain == backStrain) {
+                parentStrain = null
+            }
+	        strain = new Strain(name: null, species: species, genotype: genotypeStr, 
+				backgroundStrain: Strain.get(backStrain.id), parent: Strain.get(parentStrain.id), geneticModification: mutationStr).save(failOnError: true)
 	    }
-	    def strain = Strain.findByName(strainStr)
-	    if (!strain) {
-	        def genotype = getGenotype(genotypeStr, species)
-	        def parentStrain = Strain.findByName(parentStrainStr)
-	        strain = new Strain(name: strainStr, species: species, genotype: genotype, parent: parentStrain).save(failOnError: true)
-	        def mutation = getMutation(mutationStr)
-	        if(strain && mutation) {
-	            new StrainGeneticModifications(strain: strain, geneticModification: mutation).save(failOnError: true)
-	        }
-	    }
-	    return strain
-	}
-	
-	def getMutation(mutationStr) {
-	    if(mutationStr == "") {
-	        return null
-	    }
-	    def mutation = GeneticModification.findByName(mutationStr)
-	    if(!mutation) {
-	        mutation = new GeneticModification(name: mutationStr).save(failOnError: true)
-	    }
-	    return mutation
+	    return [strain: strain, tissue: tissue]
 	}
 	
 	def getSpecies(String genusStr, String speciesStr) {
@@ -260,17 +285,6 @@ class DataMigrate {
 	    return species
 	}
 	
-	def getGenotype(String genotypeStr, Species species) {
-	    if(genotypeStr == "") {
-	        return null
-	    }
-	    def genotype = Genotype.findByName(genotypeStr)
-	    if(!genotype) {
-	        genotype = new Genotype(name: genotypeStr, species: species).save(failOnError: true)
-	    }
-	    return genotype
-	}
-	
 	def getGrowthMedia(String mediaStr, Species species) {
 	    if(mediaStr == "") {
 	        return null
@@ -288,12 +302,12 @@ class DataMigrate {
 	}
 	
 	
-	def getCellSource( String samplePrepUser, GrowthMedia growthMedia, Strain strain, User provider, Inventory inventory) {
+	def getCellSource( String samplePrepUser, GrowthMedia growthMedia, Strain strain, User provider, Inventory inventory, Tissue tissue) {
 	    if (!strain) {
 	        return null
 	    }
 		def prepUser = getUser(samplePrepUser)
-	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, prepUser: prepUser, inventory: inventory).save(failOnError: true)
+	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, prepUser: prepUser, inventory: inventory, tissue: tissue).save(failOnError: true)
 	    return cellSource
 	}
 	

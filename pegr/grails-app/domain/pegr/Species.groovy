@@ -10,7 +10,7 @@ class Species {
 	}
 	
     static constraints = {
-		name unique: true
+		name unique: "genusName"
 		note nullable: true, blank: true
     }
 }

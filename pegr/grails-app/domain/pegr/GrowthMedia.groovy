@@ -10,7 +10,7 @@ class GrowthMedia {
     }
     
     static constraints = {
-        name unique: true, matches: '^[0-9A-Za-z -]+$'
+        name unique: true
         species nullable: true
     }
 }

@@ -54,7 +54,7 @@ class User implements Serializable {
 		username blank: false, unique: true
 		password blank: false
 		fullName nullable: true, blank: true
-		email email: true, nullable: true
+		email nullable: true, blank: true
 		phone nullable: true, maxSize: 20
 		affiliation nullable: true
 		address nullable: true

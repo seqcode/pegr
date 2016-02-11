@@ -3,6 +3,14 @@ import groovy.json.*
 includeTargets << grailsScript("_GrailsInit")
 
 target(tests: "Simple tests") {
+    String s10 = "??? no-tag"
+    String s11 =s10.replaceAll("\\?", "")
+    println s11
+    
+    String phone1 = "+1 00"
+    String phone2= phone1.replaceAll(/[ +]/, "")
+    println phone2
+    
     String estr = "9.00E10"
     println new BigDecimal(estr).toPlainString(); 
     
@@ -18,22 +26,25 @@ target(tests: "Simple tests") {
     String c = "A"
     println c.toLowerCase()
     
-    String v = "1"
-    def first = v.indexOf(".")
-    if(first == -1) {
-        v = v + ".0"
-    } else if (first == 0) {
-        v = "0" + v
-    } 
-    first = v.indexOf(".")
-    def v2 = v.substring(first+1)
-    def second = v2.indexOf(".")
-    if (second == -1) {
-        v = v + ".0"
-    }else if (second == v2.length() - 1) {
-        v = v + "0"
+    String protocolVersion = "CT"
+    String v = protocolVersion.find(/[\d.]+/)
+    if (v) {
+        def first = v.indexOf(".")
+        if(first == -1) {
+            v = v + ".0"
+        } else if (first == 0) {
+            v = "0" + v
+        } 
+        first = v.indexOf(".")
+        def v2 = v.substring(first+1)
+        def second = v2.indexOf(".")
+        if (second == -1) {
+            v = v + ".0"
+        }else if (second == v2.length() - 1) {
+            v = v + "0"
+        }
+        println "v: ${v}"
     }
-    println "v: ${v}"
     
     String name = "Frank, B.Pugh"
     def names = name.split(",|\\.")

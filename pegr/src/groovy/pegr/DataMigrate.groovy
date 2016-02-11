@@ -83,8 +83,6 @@ class DataMigrate {
 		        continue
 		    }
 		}
-		
-		Sample.list().each{ getBioReplicate(it) }
         
         def timeStop = new Date()
         TimeDuration duration = TimeCategory.minus(timeStop, timeStart)
@@ -101,7 +99,7 @@ class DataMigrate {
             index = new SequenceIndex(indexId: indexId, sequence: indexStr, indexVersion: "UNKNOWN").save(failOnError: true)
         }
         if (index && sample) {
-            new SampleSequenceIndices(sample: sample, sequenceIndex: index).save(failOnError: true)
+            new SampleSequenceIndices(sample: sample, index: index).save(failOnError: true)
         } 
     }
     
@@ -120,7 +118,8 @@ class DataMigrate {
 	        return null
 	    }    
 		if (phoneStr) {
-			phoneStr =  phoneStr.replaceAll("\\p{P}","");
+			phoneStr =  phoneStr.replaceAll("\\p{P}", "");
+            phoneStr =  phoneStr.replaceAll(/[ +]/, "");
 		}
 		def user = null
 		def fullname = null
@@ -247,14 +246,18 @@ class DataMigrate {
         }
 		
 		def catNum = abCatNum
-		if (abCatNum.contains(".")) {
+		if (abCatNum && abCatNum.contains(".")) {
 			try { 
 				catNum = new BigDecimal(abCatNum).toPlainString()
 			} catch(Exception e) {
 			}
 		} 
+        if(catNum) {
+            catNum = catNum.replaceAll("_", "-")
+            catNum = catNum.replaceAll("[^0-9A-Za-z -]", "")
+        }
 		
-	    def antibody = Antibody.findByCompanyAndCatalogNumberAndAbHostAndClonalAndConcentrationAndIgTypeAndImmunogeneAndLotNumber(company, catNum, abHost, clonal, concentration, igType, antigen, abLotNum)
+	    def antibody = Antibody.findByCompanyAndCatalogNumberAndAbHostAndClonalAndIgTypeAndImmunogeneAndLotNumber(company, catNum, abHost, clonal, igType, antigen, abLotNum)
 	    if (!antibody) {	        
 	        def noteMap = [:]
 	        if (abNotes) {
@@ -273,9 +276,8 @@ class DataMigrate {
 	        def notes = JsonOutput.toJson(noteMap)
 	        
 	        antibody = new Antibody(company: company, catalogNumber: catNum, abHost: abHost, clonal: clonal, concentration: concentration, igType: igType, immunogene: antigen, lotNumber: abLotNum, note: notes).save( failOnError: true)
-	        
-	        return antibody
-	    }
+	    }	        
+		return antibody
 	}
     
     def getStrainTissueByName(String name, Species species) {
@@ -311,8 +313,10 @@ class DataMigrate {
         
         if (genotypeStr == null && mutationStr == null) {
             // strain itself
-            strain.backgroundStrain = backgroundStrain
-            strain.save(failOnError: true)
+            if (strain) {
+                strain.backgroundStrain = backgroundStrain
+                strain.save(failOnError: true)
+            } 
             return [strain: strain, tissue: tissue]
         } else {
             // define child strain           
@@ -379,28 +383,34 @@ class DataMigrate {
 	        perturbation = new CellSourceTreatment(name: perturbStr).save( failOnError: true)
 	    }
 	    if(perturbation && cellSource) {
-			new CellSourceTreatments(cellSource: cellSource, treatment: perturbation).save( failOnError: true)
+            if (!CellSourceTreatments.findByCellSourceAndTreatment(cellSource, perturbation)) {
+                new CellSourceTreatments(cellSource: cellSource, treatment: perturbation).save( failOnError: true)
+            }			
 		} 
 	}
     
     def getProtocolInstanceSummary(String chipUser, String chipDate, String v, String resin, String PCRCycle, Assay assay){
         def protocol = null
         // clean protocol version 
-        def first = v.indexOf(".")
-        if(first == -1) {
-            v = v + ".0"
-        } else if (first == 0) {
-            v = "0" + v
-        } 
-        first = v.indexOf(".")
-        def v2 = v.substring(first+1)
-        def second = v2.indexOf(".")
-        if (second == -1) {
-            v = v + ".0"
-        }else if (second == v2.length() - 1) {
-            v = v + "0"
+        if (v) {
+            def first = v.indexOf(".")
+            if(first == -1) {
+                v = v + ".0"
+            } else if (first == 0) {
+                v = "0" + v
+            } 
+            first = v.indexOf(".")
+            def v2 = v.substring(first+1)
+            def second = v2.indexOf(".")
+            if (second == -1) {
+                v = v + ".0"
+            }else if (second == v2.length() - 1) {
+                v = v + "0"
+            }
+            if (v.length() > 10) {
+                v = v[0..9]
+            }
         }
-
         if (assay) {
 	        protocol = Protocol.findByNameAndProtocolVersion(assay.name, v)  
 	        if (!protocol) {
@@ -577,11 +587,13 @@ class DataMigrate {
 	
 	def getClonal(String clonalStr) {
 	    def clonal = null
-	    if (clonalStr.contains("mono")) {
-	        clonal = MonoPolyClonal.Mono
-	    } else if (clonalStr.contains("poly")) {
-	        clonal = MonoPolyClonal.Poly
-	    }
+        if (clonalStr) {
+            if (clonalStr.contains("mono")) {
+                clonal = MonoPolyClonal.Mono
+            } else if (clonalStr.contains("poly")) {
+                clonal = MonoPolyClonal.Poly
+            }
+        }
 	    return clonal
 	}
 	
@@ -600,7 +612,12 @@ class DataMigrate {
 	    if ([targetStr, cTag, nTag].every{ it == null }) {
 	        return null
 	    }
-
+        if(targetStr) {
+            targetStr = targetStr.replaceAll("_", "-")
+            targetStr = targetStr.replaceAll("\\?", "")
+            targetStr = targetStr.trim()
+        }
+        
 	    def target = Target.findByNameAndCTermTagAndNTermTag(targetStr, cTag, nTag)
 	    if (!target) {
 	        def type = getTargetType(targetTypeStr)
@@ -664,9 +681,12 @@ class DataMigrate {
         } else if (runStr.length() == 1) {
             runStr = "0" + runStr
         }
+        if (laneStr == null || laneStr == "unk") {
+            laneStr = "0"
+        }
         
         if (indexIdStr == null){
-            indexIdStr = "00" + indexIdStr
+            indexIdStr = "00" 
         } else if (indexIdStr.length() == 1) {
             indexIdStr = "0" + indexIdStr
         }
@@ -716,22 +736,24 @@ class DataMigrate {
 	
 	def getDate(String dateStr) {
 	    def date = null
-	    if (dateStr.size() == 5) {
-	         dateStr = "0" + dateStr
-	     }         
-	    if (dateStr.size() == 6) {
-	        try {
-	            date = Date.parse("yyMMdd", dateStr)
-	        }catch(Exception) {
-	            date = null
-	        }
-	    }
-        if (dateStr.size() == 10) {
-            try {
-	            date = Date.parse("yyyy.MM.dd", dateStr)
-	        }catch(Exception) {
-	            date = null
-	        }
+        if (dateStr) {
+            if (dateStr.size() == 5) {
+                 dateStr = "0" + dateStr
+             }         
+            if (dateStr.size() == 6) {
+                try {
+                    date = Date.parse("yyMMdd", dateStr)
+                }catch(Exception) {
+                    date = null
+                }
+            }
+            if (dateStr.size() == 10) {
+                try {
+                    date = Date.parse("yyyy.MM.dd", dateStr)
+                }catch(Exception) {
+                    date = null
+                }
+            }
         }
 	    return date
 	}

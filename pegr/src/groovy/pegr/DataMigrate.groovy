@@ -28,8 +28,8 @@ class DataMigrate {
                 String[] cells = new String[rawdata.size()]
                 rawdata.eachWithIndex{ d, idx -> 
                     def td = d.trim()
-                    if(td == "-" || td == "." || td == "?" || td == "Not applicable" || td == "not applicable" || td == "None") {
-                        cells[idx] = ""
+                    if(td == "" || td == "-" || td == "." || td == "?" || td == "Not applicable" || td == "not applicable" || td == "None") {
+                        cells[idx] = null
                     }else {
                         cells[idx] = td
                     }
@@ -47,7 +47,7 @@ class DataMigrate {
                 
 		        def target = getTarget(data.target, data.targetType, data.nTag, data.cTag)
 		
-		        def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.ulSampleSent, data.abConc, data.amountUseUg, data.amountUseUl, data.abName)
+		        def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.ulSampleSent, data.abConc, data.amountUseUg, data.amountUseUl)
 		
 		        def species = getSpecies(data.genus, data.species)
 		        
@@ -69,6 +69,7 @@ class DataMigrate {
                 
 		        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl)
                 
+                addIndexToSample(sample, data.indexStr, data.indexIdStr)
 		        addSampleToProject(project, sample)
 		        
 		        getPool(sample, results.sequenceRun, data.pool, data.volToPool, data.poolDate, data.quibitReading, data.quibitDilution, data.concentration, data.poolDilution)
@@ -90,6 +91,20 @@ class DataMigrate {
         println "Time: " + duration
 	}
 	
+    def addIndexToSample(Sample sample, String indexStr, String indexIdStr) { 
+        if (indexStr == null || indexStr == "unk"){
+            return
+        }
+        def indexId = getInteger(indexIdStr)
+        def index = SequenceIndex.findByIndexIdAndSequence(indexId, indexStr)
+        if (!index) {
+            index = new SequenceIndex(indexId: indexId, sequence: indexStr, indexVersion: "UNKNOWN").save(failOnError: true)
+        }
+        if (index && sample) {
+            new SampleSequenceIndices(sample: sample, sequenceIndex: index).save(failOnError: true)
+        } 
+    }
+    
 	def addSampleToProject(Project project, Sample sample) {
 	    if(project && sample) {
 	        new ProjectSamples(project: project, sample: sample).save( failOnError: true)
@@ -101,7 +116,7 @@ class DataMigrate {
     }
     
 	def getUser(String userStrRaw, String emailStr, String phoneStr) {
-	    if(userStrRaw == "") {
+	    if(userStrRaw == null) {
 	        return null
 	    }    
 		if (phoneStr) {
@@ -112,7 +127,7 @@ class DataMigrate {
         def username = null
 		
 		// try to get username from email
-		if (emailStr != null && emailStr != 'bfp2@psu.edu') {
+		if (emailStr && emailStr != 'bfp2@psu.edu') {
 			def at = emailStr.indexOf('@')
 			if (at > 0) {
 				username = emailStr[0..<at]
@@ -152,20 +167,20 @@ class DataMigrate {
 	        user = new User(username: username, password: password, fullName: fullname, email: emailStr, phone: phoneStr).save( failOnError: true)
         } else {
 			def flag = 0
-            if (user.email == null && emailStr != null && emailStr != 'bfp2@psu.edu') {
+            if (user.email == null && emailStr && emailStr != 'bfp2@psu.edu') {
                 user.email = emailStr
 				flag = 1
 				
             }
-			if (user.fullName == null && fullname != null) {
+			if (user.fullName == null && fullname) {
 				user.fullName = fullname
 				flag = 1
 			}
-			if (user.phone == null && phoneStr != null) {
+			if (user.phone == null && phoneStr) {
 				user.phone = phoneStr
 				flag = 1
 			}
-			if (username != null && user.username != username ) {
+			if (username && user.username != username ) {
 				user.username = username
 				flag = 1
 			}
@@ -177,7 +192,7 @@ class DataMigrate {
 	}
 	
 	def getProject(String projectName, String projectUser, String projectUserEmail) {
-	    if (projectName == "") {
+	    if (projectName == null) {
 	        return null
 	    }
 	    def project = Project.findByName(projectName)
@@ -195,16 +210,16 @@ class DataMigrate {
 	}
 	
 	def getInvoice(String service, String invoiceNum) {
-	    if (service == "" && invoiceNum == "") {
+	    if (service == null && invoiceNum == null) {
 	        return null
 	    }
 		
 		def invoice = null
-		if (service == "") {
+		if (service == null) {
 			invoice = Invoice.where{
 				serviceId == null && invoiceNum == invoiceNum
 			}.get(max:1)
-		} else if(invoiceNum == "") {
+		} else if(invoiceNum == null) {
 			invoice = Invoice.where{
 				serviceId == service && invoiceNum == null
 			}.get(max:1)
@@ -220,12 +235,16 @@ class DataMigrate {
 	    return invoice
 	}
 	
-	def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNotes, String abClonal, String abAnimal, String ig, String antigen, String ulSent, String abConc, String ugPerChIP, String ulPerChIP, String abName) {
+	def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNotes, String abClonal, String abAnimal, String ig, String antigen, String ulSent, String abConc, String ugPerChIP, String ulPerChIP) {
 		def company = getCompany(abCompName)
 		def abHost = getAbHost(abAnimal)
 		def clonal = getClonal(abClonal)
 		def igType = getIgType(ig)
 		def concentration = getFloat(abConc)
+        
+        if (antigen == "No ab" || antigen == "NoAb") {
+            antigen = null
+        }
 		
 		def catNum = abCatNum
 		if (abCatNum.contains(".")) {
@@ -238,16 +257,16 @@ class DataMigrate {
 	    def antibody = Antibody.findByCompanyAndCatalogNumberAndAbHostAndClonalAndConcentrationAndIgTypeAndImmunogeneAndLotNumber(company, catNum, abHost, clonal, concentration, igType, antigen, abLotNum)
 	    if (!antibody) {	        
 	        def noteMap = [:]
-	        if (abNotes != "") {
+	        if (abNotes) {
 	            noteMap['note'] = abNotes
 	        }
-	        if (ulSent != "") {
+	        if (ulSent) {
 	            noteMap['ulSent'] = ulSent
 	        }
-	        if (ugPerChIP != "") {
+	        if (ugPerChIP) {
 	            noteMap['ugPerChIP'] = ugPerChIP
 	        }
-	        if (ulPerChIP != "") {
+	        if (ulPerChIP) {
 	            noteMap['ulPerChIP'] = ulPerChIP
 	        }
 	        
@@ -262,7 +281,7 @@ class DataMigrate {
     def getStrainTissueByName(String name, Species species) {
         def strain = null
         def tissue = null
-        if (name && name != "") {
+        if (name) {
             if (name == "InVitro" || name == "Liver" || name.contains("tissue") || name.contains("cells") || name.contains("leukemia")) {
                 tissue = Tissue.findByName(name)
                 if (!tissue) {
@@ -279,12 +298,10 @@ class DataMigrate {
     }
 	
 	def getStrainTissue(Species species, String strainStr, String backgrounStrainStr, String genotypeStr, String mutationStr) {
-        if (mutationStr == "") {
-            mutationStr = null
-        }
-        def parentResult = getStrainTissueByName(strainStr, species)
-        def parentStrain = parentResult.strain
-        def tissue = parentResult.tissue
+
+        def result = getStrainTissueByName(strainStr, species)
+        def strain = result.strain
+        def tissue = result.tissue
         
         def backgroundResult = getStrainTissueByName(backgrounStrainStr, species)        
         def backgroundStrain = backgroundResult.strain
@@ -292,23 +309,32 @@ class DataMigrate {
             tissue = backgroundResult.tissue
         }
         
-	    def strain = Strain.findByParentAndGenotypeAndGeneticModification(parentStrain, genotypeStr, mutationStr)
+        if (genotypeStr == null && mutationStr == null) {
+            // strain itself
+            strain.backgroundStrain = backgroundStrain
+            strain.save(failOnError: true)
+            return [strain: strain, tissue: tissue]
+        } else {
+            // define child strain           
+            def childStrain = Strain.findByParentAndGenotypeAndGeneticModification(strain, genotypeStr, mutationStr)
 	    
-        if (!strain) {
-	        strain = new Strain(name: null, species: species, genotype: genotypeStr, 
-				backgroundStrain: backgroundStrain, parent: parentStrain, geneticModification: mutationStr).save( failOnError: true)
-	    }
-	    return [strain: strain, tissue: tissue]
+            if (!childStrain) {
+                childStrain = new Strain(name: null, species: species, genotype: genotypeStr, 
+                    backgroundStrain: backgroundStrain, parent: strain, geneticModification: mutationStr).save( failOnError: true)
+            }
+            return [strain: childStrain, tissue: tissue]
+        }
+	    
 	}
 	
 	def getSpecies(String genusStr, String speciesStr) {
-	    if(genusStr=="" && speciesStr == "") {
+	    if(genusStr == null && speciesStr == null) {
 	        return null
 	    }
-		if (genusStr == "") {
+		if (genusStr == null) {
 			genusStr = "Unknown"
 		}
-		if (speciesStr == "") {
+		if (speciesStr == null) {
 			speciesStr = "Unknown"
 		}
 	    def species = Species.findByNameAndGenusName(speciesStr, genusStr)
@@ -319,7 +345,7 @@ class DataMigrate {
 	}
 	
 	def getGrowthMedia(String mediaStr, Species species) {
-	    if(mediaStr == "") {
+	    if(mediaStr == null) {
 	        return null
 	    }
 	    def media = GrowthMedia.findByName(mediaStr)
@@ -345,7 +371,7 @@ class DataMigrate {
 	}
 	
 	def addTreatment(CellSource cellSource, String perturbStr) {
-	    if(perturbStr == "") {
+	    if(perturbStr == null) {
 	        return null
 	    }
 	    def perturbation = CellSourceTreatment.findByName(perturbStr)
@@ -357,24 +383,36 @@ class DataMigrate {
 		} 
 	}
     
-    def getProtocolInstanceSummary(String chipUser, String chipDate, String protocolVersion, String resin, String PCRCycle, Assay assay){
+    def getProtocolInstanceSummary(String chipUser, String chipDate, String v, String resin, String PCRCycle, Assay assay){
         def protocol = null
-        if (protocolVersion == "") {
-            protocolVersion = null
+        // clean protocol version 
+        def first = v.indexOf(".")
+        if(first == -1) {
+            v = v + ".0"
+        } else if (first == 0) {
+            v = "0" + v
+        } 
+        first = v.indexOf(".")
+        def v2 = v.substring(first+1)
+        def second = v2.indexOf(".")
+        if (second == -1) {
+            v = v + ".0"
+        }else if (second == v2.length() - 1) {
+            v = v + "0"
         }
-        
+
         if (assay) {
-	        protocol = Protocol.findByNameAndProtocolVersion(assay.name, protocolVersion)  
+	        protocol = Protocol.findByNameAndProtocolVersion(assay.name, v)  
 	        if (!protocol) {
-	            protocol = new Protocol(name: assay.name, protocolVersion: protocolVersion).save( failOnError: true)
+	            protocol = new Protocol(name: assay.name, protocolVersion: v).save( failOnError: true)
 	        }
 	    }
 	    // get note
 	    def note = [:]
-	    if (resin != "") {
+	    if (resin) {
 	        note['resin'] = resin
 	    }
-	    if (PCRCycle != "") {
+	    if (PCRCycle) {
 	        note['PCRCycle'] = PCRCycle
 	    }
 	    
@@ -385,13 +423,13 @@ class DataMigrate {
 	
 	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl) {
 	    def note = [:]
-	    if (sampleNotes != "") {
+	    if (sampleNotes) {
 	        note['note'] = sampleNotes
 	    }
-	    if (bioRep1SampleId != "") {
+	    if (bioRep1SampleId) {
 	        note['bioRep1'] = bioRep1SampleId
 	    }
-	    if (bioRep2SampleId != "") {
+	    if (bioRep2SampleId) {
 	        note['bioRep2'] = bioRep2SampleId
 	    }
 	    def date = getDate(dateStr)
@@ -407,7 +445,7 @@ class DataMigrate {
 	
 		        def sample2 = getSampleFromSampleId(note.bioRep2)
 		        def sample1 = getSampleFromSampleId(note.bioRep1)
-		        if (sample2 != null || sample1 != null) {
+		        if (sample2 || sample1) {
 		            def set = BiologicalReplicateSamples.findBySample(sample)?.set  
 		            if (!set) {
 		                set = new BiologicalReplicateSet().save( failOnError: true)
@@ -429,7 +467,7 @@ class DataMigrate {
 	}
 	
 	def getSampleFromSampleId(String sampleId) {
-	    if (sampleId == null || sampleId == "") {
+	    if (sampleId == null) {
 	        return null
 	    }
 	    def samples = Sample.where{note == '%"sampleId":"${sampleId}"%'}.list()
@@ -458,7 +496,7 @@ class DataMigrate {
 	}
 	             
 	def getAssay(String assayStr) {
-	    if(assayStr == "") {
+	    if(assayStr == null) {
 	        return null
 	    }
 	    
@@ -474,16 +512,16 @@ class DataMigrate {
 	        def poolDate = getDate(poolDateStr)
 	        
 	        def map = [:]
-	        if (concentration != ""){
+	        if (concentration){
 	            map['concentration'] = concentration
 	        }
-	        if (quibitReading != "") {
+	        if (quibitReading) {
 	            map['quibitReading'] = quibitReading
 	        }
-	        if (quibitDilution != "") {
+	        if (quibitDilution) {
 	            map['quibitDilution'] = quibitDilution
 	        }
-	        if (concentration != "") {
+	        if (concentration) {
 	            map['concentration'] = concentration
 	        }
 	        
@@ -495,13 +533,13 @@ class DataMigrate {
 	        
 	def getSeqExperiment(Sample sample, SequenceRun seqRun, String seqId, String rd1Start, String rd1End, String indexStart, String indexEnd, String rd2Start, String rd2End) {
 		def map = [:]
-		if(rd1Start != "" || rd1End != "") {
+		if(rd1Start || rd1End) {
 			map['rd1'] = [rd1Start, rd1End]
 		}
-		if(indexStart != "" || indexEnd != "") {
+		if(indexStart || indexEnd) {
 			map['index'] = [indexStart, indexEnd]
 		}
-		if(rd2Start != "" || rd2End != "") {
+		if(rd2Start || rd2End) {
 			map['rd2'] = [rd2Start, rd2End]
 		}
 	    def readPositions = JsonOutput.toJson(map)
@@ -517,7 +555,7 @@ class DataMigrate {
 	}
 	
 	def getGenome(String genomeStr, Species species) {
-	    if (genomeStr == "") {
+	    if (genomeStr == null) {
 	        return null
 	    }
 	    def genome = Genome.findByName(genomeStr)
@@ -548,7 +586,7 @@ class DataMigrate {
 	}
 	
 	def getIgType(String igStr) {
-	    if (igStr == "") {
+	    if (igStr == null) {
 	        return null
 	    }
 	    def igType = IgType.findByName(igStr)
@@ -559,18 +597,9 @@ class DataMigrate {
 	}
 	
 	def getTarget(String targetStr, String targetTypeStr, String nTag, String cTag) {
-	    if ([targetStr, cTag, nTag].every{ it == "" }) {
+	    if ([targetStr, cTag, nTag].every{ it == null }) {
 	        return null
 	    }
-        if (targetStr == "") {
-            targetStr = null
-        }
-        if (nTag == "") {
-            nTag = null
-        }
-        if (cTag == "") {
-            cTag = null
-        }
 
 	    def target = Target.findByNameAndCTermTagAndNTermTag(targetStr, cTag, nTag)
 	    if (!target) {
@@ -581,7 +610,7 @@ class DataMigrate {
 	}
 	
 	def getTargetType(String str) {
-	    if (str == "") {
+	    if (str == null) {
 	        return null
 	    }
 	    def type = TargetType.findByName(str)
@@ -592,7 +621,7 @@ class DataMigrate {
 	}
 	
 	def getAbHost(String abHostName) {
-	    if (abHostName == "") {
+	    if (abHostName == null) {
 	        return null
 	    }
 	    def abHost = AbHost.createCriteria().get{
@@ -606,7 +635,7 @@ class DataMigrate {
 	}
 	
 	def getCompany(String companyStr) {
-	    if (companyStr == "") {
+	    if (companyStr == null) {
 	        return null
 	    }    
 	    def company = Company.findByName(companyStr)
@@ -630,13 +659,13 @@ class DataMigrate {
 	    int runNum
 	    def platform
 	    def seqId
-        if (runStr == "") {
+        if (runStr == null) {
             runStr = "00"
         } else if (runStr.length() == 1) {
             runStr = "0" + runStr
         }
         
-        if (indexIdStr == ""){
+        if (indexIdStr == null){
             indexIdStr = "00" + indexIdStr
         } else if (indexIdStr.length() == 1) {
             indexIdStr = "0" + indexIdStr
@@ -751,7 +780,7 @@ class DataMigrate {
 	     amountUseUl: data[25],
 	     // data[26],
 	     // data[27],
-	     abName: data[28],
+	     // abName: data[28],
 	     samplePrepUser: data[29],
 	     genus: data[30],
 	     species: data[31],
@@ -825,6 +854,7 @@ class DataMigrate {
 	     userStr: data[99],
 	     dateStr: data[100],
 	     fcidStr: data[101],
+         indexStr: data[113]
 	    ]
 	}
 }

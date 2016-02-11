@@ -18,6 +18,23 @@ target(tests: "Simple tests") {
     String c = "A"
     println c.toLowerCase()
     
+    String v = "1"
+    def first = v.indexOf(".")
+    if(first == -1) {
+        v = v + ".0"
+    } else if (first == 0) {
+        v = "0" + v
+    } 
+    first = v.indexOf(".")
+    def v2 = v.substring(first+1)
+    def second = v2.indexOf(".")
+    if (second == -1) {
+        v = v + ".0"
+    }else if (second == v2.length() - 1) {
+        v = v + "0"
+    }
+    println "v: ${v}"
+    
     String name = "Frank, B.Pugh"
     def names = name.split(",|\\.")
     println names[0] + names[1] + names[2]

@@ -9,7 +9,7 @@ class SequenceAlignment {
 	String params
 	String filePaths
 	CorePipeline corePipeline
-	Date dateCreated
+	Date date
 	boolean isPreferred
 	
     static constraints = {
@@ -19,6 +19,7 @@ class SequenceAlignment {
         params nullable: true, blank: true, maxSize: 2000
 		filePaths nullable: true, blank: true, maxSize: 1000
         corePipeline nullable: true
+        date nullable: true
     }
     
     static mapping = {

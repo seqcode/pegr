@@ -4,7 +4,8 @@ class Species {
 	String name
 	String genusName
 	String note
-	
+	DictionaryStatus status
+    
 	String toString() {
         "${genusName} ${name}"
 	}
@@ -12,5 +13,6 @@ class Species {
     static constraints = {
 		name unique: "genusName"
 		note nullable: true, blank: true
+        status nullable: true
     }
 }

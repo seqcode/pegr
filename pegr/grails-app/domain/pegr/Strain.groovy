@@ -9,7 +9,8 @@ class Strain {
     String geneticModification
 	Lab sourceLab
 	String note
-	
+	DictionaryStatus status
+    
     static mappedBy = [parent: 'none', backgroundStrain: 'none']
     
 	String toString() {
@@ -29,5 +30,6 @@ class Strain {
         geneticModification matches: '^[0-9A-Za-z -]+$', nullable: true, blank: true
 		sourceLab nullable: true
 		note nullable: true, blank: true
+        status nullable: true
     }
 }

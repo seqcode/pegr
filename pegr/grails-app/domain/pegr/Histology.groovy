@@ -4,6 +4,7 @@ class Histology {
 
     Histology parent
 	String name
+    DictionaryStatus status
 	
 	String toString() {
 		name
@@ -12,5 +13,6 @@ class Histology {
     static constraints = {
 		name unique: true
         parent nullable: true
+        status nullable: true
     }
 }

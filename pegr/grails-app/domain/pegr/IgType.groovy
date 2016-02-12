@@ -3,6 +3,7 @@ package pegr
 class IgType {
 
 	String name
+    DictionaryStatus status
 	
 	String toString() {
 		name
@@ -10,5 +11,6 @@ class IgType {
 	
     static constraints = {
 		name unique: true
+        status nullable: true
     }
 }

@@ -3,6 +3,7 @@ package pegr
 class AbHost {
 
 	String name
+    DictionaryStatus status
 	
 	String toString() {
 		name
@@ -10,5 +11,6 @@ class AbHost {
 	
     static constraints = {
 		name unique: true
+        status nullable: true
     }
 }

@@ -7,6 +7,7 @@ class Target {
 	String cTermTag
 	String note
 	TargetType targetType
+    DictionaryStatus status
 
 	String toString() {
 		name
@@ -18,5 +19,6 @@ class Target {
 		cTermTag nullable:true, blank: true
 		note nullable: true, blank: true
         targetType nullable: true
+        status nullable: true
     }
 }

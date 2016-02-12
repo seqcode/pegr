@@ -5,6 +5,7 @@ class CellSourceTreatment {
 	String compound
 	String quantity
 	String duration
+    DictionaryStatus status
 	  
 	String toString() {
 		String s = name
@@ -16,5 +17,6 @@ class CellSourceTreatment {
         compound nullable: true, blank: true
 		quantity nullable: true, blank: true
 		duration nullable: true, blank: true
+        status nullable: true
 	}
 }

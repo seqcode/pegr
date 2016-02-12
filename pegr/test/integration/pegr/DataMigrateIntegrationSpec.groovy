@@ -10,7 +10,9 @@ class DataMigrateIntegrationSpec extends Specification {
 		 
 		when: "migration is called"
 		def dataMigrate = new DataMigrate()
-		dataMigrate.migrate(filename, startLine, endLine)
+		//dataMigrate.migrate(filename, startLine, endLine)
+		
+		dataMigrate.getAllBioReplicate()
 		
 		then: "completes"
     }

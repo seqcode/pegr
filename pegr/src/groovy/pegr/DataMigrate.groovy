@@ -436,6 +436,9 @@ class DataMigrate {
 	    if (sampleNotes) {
 	        note['note'] = sampleNotes
 	    }
+        if (sampleId) {
+            note['sampleId'] = sampleId
+        }
 	    if (bioRep1SampleId) {
 	        note['bioRep1'] = bioRep1SampleId
 	    }
@@ -447,6 +450,12 @@ class DataMigrate {
 	    return sample
 	}
 	
+    def getAllBioReplicate() {		
+        Sample.list().each {
+            getBioReplicate(it)
+        }
+    }
+    
 	def getBioReplicate(Sample sample) {    
 	    if(sample) {
 	        def jsonSlurper = new JsonSlurper()
@@ -462,10 +471,10 @@ class DataMigrate {
 		                new BiologicalReplicateSamples(set: set, sample: sample).save( failOnError: true)
 		            }
 		            if (set && sample2) {
-		                new BiologicalReplicateSamples(set: set, sample: sample2).save( failOnError: true)
+		                new BiologicalReplicateSamples(set: set, sample: sample2).save()
 		            }
 		            if (set && sample1) {
-		                new BiologicalReplicateSamples(set: set, sample: sample1).save( failOnError: true)
+		                new BiologicalReplicateSamples(set: set, sample: sample1).save()
 		            }
 		        }
 		        sample.note = note.note
@@ -480,7 +489,8 @@ class DataMigrate {
 	    if (sampleId == null) {
 	        return null
 	    }
-	    def samples = Sample.where{note == '%"sampleId":"${sampleId}"%'}.list()
+		def s = '%sampleId":"' + sampleId + "%"
+	    def samples = Sample.findAllByNoteIlike(s)
 	    if (samples.size() > 1){
 	        return null
 	    } else {

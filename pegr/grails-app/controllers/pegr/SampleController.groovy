@@ -1,35 +1,34 @@
 package pegr
 import grails.transaction.Transactional
-
+import groovy.json.*
+    
 @Transactional(readOnly = true)
 class SampleController {
-
-    static scaffold = true
     
     def index(Integer max) {
-        max = Math.min(max ?: 10, 100)
-        respond Sample.list(params), model:[sampleCount: Sample.count()]
-    }
-	
-    @Transactional
-    def create() {
-		def sample = new Sample(status: SampleStatus.CREATED)
-		if(params.projectId) {
-			def project = Project.get(params.projectId)
-			if (!project)
-				render status: 500
-			project.addToSamples(sample)
-			project.save(flush: true)	
-		}else {
-			sample.save(flush: true)
-		}
-		redirect(controller: "CellSource", action: "createCellSourceForSample", params: [sampleId: sample.id])
-
+        params.max = Math.min(max ?: 15, 100)
+        if (!params.sort) {
+            params.sort = "id"
+        }
+        def samples = Sample.where{status == SampleStatus.COMPLETED}.list(params)
+        [sampleList: samples, sampleCount: Sample.count()]
     }
     
 	def show(Integer id) {
 		def sample = Sample.get(id)
-		[sampleInstance:sample, sampleId: sample.id]
+        def jsonSlurper = new JsonSlurper()
+        def notes = [:]
+        try {
+            notes += jsonSlurper.parseText(sample.note)
+        }catch(Exception e){
+            
+        }
+        try {
+            notes += jsonSlurper.parseText(sample.prtclInstSummary.note)
+        }catch(Exception e){
+            
+        }        
+		[sample: sample, notes: notes]
 	}
 	
     def search() {       

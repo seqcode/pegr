@@ -782,6 +782,23 @@ class DataMigrate {
 		}
 		
     }
+    
+    def updateStrainName() {
+        Strain.list().each{
+            def s = "Unknown"
+            if (it.name == null || it.name == ""){
+                if (it.parent?.name) {
+                    s = it.parent?.name
+                    if (it.geneticModification) {
+                        s += "-${it.geneticModification}"
+                    }
+                    it.name = s
+                    it.save()
+                }
+            }
+
+        }
+    }
 	
 	def getNamedData(String[] data) {
 	    [laneStr: data[0],         

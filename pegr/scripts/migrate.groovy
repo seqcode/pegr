@@ -8,4 +8,7 @@ def endLine = 12000
 def dataMigrate = new DataMigrate()
 //dataMigrate.migrate(filename, startLine, endLine)
 
-dataMigrate.getAllBioReplicate()
+//dataMigrate.getAllBioReplicate()
+
+dataMigrate.updateStrainName() 
+    

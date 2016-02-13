@@ -7,6 +7,10 @@ class ProtocolInstanceSummary {
 	Protocol protocol
 	String note
 	
+    String toString(){
+        protocol
+    }
+    
     static constraints = {
 		startTime nullable: true
 		endTime nullable: true

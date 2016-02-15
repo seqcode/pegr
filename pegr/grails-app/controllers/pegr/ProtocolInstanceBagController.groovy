@@ -55,10 +55,12 @@ class ProtocolInstanceBagController {
     def previewItemAndBag(Long typeId, String barcode, Long bagId) {
         def itemType = ItemType.get(typeId)
         def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
-        if (item) {
-            def subBag = (item.bags.empty)? null : item.bags.last()
-            render(view:"previewItemAndBag", model: [item: item, subBag: subBag, bagId: bagId])
-        }
+        def sample = Sample.findByItem(item)
+        def subBag = null
+        if (sample && !sample.bags.empty){
+            subBag = sample.bags.last()    
+        } 
+        render(view:"previewItemAndBag", model: [item: item, subBag: subBag, bagId: bagId])
     }
     
     def addItemToBag(Long itemId, Long bagId) {

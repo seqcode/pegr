@@ -44,11 +44,30 @@ class ProtocolInstanceBagService {
     
     @Transactional
     void addItemToBag(Long itemId, Long bagId){
+        def bag = ProtocolInstanceBag.get(bagId)
+        def item = Item.get(itemId)
+        def sample = Sample.findByItem(item)
+        if (sample in bag.tracedSamples) {
+            throw new ProtocolInstanceBagException(message: "This sample is already in the bag!")
+        }
+        // create a new sample if the item is not a traced sample
+        if (!sample) {
+            // find the cell source
+            def csItem = item
+            def cellSource = CellSource.findByItem(item)
+            while(csItem && !cellSource) {
+                csItem = item.parent
+                cellSource = CellSource.findByItem(csitem)
+            }
+            if (cellSource) {
+                sample = new Sample(item: item, cellSource: cellSource, status: SampleStatus.CREATED)
+            } else {
+                throw new ProtocolInstanceBagException(message: "No cell source found for this item!")
+            }            
+        }
         try {
-            def sample = Sample.where{item.id == itemId}.find()
-            def bag = ProtocolInstanceBag.get(bagId)
-            sample.addToBags(bag).save(flush: true)
-        }catch(Exception e) {
+            sample.addToBags(bag).save()
+        } catch(Exception e) {
             log.error "Error: ${e.message}", e
             throw new ProtocolInstanceBagException(message: "Error adding this item!")
         }
@@ -66,36 +85,6 @@ class ProtocolInstanceBagService {
         }catch(Exception e) {
             log.error "Error: ${e.message}", e
             throw new ProtocolInstanceBagException(message: "Error adding this bag!")
-        }
-    }
-    
-    @Transactional
-    void saveItemInBag(Item item, String parentTypeId, String parentBarcode, Long bagId) {
-		if (parentBarcode?.trim()) {
-			def typeId = Long.parseLong(parentTypeId)
-	        def parent = Item.where{type.id == typeId && barcode == parentBarcode}.get(max: 1)
-	        if (!parent) {
-	            throw new ProtocolInstanceBagException(message: "Parent item not found!")
-	        }
-			item.parent = parent
-		}
-        try {            
-            def bag = ProtocolInstanceBag.get(bagId)
-            def csItem = item
-            while(csItem && csItem.type.name != "Cell Source") {
-                csItem = item.parent
-            }
-            def cellSource = null
-            if (csItem) {
-                cellSource = CellSource.findByItem(csItem)
-            }
-            def sample = new Sample(item: item, cellSource: cellSource, status: SampleStatus.CREATED)
-            sample.addToBags(bag)
-            sample.save()
-        }
-        catch(Exception e) {
-            log.error "Error: ${e.message}", e
-            throw new ProtocolInstanceBagException(message: "Error saving this item!")
         }
     }
     

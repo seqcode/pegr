@@ -39,11 +39,10 @@ class ProtocolInstanceBagController {
         def bag = ProtocolInstanceBag.get(id)
         def protocolInstances = ProtocolInstance.where { bag.id == id}.list(sort: "bagIdx", order: "asc")
         def count = protocolInstances.count{it.status == ProtocolStatus.COMPLETED}
-        def subBags = ProtocolInstanceBag.where{superBag.id == id}       
         def completed = (bag.status == ProtocolStatus.COMPLETED)
         def toBeCompleted = (bag.status != ProtocolStatus.COMPLETED && protocolInstances.last().status == ProtocolStatus.COMPLETED)
         if (bag) {
-            [bag:bag, count: count, protocolInstances: protocolInstances, subBags: subBags, completed: completed, toBeCompleted: toBeCompleted]
+            [bag:bag, count: count, protocolInstances: protocolInstances, completed: completed, toBeCompleted: toBeCompleted]
         }else {
             render status: 404
         }
@@ -59,9 +58,6 @@ class ProtocolInstanceBagController {
         if (item) {
             def subBag = (item.bags.empty)? null : item.bags.last()
             render(view:"previewItemAndBag", model: [item: item, subBag: subBag, bagId: bagId])
-        }else {
-            item = new Item(type: itemType, barcode: barcode)
-            render(view: "createItemInBag", model: [bagId: bagId, item:item])
         }
     }
     
@@ -80,19 +76,6 @@ class ProtocolInstanceBagController {
             protocolInstanceBagService.addSubBagToBag(subBagId, bagId)
             redirect(action: "showBag", id: bagId)
         } catch(ProtocolInstanceBagException e) {
-            flash.message = e.message
-            redirect(action: "searchItemForBag", id: bagId)
-        }
-    }
-    
-    def saveItemInBag() {
-        
-        def item = new Item(params)
-		def bagId = Long.parseLong(params.bagId)
-        try {
-            protocolInstanceBagService.saveItemInBag(item, params.parentTypeId, params.parentBarcode, bagId)
-            redirect(action: "showBag", id: bagId)
-        }catch(ProtocolInstanceBagException e) {
             flash.message = e.message
             redirect(action: "searchItemForBag", id: bagId)
         }
@@ -129,28 +112,29 @@ class ProtocolInstanceBagController {
         def protocolInstance = ProtocolInstance.get(id)
 
         if (protocolInstance) {
-            // get the required item types
-            def requiredItemTypes = ProtocolItemTypes.where {protocol.id == protocolInstance.protocol.id}.collect{it.itemType}
             // get the existing items
             def protocolItems = ProtocolInstanceItems.where {protocolInstance.id == id}.collect {it.item}
-            // initiate item list
-            def itemList = []
-            requiredItemTypes.each{ t ->
-                itemList.add([type: t, items: []])
+            // shared item list
+            def sharedItemList = []
+            protocolInstance.protocol.sharedItemTypes.each{ t ->
+                sharedItemList.add([type: t, items: []])
             }
-            // insert items to the list
+            // insert items to the shared item list
             protocolItems.each{ item ->
-                def itemsInType = itemList.find{it.type == item.type}
+                def itemsInType = sharedItemList.find{it.type == item.type}
                 if (itemsInType) {
                     itemsInType.items.add(item)
                 }else {
-                    itemList.add([type: item.type, items: [item]])
+                    sharedItemList.add([type: item.type, items: [item]])
                 }
-            }
+            }        
             
             def completed = (protocolInstance.bag.status == ProtocolStatus.COMPLETED)
-            def toBeCompleted = itemList.every{ !it.items.empty } && (protocolInstance.status != ProtocolStatus.COMPLETED)
-            [protocolInstance:protocolInstance, itemList: itemList, completed: completed, toBeCompleted: toBeCompleted]
+            def toBeCompleted = sharedItemList.every{ !it.items.empty } && (protocolInstance.status != ProtocolStatus.COMPLETED)
+            [protocolInstance:protocolInstance, 
+             sharedItemList: sharedItemList, 
+             completed: completed, 
+             toBeCompleted: toBeCompleted]
         }else {
             render status: 404
         }

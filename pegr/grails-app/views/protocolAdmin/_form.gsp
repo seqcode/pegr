@@ -27,30 +27,18 @@
 	<script>$("#protocol-details").cleditor();</script>
 </div>
 
-<h4>Required Item Types</h4>
-<div class="row">
-    <div class="col-sm-5">
-	   <g:select name="from[]" id="search" class="form-control" multiple="multiple"  from="${pegr.ItemType.list()}" optionKey="id" ></g:select>
-	</div>
-    <div class="col-sm-2">
-        <button type="button" id="search_rightSelected" class="btn btn-block"><i class="glyphicon glyphicon-chevron-right"></i></button>
-		<button type="button" id="search_leftSelected" class="btn btn-block"><i class="glyphicon glyphicon-chevron-left"></i></button>
-    </div>
-    <div class="col-sm-5">
-        <select name="requiredItemTypes" id="search_to" class="form-control" size="6" multiple="multiple">
-            <g:each in="${requiredItemTypes}">
-            <option value="${it.id}" >${it}</option>
-            </g:each>
-        </select>
-    </div>
+<div>
+    <label for="startItem">Traced Sample: Start State</label>
+    <g:select name="startItemTypeId" id="startItem" from="${pegr.ItemType.list()}" optionKey="id" value="${protocol?.startItemType?.id}" noSelection="['null':'N/A']"/>
+    <label for="endItem">End State</label>
+    <g:select name="endItemTypeId" id="endItem" from="${pegr.ItemType.list()}" optionKey="id" value="${protocol?.endItemType?.id}" noSelection="['null':'N/A']"/>
 </div>
 
-<script type="text/javascript">
-jQuery(document).ready(function($) {
-	$('#search').multipleselect({
-		search: {
-			left: '<input type="text" name="q" class="form-control" placeholder="Search..." />',
-		},         unique: "true",
-	});    
-});
-</script>
+<div>
+    <label for="sharedItem">Required Item Types: Shared</label>
+    <g:select name="sharedItemTypeIds" id="sharedItem" from="${pegr.ItemType.list()}" optionKey="id" value="${protocol?.sharedItemTypes*.id}" noSelection="['null':'N/A']" multiple="multiple"/>
+    
+    <label for="individualItem">Individual</label>
+    <g:select name="individualItemTypeIds" id="individualItem" from="${pegr.ItemType.list()}" optionKey="id" value="${protocol?.individualItemTypes*.id}" noSelection="['null':'N/A']" multiple="multiple"/>
+</div>
+

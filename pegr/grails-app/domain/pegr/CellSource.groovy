@@ -14,6 +14,7 @@ class CellSource {
     Histology histology
     User prepUser
 	Inventory inventory
+    Item item
     
 	String toString() {
 		strain
@@ -35,5 +36,6 @@ class CellSource {
         tissue nullable: true
         histology nullable: true
         prepUser nullable: true
+        item nullable: true
     }
 }

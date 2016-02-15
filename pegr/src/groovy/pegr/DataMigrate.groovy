@@ -261,16 +261,16 @@ class DataMigrate {
 	    if (!antibody) {	        
 	        def noteMap = [:]
 	        if (abNotes) {
-	            noteMap['note'] = abNotes
+	            noteMap['Note'] = abNotes
 	        }
 	        if (ulSent) {
-	            noteMap['ulSent'] = ulSent
+	            noteMap['Volume Sent (ul)'] = ulSent
 	        }
 	        if (ugPerChIP) {
-	            noteMap['ugPerChIP'] = ugPerChIP
+	            noteMap['Usage Per ChIP (ug)'] = ugPerChIP
 	        }
 	        if (ulPerChIP) {
-	            noteMap['ulPerChIP'] = ulPerChIP
+	            noteMap['Usage Per ChIP (ul)'] = ulPerChIP
 	        }
 	        
 	        def notes = JsonOutput.toJson(noteMap)
@@ -420,10 +420,10 @@ class DataMigrate {
 	    // get note
 	    def note = [:]
 	    if (resin) {
-	        note['resin'] = resin
+	        note['Resin'] = resin
 	    }
 	    if (PCRCycle) {
-	        note['PCRCycle'] = PCRCycle
+	        note['PCR Cycle'] = PCRCycle
 	    }
 	    
 	    def date = getDate(chipDate)

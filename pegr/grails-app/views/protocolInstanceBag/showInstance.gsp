@@ -22,7 +22,7 @@
                 ${raw(protocolInstance?.protocol?.details)}
             </g:if>
         </div>
-        <h3>Items</h3>
+        <h4>Shared Items</h4>
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
@@ -38,7 +38,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <g:each in="${itemList}">
+                    <g:each in="${sharedItemList}">
                     <tr>
                         <td class="col-sm-2" rowspan="${Math.max(1, it.items.size())}">${it.type} <g:if test="${!completed}"><g:link action="searchItemForTypeInstance" params="[instanceId:protocolInstance.id, typeId:it?.type?.id]"><span class="glyphicon glyphicon-plus"></span></g:link></g:if> </td>
                         <g:each in="${it.items}" var="item"  status="counter">

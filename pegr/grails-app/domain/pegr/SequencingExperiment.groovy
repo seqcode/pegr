@@ -11,6 +11,10 @@ class SequencingExperiment {
 	String note
 	ReadType readType
 	
+    List getAlignments() {
+        return SequenceAlignment.where{sequencingExperiment == this}.list()
+    }
+    
     static constraints = {
         seqId nullable: true, blank: true
         sequenceRun nullable: true

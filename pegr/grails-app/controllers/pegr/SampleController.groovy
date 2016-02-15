@@ -9,8 +9,10 @@ class SampleController {
         params.max = Math.min(max ?: 15, 100)
         if (!params.sort) {
             params.sort = "id"
+            params.order = "desc"
         }
         def samples = Sample.where{status == SampleStatus.COMPLETED}.list(params)
+
         [sampleList: samples, sampleCount: Sample.count()]
     }
     
@@ -30,19 +32,70 @@ class SampleController {
         }        
 		[sample: sample, notes: notes]
 	}
-	
-    def search() {       
-        def sampleProps = Sample.metaClass.properties*.name
-        def samples = Sample.withCriteria {
-            "${params.queryType}" {
-                params.each { field, value ->
-                    if (sampleProps.contains(field) && value) {
-                        ilike field, "%{value}%"
-                    }
-                }
+    
+    def showChecked(){
+        
+        def ids
+        if (session.checkedSample){
+            session.checkedSample.append(params.checkedSample)
+        }else{
+            ids = params.checkedSample
+        }
+        
+        def sampleList = []
+        ids.each{
+            def sample = Sample.get(Long.parseLong(it))
+            if (sample) {
+                sampleList.push(sample)
             }
         }
-        [samples: samples]
+        session.checkedSample = null
+        [sampleList: sampleList, ids: ids]
+    }
+    
+    def searchForm() {
+        
+    }
+    
+    def search() {       
+        def sampleProps = Sample.metaClass.properties*.name
+        def c = Sample.createCriteria()
+        params.max = 15
+        def samples = c.list(params) {
+            and {
+               if (params.species) {
+                    cellSource {
+                        strain {
+                            species {
+                                ilike "name", "%${params.species}%"
+                            }
+                        }
+                    }
+                }
+                if (params.strain) {
+                    cellSource {
+                        strain {
+                            ilike "name", "%${params.strain}%"
+                        }                    
+                    }
+                }
+                if (params.antibody) {
+                    antibody {
+                        ilike "catalogNumber", "%${params.antibody}%"
+                    }
+                }
+                eq("status", SampleStatus.COMPLETED)
+            }
+            order("id", "desc")
+        }
+        [sampleList: samples]
+    }
+    
+    def clearCheckedSampleAjax(){
+        if (session.checkedSample) {
+            session.checkedSample = null
+        }
+        return
     }
     
     @Transactional

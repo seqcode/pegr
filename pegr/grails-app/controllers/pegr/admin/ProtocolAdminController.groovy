@@ -16,16 +16,19 @@ class ProtocolAdminController {
     def show(Long id) {
         def protocol = Protocol.get(id)
         
-        [protocol: protocol, requiredItemTypes: protocol.requiredItemTypes]
+        [protocol: protocol]
     }
     
     def create() {
         if(request.method == "POST") {
             withForm{
                 def protocol = new Protocol(params)
-                def itemTypeIds = params.list('requiredItemTypes')
+                def startItemTypeId = params.long('startItemTypeId')
+                def endItemTypeId = params.long('endItemTypeId')
+                def sharedItemTypeIds = params.list('sharedItemTypeIds')
+                def individualItemTypeIds = params.list('individualItemTypeIds')
                 try {
-                    protocolService.save(protocol, itemTypeIds)
+                    protocolService.save(protocol, startItemTypeId, endItemTypeId, sharedItemTypeIds, individualItemTypeIds)
                     flash.message = "New protocol saved!"
                     redirect(action: "show", id: protocol.id)
                 }catch(ProtocolException e) {
@@ -49,22 +52,25 @@ class ProtocolAdminController {
         if(request.method == "POST") {
             withForm{
                 protocol.properties = params
-                def itemTypes = params.list('requiredItemTypes')
+                def startItemTypeId = params.long('startItemTypeId', null)
+                def endItemTypeId = params.long('endItemTypeId', null)
+                def sharedItemTypeIds = params.list('sharedItemTypeIds')
+                def individualItemTypeIds = params.list('individualItemTypeIds')
                 try {
-                    protocolService.save(protocol, itemTypes)
+                    protocolService.save(protocol, startItemTypeId, endItemTypeId, sharedItemTypeIds, individualItemTypeIds)
                     flash.message = "Protocol update!"
                     redirect(action: "show", id: protocol.id)
                 }catch(ProtocolException e) {
                     request.message = e.message
-                    render(view: "edit", model: [protocol: protocol, requiredItemTypes: protocol.requiredItemTypes])
+                    render(view: "edit", model: [protocol: protocol])
                 }catch(Exception e) {
                     request.message = "Error updateing this protocol!"
                     log.error "Error: ${e.message}", e
-                    render(view: "edit", model: [protocol: protocol, requiredItemTypes: protocol.requiredItemTypes])
+                    render(view: "edit", model: [protocol: protocol])
                 }
             }
         }else {
-            [protocol: protocol, requiredItemTypes: protocol.requiredItemTypes]
+            [protocol: protocol]
         }
     }
     

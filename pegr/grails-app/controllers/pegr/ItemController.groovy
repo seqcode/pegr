@@ -27,7 +27,7 @@ class ItemController {
         if(!item) {
             render status: 404
         }
-        def object = itemService.getObjectFromItem(item.type.objectType, item.referenceId)
+        def object = itemService.getObjectFromItem(item)
         def itemController = item.type.objectType ?: "item"
         def folder = getImageFolder(id)
         def images = folder.listFiles().findAll{getFileExtension(it.name) in allowedTypes.values()}
@@ -80,7 +80,7 @@ class ItemController {
     }
 
     def edit(Item item) {
-        def object = itemService.getObjectFromItem(item.type.objectType, item.referenceId)
+        def object = itemService.getObjectFromItem(item)
         def itemController = item.type.objectType ?: "item"
         [item: item, object: object, itemController: itemController]
     }
@@ -90,7 +90,7 @@ class ItemController {
         item.properties = params
         def object = null
         if(item.type.objectType) {
-            object = itemService.getObjectFromItem(item.type.objectType, item.referenceId)
+            object = itemService.getObjectFromItem(item)
             if (object) {
                 object.properties = params
             }else {

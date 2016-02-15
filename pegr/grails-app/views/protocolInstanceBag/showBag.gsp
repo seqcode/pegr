@@ -25,13 +25,13 @@
                 <div class="panel panel-warning">
                     <div class="panel-heading">
                         <h4 class="panel-title">
-                            <a data-toggle="collapse" href="#items">Traced Assets</a>
+                            <a data-toggle="collapse" href="#items">Traced Samples</a>
                                 <g:if test="${!completed}">
                                     <g:link action="searchItemForBag" id="${bag.id}" class="pull-right"><span class="glyphicon glyphicon-plus"></span> Add</g:link>
                                 </g:if>
                         </h4>
                     </div>                    
-                    <g:render template="/protocolInstanceBag/baggedItems" model="['items':bag.tracedItems,'subBags':subBags, 'completed':completed]"></g:render>
+                    <g:render template="/protocolInstanceBag/baggedItems" model="['items':bag.tracedSamples*.item, 'completed':completed]"></g:render>
                 </div>
             </div>
         </div>

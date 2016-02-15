@@ -7,11 +7,10 @@ class ProtocolInstanceBag {
     Date startTime
 	Date endTime
 	ProtocolStatus status
-    ProtocolInstanceBag superBag
     
-    static hasMany = [tracedItems: Item]
+    static hasMany = [tracedSamples: Sample]
     
-    static belongsTo = [Item]
+    static belongsTo = [Sample]
     
     String toString() {
         name
@@ -22,6 +21,5 @@ class ProtocolInstanceBag {
         name nullable: true, blank: true
         startTime nullable: true
         endTime nullable: true
-        superBag nullable: true
     }
 }

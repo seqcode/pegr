@@ -13,14 +13,13 @@ class ItemService {
     
     @Transactional
     def save(item, object){
-        if(object){
-            if (object.save(flush: true)) {
-                item.referenceId = object.id
-            }else {
-                throw new ItemException(message: "Invalid inputs!")
+        if(item.save(flush: true)){
+            if(object){
+                object.item = item
+                object.save(flush: true)
             }
         }
-        if(!item.save(flush: true)){
+        else{
             throw new ItemException(message: "Invalid inputs!")
         }
     }
@@ -73,10 +72,10 @@ class ItemService {
         return grailsApplication.getDomainClass(grails.util.Metadata.current.getApplicationName()+ "." + type)
     }
     
-    def getObjectFromItem(String type, Long referenceId) {
+    def getObjectFromItem(Item item) {
         try {
-            def c = grailsApplication.getDomainClass(grails.util.Metadata.current.getApplicationName()+ "." + type)
-            def object = c.clazz.get(referenceId)
+            def c = grailsApplication.getDomainClass(grails.util.Metadata.current.getApplicationName()+ "." + item.type.objectType)
+            def object = c.clazz.findByItem(item)
             return object
         }catch(Exception e) {
             return null

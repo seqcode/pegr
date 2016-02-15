@@ -10,27 +10,46 @@ class ProtocolService {
     def springSecurityService
     
     @Transactional
-    void save(Protocol protocol, List itemTypeIds) {
+    void save(Protocol protocol, Long startItemTypeId, Long endItemTypeId, List sharedItemTypeIds, List individualItemTypeIds) {
         if(protocol.save(flush: true)) {
-            def changes = [:]
-            def oldItemTypeIds = ProtocolItemTypes.where{protocol == protocol}.collect{it.itemType.id}
-            oldItemTypeIds.each {
-                changes[it] = -1                
+            def toDelete = ProtocolItemTypes.where{protocol == protocol}.list()
+            
+            def newTypes = []
+            def startItemType = ItemType.get(startItemTypeId)
+            if (startItemType) {
+                newTypes.push(new ProtocolItemTypes(protocol:protocol, itemType: startItemType, function: ProtocolItemFunction.PARENT))
             }
-            itemTypeIds.each {
-                if (changes.containsKey(it)) {
-                    changes[it] = 0
+            def endItemType = ItemType.get(endItemTypeId)
+            if (endItemType) {
+                newTypes.push(new ProtocolItemTypes(protocol:protocol, itemType: endItemType, function: ProtocolItemFunction.CHILD))
+            }
+            sharedItemTypeIds.each{
+                try {
+                    def sharedItemType = ItemType.get(it)
+                    if (sharedItemType) {
+                        newTypes.push(new ProtocolItemTypes(protocol:protocol, itemType: sharedItemType, function: ProtocolItemFunction.SHARED))
+                    }
+                } catch(Exception e) {}
+            }
+            individualItemTypeIds.each{
+                try {
+                    def individualItemType = ItemType.get(it)
+                    if (individualItemType) {
+                        newTypes.push(new ProtocolItemTypes(protocol:protocol, itemType: individualItemType, function: ProtocolItemFunction.INDIVIDUAL))
+                    }
+                } catch(Exception e) {}
+            }
+
+            newTypes.each { t ->
+                def oldType = toDelete.find{it.itemType == t.itemType && it.function == t.function}
+                if (oldType) {
+                    toDelete.remove(oldType)
                 } else {
-                    changes[it] = 1
+                    t.save()
                 }
             }
-            changes.each{ key, value ->
-                if (value == -1) {
-                    ProtocolItemTypes.where{protocol == protocol && itemType.id == key}.get(max: 1).delete()
-                }else if (value == 1){
-                    def newItemType = ItemType.get(key)
-                    new ProtocolItemTypes(protocol:protocol, itemType: newItemType).save()
-                }
+            toDelete.each { 
+                it.delete()
             }
         }else {
             throw new ProtocolException(message: "Invalid inputs!")

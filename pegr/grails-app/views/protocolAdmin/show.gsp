@@ -34,14 +34,16 @@
                 ${raw(protocol.details)}
             </g:if>
             
-             <g:if test="${requiredItemTypes}">
-                <h4>Required Item Types</h4>
-                <ul>
-                <g:each in="${requiredItemTypes}">
-                <li>${it}</li>
-                </g:each>
-                </ul>
-            </g:if>
+            <h4>Traced Sample</h4>
+            <ul>
+                <li>Start State: ${protocol?.startItemType}</li>
+                <li>End State: ${protocol?.endItemType}</li>
+            </ul>
+            <h4>Required Item Types</h4>            
+            <ul>
+                <li>Shared: <g:each in="${protocol?.sharedItemTypes}">${it}</g:each></li>
+                <li>Individual: <g:each in="${protocol?.individualItemTypes}">${it}</g:each></li>
+            </ul>
 			
 			<g:form  action='delete' method="DELETE" useToken="true">
 				<g:hiddenField name="id" value="${protocol?.id}" />

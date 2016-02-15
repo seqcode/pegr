@@ -45,9 +45,9 @@ class ProtocolInstanceBagService {
     @Transactional
     void addItemToBag(Long itemId, Long bagId){
         try {
-            def item = Item.get(itemId)
+            def sample = Sample.where{item.id == itemId}.find()
             def bag = ProtocolInstanceBag.get(bagId)
-            item.addToBags(bag).save(flush: true)
+            sample.addToBags(bag).save(flush: true)
         }catch(Exception e) {
             log.error "Error: ${e.message}", e
             throw new ProtocolInstanceBagException(message: "Error adding this item!")
@@ -59,8 +59,10 @@ class ProtocolInstanceBagService {
         try {
             def subBag = ProtocolInstanceBag.get(subBagId)
             def bag = ProtocolInstanceBag.get(bagId)
-            subBag.superBag = bag
-            subBag.save(flush: true)
+            
+            subBag.tracedSamples.each {
+                it.addtoBags(bag).save()
+            }
         }catch(Exception e) {
             log.error "Error: ${e.message}", e
             throw new ProtocolInstanceBagException(message: "Error adding this bag!")
@@ -79,7 +81,17 @@ class ProtocolInstanceBagService {
 		}
         try {            
             def bag = ProtocolInstanceBag.get(bagId)
-            item.addToBags(bag).save(flush: true)
+            def csItem = item
+            while(csItem && csItem.type.name != "Cell Source") {
+                csItem = item.parent
+            }
+            def cellSource = null
+            if (csItem) {
+                cellSource = CellSource.findByItem(csItem)
+            }
+            def sample = new Sample(item: item, cellSource: cellSource, status: SampleStatus.CREATED)
+            sample.addToBags(bag)
+            sample.save()
         }
         catch(Exception e) {
             log.error "Error: ${e.message}", e
@@ -90,26 +102,14 @@ class ProtocolInstanceBagService {
     @Transactional
     def removeItemFromBag(Long itemId, Long bagId) {
         try {
-            def item = Item.get(itemId)
+            def sample = Sample.where{item.id == itemId}.find()
             def bag = ProtocolInstanceBag.get(bagId)
-            item.removeFromBags(bag).save(flush: true)
+            sample.removeFromBags(bag).save(flush: true)
         }catch(Exception e) {
             log.error "Error: ${e.message}", e
             throw new ProtocolInstanceBagException(message: "Error removing this item!")
         }
         
-    }
-    
-    @Transactional
-    def removeBagFromBag(Long subBagId) {
-        try {
-            def subBag = ProtocolInstanceBag.get(subBagId)
-            subBag.superBag = null
-            subBag.save(flush: true)
-        }catch(Exception e) {
-            log.error "Error: ${e.message}", e
-            throw new ProtocolInstanceBagException(message: "Error removing this bag!")
-        }
     }
     
     @Transactional

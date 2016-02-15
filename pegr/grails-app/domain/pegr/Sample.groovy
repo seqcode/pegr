@@ -17,7 +17,19 @@ class Sample {
     User sendDataTo
     Invoice invoice
 	ProtocolInstanceSummary prtclInstSummary
-
+    Item item
+    List bags
+    
+    static hasMany = [bags: ProtocolInstanceBag]
+    
+    List getRuns() {
+        return SequencingExperiment.where{sample == this}.collect{it.sequenceRun}
+    }
+    
+    List getSequencingExperiments() {
+        return SequencingExperiment.where{sample == this}.list()
+    }
+    
     List getSequenceIndices() {
         return SampleSequenceIndices.where{sample == this}.collect{it.index}
     }
@@ -49,6 +61,7 @@ class Sample {
         invoice nullable: true
 		prtclInstSummary nullable: true
         date nullable: true
+        item nullable: true
     }
     
     static mapping = {

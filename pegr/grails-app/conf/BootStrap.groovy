@@ -23,13 +23,6 @@ class BootStrap {
 					objectType: "Antibody")
 				itemType.save()
 			}
-			
-			if (!ItemType.findByName("Sample")) {
-				println "Creating ItemType for Sample"
-				def itemType = new ItemType(name: "Sample",
-					objectType: "Sample")
-				itemType.save()
-			}
             
             if (!SequencingPlatform.findByName("SOLiD")) {
                 new SequencingPlatform(name: "SOLiD").save(flush: true)

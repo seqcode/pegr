@@ -13,6 +13,7 @@ class Antibody {
 	String externalId
 	String inventoryId
 	String note
+    Item item
 	
 	String toString() {
 		catalogNumber
@@ -29,5 +30,6 @@ class Antibody {
 		externalId nullable: true, blank: true
 		inventoryId nullable: true, blank: true
 		note nullable: true, blank: true
+        item nullable: true
     }
 }

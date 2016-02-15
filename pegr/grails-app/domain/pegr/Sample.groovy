@@ -34,6 +34,15 @@ class Sample {
         return SampleSequenceIndices.where{sample == this}.collect{it.index}
     }
     
+    String getSequenceIndicesString() {
+        def indices = SampleSequenceIndices.where{sample == this}.collect{it.index}
+        def s = ""
+        indices.each{
+            s += "${it.indexId}.${it.sequence}. "
+        }
+        return s
+    }
+    
     List getProjects() {
         return ProjectSamples.where{sample == this}.collect{it.project}
     }

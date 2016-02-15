@@ -112,31 +112,54 @@ class ProtocolInstanceBagController {
     
     def showInstance(Long id) {
         def protocolInstance = ProtocolInstance.get(id)
-
         if (protocolInstance) {
-            // get the existing items
-            def protocolItems = ProtocolInstanceItems.where {protocolInstance.id == id}.collect {it.item}
-            // shared item list
-            def sharedItemList = []
-            protocolInstance.protocol.sharedItemTypes.each{ t ->
-                sharedItemList.add([type: t, items: []])
+            def protocol = protocolInstance.protocol
+            // get shared item list
+            def sharedItemList = protocolInstanceBagService.getSharedItemList(id, protocol)
+            // prepare the individual item table
+            def individualItemList = getIndividualItemList(protocol)
+            def samples = null
+            if (individualItemList) {
+                // get samples in the bag
+                samples = protocolInstance.bag.tracedSamples
             }
-            // insert items to the shared item list
-            protocolItems.each{ item ->
-                def itemsInType = sharedItemList.find{it.type == item.type}
-                if (itemsInType) {
-                    itemsInType.items.add(item)
-                }else {
-                    sharedItemList.add([type: item.type, items: [item]])
-                }
-            }        
-            
             def completed = (protocolInstance.bag.status == ProtocolStatus.COMPLETED)
-            def toBeCompleted = sharedItemList.every{ !it.items.empty } && (protocolInstance.status != ProtocolStatus.COMPLETED)
-            [protocolInstance:protocolInstance, 
-             sharedItemList: sharedItemList, 
-             completed: completed, 
-             toBeCompleted: toBeCompleted]
+
+            if (completed) {
+                render(view: "showInstance", model: [protocolInstance:protocolInstance, 
+                                                     sharedItemList: sharedItemList,
+                                                     individualItemList: individualItemList,
+                                                     samples: samples] )               
+            } else {
+                if (individualItemList) {
+                    def parents = []
+                    def children = []
+                    samples.eachWithIndex { sample, idx ->
+                        def currentType = sample.item?.type
+                        if( currentType == startState) {
+                            parents[idx] = sample.item
+                            children[idx] = null
+                        } else if(currentType == endState) {
+                            children[idx] = sample.item
+                            if (sample.item.parent.type == startState) {
+                                parents[idx] = sample.item.parent
+                            } else {
+                                flash.message = "Traced samples' status does not match with protocol!"
+                                redirect(action: "showBag", id: protocolInstance.bag.id)
+                            }
+                        } else {
+                            flash.message = "Traced samples' status does not match with protocol!"
+                            redirect(action: "showBag", id: protocolInstance.bag.id)
+                        }
+                    }
+                }
+                def toBeCompleted = sharedItemList.every{ !it.items.empty } && children.every{ it != null }
+                render(view: "editInstance", model: [protocolInstance: protocolInstance, 
+                                                     sharedItemList: sharedItemList,
+                                                     individualItemList: individualItemList,
+                                                     samples: samples,
+                                                     toBeCompleted: toBeCompleted])
+            }
         }else {
             render status: 404
         }
@@ -227,5 +250,20 @@ class ProtocolInstanceBagController {
             redirect(action: "showBag", id: bagId)
         }
 
+    }
+    
+    def addIndex() {
+        def sampleId = params.list(sampleId)
+        def indexId = params.list(indexId)
+        protocolInstanceBagService.addIndex(sampleId, indexId)
+        redirect(action: "showInstance", id: params.instanceId)
+    }
+    
+    def addAntibody() {
+        
+    }
+    
+    def addChild() {
+        
     }
 }

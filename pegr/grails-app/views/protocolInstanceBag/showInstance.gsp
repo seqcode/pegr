@@ -32,49 +32,61 @@
                         <th>Location</th>
                         <th>Barcode</th>
                         <th>Notes</th>
-                        <g:if test="${!completed}">
-                            <th></th>
-                        </g:if>
                     </tr>
                 </thead>
                 <tbody>
                     <g:each in="${sharedItemList}">
                     <tr>
-                        <td class="col-sm-2" rowspan="${Math.max(1, it.items.size())}">${it.type} <g:if test="${!completed}"><g:link action="searchItemForTypeInstance" params="[instanceId:protocolInstance.id, typeId:it?.type?.id]"><span class="glyphicon glyphicon-plus"></span></g:link></g:if> </td>
+                        <td class="col-sm-2" rowspan="${Math.max(1, it.items.size())}">${it.type}</td>
                         <g:each in="${it.items}" var="item"  status="counter">
                             <g:if test="${counter>0}"><tr></g:if>
                             <td class="col-sm-2"><g:link controller="item" action="show" id="${item.id}" target="_blank">${item.name} </g:link></td>
                             <td class="col-sm-2">${item.location}</td>
                             <td class="col-sm-2">${item.barcode}</td>
                             <td class="col-sm-2">${item.notes}</td>
-                            <g:if test="${!completed}">
-                                <td>
-                                <g:link class="confirm" action="removeItemFromInstance" params="[itemId: item.id, instanceId: protocolInstance.id]"><span class="glyphicon glyphicon-remove"></span></g:link></td>
-                            </g:if>
                             </tr>
                         </g:each>
                 </g:each>
-                <tr>
-                    <td colspan="5"><g:if test="${!completed}"><g:link action="searchItemForInstance" params="[id:protocolInstance.id]">Add <span class="glyphicon glyphicon-plus"></span></g:link></g:if></td>
-                    <g:if test="${!completed}">
-                        <td></td>
-                    </g:if>
-                </tr>
                 <tr>
                     <td colspan="5"></td>
                 </tr>
                 </tbody>
               </table>
         </div>
-        <g:if test="${toBeCompleted}">
-        <div class="row well text-center">
-        <g:link action="completeInstance" params="[instanceId: protocolInstance?.id, bagId: protocolInstance?.bag?.id]" class="btn btn-success">Complete <span class="glyphicon glyphicon-ok"></span> </g:link>
-        </div>
-        </g:if>
+        <g:if test="${individualItemList}">
+            <h4>Individual Items</h4>
+            <table class="table table-striped">
+                <thead>
+                    <th>Traced Sample</th>
+                    <g:each in="${individualItemList}">
+                        <th>${it}</th>
+                    </g:each>
+                </thead>
+                <tbody>
+                    <g:if test="${individualItemList.size()==2}">
+                        <g:each in="${samples}" var="sample">
+                            <tr>
+                                <td><g:link controller="item" action="show" id="${sample.item.parent.id}" target="_blank">${sample.item.parent.name}</g:link></td>
+                                <td><g:link controller="item" action="show" id="${sample.item.id}" target="_blank">${sample.item.name}</g:link></td>
+                            </tr>
+                        </g:each>
+                    </g:if>
+                    <g:else>
+                        <g:each in="${samples}" var="sample">
+                            <tr>
+                                <td><g:link controller="item" action="show" id="${sample.item.parent.id}" target="_blank">${sample.item.parent.name}</g:link></td>
+                                <td><g:link controller="item" action="show" id="${sample.item.id}" target="_blank">${sample.item.name}</g:link></td>
+                                <td>${sample.antibody}</td>
+                                <td>${sample.sequenceIndicesString}</td>        
+                            </tr>
+                        </g:each>
+                    </g:else>
+                </tbody>
+            </table>
+        </g:if>    
     </div>
     <script>
         $("#nav-bench").addClass("active"); 
-        $(".confirm").confirm();
     </script>
 </body>
 </html>

@@ -195,4 +195,62 @@ class ProtocolInstanceBagService {
             throw new ProtocolInstanceBagException(message: "Error saving the status for protocol instance bag!")
         }
     }
+    
+    @Transactional
+    void addIndex(List sampleId, List indexId) {
+        sampleId.eachWithIndex { id, idx ->
+            def sample =  null
+            try {
+                sample = Sample.get(Long.parseLong(id))
+            } catch(Exception e){}
+            def index = null
+            try {
+                index = SequenceIndex.findByIndexIdAndIndexDictionaryStatus(Long.parseLong(indexId[idx]), DictionaryStatus.Y)
+            }catch (Exception e) {}
+            if (sample && index) {
+                new SampleSequenceIndices(sample: sample, index: index).save()
+            }
+        }
+    }
+    
+    List getSharedItemList(Long protocolInstanceId, Protocol protocol) {
+        // get the existing items
+        def protocolItems = ProtocolInstanceItems.where {protocolInstance.id == protocolInstanceId}.collect {it.item}
+        // shared item list
+        def sharedItemList = []
+        protocol.sharedItemTypes.each{ t ->
+            sharedItemList.add([type: t, items: []])
+        }
+        // insert items to the shared item list
+        protocolItems.each{ item ->
+            def itemsInType = sharedItemList.find{it.type == item.type}
+            if (itemsInType) {
+                itemsInType.items.add(item)
+            }else {
+                sharedItemList.add([type: item.type, items: [item]])
+            }
+        }  
+        return sharedItemList
+    }
+    
+    List getIndividualItemList(Protocol protocol) {    
+        def individualItemList = []
+        def samples = null
+        def startState = protocol.startItemType
+        def endState = protocol.endItemType
+        if (startState != endState) {
+            individualItemList.push('Child')
+        }
+        if (protocol.individualItemTypes.find{it.name =~ "%Antibody%"}) {
+            individualItemList.push('Antibody')
+        }
+        if (sharedItemList.find{it.type.name =~ "%index%"}) {
+            individualItemList.push('Index')
+        }
+        if (individualItemList.size() == 0) {
+            individualItemList = null
+        }
+        return individualItemList
+    }
+    
 }

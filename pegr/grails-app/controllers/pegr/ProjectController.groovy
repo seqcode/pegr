@@ -7,17 +7,20 @@ class ProjectController {
     
 	def springSecurityService
 	
-    def index() {
-        def max = Math.min(params.max ?:10, 100)
+    def index(int max) {
+        params.max = Math.min(max ?:15, 100)
+        if (!params.sort) {
+            params.sort = "project.lastUpdated"
+            params.order = "desc"
+        }
         // get the current login user
 		def currentUser = springSecurityService.currentUser
-		// query the user's the projects
-        // TODO: offset, max
-        def userProjects = ProjectUser.where {user==currentUser}
+		
+        // query the user's the projects
+        def query = (currentUser?.id == 1) ? ProjectUser : ProjectUser.where {user == currentUser}
+        def userProjects = query.list(params)
 
-       // userProjects.sort{a,b->b.project.lastUpdated<=>a.project.lastUpdated}
-		def projectCount = ProjectUser.where {user==currentUser}.count()
-		[userProjects: userProjects, projectCount: projectCount]
+		[userProjects: userProjects, projectCount: query.count()]
 	}
 	
     @Transactional

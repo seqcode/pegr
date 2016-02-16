@@ -116,49 +116,38 @@ class ProtocolInstanceBagController {
             def protocol = protocolInstance.protocol
             // get shared item list
             def sharedItemList = protocolInstanceBagService.getSharedItemList(id, protocol)
-            // prepare the individual item table
-            def individualItemList = getIndividualItemList(protocol)
+            // prepare the individual item table template
+            def template = protocolInstanceBagService.getTemplate(protocol)
             def samples = null
-            if (individualItemList) {
+            if (template) {
                 // get samples in the bag
                 samples = protocolInstance.bag.tracedSamples
             }
             def completed = (protocolInstance.bag.status == ProtocolStatus.COMPLETED)
-
             if (completed) {
-                render(view: "showInstance", model: [protocolInstance:protocolInstance, 
-                                                     sharedItemList: sharedItemList,
-                                                     individualItemList: individualItemList,
-                                                     samples: samples] )               
-            } else {
-                if (individualItemList) {
-                    def parents = []
-                    def children = []
-                    samples.eachWithIndex { sample, idx ->
-                        def currentType = sample.item?.type
-                        if( currentType == startState) {
-                            parents[idx] = sample.item
-                            children[idx] = null
-                        } else if(currentType == endState) {
-                            children[idx] = sample.item
-                            if (sample.item.parent.type == startState) {
-                                parents[idx] = sample.item.parent
-                            } else {
-                                flash.message = "Traced samples' status does not match with protocol!"
-                                redirect(action: "showBag", id: protocolInstance.bag.id)
-                            }
-                        } else {
-                            flash.message = "Traced samples' status does not match with protocol!"
-                            redirect(action: "showBag", id: protocolInstance.bag.id)
-                        }
-                    }
+                template = "show" + template
+            }else {
+                template = "edit" + template
+            }
+            try{
+                def toBeCompleted = false
+                def results
+                if (completed) {
+                    results = protocolInstanceBagService.getParentsAndChildrenForCompletedInstance(samples, protocol.startItemType, protocol.endItemType)
+                } else {
+                    results = protocolInstanceBagService.getParentsAndChildrenForProcessingInstance(samples, protocol.startItemType, protocol.endItemType)                
+                    toBeCompleted = sharedItemList.every{ !it.items.empty } && children.every{ it != null }
                 }
-                def toBeCompleted = sharedItemList.every{ !it.items.empty } && children.every{ it != null }
                 render(view: "editInstance", model: [protocolInstance: protocolInstance, 
-                                                     sharedItemList: sharedItemList,
-                                                     individualItemList: individualItemList,
-                                                     samples: samples,
-                                                     toBeCompleted: toBeCompleted])
+                                                 sharedItemList: sharedItemList,
+                                                 template: template,
+                                                 samples: samples,
+                                                 parents: results.parents,
+                                                 children: results.children,
+                                                 toBeCompleted: toBeCompleted])
+            } catch(ProtocolInstanceBagException e) {
+                flash.message = e.message
+                redirect(action: "showBag", id: protocolInstance.bag.id)
             }
         }else {
             render status: 404

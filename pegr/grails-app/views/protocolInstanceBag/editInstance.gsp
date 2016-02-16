@@ -59,45 +59,9 @@
                 </tbody>
               </table>
         </div>
-        <g:if test="${individualItemList}">
-            <h4>Individual Items</h4>
-            <g:form action="addIndex">
-                <g:hiddenField name="instanceId" value="${protocolInstance.id}"></g:hiddenField>
-                <g:submitButton name="save" clas="btn btn-primary"></g:submitButton>
-                <table class="table table-striped">
-                    <thead>
-                        <th>Traced Sample</th>
-                        <g:each in="${individualItemList}">
-                            <th>${it}</th>
-                        </g:each>
-                    </thead>
-                    <tbody>
-                        <g:if test="${individualItemList.size()==2}">
-                            <g:each in="${samples}" var="sample">
-                                <tr>
-                                    <td><g:link controller="item" action="show" id="${sample.item.id}" target="_blank">${sample.item.name}</g:link></td>
-                         
-
-                                                                                    <g:link action="add${it}" params="[sampleId:sample.id]">Add</g:link>
-                                        <td>
-
-                                                <g:hiddenField name="sampleId" value="${sample.id}"/>
-                                                <g:textField name="indexId" value="${sample.sequenceIndicesString}" />
-
-
-
-                                        </td>
-                                    
-                                </tr>
-                            </g:each>
-                        </g:if>
-                        <g:else>
-                        </g:else>
-                    </tbody>
-                </table>
-            </g:form>
+        <g:if test="${template}">            
+            <g:render template="${template}" model="['parents':parents,'children':children, 'sampleIds':sampleIds, 'instanceId':protocolInstance.id]"></g:render>         
         </g:if>    
-    
         <g:if test="${toBeCompleted}">
         <div class="row well text-center">
         <g:link action="completeInstance" params="[instanceId: protocolInstance?.id, bagId: protocolInstance?.bag?.id]" class="btn btn-success">Complete <span class="glyphicon glyphicon-ok"></span> </g:link>

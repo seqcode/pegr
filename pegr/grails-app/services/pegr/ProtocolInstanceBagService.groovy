@@ -233,24 +233,74 @@ class ProtocolInstanceBagService {
         return sharedItemList
     }
     
-    List getIndividualItemList(Protocol protocol) {    
-        def individualItemList = []
-        def samples = null
-        def startState = protocol.startItemType
-        def endState = protocol.endItemType
-        if (startState != endState) {
-            individualItemList.push('Child')
+    String getTemplate(Protocol protocol) {    
+        def template = null
+        if (protocol.assay) {
+            template = "AssayInstance"
+        } else if (protocol.startItemType 
+            && protocol.endItemType 
+            && protocol.startItemType != protocol.endItemType) {
+            template = "Children"
         }
-        if (protocol.individualItemTypes.find{it.name =~ "%Antibody%"}) {
-            individualItemList.push('Antibody')
-        }
-        if (sharedItemList.find{it.type.name =~ "%index%"}) {
-            individualItemList.push('Index')
-        }
-        if (individualItemList.size() == 0) {
-            individualItemList = null
-        }
-        return individualItemList
+        return template
     }
     
+    Map getParentsAndChildrenForCompletedInstance(Set samples, ItemType startState, ItemType endState) {
+        def parents = []
+        def children = []
+        if (startState && endState) {
+            samples.eachWithIndex { sample, idx ->
+                def item = sample.item
+                while(item && item.type != endState) {
+                    item = item.parent
+                }
+                if (item && item.parent?.type == startState) {
+                    parents[ids] = item.parent
+                    children[ids] = item
+                } else {
+                    throw new ProtocolInstanceBagException(message: "Status of the parent does not match the protocol!")
+                }
+            }
+        }
+        return [parents: parents, children: children]
+    }
+    
+    Map getParentsAndChildrenForProcessingInstance(Set samples, ItemType startState, ItemType endState) {
+        def parents = []
+        def children = []
+        if (startState && endState) {
+            samples.eachWithIndex { sample, idx ->
+                def currentType = sample.item?.type
+                if( currentType == startState) {
+                    parents[idx] = sample.item
+                    children[idx] = null
+                } else if(currentType == endState) {
+                    children[idx] = sample.item
+                    if (sample.item.parent.type == startState) {
+                        parents[idx] = sample.item.parent
+                    } else {
+                        throw new ProtocolInstanceBagException(message: "Status of the parent does not match the protocol!")
+                    }
+                } else {
+                    throw new ProtocolInstanceBagException(message: "Status of the traced sample does not match the protocol!")
+                }
+            }
+        }
+        return [parents: parents, children: children]
+    }
+    
+    @Transactional
+    void addAntibody(Long sampleId, String barcode) {
+        def sample = Sample.get(sampleId)
+        def antibody = Antibody.where{item.barcode == barcode}.get(max: 1)
+        if (sample && antibody) {
+            sample.antibody = antibody
+            sample.save()
+        } 
+    }
+    
+    @Transactional
+    void addChild() {
+        
+    }
 }

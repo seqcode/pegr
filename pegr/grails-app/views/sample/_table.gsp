@@ -15,7 +15,7 @@
             <g:each in="${sampleList}" var="sample">
                 <tr>
                     <td><input type="checkbox" name="checkedSample" value="${sample.id}"></td>
-                    <td><g:link action="show" id="${sample.id}">${sample.id}</g:link></td>    
+                    <td><g:link controller="sample" action="show" id="${sample.id}">${sample.id}</g:link></td>    
                     <td>${sample.cellSource} </td>
                     <td>${sample.antibody}</td>
                     <td>${sample.target}</td>

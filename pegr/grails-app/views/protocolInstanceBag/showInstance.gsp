@@ -53,37 +53,9 @@
                 </tbody>
               </table>
         </div>
-        <g:if test="${individualItemList}">
-            <h4>Individual Items</h4>
-            <table class="table table-striped">
-                <thead>
-                    <th>Traced Sample</th>
-                    <g:each in="${individualItemList}">
-                        <th>${it}</th>
-                    </g:each>
-                </thead>
-                <tbody>
-                    <g:if test="${individualItemList.size()==2}">
-                        <g:each in="${samples}" var="sample">
-                            <tr>
-                                <td><g:link controller="item" action="show" id="${sample.item.parent.id}" target="_blank">${sample.item.parent.name}</g:link></td>
-                                <td><g:link controller="item" action="show" id="${sample.item.id}" target="_blank">${sample.item.name}</g:link></td>
-                            </tr>
-                        </g:each>
-                    </g:if>
-                    <g:else>
-                        <g:each in="${samples}" var="sample">
-                            <tr>
-                                <td><g:link controller="item" action="show" id="${sample.item.parent.id}" target="_blank">${sample.item.parent.name}</g:link></td>
-                                <td><g:link controller="item" action="show" id="${sample.item.id}" target="_blank">${sample.item.name}</g:link></td>
-                                <td>${sample.antibody}</td>
-                                <td>${sample.sequenceIndicesString}</td>        
-                            </tr>
-                        </g:each>
-                    </g:else>
-                </tbody>
-            </table>
-        </g:if>    
+        <g:if test="${template}">            
+            <g:render template="${template}" model="['parents':parents,'children':children, 'sampleIds':sampleIds, 'instanceId':protocolInstance.id]"></g:render>         
+        </g:if> 
     </div>
     <script>
         $("#nav-bench").addClass("active"); 

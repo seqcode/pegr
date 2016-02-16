@@ -12,6 +12,10 @@ class Project {
 		name
 	}
 	
+    List getSamples() {
+        return ProjectSamples.where{project == this}.collect{it.sample}
+    }
+    
     static constraints = {
 		name unique: true
 		description nullable: true, blank: true, maxSize: 1000

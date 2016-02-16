@@ -124,10 +124,12 @@ class ProtocolInstanceBagController {
                 samples = protocolInstance.bag.tracedSamples
             }
             def completed = (protocolInstance.bag.status == ProtocolStatus.COMPLETED)
-            if (completed) {
-                template = "show" + template
-            }else {
-                template = "edit" + template
+            if (template) {
+                if (completed) {
+                    template = "show" + template
+                }else {
+                    template = "edit" + template
+                }
             }
             try{
                 def toBeCompleted = false
@@ -136,7 +138,7 @@ class ProtocolInstanceBagController {
                     results = protocolInstanceBagService.getParentsAndChildrenForCompletedInstance(samples, protocol.startItemType, protocol.endItemType)
                 } else {
                     results = protocolInstanceBagService.getParentsAndChildrenForProcessingInstance(samples, protocol.startItemType, protocol.endItemType)                
-                    toBeCompleted = sharedItemList.every{ !it.items.empty } && children.every{ it != null }
+                    toBeCompleted = sharedItemList.every{ !it.items.empty } && results.children.every{ it != null }
                 }
                 render(view: "editInstance", model: [protocolInstance: protocolInstance, 
                                                  sharedItemList: sharedItemList,
@@ -144,6 +146,7 @@ class ProtocolInstanceBagController {
                                                  samples: samples,
                                                  parents: results.parents,
                                                  children: results.children,
+                                                 childType: protocol.endItemType,
                                                  toBeCompleted: toBeCompleted])
             } catch(ProtocolInstanceBagException e) {
                 flash.message = e.message
@@ -242,17 +245,62 @@ class ProtocolInstanceBagController {
     }
     
     def addIndex() {
-        def sampleId = params.list(sampleId)
-        def indexId = params.list(indexId)
+        def sampleId = params.list('sampleId')
+        def indexId = params.list('indexId')
         protocolInstanceBagService.addIndex(sampleId, indexId)
         redirect(action: "showInstance", id: params.instanceId)
     }
     
-    def addAntibody() {
-        
+    def searchAntibody(Long sampleId, Long instanceId) {
+        def antibodyTypeId = ItemType.findByName('Antibody')
+        [instanceId: instanceId, sampleId: sampleId, antibodyTypeId: antibodyTypeId]
     }
     
-    def addChild() {
-        
+    def previewAntibody(Long sampleId, Long instanceId, String barcode) {
+        def item = Item.where{type.name =~ "Antibody" && barcode == barcode}.get(max: 1)
+        if (item) {
+            def antibody = Antibody.findByItem(item)
+            if (antibody) {
+                render(view: "previewAntibody", model: [antibody: antibody, instanceId: instanceId, sampleId: sampleId] )
+            } 
+        } 
+        flash.message = "Antibody not found!"
+        redirect(action: "searchAntibody", params: [instanceId: instanceId, sampleId: sampleId])
+    }
+    
+    def addAntibody(Long sampleId, Long instanceId, Long antibodyId) {
+        try{
+            protocolInstanceBagService.addAntibodyToSample(sampleId, antibodyId)
+        } catch(ProtocolInstanceBagException e) {
+            flash.message("Error adding the antibody to the sample!")
+        }
+        redirect(action: "showInstance", id: instanceId)
+    }
+    
+    def addChild(Long sampleId, Long instanceId) {
+        if (request.method == "POST") {
+            withForm {
+                def item = new Item(params)
+                try {
+                    protocolInstanceBagService.addChild(item, sampleId)
+                    redirect(action: "showInstance", id: instanceId)
+                }catch(ProtocolInstanceBagException e){
+                    flash.message = e.message
+                    def childType = ItemType.get(params.long('childTypeId'))
+                    def sample = Sample.get(sampleId)
+                    if (!sample) {
+                        redirect(action: "showInstance", id: instanceId)
+                    }
+                    [sample: sample, instanceId: instanceId, childType: childType, item:item]
+                }                
+            }
+        } else{
+            def childType = ItemType.get(params.long('childTypeId'))
+            def sample = Sample.get(sampleId)
+            if (!sample) {
+                redirect(action: "showInstance", id: instanceId)
+            }
+            [sample: sample, instanceId: instanceId, childType: childType]
+        }
     }
 }

@@ -1,7 +1,7 @@
-<h4>Traced Samples</h4>
 <g:form action="addIndex">
+    <h4>Traced Samples <g:submitButton name="save" class="btn btn-primary"></g:submitButton></h4>
     <g:hiddenField name="instanceId" value="${instanceId}"></g:hiddenField>
-    <g:submitButton name="save" clas="btn btn-primary"></g:submitButton>
+    
     <table class="table table-striped">
         <thead>
             <th>Start State</th>
@@ -18,7 +18,7 @@
                             <g:link controller="item" action="show" id="${children[n].id}" target="_blank">${children[n].name}</g:link>
                         </g:if>
                         <g:else>
-                            <g:link action="addChild" params="[sampleId:sample.id, instanceId:instanceId]">Add</g:link>
+                            <g:link action="addChild" params="[sampleId:sample.id, instanceId:instanceId, childTypeId:childType.id]">Add</g:link>
                         </g:else>
                     </td>
                     <td>
@@ -26,7 +26,7 @@
                             <g:link controller="antibody" action="show" id="${sample.antibody}" target="_blank">${sample.antibody}</g:link>
                         </g:if>
                         <g:else>
-                            <g:link action="addAntibody" params="[sampleId:sampleId]">Add</g:link>
+                            <g:link action="searchAntibody" params="[sampleId:sampleId, instanceId:instanceId]">Add</g:link>
                         </g:else>
                     </td>
                     <g:hiddenField name="sampleId" value="${sample.id}"/>

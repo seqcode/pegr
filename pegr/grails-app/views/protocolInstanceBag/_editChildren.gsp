@@ -13,7 +13,7 @@
                         <g:link controller="item" action="show" id="${children[n].id}" target="_blank">${children[n].name}</g:link>
                     </g:if>
                     <g:else>
-                        <g:link action="addChild" params="[sampleId:sample.id, instanceId:instanceId]">Add</g:link>
+                        <g:link action="addChild" params="[sampleId:sample.id, instanceId:instanceId, childTypeId:childType.id]">Add</g:link>
                     </g:else>
                 </td>
             </tr>

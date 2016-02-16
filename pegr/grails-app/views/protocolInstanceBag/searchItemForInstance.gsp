@@ -7,7 +7,7 @@
     </script>
 </head>
 <body  onhashchange="getHash()">
-<div class="container-fluid">
+<div>
     <g:link action="showInstance" id="${instanceId}"><span class="glyphicon glyphicon-menu-left"></span> Back</g:link>
 
     <h4>Add Item </h4>

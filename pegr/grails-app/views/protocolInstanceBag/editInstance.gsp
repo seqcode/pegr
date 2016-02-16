@@ -5,7 +5,7 @@
 <title>Work bench</title>
 </head>
 <body>
-    <div class="container-fluid">
+    <div>
         <g:link action="showBag" id="${protocolInstance?.bag?.id}"><span class="glyphicon glyphicon-home"></span> Home</g:link>
         <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
@@ -38,7 +38,7 @@
                 <tbody>
                     <g:each in="${sharedItemList}">
                     <tr>
-                        <td class="col-sm-2" rowspan="${Math.max(1, it.items.size())}">${it.type}<g:link action="searchItemForTypeInstance" params="[instanceId:protocolInstance.id, typeId:it?.type?.id]"><span class="glyphicon glyphicon-plus"></span></g:link></td>
+                        <td class="col-sm-2" rowspan="${Math.max(1, it.items.size())}">${it.type} <g:link action="searchItemForTypeInstance" params="[instanceId:protocolInstance.id, typeId:it?.type?.id]"><span class="glyphicon glyphicon-plus"></span></g:link></td>
                         <g:each in="${it.items}" var="item"  status="counter">
                             <g:if test="${counter>0}"><tr></g:if>
                             <td class="col-sm-2"><g:link controller="item" action="show" id="${item.id}" target="_blank">${item.name} </g:link></td>

@@ -15,6 +15,9 @@ class ItemController {
     
     def list(Integer max, Long typeId) {
         params.max = Math.min(max ?: 10, 100)
+        if(typeId) {
+            def itemType = ItemType.get(typeId)
+            if (itemType.name)
         def items = Item.where{
             if(typeId) {type.id == typeId}
         }

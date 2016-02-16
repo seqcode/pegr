@@ -80,7 +80,7 @@ class ProtocolInstanceBagService {
             def bag = ProtocolInstanceBag.get(bagId)
             
             subBag.tracedSamples.each {
-                it.addtoBags(bag).save()
+                it.addToBags(bag).save()
             }
         }catch(Exception e) {
             log.error "Error: ${e.message}", e
@@ -290,17 +290,33 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    void addAntibody(Long sampleId, String barcode) {
+    void addAntibodyToSample(Long sampleId, Long antibodyId) {
         def sample = Sample.get(sampleId)
-        def antibody = Antibody.where{item.barcode == barcode}.get(max: 1)
+        def antibody = Antibody.get(antibodyId)
         if (sample && antibody) {
             sample.antibody = antibody
             sample.save()
-        } 
+        } else {
+            throw new ProtocolInstanceBagException(message: "Sample or antibody not found!")
+        }
     }
     
     @Transactional
-    void addChild() {
-        
+    void addChild(Item item, Long sampleId) {
+        def sample = Sample.get(sampleId)
+        if (!sample) {
+            throw new ProtocolInstanceBagException(message: "Sample not found!")
+        }
+        if (!sample.item) {
+            throw new ProtocolInstanceBagException(message: "Parent not found!")
+        }
+        try {
+            item.parent = sample.item
+            item.save(flush: true)
+            sample.item = item
+            sample.save()
+        }catch(Exception e) {
+            throw new ProtocolInstanceBagException(message: "Invalid inputs!")
+        }
     }
 }

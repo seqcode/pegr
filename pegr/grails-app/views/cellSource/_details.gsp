@@ -1,17 +1,11 @@
-<g:if test="${item?.name}">
-<h4>Name: ${item.name}</h4>
-</g:if>
 <ul class="property-list">
-    <g:if test="${item?.type}">
-    <li>Type: ${item.type}</li>
-    </g:if>
-    
+
 	<li>Strain: ${object?.strain?.name}</li>
         <ul>
-            <li>Species: ${object?.strain?.genotype?.species}</li>
+            <li>Species: ${object?.strain?.species}</li>
             <li>Genotype: ${object?.strain?.genotype}</li>
-            <g:if test="${object?.strain?.geneticModifications}">
-                <li>Genetic Modifications: <g:each in="${object?.strain?.geneticModifications}">${it} </g:each></li>
+            <g:if test="${object?.strain?.geneticModification}">
+                <li>Genetic Modification: ${object?.strain?.geneticModification}</li>
             </g:if>
             <g:if test="${object?.strain?.parent}">
                 <li>Parent Strain: ${object?.strain?.parent}</li>
@@ -51,22 +45,10 @@
 	<li>Biological Source ID: ${object.biologicalSourceId}</li>
 	</g:if>
     
-    <g:if test="${item?.barcode}">
-    <li>Barcode: ${item.barcode }</li>
-    </g:if>	
-
-    <g:if test="${item?.location}">
-    <li>Location: ${item.location}</li>
-    </g:if>	
-
-    <g:if test="${item?.notes}">
-    <li>Notes: ${item.notes}</li>
-    </g:if>
     <li>Cell Source Treatments:
         <g:each in="${object.treatments}" var="c">
             ${c}
         </g:each>	
-         <g:link controller="cellSource" action="updateTreatments" params="[cellSourceId: object.id, itemId: item.id]">(update)</g:link>
     </li>
 </ul>
 

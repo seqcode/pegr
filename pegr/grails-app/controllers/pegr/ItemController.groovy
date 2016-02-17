@@ -10,21 +10,20 @@ class ItemController {
     def itemService
     
     def index(){
-        redirect(action: "list")
+        redirect(action: "list", params: [typeId: 1])
     }
     
     def list(Integer max, Long typeId) {
         params.max = Math.min(max ?: 15, 100)
-        if(typeId) {
-            def itemType = ItemType.get(typeId)
-            if (itemType.name == "Antibody") {
-                [objectList: Antibody.list(params), objectCount: Antibody.count(), template: 'antibodyTable']
-            } else{
-                def items = Item.where{ type.id == typeId }
-                [objectList: items.list(params), objectCount: items.count(), template: 'itemTable']
-            }
+        if(!typeId) {
+            typeId = 1
+        }
+        def itemType = ItemType.get(typeId)
+        if (itemType.category == ItemTypeCategory.ANTIBODY) {
+            redirect(controller: "Antibody", action: "list", params: params)
         } else {
-            [objectList: Item.list(params), objectCount: Item.count(), template: 'itemTable']
+            def items = Item.where{ type.id == typeId }
+            [objectList: items.list(params), objectCount: items.count(), currentType: itemType]
         }
     }
     
@@ -33,11 +32,19 @@ class ItemController {
         if(!item) {
             render status: 404
         }
-        def object = itemService.getObjectFromItem(item)
-        def itemController = item.type.objectType ?: "item"
         def folder = getImageFolder(id)
         def images = folder.listFiles().findAll{getFileExtension(it.name) in allowedTypes.values()}
-        [item: item, object: object, itemController: itemController, images: images]
+        def traces = []
+        def cellSource = null
+        if (item.type.category == ItemTypeCategory.TRACED_SAMPLE) {
+            def tmp = item
+            while(tmp.parent) {
+                traces.push(tmp.parent)
+                tmp = tmp.parent
+            }
+            cellSource = CellSource.findByItem(tmp)
+        }        
+        [item: item, images: images, traces: traces, cellSource: cellSource]
     }
   
     def preview(Long typeId, String barcode) {
@@ -86,32 +93,19 @@ class ItemController {
     }
 
     def edit(Item item) {
-        def object = itemService.getObjectFromItem(item)
-        def itemController = item.type.objectType ?: "item"
-        [item: item, object: object, itemController: itemController]
+        [item: item]
     }
     
     def update() {
         def item = Item.get(params.long('itemId'))
         item.properties = params
-        def object = null
-        if(item.type.objectType) {
-            object = itemService.getObjectFromItem(item)
-            if (object) {
-                object.properties = params
-            }else {
-                def dc = itemService.getClassFromObjectType(item.type.objectType)
-                object = dc.clazz.newInstance(params)
-            }
-        }  
         try {
-            itemService.save(item, object)
+            itemService.save(item)
             flash.message = "Item update!"
             redirect(action: "show", id: params.itemId)
         }catch(ItemException e) {
             request.message = e.message
-			def itemController = item.type.objectType ?: "item"
-            render(view:'edit', model:[item: item, object: object, itemController: itemController])
+            render(view:'edit', model:[item: item])
         }
     }
     
@@ -132,23 +126,7 @@ class ItemController {
             [item: item]
         }
     }
-    
-    def updateParent(Long itemId, Long parentTypeId, String parentBarcode) {
-        if(request.method == "POST") {
-            try {
-                itemService.updateParent(itemId, parentTypeId, parentBarcode)
-            }catch(ItemException e) {
-                flash.message = e.message
-            }catch(Exception e) {
-                log.error "Error: ${e.message}", e
-                flash.message = "Error updating the parent!"
-            }
-            redirect(action: "show", id: itemId)
-        } else {
-            [itemId: itemId]
-        }
-    }
-    
+
     def upload() {        
         try {
             MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  

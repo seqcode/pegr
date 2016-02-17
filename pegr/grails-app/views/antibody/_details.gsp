@@ -1,5 +1,3 @@
-<h4>${item.type}: ${item.name}</h4>
-
 <ul>
     <g:if test="${object?.abHost}">
     <li>Ab Host: ${object?.abHost}</li>

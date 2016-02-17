@@ -2827,4 +2827,6 @@ databaseChangeLog = {
 	}
 
 	include file: 'index.groovy'
+
+	include file: 'itemTypeCategory.groovy'
 }

@@ -10,6 +10,13 @@ class ItemException extends RuntimeException {
 class ItemService {
 
     def grailsApplication
+
+    @Transactional
+    def save(Item item){
+        if(!item.save(flush: true)){
+            throw new ItemException(message: "Invalid inputs!")
+        }
+    }
     
     @Transactional
     def save(item, object){
@@ -34,20 +41,6 @@ class ItemService {
     }
     
     @Transactional
-    def updateParent(Long itemId, Long parentTypeId, String parentBarcode) {
-        def item = Item.get(itemId)
-        if (!item) {
-            throw new ItemException(message: "Item not found!")
-        }
-        def parent = Item.where{type.id == parentTypeId && barcode == parentBarcode}.get(max:1)
-        if (!parent) {
-            throw new ItemException(message: "Parent not found!")
-        }
-        item.parent = parent
-        item.save()
-    }
-    
-    @Transactional
     def delete(Long id, File folder) {
         def item = Item.get(id)
         if(!item) {
@@ -66,6 +59,11 @@ class ItemService {
             log.error "Error: ${e.message}", e
             throw new ItemException(message: "Item cannot be deleted!")
         }
+    }
+    
+    def getObject(Long id, String type) {
+        def c = getClassFromObjectType(type)
+        return c?.clazz.get(id)
     }
     
     def getClassFromObjectType(String type) {

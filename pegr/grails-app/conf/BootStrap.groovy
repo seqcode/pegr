@@ -10,12 +10,6 @@ class BootStrap {
 		}
 			
 		private createItemTypeIfRequired() {			
-			if (!ItemType.findByName("Cell Source")) {
-				println "Creating ItemType for Cell Source"
-				def itemType = new ItemType(name: "Cell Source",
-					objectType: "CellSource")
-				itemType.save()
-			}
 			
 			if (!ItemType.findByName("Antibody")) {
 				println "Creating ItemType for Antibody"

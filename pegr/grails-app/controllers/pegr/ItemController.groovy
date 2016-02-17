@@ -14,15 +14,18 @@ class ItemController {
     }
     
     def list(Integer max, Long typeId) {
-        params.max = Math.min(max ?: 10, 100)
+        params.max = Math.min(max ?: 15, 100)
         if(typeId) {
             def itemType = ItemType.get(typeId)
-            if (itemType.name)
-        def items = Item.where{
-            if(typeId) {type.id == typeId}
+            if (itemType.name == "Antibody") {
+                [objectList: Antibody.list(params), objectCount: Antibody.count(), template: 'antibodyTable']
+            } else{
+                def items = Item.where{ type.id == typeId }
+                [objectList: items.list(params), objectCount: items.count(), template: 'itemTable']
+            }
+        } else {
+            [objectList: Item.list(params), objectCount: Item.count(), template: 'itemTable']
         }
-
-        [itemList: items.list(params), itemCount: items.count()]
     }
     
     def show(Long id) {

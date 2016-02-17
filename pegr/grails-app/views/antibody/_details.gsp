@@ -5,10 +5,6 @@
     <li>Ab Host: ${object?.abHost}</li>
     </g:if>
     
-    <g:if test="${object?.target}">
-    <li>Target: ${object?.target}</li>
-    </g:if>
-    
     <g:if test="${object?.concentration}">
     <li>Concentration: ${object.concentration}</li>
     </g:if>    

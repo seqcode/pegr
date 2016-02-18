@@ -257,22 +257,26 @@ class ProtocolInstanceBagController {
     }
     
     def previewAntibody(Long sampleId, Long instanceId, String barcode) {
-        def item = Item.where{type.name =~ "Antibody" && barcode == barcode}.get(max: 1)
+        def item = Item.where{type.name == "Antibody" && barcode == barcode}.get(max: 1)
         if (item) {
             def antibody = Antibody.findByItem(item)
             if (antibody) {
                 render(view: "previewAntibody", model: [antibody: antibody, instanceId: instanceId, sampleId: sampleId] )
             } 
-        } 
-        flash.message = "Antibody not found!"
-        redirect(action: "searchAntibody", params: [instanceId: instanceId, sampleId: sampleId])
+        } else {
+            flash.message = "Antibody not found!"
+            redirect(action: "searchAntibody", params: [instanceId: instanceId, sampleId: sampleId])
+        }
     }
     
-    def addAntibody(Long sampleId, Long instanceId, Long antibodyId) {
+    def addAntibodyToSample(Long sampleId, Long instanceId, Long antibodyId) {
         try{
             protocolInstanceBagService.addAntibodyToSample(sampleId, antibodyId)
         } catch(ProtocolInstanceBagException e) {
-            flash.message("Error adding the antibody to the sample!")
+            flash.message = e.message
+        } catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            flash.message = "Error adding the antibody to the sample!"
         }
         redirect(action: "showInstance", id: instanceId)
     }

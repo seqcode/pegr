@@ -5,7 +5,7 @@
 </head>
 <body>
 <div class="container-fluid">
-    <h4>Add Item </h4>
+    <h4>Add Antibody</h4>
     <p>Item not found! You may save it as a new item.</p>
     <g:if test="${request.message}">
         <div class="message" role="status">${request.message}</div>
@@ -17,8 +17,9 @@
     </g:hasErrors>
     <g:form action="save" class="fields" role="form" method="post" useToken="true">
         <g:submitButton class="btn btn-primary" name="save" value="Save"/>
-        <g:link class="btn btn-default" action="index">Cancel</g:link>
-        <g:render template="form" model="['item':item]"/>
+        <g:link class="btn btn-default" action="list">Cancel</g:link>
+        <g:render template="/item/form" model="['item':item]"/>
+        <g:render template="/antibody/form" model="['object':object]"></g:render>
     </g:form>
 
     <script>

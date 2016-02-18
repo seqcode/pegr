@@ -49,7 +49,7 @@
 
 <script>
     function strainChanged(strainId) {
-        <g:remoteFunction controller="item" action="strainChangedAjax"
+        <g:remoteFunction controller="cellSource" action="strainChangedAjax"
             update="growthMedia"
             params="'strainId='+strainId"/>
     }

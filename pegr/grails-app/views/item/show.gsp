@@ -6,22 +6,23 @@
 <body>
 <div class="container-fluid">
      <ul class="nav nav-tabs">
-        <li><g:link action="list">List</g:link></li>
+        <li><g:link action="list" params="[typeId: item?.type?.id]">List</g:link></li>
         <li><g:link action="delete" id="${item?.id}" class="confirm">Delete</g:link></li>   
     </ul>
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
-    <g:if test="${item?.name}">
-        <h4>Name: ${item.name} <g:link action="edit" id="${item?.id}" class="edit">Edit</g:link></h4>
-    </g:if>
+    <h4>Barcode Information <g:link action="edit" id="${item?.id}" class="edit">Edit</g:link></h4>
     <ul>
+        <g:if test="${item?.name}">
+        <li>Name: ${item.name}</li>
+        </g:if>
         <g:if test="${item?.type}">
         <li>Type: ${item.type}</li>
         </g:if>
 
         <g:if test="${item?.barcode}">
-        <li>Barcode: ${item.barcode } <g:link action="changeBarcode" id="${item?.id}" class="edit">Edit</g:link></li>
+        <li>Barcode: ${item.barcode }</li>
         </g:if>	
 
         <g:if test="${item?.location}">
@@ -32,14 +33,15 @@
         <li>Notes: ${item.notes}</li>
         </g:if>    
     </ul>
-    <g:if test="${item?.type?.category == pegr.ItemTypeCategory.TRACED_SAMPLE}">
+    <g:if test="${traces?.size()}">
         <h4>Sample Traces</h4>
-        <g:if test="${traces?.size()==0}">
-            <p>None</p>
-        </g:if>
+        <ul>
         <g:each in="${traces}">
-            <g:link action="show" id="${it.id}">${it.name}</g:link>
+            <li><g:link action="show" id="${it.id}">${it.name}</g:link></li>
         </g:each>
+        </ul>
+    </g:if>
+    <g:if test="${cellSource}">
         <h4>Cell Source Information <g:link controller="cellSource" action="edit" id="${cellSource?.id}" class="edit">Edit</g:link></h4>
         <g:render template="/cellSource/details" model="[object: cellSource]"></g:render>
     </g:if>

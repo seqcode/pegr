@@ -13,6 +13,9 @@ class ItemService {
 
     @Transactional
     def save(Item item){
+        if (Item.where{type.id == item.type.id && barcode == item.barcode && id != item.id}.get(max:1)){
+            throw new ItemException(message: "This barcode has already been used!")
+        } 
         if(!item.save(flush: true)){
             throw new ItemException(message: "Invalid inputs!")
         }
@@ -20,41 +23,47 @@ class ItemService {
     
     @Transactional
     def save(item, object){
-        if(item.save(flush: true)){
-            if(object){
-                object.item = item
-                object.save(flush: true)
+        save(item)            
+        if(object){
+            object.item = item 
+            if (!object.save(flush: true)) {
+                throw new ItemException(message: "Invalid inputs!")
             }
         }
-        else{
-            throw new ItemException(message: "Invalid inputs!")
-        }
     }
-    
-    @Transactional
-    def changeBarcode(Item item, String newBarcode) {
-        if (Item.where{type.id == item.type.id && barcode == newBarcode}.get(max:1)){
-            throw new ItemException(message: "This barcode has already been used!")
-        } 
-        item.barcode = newBarcode
-        item.save()       
-    }
-    
+
     @Transactional
     def delete(Long id, File folder) {
         def item = Item.get(id)
         if(!item) {
             throw new ItemException(message: "Item not found!")
         }
-        def instance = ProtocolInstanceItems.findByItem(item)
-        if (instance || item.bags.size()) {
-            throw new ItemException(message: "Item cannot be deleted because it has been used in protocols!")
-        }
-        
+        switch (item.type.category) {
+            case ItemTypeCategory.TRACED_SAMPLE:
+                def child = Item.findByParent(item)
+                if (child) {
+                    throw new ItemException(message: "This traced sample cannot be deleted because it has children samples!")
+                }
+                def sample = Sample.findByItem(item) 
+                if (sample) {
+                    throw new ItemException(message: "This traced sample cannot be deleted because it has been attached to a sample!")
+                }
+                break
+            default: 
+                def instance = ProtocolInstanceItems.findByItem(item)
+                if (instance) {
+                    throw new ItemException(message: "Item cannot be deleted because it has been used in protocols!")
+                }
+        }        
         try {
+            if (item.type.category == ItemTypeCategory.TRACED_SAMPLE) {
+                def cellSource = CellSource.findByItem(item)
+                cellSource?.delete(flush: true)
+            }            
             item.delete(flush: true)
-            if (folder.exists())
-            folder.deleteDir()
+            if (folder?.exists()) {
+                folder.deleteDir()    
+            }
         }catch(Exception e) {
             log.error "Error: ${e.message}", e
             throw new ItemException(message: "Item cannot be deleted!")

@@ -19,11 +19,13 @@ class ItemController {
             typeId = 1
         }
         def itemType = ItemType.get(typeId)
-        if (itemType.category == ItemTypeCategory.ANTIBODY) {
-            redirect(controller: "Antibody", action: "list", params: params)
-        } else {
-            def items = Item.where{ type.id == typeId }
-            [objectList: items.list(params), objectCount: items.count(), currentType: itemType]
+        switch (itemType.category) {
+            case ItemTypeCategory.ANTIBODY:
+                redirect(controller: "antibody", action: "list", params: params)
+                break
+            default:
+                def items = Item.where{ type.id == typeId }
+                [objectList: items.list(params), objectCount: items.count(), currentType: itemType]
         }
     }
     
@@ -34,60 +36,100 @@ class ItemController {
         }
         def folder = getImageFolder(id)
         def images = folder.listFiles().findAll{getFileExtension(it.name) in allowedTypes.values()}
-        def traces = []
-        def cellSource = null
-        if (item.type.category == ItemTypeCategory.TRACED_SAMPLE) {
-            def tmp = item
-            while(tmp.parent) {
-                traces.push(tmp.parent)
-                tmp = tmp.parent
-            }
-            cellSource = CellSource.findByItem(tmp)
-        }        
-        [item: item, images: images, traces: traces, cellSource: cellSource]
+        switch (item.type.category) {
+            case ItemTypeCategory.TRACED_SAMPLE:
+                def traces = []
+                def tmp = item
+                while(tmp.parent) {
+                    traces.push(tmp.parent)
+                    tmp = tmp.parent
+                }
+                def cellSource = CellSource.findByItem(item)
+                [item: item, images: images, traces: traces, cellSource: cellSource]
+                break
+            default:
+                [item: item, images: images]
+        }                    
     }
   
     def preview(Long typeId, String barcode) {
-        if (barcode.trim()){
+        if (barcode?.trim()){
             def itemType = typeId ? ItemType.get(typeId):null
             if (itemType) { 
                 def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
                 if (item) {
-                    redirect(action: "show", id: item.id)
+                    switch (itemType.category) {
+                        case ItemTypeCategory.ANTIBODY:
+                            def antibody = Antibody.findByItem(item)
+                            redirect(controller: "antibody", action: "show", id: antibody?.id)
+                            break
+                        default:
+                            redirect(action: "show", id: item.id)
+                    }
                 }else {
                     item = new Item(type: itemType, barcode: barcode)
-                    def itemController = itemType.objectType ?: "item"
-                    render(view: "create", model: [item:item, itemController: itemController])
+                    switch (itemType.category) {
+                        case ItemTypeCategory.ANTIBODY:
+                            redirect(controller: "antibody", action: "create", params: [barcode:barcode])
+                            break
+                        case ItemTypeCategory.TRACED_SAMPLE:
+                            render(view: "createTracedSample", model: [item: item])
+                            break
+                        default:
+                            render(view: "create", model: [item: item])
+                    }
                 }
             }else {
                 flash.message = "Item type not found!"
-                redirect(action: "list")
+                redirect(action: "list", params: [typeId: typeId])
             }
         }else {
             flash.message = "Barcode cannot be empty!"
-            redirect(action: "list")
+            redirect(action: "list", params: [typeId: typeId])
         }
     }
     
-    def create(item, object, itemController) {
-        [item:item, object: object, itemController:itemController]
+    def create(Item item) {
+        [item: item]
+    }
+    
+    def createTracedSample(Item item, CellSource object) {
+        [item: item, object: object]
     }
     
     def save() {
         withForm{        
             def item = new Item(params)
-            def object = (params.itemController != "item") ? itemService.getClassFromObjectType(params.itemController).clazz.newInstance(params) : null
             try {
-                itemService.save(item, object)
+                itemService.save(item)
                 flash.message = "New item added!"
-                redirect(action: "list")
+                redirect(action: "show", id: item.id)
             }catch(ItemException e) {
                 request.message = e.message
-                render(view: "create", model: [item:item, object: object, itemController: params.itemController])
+                render(view: "create", model: [item:item])
             }catch(Exception e) {
                 log.error "Error: ${e.message}", e
                 request.message = "Error saving this item!"
-                render(view: "create", model: [item:item, object: object, itemController: params.itemController])
+                render(view: "create", model: [item:item])
+            }
+        }
+    }
+    
+    def saveWithCellSource() {
+        withForm{        
+            def item = new Item(params)
+            def object = new CellSource(params)
+            try {
+                itemService.save(item, object)
+                flash.message = "New traced sample added!"
+                redirect(action: "show", id: item.id)
+            }catch(ItemException e) {
+                request.message = e.message
+                render(view: "createTracedSample", model: [item:item, object: object])
+            }catch(Exception e) {
+                log.error "Error: ${e.message}", e
+                request.message = "Error saving this item!"
+                render(view: "createTracedSample", model: [item:item, object: object])
             }
         }
     }
@@ -96,37 +138,25 @@ class ItemController {
         [item: item]
     }
     
-    def update() {
-        def item = Item.get(params.long('itemId'))
-        item.properties = params
-        try {
-            itemService.save(item)
-            flash.message = "Item update!"
-            redirect(action: "show", id: params.itemId)
-        }catch(ItemException e) {
-            request.message = e.message
-            render(view:'edit', model:[item: item])
+    def update(Long itemId) {
+        def item = Item.get(itemId)
+        if (item) {
+            item.properties = params
+            try {
+                itemService.save(item)
+                flash.message = "Item update!"
+                redirect(action: "show", id: params.itemId)
+            }catch(ItemException e) {
+                request.message = e.message
+                render(view:'edit', model:[item: item])
+            }            
+        } else {
+            flash.message = "Item not found!"
+            redirect(controller: "item", action: "list")
         }
+        
     }
     
-    def changeBarcode() {
-        def item = Item.get(params.long('id'))
-        if(request.method=='POST') {            
-            try {
-                itemService.changeBarcode(item, params.barcode)
-                flash.message = "Barcode updated!"
-            }catch(ItemException e) {
-                flash.message = e.message
-            }catch(Exception e) {
-                log.error "Error: ${e.message}", e
-                flash.message = "Error updating the barcode!"
-            }
-            redirect(action: "show", id: params.id)
-        } else {
-            [item: item]
-        }
-    }
-
     def upload() {        
         try {
             MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  
@@ -198,25 +228,15 @@ class ItemController {
     }
     
     def delete(Long id) {
-
+        def typeId = Item.get(id)?.type?.id
         try {
             def folder = getImageFolder(id)
             itemService.delete(id, folder)
             flash.message = "Item deleted!"
-    		redirect(action: 'list')
+    		redirect(action: 'list', params: [typeId: typeId])
         } catch(ItemException e) {
             flash.message = e.message
             redirect(action: 'show', id: id)
         }
-    }
-    
-    def strainChangedAjax(Long strainId) {
-        def strain = Strain.get(strainId)
-        def growthMedias = GrowthMedia.where{
-            if(strain?.genotype?.species) {
-                (species == null) || (species == strain?.genotype?.species)
-            }
-        }.list()
-        render g.select(id: 'growthMedia', name:'growthMedia.id', from: growthMedias, optionKey: 'id', noSelection:[null:''])
     }
 }

@@ -2,12 +2,12 @@
 
 <div class="${hasErrors(bean: object, field: 'abHost', 'error')} required">
 	<label for="abHost">Ab Host<span class="required-indicator">*</span></label>
-	<g:select id="abHost" name="abHost.id" from="${pegr.AbHost.list()}" optionKey="id" required="" value="${object?.abHost?.id}" class="many-to-one"/>
+	<g:select id="abHost" name="abHost.id" from="${pegr.AbHost.list()}" optionKey="id" required="" value="${object?.abHost?.id}" class="many-to-one" noSelection="['null': '']"/>
 </div>
 
 <div class="${hasErrors(bean: object, field: 'concentration', 'error')} required">
-	<label for="concentration">Concentration (ug/ul)<span class="required-indicator">*</span></label>
-	<g:field name="concentration" value="${fieldValue(bean: object, field: 'concentration')}" required=""/>
+	<label for="concentration">Concentration (ug/ul)</label>
+	<g:field name="concentration" value="${fieldValue(bean: object, field: 'concentration')}" />
 </div>
 
 <div class="${hasErrors(bean: object, field: 'immunogene', 'error')} ">

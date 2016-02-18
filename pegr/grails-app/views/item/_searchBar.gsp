@@ -1,4 +1,4 @@
-<g:form class="fields form-inline well well-sm" role="form" action="preview" >
+<g:form class="fields form-inline well well-sm" role="form" controller="item" action="preview" >
     <div class="form-group">
         <label for="type">Type</label>
         <g:select id="type" name="typeId" optionKey="id" from="${pegr.ItemType.list()}" noSelection="['null': '-- choose --']" />

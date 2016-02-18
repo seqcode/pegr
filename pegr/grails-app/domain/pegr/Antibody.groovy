@@ -27,6 +27,7 @@ class Antibody {
         abHost nullable: true
 		igType nullable: true
 		immunogene nullable: true, blank: true
+        concentration nullable: true
 		externalId nullable: true, blank: true
 		inventoryId nullable: true, blank: true
 		note nullable: true, blank: true

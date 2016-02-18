@@ -26,7 +26,7 @@
                             <g:link controller="antibody" action="show" id="${sample.antibody}" target="_blank">${sample.antibody}</g:link>
                         </g:if>
                         <g:else>
-                            <g:link action="searchAntibody" params="[sampleId:sampleId, instanceId:instanceId]">Add</g:link>
+                            <g:link action="searchAntibody" params="[sampleId:sample.id, instanceId:instanceId]">Add</g:link>
                         </g:else>
                     </td>
                     <g:hiddenField name="sampleId" value="${sample.id}"/>

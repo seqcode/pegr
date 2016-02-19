@@ -35,11 +35,8 @@ class Sample {
     }
     
     String getSequenceIndicesString() {
-        def indices = SampleSequenceIndices.where{sample == this}.collect{it.index}
-        def s = ""
-        indices.each{
-            s += "${it.indexId}.${it.sequence}. "
-        }
+        def indices = SampleSequenceIndices.where{sample == this}.collect{it.index.indexId}
+        def s = indices.join(", ")
         return s
     }
     

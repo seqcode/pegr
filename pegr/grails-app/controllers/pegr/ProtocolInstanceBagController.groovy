@@ -55,12 +55,24 @@ class ProtocolInstanceBagController {
     def previewItemAndBag(Long typeId, String barcode, Long bagId) {
         def itemType = ItemType.get(typeId)
         def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
-        def sample = Sample.findByItem(item)
-        def subBag = null
-        if (sample && !sample.bags.empty){
-            subBag = sample.bags.last()    
-        } 
-        render(view:"previewItemAndBag", model: [item: item, subBag: subBag, bagId: bagId])
+        if (item) {        
+            def sample = Sample.findByItem(item)
+            def subBag = null
+            if (sample && !sample.bags.empty){
+                subBag = sample.bags.last()
+                if (subBag.status == ProtocolStatus.COMPLETED) {
+                    render(view:"previewItemAndBag", model: [item: item, subBag: subBag, bagId: bagId])
+                } else {
+                    flash.message = "The previous protocol for this sample is not completed yet!"
+                    redirect(action: "searchItemForBag", id: bagId)
+                }
+            } else {
+                render(view:"previewItemAndBag", model: [item: item, bagId: bagId])
+            }
+        } else {
+            flash.message = "No item found!"
+            redirect(action: "searchItemForBag", id: bagId)
+        }
     }
     
     def addItemToBag(Long itemId, Long bagId) {
@@ -121,7 +133,7 @@ class ProtocolInstanceBagController {
             def samples = null
             if (template) {
                 // get samples in the bag
-                samples = protocolInstance.bag.tracedSamples
+                samples = protocolInstance.bag.tracedSamples.toList().sort {it.id}
             }
             def completed = (protocolInstance.bag.status == ProtocolStatus.COMPLETED)
             if (template) {
@@ -244,11 +256,19 @@ class ProtocolInstanceBagController {
 
     }
     
-    def addIndex() {
+    def addIndex(Long instanceId) {
         def sampleId = params.list('sampleId')
-        def indexId = params.list('indexId')
-        protocolInstanceBagService.addIndex(sampleId, indexId)
-        redirect(action: "showInstance", id: params.instanceId)
+        def indexIds = params.list('indexId')
+        try {
+            protocolInstanceBagService.addIndex(sampleId, indexIds)
+            flash.message = "Index saved!"            
+        } catch (ProtocolInstanceBagException e) {
+            flash.message = e.message  
+        } catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            flash.message = "Error saving the index!"
+        }        
+        redirect(action: "showInstance", id: instanceId)
     }
     
     def searchAntibody(Long sampleId, Long instanceId) {
@@ -281,6 +301,11 @@ class ProtocolInstanceBagController {
         redirect(action: "showInstance", id: instanceId)
     }
     
+    def removeAntibodyFromSample(Long sampleId, Long instanceId) {
+        protocolInstanceBagService.removeAntibodyFromSample(sampleId)
+        redirect(action: "showInstance", id: instanceId)
+    }
+    
     def addChild(Long sampleId, Long instanceId) {
         if (request.method == "POST") {
             withForm {
@@ -306,5 +331,10 @@ class ProtocolInstanceBagController {
             }
             [sample: sample, instanceId: instanceId, childType: childType]
         }
+    }
+    
+    def removeChild(Long sampleId, Long instanceId) {
+        protocolInstanceBagService.removeChild(sampleId)
+        redirect(action: "showInstance", id: instanceId)
     }
 }

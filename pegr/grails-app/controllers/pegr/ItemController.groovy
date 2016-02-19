@@ -34,7 +34,7 @@ class ItemController {
         if(!item) {
             render status: 404
         }
-        def folder = getImageFolder(id)
+        def folder = itemService.getImageFolder(id)
         def images = folder.listFiles().findAll{getFileExtension(it.name) in allowedTypes.values()}
         switch (item.type.category) {
             case ItemTypeCategory.TRACED_SAMPLE:
@@ -166,7 +166,7 @@ class ItemController {
 
             if(!mpf?.empty && mpf.size < 15 * 1024 * 1024 && allowedTypes.containsKey(fileType)) {
                 
-                File folder = getImageFolder(params.long('itemId')); 
+                File folder = itemService.getImageFolder(params.long('itemId')); 
                 if (!folder.exists()) { 
                     folder.mkdirs(); 
                 } 
@@ -189,7 +189,7 @@ class ItemController {
     
     
     def displayImage(String img, Long itemId) {
-        File folder = getImageFolder(itemId); 
+        File folder = itemService.getImageFolder(itemId); 
         File image = new File(folder.getAbsolutePath() + File.separator + img)
         if(!image.exists()) {
             response.status = 404
@@ -208,7 +208,7 @@ class ItemController {
     
     def deleteImage(String img, Long itemId) {
         try {
-            File folder = getImageFolder(itemId); 
+            File folder = itemService.getImageFolder(itemId); 
             File image = new File(folder.getAbsolutePath() + File.separator + img)
             image.delete()
             flash.message = "Image deleted!"
@@ -219,9 +219,7 @@ class ItemController {
         redirect(action: "show", id: params.itemId)
     }
     
-    def getImageFolder(Long itemId){
-        File folder = new File("files/items/${itemId}"); 
-    }
+
     
     def getFileExtension(String s) {
         return s.substring(s.lastIndexOf('.') + 1)
@@ -230,8 +228,7 @@ class ItemController {
     def delete(Long id) {
         def typeId = Item.get(id)?.type?.id
         try {
-            def folder = getImageFolder(id)
-            itemService.delete(id, folder)
+            itemService.delete(id)
             flash.message = "Item deleted!"
     		redirect(action: 'list', params: [typeId: typeId])
         } catch(ItemException e) {

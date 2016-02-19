@@ -60,7 +60,7 @@
               </table>
         </div>
         <g:if test="${template}">            
-            <g:render template="${template}" model="['parents':parents,'children':children, 'sampleIds':sampleIds, 'instanceId':protocolInstance.id]"></g:render>         
+            <g:render template="${template}" model="['parents':parents,'children':children, 'samples':samples, 'instanceId':protocolInstance.id]"></g:render>         
         </g:if>    
         <g:if test="${toBeCompleted}">
         <div class="row well text-center">

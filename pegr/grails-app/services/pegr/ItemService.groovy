@@ -33,11 +33,12 @@ class ItemService {
     }
 
     @Transactional
-    def delete(Long id, File folder) {
+    def delete(Long id) {
         def item = Item.get(id)
         if(!item) {
             throw new ItemException(message: "Item not found!")
         }
+        File folder = getImageFolder(id)
         switch (item.type.category) {
             case ItemTypeCategory.TRACED_SAMPLE:
                 def child = Item.findByParent(item)
@@ -87,5 +88,9 @@ class ItemService {
         }catch(Exception e) {
             return null
         }
+    }
+    
+    def getImageFolder(Long itemId){
+        File folder = new File("files/items/${itemId}"); 
     }
 }

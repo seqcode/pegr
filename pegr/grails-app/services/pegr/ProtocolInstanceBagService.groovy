@@ -8,6 +8,7 @@ class ProtocolInstanceBagException extends RuntimeException {
 
 class ProtocolInstanceBagService {
     def springSecurityService
+    def itemService
     
     List fetchProcessingBags() {
         def bags = ProtocolInstanceBag.where { status != ProtocolStatus.COMPLETED }.list(sort: "startTime", order: "desc")
@@ -56,8 +57,8 @@ class ProtocolInstanceBagService {
             def csItem = item
             def cellSource = CellSource.findByItem(item)
             while(csItem && !cellSource) {
-                csItem = item.parent
-                cellSource = CellSource.findByItem(csitem)
+                csItem = csItem.parent
+                cellSource = CellSource.findByItem(csItem)
             }
             if (cellSource) {
                 sample = new Sample(item: item, cellSource: cellSource, status: SampleStatus.CREATED)
@@ -197,19 +198,42 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    void addIndex(List sampleId, List indexId) {
+    void addIndex(List sampleId, List indexIds) {
+        def newSampleIndices = []
+        def indexIdSet = []
+        def toDelete = []
         sampleId.eachWithIndex { id, idx ->
-            def sample =  null
-            try {
-                sample = Sample.get(Long.parseLong(id))
-            } catch(Exception e){}
-            def index = null
-            try {
-                index = SequenceIndex.findByIndexIdAndIndexDictionaryStatus(Long.parseLong(indexId[idx]), DictionaryStatus.Y)
-            }catch (Exception e) {}
-            if (sample && index) {
-                new SampleSequenceIndices(sample: sample, index: index).save()
+            def sample = Sample.get(Long.parseLong(id))
+            if (!sample) {
+                throw new ProtocolInstanceBagException(message: "Sample not found!")
             }
+            toDelete.addAll(SampleSequenceIndices.findAllBySample(sample))
+            if (indexIds[idx] != "") {
+                def indexStrings = indexIds[idx].split(",")*.trim()
+                indexStrings.each{ 
+                    def indexId = Long.parseLong(it)
+                    if (indexId in indexIdSet) {
+                        throw new ProtocolInstanceBagException(message: "Index ${indexId} has been used for more than twice!")
+                    }
+                    def index = SequenceIndex.findByIndexIdAndStatus(indexId, DictionaryStatus.Y)
+                    if (!index) {
+                        throw new ProtocolInstanceBagException(message: "Index ${indexId} not found!")
+                    }          
+                    indexIdSet.push(indexId)
+                    def oldIndex = toDelete.find{it.index == index && it.sample == sample}
+                    if (oldIndex) {
+                        toDelete.remove(oldIndex)
+                    } else {
+                        newSampleIndices.push(new SampleSequenceIndices(sample: sample, index: index))
+                    }
+                }       
+            }
+        }
+        toDelete.each {
+            it.delete()
+        }
+        newSampleIndices.each {
+            it.save()
         }
     }
     
@@ -245,7 +269,7 @@ class ProtocolInstanceBagService {
         return template
     }
     
-    Map getParentsAndChildrenForCompletedInstance(Set samples, ItemType startState, ItemType endState) {
+    Map getParentsAndChildrenForCompletedInstance(List samples, ItemType startState, ItemType endState) {
         def parents = []
         def children = []
         if (startState && endState) {
@@ -265,7 +289,7 @@ class ProtocolInstanceBagService {
         return [parents: parents, children: children]
     }
     
-    Map getParentsAndChildrenForProcessingInstance(Set samples, ItemType startState, ItemType endState) {
+    Map getParentsAndChildrenForProcessingInstance(List samples, ItemType startState, ItemType endState) {
         def parents = []
         def children = []
         if (startState && endState) {
@@ -302,6 +326,15 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
+    void removeAntibodyFromSample(Long sampleId) {
+        def sample = Sample.get(sampleId) 
+        if (sample) {
+            sample.antibody = null
+            sample.save()
+        } 
+    }
+    
+    @Transactional
     void addChild(Item item, Long sampleId) {
         def sample = Sample.get(sampleId)
         if (!sample) {
@@ -318,5 +351,17 @@ class ProtocolInstanceBagService {
         }catch(Exception e) {
             throw new ProtocolInstanceBagException(message: "Invalid inputs!")
         }
+    }
+    
+    @Transactional
+    void removeChild(Long sampleId) {
+        def sample = Sample.get(sampleId)
+        if (!sample) {
+            throw new ProtocolInstanceBagException(message: "Sample not found!")
+        }
+        def item = sample.item
+        sample.item = item.parent
+        sample.save(flush: true)
+        itemService.delete(item.id)
     }
 }

@@ -726,7 +726,7 @@ class DataMigrate {
 	
 	    def run = SequenceRun.findByPlatformAndRunNum(platform, runNum)
 	    if (!run) {                     
-	         run = new SequenceRun(runNum: runNum, platform: platform)
+	         run = new SequenceRun(runNum: runNum, platform: platform, status: RunStatus.COMPLETED)
 	
 	         // lane
 	         run.lane = getInteger(laneStr)

@@ -6,16 +6,26 @@ class ProtocolInstanceBagController {
     def protocolInstanceBagService
     
     def index() {
-        redirect(action: "processingBags")
+        redirect(action: "processingBags", params: params )
     } 
     
-    def processingBags() {
-        def bags = protocolInstanceBagService.fetchProcessingBags()
+    def processingBags(Integer max) {
+        params.max = Math.min(max ?: 15, 100)
+        if (!params.sort) {
+            params.sort = "startTime"
+            params.order = "desc"
+        }
+        def bags = ProtocolInstanceBag.where { status != ProtocolStatus.COMPLETED }.list(params)
         [bags: bags]
     }
     
-    def completedBags(){
-        def bags = protocolInstanceBagService.fetchCompletedBags()
+    def completedBags(Integer max){
+        params.max = Math.min(max ?: 15, 100)
+        if (!params.sort) {
+            params.sort = "startTime"
+            params.order = "desc"
+        }
+        def bags = ProtocolInstanceBag.where { status == ProtocolStatus.COMPLETED }.list(params)
         [bags: bags]
     }
         

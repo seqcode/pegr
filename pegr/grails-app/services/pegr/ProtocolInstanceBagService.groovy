@@ -10,16 +10,6 @@ class ProtocolInstanceBagService {
     def springSecurityService
     def itemService
     
-    List fetchProcessingBags() {
-        def bags = ProtocolInstanceBag.where { status != ProtocolStatus.COMPLETED }.list(sort: "startTime", order: "desc")
-        return bags
-    }
-    
-    List fetchCompletedBags() {
-        def bags = ProtocolInstanceBag.where { status == ProtocolStatus.COMPLETED }.list(sort: "startTime", order: "desc")
-        return bags
-    }
-    
     @Transactional
     ProtocolInstanceBag savePrtclInstBag(Long protocolGroupId, String name, Date startTime) {
         def protocolGroup = ProtocolGroup.get(protocolGroupId)

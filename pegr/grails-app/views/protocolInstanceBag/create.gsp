@@ -5,6 +5,7 @@
 </head>
 <body>
     <div class="container-fluid">
+        <h4>New Protocol Instance Bag</h4>
         <form role="form" method="post" action="savePrtclInstBag" class="fields">
             <div>
                 <label>Name</label>

@@ -2831,4 +2831,10 @@ databaseChangeLog = {
 	include file: 'itemTypeCategory.groovy'
 
 	include file: 'nullConc.groovy'
+
+	include file: 'runStatus.groovy'
+
+	include file: 'runStatusNonNull.groovy'
+
+	include file: 'removePoolFromRun.groovy'
 }

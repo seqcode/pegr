@@ -7,8 +7,8 @@
 <div class="container-fluid">
     <h4>Sequencing Runs</h4>
     <ul class="nav nav-tabs">
-        <li class="active"><g:link action="index">Processing</g:link></li>
-        <li><g:link action="completedRuns">Completed</g:link></li>
+        <li><g:link action="index">Processing</g:link></li>
+        <li class="active"><a href="#">Completed</a></li>
         <li><g:link action="create">New</g:link></li>
     </ul>
     <g:render template="/sequenceRun/table"></g:render>

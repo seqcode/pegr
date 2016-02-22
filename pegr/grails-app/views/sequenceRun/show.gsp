@@ -5,57 +5,45 @@
 </head>
 <body>
 <div class="container-fluid">
-    <g:link action="index"><span class="glyphicon glyphicon-home"></span> Home</g:link>
+    <g:link action="index"><span class="glyphicon glyphicon-home"></span> Sequencing Run List</g:link>   
+    <h3>Sequence Run #${run.runNum}  <small><span class="label label-default">${run.status}</span></small></h3>
+    <h4>Run Information</h4>
+    <ul>
+        <li>Platform: ${run.platform}</li>
+        <li>User: ${run.user}</li>
+        <li>Date: <g:formatDate format="yyyy-MM-dd" date="${run.date}"/></li>
+        <g:if test="${run.note}"><li>Note: ${run.note}</li></g:if>        
+    </ul>
     
-    <g:if test="${flash.message}">
-        <div class="message" role="status">${flash.message}</div>
-    </g:if>
-    <g:form class="fields form-inline well well-sm" role="form" action="preview" >
-        <div class="form-group">
-            <label for="type">Type</label>
-            <g:select id="type" name="typeId" optionKey="id" from="${pegr.ItemType.list()}" noSelection="['null': '-- choose --']" />
-        </div>        
-        <div class="form-group">
-            <label for="barcode">Barcode</label>
-             <g:textField id="barcode" name="barcode" />
-            <button type="button" onclick="getScan();"><span class="glyphicon glyphicon-qrcode"></span></button>
-        </div>
-        <g:submitButton class="btn btn-primary btn-sm" name="search" value="Search"/>
-    </g:form>    
-    
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead>
+    <h4>Samples</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Sample ID</th>
+                <th>Strain</th>
+                <th>Antibody</th>
+                <th>Index</th>
+                <th>Genome Build</th>
+            </tr>
+        </thead>
+        <tbody>
+            <g:each in="${run.experiments}">
                 <tr>
-                    <g:sortableColumn property="id" title="ID"></g:sortableColumn>
-                    <g:sortableColumn property="sample" title="Sample"></g:sortableColumn>
-                    <th>Genome Build</th>
-                    <th>Index</th>
+                    <td><g:link control="sample" action="show" id="${it.sample.id}">${it.sample.id}</g:link></td>
+                    <td>${it.sample.cellSource.strain}</td>
+                    <td>${it.sample.antibody}</td>
+                    <td>${it.sample.sequenceIndicesString}</td>
+                    <td>${it.genomesString}</td>                        
                 </tr>
-            </thead>
-            <tbody>
-                <g:each in="${sampleList}">
-                    <tr>
-                    <td><g:link action="show" id="${it.id}">${it.id}</g:link></td>
-                    <td>${it}</td>
-                    <td>${it.genomes}</td>
-                    <td>${it.indices}</td>
-                    </tr>
-                </g:each>              
-                <tr>
-                    <td colspan="4"></td>
-                </tr>
-            </tbody>
-          </table>
-    </div>
+            </g:each>              
+            <tr>
+                <td colspan="5"></td>
+            </tr>
+        </tbody>
+    </table>
 
-    <div class="pagination">
-        <g:paginate next="Next" prev="Prev" controller="item" action="list" total="${itemCount ?: 0}" />
-    </div>
-    
     <script>
         $("#nav-bench").addClass("active");
-        $(".confirm").confirm();
      </script>
 </div>
 </body>

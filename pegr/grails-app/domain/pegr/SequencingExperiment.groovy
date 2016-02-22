@@ -15,6 +15,15 @@ class SequencingExperiment {
         return SequenceAlignment.where{sequencingExperiment == this}.list()
     }
     
+    List getGenomes() {
+        return SequenceAlignment.where{sequencingExperiment == this}.collect{it.genome}
+    }
+    
+    String getGenomesString() {
+        def genomes = SequenceAlignment.where{sequencingExperiment == this}.collect{it.genome.name}
+        return genomes.join(', ')
+    }
+    
     static constraints = {
         seqId nullable: true, blank: true
         sequenceRun nullable: true

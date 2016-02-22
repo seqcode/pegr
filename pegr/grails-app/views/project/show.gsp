@@ -6,12 +6,12 @@
 <body>
 	<div><g:link action='index'>My Projects</g:link> -> Project ${project?.name} </div>
 	<div>
-		<h3>Project: ${project?.name} <g:link action="edit" id="${project?.id}" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-plus">Edit</span></g:link></h3>
+		<h3>Project: ${project?.name} <g:link action="edit" id="${project?.id}" class="edit">Edit</g:link></h3>
 		<p>Created: ${project?.dateCreated}, updated: ${project?.lastUpdated}</p>
 		<p>Description: ${project?.description}</p>
         <p>Funding: ${project?.funding}</p>
         
-        <h3>Users <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#addUser"><span class="glyphicon glyphicon-plus">Add</span></button></h3>
+        <h3>Users <button class="edit" data-toggle="modal" data-target="#addUser">Add</button></h3>
         <div id="addUser" class="modal fade" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -43,7 +43,7 @@
         </div>
         
 		<h3>Samples</h3>
-        <g:link controller="sample" action="create" params="[projectId: project?.id]" class="btn btn-info">Create New Sample</g:link>
+        <g:link action="addSamples" params="[projectId: project?.id]" class="btn btn-info">Create New Sample</g:link>
         <g:link action="addSample" class="btn btn-info">Add Existing Sample</g:link>
         <g:render template="/sample/table" model="['sampleList':project?.samples]" />
 		<div class="pagination">

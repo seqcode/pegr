@@ -12,6 +12,10 @@ class SequenceRun {
 	String note
     RunStatus status
 	
+    List getExperiments() {
+        return SequencingExperiment.where{sequenceRun == this}.list()
+    }
+    
     static constraints = {
 		note nullable: true, blank: true
 		fcId nullable: true, blank: true

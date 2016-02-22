@@ -269,8 +269,8 @@ class ProtocolInstanceBagService {
                     item = item.parent
                 }
                 if (item && item.parent?.type == startState) {
-                    parents[ids] = item.parent
-                    children[ids] = item
+                    parents[idx] = item.parent
+                    children[idx] = item
                 } else {
                     throw new ProtocolInstanceBagException(message: "Status of the parent does not match the protocol!")
                 }

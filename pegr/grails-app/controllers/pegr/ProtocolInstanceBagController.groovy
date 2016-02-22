@@ -158,11 +158,17 @@ class ProtocolInstanceBagController {
                 def results
                 if (completed) {
                     results = protocolInstanceBagService.getParentsAndChildrenForCompletedInstance(samples, protocol.startItemType, protocol.endItemType)
+                    render(view: "showInstance", model: [protocolInstance: protocolInstance, 
+                                                 sharedItemList: sharedItemList,
+                                                 template: template,
+                                                 samples: samples,
+                                                 parents: results.parents,
+                                                 children: results.children,
+                                                 childType: protocol.endItemType])
                 } else {
                     results = protocolInstanceBagService.getParentsAndChildrenForProcessingInstance(samples, protocol.startItemType, protocol.endItemType)                
                     toBeCompleted = sharedItemList.every{ !it.items.empty } && results.children.every{ it != null }
-                }
-                render(view: "editInstance", model: [protocolInstance: protocolInstance, 
+                    render(view: "editInstance", model: [protocolInstance: protocolInstance, 
                                                  sharedItemList: sharedItemList,
                                                  template: template,
                                                  samples: samples,
@@ -170,6 +176,7 @@ class ProtocolInstanceBagController {
                                                  children: results.children,
                                                  childType: protocol.endItemType,
                                                  toBeCompleted: toBeCompleted])
+                }
             } catch(ProtocolInstanceBagException e) {
                 flash.message = e.message
                 redirect(action: "showBag", id: protocolInstance.bag.id)

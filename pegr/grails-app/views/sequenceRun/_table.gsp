@@ -13,7 +13,7 @@
                 <tr>
                     <td><g:link controller="sequenceRun" action="show" id="${run.id}">${run.runNum}</g:link></td>                        
                     <td>${run.platform}</td>
-                    <td>${run.date} </td>
+                    <td><g:formatDate format="yyyy-MM-dd" date="${run.date}"/></td>
                     <td>${run.user}</td>
                 </tr>
             </g:each>              

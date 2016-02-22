@@ -33,16 +33,16 @@ class ProjectController {
                 try {
                     if (project.save(flush: true)) {
                         // add current user as owner
-                        project.addToProjectUsers(new ProjectUser(user: user, 
-                                                                  project: project, 
-                                                                  projectRole: ProjectRole.OWNER)) 
+                        new ProjectUser(user: user, 
+                                      project: project, 
+                                      projectRole: ProjectRole.OWNER).save()
                         flash.message = "Successfully  created project ${project.name}"
                         redirect(action:"show", id:"${project.id}")
                     } else {
                         request.message = "Invalid inputs!"
                         render(view:'create', model:[project: project])
-                }
-                }catch(Exception e) {
+                    }
+                } catch(Exception e) {
                     log.error "Error: ${e.message}", e
                     request.message ="Oops! Please try again."
                     render(view:'create', model:[project: project])
@@ -112,7 +112,10 @@ class ProjectController {
 			log.error "Error: ${e.message}", e
 			render status: 500
 			render "<div class='errors'>An error has occurred</div>"
-		}
-				
+		}				
 	}
+    
+    def addSamples() {
+        
+    }
 }

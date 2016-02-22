@@ -4,14 +4,15 @@ class Genome {
 
 	String name
 	Species species
-	String genomeBuild
+    DictionaryStatus status
 	
 	String toString() {
-		name + "-" + genomeBuild
+		name
 	}
 	
     static constraints = {
-		name size: 2..30, unqiue: 'genomeBuild'
-		genomeBuild size: 2..30
+		name unqiue: true, matches: '^[0-9A-Za-z -]+$'
+        species nullable: true
+        status nullable: true
     }
 }

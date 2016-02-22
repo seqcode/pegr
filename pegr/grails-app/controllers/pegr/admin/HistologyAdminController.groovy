@@ -1,6 +1,6 @@
 package pegr.admin
-import pegr.AdminCategory;
 import pegr.Histology
+import pegr.AdminCategory
 
 class HistologyAdminController {
 

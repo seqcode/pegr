@@ -1,33 +1,37 @@
 package pegr
 import grails.transaction.Transactional
 
-@Transactional(readOnly = true)
 class UserController {
 
 	def springSecurityService	
-	
+	def userService
+    
 	def profile(){
         def user = springSecurityService.currentUser
-        [user:user]
+        if (!user) {
+            redirect(uri: "/login/form")
+        } else {
+            [user:user]
+        }
 	}
     
-    @Transactional
-    def editInfo() {
+    def editInfo(UserInfoCommand uic) {
         if(request.method=='POST'){
-            withForm {
-                def user = springSecurityService.currentUser?.attach()
-                user.properties = params
-                if (user.validate() && user.save()) {
+            withForm {                
+				try {
+                    int id = springSecurityService.currentUser.id
+				    userService.updateUser(uic, id)
                     flash.message = "Successfully updated basic information!"
-                    redirect(action: "profile")
-                } else {
-                    flash.message = "Invalid input!" 
-                    render(view:'editInfo', model:[user: user])
-                }
+	                redirect(action: "profile")
+				} catch(UserException e) {
+					request.message = e.message
+					render(view:'editInfo', model:[user: uic])
+				}
             }
         }else{
             def user = springSecurityService.currentUser
-            [user: user]
+            uic = new UserInfoCommand(user.properties['fullName', 'email', 'phone'])
+            [user: uic]
         }
     }
     
@@ -93,10 +97,15 @@ class UserController {
             } else {
                 def user = new User(urc.properties)
                 user.password = springSecurityService.encodePassword(urc.password)
-                if (user.save()) {
-                    redirect(action: "profile")
-                }else {
-                    [user: urc]
+                try {
+                    if (user.save(flush:true)) {
+                        redirect(controller: "auth", action: "form")
+                    }else {
+                        [user: urc]
+                    }
+                } catch(Exception e) {
+                    log.error "Error: ${e.message}", e
+                    render status: 404
                 }
             }
         }
@@ -117,4 +126,13 @@ class UserRegistrationCommand {
 			   return passwd2 == urc.password ?: 'validation.reenterSamePassword'
 		   }
 	}
+}
+
+class UserInfoCommand {
+    String fullName
+    String email
+    String phone
+    static constraints = {
+		importFrom User
+    }
 }

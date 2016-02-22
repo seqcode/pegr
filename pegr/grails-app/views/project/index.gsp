@@ -10,8 +10,9 @@
     <ul class="list-group" id="allProjects">
         <g:render template="overview" collection="${userProjects}" var="userProject"/>
     </ul>
-    <g:paginate action="index" total="${projectCount}" max="25"/>
-
+    <div class="pagination">
+        <g:paginate next="Next" prev="Prev" controller="project" action="index" total="${projectCount ?: 0}" />
+    </div>
      <script>
         $("#nav-projects").addClass("active");
      </script>

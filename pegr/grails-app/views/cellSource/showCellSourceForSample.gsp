@@ -19,7 +19,7 @@
         </div>
     </div>
     <script>
-        $("#nav-sample-cellsource").addClass("active");
+        $("#nav-sample-cellculture").addClass("active");
         $("#nav-projects").addClass("active");        
     </script>
 </body>

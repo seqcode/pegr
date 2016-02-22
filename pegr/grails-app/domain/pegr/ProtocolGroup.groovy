@@ -3,17 +3,19 @@ package pegr
 class ProtocolGroup {
 
 	String name
-	List protocols
 	Date dateCreated
+    User user
+    List protocols
     
 	String toString() {
 		name
 	}
-	
-	static hasMany = [protocols: Protocol]
+    
+    static hasMany = [protocols: Protocol]
 	
     static constraints = {
-    	name maxSize: 30, unique: true
+    	name unique: true
+        user nullable: true
 	}
     
     static mapping = {

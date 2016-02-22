@@ -14,8 +14,6 @@ class User implements Serializable {
 	Organization affiliation
 	Address address
 	
-	static hasMany = [userProjects: ProjectUser]
-	
 	boolean enabled = true
 	boolean accountExpired
 	boolean accountLocked
@@ -39,7 +37,11 @@ class User implements Serializable {
 
 	@Override
 	String toString() {
-		return "$fullName ($username)" 
+        if (fullName) {
+            return "$username($fullName)" 
+        } else {
+            return "${username}"
+        }
 	}
 
 	Set<Role> getAuthorities() {
@@ -51,8 +53,8 @@ class User implements Serializable {
 	static constraints = {
 		username blank: false, unique: true
 		password blank: false
-		fullName nullable: true, blank: true, maxSize: 50
-		email email: true, nullable: true
+		fullName nullable: true, blank: true
+		email nullable: true, blank: true
 		phone nullable: true, maxSize: 20
 		affiliation nullable: true
 		address nullable: true
@@ -60,5 +62,6 @@ class User implements Serializable {
 
 	static mapping = {
 		password column: '`password`'
+		dynamicUpdate true
 	}
 }

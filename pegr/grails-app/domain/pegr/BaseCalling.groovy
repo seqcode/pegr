@@ -8,7 +8,7 @@ class BaseCalling {
 		name + baseCallingVersion
 	}
     static constraints = {
-		name maxSize: 30, unique: 'baseCallingVersion'
+		name unique: 'baseCallingVersion'
 		baseCallingVersion maxSize: 10, nullable: true, blank: false
     }
 }

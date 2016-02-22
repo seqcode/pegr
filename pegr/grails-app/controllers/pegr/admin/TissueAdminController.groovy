@@ -1,6 +1,6 @@
 package pegr.admin
-import pegr.AdminCategory;
 import pegr.Tissue
+import pegr.AdminCategory
 
 class TissueAdminController {
 

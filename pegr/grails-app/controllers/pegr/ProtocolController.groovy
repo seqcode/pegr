@@ -1,19 +1,9 @@
 package pegr
 import grails.transaction.Transactional
 
-@Transactional(readOnly = true)
 class ProtocolController {
 	def springSecurityService
-	
-    def showProtocolsAjax(){
-        if (params.id.isInteger()){
-			def protocolGroup = ProtocolGroup.get(params.id)
-            render template: 'protocolsDetails', bean: protocolGroup
-        } else{
-            render "Please select a protocol group."
-        }
-	
-    }
+	def protocolService
     
     @Transactional
 	def updateProtocolGroupForSample() {
@@ -60,39 +50,22 @@ class ProtocolController {
 		[protocolGroup: sample.protocolGroup, protocolInstances: protocolInstances, protInstCount: n, sampleId: sample.id]
 	}
     
-	@Transactional
 	def createInstanceForSample() {
-		def user = springSecurityService.currentUser
-		def priorProtInst = null
-		if (params.priorProtInstId) {
-			priorProtInst = ProtocolInstance.get(params.priorProtInstId)
-		}
-		def protocol = Protocol.get(params.protocolId)
-		def protocolInstance = new ProtocolInstance(protocol: protocol, 
-			user: user,
-			prior: priorProtInst,
-            completed: false)
-		if (protocolInstance.validate() && protocolInstance.save(flush: true)) {
-			// update the latest protocol instance for sample
-			def sample = Sample.get(params.sampleId)
-			if (sample){
-				sample.latestProtocolInstance = protocolInstance
-				sample.save(flush: true)
-				render(view: "editInstanceForSample", 
-					model: [protocolInstance: protocolInstance, sampleId: params.sampleId])
-			} else {
-				render status: 500
-			}
-		}else {
-			render status: 500
-		}
+        try {
+            def protocolInstance = protocolService.createInstanceForSample(params.protocolId, params.sampleId, params.priorProtInstId)
+            render(view: "editInstanceForSample", 
+                    model: [protocolInstance: protocolInstance, sampleId: params.sampleId])
+        } catch(Exception e) {
+            flash.message = e.message
+            redirect(action: "showProtocolsForSample", params: [sampleId: params.sampleId])
+        }
 	}
-		
-    @Transactional
+
 	def showInstanceForSample(Integer prtclInstanceId, Integer sampleId) {
         def protocolInstance = ProtocolInstance.get(prtclInstanceId)
         if (protocolInstance) {
-		  [protocolInstance:protocolInstance, sampleId: sampleId]
+            render(view: "editInstanceForSample", 
+					model: [protocolInstance:protocolInstance, sampleId: sampleId])
         } else {
             render status: 500
         }
@@ -100,13 +73,62 @@ class ProtocolController {
     
     @Transactional
     def addItemToPrtclInstanceAjax(){
-        withForm {
+        try {
             def item = new Item(params)
-            if (item.validate() && item.save(flush: true)) {
-                render template: '/item/details', bean: item, var: 'itemInstance'
-            } else {
-                render "Invalid inputs for the new item!"
+            def protocolInstance = ProtocolInstance.get(params.prtclInstId)
+            if (protocolInstance) {
+                if (item.save(flush:true) ) {
+                    protocolInstance.addToItems(item).save(flush: true)
+
+                    render template: '/item/detailSquare', collection: protocolInstance.items, var: 'itemInstance'
+                } else {
+                    render template: '/layouts/error', bean: item
+                }
+            }else {
+                render "<div class='errors'>Protocol Instance not found!</div>"
             }
+        }catch(Exception e) {
+            log.error "Error saving item", e
+            render "<div class='errors'>Error saving this item!</div>"
+        }   
+    }
+    
+    @Transactional
+    def linkItemToPrtclInstanceAjax() {
+        try {
+            def item = Item.get(params.itemId)
+            def protocolInstance = ProtocolInstance.get(params.prtclInstId)
+            if (protocolInstance && item) {    
+                protocolInstance.addToItems(item).save(flush: true)
+                render template: '/item/detailSquare', collection: protocolInstance.items, var: 'itemInstance'                
+            }else {
+                throw new Exception()
+            }
+        }catch(Exception e) { 
+            log.error "Error linking item to protocol instance", e
+            render "<div class='errors'>Error linking this item to the protocol instance!</div>"
+        }   
+    }
+    
+    def searchAjax() {        
+        try {
+            def items = Item.withCriteria {
+                and {
+                        eq "type.id", Long.parseLong(params.typeId)
+                        eq "barcode", params.barcode                    
+                    }
+            }
+            if (items && items.size()) {
+                def protocolInstance = ProtocolInstance.get(params.prtclInstId)
+                def linkedItemIds = protocolInstance.items*.id
+                render template: "searchItems", model: [items:items, prtclInstId:params.prtclInstId, linkedItemIds: linkedItemIds]
+                
+            } else {
+                render "<div class='errors'>No item found!</div>"
+            }
+        }catch(Exception e) {
+            log.error "Error searching item within protocol instance", e
+            render status: 404
         }
     }
 }

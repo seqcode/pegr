@@ -6,26 +6,36 @@ class CellSource {
 	Lab providerLab
 	String biologicalSourceId
 	Strain strain
-	Sex sex
-	String age
-	Tissue tissue
-	Histology histology
 	String note	
-	
+    GrowthMedia growthMedia
+    String age
+    Sex sex
+    Tissue tissue
+    Histology histology
+    User prepUser
+	Inventory inventory
+    Item item
+    
 	String toString() {
 		strain
 	}
-	
-	static hasMany = [cellSourceTreatments: CellSourceTreatment]
+    
+    List getTreatments() {
+        return CellSourceTreatments.where{cellSource == this}.collect{it.treatment}
+    }
 	
     static constraints = {
-		biologicalSourceId maxSize: 50, nullable: true, blank: true
-		sex nullable: true
-		age nullable: true, blank: true, maxSize: 30
-		tissue nullable: true
-		histology nullable: true
-		note nullable: true, blank: true
-		providerUser nullable: true
+		inventory nullable: true
+        providerUser nullable: true
 		providerLab nullable: true
+		biologicalSourceId nullable: true, blank: true
+		note nullable: true, blank: true
+        growthMedia nullable: true
+        age nullable: true, blank: true
+        sex nullable: true
+        tissue nullable: true
+        histology nullable: true
+        prepUser nullable: true
+        item nullable: true
     }
 }

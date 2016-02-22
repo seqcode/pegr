@@ -9,7 +9,7 @@ class AlignType {
 	}
 	
     static constraints = {
-		name maxSize: 30, unique: true
+		name unique: true
 		shortName nullable: true, blank: true, maxSize:20, unique: true
     }
 }

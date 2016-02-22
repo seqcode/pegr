@@ -14,16 +14,16 @@
         </div>
         <div class="col-sm-10 content">
             <h3>Cell Source ${cellSourceId}</h3>
-            <div id="cellsource-details">
+            <div id="cellculture-details">
             <div>
                 <ul class="nav nav-tabs">
-                  <li class="active"><a data-toggle="tab" href="#new-cellsource"><span class="glyphicon glyphicon-plus"></span> New</a></li>
-                  <li><a data-toggle="tab" href="#scan-cellsource"><span class="glyphicon glyphicon-qrcode"></span> Scan</a></li>
-                  <li><a data-toggle="tab" href="#search-cellsource"><span class="glyphicon glyphicon-search"></span> Search</a></li>
+                  <li class="active"><a data-toggle="tab" href="#new-cellculture"><span class="glyphicon glyphicon-plus"></span> New</a></li>
+                  <li><a data-toggle="tab" href="#scan-cellculture"><span class="glyphicon glyphicon-qrcode"></span> Scan</a></li>
+                  <li><a data-toggle="tab" href="#search-cellculture"><span class="glyphicon glyphicon-search"></span> Search</a></li>
                 </ul>
                 
                 <div class="tab-content">
-                  <div id="new-cellsource" class="tab-pane fade in active">
+                  <div id="new-cellculture" class="tab-pane fade in active">
                     <h4>New Cell Source</h4>
                     <g:if test="${flash.message}">
 						<div class="message" role="status">${flash.message}</div>
@@ -41,7 +41,7 @@
                     </g:form>
                   </div>
                   
-                  <div id="scan-cellsource" class="tab-pane fade">
+                  <div id="scan-cellculture" class="tab-pane fade">
                     <h4>Scan </h4>
                     <span class="glyphicon glyphicon-qrcode"></span>
                     <p>Some content in menu 2.</p>
@@ -51,7 +51,7 @@
         </div>
     </div>
     <script>
-        $("#nav-sample-cellsource").addClass("active");
+        $("#nav-sample-cellculture").addClass("active");
         $("#nav-projects").addClass("active");        
     </script>
 </body>

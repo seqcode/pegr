@@ -1,14 +1,14 @@
 <html>
 <head>
-    <title>Profile-Basic Infomation</title>
+    <title>Profile-Basic Information</title>
     <meta name="layout" content="main" />
 </head>
 <body>
     <h2>Profile</h2>
     <div class="profile">
         <h3>Basic Information </h3>   
-        <g:if test="${flash.message}">
-			<div class="message" role="status">${flash.message}</div>
+        <g:if test="${request.message}">
+			<div class="message" role="status">${request.message}</div>
         </g:if>
         <g:hasErrors>
             <div class="errors">
@@ -29,7 +29,7 @@
                 <g:textField type="tel" class="form-control" id="phone" name="phone"></g:textField>
             </div>
             <span>
-                <g:submitButton name="update" value="Update" class="btn btn-primary"/>                   <g:link action='profile' class="btn btn-primary ">Cancel</g:link>
+                <g:submitButton name="update" value="Update" class="btn btn-primary"/> <g:link action='profile' class="btn btn-primary ">Cancel</g:link>
             </span>
         </g:form>
     </div>

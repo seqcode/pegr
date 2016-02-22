@@ -36,6 +36,23 @@ ul {
   background-color: #3973ad;
 }
 
+.nav .open > a:focus {
+  background-color: #3f7fc0;
+}
+
+.filter {
+    padding: 0;
+    background-color: #dbdbdb;
+}
+
+.filter ul {
+    padding: 0 10px;
+}
+
+.filter .active {
+  font-weight: bold;
+}
+
 /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
 .row.content {height: 450px}
 
@@ -61,6 +78,19 @@ footer {
     padding: 0;
   }
   .row .content {height:auto;} 
+}
+
+.dropdown-menu {
+    min-width: 100px;
+    background-color: #3973ad;
+}
+
+.dropdown-menu li a {
+    color: white;
+}
+
+.dropdown-menu li a:hover {
+    color: white;
 }
 
 #main-content {
@@ -99,7 +129,7 @@ footer {
     padding: 1px 10px;
 }
 
-.fields div {
+.fields > div {
     margin: 5px;
 }
 
@@ -126,5 +156,21 @@ footer {
     background-color: #E0E0E0; 
 }
 #sample-nav .active {
+    background-color: white;
+}
+
+.item {
+    border: 1px solid; 
+    margin: 5px;
+    border-style: outset;
+}
+
+.edit {
+    border: 1px solid;
+    border-radius: 5px;
+    padding: 0 2px;
+    font-size: 15px;
+    font-weight: normal;
+    color: #3f7fc0;
     background-color: white;
 }

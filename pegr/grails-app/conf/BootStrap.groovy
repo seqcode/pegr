@@ -10,26 +10,29 @@ class BootStrap {
 		}
 			
 		private createItemTypeIfRequired() {			
-			if (!ItemType.findByName("Cell Source")) {
-				println "Creating ItemType for Cell Source"
-				def itemType = new ItemType(name: "Cell Source",
-					objectType: "CellSource")
-				itemType.save()
-			}
 			
 			if (!ItemType.findByName("Antibody")) {
 				println "Creating ItemType for Antibody"
 				def itemType = new ItemType(name: "Antibody",
-					objectType: "Antibody")
+					category: "ItemTypeCategory.ANTIBODY")
 				itemType.save()
 			}
-			
-			if (!ItemType.findByName("Sample")) {
-				println "Creating ItemType for Sample"
-				def itemType = new ItemType(name: "Sample",
-					objectType: "Sample")
-				itemType.save()
-			}
+            
+            if (!SequencingPlatform.findByName("SOLiD")) {
+                new SequencingPlatform(name: "SOLiD").save(flush: true)
+            }
+
+            if (!SequencingPlatform.findByName("Illumina GA")) {
+                new SequencingPlatform(name: "Illumina GA").save(flush: true)
+            }
+
+            if (!SequencingPlatform.findByName("HiSeq 2000")) {
+                new SequencingPlatform(name: "HiSeq 2000").save(flush: true)
+            }
+
+            if (!SequencingPlatform.findByName("NextSeq 500")) {
+                new SequencingPlatform(name: "NextSeq 500").save(flush: true)
+            }
 		}
 			
 		private createAdminUserIfRequired() {

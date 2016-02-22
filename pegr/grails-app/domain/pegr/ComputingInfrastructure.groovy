@@ -8,6 +8,6 @@ class ComputingInfrastructure {
 		name
 	}
     static constraints = {
-    	name unique: true, maxSize: 20
+    	name unique: true
 	}
 }

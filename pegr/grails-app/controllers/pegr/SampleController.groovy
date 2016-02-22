@@ -1,49 +1,101 @@
 package pegr
 import grails.transaction.Transactional
-
+import groovy.json.*
+    
 @Transactional(readOnly = true)
 class SampleController {
-
-    static scaffold = true
     
     def index(Integer max) {
-        max = Math.min(max ?: 10, 100)
-        respond Sample.list(params), model:[sampleCount: Sample.count()]
-    }
-	
-    @Transactional
-    def create() {
-		def sample = new Sample(status: SampleStatus.CREATED)
-		if(params.projectId) {
-			def project = Project.get(params.projectId)
-			if (!project)
-				render status: 500
-			project.addToSamples(sample)
-			project.save(flush: true)	
-		}else {
-			sample.save(flush: true)
-		}
-		redirect(controller: "CellSource", action: "createCellSourceForSample", params: [sampleId: sample.id])
+        params.max = Math.min(max ?: 15, 100)
+        if (!params.sort) {
+            params.sort = "id"
+            params.order = "desc"
+        }
+        def samples = Sample.where{status == SampleStatus.COMPLETED}.list(params)
 
+        [sampleList: samples, sampleCount: Sample.count()]
     }
     
 	def show(Integer id) {
 		def sample = Sample.get(id)
-		[sampleInstance:sample, sampleId: sample.id]
+        def jsonSlurper = new JsonSlurper()
+        def notes = [:]
+        try {
+            notes += jsonSlurper.parseText(sample.note)
+        }catch(Exception e){
+            
+        }
+        try {
+            notes += jsonSlurper.parseText(sample.prtclInstSummary.note)
+        }catch(Exception e){
+            
+        }        
+		[sample: sample, notes: notes]
 	}
-	
-    def search() {       
-        def sampleProps = Sample.metaClass.properties*.name
-        def samples = Sample.withCriteria {
-            "${params.queryType}" {
-                params.each { field, value ->
-                    if (sampleProps.contains(field) && value) {
-                        ilike field, "%{value}%"
-                    }
-                }
+    
+    def showChecked(){
+        
+        def ids
+        if (session.checkedSample){
+            session.checkedSample.append(params.checkedSample)
+        }else{
+            ids = params.checkedSample
+        }
+        
+        def sampleList = []
+        ids.each{
+            def sample = Sample.get(Long.parseLong(it))
+            if (sample) {
+                sampleList.push(sample)
             }
         }
-        [samples: samples]
+        session.checkedSample = null
+        [sampleList: sampleList, ids: ids]
+    }
+    
+    def searchForm() {
+        
+    }
+    
+    def search() {       
+        def sampleProps = Sample.metaClass.properties*.name
+        def c = Sample.createCriteria()
+        params.max = 15
+        def samples = c.list(params) {
+            and {
+               if (params.species) {
+                    cellSource {
+                        strain {
+                            species {
+                                ilike "name", "%${params.species}%"
+                            }
+                        }
+                    }
+                }
+                if (params.strain) {
+                    cellSource {
+                        strain {
+                            ilike "name", "%${params.strain}%"
+                        }                    
+                    }
+                }
+                if (params.antibody) {
+                    antibody {
+                        ilike "catalogNumber", "%${params.antibody}%"
+                    }
+                }
+                eq("status", SampleStatus.COMPLETED)
+            }
+            order("id", "desc")
+        }
+        [sampleList: samples]
+    }
+    
+    def clearCheckedSampleAjax(){
+        if (session.checkedSample) {
+            session.checkedSample = null
+        }
+        return
     }
     
     @Transactional

@@ -4,16 +4,24 @@ class ProtocolInstance {
 
 	Protocol protocol
 	User user
-	Date dateCreated
+    Date startTime
+	Date endTime
 	String note
-	ProtocolInstance prior
-	Boolean completed
-		
-	static hasMany = [items: Item]
+	ProtocolStatus status
+	ProtocolInstanceBag bag	
+    Integer bagIdx
 	
     static constraints = {
+        protocol nullable: true
 		note nullable: true, blank: true
-		prior nullable: true
+        bag nullable: true
+        user nullable: true
+        startTime nullable: true
+        endTime nullable: true
+    }
+    
+    static mapping = {
+        bagIdx defaultValue: 0
     }
 	
 }

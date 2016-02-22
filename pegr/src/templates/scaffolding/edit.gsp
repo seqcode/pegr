@@ -12,7 +12,7 @@
 			<li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
 			<li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
 		</ul>
-		</div>
+
 		<div id="edit-${domainClass.propertyName}" class="content scaffold-edit" role="main">
 			<h3><g:message code="default.edit.label" args="[entityName]" /></h3>
 			<g:if test="\${flash.message}">
@@ -25,7 +25,7 @@
 				</g:eachError>
 			</ul>
 			</g:hasErrors>
-			<g:form action='update' method="PUT" <%= multiPart ? ' enctype="multipart/form-data"' : '' %>>
+			<g:form action='update' method="PUT" useToken="true" <%= multiPart ? ' enctype="multipart/form-data"' : '' %>>
                 <g:hiddenField name="id" value="\${${propertyName}?.id}" />
 				<g:hiddenField name="version" value="\${${propertyName}?.version}" />
 				<fieldset class="form">

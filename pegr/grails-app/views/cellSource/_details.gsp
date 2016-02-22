@@ -1,44 +1,54 @@
 <ul class="property-list">
-	<g:if test="${cellSourceInstance?.strain}">
-	<li>Strain: ${cellSourceInstance.strain}</li>
-	</g:if>
-	
-	<g:if test="${cellSourceInstance?.tissue}">
-	<li>Tissue: ${cellSourceInstance.tissue}</li>
-	</g:if>
-	
-	<g:if test="${cellSourceInstance?.sex}">
-	<li>Sex:${cellSourceInstance.sex}	</li>
-	</g:if>
 
-	<g:if test="${cellSourceInstance?.age}">
-	<li>Age: ${cellSourceInstance.age}</li>
-	</g:if>
+	<li>Strain: ${object?.strain?.name}</li>
+        <ul>
+            <li>Species: ${object?.strain?.species}</li>
+            <li>Genotype: ${object?.strain?.genotype}</li>
+            <g:if test="${object?.strain?.geneticModification}">
+                <li>Genetic Modification: ${object?.strain?.geneticModification}</li>
+            </g:if>
+            <g:if test="${object?.strain?.parent}">
+                <li>Parent Strain: ${object?.strain?.parent}</li>
+            </g:if>
+        </ul>
 	
-	<g:if test="${cellSourceInstance?.histology}">
-	<li>Histology: ${cellSourceInstance.histology}</li>
-	</g:if>
-	
-	<g:if test="${cellSourceInstance?.cellSourceTreatments}">
-	<li>Treatments: 
-			<g:each in="${cellSourceInstance.cellSourceTreatments}" var="c">
-			${c}
-			</g:each>
-	</li>
-	</g:if>
-	
-	<g:if test="${cellSourceInstance?.providerUser}">
-	<li>Provider User: ${cellSourceInstance.providerUser}</li>
-	</g:if>
-
-	<g:if test="${cellSourceInstance?.providerLab}">
-	<li>Provider User: ${cellSourceInstance.providerLab}</li>
-	</g:if>
-
-	<g:if test="${cellSourceInstance?.biologicalSourceId}">
-	<li>Biological Source ID: ${cellSourceInstance.biologicalSourceId}</li>
+	<g:if test="${object?.sex}">
+	<li>Sex:${object.sex}	</li>
 	</g:if>
     
-    <g:render template="/item/details" bean="${itemInstance}" />
-		
+    <g:if test="${object?.age}">
+	<li>Age:${object.age}	</li>
+	</g:if>
+    
+    <g:if test="${object?.tissue}">
+	<li>Tissue:${object.tissue}	</li>
+	</g:if>
+	
+    <g:if test="${object?.histology}">
+	<li>Histology:${object.histology}	</li>
+	</g:if>
+    
+    <g:if test="${object?.growthMedia}">
+	<li>Growth Media:${object.growthMedia}	</li>
+	</g:if>
+	
+    <li>Provider: 
+	<g:if test="${object?.providerUser}">
+	   ${object.providerUser}
+	</g:if>
+	<g:if test="${object?.providerLab}">
+        , ${object.providerLab}
+	</g:if>
+    </li>
+    
+	<g:if test="${object?.biologicalSourceId}">
+	<li>Biological Source ID: ${object.biologicalSourceId}</li>
+	</g:if>
+    
+    <li>Cell Source Treatments:
+        <g:each in="${object.treatments}" var="c">
+            ${c}
+        </g:each>	
+    </li>
 </ul>
+

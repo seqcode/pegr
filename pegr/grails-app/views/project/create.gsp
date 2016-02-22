@@ -5,6 +5,9 @@
 </head>
 <body>
     <h3>New Project</h3>
+    <g:if test="${flash.message}">
+    <div class="message" role="status">${flash.message}</div>
+    </g:if>
     <g:hasErrors bean="${project}">
         <ul class="errors" role="alert">
             <g:eachError bean="${project}" var="error">

@@ -8,11 +8,21 @@ class Project {
 	Date lastUpdated
 	String funding
 
-	static hasMany = [samples: Sample, projectUsers: ProjectUser]
-
+	String toString() {
+		name
+	}
+	
+    List getSamples() {
+        return ProjectSamples.where{project == this}.collect{it.sample}
+    }
+    
     static constraints = {
 		name unique: true
 		description nullable: true, blank: true, maxSize: 1000
-		funding nullable: true, blank: true, maxSize:50
+		funding nullable: true, blank: true
+    }
+    
+    static mapping = {
+        dynamicUpdate: true
     }
 }

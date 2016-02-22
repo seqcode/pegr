@@ -1,15 +1,29 @@
-		<div class=" ${hasErrors(bean: itemInstance, field: 'barcode', 'error')} ">
-			<label for="barcode">Barcode</label>
-			<g:textField id="barcode" name="barcode" value="${itemInstance?.barcode}"/>
-			<input type=button value="Scan" onclick="getScan();">
-		</div>
-		
-		<div class=" ${hasErrors(bean: itemInstance, field: 'location', 'error')} ">
-			<label for="location">Location</label>
-			<g:textField name="location" value="${itemInstance?.location}"/>
-		</div>
-		
-		<div class=" ${hasErrors(bean: itemInstance, field: 'note', 'error')} ">
-			<label for="note">Note</label>
-			<g:textArea name="note" value="${itemInstance?.note}"/>
-		</div>
+<%@ page import="pegr.Item" %>
+
+<div class=" ${hasErrors(bean: item, field: 'name', 'error')} ">
+    <label>Name</label>
+    <g:textField name="name" value="${item?.name}"/>
+</div>
+
+<div class=" ${hasErrors(bean: item, field: 'type', 'error')} ">
+    <label>Type</label>
+    <select id="type" name="type.id">
+        <option value="${item?.type?.id}" selected>${item?.type?.name}</option>
+    </select>
+</div>
+
+<div class=" ${hasErrors(bean: item, field: 'barcode', 'error')} ">
+    <label>Barcode</label>
+    <g:field name="barcode" value="${item?.barcode}" readonly="readonly" />
+</div>
+
+<div class=" ${hasErrors(bean: item, field: 'location', 'error')} ">
+    <label>Location</label>
+    <g:textField name="location" value="${item?.location}"/>
+</div>
+
+<div class=" ${hasErrors(bean: item, field: 'notes', 'error')} ">
+    <label>Notes</label>
+    <g:textArea name="notes" value="${item?.notes}"/>
+</div>
+

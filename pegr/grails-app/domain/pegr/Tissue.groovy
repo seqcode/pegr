@@ -1,13 +1,16 @@
 package pegr
 
 class Tissue {
+
 	String name
+    DictionaryStatus status
 	
 	String toString() {
 		name
 	}
 	
     static constraints = {
-		name unique: true, size: 2..30
+		name unique: true
+        status nullable: true
     }
 }

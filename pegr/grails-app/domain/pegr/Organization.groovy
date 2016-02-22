@@ -6,6 +6,7 @@ class Organization {
 	Address address
 	String note
 	String website
+    DictionaryStatus status
 	
 	String toString() {
 		name
@@ -13,10 +14,11 @@ class Organization {
 	
     static constraints = {
 		parent nullable: true
-		name unique: true, maxSize: 50
+		name unique: true
 		note nullable: true, blank: true
 		address nullable: true
 		website url: true, nullable: true
+        status nullable: true
     }
 }
 

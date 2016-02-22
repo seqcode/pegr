@@ -2,11 +2,13 @@ package pegr
 
 class Sex {
 	String name
-	
+	DictionaryStatus status
+    
 	String toString() {
 		name
 	}
     static constraints = {
-		name unique: true, size: 2..20	
+		name unique: true
+        status nullable: true
     }
 }

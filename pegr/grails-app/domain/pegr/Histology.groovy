@@ -2,15 +2,17 @@ package pegr
 
 class Histology {
 
-	Histology parent
+    Histology parent
 	String name
+    DictionaryStatus status
 	
 	String toString() {
 		name
 	}
 	
     static constraints = {
-		parent nullable: true
-		name size: 2..30, unique: true
+		name unique: true
+        parent nullable: true
+        status nullable: true
     }
 }

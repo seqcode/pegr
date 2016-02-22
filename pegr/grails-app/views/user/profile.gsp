@@ -16,7 +16,7 @@
                 <li>Full name: ${user?.fullName}</li>
                 <li>Email: ${user?.email}</li>
                 <li>Phone: ${user?.phone}</li>
-                <g:link action='editInfo' class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil">Edit</span></g:link>
+                <g:link action='editInfo' id="${user?.id}" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil">Edit</span></g:link>
             </ul>
         </div>
         <h3>Address</h3>
@@ -53,7 +53,7 @@
         </div>
         <h3>Password</h3>
         <ul>
-        <g:link action='updatePassword' class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil">Change</span></g:link>
+        <g:link action='updatePassword' id="${user?.id}" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil">Change</span></g:link>
         </ul>
     </div>
 </body>

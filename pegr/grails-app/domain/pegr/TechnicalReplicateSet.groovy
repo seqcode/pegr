@@ -2,7 +2,9 @@ package pegr
 
 class TechnicalReplicateSet {
 
-    static hasMany = [sampels: Sample]
+    Project project
+    
     static constraints = {
+        project nullable: true
     }
 }

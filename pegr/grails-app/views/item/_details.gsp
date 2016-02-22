@@ -1,14 +1,20 @@
-<h5>${itemInstance?.type?.name}</h5>
+<g:if test="${item?.name}">
+<h4>Name: ${item.name}</h4>
+</g:if>
 <ul>
-    <g:if test="${itemInstance?.barcode}">
-    <li>Barcode: ${itemInstance.barcode }</li>
-    </g:if>	
-
-    <g:if test="${itemInstance?.location}">
-    <li>Location: ${itemInstance.location}</li>
-    </g:if>	
-
-    <g:if test="${itemInstance?.notes}">
-    <li>Notes: ${itemInstance.notes}</li>
+    <g:if test="${item?.type}">
+    <li>Type: ${item.type}</li>
     </g:if>
+    
+    <g:if test="${item?.barcode}">
+    <li>Barcode: ${item.barcode }</li>
+    </g:if>	
+
+    <g:if test="${item?.location}">
+    <li>Location: ${item.location}</li>
+    </g:if>	
+
+    <g:if test="${item?.notes}">
+    <li>Notes: ${item.notes}</li>
+    </g:if>    
 </ul>

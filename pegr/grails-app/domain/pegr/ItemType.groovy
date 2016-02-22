@@ -3,7 +3,7 @@ package pegr
 class ItemType {
 
 	String name
-	String objectType
+	ItemTypeCategory category
 	String fields
 	
 	String toString() {
@@ -11,8 +11,7 @@ class ItemType {
 	}
 	
     static constraints = {
-		name maxSize: 30, unique: true
-		objectType nullable: true, blank: true, maxSize: 30
+		name unique: true
 		fields nullable: true, blank: true
     }
 }

@@ -2,13 +2,7 @@ package pegr
 
 class Antibody {
 
-	enum MonoPolyClonal {
-		Mono, Poly
-	}
-	
-	String name
 	Company company
-	Target target
 	String catalogNumber
 	String lotNumber
 	MonoPolyClonal clonal
@@ -16,24 +10,27 @@ class Antibody {
 	IgType igType
 	String immunogene
 	Float concentration
-	String encodeId
+	String externalId
 	String inventoryId
 	String note
+    Item item
 	
 	String toString() {
-		name
+		catalogNumber
 	}
 	
     static constraints = {
-		name maxSize: 30, unique: true
 		company nullable: true
-		catalogNumber nullable: true, blank: true
+		catalogNumber nullable: true, blank: true, matches: '^[0-9A-Za-z -]+$'
 		lotNumber nullable: true, blank: true
 		clonal nullable: true
+        abHost nullable: true
 		igType nullable: true
 		immunogene nullable: true, blank: true
-		encodeId nullable: true, blank: true
+        concentration nullable: true
+		externalId nullable: true, blank: true
 		inventoryId nullable: true, blank: true
 		note nullable: true, blank: true
+        item nullable: true
     }
 }

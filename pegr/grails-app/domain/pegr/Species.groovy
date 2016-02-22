@@ -4,14 +4,15 @@ class Species {
 	String name
 	String genusName
 	String note
-	
+	DictionaryStatus status
+    
 	String toString() {
-		name
+        "${genusName} ${name}"
 	}
 	
     static constraints = {
-		name unique: true, maxSize: 50
-		genusName maxSize: 50 
+		name unique: "genusName"
 		note nullable: true, blank: true
+        status nullable: true
     }
 }

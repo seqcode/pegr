@@ -5,25 +5,18 @@ class CellSourceTreatment {
 	String compound
 	String quantity
 	String duration
-	
+    DictionaryStatus status
+	  
 	String toString() {
-		String s = name + " " + compound
-		if (quantity) {
-			 s += " " + quantity 
-		}
-		if (duration) {
-			 s += " " + duration
-		}
+		String s = name
 		return s
 	}
 	
-	static hasMany = [cellSources: CellSource]
-	static belongsTo = CellSource
-	
     static constraints = {
-    	name unique: true, size: 2..30
-		compound size: 2..30
-		quantity maxSize: 20, nullable: true, blank: true
-		duration maxSize: 20, nullable: true, blank: true
+    	name unique: true
+        compound nullable: true, blank: true
+		quantity nullable: true, blank: true
+		duration nullable: true, blank: true
+        status nullable: true
 	}
 }

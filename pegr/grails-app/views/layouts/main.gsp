@@ -17,18 +17,25 @@
 	    </div>
 	    <div class="collapse navbar-collapse" id="myNavbar">
 	      <ul class="nav navbar-nav">
+  	        <li id="nav-metadata"><g:link controller="sample">Metadata</g:link></li>
 	        <li id="nav-projects"><g:link controller="project">My Projects</g:link></li>
-	        <li id="nav-metadata"><g:link controller="sample">Metadata</g:link></li>
-	        <li id="nav-analysis"><a href="#">Analysis</a></li>
+  	        <li id="nav-bench" class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Work Bench</a>
+                <ul class="dropdown-menu">
+                    <li><g:link controller="ProtocolInstanceBag" action="processingBags" >Sample Prep</g:link></li>
+                    <li><g:link controller="item" method="post" asynchronous="false" onSuccess="location.reload()">Items</g:link></li>
+                    <li><g:link controller="sequenceRun">Sequencing</g:link></li>
+                </ul>
+            </li>
 	       	<sec:ifAllGranted roles="ROLE_ADMIN"><li id="nav-admin"><g:link controller="admin">Admin</g:link></li></sec:ifAllGranted>
 	      </ul>
 	    <ul class="nav navbar-nav navbar-right">
 		  <li><a href="#"><span class="glyphicon glyphicon-envelope"></span> Message</a></li>
 		  <li class="dropdown">
-		    <a class="dropdown-toggle"  data-toggle="dropdown">
+		    <a href="#" class="dropdown-toggle"  data-toggle="dropdown">
 		    	<span class="glyphicon glyphicon-user"></span>${sec.username()}<span class="caret"></span>
 		    </a>
-		    <ul class="dropdown-menu" style="min-width:100px">
+		    <ul class="dropdown-menu">
                 <li><g:link controller="user" action="profile"><span class="glyphicon glyphicon-user"></span> Profile</g:link></li>
 		      <li><g:remoteLink class="logout" controller="logout" method="post" asynchronous="false" onSuccess="location.reload()"><span class="glyphicon glyphicon-log-out"></span> Logout</g:remoteLink></li>
 		    </ul>

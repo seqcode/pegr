@@ -7,6 +7,7 @@ class SequenceRunException extends RuntimeException {
 
 class SequenceRunService {
     def springSecurityService
+    def grailsApplication
     
     @Transactional
     void save(SequenceRun run) {
@@ -103,12 +104,14 @@ class SequenceRunService {
     }
     
     @Transactional
-    void run(Long runId) {
+    String run(Long runId) {
         def run = SequenceRun.get(runId)
         if (!run) {
             throw new SequenceRunException(message: "Sequence run not found!")
         }
-        run.status = RunStatus.RUN
-        run.save()
+        def password = grailsApplication.config.walle.password
+        return password
+        //run.status = RunStatus.RUN
+        //run.save()
     }
 }

@@ -187,8 +187,9 @@ class SequenceRunController {
     
     def run(Long runId) {
         try {
-            sequenceRunService.run(runId)
-            redirect(action: "show", id: runId)
+            String password = sequenceRunService.run(runId)
+            [password: password]
+            // redirect(action: "show", id: runId)
         } catch(SequenceRunException e) {
             flash.message = e.message
             redirect(action: "edit", id: runId)

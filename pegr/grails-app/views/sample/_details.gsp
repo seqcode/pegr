@@ -49,7 +49,7 @@
             </g:if>
 
             <li>Treatments:
-                <g:each in="${sample.cellSource.treatments}" var="c">
+                <g:each in="${sample?.cellSource?.treatments}" var="c">
                     ${c}
                 </g:each>	
             </li>

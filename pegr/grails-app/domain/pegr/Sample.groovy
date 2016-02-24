@@ -40,6 +40,12 @@ class Sample {
         return s
     }
     
+    String getSequenceIndicesDetailString() {
+        def indices = SampleSequenceIndices.where{sample == this}.collect{it.index}
+        def s = indices.collect{"${it.indexId}.${it.sequence}"}.join(", ")
+        return s
+    }
+    
     List getProjects() {
         return ProjectSamples.where{sample == this}.collect{it.project}
     }

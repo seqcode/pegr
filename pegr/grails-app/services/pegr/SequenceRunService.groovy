@@ -104,14 +104,13 @@ class SequenceRunService {
     }
     
     @Transactional
-    String run(Long runId) {
+    void run(Long runId) {
         def run = SequenceRun.get(runId)
         if (!run) {
             throw new SequenceRunException(message: "Sequence run not found!")
         }
         def password = grailsApplication.config.walle.password
-        return password
-        //run.status = RunStatus.RUN
-        //run.save()
+        run.status = RunStatus.RUN
+        run.save()
     }
 }

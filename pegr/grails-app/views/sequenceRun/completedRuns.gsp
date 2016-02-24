@@ -10,6 +10,7 @@
         <li><g:link action="index">Processing</g:link></li>
         <li class="active"><a href="#">Completed</a></li>
         <li><g:link action="create">New</g:link></li>
+        <li><g:link action="upload">Upload</g:link></li>
     </ul>
     <g:render template="/sequenceRun/table"></g:render>
     <div class="pagination">

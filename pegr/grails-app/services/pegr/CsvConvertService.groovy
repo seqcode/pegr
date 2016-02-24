@@ -9,7 +9,7 @@ class CsvConvertService {
     
     CsvConvertService() {}
 	
-	def migrate(String filename, RunStatus runStatus, int startLine, int endLine, User user = null){
+	def migrate(String filename, RunStatus runStatus, int startLine, int endLine){
 		
         def timeStart = new Date()
 		def lineNo = 0    
@@ -28,7 +28,7 @@ class CsvConvertService {
 		        break
 		    }
             try {
-                migrateOneRow(rawdata, runStatus, user)
+                migrateOneRow(rawdata, runStatus)
 		 	}catch(Exception e) {
 		        log.error "Error: line ${lineNo}. " + e
 		        continue
@@ -41,7 +41,7 @@ class CsvConvertService {
 	}
 	
     @Transactional
-    def migrateOneRow(String[] rawdata, RunStatus runStatus, User user) {
+    def migrateOneRow(String[] rawdata, RunStatus runStatus) {
 
         String[] cells = new String[rawdata.size()]
         rawdata.eachWithIndex{ d, idx -> 
@@ -53,8 +53,10 @@ class CsvConvertService {
             }
          }
         def data = getNamedData(cells)
+        
+        def runUser = getUser(userStr)
 
-        def results = getSequenceRun(runStatus, data.runStr, data.laneStr, data.dateStr, data.fcidStr, data.indexIdStr, user)
+        def results = getSequenceRun(runStatus, data.runStr, data.laneStr, data.dateStr, data.fcidStr, data.indexIdStr, runUser)
 
         def cellProvider = getUser(data.senderNameStr, data.senderEmail, data.senderPhone)
         def dataTo = getUser(data.dataToUser, data.dataToEmail, null)
@@ -69,7 +71,7 @@ class CsvConvertService {
 
         def species = getSpecies(data.genus, data.species)
 
-        def strainAndTissue = getStrainTissue(species, data.strain, data.backgrounStrain, data.genotype, data.mutation)
+        def strainAndTissue = getStrainTissue(species, data.strain, data.parentStrain, data.genotype, data.mutation)
         def strain = strainAndTissue.strain
         def tissue = strainAndTissue.tissue
 
@@ -289,8 +291,7 @@ class CsvConvertService {
 		return antibody
 	}
     
-    def getStrainTissueByName(String name, Species species) {
-        def strain = null
+    def getTissue(String name) {
         def tissue = null
         if (name) {
             if (name == "InVitro" || name == "Liver" || name.contains("tissue") || name.contains("cells") || name.contains("leukemia")) {
@@ -298,46 +299,38 @@ class CsvConvertService {
                 if (!tissue) {
                     tissue = new Tissue(name: name).save( failOnError: true)
                 }
-            } else{
-                strain = Strain.findByName(name) 
-                if (!strain) {
-                    strain = new Strain(name: name, species: species).save( faliOnError: true)    
-                }
-            }
+            } 
         }
-        return [strain: strain, tissue: tissue]
+        return tissue
     }
 	
-	def getStrainTissue(Species species, String strainStr, String backgrounStrainStr, String genotypeStr, String mutationStr) {
-
-        def result = getStrainTissueByName(strainStr, species)
-        def strain = result.strain
-        def tissue = result.tissue
-        
-        def backgroundResult = getStrainTissueByName(backgrounStrainStr, species)        
-        def backgroundStrain = backgroundResult.strain
-        if (!tissue) {
-            tissue = backgroundResult.tissue
-        }
-        
-        if (genotypeStr == null && mutationStr == null) {
-            // strain itself
-            if (strain) {
-                strain.backgroundStrain = backgroundStrain
-                strain.save(failOnError: true)
-            } 
-            return [strain: strain, tissue: tissue]
-        } else {
-            // define child strain           
-            def childStrain = Strain.findByParentAndGenotypeAndGeneticModification(strain, genotypeStr, mutationStr)
-	    
-            if (!childStrain) {
-                childStrain = new Strain(name: null, species: species, genotype: genotypeStr, 
-                    backgroundStrain: backgroundStrain, parent: strain, geneticModification: mutationStr).save( failOnError: true)
+	def getStrainTissue(Species species, String strainStr, String parentStrainStr, String genotypeStr, String mutationStr) {     
+        // get the parent strain and tissue
+        def parentStrain = null
+        def parentTissue = getTissue(parentStrainStr)
+        if (parentStrainStr && !parentTissue) {
+            parentStrain = Strain.findByName(parentStrainStr)
+            if (!parentStrain) {
+                parentStrain = new Strain(name: parentStrainStr, species: species).save(failOnError: true) 
             }
-            return [strain: childStrain, tissue: tissue]
         }
-	    
+        
+        // get strain and tissue
+        def strain = null
+        def tissue = getTissue(strainStr)
+        if (!tissue) {
+            tissue = parentTissue
+            strain = Strain.findByNameAndParentAndGenotypeAndGeneticModification(strainStr, parentstrain, genotypeStr, mutationStr)
+            if (!strain) {
+                strain = new Strain(name: strainStr, 
+                                    species: species, 
+                                    genotype: genotypeStr, 
+                                    parent: parentStrain, 
+                                    geneticModification: mutationStr).save( failOnError: true)
+            }
+        }
+        
+        return [strain: strain, tissue: tissue]	    
 	}
 	
 	def getSpecies(String genusStr, String speciesStr) {
@@ -791,23 +784,6 @@ class CsvConvertService {
 		}
 		
     }
-    
-    def updateStrainName() {
-        Strain.list().each{
-            def s = "Unknown"
-            if (it.name == null || it.name == ""){
-                if (it.parent?.name) {
-                    s = it.parent?.name
-                    if (it.geneticModification) {
-                        s += "-${it.geneticModification}"
-                    }
-                    it.name = s
-                    it.save()
-                }
-            }
-
-        }
-    }
 	
 	def getNamedData(String[] data) {
 	    [laneStr: data[0],         
@@ -843,7 +819,7 @@ class CsvConvertService {
 	     genus: data[30],
 	     species: data[31],
 	     strain: data[32],
-	     backgrounStrain: data[33],
+	     parentStrain: data[33],
 	     genotype: data[34],
 	     mutation: data[35],
 	     growthMedia: data[36],

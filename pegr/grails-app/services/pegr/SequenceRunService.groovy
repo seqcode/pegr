@@ -129,6 +129,7 @@ class SequenceRunService {
             run.experiments.each { experiment -> 
                 def xmlNames = []
                 experiment.alignments.eachWithIndex { alignment, idx ->
+                    def xmlName = generateXmlFile(alignment, run.id, experiment.sample.id, idx, folder)
                     xmlNames.push(xmlName)
                 }
                 def indicesString = experiment.sample?.sequenceIndices.collect{it.sequence}.join(",")

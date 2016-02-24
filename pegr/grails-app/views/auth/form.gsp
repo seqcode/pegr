@@ -19,7 +19,7 @@
 		</div>
 		<div class="form-group">
 			<g:submitButton name="signIn" value="Sign in" class="btn btn-primary"/>
-			<g:link controller="user" action="register" class="btn btn-default">Register</g:link>
+            <a href="#" class="btn btn-default">Register</a>
 		</div>
 	</g:form>
 	</div>

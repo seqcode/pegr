@@ -1,4 +1,5 @@
 package pegr
+import grails.converters.XML
 import grails.transaction.Transactional
 
 class SequenceRunException extends RuntimeException {
@@ -109,8 +110,65 @@ class SequenceRunService {
         if (!run) {
             throw new SequenceRunException(message: "Sequence run not found!")
         }
-        def password = grailsApplication.config.walle.password
+        generateRunFiles(run)
         run.status = RunStatus.RUN
         run.save()
     }
+    
+    void generateRunFiles(SequenceRun run) {
+        // make the directory
+        def folderName = "files/runInfos/${run.id}"
+        File folder = new File(folderName); 
+        if (!folder.exists()) { 
+            folder.mkdirs(); 
+        } 
+        File runInfoFile = new File(folder, "cegr_run_info.txt")
+        runInfoFile.createNewFile();
+        // get parameters
+        runInfoFile.withWriter{
+            run.experiments.each { experiment -> 
+                def xmlNames = []
+                experiment.alignments.eachWithIndex { alignment, idx ->
+                    xmlNames.push(xmlName)
+                }
+                def indicesString = experiment.sample?.sequenceIndices.collect{it.sequence}.join(",")
+                def xmlNamesString= xmlNames.join(",")
+                def data = "${run.id} ; ${experiment.sample?.id} ; ${indicesString} ; ${xmlNamesString}"           
+                it.println data
+            }
+        }      
+    }
+    
+    String generateXmlFile(SequenceAlignment alignment, Long runId, Long sampleId, int idx, File folder) {
+        def filename = "${sampleId}_${idx}.xml"
+        def file = new File(folder, filename)
+        def alignmentParams = new Payload( 
+            parameters : new Parameters (
+                step : [new Step( param: [
+                                new Param(name: "reference_genome", value: alignment.genome.name)
+                            ])
+                       ]
+            ))
+        def converter = alignmentParams as XML
+        converter.render(new java.io.FileWriter(file))
+        return filename
+    }
+    
+}
+
+class Payload {
+    Parameters parameters
+}
+
+class Parameters {
+    Step[] step
+}
+
+class Step {
+    Param[] param
+}
+
+class Param {
+    String name
+    String value
 }

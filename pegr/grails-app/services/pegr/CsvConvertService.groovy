@@ -40,8 +40,7 @@ class CsvConvertService {
         println "Time: " + duration
 	}
 	
-    @Transactional
-    def migrateOneRow(String[] rawdata, RunStatus runStatus) {
+    void migrateOneRow(String[] rawdata, RunStatus runStatus) {
 
         String[] cells = new String[rawdata.size()]
         rawdata.eachWithIndex{ d, idx -> 
@@ -54,7 +53,7 @@ class CsvConvertService {
          }
         def data = getNamedData(cells)
         
-        def runUser = getUser(userStr)
+        def runUser = getUser(data.userStr)
 
         def results = getSequenceRun(runStatus, data.runStr, data.laneStr, data.dateStr, data.fcidStr, data.indexIdStr, runUser)
 
@@ -320,14 +319,16 @@ class CsvConvertService {
         def tissue = getTissue(strainStr)
         if (!tissue) {
             tissue = parentTissue
-            strain = Strain.findByNameAndParentAndGenotypeAndGeneticModification(strainStr, parentstrain, genotypeStr, mutationStr)
-            if (!strain) {
-                strain = new Strain(name: strainStr, 
-                                    species: species, 
-                                    genotype: genotypeStr, 
-                                    parent: parentStrain, 
-                                    geneticModification: mutationStr).save( failOnError: true)
-            }
+			if (strainStr || parentStrain || genotypeStr || mutationStr) {
+	            strain = Strain.findByNameAndParentAndGenotypeAndGeneticModification(strainStr, parentStrain, genotypeStr, mutationStr)
+	            if (!strain) {
+	                strain = new Strain(name: strainStr, 
+	                                    species: species, 
+	                                    genotype: genotypeStr, 
+	                                    parent: parentStrain, 
+	                                    geneticModification: mutationStr).save( failOnError: true)
+	            }
+			}
         }
         
         return [strain: strain, tissue: tissue]	    
@@ -723,7 +724,7 @@ class CsvConvertService {
 	    }
 	
 	    if (SequencingExperiment.findBySeqId(seqId)) {
-	        throw new Exception("SeqId ${seqId} already exists!")
+	        log.error "SeqId ${seqId} already exists!"
 	    }
 	
 	    def run = SequenceRun.findByPlatformAndRunNum(platform, runNum)

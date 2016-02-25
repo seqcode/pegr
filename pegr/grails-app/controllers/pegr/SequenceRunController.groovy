@@ -222,8 +222,8 @@ class SequenceRunController {
                 csvConvertService.migrate(folderName + filename, 
                                           RunStatus.PREP, 
                                           params.int("startLine"), 
-                                          params.int("endLine"), 
-                                          user)
+                                          params.int("endLine")
+                                         )
                 flash.message = "CSV file uploaded!"
             } else {
                 flash.message = "Only csv files are accepted!"

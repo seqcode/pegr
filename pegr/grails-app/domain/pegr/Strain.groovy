@@ -17,7 +17,7 @@ class Strain {
 	}
     
     static constraints = {
-		name matches: '^[0-9A-Za-z -.]+$', nullable: true, blank: true
+		name nullable: true, blank: true
         species nullable: true
         genotype nullable: true, blank: true
         parent nullable: true

@@ -29,7 +29,7 @@
         <tbody>
             <g:each in="${run.experiments}">
                 <tr>
-                    <td><g:link control="sample" action="show" id="${it.sample.id}">${it.sample?.id}</g:link></td>
+                    <td><g:link controller="sample" action="show" id="${it.sample.id}">${it.sample?.id}</g:link></td>
                     <td>${it.sample?.cellSource?.strain}</td>
                     <td>${it.sample?.antibody}</td>
                     <td>${it.sample?.sequenceIndicesDetailString}</td>

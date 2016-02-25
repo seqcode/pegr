@@ -1,8 +1,7 @@
 
 <li class="list-group-item">
      <h4>
-        <g:link action="show" id="${userProject.project.id}">Project: ${userProject.project.name}</g:link> 
-        <small><span class="label label-default">${userProject.projectRole}</span></small> 
+        <g:link action="show" id="${project.id}">Project: ${project.name}</g:link> 
     </h4>
-    <p>Created: ${userProject.project.dateCreated}; Updated: ${userProject.project.lastUpdated}. </p>
+    <p>Created: ${project.dateCreated}; Updated: ${project.lastUpdated}. </p>
 </li>

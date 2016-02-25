@@ -154,7 +154,7 @@ class CsvConvertService {
 			}
 		}
 		user = User.findByUsername(username)
-		if (!user) {
+		if (!user && fullname && fullname != "") {
 			user = User.findByFullName(fullname)
 		}
 	    if (!user) {	        
@@ -266,25 +266,30 @@ class CsvConvertService {
             catNum = catNum.replaceAll("_", "-")
             catNum = catNum.replaceAll("[^0-9A-Za-z -]", "")
         }
+        
+        def noteMap = [:]
+        if (abNotes) {
+            noteMap['Note'] = abNotes
+        }
+        if (ulSent) {
+            noteMap['Volume Sent (ul)'] = ulSent
+        }
+        if (ugPerChIP) {
+            noteMap['Usage Per ChIP (ug)'] = ugPerChIP
+        }
+        if (ulPerChIP) {
+            noteMap['Usage Per ChIP (ul)'] = ulPerChIP
+        }
+
+        def notes = JsonOutput.toJson(noteMap)
 		
-	    def antibody = Antibody.findByCompanyAndCatalogNumberAndAbHostAndClonalAndIgTypeAndImmunogeneAndLotNumber(company, catNum, abHost, clonal, igType, antigen, abLotNum)
+	    def antibodies = Antibody.findAllByCompanyAndCatalogNumberAndAbHostAndClonalAndIgTypeAndImmunogeneAndLotNumberAndNote(company, catNum, abHost, clonal, igType, antigen, abLotNum, notes)
+        
+        float err = 0.000001
+        def antibody = antibodies.find {
+            it.concentration > concentration - err && it.concentration < concentration + err
+        }
 	    if (!antibody) {	        
-	        def noteMap = [:]
-	        if (abNotes) {
-	            noteMap['Note'] = abNotes
-	        }
-	        if (ulSent) {
-	            noteMap['Volume Sent (ul)'] = ulSent
-	        }
-	        if (ugPerChIP) {
-	            noteMap['Usage Per ChIP (ug)'] = ugPerChIP
-	        }
-	        if (ulPerChIP) {
-	            noteMap['Usage Per ChIP (ul)'] = ulPerChIP
-	        }
-	        
-	        def notes = JsonOutput.toJson(noteMap)
-	        
 	        antibody = new Antibody(company: company, catalogNumber: catNum, abHost: abHost, clonal: clonal, concentration: concentration, igType: igType, immunogene: antigen, lotNumber: abLotNum, note: notes).save( failOnError: true)
 	    }	        
 		return antibody

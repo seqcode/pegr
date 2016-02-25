@@ -1,7 +1,13 @@
 package pegr
+import static org.springframework.http.HttpStatus.*
+import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 class SequenceRunController {
+    def springSecurityService
+    
     def sequenceRunService
+    
+    def csvConvertService
     
     def index(Integer max){
         params.max = Math.min(max ?: 15, 100)
@@ -193,5 +199,40 @@ class SequenceRunController {
             flash.message = e.message
             redirect(action: "edit", id: runId)
         }
+    }
+    
+    def upload() { 
+    
+    }
+    
+    def convertCsv() {
+        def folderName = "files/csv/"
+        try {
+            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  
+            def mpf = mpr.getFile("file");
+            String filename = mpf.getOriginalFilename();
+            if(!mpf?.empty && filename[-4..-1] == ".csv") {  
+                File folder = new File(folderName); 
+                if (!folder.exists()) { 
+                    folder.mkdirs(); 
+                } 
+                File fileDest = new File(folder, filename)
+                mpf.transferTo(fileDest)
+                def user = springSecurityService.currentUser
+                csvConvertService.migrate(folderName + filename, 
+                                          RunStatus.PREP, 
+                                          params.int("startLine"), 
+                                          params.int("endLine")
+                                         )
+                flash.message = "CSV file uploaded!"
+            } else {
+                flash.message = "Only csv files are accepted!"
+            }
+        } catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            flash.message = "Error uploading the file!"
+        }
+
+        redirect(action: "show", id: params.itemId)
     }
 }

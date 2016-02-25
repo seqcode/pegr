@@ -39,10 +39,10 @@
             <tbody>
                 <g:each in="${run.experiments}">
                     <tr>
-                        <td><g:link controller="sample" action="show" id="${it.sample.id}">${it.sample.id}</g:link></td>
-                        <td>${it.sample.cellSource.strain}</td>
-                        <td>${it.sample.antibody}</td>
-                        <td>${it.sample.sequenceIndicesString}</td>
+                        <td><g:link controller="sample" action="show" id="${it.sample.id}">${it.sample?.id}</g:link></td>
+                        <td>${it.sample?.cellSource?.strain}</td>
+                        <td>${it.sample?.antibody}</td>
+                        <td>${it.sample?.sequenceIndicesDetailString}</td>
                         <td>
                             <g:hiddenField name="experimentId" value="${it.id}"></g:hiddenField>
                             <g:select multiple="multiple" name="genomes${it.id}" from="${pegr.Genome.list()}" optionKey="id" value="${it.genomes}" class="tokenize-sample tokenize"></g:select>
@@ -60,7 +60,12 @@
     </g:form>
     </div>
     <div class="row well text-center">
-        <g:link action="run" params="[runId: run.id]" class="btn btn-success confirm">Sequencer Started</g:link>
+        <g:if test="run.status == pegr.RunStatus.PREP">
+            <g:link action="run" params="[runId: run.id]" class="btn btn-success confirm">Submit</g:link>
+        </g:if>
+        <g:else>
+            <span class="btn btn-default">Submitted</span>
+        </g:else>
     </div>
     <script>
         $("#nav-bench").addClass("active");

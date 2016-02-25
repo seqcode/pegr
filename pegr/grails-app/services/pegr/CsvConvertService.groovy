@@ -1,17 +1,20 @@
 package pegr
+import grails.transaction.Transactional
 import com.opencsv.CSVParser
 import com.opencsv.CSVReader
 import groovy.json.*
 import groovy.time.*
 
-class DataMigrate {
-	DataMigrate() {}
+class CsvConvertService {
+    
+    CsvConvertService() {}
 	
-	def migrate(String filename, int startLine, int endLine){
-        def timeStart = new Date()
-		def file = new FileReader(filename)
-		def lineNo = 0    
+	def migrate(String filename, RunStatus runStatus, int startLine, int endLine){
 		
+        def timeStart = new Date()
+		def lineNo = 0    
+        
+        def file = new FileReader(filename)
 		CSVReader reader = new CSVReader(file);
 		String [] rawdata;
 		
@@ -21,67 +24,15 @@ class DataMigrate {
 		    ++lineNo
 		    if (lineNo < startLine) {
 		        continue
-		    } else if (lineNo > endLine) {
+		    } else if (endLine > 0 && lineNo > endLine) {
 		        break
 		    }
-		    try {
-                String[] cells = new String[rawdata.size()]
-                rawdata.eachWithIndex{ d, idx -> 
-                    def td = d.trim()
-                    if(td == "" || td == "-" || td == "." || td == "?" || td == "Not applicable" || td == "not applicable" || td == "None") {
-                        cells[idx] = null
-                    }else {
-                        cells[idx] = td
-                    }
-                 }
-		        def data = getNamedData(cells)
-				
-				def results = getSequenceRun(data.runStr, data.laneStr, data.dateStr, data.fcidStr, data.indexIdStr)
-                
-		        def cellProvider = getUser(data.senderNameStr, data.senderEmail, data.senderPhone)
-		        def dataTo = getUser(data.dataToUser, data.dataToEmail, null)
-		
-		        def project = getProject(data.projectName, data.projectUser, data.projectUserEmail)
-		
-		        def invoice = getInvoice(data.service, data.invoice)
-                
-		        def target = getTarget(data.target, data.targetType, data.nTag, data.cTag)
-		
-		        def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.ulSampleSent, data.abConc, data.amountUseUg, data.amountUseUl)
-		
-		        def species = getSpecies(data.genus, data.species)
-		        
-		        def strainAndTissue = getStrainTissue(species, data.strain, data.backgrounStrain, data.genotype, data.mutation)
-                def strain = strainAndTissue.strain
-                def tissue = strainAndTissue.tissue
-		
-		        def growthMedia = getGrowthMedia(data.growthMedia, species)
-		
-                def inventory = getInventory(data.dateReceived, data.receivingUser, data.inOrExternal, data.inventoryNotes)
-		        def cellSource = getCellSource(data.samplePrepUser, growthMedia, strain, cellProvider, inventory, tissue)
-		
-		        addTreatment(cellSource, data.perturbation1)
-		        addTreatment(cellSource, data.perturbation2)
-		
-		        def assay = getAssay(data.assay)
-		             
-		        def prtcl = getProtocolInstanceSummary(data.chipUser, data.chipDate, data.protocolVersion, data.resin, data.PCRCycle, assay)
-                
-		        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl)
-                
-                addIndexToSample(sample, data.indexStr, data.indexIdStr)
-		        addSampleToProject(project, sample)
-		        
-		        getPool(sample, results.sequenceRun, data.pool, data.volToPool, data.poolDate, data.quibitReading, data.quibitDilution, data.concentration, data.poolDilution)
-		        
-		        def seqExp = getSeqExperiment(sample, results.sequenceRun, results.seqId, data.rd1Start, data.rd1End, data.indexStart, data.indexEnd, data.rd2Start, data.rd2End)
-		        
-		        [data.genomeBuild1, data.genomeBuild2, data.genomeBuild3].each{ getSeqAlign(it, seqExp, species) }
-		
-		    }catch(Exception e) {
-		        println "Error: line ${lineNo}. " + e
+            try {
+                migrateOneRow(rawdata, runStatus)
+		 	}catch(Exception e) {
+		        log.error "Error: line ${lineNo}. " + e
 		        continue
-		    }
+		    }   
 		}
         
         def timeStop = new Date()
@@ -89,6 +40,65 @@ class DataMigrate {
         println "Time: " + duration
 	}
 	
+    void migrateOneRow(String[] rawdata, RunStatus runStatus) {
+
+        String[] cells = new String[rawdata.size()]
+        rawdata.eachWithIndex{ d, idx -> 
+            def td = d.trim()
+            if(td == "" || td == "-" || td == "." || td == "?" || td == "Not applicable" || td == "not applicable" || td == "None") {
+                cells[idx] = null
+            }else {
+                cells[idx] = td
+            }
+         }
+        def data = getNamedData(cells)
+        
+        def runUser = getUser(data.userStr)
+
+        def results = getSequenceRun(runStatus, data.runStr, data.laneStr, data.dateStr, data.fcidStr, data.indexIdStr, runUser)
+
+        def cellProvider = getUser(data.senderNameStr, data.senderEmail, data.senderPhone)
+        def dataTo = getUser(data.dataToUser, data.dataToEmail, null)
+
+        def project = getProject(data.projectName, data.projectUser, data.projectUserEmail)
+
+        def invoice = getInvoice(data.service, data.invoice)
+
+        def target = getTarget(data.target, data.targetType, data.nTag, data.cTag)
+
+        def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.ulSampleSent, data.abConc, data.amountUseUg, data.amountUseUl)
+
+        def species = getSpecies(data.genus, data.species)
+
+        def strainAndTissue = getStrainTissue(species, data.strain, data.parentStrain, data.genotype, data.mutation)
+        def strain = strainAndTissue.strain
+        def tissue = strainAndTissue.tissue
+
+        def growthMedia = getGrowthMedia(data.growthMedia, species)
+
+        def inventory = getInventory(data.dateReceived, data.receivingUser, data.inOrExternal, data.inventoryNotes)
+        def cellSource = getCellSource(data.samplePrepUser, growthMedia, strain, cellProvider, inventory, tissue)
+
+        addTreatment(cellSource, data.perturbation1)
+        addTreatment(cellSource, data.perturbation2)
+
+        def assay = getAssay(data.assay)
+
+        def prtcl = getProtocolInstanceSummary(data.chipUser, data.chipDate, data.protocolVersion, data.resin, data.PCRCycle, assay)
+
+        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl)
+
+        addIndexToSample(sample, data.indexStr, data.indexIdStr)
+        addSampleToProject(project, sample)
+
+        getPool(sample, results.sequenceRun, data.pool, data.volToPool, data.poolDate, data.quibitReading, data.quibitDilution, data.concentration, data.poolDilution)
+
+        def seqExp = getSeqExperiment(sample, results.sequenceRun, results.seqId, data.rd1Start, data.rd1End, data.indexStart, data.indexEnd, data.rd2Start, data.rd2End)
+
+        [data.genomeBuild1, data.genomeBuild2, data.genomeBuild3].each{ getSeqAlign(it, seqExp, species) }
+
+    }
+    
     def addIndexToSample(Sample sample, String indexStr, String indexIdStr) { 
         if (indexStr == null || indexStr == "unk"){
             return
@@ -144,7 +154,7 @@ class DataMigrate {
 			}
 		}
 		user = User.findByUsername(username)
-		if (!user) {
+		if (!user && fullname && fullname != "") {
 			user = User.findByFullName(fullname)
 		}
 	    if (!user) {	        
@@ -256,32 +266,36 @@ class DataMigrate {
             catNum = catNum.replaceAll("_", "-")
             catNum = catNum.replaceAll("[^0-9A-Za-z -]", "")
         }
+        
+        def noteMap = [:]
+        if (abNotes) {
+            noteMap['Note'] = abNotes
+        }
+        if (ulSent) {
+            noteMap['Volume Sent (ul)'] = ulSent
+        }
+        if (ugPerChIP) {
+            noteMap['Usage Per ChIP (ug)'] = ugPerChIP
+        }
+        if (ulPerChIP) {
+            noteMap['Usage Per ChIP (ul)'] = ulPerChIP
+        }
+
+        def notes = JsonOutput.toJson(noteMap)
 		
-	    def antibody = Antibody.findByCompanyAndCatalogNumberAndAbHostAndClonalAndIgTypeAndImmunogeneAndLotNumber(company, catNum, abHost, clonal, igType, antigen, abLotNum)
+	    def antibodies = Antibody.findAllByCompanyAndCatalogNumberAndAbHostAndClonalAndIgTypeAndImmunogeneAndLotNumberAndNote(company, catNum, abHost, clonal, igType, antigen, abLotNum, notes)
+        
+        float err = 0.000001
+        def antibody = antibodies.find {
+            it.concentration > concentration - err && it.concentration < concentration + err
+        }
 	    if (!antibody) {	        
-	        def noteMap = [:]
-	        if (abNotes) {
-	            noteMap['Note'] = abNotes
-	        }
-	        if (ulSent) {
-	            noteMap['Volume Sent (ul)'] = ulSent
-	        }
-	        if (ugPerChIP) {
-	            noteMap['Usage Per ChIP (ug)'] = ugPerChIP
-	        }
-	        if (ulPerChIP) {
-	            noteMap['Usage Per ChIP (ul)'] = ulPerChIP
-	        }
-	        
-	        def notes = JsonOutput.toJson(noteMap)
-	        
 	        antibody = new Antibody(company: company, catalogNumber: catNum, abHost: abHost, clonal: clonal, concentration: concentration, igType: igType, immunogene: antigen, lotNumber: abLotNum, note: notes).save( failOnError: true)
 	    }	        
 		return antibody
 	}
     
-    def getStrainTissueByName(String name, Species species) {
-        def strain = null
+    def getTissue(String name) {
         def tissue = null
         if (name) {
             if (name == "InVitro" || name == "Liver" || name.contains("tissue") || name.contains("cells") || name.contains("leukemia")) {
@@ -289,46 +303,40 @@ class DataMigrate {
                 if (!tissue) {
                     tissue = new Tissue(name: name).save( failOnError: true)
                 }
-            } else{
-                strain = Strain.findByName(name) 
-                if (!strain) {
-                    strain = new Strain(name: name, species: species).save( faliOnError: true)    
-                }
-            }
+            } 
         }
-        return [strain: strain, tissue: tissue]
+        return tissue
     }
 	
-	def getStrainTissue(Species species, String strainStr, String backgrounStrainStr, String genotypeStr, String mutationStr) {
-
-        def result = getStrainTissueByName(strainStr, species)
-        def strain = result.strain
-        def tissue = result.tissue
-        
-        def backgroundResult = getStrainTissueByName(backgrounStrainStr, species)        
-        def backgroundStrain = backgroundResult.strain
-        if (!tissue) {
-            tissue = backgroundResult.tissue
-        }
-        
-        if (genotypeStr == null && mutationStr == null) {
-            // strain itself
-            if (strain) {
-                strain.backgroundStrain = backgroundStrain
-                strain.save(failOnError: true)
-            } 
-            return [strain: strain, tissue: tissue]
-        } else {
-            // define child strain           
-            def childStrain = Strain.findByParentAndGenotypeAndGeneticModification(strain, genotypeStr, mutationStr)
-	    
-            if (!childStrain) {
-                childStrain = new Strain(name: null, species: species, genotype: genotypeStr, 
-                    backgroundStrain: backgroundStrain, parent: strain, geneticModification: mutationStr).save( failOnError: true)
+	def getStrainTissue(Species species, String strainStr, String parentStrainStr, String genotypeStr, String mutationStr) {     
+        // get the parent strain and tissue
+        def parentStrain = null
+        def parentTissue = getTissue(parentStrainStr)
+        if (parentStrainStr && !parentTissue) {
+            parentStrain = Strain.findByName(parentStrainStr)
+            if (!parentStrain) {
+                parentStrain = new Strain(name: parentStrainStr, species: species).save(failOnError: true) 
             }
-            return [strain: childStrain, tissue: tissue]
         }
-	    
+        
+        // get strain and tissue
+        def strain = null
+        def tissue = getTissue(strainStr)
+        if (!tissue) {
+            tissue = parentTissue
+			if (strainStr || parentStrain || genotypeStr || mutationStr) {
+	            strain = Strain.findByNameAndParentAndGenotypeAndGeneticModification(strainStr, parentStrain, genotypeStr, mutationStr)
+	            if (!strain) {
+	                strain = new Strain(name: strainStr, 
+	                                    species: species, 
+	                                    genotype: genotypeStr, 
+	                                    parent: parentStrain, 
+	                                    geneticModification: mutationStr).save( failOnError: true)
+	            }
+			}
+        }
+        
+        return [strain: strain, tissue: tissue]	    
 	}
 	
 	def getSpecies(String genusStr, String speciesStr) {
@@ -682,7 +690,7 @@ class DataMigrate {
         return i
     }
 	
-	def getSequenceRun(String runStr, String laneStr, String dateStr, String fcidStr, String indexIdStr) {
+	def getSequenceRun(RunStatus runStatus, String runStr, String laneStr, String dateStr, String fcidStr, String indexIdStr, User user) {
 	    int runNum
 	    def platform
 	    def seqId
@@ -721,12 +729,12 @@ class DataMigrate {
 	    }
 	
 	    if (SequencingExperiment.findBySeqId(seqId)) {
-	        throw new Exception("SeqId ${seqId} already exists!")
+	        log.error "SeqId ${seqId} already exists!"
 	    }
 	
 	    def run = SequenceRun.findByPlatformAndRunNum(platform, runNum)
 	    if (!run) {                     
-	         run = new SequenceRun(runNum: runNum, platform: platform, status: RunStatus.COMPLETED)
+	         run = new SequenceRun(runNum: runNum, platform: platform, status: runStatus, user: user)
 	
 	         // lane
 	         run.lane = getInteger(laneStr)
@@ -782,23 +790,6 @@ class DataMigrate {
 		}
 		
     }
-    
-    def updateStrainName() {
-        Strain.list().each{
-            def s = "Unknown"
-            if (it.name == null || it.name == ""){
-                if (it.parent?.name) {
-                    s = it.parent?.name
-                    if (it.geneticModification) {
-                        s += "-${it.geneticModification}"
-                    }
-                    it.name = s
-                    it.save()
-                }
-            }
-
-        }
-    }
 	
 	def getNamedData(String[] data) {
 	    [laneStr: data[0],         
@@ -834,7 +825,7 @@ class DataMigrate {
 	     genus: data[30],
 	     species: data[31],
 	     strain: data[32],
-	     backgrounStrain: data[33],
+	     parentStrain: data[33],
 	     genotype: data[34],
 	     mutation: data[35],
 	     growthMedia: data[36],

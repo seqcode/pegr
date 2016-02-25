@@ -7,9 +7,6 @@
             <g:if test="${sample.cellSource?.strain?.parent}">
                 <li>Parent Strain: ${sample.cellSource?.strain?.parent}</li>
             </g:if>
-             <g:if test="${sample.cellSource?.strain?.backgroundStrain}">
-                <li>Parent Strain: ${sample.cellSource?.strain?.backgroundStrain}</li>
-            </g:if>
             <li>Genotype: ${sample.cellSource?.strain?.genotype}</li>
             <g:if test="${sample.cellSource?.strain?.geneticModification}">
                 <li>Genetic Modifications: ${sample.cellSource?.strain?.geneticModification}</li>
@@ -49,7 +46,7 @@
             </g:if>
 
             <li>Treatments:
-                <g:each in="${sample.cellSource.treatments}" var="c">
+                <g:each in="${sample?.cellSource?.treatments}" var="c">
                     ${c}
                 </g:each>	
             </li>

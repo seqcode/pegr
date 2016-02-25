@@ -9,18 +9,22 @@ class ProjectController {
 	
     def index(int max) {
         params.max = Math.min(max ?:15, 100)
-        if (!params.sort) {
-            params.sort = "project.lastUpdated"
-            params.order = "desc"
-        }
+
         // get the current login user
 		def currentUser = springSecurityService.currentUser
 		
         // query the user's the projects
-        def query = (currentUser?.id == 1) ? ProjectUser : ProjectUser.where {user == currentUser}
-        def userProjects = query.list(params)
+        if (currentUser?.id == 1) {
+            def projects =  Project.list(params)
+    		[projects: projects, totalCount: Project.count()]
+        } else {
+            def query = ProjectUser.where {user == currentUser}
+            def projects = query.list(params).collect{it.project}
+            def totalCount = query.count()
+            [projects: projects, totalCount: totalCount]
+        }
 
-		[userProjects: userProjects, projectCount: query.count()]
+
 	}
 	
     @Transactional

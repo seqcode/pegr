@@ -1,6 +1,6 @@
 package pegr
-import grails.converters.XML
 import grails.transaction.Transactional
+import static grails.async.Promises.*
 
 class SequenceRunException extends RuntimeException {
     String message
@@ -8,7 +8,8 @@ class SequenceRunException extends RuntimeException {
 
 class SequenceRunService {
     def springSecurityService
-    def grailsApplication
+
+    def walleService
     
     @Transactional
     void save(SequenceRun run) {
@@ -105,71 +106,20 @@ class SequenceRunService {
     }
     
     @Transactional
-    void run(Long runId) {
+    void run(Long runId) {        
         def run = SequenceRun.get(runId)
         if (!run) {
             throw new SequenceRunException(message: "Sequence run not found!")
+        }        
+ 
+        if (run.status == RunStatus.RUN) {
+             throw new SequenceRunException(message: "Sequence run has already been submitted!")
         }
-        generateRunFiles(run)
+        
+        walleService.addToQueue(runId)
+        
+        // start the run by creating a job on remote server
         run.status = RunStatus.RUN
         run.save()
     }
-    
-    void generateRunFiles(SequenceRun run) {
-        // make the directory
-        def folderName = "files/runInfos/${run.id}"
-        File folder = new File(folderName); 
-        if (!folder.exists()) { 
-            folder.mkdirs(); 
-        } 
-        File runInfoFile = new File(folder, "cegr_run_info.txt")
-        runInfoFile.createNewFile();
-        // get parameters
-        runInfoFile.withWriter{
-            run.experiments.each { experiment -> 
-                def xmlNames = []
-                experiment.alignments.eachWithIndex { alignment, idx ->
-                    def xmlName = generateXmlFile(alignment, run.id, experiment.sample.id, idx, folder)
-                    xmlNames.push(xmlName)
-                }
-                def indicesString = experiment.sample?.sequenceIndices.collect{it.sequence}.join(",")
-                def xmlNamesString= xmlNames.join(",")
-                def data = "${run.id} ; ${experiment.sample?.id} ; ${indicesString} ; ${xmlNamesString}"           
-                it.println data
-            }
-        }      
-    }
-    
-    String generateXmlFile(SequenceAlignment alignment, Long runId, Long sampleId, int idx, File folder) {
-        def filename = "${sampleId}_${idx}.xml"
-        def file = new File(folder, filename)
-        def alignmentParams = new Payload( 
-            parameters : new Parameters (
-                step : [new Step( param: [
-                                new Param(name: "reference_genome", value: alignment.genome.name)
-                            ])
-                       ]
-            ))
-        def converter = alignmentParams as XML
-        converter.render(new java.io.FileWriter(file))
-        return filename
-    }
-    
-}
-
-class Payload {
-    Parameters parameters
-}
-
-class Parameters {
-    Step[] step
-}
-
-class Step {
-    Param[] param
-}
-
-class Param {
-    String name
-    String value
 }

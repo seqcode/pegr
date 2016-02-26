@@ -2817,4 +2817,6 @@ databaseChangeLog = {
 	changeSet(author: "dus73 (generated)", id: "1456345094061-163") {
 		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "user_role", constraintName: "FK_apcc8lxk2xnug8377fatvbn04", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
+
+	include file: 'addChores.groovy'
 }

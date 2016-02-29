@@ -1,6 +1,5 @@
 package pegr
 import grails.transaction.Transactional
-import static grails.async.Promises.*
 
 class SequenceRunException extends RuntimeException {
     String message

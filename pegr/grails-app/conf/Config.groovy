@@ -145,3 +145,19 @@ grails.plugin.springsecurity.logout.afterLogoutUrl = "/login/form"
 grails.plugin.springsecurity.failureHandler.defaultFailureUrl = "/login/form"
 grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
 
+grails {
+   mail {
+     host = "smtp.gmail.com"
+     port = 465
+     props = ["mail.smtp.auth":"true", 					   
+              "mail.smtp.socketFactory.port":"465",
+              "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+              "mail.smtp.socketFactory.fallback":"false"]
+   }
+}
+
+environments {
+    test {
+        grails.mail.disabled=true
+    }
+}

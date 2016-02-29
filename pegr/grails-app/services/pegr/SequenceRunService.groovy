@@ -8,8 +8,6 @@ class SequenceRunException extends RuntimeException {
 
 class SequenceRunService {
     def springSecurityService
-
-    def walleService
     
     @Transactional
     void save(SequenceRun run) {
@@ -116,6 +114,7 @@ class SequenceRunService {
              throw new SequenceRunException(message: "Sequence run has already been submitted!")
         }
         
+        def walleService = new WalleService()
         walleService.addToQueue(runId)
         
         // start the run by creating a job on remote server

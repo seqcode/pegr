@@ -6,7 +6,7 @@ class WalleServiceIntegrationSpec extends Specification {
     
     def "create walle job"() {
 		given: "walle config"
-        walleService.addToQueue(194)
+        walleService.addToQueue(189)
             
 		when: "create job"
         walleService.createJob()

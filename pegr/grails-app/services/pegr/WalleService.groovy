@@ -8,8 +8,7 @@ import ssh.RemoteSCPDir
 import groovy.json.*
 
 class WalleService {
-    
-    def mailService
+
     def grailsApplication
     def sshConfig
 
@@ -48,17 +47,16 @@ class WalleService {
             return
         }        
         if (runIds.size() > MAX_QUEUE_LENGTH) {
-            // notify the run user of exceeded queue length
+            // log exceeded queue length
             String message = "More than ${MAX_QUEUE_LENGTH} waiting in the queue!" 
             log.error message
-            mailService.sendMail {
-                to "dus73@psu.edu"
-                subject "[PEGR]${message}"
-                body message
-            }
         }
+        // get the run object
+        Long runId = Long.parseLong(runIds[0])
+        def run = SequenceRun.get(runId)
         // return if the prior run has not been processed by the remote server
         if (findPriorInfoOnRemote(walle)) {
+            log.warn "The last run has not been processed yet!"
             return
         }
         // get new folder name on the remote server
@@ -69,38 +67,35 @@ class WalleService {
         }        
         if (newRunFolders.size() > 1) {
             // notify the run user of multiple new folders on the remote server
-            String message = "More than 1 new folders found on Wall E!"
+            String message = "More than one new folders found on Wall E!"
             log.error message
-            mailService.sendMail {
-                to "dus73@psu.edu"
-                subject "[PEGR]${message}"
-                body message
-            }
+            run.status = RunStatus.ERROR
+            run.note = (run.note && run.note != "") ? "${run.note}; ${message}" : message
+            run.save()
             return
         }
         def newFolder = newRunFolders.first()
         def newRunRemotePath = new File(walle.root, newFolder).getPath()
         // update run object
-        Long runId = Long.parseLong(runIds[0])
-        def run = SequenceRun.get(runId)
         run.directoryName = newFolder
         def d = newFolder.split("_").last()
         run.fcId = d[1..-1]
         run.save()
         // generate run info and parameter files
-        def fileAndFolder = generateRunFiles(run, newRunRemotePath)
+        def fileAndFolder = generateAndSendRunFiles(run, newRunRemotePath)
         // move files to the remote server
         moveFilesToRemote(fileAndFolder.runInfoLocalFile, fileAndFolder.configLocalFolder, newRunRemotePath, walle)
         // update queue
         removeRunFromQueue()  
         updatePriorRunFolder(newFolder)
+        log.info "WallE service has sent the info of run ${run.id} to Wall E."
     }
 
     
     def getQueuedRunIds() {
         def runIds = []
         def runsInQueue = Chores.findByName(RUNS_IN_QUEUE)
-        if (runsInQueue && runsInQueue != "") {
+        if (runsInQueue?.value && runsInQueue.value != "") {
             runIds = runsInQueue.value.split(",")
         }
         return runIds
@@ -108,15 +103,10 @@ class WalleService {
     
     def findPriorInfoOnRemote(Map walle) {
         def runInfoPath = new File(walle.root, RUN_INFO_FILE_NAME).getPath()
-        def command = '[ -f ' + runInfoPath + ' ] && echo yes'
+        def command = 'ls ' + runInfoPath 
         def rsh = new RemoteSSH(walle.host, walle.username, walle.password, '', command, '', walle.port)
-        if (!rsh) {
-            log.error "rsh is null"
-        }
-        if (!sshConfig) {
-            log.error "sshConfig is null"
-        }
-        return (rsh.Result(sshConfig) == "yes") 
+        def result = rsh.Result(sshConfig).toString().split('<br>')
+        return ( result[1] == runInfoPath ) 
     }
     
     def getNewRunFolders(Map walle) {
@@ -124,10 +114,10 @@ class WalleService {
         // get all the folder names 
         def command = 'ls ' + walle.root + ' | sort'
         def rsh = new RemoteSSH(walle.host, walle.username, walle.password, '', command, '', walle.port)
-        def s = rsh.Result(sshConfig)
+        def s = rsh.Result(sshConfig).toString().split('<br>')
         def newPaths = []
 
-        s.eachLine{
+        s[1..-3].each{
             if (priorRunFolder == null || it > priorRunFolder) {
                 newPaths.push(it)
             }
@@ -143,13 +133,19 @@ class WalleService {
         } 
         // create the "cegr_run_info.txt" file
         File runInfoLocalFile = new File(localFolder, RUN_INFO_FILE_NAME)
+        // clean up folder
+        runInfoLocalFile.delete()
         runInfoLocalFile.createNewFile();
         // create the "cegr_config" folder
         File configLocalFolder = new File(localFolder, CONFIG_FOLDER_NAME)
         if (!configLocalFolder.exists()) { 
             configLocalFolder.mkdirs(); 
+        } else {
+            // clean up
+            configLocalFolder.eachFile() {
+                it.delete()
+            }
         }
-
         // get parameters
         runInfoLocalFile.withWriter{
             // write the run folder path
@@ -169,9 +165,17 @@ class WalleService {
         return [runInfoLocalFile: runInfoLocalFile, configLocalFolder: configLocalFolder]
     }
     
-    def moveFilesToRemote(File runInfoLocalFile, File configLocalFolder, String newRunRemotePath, Map walle, def sshConfig) {                   
+    def moveFilesToRemote(File runInfoLocalFile, File configLocalFolder, String newRunRemotePath, Map walle) {  
+        // scp run info txt
         RemoteSCP rscp=new RemoteSCP(walle.host, walle.username, walle.password, runInfoLocalFile.getPath(), walle.root, walle.port)
-        RemoteSCPDir rscpdir=new RemoteSCPDir(walle.host, walle.username, walle.password, configLocalFolder.getPath(), newRunRemotePath, walle.port)
+        rscp.Result(sshConfig)
+        // scp parameter config folder
+        def remoteConfigPath = new File(newRunRemotePath, CONFIG_FOLDER_NAME).getPath()
+        def command = 'mkdir ' + remoteConfigPath
+        def rsh = new RemoteSSH(walle.host, walle.username, walle.password, '', command, '', walle.port)
+        rsh.Result(sshConfig)
+        RemoteSCPDir rscpdir=new RemoteSCPDir(walle.host, walle.username, walle.password, configLocalFolder.getPath(), remoteConfigPath, walle.port)
+        rscpdir.Result(sshConfig)
         // cleanup the local files
         runInfoLocalFile.delete()
         configLocalFolder.eachFile() {

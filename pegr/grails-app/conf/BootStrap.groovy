@@ -9,6 +9,8 @@ class BootStrap {
         createAdminUserIfRequired()
 
         createItemTypeIfRequired()
+        
+        createChoresIfRequired()
     }
 
     private createItemTypeIfRequired() {			
@@ -36,6 +38,15 @@ class BootStrap {
             new SequencingPlatform(name: "NextSeq 500").save(flush: true)
         }
     }
+    
+    private createChoresIfRequired() {
+        if (!Chores.findByName("RunsInQueue")) {
+            new Chores(name: "RunsInQueue").save(flush: true)                   
+        }
+        if (!Chores.findByName("PriorRunFolder")) {
+            new Chores(name: "PriorRunFolder").save(flush: true)                   
+        }
+    }    
 
     private createAdminUserIfRequired() {
         println "Creating admin user"

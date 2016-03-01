@@ -147,16 +147,17 @@ grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
 
 grails {
    mail {
-     host = "smtp.gmail.com"
-     port = 465
-     props = ["mail.smtp.auth":"true", 					   
-              "mail.smtp.socketFactory.port":"465",
-              "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
-              "mail.smtp.socketFactory.fallback":"false"]
+     host = "ucs.psu.edu"
+     port = 587
+     props = ["mail.smtp.starttls.enable":"true",				   
+              "mail.smtp.port":"587"]
    }
 }
 
 environments {
+    development {
+        grails.mail.disabled=true
+    }
     test {
         grails.mail.disabled=true
     }

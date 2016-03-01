@@ -60,7 +60,7 @@
     </g:form>
     </div>
     <div class="row well text-center">
-        <g:if test="run.status == pegr.RunStatus.PREP">
+        <g:if test="${run.status == pegr.RunStatus.PREP}">
             <g:link action="run" params="[runId: run.id]" class="btn btn-success confirm">Submit</g:link>
         </g:if>
         <g:else>

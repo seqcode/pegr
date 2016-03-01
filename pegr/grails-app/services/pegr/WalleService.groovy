@@ -1,0 +1,228 @@
+package pegr
+import grails.converters.XML
+import grails.transaction.Transactional
+import groovy.io.FileType
+import ssh.RemoteSSH
+import ssh.RemoteSCP
+import ssh.RemoteSCPDir
+import groovy.json.*
+
+class WalleService {
+
+    def grailsApplication
+    def sshConfig
+
+    final String RUNS_IN_QUEUE = "RunsInQueue"
+    final String PRIOR_RUN_FOLDER = "PriorRunFolder"
+    final String LOCAL_FOLDER = "files/runInfos"
+    final String RUN_INFO_FILE_NAME = "cegr_run_info.txt"
+    final String CONFIG_FOLDER_NAME = "cegr_config"
+    final int MAX_QUEUE_LENGTH = 24
+    
+    void addToQueue(Long runId) {
+        def runsInQueue = Chores.findByName(RUNS_IN_QUEUE)
+        if (runsInQueue) {
+            if (runsInQueue.value && runsInQueue.value != "") {
+                runsInQueue.value += ",${runId}"
+            } else {
+                runsInQueue.value = runId
+            }
+            runsInQueue.save()        
+        } else {
+            new Chores(name: RUNS_IN_QUEUE, value: "${runId}").save()
+        }    
+    }
+    
+    void createJob() {
+        if (grailsApplication.config == null) {
+            log.error "grailsApplication null"
+        }
+        def walle = [
+            host : grailsApplication.config.walle.host,
+            port : grailsApplication.config.walle.port.toInteger(),
+            username : grailsApplication.config.walle.username,
+            password : grailsApplication.config.walle.password,
+            root : grailsApplication.config.walle.root
+        ]
+        
+        def runIds = getQueuedRunIds()
+        // return if no runs in the queue
+        if (runIds.size() == 0) {
+            return
+        }        
+        if (runIds.size() > MAX_QUEUE_LENGTH) {
+            // log exceeded queue length
+            String message = "More than ${MAX_QUEUE_LENGTH} waiting in the queue!" 
+            log.error message
+        }
+        // get the run object
+        Long runId = Long.parseLong(runIds[0])
+        def run = SequenceRun.get(runId)
+        // return if the prior run has not been processed by the remote server
+        if (findPriorInfoOnRemote(walle)) {
+            log.warn "The last run has not been processed yet!"
+            return
+        }
+        // get new folder name on the remote server
+        def newRunFolders = getNewRunFolders(walle)
+        // return if no new folder has been created on the remote server
+        if (newRunFolders.size() == 0) {
+            return
+        }        
+        if (newRunFolders.size() > 1) {
+            // notify the run user of multiple new folders on the remote server
+            String message = "More than one new folders found on Wall E!"
+            log.error message
+            run.status = RunStatus.ERROR
+            run.note = (run.note && run.note != "" && !run.note.contains(message)) ? "${run.note}; ${message}" : message
+            run.save()
+            return
+        }
+        def newFolder = newRunFolders.first()
+        def newRunRemotePath = new File(walle.root, newFolder).getPath()
+        // update run object
+        run.directoryName = newFolder
+        def d = newFolder.split("_").last()
+        run.fcId = d[1..-1]
+        run.status = RunStatus.RUN
+        run.save()
+        // generate run info and parameter files
+        def fileAndFolder = generateAndSendRunFiles(run, newRunRemotePath)
+        // move files to the remote server
+        moveFilesToRemote(fileAndFolder.runInfoLocalFile, fileAndFolder.configLocalFolder, newRunRemotePath, walle)
+        // update queue
+        removeRunFromQueue()  
+        updatePriorRunFolder(newFolder)
+        log.info "WallE service has sent the info of run ${run.id} to Wall E."
+    }
+
+    
+    def getQueuedRunIds() {
+        def runIds = []
+        def runsInQueue = Chores.findByName(RUNS_IN_QUEUE)
+        if (runsInQueue?.value && runsInQueue.value != "") {
+            runIds = runsInQueue.value.split(",")
+        }
+        return runIds
+    }
+    
+    def findPriorInfoOnRemote(Map walle) {
+        def runInfoPath = new File(walle.root, RUN_INFO_FILE_NAME).getPath()
+        def command = 'ls ' + runInfoPath 
+        def rsh = new RemoteSSH(walle.host, walle.username, walle.password, '', command, '', walle.port)
+        def result = rsh.Result(sshConfig).toString().split('<br>') 
+        return result.find{ it == runInfoPath}
+    }
+    
+    def getNewRunFolders(Map walle) {
+        String priorRunFolder = Chores.findByName(PRIOR_RUN_FOLDER)?.value
+        // get all the folder names 
+        def command = 'ls ' + walle.root + ' | sort'
+        def rsh = new RemoteSSH(walle.host, walle.username, walle.password, '', command, '', walle.port)
+        def s = rsh.Result(sshConfig).toString().split('<br>')
+        def newPaths = []
+
+        s.each{
+            if (!it.contains("exit") && !it.contains(command) && !it.contains(RUN_INFO_FILE_NAME)) {
+                if (priorRunFolder == null || it > priorRunFolder) {
+                    newPaths.push(it)
+                }
+            }
+        }
+        return newPaths
+    }
+    
+    def generateAndSendRunFiles(SequenceRun run, String newRunRemotePath) {
+        // make the directory
+        File localFolder = new File(LOCAL_FOLDER); 
+        if (!localFolder.exists()) { 
+            localFolder.mkdirs(); 
+        } 
+        // create the "cegr_run_info.txt" file
+        File runInfoLocalFile = new File(localFolder, RUN_INFO_FILE_NAME)
+        // clean up folder
+        runInfoLocalFile.delete()
+        runInfoLocalFile.createNewFile();
+        // create the "cegr_config" folder
+        File configLocalFolder = new File(localFolder, CONFIG_FOLDER_NAME)
+        if (!configLocalFolder.exists()) { 
+            configLocalFolder.mkdirs(); 
+        } else {
+            // clean up
+            configLocalFolder.eachFile() {
+                it.delete()
+            }
+        }
+        // get parameters
+        runInfoLocalFile.withWriter{
+            // write the run folder path
+            it.println newRunRemotePath
+            run.experiments.each { experiment -> 
+                def xmlNames = []
+                experiment.alignments.eachWithIndex { alignment, idx ->
+                    def xmlName = generateXmlFile(alignment, run.id, experiment.sample.id, idx, configLocalFolder)
+                    xmlNames.push(xmlName)
+                }
+                def indicesString = experiment.sample?.sequenceIndices.collect{it.sequence}.join(",")
+                def xmlNamesString= xmlNames.join(",")
+                def data = "${run.id} ; ${experiment.sample?.id} ; ${indicesString} ; ${xmlNamesString}"           
+                it.println data
+            }
+        }
+        return [runInfoLocalFile: runInfoLocalFile, configLocalFolder: configLocalFolder]
+    }
+    
+    def moveFilesToRemote(File runInfoLocalFile, File configLocalFolder, String newRunRemotePath, Map walle) {  
+        // scp run info txt
+        RemoteSCP rscp=new RemoteSCP(walle.host, walle.username, walle.password, runInfoLocalFile.getPath(), walle.root, walle.port)
+        rscp.Result(sshConfig)
+        // scp parameter config folder
+        def remoteConfigPath = new File(newRunRemotePath, CONFIG_FOLDER_NAME).getPath()
+        def command = 'mkdir ' + remoteConfigPath
+        def rsh = new RemoteSSH(walle.host, walle.username, walle.password, '', command, '', walle.port)
+        rsh.Result(sshConfig)
+        RemoteSCPDir rscpdir=new RemoteSCPDir(walle.host, walle.username, walle.password, configLocalFolder.getPath(), remoteConfigPath, walle.port)
+        rscpdir.Result(sshConfig)
+        // cleanup the local files
+        runInfoLocalFile.delete()
+        configLocalFolder.eachFile() {
+            it.delete()
+        }
+    }
+    
+    String generateXmlFile(SequenceAlignment alignment, Long runId, Long sampleId, int idx, File folder) {
+        def filename = "${sampleId}_${idx}.xml"
+        def file = new File(folder, filename)
+        def alignmentParams = new WorkFlow(dbkey: alignment.genome.name)
+        def converter = alignmentParams as XML
+        converter.render(new java.io.FileWriter(file))
+        return filename
+    }
+    
+    def removeRunFromQueue() {
+        def runsInQueue = Chores.findByName(RUNS_IN_QUEUE)
+        def oldStr = runsInQueue.value
+        def p = oldStr.indexOf(',')
+        if (p == -1) {
+            runsInQueue.value = null
+        } else {
+            runsInQueue.value = oldStr[(p+1)..-1]
+        }
+        runsInQueue.save()
+    }
+
+    def updatePriorRunFolder(String newFolder) {
+        def priorRunFolder = Chores.findByName(PRIOR_RUN_FOLDER)
+        if (priorRunFolder) {
+            priorRunFolder.value = newFolder
+            priorRunFolder.save()
+        } else {
+            new Chores(name: PRIOR_RUN_FOLDER, value: newFolder).save()
+        }
+        return
+    }
+}
+
+class WorkFlow {
+    String dbkey
+}

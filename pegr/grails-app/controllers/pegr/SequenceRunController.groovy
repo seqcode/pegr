@@ -233,6 +233,6 @@ class SequenceRunController {
             flash.message = "Error uploading the file!"
         }
 
-        redirect(action: "show", id: params.itemId)
+        redirect(action: "index")
     }
 }

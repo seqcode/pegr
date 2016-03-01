@@ -22,8 +22,12 @@ class WalleService {
     void addToQueue(Long runId) {
         def runsInQueue = Chores.findByName(RUNS_IN_QUEUE)
         if (runsInQueue) {
-            runsInQueue.value += ",${runId}"
-            runsInQueue.save()
+            if (runsInQueue.value && runsInQueue.value != "") {
+                runsInQueue.value += ",${runId}"
+            } else {
+                runsInQueue.value = runId
+            }
+            runsInQueue.save()        
         } else {
             new Chores(name: RUNS_IN_QUEUE, value: "${runId}").save()
         }    
@@ -70,7 +74,7 @@ class WalleService {
             String message = "More than one new folders found on Wall E!"
             log.error message
             run.status = RunStatus.ERROR
-            run.note = (run.note && run.note != "") ? "${run.note}; ${message}" : message
+            run.note = (run.note && run.note != "" && !run.note.contains(message)) ? "${run.note}; ${message}" : message
             run.save()
             return
         }
@@ -80,6 +84,7 @@ class WalleService {
         run.directoryName = newFolder
         def d = newFolder.split("_").last()
         run.fcId = d[1..-1]
+        run.status = RunStatus.RUN
         run.save()
         // generate run info and parameter files
         def fileAndFolder = generateAndSendRunFiles(run, newRunRemotePath)
@@ -105,8 +110,8 @@ class WalleService {
         def runInfoPath = new File(walle.root, RUN_INFO_FILE_NAME).getPath()
         def command = 'ls ' + runInfoPath 
         def rsh = new RemoteSSH(walle.host, walle.username, walle.password, '', command, '', walle.port)
-        def result = rsh.Result(sshConfig).toString().split('<br>')
-        return ( result[1] == runInfoPath ) 
+        def result = rsh.Result(sshConfig).toString().split('<br>') 
+        return result.find{ it == runInfoPath}
     }
     
     def getNewRunFolders(Map walle) {
@@ -117,9 +122,11 @@ class WalleService {
         def s = rsh.Result(sshConfig).toString().split('<br>')
         def newPaths = []
 
-        s[1..-3].each{
-            if (priorRunFolder == null || it > priorRunFolder) {
-                newPaths.push(it)
+        s.each{
+            if (!it.contains("exit") && !it.contains(command) && !it.contains(RUN_INFO_FILE_NAME)) {
+                if (priorRunFolder == null || it > priorRunFolder) {
+                    newPaths.push(it)
+                }
             }
         }
         return newPaths

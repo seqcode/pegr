@@ -117,7 +117,7 @@ class SequenceRunService {
         walleService.addToQueue(runId)
         
         // start the run by creating a job on remote server
-        run.status = RunStatus.RUN
+        run.status = RunStatus.QUEUE
         run.save()
     }
 }

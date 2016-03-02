@@ -4,6 +4,9 @@
   <meta name="layout" content="main"/>
 </head>
 <body>
+    <g:if test="${flash.message}">
+        <div class="message" role="status">${flash.message}</div>
+    </g:if>
     <div id="addProject">
         <g:link action='create'  class="btn btn-primary" ><span class="glyphicon glyphicon-plus"></span> Add Project</g:link>
     </div>

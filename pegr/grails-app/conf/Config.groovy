@@ -133,12 +133,17 @@ grails.plugin.springsecurity.interceptUrlMap = [
 	'/**/js/**':        ['permitAll'],
 	'/**/css/**':       ['permitAll'],
 	'/**/images/**':    ['permitAll'],
-    '/user/register': ['permitAll'],
-    '/login/**': ['permitAll'],
-	'/logout/**': ['permitAll'],
-	'/admin/**': ['hasRole("ROLE_ADMIN")'],
-	'/*Admin/**': ['hasRole("ROLE_ADMIN")'],
-	'/**': ['isAuthenticated()'] // everything else requires authenticated user
+    '/user/register':   ['permitAll'],
+    '/login/**':        ['permitAll'],
+	'/logout/**':       ['permitAll'],
+	'/admin/**':        ['ROLE_ADMIN'],
+	'/*Admin/**':       ['ROLE_ADMIN'],
+    '/project/create/**':['ROLE_MEMBER', 'ROLE_ADMIN'],
+    '/protocolInstanceBag/**': ['ROLE_MEMBER', 'ROLE_ADMIN'],
+    '/antibody/**':     ['ROLE_MEMBER', 'ROLE_ADMIN'],
+    '/item/**':         ['ROLE_MEMBER', 'ROLE_ADMIN'],
+    '/sequenceRun/**':  ['ROLE_MEMBER', 'ROLE_ADMIN'],
+	'/**':              ['isAuthenticated()'] // everything else requires authenticated user
 ]
 grails.plugin.springsecurity.auth.loginFormUrl = "/login/form"
 grails.plugin.springsecurity.logout.afterLogoutUrl = "/login/form"

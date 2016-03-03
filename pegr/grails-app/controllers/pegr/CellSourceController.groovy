@@ -25,16 +25,6 @@ class CellSourceController {
             [cellSourceId: params.long('cellSourceId'), itemId: params.long('itemId'), treatments: cellSource.treatments]
         }
     }
-    
-   def showCellSourceForSample(Integer sampleId) {
-        def sample = Sample.get(sampleId)
-		
-		if (sample.cellSource) {
-			[cellSourceInstance: sample.cellSource, itemInstance: sample.cellSource.item, sampleId: sampleId]
-		} else {
-			redirect(action:"createCellSourceForSample", params: [sampleId: sampleId])
-		}
-    }
 	
     def edit(CellSource cellSource) {
         [object: cellSource, itemId: cellSource?.item?.id]

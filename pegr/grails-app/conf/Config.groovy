@@ -141,6 +141,7 @@ grails.plugin.springsecurity.interceptUrlMap = [
     '/project/create/**':['ROLE_MEMBER', 'ROLE_ADMIN'],
     '/protocolInstanceBag/**': ['ROLE_MEMBER', 'ROLE_ADMIN'],
     '/antibody/**':     ['ROLE_MEMBER', 'ROLE_ADMIN'],
+    '/cellSource/**':   ['ROLE_MEMBER', 'ROLE_ADMIN'],
     '/item/**':         ['ROLE_MEMBER', 'ROLE_ADMIN'],
     '/sequenceRun/**':  ['ROLE_MEMBER', 'ROLE_ADMIN'],
 	'/**':              ['isAuthenticated()'] // everything else requires authenticated user

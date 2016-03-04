@@ -12,16 +12,19 @@ class ProjectController {
 		def currentUser = springSecurityService.currentUser
 		
         // query the user's the projects
-        if (currentUser?.id == 1) {
-            def projects =  Project.list(params)
-    		[projects: projects, totalCount: Project.count()]
-        } else {
-            def query = ProjectUser.where {user == currentUser}
-            def projects = query.list(params).collect{it.project}
-            def totalCount = query.count()
-            [projects: projects, totalCount: totalCount]
-        }
+        def query = ProjectUser.where {user == currentUser}
+        def projects = query.list(params).collect{it.project}
+        def totalCount = query.count()
+        [projects: projects, totalCount: totalCount]
 	}
+    
+    def all(int max) {
+        params.max = Math.min(max ?:15, 100)
+		
+        // query all the projects
+        def projects =  Project.list(params)
+        [projects: projects, totalCount: Project.count()]
+    }
 
     def create() {
         if(request.method == 'POST') {

@@ -7,7 +7,7 @@
     <div class="container-fluid">
          <ul class="nav nav-tabs">
             <li><g:link action="list">List</g:link></li>
-            <li><g:link action="delete" id="${antibody.id}" class="confirm">Delete</g:link></li>   
+            <li><g:link action="delete" params="[antibodyId:antibody.id]" class="confirm">Delete</g:link></li>   
         </ul>
         <g:if test="${flash.message}">
             <div class="message" role="status">${flash.message}</div>
@@ -32,7 +32,7 @@
                 </g:if>    
             </ul>
         </g:else>
-        <h4>Antibody Information <g:link controller="antibody" action="edit" id="${antibody?.id}" class="edit">Edit</g:link></h4>
+        <h4>Antibody Information <g:link controller="antibody" action="edit" params="[antibodyId:antibody.id]" class="edit">Edit</g:link></h4>
         <g:render template="/antibody/details" model="[object: antibody]"></g:render>
     </div>
     <script>

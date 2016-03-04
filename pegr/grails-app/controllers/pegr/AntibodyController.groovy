@@ -50,17 +50,19 @@ class AntibodyController {
         }
     }
     
-    def edit(Antibody antibody){
+    def edit(Long antibodyId){
+        def antibody = Antibody.get(antibodyId)
+        antibody.properties = params
         [antibody: antibody]
     }
     
-    def update() {
-        def antibody = Antibody.get(params.long('id'))
+    def update(Long antibodyId) {
+        def antibody = Antibody.get(antibodyId)
         antibody.properties = params
         try {
             antibodyService.save(antibody)
             flash.message = "Antibody update!"
-            redirect(action: "show", id: params.id)
+            redirect(action: "show", id: antibodyId)
         }catch(ItemException e) {
             request.message = e.message
             render(view:'edit', model:[antibody: antibody])
@@ -122,14 +124,14 @@ class AntibodyController {
         }
     }
     
-    def delete(Long id) {
+    def delete(Long antibodyId) {
         try {   
-            antibodyService.delete(id)
+            antibodyService.delete(antibodyId)
             flash.message = "Antibody deleted!"
             redirect(action: 'list')
         }catch(AntibodyException e) {
             flash.message = e.message
-            redirect(action: 'show', id: id)
+            redirect(action: 'show', id: antibodyId)
         }        
     }
     

@@ -6,8 +6,8 @@ class SecurityFilters {
     
     def filters = {
         
-        // allow admin or anyone who has role in this project to view 
-        projectView(controller:'project', action:'show') {
+        // allow admin or anyone who has a role in this project to view 
+        projectShow(controller:'project', action:'show') {
             before = {
                 def currUser = springSecurityService.currentUser
                 if (currUser.id == 1) {
@@ -39,25 +39,24 @@ class SecurityFilters {
                     return false
                 }
             }
+        }     
+                
+        AntibodyEdit(controller: 'antibody', action: 'edit|update|delete|editItem|updateItem|addBarcode') {
+            before = {
+                def antibodyId = params.long('antibodyId')
+                def antibody = Antibody.get(antibodyId)
+                def currUser = springSecurityService.currentUser
+                if (currUser.authorities.any { it.authority == "ROLE_ADMIN" }
+                   || antibody?.item?.user == currUser) {
+                    return true
+                } else {
+                    render(view: '/login/denied')
+                    return false
+                }
+            }
         }
 
-        AntibodyView(controller: 'antibody', action: 'show') {
-            
-        }
-        
-        AntibodyEdit(controller: 'antibody', action: 'edit|delete') {
-            
-        }
-        
-        CellSourceView(controller: 'cellSource', action: 'show') {
-            
-        }
-        
         CellSourceEdit(controller: 'cellSource', action: 'edit|delete') {
-            
-        }
-        
-        ItemView(controller: 'item', action: 'show') {
             
         }
         

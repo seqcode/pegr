@@ -10,12 +10,17 @@ class ItemException extends RuntimeException {
 class ItemService {
 
     def grailsApplication
+    def springSecurityService
 
     @Transactional
     def save(Item item){
         if (Item.where{type.id == item.type.id && barcode == item.barcode && id != item.id}.get(max:1)){
             throw new ItemException(message: "This barcode has already been used!")
         } 
+        // add the current user if the item is new
+        if (!item.id) {
+            item.user = springSecurityService.currentUser
+        }
         if(!item.save(flush: true)){
             throw new ItemException(message: "Invalid inputs!")
         }

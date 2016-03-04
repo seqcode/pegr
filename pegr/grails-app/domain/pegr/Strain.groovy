@@ -13,7 +13,11 @@ class Strain {
     static mappedBy = [parent: 'none', backgroundStrain: 'none']
     
 	String toString() {
-        name
+        String s = name
+        if (geneticModification) {
+            s += ";${geneticModification}"
+        }
+        return s
 	}
     
     static constraints = {

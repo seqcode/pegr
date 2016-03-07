@@ -125,6 +125,10 @@ class ProtocolAdminController {
     
     def renderFile(Long protocolId) {
         def file = protocolService.getProtocolFile(protocolId)
+        response.setHeader "Content-disposition", "inline; filename=${file.getName()}"
+        response.contentType = 'application/pdf'
+        response.outputStream << file
+        response.outputStream.flush()
         render(contentType: "application/pdf", contentDisposition: "inline", file: file, fileName: file.getName())
     }
 }

@@ -27,9 +27,6 @@
             <div class="message" role="status">${flash.message}</div>
         </g:if>
         <div id="protocols">
-        <g:if test="${protocolGroup}">
-        <g:render template="/protocol/protocolsDetails" bean="${protocolGroup}" />
-        </g:if>
         </div>
     </div>
     <script>

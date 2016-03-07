@@ -236,8 +236,6 @@ class ItemController {
         redirect(action: "show", id: params.itemId)
     }
     
-
-    
     def getFileExtension(String s) {
         return s.substring(s.lastIndexOf('.') + 1)
     }

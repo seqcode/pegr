@@ -53,7 +53,10 @@ class ItemService {
         try {
             if (item.type.category == ItemTypeCategory.TRACED_SAMPLE) {
                 def cellSource = CellSource.findByItem(item)
-                cellSource?.delete(flush: true)
+                if (cellSource) {
+                    CellSourceTreatments.executeUpdate("delete CellSourceTreatments where cellSource.id = :cellSourceId", [cellSourceId: cellSource.id])
+                    cellSource.delete(flush: true)
+                }
             }            
             item.delete(flush: true)
             if (folder?.exists()) {

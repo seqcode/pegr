@@ -56,12 +56,34 @@ class SecurityFilters {
             }
         }
 
-        CellSourceEdit(controller: 'cellSource', action: 'edit|delete') {
-            
+        CellSourceEdit(controller: 'cellSource', action: 'edit|update|addTreatment') {
+            before = {
+                def cellSourceId = params.long('cellSourceId')
+                def cellSource = CellSource.get(cellSourceId)
+                def currUser = springSecurityService.currentUser
+                if (currUser.authorities.any { it.authority == "ROLE_ADMIN" }
+                   || cellSource?.item?.user == currUser) {
+                    return true
+                } else {
+                    render(view: '/login/denied')
+                    return false
+                }
+            }
         }
         
-        ItemEdit(controller: 'item', action: 'edit|delete') {
-            
+        ItemEdit(controller: 'item', action: 'edit|update|upload|deleteImage|delete') {
+            before = {
+                def itemId = params.long('itemId')
+                def item = Item.get(itemId)
+                def currUser = springSecurityService.currentUser
+                if (currUser.authorities.any { it.authority == "ROLE_ADMIN" }
+                   || item?.user == currUser) {
+                    return true
+                } else {
+                    render(view: '/login/denied')
+                    return false
+                }
+            }
         }
     }
 }

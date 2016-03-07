@@ -6,12 +6,14 @@ class CellSourceController {
     def protocolInstanceBagService
     def cellSourceService
 	
-    def edit(CellSource cellSource) {
+    def edit(Long cellSourceId) {
+        def cellSource = CellSource.get(cellSourceId)
+        cellSource.properties = params
         [cellSource: cellSource, itemId: cellSource?.item?.id]
     }
     
-    def update(Long id) {
-        def cellSource = CellSource.get(id)
+    def update(Long cellSourceId) {
+        def cellSource = CellSource.get(cellSourceId)
         if (cellSource) {
             cellSource.properties = params
             def treatments = params.list("treatments")
@@ -50,8 +52,7 @@ class CellSourceController {
         render g.select(id: 'growthMedia', name:'growthMedia.id', from: growthMedias, optionKey: 'id', noSelection:[null:''])
     }
     
-    def addTreatment() {
-        def cellSourceId = params.long('cellSourceId')
+    def addTreatment(Long cellSourceId) {
         def treatment = new CellSourceTreatment(params)
         def cellSource = CellSource.get(cellSourceId)
         if (!cellSource) {

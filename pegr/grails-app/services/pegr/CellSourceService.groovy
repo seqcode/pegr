@@ -29,15 +29,23 @@ class CellSourceService {
             throw new ItemException(message: "Invalid inputs for cell source!")
         }
         // save cell source's treatments
+        def toDelete = CellSourceTreatments.where{cellSource == cellSource}.list()
         treatments.each {
-            if (it.isNumber()) {
-                def treatment = CellSourceTreatment.get(it.toInteger())
+            def treatmentId = Long.parseLong(it)
+            def oldTreatment = toDelete.find{it.treatment.id == treatmentId}
+            if (oldTreatment) {
+                toDelete.remove(oldTreatment)
+            } else {
+                def treatment = CellSourceTreatment.get(treatmentId)
                 if (treatment) {
                     new CellSourceTreatments(cellSource: cellSource, treatment: treatment).save()
                 } else {
                     throw new ItemException(message: "Treatment not found!")
                 }
-            } 
+            }
+        }
+        toDelete.each {
+            it.delete()
         }
     }       
     

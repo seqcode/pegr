@@ -1,7 +1,7 @@
 <div class="modal fade" id="new-treatment" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
-            <g:form method="post" action="addTreatment">
+            <g:form method="post" controller="cellSource" action="addTreatment">
                 <div class="modal-header">New Treatment</div>
                 <div class="modal-body fields">
                     <g:hiddenField name="cellSourceId" value="${cellSource?.id}"></g:hiddenField>

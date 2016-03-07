@@ -38,14 +38,14 @@ class AntibodyController {
             try {
                 antibodyService.save(item, antibody)
                 flash.message = "New traced sample added!"
-                redirect(action: "show", id: object.id)
+                redirect(action: "show", id: antibody.id)
             }catch(ItemException e) {
                 request.message = e.message
-                render(view: "create", model: [item:item, object: object])
+                render(view: "create", model: [item:item, antibody: antibody])
             }catch(Exception e) {
                 log.error "Error: ${e.message}", e
                 request.message = "Error saving this item!"
-                render(view: "create", model: [item:item, object: object])
+                render(view: "create", model: [item:item, antibody: antibody])
             }
         }
     }

@@ -121,12 +121,12 @@ class ItemController {
             def item = new Item(params)
             def cellSource = new CellSource(params)
             def treatments = params.list("treatments")
-            if (!cellSource.strain.id) {
+            if (!(cellSource?.strain?.id)) {
                 cellSource.strain = new Strain(params)
                 cellSource.strain.name = params.strainName
-                if (!strain.species.id) {
+                if (!(cellSource?.strain?.species?.id)) {
                     cellSource.strain.species = new Species(genusName:params.genusName, 
-                                                            name: speciesName)
+                                                            name: params.speciesName)
                 }
             }
             try {
@@ -144,8 +144,15 @@ class ItemController {
         }
     }
 
-    def edit(Item item) {
-        [item: item]
+    def edit(Long itemId) {
+        def item = Item.get(itemId)
+        if (item) {
+            item.properties = params
+            [item: item]
+        } else {
+            flash.message = "Item not found!"
+            redirect(controller: "item", action: "list")
+        }        
     }
     
     def update(Long itemId) {
@@ -235,15 +242,15 @@ class ItemController {
         return s.substring(s.lastIndexOf('.') + 1)
     }
     
-    def delete(Long id) {
-        def typeId = Item.get(id)?.type?.id
+    def delete(Long itemId) {
+        def typeId = Item.get(itemId)?.type?.id
         try {
-            itemService.delete(id)
+            itemService.delete(itemId)
             flash.message = "Item deleted!"
     		redirect(action: 'list', params: [typeId: typeId])
         } catch(ItemException e) {
             flash.message = e.message
-            redirect(action: 'show', id: id)
+            redirect(action: 'show', id: itemId)
         }
     }
 }

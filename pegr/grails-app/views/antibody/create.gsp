@@ -19,7 +19,7 @@
         <g:submitButton class="btn btn-primary" name="save" value="Save"/>
         <g:link class="btn btn-default" action="list">Cancel</g:link>
         <g:render template="/item/form" model="['item':item]"/>
-        <g:render template="/antibody/form" model="['object':object]"></g:render>
+        <g:render template="/antibody/form" model="['antibody':antibody]"></g:render>
     </g:form>
 
     <script>

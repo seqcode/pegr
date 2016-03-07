@@ -25,7 +25,7 @@
         <h4>Cell Source Information</h4>
         <g:render template="/cellSource/form" model="['cellSource':cellSource]"></g:render>
     </g:form>
-
+    <g:render template="/cellSource/treatmentModal"></g:render>
     <script>
         $("#nav-bench").addClass("active");
      </script>

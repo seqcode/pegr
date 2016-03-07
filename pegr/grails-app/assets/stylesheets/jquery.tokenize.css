@@ -9,6 +9,7 @@ div.Tokenize {
     position: relative;
     display: inline-block;
     zoom: 1;
+    vertical-align: middle;
 }
 
 div.Tokenize ul {

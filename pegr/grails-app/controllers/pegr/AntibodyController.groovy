@@ -34,9 +34,9 @@ class AntibodyController {
     def save() {
         withForm{        
             def item = new Item(params)
-            def object = new Antibody(params)
+            def antibody = new Antibody(params)
             try {
-                itemService.save(item, object)
+                antibodyService.save(item, antibody)
                 flash.message = "New traced sample added!"
                 redirect(action: "show", id: object.id)
             }catch(ItemException e) {
@@ -97,15 +97,14 @@ class AntibodyController {
         }
     }
     
-    
     def addBarcode(Long antibodyId) {
-        def object = Antibody.get(antibodyId)
-        if (object) {        
+        def antibody = Antibody.get(antibodyId)
+        if (antibody) {        
             if (request.method == "POST") {
                 withForm {
                     def item = new Item(params)
                     try {
-                        itemService.save(item, object)
+                        antibodyService.save(item, antibody)
                         flash.message = "Barcode added!"
                         redirect(action: "show", id: antibodyId)
                     }catch(ItemException e) {

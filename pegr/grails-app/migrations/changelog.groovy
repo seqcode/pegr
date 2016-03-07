@@ -2821,4 +2821,6 @@ databaseChangeLog = {
 	include file: 'addChores.groovy'
 
 	include file: 'addUserToItem.groovy'
+
+	include file: 'changeTreatment.groovy'
 }

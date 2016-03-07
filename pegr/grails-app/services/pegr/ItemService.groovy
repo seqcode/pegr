@@ -22,18 +22,7 @@ class ItemService {
             item.user = springSecurityService.currentUser
         }
         if(!item.save(flush: true)){
-            throw new ItemException(message: "Invalid inputs!")
-        }
-    }
-    
-    @Transactional
-    def save(item, object){
-        save(item)            
-        if(object){
-            object.item = item 
-            if (!object.save(flush: true)) {
-                throw new ItemException(message: "Invalid inputs!")
-            }
+            throw new ItemException(message: "Invalid inputs for item!")
         }
     }
 
@@ -75,26 +64,7 @@ class ItemService {
             throw new ItemException(message: "Item cannot be deleted!")
         }
     }
-    
-    def getObject(Long id, String type) {
-        def c = getClassFromObjectType(type)
-        return c?.clazz.get(id)
-    }
-    
-    def getClassFromObjectType(String type) {
-        return grailsApplication.getDomainClass(grails.util.Metadata.current.getApplicationName()+ "." + type)
-    }
-    
-    def getObjectFromItem(Item item) {
-        try {
-            def c = grailsApplication.getDomainClass(grails.util.Metadata.current.getApplicationName()+ "." + item.type.objectType)
-            def object = c.clazz.findByItem(item)
-            return object
-        }catch(Exception e) {
-            return null
-        }
-    }
-    
+
     def getImageFolder(Long itemId){
         File folder = new File("files/items/${itemId}"); 
     }

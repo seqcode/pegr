@@ -8,6 +8,7 @@ class ItemController {
     def private final allowedTypes = ['image/png':'png', 'image/jpeg':'jpg', 'image/jpg':'jpg', 'image/gif':'gif']
     
     def itemService
+    def cellSourceService
     
     def index(){
         redirect(action: "list", params: [typeId: 1])
@@ -25,7 +26,7 @@ class ItemController {
                 break
             default:
                 def items = Item.where{ type.id == typeId }
-                [objectList: items.list(params), objectCount: items.count(), currentType: itemType]
+                [itemList: items.list(params), itemCount: items.count(), currentType: itemType]
         }
     }
     
@@ -93,8 +94,8 @@ class ItemController {
         [item: item]
     }
     
-    def createTracedSample(Item item, CellSource object) {
-        [item: item, object: object]
+    def createTracedSample(Item item, CellSource cellSource) {
+        [item: item, cellSource: cellSource]
     }
     
     def save() {
@@ -118,18 +119,27 @@ class ItemController {
     def saveWithCellSource() {
         withForm{        
             def item = new Item(params)
-            def object = new CellSource(params)
+            def cellSource = new CellSource(params)
+            def treatments = params.list("treatments")
+            if (!cellSource.strain.id) {
+                cellSource.strain = new Strain(params)
+                cellSource.strain.name = params.strainName
+                if (!strain.species.id) {
+                    cellSource.strain.species = new Species(genusName:params.genusName, 
+                                                            name: speciesName)
+                }
+            }
             try {
-                itemService.save(item, object)
+                cellSourceService.save(item, cellSource, treatments)
                 flash.message = "New traced sample added!"
                 redirect(action: "show", id: item.id)
             }catch(ItemException e) {
                 request.message = e.message
-                render(view: "createTracedSample", model: [item:item, object: object])
+                render(view: "createTracedSample", model: [item:item, cellSource: cellSource])
             }catch(Exception e) {
                 log.error "Error: ${e.message}", e
                 request.message = "Error saving this item!"
-                render(view: "createTracedSample", model: [item:item, object: object])
+                render(view: "createTracedSample", model: [item:item, cellSource: cellSource])
             }
         }
     }

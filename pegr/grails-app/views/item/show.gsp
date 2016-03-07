@@ -43,7 +43,7 @@
     </g:if>
     <g:if test="${cellSource}">
         <h4>Cell Source Information <g:link controller="cellSource" action="edit" id="${cellSource?.id}" class="edit">Edit</g:link></h4>
-        <g:render template="/cellSource/details" model="[object: cellSource]"></g:render>
+        <g:render template="/cellSource/details" model="[cellSource: cellSource]"></g:render>
     </g:if>
     <h4>Images</h4>
     <div class="row">

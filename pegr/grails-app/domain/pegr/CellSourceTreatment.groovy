@@ -2,21 +2,16 @@ package pegr
 
 class CellSourceTreatment {
 	String name
-	String compound
-	String quantity
-	String duration
+	String note
     DictionaryStatus status
 	  
 	String toString() {
-		String s = name
-		return s
+		return name
 	}
 	
     static constraints = {
     	name unique: true
-        compound nullable: true, blank: true
-		quantity nullable: true, blank: true
-		duration nullable: true, blank: true
+        note nullable: true, blank: true
         status nullable: true
 	}
 }

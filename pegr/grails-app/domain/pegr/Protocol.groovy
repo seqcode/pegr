@@ -4,7 +4,6 @@ class Protocol {
 	String name
 	String protocolVersion
 	String description
-	String details
     User user
 	Assay assay
     
@@ -39,12 +38,8 @@ class Protocol {
 		name unique: 'protocolVersion'
 		protocolVersion nullable: true, blank: true, maxSize: 10
 		description nullable: true, blank: true
-		details nullable: true, blank: true
         user nullable: true
         assay nullable: true
 	}
-	
-	static mapping = {
-		details sqlType: 'text'
-	}
+
 }

@@ -28,11 +28,6 @@
                 <h4>Description</h4>
                 ${protocol?.description}
             </g:if>
-			
-            <g:if test="${protocol?.details}">
-                <h4>Details</h4>
-                ${raw(protocol.details)}
-            </g:if>
             
             <h4>Traced Sample</h4>
             <ul>
@@ -45,6 +40,21 @@
                 <li>Individual: <g:each in="${protocol?.individualItemTypes}">${it}</g:each></li>
             </ul>
 			
+            <h4>Protocol File</h4>
+            <g:if test="${file}">
+                <g:link action="renderFile" params="[protocolId: protocol?.id]" target="_blank">${file.getName()}</g:link>
+                <g:link action="deleteFile" params="[protocolId: protocol?.id]" class="confirm edit">Remove</g:link> 
+            </g:if>
+            <g:else>
+                <g:uploadForm action="upload" >
+                    <div class="form-group">
+                        <g:hiddenField name="protocolId" value="${protocol?.id}"></g:hiddenField>
+                        <input type="file" id="file" name="file"/>
+                        <g:submitButton name="upload" value="Upload"/> (only pdf files)
+                    </div>
+                </g:uploadForm>
+            </g:else>
+            
 			<g:form  action='delete' method="DELETE" useToken="true">
 				<g:hiddenField name="id" value="${protocol?.id}" />
 				<fieldset class="buttons">
@@ -53,5 +63,8 @@
 				</fieldset>
 			</g:form>
 		</div>
+        <script>
+            $(".confirm").confirm();
+        </script>
 	</body>
 </html>

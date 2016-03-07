@@ -67,4 +67,13 @@ class ProtocolService {
         }
     }
     
+    def getProtocolFolder() {
+        return new File("files/protocols"); 
+    }
+    
+    def getProtocolFile(Long protocolId) {
+        def folder = getProtocolFolder()
+        return new File(folder, "protocol${protocolId}.pdf") 
+    }
+    
 }

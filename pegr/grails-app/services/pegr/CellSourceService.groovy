@@ -57,10 +57,8 @@ class CellSourceService {
     }
     
     @Transactional
-    def addTreatment(CellSourceTreatment treatment, CellSource cellSource) {
-        if(treatment.save(flush: true)) {
-            new CellSourceTreatments(cellSource: cellSource, treatment: treatment).save()
-        } else{
+    def addTreatment(CellSourceTreatment treatment) {
+        if(!treatment.save(flush: true)) {
             throw new CellSourceException(message: "Invalid inputs for treatment!")
         }
     }

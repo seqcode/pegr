@@ -58,8 +58,11 @@ class CellSourceController {
         if (!cellSource) {
             render status:404
         } else {
-            cellSourceService.addTreatment(treatment, cellSource)
-            redirect(action:"edit", id:cellSourceId)
+            cellSourceService.addTreatment(treatment)
+            def treatments = cellSource.treatments
+            treatments.push(treatment)
+
+            render g.select(multiple:"multiple", name:"treatments", from:CellSourceTreatment.list(), optionKey:"id", value: treatments*.id, class:"tokenize tokenize-sample")
         }
     }
 }

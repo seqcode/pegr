@@ -49,7 +49,9 @@
 
 <div>
     <label>Treatments</label>
-    <g:select id="treatments" multiple="multiple" name="treatments" from="${pegr.CellSourceTreatment.list()}" optionKey="id" value="${cellSource?.treatments}" class="tokenize tokenize-sample"></g:select>
+    <span id="treatments">
+    <g:select multiple="multiple" name="treatments" from="${pegr.CellSourceTreatment.list()}" optionKey="id" value="${cellSource?.treatments}" class="tokenize tokenize-sample"></g:select>
+    </span>
     <a href="#" class="edit" data-toggle="modal" data-target="#new-treatment"><span class="glyphicon glyphicon-plus"></span>New</a>
 </div>
 

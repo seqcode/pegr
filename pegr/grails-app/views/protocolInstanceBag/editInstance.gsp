@@ -16,10 +16,9 @@
                 <h4>Description</h4>
                 ${protocolInstance?.protocol?.description}
             </g:if>
-
-            <g:if test="${protocolInstance?.protocol?.details}">
-                <h4>Details</h4>
-                ${raw(protocolInstance?.protocol?.details)}
+            <g:if test="${file}">
+            <h4>Protocol File</h4>
+            <g:link action="renderFile" params="[protocolId: protocolInstance?.protocol?.id]" target="_blank">${file.getName()}</g:link>
             </g:if>
         </div>
         <h4>Shared Items</h4>

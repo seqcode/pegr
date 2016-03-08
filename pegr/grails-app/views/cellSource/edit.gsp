@@ -10,16 +10,17 @@
     </g:if>
     <g:hasErrors>
         <div class="errors">
-            <g:renderErrors bean="${object}" as="list"/>
+            <g:renderErrors bean="${cellSource}" as="list"/>
         </div>
     </g:hasErrors>
+    <h3>Edit Cell Source</h3>
     <g:form action="update" class="fields" role="form" method="post">
-        <g:hiddenField name="id" value="${object.id}"></g:hiddenField>
-        <g:render template="form" model="['object': object]"></g:render>
+        <g:hiddenField name="cellSourceId" value="${cellSource.id}"></g:hiddenField>
+        <g:render template="form" model="['cellSource': cellSource]"></g:render>
         <g:submitButton class="btn btn-primary" name="save" value="Save"/>
         <g:link class="btn btn-default" controller="item" action="show" id="${itemId}">Cancel</g:link>
     </g:form>
-
+    <g:render template="/cellSource/treatmentModal"></g:render>
     <script>
         $("#nav-bench").addClass("active");
      </script>

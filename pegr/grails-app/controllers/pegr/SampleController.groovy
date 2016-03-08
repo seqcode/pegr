@@ -1,8 +1,6 @@
 package pegr
-import grails.transaction.Transactional
 import groovy.json.*
     
-@Transactional(readOnly = true)
 class SampleController {
     
     def index(Integer max) {
@@ -96,16 +94,6 @@ class SampleController {
             session.checkedSample = null
         }
         return
-    }
-    
-    @Transactional
-    def createTechnicalReplicate(){
-        
-    }
-    
-    @Transactional
-    def createBiologicalReplicate(){
-        
     }
     
 }

@@ -7,12 +7,12 @@
 <div class="container-fluid">
      <ul class="nav nav-tabs">
         <li><g:link action="list" params="[typeId: item?.type?.id]">List</g:link></li>
-        <li><g:link action="delete" id="${item?.id}" class="confirm">Delete</g:link></li>   
+        <li><g:link action="delete" params="[itemId:item?.id]" class="confirm">Delete</g:link></li>   
     </ul>
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
-    <h4>Barcode Information <g:link action="edit" id="${item?.id}" class="edit">Edit</g:link></h4>
+    <h4>Barcode Information <g:link action="edit" params="[itemId:item?.id]" class="edit">Edit</g:link></h4>
     <ul>
         <g:if test="${item?.name}">
         <li>Name: ${item.name}</li>
@@ -42,8 +42,8 @@
         </ul>
     </g:if>
     <g:if test="${cellSource}">
-        <h4>Cell Source Information <g:link controller="cellSource" action="edit" id="${cellSource?.id}" class="edit">Edit</g:link></h4>
-        <g:render template="/cellSource/details" model="[object: cellSource]"></g:render>
+        <h4>Cell Source Information <g:link controller="cellSource" action="edit" params="[cellSourceId:cellSource?.id]" class="edit">Edit</g:link></h4>
+        <g:render template="/cellSource/details" model="[cellSource: cellSource]"></g:render>
     </g:if>
     <h4>Images</h4>
     <div class="row">

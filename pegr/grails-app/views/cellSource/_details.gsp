@@ -1,52 +1,51 @@
-<ul class="property-list">
-
-	<li>Strain: ${object?.strain?.name}</li>
+<ul>
+	<li>Strain: ${cellSource?.strain?.name}</li>
         <ul>
-            <li>Species: ${object?.strain?.species}</li>
-            <li>Genotype: ${object?.strain?.genotype}</li>
-            <g:if test="${object?.strain?.geneticModification}">
-                <li>Genetic Modification: ${object?.strain?.geneticModification}</li>
+            <li>Species: ${cellSource?.strain?.species}</li>
+            <li>Genotype: ${cellSource?.strain?.genotype}</li>
+            <g:if test="${cellSource?.strain?.geneticModification}">
+                <li>Genetic Modification: ${cellSource?.strain?.geneticModification}</li>
             </g:if>
-            <g:if test="${object?.strain?.parent}">
-                <li>Parent Strain: ${object?.strain?.parent}</li>
+            <g:if test="${cellSource?.strain?.parent}">
+                <li>Parent Strain: ${cellSource?.strain?.parent}</li>
             </g:if>
         </ul>
 	
-	<g:if test="${object?.sex}">
-	<li>Sex:${object.sex}	</li>
+	<g:if test="${cellSource?.sex}">
+	<li>Sex:${cellSource.sex}	</li>
 	</g:if>
     
-    <g:if test="${object?.age}">
-	<li>Age:${object.age}	</li>
+    <g:if test="${cellSource?.age}">
+	<li>Age:${cellSource.age}	</li>
 	</g:if>
     
-    <g:if test="${object?.tissue}">
-	<li>Tissue:${object.tissue}	</li>
+    <g:if test="${cellSource?.tissue}">
+	<li>Tissue:${cellSource.tissue}	</li>
 	</g:if>
 	
-    <g:if test="${object?.histology}">
-	<li>Histology:${object.histology}	</li>
+    <g:if test="${cellSource?.histology}">
+	<li>Histology:${cellSource.histology}	</li>
 	</g:if>
     
-    <g:if test="${object?.growthMedia}">
-	<li>Growth Media:${object.growthMedia}	</li>
+    <g:if test="${cellSource?.growthMedia}">
+	<li>Growth Media:${cellSource.growthMedia}	</li>
 	</g:if>
 	
     <li>Provider: 
-	<g:if test="${object?.providerUser}">
-	   ${object.providerUser}
+	<g:if test="${cellSource?.providerUser}">
+	   ${cellSource.providerUser}
 	</g:if>
-	<g:if test="${object?.providerLab}">
-        , ${object.providerLab}
+	<g:if test="${cellSource?.providerLab}">
+        , ${cellSource.providerLab}
 	</g:if>
     </li>
     
-	<g:if test="${object?.biologicalSourceId}">
-	<li>Biological Source ID: ${object.biologicalSourceId}</li>
+	<g:if test="${cellSource?.biologicalSourceId}">
+	<li>Biological Source ID: ${cellSource.biologicalSourceId}</li>
 	</g:if>
     
     <li>Cell Source Treatments:
-        <g:each in="${object.treatments}" var="c">
+        <g:each in="${cellSource.treatments}" var="c">
             ${c}
         </g:each>	
     </li>

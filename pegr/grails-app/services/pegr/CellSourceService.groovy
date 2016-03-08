@@ -7,38 +7,60 @@ class CellSourceException extends RuntimeException {
 }
 
 class CellSourceService {
-
+    def itemService
+    
     @Transactional
-    def updateTreatments(CellSource cellSource, List treatments) {
-        def changes = [:]
-        def oldTreatments = cellSource.treatments
-        oldTreatments.each {
-            changes[it.id] = -1 
+    def save(CellSource cellSource, List treatments) {
+        if (cellSource.strain && !cellSource.strain.id) {
+            // save species if it's new
+            def species = cellSource.strain.species
+            if(species && !species.id) {
+                if(!species.save(flush:true)) {
+                    throw new ItemException(message: "Invalid inputs for species!")
+                }
+            }
+            // save strain if it's new
+            if (!cellSource.strain.save(flush:true)) {
+                throw new ItemException(message: "Invalid inputs for strain!")
+            }
         }
-        treatments.each{
-            if(changes.containsKey(it)) {
-                changes[it] = 0
+        // save cell source
+        if (!cellSource.save(flush: true)) {
+            throw new ItemException(message: "Invalid inputs for cell source!")
+        }
+        // save cell source's treatments
+        def toDelete = CellSourceTreatments.where{cellSource == cellSource}.list()
+        treatments.each {
+            def treatmentId = Long.parseLong(it)
+            def oldTreatment = toDelete.find{it.treatment.id == treatmentId}
+            if (oldTreatment) {
+                toDelete.remove(oldTreatment)
             } else {
-                changes[it] = 1
+                def treatment = CellSourceTreatment.get(treatmentId)
+                if (treatment) {
+                    new CellSourceTreatments(cellSource: cellSource, treatment: treatment).save()
+                } else {
+                    throw new ItemException(message: "Treatment not found!")
+                }
             }
         }
-        changes.each{ key, value ->
-            if(value == -1) {
-                CellSourceTreatments.where{cellSource == cellSource && treatment.id == key}.get(max: 1).delete()
-            }else if(value == 1) {
-                def newTreatment = CellSourceTreatment.get(key)
-                new CellSourceTreatments(cellSource: cellSource, treatment: newTreatment).save()
-            }
+        toDelete.each {
+            it.delete()
         }
+    }       
+    
+    @Transactional
+    def save(Item item, CellSource cellSource, List treatments){
+        itemService.save(item) 
+        cellSource.item = item 
+        save(cellSource, treatments)
     }
     
     @Transactional
-    def save(CellSource cellSource) {
-        try {
-            cellSource.save(flush: true)
-        } catch (Exception E) {
-            throw new CellSourceException(message: "Invalid inputs!")
+    def addTreatment(CellSourceTreatment treatment) {
+        if(!treatment.save(flush: true)) {
+            throw new CellSourceException(message: "Invalid inputs for treatment!")
         }
-        
     }
+
 }

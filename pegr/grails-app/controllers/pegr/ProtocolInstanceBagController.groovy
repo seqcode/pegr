@@ -4,6 +4,7 @@ class ProtocolInstanceBagController {
 
     def springSecurityService
     def protocolInstanceBagService
+    def protocolService
     
     def index() {
         redirect(action: "processingBags", params: params )
@@ -136,6 +137,10 @@ class ProtocolInstanceBagController {
         def protocolInstance = ProtocolInstance.get(id)
         if (protocolInstance) {
             def protocol = protocolInstance.protocol
+            def file = protocolService.getProtocolFile(protocol.id)
+            if (!file.exists()) {
+                file = null
+            }
             // get shared item list
             def sharedItemList = protocolInstanceBagService.getSharedItemList(id, protocol)
             // prepare the individual item table template
@@ -164,7 +169,8 @@ class ProtocolInstanceBagController {
                                                  samples: samples,
                                                  parents: results.parents,
                                                  children: results.children,
-                                                 childType: protocol.endItemType])
+                                                 childType: protocol.endItemType,
+                                                 file: file])
                 } else {
                     results = protocolInstanceBagService.getParentsAndChildrenForProcessingInstance(samples, protocol.startItemType, protocol.endItemType)                
                     toBeCompleted = sharedItemList.every{ !it.items.empty } && results.children.every{ it != null }
@@ -175,7 +181,8 @@ class ProtocolInstanceBagController {
                                                  parents: results.parents,
                                                  children: results.children,
                                                  childType: protocol.endItemType,
-                                                 toBeCompleted: toBeCompleted])
+                                                 toBeCompleted: toBeCompleted,
+                                                 file: file])
                 }
             } catch(ProtocolInstanceBagException e) {
                 flash.message = e.message
@@ -353,5 +360,14 @@ class ProtocolInstanceBagController {
     def removeChild(Long sampleId, Long instanceId) {
         protocolInstanceBagService.removeChild(sampleId)
         redirect(action: "showInstance", id: instanceId)
+    }
+    
+    def renderFile(Long protocolId) {
+        def file = protocolService.getProtocolFile(protocolId)
+        response.setHeader "Content-disposition", "inline; filename=${file.getName()}"
+        response.contentType = 'application/pdf'
+        response.outputStream << file
+        response.outputStream.flush()
+        render(contentType: "application/pdf", contentDisposition: "inline", file: file, fileName: file.getName())
     }
 }

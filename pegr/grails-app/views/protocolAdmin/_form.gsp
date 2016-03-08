@@ -21,12 +21,6 @@
 
 </div>
 
-<div class=" ${hasErrors(bean: protocol, field: 'details', 'error')} ">
-	<label for="details">Details</label>
-	<g:textArea id="protocol-details" name="details" value="${protocol?.details}"/>
-	<script>$("#protocol-details").cleditor();</script>
-</div>
-
 <div>
     <label for="startItem">Traced Sample: Start State</label>
     <g:select name="startItemTypeId" id="startItem" from="${pegr.ItemType.list()}" optionKey="id" value="${protocol?.startItemType?.id}" noSelection="['null':'N/A']"/>
@@ -41,4 +35,3 @@
     <label for="individualItem">Individual</label>
     <g:select name="individualItemTypeIds" id="individualItem" from="${pegr.ItemType.list()}" optionKey="id" value="${protocol?.individualItemTypes*.id}" noSelection="['null':'N/A']" multiple="multiple"/>
 </div>
-

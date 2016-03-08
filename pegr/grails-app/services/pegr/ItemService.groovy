@@ -10,25 +10,19 @@ class ItemException extends RuntimeException {
 class ItemService {
 
     def grailsApplication
+    def springSecurityService
 
     @Transactional
     def save(Item item){
         if (Item.where{type.id == item.type.id && barcode == item.barcode && id != item.id}.get(max:1)){
             throw new ItemException(message: "This barcode has already been used!")
         } 
-        if(!item.save(flush: true)){
-            throw new ItemException(message: "Invalid inputs!")
+        // add the current user if the item is new
+        if (!item.id) {
+            item.user = springSecurityService.currentUser
         }
-    }
-    
-    @Transactional
-    def save(item, object){
-        save(item)            
-        if(object){
-            object.item = item 
-            if (!object.save(flush: true)) {
-                throw new ItemException(message: "Invalid inputs!")
-            }
+        if(!item.save(flush: true)){
+            throw new ItemException(message: "Invalid inputs for item!")
         }
     }
 
@@ -59,7 +53,10 @@ class ItemService {
         try {
             if (item.type.category == ItemTypeCategory.TRACED_SAMPLE) {
                 def cellSource = CellSource.findByItem(item)
-                cellSource?.delete(flush: true)
+                if (cellSource) {
+                    CellSourceTreatments.executeUpdate("delete CellSourceTreatments where cellSource.id = :cellSourceId", [cellSourceId: cellSource.id])
+                    cellSource.delete(flush: true)
+                }
             }            
             item.delete(flush: true)
             if (folder?.exists()) {
@@ -70,26 +67,7 @@ class ItemService {
             throw new ItemException(message: "Item cannot be deleted!")
         }
     }
-    
-    def getObject(Long id, String type) {
-        def c = getClassFromObjectType(type)
-        return c?.clazz.get(id)
-    }
-    
-    def getClassFromObjectType(String type) {
-        return grailsApplication.getDomainClass(grails.util.Metadata.current.getApplicationName()+ "." + type)
-    }
-    
-    def getObjectFromItem(Item item) {
-        try {
-            def c = grailsApplication.getDomainClass(grails.util.Metadata.current.getApplicationName()+ "." + item.type.objectType)
-            def object = c.clazz.findByItem(item)
-            return object
-        }catch(Exception e) {
-            return null
-        }
-    }
-    
+
     def getImageFolder(Long itemId){
         File folder = new File("files/items/${itemId}"); 
     }

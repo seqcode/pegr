@@ -729,7 +729,7 @@ class CsvConvertService {
 	    }
 	
 	    if (SequencingExperiment.findBySeqId(seqId)) {
-	        log.error "SeqId ${seqId} already exists!"
+            throw new Exception(message: "SeqId ${seqId} already exists!")
 	    }
 	
 	    def run = SequenceRun.findByPlatformAndRunNum(platform, runNum)

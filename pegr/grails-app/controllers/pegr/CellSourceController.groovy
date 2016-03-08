@@ -5,47 +5,20 @@ class CellSourceController {
     def springSecurityService
     def protocolInstanceBagService
     def cellSourceService
-    
-    def updateTreatments(){
-        def cellSource = CellSource.get(params.long('cellSourceId'))
-        if (!cellSource) {
-            redirect(controller: "item")
-        }
-        if(request.method == "POST") {
-            withForm {
-                try {
-                    cellSourceService.updateTreatments(cellSource, params.list('treatments'))
-                }catch(Exception e){
-                    flash.message = "Error saving the treatments!"
-                    log.error "Error: ${e.message}", e
-                }
-                redirect(controller: "item", action: 'show', id: params.long('itemId'))
-            }
-        } else {
-            [cellSourceId: params.long('cellSourceId'), itemId: params.long('itemId'), treatments: cellSource.treatments]
-        }
-    }
-    
-   def showCellSourceForSample(Integer sampleId) {
-        def sample = Sample.get(sampleId)
-		
-		if (sample.cellSource) {
-			[cellSourceInstance: sample.cellSource, itemInstance: sample.cellSource.item, sampleId: sampleId]
-		} else {
-			redirect(action:"createCellSourceForSample", params: [sampleId: sampleId])
-		}
-    }
 	
-    def edit(CellSource cellSource) {
-        [object: cellSource, itemId: cellSource?.item?.id]
+    def edit(Long cellSourceId) {
+        def cellSource = CellSource.get(cellSourceId)
+        cellSource.properties = params
+        [cellSource: cellSource, itemId: cellSource?.item?.id]
     }
     
-    def update(Long id) {
-        def cellSource = CellSource.get(id)
+    def update(Long cellSourceId) {
+        def cellSource = CellSource.get(cellSourceId)
         if (cellSource) {
             cellSource.properties = params
+            def treatments = params.list("treatments")
             try {
-                cellSourceService.save(cellSource)
+                cellSourceService.save(cellSource, treatments)
                 flash.message = "Cell source information updated!"
                 redirect(controller: "item", action:"show", id: cellSource?.item?.id)
             } catch (CellSourceException e) {
@@ -58,13 +31,38 @@ class CellSourceController {
         }
     }
         
-    def strainChangedAjax(Long strainId) {
-        def strain = Strain.get(strainId)
-        def growthMedias = GrowthMedia.where{
-            if(strain?.genotype?.species) {
-                (species == null) || (species == strain?.genotype?.species)
-            }
-        }.list()
+    def fetchStrainsForSpeciesAjax(Long id) {
+        def selectedSpecies = Species.get(id)
+        def strains = Strain.where {species == selectedSpecies}.list()
+        render g.select(id: 'strain', name: 'strain.id', from: strains, optionKey: 'id', noSelection:[null:'Other'], onchange: "strainChanged(this.value);")
+    }
+    
+    def showStrainDetailsAjax(Long id) {
+        if (id) {
+            def strain = Strain.get(id)
+            render(template:"strainDetails", model: ['strain': strain])
+        } else {
+            render(template:"strainForm")
+        }
+    }
+    
+    def fetchGrowthMediasForSpeciesAjax(Long id) {
+        def selectedSpecies = Species.get(id)
+        def growthMedias = GrowthMedia.where{species == null || species == selectedSpecies}.list()
         render g.select(id: 'growthMedia', name:'growthMedia.id', from: growthMedias, optionKey: 'id', noSelection:[null:''])
+    }
+    
+    def addTreatment(Long cellSourceId) {
+        def treatment = new CellSourceTreatment(params)
+        def cellSource = CellSource.get(cellSourceId)
+        if (!cellSource) {
+            render status:404
+        } else {
+            cellSourceService.addTreatment(treatment)
+            def treatments = cellSource.treatments
+            treatments.push(treatment)
+
+            render g.select(multiple:"multiple", name:"treatments", from:CellSourceTreatment.list(), optionKey:"id", value: treatments*.id, class:"tokenize tokenize-sample")
+        }
     }
 }

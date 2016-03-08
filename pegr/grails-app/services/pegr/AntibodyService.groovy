@@ -7,6 +7,8 @@ class AntibodyException extends RuntimeException {
 }
 
 class AntibodyService {
+    def itemService
+    
     @Transactional
     def delete(Long id) {
         def antibody = Antibody.get(id)
@@ -34,5 +36,16 @@ class AntibodyService {
         if (!antibody.save(flush: true)) {
             throw new AntibodyException(message: "Invalid inputs!")
         } 
+    }
+    
+    @Transactional
+    def save(Item item, Antibody antibody){
+        itemService.save(item)            
+        if(antibody){
+            antibody.item = item 
+            if (!antibody.save(flush: true)) {
+                throw new ItemException(message: "Invalid inputs for antibody!")
+            }
+        }
     }
 }

@@ -8,6 +8,7 @@ class ItemController {
     def private final allowedTypes = ['image/png':'png', 'image/jpeg':'jpg', 'image/jpg':'jpg', 'image/gif':'gif']
     
     def itemService
+    def cellSourceService
     
     def index(){
         redirect(action: "list", params: [typeId: 1])
@@ -25,7 +26,7 @@ class ItemController {
                 break
             default:
                 def items = Item.where{ type.id == typeId }
-                [objectList: items.list(params), objectCount: items.count(), currentType: itemType]
+                [itemList: items.list(params), itemCount: items.count(), currentType: itemType]
         }
     }
     
@@ -93,8 +94,8 @@ class ItemController {
         [item: item]
     }
     
-    def createTracedSample(Item item, CellSource object) {
-        [item: item, object: object]
+    def createTracedSample(Item item, CellSource cellSource) {
+        [item: item, cellSource: cellSource]
     }
     
     def save() {
@@ -118,24 +119,40 @@ class ItemController {
     def saveWithCellSource() {
         withForm{        
             def item = new Item(params)
-            def object = new CellSource(params)
+            def cellSource = new CellSource(params)
+            def treatments = params.list("treatments")
+            if (!(cellSource?.strain?.id)) {
+                cellSource.strain = new Strain(params)
+                cellSource.strain.name = params.strainName
+                if (!(cellSource?.strain?.species?.id)) {
+                    cellSource.strain.species = new Species(genusName:params.genusName, 
+                                                            name: params.speciesName)
+                }
+            }
             try {
-                itemService.save(item, object)
+                cellSourceService.save(item, cellSource, treatments)
                 flash.message = "New traced sample added!"
                 redirect(action: "show", id: item.id)
             }catch(ItemException e) {
                 request.message = e.message
-                render(view: "createTracedSample", model: [item:item, object: object])
+                render(view: "createTracedSample", model: [item:item, cellSource: cellSource])
             }catch(Exception e) {
                 log.error "Error: ${e.message}", e
                 request.message = "Error saving this item!"
-                render(view: "createTracedSample", model: [item:item, object: object])
+                render(view: "createTracedSample", model: [item:item, cellSource: cellSource])
             }
         }
     }
 
-    def edit(Item item) {
-        [item: item]
+    def edit(Long itemId) {
+        def item = Item.get(itemId)
+        if (item) {
+            item.properties = params
+            [item: item]
+        } else {
+            flash.message = "Item not found!"
+            redirect(controller: "item", action: "list")
+        }        
     }
     
     def update(Long itemId) {
@@ -219,21 +236,19 @@ class ItemController {
         redirect(action: "show", id: params.itemId)
     }
     
-
-    
     def getFileExtension(String s) {
         return s.substring(s.lastIndexOf('.') + 1)
     }
     
-    def delete(Long id) {
-        def typeId = Item.get(id)?.type?.id
+    def delete(Long itemId) {
+        def typeId = Item.get(itemId)?.type?.id
         try {
-            itemService.delete(id)
+            itemService.delete(itemId)
             flash.message = "Item deleted!"
     		redirect(action: 'list', params: [typeId: typeId])
         } catch(ItemException e) {
             flash.message = e.message
-            redirect(action: 'show', id: id)
+            redirect(action: 'show', id: itemId)
         }
     }
 }

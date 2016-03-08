@@ -20,11 +20,12 @@
     <g:form action="saveWithCellSource" class="fields" role="form" method="post" useToken="true">
         <g:submitButton class="btn btn-primary" name="save" value="Save"/>
         <g:link class="btn btn-default" action="index">Cancel</g:link>
+        <h4>Item Information</h4>
         <g:render template="form" model="['item':item]"/>
         <h4>Cell Source Information</h4>
-        <g:render template="/cellSource/form" model="['object':object]"></g:render>
+        <g:render template="/cellSource/form" model="['cellSource':cellSource]"></g:render>
     </g:form>
-
+    <g:render template="/cellSource/treatmentModal"></g:render>
     <script>
         $("#nav-bench").addClass("active");
      </script>

@@ -26,12 +26,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <g:each in="${objectList}" var="object">
+                    <g:each in="${itemList}" var="item">
                         <tr>
-                        <td><g:link action="show" params="[type:'Item', id:object.id]">${object.name}</g:link></td>
-                            <td>${object.barcode}</td>
-                            <td >${object.location}</td>
-                            <td>${object.notes}</td>
+                        <td><g:link action="show" params="[type:'Item', id:item.id]">${item.name}</g:link></td>
+                            <td>${item.barcode}</td>
+                            <td >${item.location}</td>
+                            <td>${item.notes}</td>
                         </tr>
                     </g:each>              
                     <tr>
@@ -41,7 +41,7 @@
               </table>
         </div>
         <div class="pagination">
-            <g:paginate next="Next" prev="Prev" action="list" total="${objectCount ?: 0}" />
+            <g:paginate next="Next" prev="Prev" action="list" total="${itemCount ?: 0}" />
         </div>
     </div>
     <g:render template="filter"></g:render>

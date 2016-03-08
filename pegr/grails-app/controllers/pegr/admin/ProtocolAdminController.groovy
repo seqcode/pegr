@@ -1,6 +1,7 @@
 package pegr.admin
-import pegr.AdminCategory;
+import pegr.AdminCategory
 import pegr.Protocol
+import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 class ProtocolAdminController {
 
@@ -15,8 +16,8 @@ class ProtocolAdminController {
     
     def show(Long id) {
         def protocol = Protocol.get(id)
-        
-        [protocol: protocol]
+        def file = protocolService.getProtocolFile(id)
+        [protocol: protocol, file: file.exists() ? file : null]
     }
     
     def create() {
@@ -84,5 +85,50 @@ class ProtocolAdminController {
             request.message = e.message
             redirect(action: "show", id: id)
         }
+    }
+    
+    def upload(Long protocolId) {
+        try {
+            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  
+            def mpf = mpr.getFile("file");
+            String fileName = mpf.getOriginalFilename();
+            String fileType = mpf.getContentType();
+
+            if(!mpf?.empty && mpf.size < 100 * 1024 * 1024 && fileType == "application/pdf") {                
+                File folder = protocolService.getProtocolFolder(); 
+                if (!folder.exists()) { 
+                    folder.mkdirs(); 
+                } 
+                File fileDest = protocolService.getProtocolFile(protocolId) 
+                mpf.transferTo(fileDest)
+                flash.message = "Protocol uploaded!"
+            }
+        } catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            flash.message = "Error uploading the file!"
+        }
+
+        redirect(action: "show", id: protocolId)
+    }
+
+    def deleteFile(Long protocolId) {
+        try {
+            def file = protocolService.getProtocolFile(protocolId)
+            file.delete()
+            flash.message = "File deleted!"
+        }catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            flash.message = "Error deleting the file!"
+        }
+        redirect(action: "show", id: protocolId)
+    }
+    
+    def renderFile(Long protocolId) {
+        def file = protocolService.getProtocolFile(protocolId)
+        response.setHeader "Content-disposition", "inline; filename=${file.getName()}"
+        response.contentType = 'application/pdf'
+        response.outputStream << file
+        response.outputStream.flush()
+        render(contentType: "application/pdf", contentDisposition: "inline", file: file, fileName: file.getName())
     }
 }

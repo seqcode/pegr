@@ -34,33 +34,35 @@ class AntibodyController {
     def save() {
         withForm{        
             def item = new Item(params)
-            def object = new Antibody(params)
+            def antibody = new Antibody(params)
             try {
-                itemService.save(item, object)
+                antibodyService.save(item, antibody)
                 flash.message = "New traced sample added!"
-                redirect(action: "show", id: object.id)
+                redirect(action: "show", id: antibody.id)
             }catch(ItemException e) {
                 request.message = e.message
-                render(view: "create", model: [item:item, object: object])
+                render(view: "create", model: [item:item, antibody: antibody])
             }catch(Exception e) {
                 log.error "Error: ${e.message}", e
                 request.message = "Error saving this item!"
-                render(view: "create", model: [item:item, object: object])
+                render(view: "create", model: [item:item, antibody: antibody])
             }
         }
     }
     
-    def edit(Antibody antibody){
+    def edit(Long antibodyId){
+        def antibody = Antibody.get(antibodyId)
+        antibody.properties = params
         [antibody: antibody]
     }
     
-    def update() {
-        def antibody = Antibody.get(params.long('id'))
+    def update(Long antibodyId) {
+        def antibody = Antibody.get(antibodyId)
         antibody.properties = params
         try {
             antibodyService.save(antibody)
             flash.message = "Antibody update!"
-            redirect(action: "show", id: params.id)
+            redirect(action: "show", id: antibodyId)
         }catch(ItemException e) {
             request.message = e.message
             render(view:'edit', model:[antibody: antibody])
@@ -95,15 +97,14 @@ class AntibodyController {
         }
     }
     
-    
     def addBarcode(Long antibodyId) {
-        def object = Antibody.get(antibodyId)
-        if (object) {        
+        def antibody = Antibody.get(antibodyId)
+        if (antibody) {        
             if (request.method == "POST") {
                 withForm {
                     def item = new Item(params)
                     try {
-                        itemService.save(item, object)
+                        antibodyService.save(item, antibody)
                         flash.message = "Barcode added!"
                         redirect(action: "show", id: antibodyId)
                     }catch(ItemException e) {
@@ -122,14 +123,14 @@ class AntibodyController {
         }
     }
     
-    def delete(Long id) {
+    def delete(Long antibodyId) {
         try {   
-            antibodyService.delete(id)
+            antibodyService.delete(antibodyId)
             flash.message = "Antibody deleted!"
             redirect(action: 'list')
         }catch(AntibodyException e) {
             flash.message = e.message
-            redirect(action: 'show', id: id)
+            redirect(action: 'show', id: antibodyId)
         }        
     }
     

@@ -8,7 +8,9 @@ class CellSourceController {
 	
     def edit(Long cellSourceId) {
         def cellSource = CellSource.get(cellSourceId)
-        cellSource.properties = params
+        if (cellSource) {
+            cellSource.properties = params
+        }
         [cellSource: cellSource, itemId: cellSource?.item?.id]
     }
     
@@ -21,9 +23,9 @@ class CellSourceController {
                 cellSourceService.save(cellSource, treatments)
                 flash.message = "Cell source information updated!"
                 redirect(controller: "item", action:"show", id: cellSource?.item?.id)
-            } catch (CellSourceException e) {
+            } catch (ItemException e) {
                 flash.message = e.message
-                redirect(action: "edit", id: id)
+                redirect(action: "edit", cellSourceId: cellSourceId)
             }
         } else {
             flash.message = "Cell source not found!"
@@ -53,16 +55,13 @@ class CellSourceController {
     }
     
     def addTreatment(Long cellSourceId) {
+        // save the new treatment
         def treatment = new CellSourceTreatment(params)
+        cellSourceService.addTreatment(treatment)
         def cellSource = CellSource.get(cellSourceId)
-        if (!cellSource) {
-            render status:404
-        } else {
-            cellSourceService.addTreatment(treatment)
-            def treatments = cellSource.treatments
-            treatments.push(treatment)
-
-            render g.select(multiple:"multiple", name:"treatments", from:CellSourceTreatment.list(), optionKey:"id", value: treatments*.id, class:"tokenize tokenize-sample")
-        }
+        def treatments = cellSource ? cellSource.treatments : []
+        // add the new treatment to the cellSource for preview (not saved yet)
+        treatments.push(treatment)
+        render g.select(multiple:"multiple", name:"treatments", from:CellSourceTreatment.list(), optionKey:"id", value: treatments*.id, class:"tokenize tokenize-sample")
     }
 }

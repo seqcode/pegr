@@ -2,7 +2,7 @@
 	<label for="species">Species</label>
 	<g:select id="species" name="species.id" from="${pegr.Species.list()}" optionKey="id" value="${cellSource?.strain?.species?.id}" noSelection="['null': 'Other']" onchange="speciesChanged(this.value);"/>
 </div>
-<ul id="speciesForm" <g:if test="${cellSource?.strain?.species?.id}">class="hide"</g:if> >
+<ul id="speciesForm">
     <li>
         <label>Genus Name</label>
         <g:textField name="genusName"></g:textField>
@@ -76,7 +76,12 @@
 </div>
 
 <script>
-    $(".tokenize").tokenize({newElements: false});
+    $(document).ready(function(){
+        $(".tokenize").tokenize({newElements: false});
+        if($( "#species option:selected" ).text() != "Other") {
+            $("#speciesForm").hide();
+        }
+    });
     
     function speciesChanged(speciesId) {
         if(speciesId == "null") {
@@ -87,7 +92,8 @@
         $.ajax({url: "/pegr/cellSource/fetchStrainsForSpeciesAjax/"+speciesId, success: function(result){
             $("#strain").html(result)
         }});
-
+        strainChanged();
+        
         $.ajax({url: "/pegr/cellSource/fetchGrowthMediasForSpeciesAjax/"+speciesId, success: function(result){
             $("#growthmedia").html(result)
         }});     

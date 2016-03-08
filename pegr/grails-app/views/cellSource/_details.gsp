@@ -45,9 +45,7 @@
 	</g:if>
     
     <li>Cell Source Treatments:
-        <g:each in="${cellSource.treatments}" var="c">
-            ${c}
-        </g:each>	
+        ${cellSource.treatments.join("; ")}
     </li>
 </ul>
 

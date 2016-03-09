@@ -17,7 +17,7 @@
     </g:hasErrors>
     <g:form action="save" class="fields" role="form" method="post" useToken="true">
         <g:submitButton class="btn btn-primary" name="save" value="Save"/>
-        <g:link class="btn btn-default" action="index">Cancel</g:link>
+        <g:link class="btn btn-default" action="list" params="[typeId:item.type.id]">Cancel</g:link>
         <g:render template="form" model="['item':item]"/>
     </g:form>
 

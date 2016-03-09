@@ -35,7 +35,7 @@ class CellSourceController {
         
     def fetchStrainsForSpeciesAjax(Long id) {
         def selectedSpecies = Species.get(id)
-        def strains = Strain.where {species == selectedSpecies}.list()
+        def strains = Strain.where {species == selectedSpecies}.list(sort:'name')
         render g.select(id: 'strain', name: 'strain.id', from: strains, optionKey: 'id', noSelection:[null:'Other'], onchange: "strainChanged(this.value);")
     }
     
@@ -50,7 +50,7 @@ class CellSourceController {
     
     def fetchGrowthMediasForSpeciesAjax(Long id) {
         def selectedSpecies = Species.get(id)
-        def growthMedias = GrowthMedia.where{species == null || species == selectedSpecies}.list()
+        def growthMedias = GrowthMedia.where{species == null || species == selectedSpecies}.list(sort:'name')
         render g.select(id: 'growthMedia', name:'growthMedia.id', from: growthMedias, optionKey: 'id', noSelection:[null:''])
     }
     
@@ -62,6 +62,6 @@ class CellSourceController {
         def treatments = cellSource ? cellSource.treatments : []
         // add the new treatment to the cellSource for preview (not saved yet)
         treatments.push(treatment)
-        render g.select(multiple:"multiple", name:"treatments", from:CellSourceTreatment.list(), optionKey:"id", value: treatments*.id, class:"tokenize tokenize-sample")
+        render g.select(multiple:"multiple", name:"treatments", from:CellSourceTreatment.list(sort:'name'), optionKey:"id", value: treatments*.id, class:"tokenize tokenize-sample")
     }
 }

@@ -3,6 +3,7 @@ package pegr;
 public enum ItemTypeCategory {
     ANTIBODY("Antibody"), 
     TRACED_SAMPLE("Traced Sample"),
+    SAMPLE_POOL("Sample Pool"),
     OTHER("Other")
 	;
     

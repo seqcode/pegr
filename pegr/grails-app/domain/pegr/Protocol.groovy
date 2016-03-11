@@ -6,6 +6,7 @@ class Protocol {
 	String description
     User user
 	Assay assay
+    String templateElements
     
 	String toString() {
         String s = name
@@ -40,6 +41,7 @@ class Protocol {
 		description nullable: true, blank: true
         user nullable: true
         assay nullable: true
+        templateElements nullable: true, blank: true
 	}
 
 }

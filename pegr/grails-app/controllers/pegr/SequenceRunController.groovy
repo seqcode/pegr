@@ -94,7 +94,12 @@ class SequenceRunController {
         if (run) {
             try {
                 run.properties = params 
-                sequenceRunService.save(run)
+                if (run.runStats) {
+                    run.runStats.properties = params
+                } else {
+                    run.runStats = new RunStats(params)
+                }
+                sequenceRunService.save(run)                   
                 redirect(action: "edit", id: run.id)
             } catch(SequenceRunException e) {
                 flash.message = e.message

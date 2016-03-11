@@ -13,16 +13,12 @@
             </div>
         </g:if>
     </div>
-    <h3>Sequence Run #${run.runNum}  <small><span class="label label-default">${run.status}</span></small></h3>
-    <h4>Run Information <g:link action="editInfo" id="${run.id}"><span class="edit">Edit</span></g:link></h4>
-    <ul>
-        <li>Platform: ${run.platform}</li>
-        <li>User: ${run.user}</li>
-        <li>Date: <g:formatDate format="yyyy-MM-dd" date="${run.date}"/></li>
-        <g:if test="${run.note}"><li>Note: ${run.note}</li></g:if>        
-    </ul>
-    
-    <h4>Samples <g:link action="searchSample" params="['runId':run.id]" class="edit">Add</g:link></h4>
+    <h2>Sequence Run #${run.runNum}  <small><span class="label label-default">${run.status}</span></small></h2>
+    <div>
+        <h3>Summary <g:link action="editInfo" id="${run.id}"><span class="edit">Edit</span></g:link></h3>
+        <g:render template="summaryDetails"></g:render>
+    </div>
+    <h3>Samples <g:link action="searchSample" params="['runId':run.id]" class="edit">Add</g:link></h3>
     <g:form action="updateGenomes" role="form" method="post">
         <g:hiddenField name="runId" value="${run.id}"></g:hiddenField>
         <table class="table table-striped">

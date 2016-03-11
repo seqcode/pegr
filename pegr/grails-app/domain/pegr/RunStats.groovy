@@ -1,48 +1,45 @@
 package pegr;
 
-class MasterPool {
+class RunStats {
     Float libraryVolume
     Float libraryStock
-    Float stdDev
-    Float pctStdDev
-    Date qPCRDate
-    User technician
-    String instrument
+    Float libraryStdDev
+    Float pctLibraryStdDev
+    Date qPcrDate
+    User qPcrTechnician
     Integer cycles
     String srOrPe
     String seqCtrl
-    Integer PcrCycles
-    Float quibitConc
+    Integer pcrCycles
+    Float qubitConc
     Float qPcrConc
-    Float libraryLoaded
+    Float libraryLoadedPm
     Float phiXLoaded
     Float libraryLoadedFmol
     Float clusterNum
     Float readPf
     Float pctPf
     Float pctQ30
-    Float Qidx
+    Float qidx
     Float totalReads
     Float unmatchedIndices
-    Float pctUnmatched
+    Float pctUnmatchedIndices
     Float pctAlignedToPhiX    
-    String Notes
     
     static constraints = {
         libraryVolume nullable: true
         libraryStock nullable: true
-        stdDev nullable: true
-        pctStdDev nullable: true
-        qPCRDate nullable: true
-        technician nullable: true
-        instrument nullable: true
+        libraryStdDev nullable: true
+        pctLibraryStdDev nullable: true
+        qPcrDate nullable: true
+        qPcrTechnician nullable: true
         cycles nullable: true
         srOrPe nullable: true
-        seqCtrl nullable: true
+        seqCtrl nullable: true, blank: true
         pcrCycles nullable: true
-        quibitConc nullable: true
+        qubitConc nullable: true
         qPcrConc nullable: true
-        libraryLoaded nullable: true
+        libraryLoadedPm nullable: true
         phiXLoaded nullable: true
         libraryLoadedFmol nullable: true
         clusterNum nullable: true
@@ -52,8 +49,7 @@ class MasterPool {
         qidx nullable: true
         totalReads nullable: true
         unmatchedIndices nullable: true
-        pctUnmatched nullable: true
+        pctUnmatchedIndices nullable: true
         pctAlignedToPhiX nullable: true
-        Notes nullable: true
     }
 }

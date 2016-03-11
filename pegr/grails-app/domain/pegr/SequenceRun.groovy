@@ -11,6 +11,8 @@ class SequenceRun {
 	String directoryName
 	String note
     RunStatus status
+    RunStats runStats
+    Item poolItem
 	
     List getExperiments() {
         return SequencingExperiment.where{sequenceRun == this}.list()
@@ -23,6 +25,8 @@ class SequenceRun {
         user nullable: true
         lane nullable: true, blank: true
         date nullable: true
+        runStats nullable: true
+        poolItem nullable: true
     }
 
 }

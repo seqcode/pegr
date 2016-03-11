@@ -13,8 +13,13 @@ class SequenceRunService {
         run.lane = 0
         run.user = springSecurityService.currentUser
         run.status = RunStatus.PREP
+        if (run.runStats) {
+            if (!run.runStats.save(flush: true)) {
+                throw new SequenceRunException(message: "Invalid inputs for stats!")
+            }
+        }
         if(!run.save(flush: true)) {
-            throw new SequenceRunException(message: "Invalid input!")
+            throw new SequenceRunException(message: "Invalid inputs for basic information!")
         }
     }
     

@@ -24,12 +24,16 @@ class ProtocolAdminController {
         if(request.method == "POST") {
             withForm{
                 def protocol = new Protocol(params)
-                def startItemTypeId = params.long('startItemTypeId')
-                def endItemTypeId = params.long('endItemTypeId')
-                def sharedItemTypeIds = params.list('sharedItemTypeIds')
-                def individualItemTypeIds = params.list('individualItemTypeIds')
+                def protocolItemTypeIds = [ 
+                        (ProtocolItemFunction.PARENT) : [params.long('startItemTypeId')],
+                        (ProtocolItemFunction.CHILD) : [params.long('endItemTypeId')],
+                        (ProtocolItemFunction.SHARED) : params.list('sharedItemTypeIds'),
+                        (ProtocolItemFunction.INDIVIDUAL) : params.list('individualItemTypeIds'),
+                        (ProtocolItemFunction.START_POOL) : [params.long('startPoolTypeId')],
+                        (ProtocolItemFunction.END_POOL) : [params.long('endPoolTypeId')]
+                ]
                 try {
-                    protocolService.save(protocol, startItemTypeId, endItemTypeId, sharedItemTypeIds, individualItemTypeIds)
+                    protocolService.save(protocol, protocolItemTypeIds)
                     flash.message = "New protocol saved!"
                     redirect(action: "show", id: protocol.id)
                 }catch(ProtocolException e) {

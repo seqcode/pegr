@@ -4,6 +4,8 @@ public enum ProtocolItemFunction {
     SHARED,
     INDIVIDUAL,
     PARENT,
-    CHILD
+    CHILD,
+    START_POOL,
+    END_POOL
 	;
 }

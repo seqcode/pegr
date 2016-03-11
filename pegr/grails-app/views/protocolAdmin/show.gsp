@@ -36,10 +36,14 @@
             </ul>
             <h4>Required Item Types</h4>            
             <ul>
-                <li>Shared: <g:each in="${protocol?.sharedItemTypes}">${it}</g:each></li>
-                <li>Individual: <g:each in="${protocol?.individualItemTypes}">${it}</g:each></li>
+                <li><strong>Shared:</strong> ${protocol?.sharedItemTypes.join(", ")}</li>
+                <li><strong>Individual:</strong> ${protocol?.individualItemTypes.join(", ")}</li>
             </ul>
-			
+			<h4>Sample Pool</h4>
+            <ul>
+                <li>Start Pool: ${protocol?.startPoolType}</li>
+                <li>End Pool: ${protocol?.endPoolType}</li>
+            </ul>
             <h4>Protocol File</h4>
             <g:if test="${file}">
                 <g:link action="renderFile" params="[protocolId: protocol?.id]" target="_blank">${file.getName()}</g:link>

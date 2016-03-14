@@ -227,7 +227,31 @@ class ProtocolInstanceBagService {
         }
     }
     
-    List getSharedItemList(Long protocolInstanceId, Protocol protocol) {
+    Boolean readyToBeCompleted(Map sharedItemAndPoolList, Map parentsAndChildren, List samples, Protocol protocol) {
+        sharedItemAndPoolList.each {k, v ->
+            if (v.any { it.items.empty }) {
+                return false
+            }
+        } 
+        if (parentsAndChildren.children) {
+            if (results.children.any { it == null } ) {
+                return false
+            }
+        }
+        if (protocol.addIndex) {
+            if (samples.any {it.SequenceIndices.empty}) {
+                return false
+            }
+        }
+        if (protocol.addAntibody) {
+            if (samples.any {it.antibody == null}) {
+                return false
+            }
+        }
+        return true
+    }
+    
+    Map getSharedItemAndPoolList(Long protocolInstanceId, Protocol protocol) {
         // get the existing items
         def protocolItems = ProtocolInstanceItems.where {protocolInstance.id == protocolInstanceId}.collect {it.item}
         // shared item list
@@ -235,34 +259,34 @@ class ProtocolInstanceBagService {
         protocol.sharedItemTypes.each{ t ->
             sharedItemList.add([type: t, items: []])
         }
+        def result = [sharedItemList: sharedItemList]
+        if (protocol.startPoolType) {
+            result.startPool = [[type: protocol.startPoolType, items:[]]]
+        }
+        if (protocol.endPoolType) {
+            result.endPool = [[type: protocol.endPoolType, items:[]]]
+        }
         // insert items to the shared item list
         protocolItems.each{ item ->
-            def itemsInType = sharedItemList.find{it.type == item.type}
+            def itemsInType = result.sharedItemList.find{it.type == item.type}
             if (itemsInType) {
                 itemsInType.items.add(item)
+            }else if (item.type == protocol.startPoolType) {
+                result.startPool.items.add(item)
+            } else if (item.type == protocol.endPoolType) {
+                result.endPool.items.add(item)
             }else {
-                sharedItemList.add([type: item.type, items: [item]])
+                result.sharedItemList.add([type: item.type, items: [item]])
             }
         }  
-        return sharedItemList
-    }
-    
-    String getTemplate(Protocol protocol) {    
-        def template = null
-        if (protocol.assay) {
-            template = "AssayInstance"
-        } else if (protocol.startItemType 
-            && protocol.endItemType 
-            && protocol.startItemType != protocol.endItemType) {
-            template = "Children"
-        }
-        return template
+        return result
     }
     
     Map getParentsAndChildrenForCompletedInstance(List samples, ItemType startState, ItemType endState) {
         def parents = []
-        def children = []
-        if (startState && endState) {
+        def children = null
+        if (startState && endState && startState != endState) {
+            children = []
             samples.eachWithIndex { sample, idx ->
                 def item = sample.item
                 while(item && item.type != endState) {
@@ -275,14 +299,26 @@ class ProtocolInstanceBagService {
                     throw new ProtocolInstanceBagException(message: "Status of the parent does not match the protocol!")
                 }
             }
-        }
+        } else if (startState || endState) {
+            def currentType = startState?: endState
+            samples.eachWithIndex { sample, idx ->
+                def item = sample.item
+                while(item && item.type != currentType) {
+                    item = item.parent
+                }
+                if (item) {
+                    parents[idx] = item
+                } 
+            }
+        } 
         return [parents: parents, children: children]
     }
     
     Map getParentsAndChildrenForProcessingInstance(List samples, ItemType startState, ItemType endState) {
         def parents = []
-        def children = []
-        if (startState && endState) {
+        def children = null
+        if (startState && endState && startState != endState) {
+            children = []
             samples.eachWithIndex { sample, idx ->
                 def currentType = sample.item?.type
                 if( currentType == startState) {
@@ -295,6 +331,15 @@ class ProtocolInstanceBagService {
                     } else {
                         throw new ProtocolInstanceBagException(message: "Status of the parent does not match the protocol!")
                     }
+                } else {
+                    throw new ProtocolInstanceBagException(message: "Status of the traced sample does not match the protocol!")
+                }
+            }
+        } else if (startState || endState) {
+            def requiredType = startState?: endState
+            samples.eachWithIndex { sample, idx ->
+                if(sample.item?.type == requiredType) {
+                    parents[idx] = sample.item
                 } else {
                     throw new ProtocolInstanceBagException(message: "Status of the traced sample does not match the protocol!")
                 }

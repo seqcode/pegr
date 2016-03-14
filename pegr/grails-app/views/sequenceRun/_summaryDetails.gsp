@@ -9,14 +9,19 @@
         </ul>
     </div>
     <div class="col-md-3">
-        <h4>Master Pool</h4>
+        <h4>Master Pool
+            <g:if test="${run?.poolItem}">
+                <g:link controller="item" action="show" params="['id':run.poolItem.id]" class="edit">Link</g:link>
+            </g:if>
+            <g:else>
+                <g:link action="searchPool" params="['runId':run.id]" class="edit">Add</g:link>
+            </g:else>
+        </h4>
         <ul>
             <g:if test="${run.runStats?.libraryVolume}"><li>Library Volume (ul): ${run.runStats?.libraryVolume}</li></g:if>
             <g:if test="${run.runStats?.libraryStock}"><li>Library Stock (fmol): ${run.runStats?.libraryStock}</li></g:if>
             <g:if test="${run.runStats?.libraryStdDev}"><li>Std Dev: ${run.runStats?.libraryStdDev}</li></g:if>
             <g:if test="${run.runStats?.pctLibraryStdDev}"><li>% Std Dev: ${run.runStats?.pctLibraryStdDev}%</li></g:if>
-            <g:if test="${run.runStats?.qPcrDate}"><li>qPCR Date: <g:formatDate format="yyyy-MM-dd" date="${run.runStats?.qPcrDate}"/></li></g:if>
-            <g:if test="${run.runStats?.qPcrTechnician}"><li>qPCR Technician: ${run.runStats?.qPcrTechnician}</li></g:if>
             <g:if test="${run.runStats?.cycles}"><li>Cycles: ${run.runStats?.cycles}</li></g:if>
             <g:if test="${run.runStats?.srOrPe}"><li>SR or PE: ${run.runStats?.srOrPe}</li></g:if>
             <g:if test="${run.runStats?.seqCtrl}"><li>Seq Ctrl: ${run.runStats?.seqCtrl}</li></g:if>

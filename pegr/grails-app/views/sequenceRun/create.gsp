@@ -9,6 +9,11 @@
     <g:if test="${flash.message}">
     <div class="message" role="status">${flash.message}</div>
     </g:if>
+    <g:hasErrors>
+        <div class="errors">
+            <g:renderErrors bean="${run}" as="list"/>
+        </div>
+    </g:hasErrors>
     <g:form role="form" method="post" action="save" class="fields">
         <g:render template="basicForm" model="['run':run]"></g:render>
         <div class="row well text-center">

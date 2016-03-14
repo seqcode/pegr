@@ -22,14 +22,6 @@
             <g:textField name="pctLibraryStdDev" value="${run?.runStats?.pctLibraryStdDev}"></g:textField>%
         </div>
         <div>
-            <label>qPCR Date</label>
-            <g:datePicker precision="day" name="qPcrDate" default="${run?.runStats?.qPcrDate}"/>
-        </div>
-        <div>
-            <label>qPCR Technician</label>
-            <g:select name="qPcrTechnician.id" from="${pegr.User.list(sort:'username')}" optionKey="id" value="${run?.runStats?.qPcrTechnician?.id}" noSelection="['null': '']"/>
-        </div>
-        <div>
             <label>Cycles</label>
             <g:textField name="cycles" value="${run?.runStats?.cycles}"></g:textField>
         </div>

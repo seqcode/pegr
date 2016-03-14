@@ -142,30 +142,24 @@ class ProtocolInstanceBagController {
                 file = null
             }
             // get shared item list
-            def sharedItemList = protocolInstanceBagService.getSharedItemList(id, protocol)
-            // prepare the individual item table template
-            def template = protocolInstanceBagService.getTemplate(protocol)
+            def sharedItemAndPoolList = protocolInstanceBagService.getSharedItemAndPoolList(id, protocol)
+            // prepare the individual sample table template
+            def addChild = (protocol.startItemType 
+                        && protocol.endItemType 
+                        && protocol.startItemType != protocol.endItemType)
             def samples = null
-            if (template) {
+            if (addChild || protocol.addAntibody || protocol.addIndex) {
                 // get samples in the bag
                 samples = protocolInstance.bag.tracedSamples.toList().sort {it.id}
             }
             def completed = (protocolInstance.bag.status == ProtocolStatus.COMPLETED)
-            if (template) {
-                if (completed) {
-                    template = "show" + template
-                }else {
-                    template = "edit" + template
-                }
-            }
             try{
                 def toBeCompleted = false
                 def results
                 if (completed) {
                     results = protocolInstanceBagService.getParentsAndChildrenForCompletedInstance(samples, protocol.startItemType, protocol.endItemType)
                     render(view: "showInstance", model: [protocolInstance: protocolInstance, 
-                                                 sharedItemList: sharedItemList,
-                                                 template: template,
+                                                 sharedItemAndPoolList: sharedItemAndPoolList,
                                                  samples: samples,
                                                  parents: results.parents,
                                                  children: results.children,
@@ -173,10 +167,9 @@ class ProtocolInstanceBagController {
                                                  file: file])
                 } else {
                     results = protocolInstanceBagService.getParentsAndChildrenForProcessingInstance(samples, protocol.startItemType, protocol.endItemType)                
-                    toBeCompleted = sharedItemList.every{ !it.items.empty } && results.children.every{ it != null }
+                    toBeCompleted = protocolInstanceBagService.readyToBeCompleted(sharedItemAndPoolList, results, samples, protocol)
                     render(view: "editInstance", model: [protocolInstance: protocolInstance, 
-                                                 sharedItemList: sharedItemList,
-                                                 template: template,
+                                                 sharedItemAndPoolList: sharedItemAndPoolList,
                                                  samples: samples,
                                                  parents: results.parents,
                                                  children: results.children,

@@ -28,17 +28,25 @@
                 <h4>Description</h4>
                 ${protocol?.description}
             </g:if>
+
+            <h4>Shared Item Types</h4>           
+            <ul>
+            <g:each in="${protocol?.sharedItemTypes}">
+                <li>${it}</li>
+            </g:each>
+            </ul>
+            
             
             <h4>Traced Sample</h4>
             <ul>
                 <li>Start State: ${protocol?.startItemType}</li>
                 <li>End State: ${protocol?.endItemType}</li>
+                <li>Add-on: 
+                    <g:checkBox name="addAntibody" value="${protocol?.addAntibody}" disabled="true"/> Antibody 
+                    <g:checkBox name="addIndex" value="${protocol?.addIndex}" disabled="true"/> Index
+                </li>
             </ul>
-            <h4>Required Item Types</h4>            
-            <ul>
-                <li><strong>Shared:</strong> ${protocol?.sharedItemTypes.join(", ")}</li>
-                <li><strong>Individual:</strong> ${protocol?.individualItemTypes.join(", ")}</li>
-            </ul>
+
 			<h4>Sample Pool</h4>
             <ul>
                 <li>Start Pool: ${protocol?.startPoolType}</li>
@@ -58,6 +66,8 @@
                     </div>
                 </g:uploadForm>
             </g:else>
+            
+            <h4>Protocol approved? ${protocol?.status}</h4>
             
 			<g:form  action='delete' method="DELETE" useToken="true">
 				<g:hiddenField name="id" value="${protocol?.id}" />

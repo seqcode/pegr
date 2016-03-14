@@ -18,7 +18,7 @@
         <h3>Summary <g:link action="editInfo" id="${run.id}"><span class="edit">Edit</span></g:link></h3>
         <g:render template="summaryDetails"></g:render>
     </div>
-    <h3>Samples <g:link action="searchSample" params="['runId':run.id]" class="edit">Add</g:link></h3>
+    <h3>Samples</h3>
     <g:form action="updateGenomes" role="form" method="post">
         <g:hiddenField name="runId" value="${run.id}"></g:hiddenField>
         <table class="table table-striped">

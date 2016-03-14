@@ -8,6 +8,7 @@ class ProtocolAdminController {
 	public static AdminCategory category = AdminCategory.PROTOCOLS
     
     def protocolService
+    def springSecurityService
     
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -24,13 +25,13 @@ class ProtocolAdminController {
         if(request.method == "POST") {
             withForm{
                 def protocol = new Protocol(params)
+                protocol.user = springSecurityService.currentUser
                 def protocolItemTypeIds = [ 
-                        (ProtocolItemFunction.PARENT) : [params.long('startItemTypeId')],
-                        (ProtocolItemFunction.CHILD) : [params.long('endItemTypeId')],
-                        (ProtocolItemFunction.SHARED) : params.list('sharedItemTypeIds'),
-                        (ProtocolItemFunction.INDIVIDUAL) : params.list('individualItemTypeIds'),
-                        (ProtocolItemFunction.START_POOL) : [params.long('startPoolTypeId')],
-                        (ProtocolItemFunction.END_POOL) : [params.long('endPoolTypeId')]
+                        (pegr.ProtocolItemFunction.PARENT) : [params.long('startItemTypeId')],
+                        (pegr.ProtocolItemFunction.CHILD) : [params.long('endItemTypeId')],
+                        (pegr.ProtocolItemFunction.SHARED) : params.list('sharedItemTypeIds'),
+                        (pegr.ProtocolItemFunction.START_POOL) : [params.long('startPoolTypeId')],
+                        (pegr.ProtocolItemFunction.END_POOL) : [params.long('endPoolTypeId')]
                 ]
                 try {
                     protocolService.save(protocol, protocolItemTypeIds)
@@ -57,12 +58,15 @@ class ProtocolAdminController {
         if(request.method == "POST") {
             withForm{
                 protocol.properties = params
-                def startItemTypeId = params.long('startItemTypeId', null)
-                def endItemTypeId = params.long('endItemTypeId', null)
-                def sharedItemTypeIds = params.list('sharedItemTypeIds')
-                def individualItemTypeIds = params.list('individualItemTypeIds')
+                def protocolItemTypeIds = [ 
+                        (pegr.ProtocolItemFunction.PARENT) : [params.long('startItemTypeId')],
+                        (pegr.ProtocolItemFunction.CHILD) : [params.long('endItemTypeId')],
+                        (pegr.ProtocolItemFunction.SHARED) : params.list('sharedItemTypeIds'),
+                        (pegr.ProtocolItemFunction.START_POOL) : [params.long('startPoolTypeId')],
+                        (pegr.ProtocolItemFunction.END_POOL) : [params.long('endPoolTypeId')]
+                ]
                 try {
-                    protocolService.save(protocol, startItemTypeId, endItemTypeId, sharedItemTypeIds, individualItemTypeIds)
+                    protocolService.save(protocol, protocolItemTypeIds)
                     flash.message = "Protocol update!"
                     redirect(action: "show", id: protocol.id)
                 }catch(ProtocolException e) {

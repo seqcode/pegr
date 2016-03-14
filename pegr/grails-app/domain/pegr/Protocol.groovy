@@ -6,6 +6,9 @@ class Protocol {
 	String description
     User user
 	Assay assay
+    Boolean addAntibody
+    Boolean addIndex
+    DictionaryStatus status
     
 	String toString() {
         String s = name
@@ -17,13 +20,9 @@ class Protocol {
     
     static hasMany = [protocolGroups: ProtocolGroup]
     static belongsTo = [ProtocolGroup]
-	
+    
     List getSharedItemTypes(){
         return ProtocolItemTypes.where{protocol == this && function == ProtocolItemFunction.SHARED}.collect{it.itemType}
-    }
-    
-    List getIndividualItemTypes(){
-        return ProtocolItemTypes.where{protocol == this && function == ProtocolItemFunction.INDIVIDUAL}.collect{it.itemType}
     }
     
     ItemType getStartItemType() {
@@ -48,6 +47,9 @@ class Protocol {
 		description nullable: true, blank: true
         user nullable: true
         assay nullable: true
+        addAntibody nullable: true
+        addIndex nullable: true
+        status nullable: true
 	}
 
 }

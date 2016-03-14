@@ -5,8 +5,6 @@ class RunStats {
     Float libraryStock
     Float libraryStdDev
     Float pctLibraryStdDev
-    Date qPcrDate
-    User qPcrTechnician
     Integer cycles
     String srOrPe
     String seqCtrl
@@ -31,8 +29,6 @@ class RunStats {
         libraryStock nullable: true
         libraryStdDev nullable: true
         pctLibraryStdDev nullable: true
-        qPcrDate nullable: true
-        qPcrTechnician nullable: true
         cycles nullable: true
         srOrPe nullable: true
         seqCtrl nullable: true, blank: true

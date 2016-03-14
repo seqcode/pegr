@@ -198,12 +198,42 @@ class ProtocolInstanceBagController {
     def previewItemInInstance(Long typeId, String barcode, Long instanceId) {
         def itemType = ItemType.get(typeId)
         def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
-        if (item) {
-            render(view:"previewItemInInstance", model: [item: item, instanceId: instanceId])
-        }else {
-            item = new Item(type: itemType, barcode: barcode)
-            render(view: "createItemInInstance", model: [instanceId: instanceId, item:item])
+        if (itemType.category == ItemTypeCategory.SAMPLE_POOL) {
+            def instance = ProtocolInstance.get(instanceId)
+            if (instance) {
+                if (instance.protocol.startPoolType == itemType && item) {
+                    // start pool must be pre-existing    
+                    render(view: "previewPoolInInstance", model: [instanceId: instanceId, item:item])
+                } else if (instance.protocol.endPoolType == itemType && !item) {
+                    // end pool must be new
+                    item = new Item(type: itemType, barcode: barcode)
+                    render(view: "createItemInInstance", model: [instanceId: instanceId, item:item])    
+                } else {
+                    flash.message = "Start pool must be pre-existing and end pool must be new!"
+                    redirect(action: "showInstance", id: instanceId)
+                }
+            } else {
+                flash.message = "Protocol instance not found!"
+                redirect(action: "index")
+            }
+        } else {
+            if (item) {
+                render(view:"previewItemInInstance", model: [item: item, instanceId: instanceId])
+            }else {
+                item = new Item(type: itemType, barcode: barcode)
+                render(view: "createItemInInstance", model: [instanceId: instanceId, item:item])
+            }
         }
+    }
+    
+    def addPoolToInstance(Long itemId, Long instanceId) {
+        try {
+            protocolInstanceBagService.addPoolToInstance(itemId, instanceId)
+            flash.message = "Pool is added successfully!"
+        } catch(ProtocolInstanceBagException e) {
+            flash.message = e.message
+        }        
+        redirect(action: "showInstance", id: instanceId)
     }
     
     def addItemToInstance(Long itemId, Long instanceId) {
@@ -259,7 +289,6 @@ class ProtocolInstanceBagController {
             flash.message = e.message
             redirect(action: "showInstance", id: instanceId)
         }
-
     }
     
     def completeBag(Long bagId) {

@@ -62,8 +62,14 @@
             <g:submitButton name="upload" value="Upload"/> (only jpeg, png, gif files)
         </div>
     </g:uploadForm>
-    
-
+    <g:if test="${item?.type?.category == pegr.ItemTypeCategory.OTHER || item?.type?.category == pegr.ItemTypeCategory.SAMPLE_POOL}">
+        <h4>Related Protocol Instances</h4>
+        <ul>
+            <g:each in="${item.relatedInstances}">
+                <li><g:link controller="protocolInstanceBag" action="showInstance" id="${it.id}">${it.protocol}</g:link></li>
+            </g:each>
+        </ul>
+    </g:if>
     <script>
         $("#nav-bench").addClass("active");
         $(".confirm").confirm();

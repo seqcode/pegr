@@ -29,6 +29,8 @@ class SequenceRunService {
         if (!run) {
             throw new SequenceRunException(message: "Sequence run not found!")
         }       
+        run.poolItem = Item.get(poolItemId)
+        run.save()
         def messages = []
         def samples = fetchSamplesInPool(poolItemId)
         samples.each {
@@ -49,8 +51,7 @@ class SequenceRunService {
         if (!pool) {
             throw new SequenceRunException(message: "Pool not found!")
         }
-        def instance = ProtocolInstanceItems.findAllByItem(pool).last()
-        return instance.bag.tracedSamples
+        return pool.samplesInPool
     }
     
     @Transactional

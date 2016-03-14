@@ -33,7 +33,7 @@
             <g:render template="sharedItemsTable" model="['itemList':sharedItemAndPoolList.endPool,'instanceId':protocolInstance.id, 'extra':false,'edit':false]"></g:render>
         </g:if>
         <g:if test="${samples}">            
-            <g:render template="sampleItemsTable" model="['parents':parents,'children':children, 'samples':samples, 'instanceId':protocolInstance.id]"></g:render>         
+            <g:render template="showSampleItemsTable" model="['parents':parents,'children':children, 'samples':samples, 'instanceId':protocolInstance.id, 'edit':false]"></g:render>         
         </g:if> 
     </div>
     <script>

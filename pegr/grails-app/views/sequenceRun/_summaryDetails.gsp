@@ -13,9 +13,9 @@
             <g:if test="${run?.poolItem}">
                 <g:link controller="item" action="show" params="['id':run.poolItem.id]" class="edit">Link</g:link>
             </g:if>
-            <g:else>
+            <g:elseif test="${run?.status!=pegr.RunStatus.COMPLETED}">
                 <g:link action="searchPool" params="['runId':run.id]" class="edit">Add</g:link>
-            </g:else>
+            </g:elseif>
         </h4>
         <ul>
             <g:if test="${run.runStats?.libraryVolume}"><li>Library Volume (ul): ${run.runStats?.libraryVolume}</li></g:if>

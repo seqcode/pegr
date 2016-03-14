@@ -20,12 +20,20 @@
             <tr>
                 <td><g:link controller="item" action="show" id="${parents[n].id}" target="_blank">${parents[n].name}</g:link></td>
                 <g:if test="${children}">
-                    <td><g:link controller="item" action="show" id="${children[n].id}" target="_blank">${children[n].name}</g:link></td> 
+                    <td>
+                        <g:if test="${children[n]}">
+                            <g:link controller="item" action="show" id="${children[n].id}" target="_blank">${children[n].name}</g:link>
+                        </g:if>
+                    </td> 
                 </g:if>
-                <g:if test="${protocolInstance.protocol.addAntibody}">
-                    <td><g:link controller="antibody" action="show" id="${sample.antibody}" target="_blank">${sample.antibody}</g:link></td> 
+                <g:if test="${protocolInstance?.protocol?.addAntibody}">
+                    <td>
+                        <g:if test="${sample.antibody}">
+                            <g:link controller="antibody" action="show" id="${sample.antibody.id}" target="_blank">${sample.antibody}</g:link>
+                        </g:if>
+                    </td> 
                 </g:if>
-                <g:if test="${protocolInstance.protocol.addIndex}">
+                <g:if test="${protocolInstance?.protocol?.addIndex}">
                     <td>${sample.sequenceIndicesString}</td>
                 </g:if>
             </tr>

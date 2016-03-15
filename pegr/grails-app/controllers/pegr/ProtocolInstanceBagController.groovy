@@ -358,16 +358,10 @@ class ProtocolInstanceBagController {
                 def item = new Item(params)
                 try {
                     protocolInstanceBagService.addChild(item, sampleId)
-                    redirect(action: "showInstance", id: instanceId)
                 }catch(ProtocolInstanceBagException e){
-                    flash.message = e.message
-                    def childType = ItemType.get(params.long('childTypeId'))
-                    def sample = Sample.get(sampleId)
-                    if (!sample) {
-                        redirect(action: "showInstance", id: instanceId)
-                    }
-                    [sample: sample, instanceId: instanceId, childType: childType, item:item]
+                    flash.message = e.message 
                 }                
+                redirect(action: "showInstance", id: instanceId)  
             }
         } else{
             def childType = ItemType.get(params.long('childTypeId'))

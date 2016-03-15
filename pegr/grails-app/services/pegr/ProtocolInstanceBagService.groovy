@@ -381,13 +381,12 @@ class ProtocolInstanceBagService {
         if (!sample.item) {
             throw new ProtocolInstanceBagException(message: "Parent not found!")
         }
-        try {
-            item.parent = sample.item
-            item.save(flush: true)
+        item.parent = sample.item
+        if (item.save(flush: true)){
             sample.item = item
             sample.save()
-        }catch(Exception e) {
-            throw new ProtocolInstanceBagException(message: "Invalid inputs!")
+        } else {
+            throw new ProtocolInstanceBagException(message: "Invalid inputs! Barcode might already exist for this type!")
         }
     }
     

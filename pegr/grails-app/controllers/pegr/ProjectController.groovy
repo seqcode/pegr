@@ -48,8 +48,8 @@ class ProjectController {
         }
     }
     
-    def edit() {
-        def project = Project.get(params.id)
+    def edit(Long projectId) {
+        def project = Project.get(projectId)
         if (!project) {
             flash.message = "Project no longer exists!"
             redirect(action:"index")
@@ -61,7 +61,7 @@ class ProjectController {
                 try {
                     projectService.save(project)
                     flash.message = "Successfully  updated information for project ${project.name}"
-                    redirect(action:"show", id:"${project.id}")
+                    redirect(action:"show", id:projectId)
                 } catch(ProjectException e) {
                     reqeust.message = e.message
                     [project: project]
@@ -80,37 +80,55 @@ class ProjectController {
 		def currentProject = Project.get(id)
         if (currentProject) {
             def projectUsers = ProjectUser.where { project==currentProject}.list()
-            [project: currentProject, projectUsers: projectUsers, sampleCount: currentProject.samples.size()]
+            def authorized = false
+            def currUser = springSecurityService.currentUser
+            if (currUser.isAdmin()) {
+                authorized = true
+            } else if (projectUsers.find { it.user == currUser && it.projectRole == ProjectRole.OWNER}) {
+               authorized = true                    
+            }                
+            [project: currentProject, projectUsers: projectUsers, sampleCount: currentProject.samples.size(), authorized: authorized]
         } else {
             flash.message = "Project not found!"
             redirect(action: "index")
         }
 	}
 	
-	def addUserAjax() {
+	def addUserAjax(Long projectId, Long userId, String projectRole) {
+        def message = null
         try {
-            def projectUser = new ProjectUser(params)
-            projectService.addUser(projectUser)			
-			def projectUsers = ProjectUser.where { project.id==params.project.id}.list()
-			render template:"userTable", bean: projectUsers
+            def projectUser = new ProjectUser(project: Project.load(projectId), user: User.load(userId), projectRole: projectRole)
+            projectService.saveUser(projectUser)				
         }catch(Exception e){
-            log.error "Error: ${e.message}", e
-			render status: 500
-            render "<div class='errors'>An error has occurred</div>"
+            message = "Error adding the user!"
         }
+        def projectUsers = ProjectUser.where { project.id==projectId}.list()
+        render template:"userTable", model: [projectUsers: projectUsers, message: message, authorized: true]
 	}
 
 	def removeUserAjax(Long projectId, Long userId) {
+        def message = null
 		try {
 			projectService.removeUser(projectId, userId)
-			def projectUsers = ProjectUser.where { project.id==projectId}.list()
-			render template:"userTable", bean: projectUsers
 		}catch(Exception e) {
-			log.error "Error: ${e.message}", e
-			render status: 500
-			render "<div class='errors'>An error has occurred</div>"
+			message = "Error removing the user!"
 		}				
+        def projectUsers = ProjectUser.where { project.id==projectId}.list()
+        render template:"userTable", model: [projectUsers: projectUsers, message: message, authorized: true]
 	}
+    
+    def editUserRoleAjax(Long projectId, Long userId, String projectRole) {
+        def message = null
+        def projectUser = ProjectUser.where{project.id == projectId && user.id == userId}.get(max:1)
+        if(projectUser) {
+            projectUser.projectRole = projectRole
+            projectService.saveUser(projectUser)
+        } else {
+            message = "User not found in this project!"
+        }
+        def projectUsers = ProjectUser.where { project.id==projectId}.list()
+        render template:"userTable", model: [projectUsers: projectUsers, message: message, authorized: true]
+    }
     
     def addSamples() {
         

@@ -10,32 +10,42 @@ class SecurityFilters {
         projectShow(controller:'project', action:'show') {
             before = {
                 def currUser = springSecurityService.currentUser
-                if (currUser.id == 1) {
+                if (currUser.isAdmin()) {
                     return true
                 }
                 def projectId = params.long('id')
                 if (ProjectUser.where {project.id == projectId && user == currUser}.get(max: 1)) {
                     return true                    
                 } else {
-                    flash.message = "Access denied!"
-                    redirect(controller: "project", action: "index")
+                    render(view: '/login/denied')
                     return false
                 }
             }
         }
         
-        projectEdit(controller:'project', action:'edit|addUserAjax|removeUserAjax') {
+        projectAllAndCreate(controller: 'project', action: 'create|all') {
             before = {
                 def currUser = springSecurityService.currentUser
-                if (currUser.id == 1) {
+                if (currUser.isAdmin()) {
+                    return true
+                } else {
+                    render(view: '/login/denied')
+                    return false
+                }
+            }    
+        }
+        
+        projectEdit(controller:'project', action:'edit|addUserAjax|removeUserAjax|editUserRoleAjax') {
+            before = {
+                def currUser = springSecurityService.currentUser
+                if (currUser.isAdmin()) {
                     return true
                 }
-                def projectId = params.long('id')
+                def projectId = params.long('projectId')
                 if (ProjectUser.where {project.id == projectId && user == currUser && projectRole == ProjectRole.OWNER}.get(max: 1)) {
                     return true                    
                 } else {
-                    flash.message = "Access denied!"
-                    redirect(controller: "project", action: "index")
+                    render(view: '/login/denied')
                     return false
                 }
             }
@@ -46,8 +56,7 @@ class SecurityFilters {
                 def antibodyId = params.long('antibodyId')
                 def antibody = Antibody.get(antibodyId)
                 def currUser = springSecurityService.currentUser
-                if (currUser.authorities.any { it.authority == "ROLE_ADMIN" }
-                   || antibody?.item?.user == currUser) {
+                if (currUser.isAdmin() || antibody?.item?.user == currUser) {
                     return true
                 } else {
                     render(view: '/login/denied')
@@ -61,8 +70,7 @@ class SecurityFilters {
                 def cellSourceId = params.long('cellSourceId')
                 def cellSource = CellSource.get(cellSourceId)
                 def currUser = springSecurityService.currentUser
-                if (currUser.authorities.any { it.authority == "ROLE_ADMIN" }
-                   || cellSource?.item?.user == currUser) {
+                if (currUser.isAdmin() || cellSource?.item?.user == currUser) {
                     return true
                 } else {
                     render(view: '/login/denied')
@@ -76,8 +84,7 @@ class SecurityFilters {
                 def itemId = params.long('itemId')
                 def item = Item.get(itemId)
                 def currUser = springSecurityService.currentUser
-                if (currUser.authorities.any { it.authority == "ROLE_ADMIN" }
-                   || item?.user == currUser) {
+                if (currUser.isAdmin() || item?.user == currUser) {
                     return true
                 } else {
                     render(view: '/login/denied')
@@ -85,5 +92,6 @@ class SecurityFilters {
                 }
             }
         }
+
     }
 }

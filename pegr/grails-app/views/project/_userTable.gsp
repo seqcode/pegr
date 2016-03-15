@@ -1,3 +1,6 @@
+<g:if test="${message}">
+    <div class='errors'>${message}</div>
+</g:if>
 <div class="table-responsive" >          
     <table class="table table-striped">
         <thead>
@@ -9,12 +12,18 @@
             </tr>
         </thead>
         <tbody>
-            <g:each var="projectUser" in="${it}">
+            <g:each var="projectUser" in="${projectUsers}">
             <tr>
                 <td>${projectUser.user.fullName} (${projectUser.user.username})</td>
                 <td>${projectUser.user.affiliation}</td>
-                <td>${projectUser.projectRole} <g:link action="editUserRole" ><span class="glyphicon glyphicon-pencil"></span></g:link></td>
-                <td><g:remoteLink action="removeUserAjax" update="project-users" params="[userId: projectUser.user.id, projectId: projectUser.project.id]"><span class="glyphicon glyphicon-remove"></span></g:remoteLink></td>
+                <td>${projectUser.projectRole} 
+                    <g:if test="${authorized}">
+                        <button class="edit" data-toggle="modal" data-target="#editUserRole" onclick="showEditRole(${projectUser.user.id})">Edit</button>
+                    </g:if>
+                </td>
+                <g:if test="${authorized}">
+                <td><a href="#" onclick="removeUser(${projectUser.user.id}, ${projectUser.project.id})"><span class="glyphicon glyphicon-remove"></span></a></td>
+                </g:if>
             </tr>
             </g:each>
             <tr></tr>

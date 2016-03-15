@@ -119,8 +119,12 @@ log4j.main = {
            'org.springframework',
            'org.hibernate',
            'net.sf.ehcache.hibernate'
+    info   'grails.app'
 }
 
+grails.war.resources = { stagingDir ->
+    delete { fileset dir: "${stagingDir}/files/" }
+}
 
 // Added by the Spring Security Core plugin:
 grails.plugin.springsecurity.userLookup.userDomainClassName = 'pegr.User'

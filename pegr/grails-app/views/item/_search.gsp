@@ -1,6 +1,6 @@
 <div class="form-group">
     <label for="type">Type</label>
-    <g:select id="type" name="typeId" optionKey="id" from="${pegr.ItemType.list()}" noSelection="['null': '-- choose --']" />
+    <g:select id="type" name="typeId" optionKey="id" from="${pegr.ItemType.where{if (currentCategory) category==currentCategory}.list()}" value="${currentType?.id}" noSelection="['null': '-- choose --']" />
 </div>        
 <div class="form-group">
     <label for="barcode">Barcode</label>

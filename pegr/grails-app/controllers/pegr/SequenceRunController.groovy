@@ -94,7 +94,12 @@ class SequenceRunController {
         if (run) {
             try {
                 run.properties = params 
-                sequenceRunService.save(run)
+                if (run.runStats) {
+                    run.runStats.properties = params
+                } else {
+                    run.runStats = new RunStats(params)
+                }
+                sequenceRunService.save(run)                   
                 redirect(action: "edit", id: run.id)
             } catch(SequenceRunException e) {
                 flash.message = e.message
@@ -106,51 +111,23 @@ class SequenceRunController {
         }
     }
     
-    def searchSample(Long runId) {
-        [runId: runId]
-    }
-    
-    def searchSampleById(Long runId, Long sampleId) {
-        def sample = Sample.get(sampleId)
-        if (sample) {
-            def bag = sample.bags.size() > 0 ? sample.bags.last() : null
-            render(view: "preview", model: [sample: sample, runId: runId, bag: bag])
-        } else {
-            flash.message = "Sample not found!"
-            redirect(action: searchSample, params: [runId: runId])
-        }
-    }
-    
-    def searchSampleByBarcode(Long runId, Long typeId, String barcode) {
-        def item = Item.where{type.id == typeId && barcode == barcode}.find()
-        if (item) {
-            def sample = Sample.findByItem(item)
-            if (sample) {
-                def bag = sample.bags.size() > 0 ? sample.bags.last() : null
-                render(view: "preview", model: [sample: sample, runId: runId, bag: bag])
+    def searchPool(Long runId, Long typeId, String barcode) {
+        if (request.method == "POST") {
+            def poolItem = Item.where {type.id == typeId && barcode == barcode}.find()
+            if (poolItem) {
+                render(view: "previewPool", model: [runId: runId, poolItem: poolItem])
             } else {
-                flash.message = "This item is not linked to a sample!"
-                redirect(action: searchSample, params: [runId: runId])
+                flash.message = "Pool not found!"
+                [runId: runId]
             }
         } else {
-            flash.message = "Item not found!"
-            redirect(action: searchSample, params: [runId: runId])
-        }            
-    }
-    
-    def addSample(Long sampleId, Long runId) {
-        try {
-            sequenceRunService.addSample(sampleId, runId)
-            flash.message = "Sample ${sampleId} included!"
-        } catch (SequenceRunException e) {
-            flash.message = e.message
+            [runId: runId]   
         }
-        redirect(action: "edit", id: runId)
     }
     
-    def addBag(Long bagId, Long runId) {
+    def addPool(Long poolItemId, Long runId) {
         try {
-            def messages = sequenceRunService.addBag(bagId, runId)
+            def messages = sequenceRunService.addPool(poolItemId, runId)
             if (messages.size() > 0) {
                 flash.message = messages.join("</br>")
             } else {

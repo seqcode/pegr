@@ -10,36 +10,23 @@ class ProtocolService {
     def springSecurityService
     
     @Transactional
-    void save(Protocol protocol, Long startItemTypeId, Long endItemTypeId, List sharedItemTypeIds, List individualItemTypeIds) {
+    void save(Protocol protocol, Map protocolItemTypeIds) {
         if(protocol.save(flush: true)) {
             def toDelete = ProtocolItemTypes.where{protocol == protocol}.list()
             
             def newTypes = []
-            def startItemType = ItemType.get(startItemTypeId)
-            if (startItemType) {
-                newTypes.push(new ProtocolItemTypes(protocol:protocol, itemType: startItemType, function: ProtocolItemFunction.PARENT))
-            }
-            def endItemType = ItemType.get(endItemTypeId)
-            if (endItemType) {
-                newTypes.push(new ProtocolItemTypes(protocol:protocol, itemType: endItemType, function: ProtocolItemFunction.CHILD))
-            }
-            sharedItemTypeIds.each{
-                try {
-                    def sharedItemType = ItemType.get(it)
-                    if (sharedItemType) {
-                        newTypes.push(new ProtocolItemTypes(protocol:protocol, itemType: sharedItemType, function: ProtocolItemFunction.SHARED))
-                    }
-                } catch(Exception e) {}
-            }
-            individualItemTypeIds.each{
-                try {
-                    def individualItemType = ItemType.get(it)
-                    if (individualItemType) {
-                        newTypes.push(new ProtocolItemTypes(protocol:protocol, itemType: individualItemType, function: ProtocolItemFunction.INDIVIDUAL))
-                    }
-                } catch(Exception e) {}
-            }
 
+            protocolItemTypeIds.each{ itemFunction, typeIds ->
+                typeIds.each { id ->
+                    try {
+                        def itemType = ItemType.get(id)
+                        if (itemType) {
+                            newTypes.push(new ProtocolItemTypes(protocol: protocol, itemType: itemType, function: itemFunction))
+                        }
+                    } catch(Exception e) {}
+                }
+            }
+            
             newTypes.each { t ->
                 def oldType = toDelete.find{it.itemType == t.itemType && it.function == t.function}
                 if (oldType) {

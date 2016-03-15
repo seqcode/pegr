@@ -142,30 +142,24 @@ class ProtocolInstanceBagController {
                 file = null
             }
             // get shared item list
-            def sharedItemList = protocolInstanceBagService.getSharedItemList(id, protocol)
-            // prepare the individual item table template
-            def template = protocolInstanceBagService.getTemplate(protocol)
+            def sharedItemAndPoolList = protocolInstanceBagService.getSharedItemAndPoolList(id, protocol)
+            // prepare the individual sample table template
+            def addChild = (protocol.startItemType 
+                        && protocol.endItemType 
+                        && protocol.startItemType != protocol.endItemType)
             def samples = null
-            if (template) {
+            if (addChild || protocol.addAntibody || protocol.addIndex) {
                 // get samples in the bag
                 samples = protocolInstance.bag.tracedSamples.toList().sort {it.id}
             }
             def completed = (protocolInstance.bag.status == ProtocolStatus.COMPLETED)
-            if (template) {
-                if (completed) {
-                    template = "show" + template
-                }else {
-                    template = "edit" + template
-                }
-            }
             try{
                 def toBeCompleted = false
                 def results
                 if (completed) {
                     results = protocolInstanceBagService.getParentsAndChildrenForCompletedInstance(samples, protocol.startItemType, protocol.endItemType)
                     render(view: "showInstance", model: [protocolInstance: protocolInstance, 
-                                                 sharedItemList: sharedItemList,
-                                                 template: template,
+                                                 sharedItemAndPoolList: sharedItemAndPoolList,
                                                  samples: samples,
                                                  parents: results.parents,
                                                  children: results.children,
@@ -173,10 +167,9 @@ class ProtocolInstanceBagController {
                                                  file: file])
                 } else {
                     results = protocolInstanceBagService.getParentsAndChildrenForProcessingInstance(samples, protocol.startItemType, protocol.endItemType)                
-                    toBeCompleted = sharedItemList.every{ !it.items.empty } && results.children.every{ it != null }
+                    toBeCompleted = protocolInstanceBagService.readyToBeCompleted(sharedItemAndPoolList, results, samples, protocol)
                     render(view: "editInstance", model: [protocolInstance: protocolInstance, 
-                                                 sharedItemList: sharedItemList,
-                                                 template: template,
+                                                 sharedItemAndPoolList: sharedItemAndPoolList,
                                                  samples: samples,
                                                  parents: results.parents,
                                                  children: results.children,
@@ -205,12 +198,42 @@ class ProtocolInstanceBagController {
     def previewItemInInstance(Long typeId, String barcode, Long instanceId) {
         def itemType = ItemType.get(typeId)
         def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
-        if (item) {
-            render(view:"previewItemInInstance", model: [item: item, instanceId: instanceId])
-        }else {
-            item = new Item(type: itemType, barcode: barcode)
-            render(view: "createItemInInstance", model: [instanceId: instanceId, item:item])
+        if (itemType.category == ItemTypeCategory.SAMPLE_POOL) {
+            def instance = ProtocolInstance.get(instanceId)
+            if (instance) {
+                if (instance.protocol.startPoolType == itemType && item) {
+                    // start pool must be pre-existing    
+                    render(view: "previewPoolInInstance", model: [instanceId: instanceId, item:item])
+                } else if (instance.protocol.endPoolType == itemType && !item) {
+                    // end pool must be new
+                    item = new Item(type: itemType, barcode: barcode)
+                    render(view: "createItemInInstance", model: [instanceId: instanceId, item:item])    
+                } else {
+                    flash.message = "Start pool must be pre-existing and end pool must be new!"
+                    redirect(action: "showInstance", id: instanceId)
+                }
+            } else {
+                flash.message = "Protocol instance not found!"
+                redirect(action: "index")
+            }
+        } else {
+            if (item) {
+                render(view:"previewItemInInstance", model: [item: item, instanceId: instanceId])
+            }else {
+                item = new Item(type: itemType, barcode: barcode)
+                render(view: "createItemInInstance", model: [instanceId: instanceId, item:item])
+            }
         }
+    }
+    
+    def addPoolToInstance(Long itemId, Long instanceId) {
+        try {
+            protocolInstanceBagService.addPoolToInstance(itemId, instanceId)
+            flash.message = "Pool is added successfully!"
+        } catch(ProtocolInstanceBagException e) {
+            flash.message = e.message
+        }        
+        redirect(action: "showInstance", id: instanceId)
     }
     
     def addItemToInstance(Long itemId, Long instanceId) {
@@ -266,7 +289,6 @@ class ProtocolInstanceBagController {
             flash.message = e.message
             redirect(action: "showInstance", id: instanceId)
         }
-
     }
     
     def completeBag(Long bagId) {
@@ -336,16 +358,10 @@ class ProtocolInstanceBagController {
                 def item = new Item(params)
                 try {
                     protocolInstanceBagService.addChild(item, sampleId)
-                    redirect(action: "showInstance", id: instanceId)
                 }catch(ProtocolInstanceBagException e){
-                    flash.message = e.message
-                    def childType = ItemType.get(params.long('childTypeId'))
-                    def sample = Sample.get(sampleId)
-                    if (!sample) {
-                        redirect(action: "showInstance", id: instanceId)
-                    }
-                    [sample: sample, instanceId: instanceId, childType: childType, item:item]
+                    flash.message = e.message 
                 }                
+                redirect(action: "showInstance", id: instanceId)  
             }
         } else{
             def childType = ItemType.get(params.long('childTypeId'))

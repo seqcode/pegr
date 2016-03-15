@@ -1,8 +1,8 @@
 <div>
 	<label for="species">Species</label>
-	<g:select id="species" name="species.id" from="${pegr.Species.list()}" optionKey="id" value="${cellSource?.strain?.species?.id}" noSelection="['null': 'Other']" onchange="speciesChanged(this.value);"/>
+	<g:select id="species" name="species.id" from="${pegr.Species.list(sort:'genusName')}" optionKey="id" value="${cellSource?.strain?.species?.id}" noSelection="['null': 'Other']" onchange="speciesChanged(this.value);"/>
 </div>
-<ul id="speciesForm" <g:if test="${cellSource?.strain?.species?.id}">class="hide"</g:if> >
+<ul id="speciesForm">
     <li>
         <label>Genus Name</label>
         <g:textField name="genusName"></g:textField>
@@ -14,7 +14,7 @@
 </ul>
 <div>
 	<label for="strain">Strain</label>
-	<g:select id="strain" name="strain.id" from="${pegr.Strain.where{species == cellSource?.strain?.species}.list()}" optionKey="id" value="${cellSource?.strain?.id}" noSelection="['null': 'Other']" onchange="strainChanged(this.value);"/>
+	<g:select id="strain" name="strain.id" from="${pegr.Strain.where{species == cellSource?.strain?.species}.list(sort:'name')}" optionKey="id" value="${cellSource?.strain?.id}" noSelection="['null': 'Other']" onchange="strainChanged(this.value);"/>
 </div>
 
 <div id="strainDetails">
@@ -28,7 +28,7 @@
 
 <div class=" ${hasErrors(bean: cellSource, field: 'sex', 'error')} ">
     <label for="sex">Sex </label>
-    <g:select id="sex" name="sex.id" from="${pegr.Sex.list()}" optionKey="id" value="${cellSource?.sex?.id}" noSelection="['null': '']"/>
+    <g:select id="sex" name="sex.id" from="${pegr.Sex.list(sort:'name')}" optionKey="id" value="${cellSource?.sex?.id}" noSelection="['null': '']"/>
 </div>
 
 <div class=" ${hasErrors(bean: cellSource, field: 'age', 'error')} ">
@@ -39,25 +39,25 @@
 
 <div class=" ${hasErrors(bean: cellSource, field: 'tissue', 'error')} ">
     <label for="tissue">Tissue</label>
-    <g:select id="tissue" name="tissue.id" from="${pegr.Tissue.list()}" optionKey="id" value="${cellSource?.tissue?.id}" noSelection="['null': '']"/>
+    <g:select id="tissue" name="tissue.id" from="${pegr.Tissue.list(sort:'name')}" optionKey="id" value="${cellSource?.tissue?.id}" noSelection="['null': '']"/>
 </div>
 
 <div class=" ${hasErrors(bean: cellSource, field: 'histology', 'error')} ">
     <label for="histology">Histology</label>
-    <g:select id="histology" name="histology.id" from="${pegr.Histology.list()}" optionKey="id" value="${cellSource?.histology?.id}" noSelection="['null': 'Other']"/>
+    <g:select id="histology" name="histology.id" from="${pegr.Histology.list(sort:'name')}" optionKey="id" value="${cellSource?.histology?.id}" noSelection="['null': 'Other']"/>
 </div>
 
 <div>
     <label>Treatments</label>
     <span id="treatments">
-    <g:select multiple="multiple" name="treatments" from="${pegr.CellSourceTreatment.list()}" optionKey="id" value="${cellSource?.treatments}" class="tokenize tokenize-sample"></g:select>
+    <g:select multiple="multiple" name="treatments" from="${pegr.CellSourceTreatment.list(sort:'name')}" optionKey="id" value="${cellSource?.treatments}" class="tokenize tokenize-sample"></g:select>
     </span>
     <a href="#" class="edit" data-toggle="modal" data-target="#new-treatment"><span class="glyphicon glyphicon-plus"></span>New</a>
 </div>
 
 <div class=" ${hasErrors(bean: cellSource, field: 'growthMeida', 'error')} ">
     <label for="growthMedia">Growth Media</label>
-    <g:select id="growthMedia" name="growthMedia.id" from="${pegr.GrowthMedia.where{if(cellSource?.strain?.species?.id){species == cellSource.strain.species}}.list()}" optionKey="id" value="${cellSource?.growthMedia?.id}" noSelection="['null': '']"/>
+    <g:select id="growthMedia" name="growthMedia.id" from="${pegr.GrowthMedia.where{if(cellSource?.strain?.species?.id){species == cellSource.strain.species}}.list(sort:'name')}" optionKey="id" value="${cellSource?.growthMedia?.id}" noSelection="['null': '']"/>
 </div>
 
 <div class=" ${hasErrors(bean: cellSource, field: 'providerUser', 'error')} ">
@@ -76,7 +76,12 @@
 </div>
 
 <script>
-    $(".tokenize").tokenize({newElements: false});
+    $(document).ready(function(){
+        $(".tokenize").tokenize({newElements: false});
+        if($( "#species option:selected" ).text() != "Other") {
+            $("#speciesForm").hide();
+        }
+    });
     
     function speciesChanged(speciesId) {
         if(speciesId == "null") {
@@ -87,7 +92,8 @@
         $.ajax({url: "/pegr/cellSource/fetchStrainsForSpeciesAjax/"+speciesId, success: function(result){
             $("#strain").html(result)
         }});
-
+        strainChanged();
+        
         $.ajax({url: "/pegr/cellSource/fetchGrowthMediasForSpeciesAjax/"+speciesId, success: function(result){
             $("#growthmedia").html(result)
         }});     

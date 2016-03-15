@@ -13,42 +13,27 @@ class SequenceRunService {
         run.lane = 0
         run.user = springSecurityService.currentUser
         run.status = RunStatus.PREP
+        if (run.runStats) {
+            if (!run.runStats.save(flush: true)) {
+                throw new SequenceRunException(message: "Invalid inputs for stats!")
+            }
+        }
         if(!run.save(flush: true)) {
-            throw new SequenceRunException(message: "Invalid input!")
+            throw new SequenceRunException(message: "Invalid inputs for basic information!")
         }
     }
     
     @Transactional
-    def addSample(Long sampleId, Long runId) {
-        def sample = Sample.get(sampleId)
-        if (!sample) {
-            throw new SequenceRunException(message: "Sample not found!")
-        }
+    List addPool(Long poolItemId, Long runId) {
         def run = SequenceRun.get(runId)
         if (!run) {
             throw new SequenceRunException(message: "Sequence run not found!")
-        }
-        if (SequencingExperiment.findBySampleAndSequenceRun(sample, run)) {
-            throw new SequenceRunException(message: "Sample already included in this run!")
-        }
-        def experiment = new SequencingExperiment(sample: sample, sequenceRun: run) 
-        if (!experiment.save(flush: true)) {
-            throw new SequenceRunException(message: "Error including this sample to the sequence run!")
-        }        
-    }
-    
-    @Transactional
-    List addBag(Long bagId, Long runId) {
-        def bag = ProtocolInstanceBag.get(bagId)
-        if (!bag) {
-            throw new SequenceRunException(message: "Protocol instance bag not found!")
-        }        
-        def run = SequenceRun.get(runId)
-        if (!run) {
-            throw new SequenceRunException(message: "Sequence run not found!")
-        }
+        }       
+        run.poolItem = Item.get(poolItemId)
+        run.save()
         def messages = []
-        bag.tracedSamples.each {
+        def samples = fetchSamplesInPool(poolItemId)
+        samples.each {
             if (SequencingExperiment.findBySampleAndSequenceRun(it, run)) {
                 messages.push("Sample already included in this run!")
             } else {
@@ -59,6 +44,14 @@ class SequenceRunService {
             }
         }
         return messages
+    }
+    
+    List fetchSamplesInPool(Long poolItemId) {
+        def pool = Item.get(poolItemId)
+        if (!pool) {
+            throw new SequenceRunException(message: "Pool not found!")
+        }
+        return pool.samplesInPool
     }
     
     @Transactional

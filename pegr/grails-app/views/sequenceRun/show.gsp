@@ -6,16 +6,10 @@
 <body>
 <div class="container-fluid">
     <g:link action="index"><span class="glyphicon glyphicon-home"></span> Sequencing Run List</g:link>   
-    <h3>Sequence Run #${run.runNum}  <small><span class="label label-default">${run.status}</span></small></h3>
-    <h4>Run Information</h4>
-    <ul>
-        <li>Platform: ${run.platform}</li>
-        <li>User: ${run.user}</li>
-        <li>Date: <g:formatDate format="yyyy-MM-dd" date="${run.date}"/></li>
-        <g:if test="${run.note}"><li>Note: ${run.note}</li></g:if>        
-    </ul>
-    
-    <h4>Samples</h4>
+    <h2>Sequence Run #${run.runNum}  <small><span class="label label-default">${run.status}</span></small></h2>
+    <h3>Summary</h3>
+    <g:render template="summaryDetails"></g:render>    
+    <h3>Samples</h3>
     <table class="table table-striped">
         <thead>
             <tr>

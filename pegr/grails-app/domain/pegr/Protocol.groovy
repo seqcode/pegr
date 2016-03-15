@@ -6,24 +6,23 @@ class Protocol {
 	String description
     User user
 	Assay assay
+    Boolean addAntibody
+    Boolean addIndex
+    DictionaryStatus status
     
 	String toString() {
         String s = name
         if (protocolVersion) {
-            s += " " +protocolVersion
+            s += " " + protocolVersion
         }
         return s
 	}
     
     static hasMany = [protocolGroups: ProtocolGroup]
     static belongsTo = [ProtocolGroup]
-	
+    
     List getSharedItemTypes(){
         return ProtocolItemTypes.where{protocol == this && function == ProtocolItemFunction.SHARED}.collect{it.itemType}
-    }
-    
-    List getIndividualItemTypes(){
-        return ProtocolItemTypes.where{protocol == this && function == ProtocolItemFunction.INDIVIDUAL}.collect{it.itemType}
     }
     
     ItemType getStartItemType() {
@@ -34,12 +33,23 @@ class Protocol {
         return ProtocolItemTypes.where{protocol == this && function == ProtocolItemFunction.CHILD}.get(max: 1)?.itemType
     }
     
+    ItemType getStartPoolType() {
+        return ProtocolItemTypes.where{protocol == this && function == ProtocolItemFunction.START_POOL}.get(max: 1)?.itemType
+    }
+    
+    ItemType getEndPoolType() {
+        return ProtocolItemTypes.where{protocol == this && function == ProtocolItemFunction.END_POOL}.get(max: 1)?.itemType
+    }
+    
     static constraints = {
 		name unique: 'protocolVersion'
 		protocolVersion nullable: true, blank: true, maxSize: 10
 		description nullable: true, blank: true
         user nullable: true
         assay nullable: true
+        addAntibody nullable: true
+        addIndex nullable: true
+        status nullable: true
 	}
 
 }

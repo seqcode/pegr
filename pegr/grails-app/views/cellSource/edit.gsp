@@ -15,7 +15,7 @@
     </g:hasErrors>
     <h3>Edit Cell Source</h3>
     <g:form action="update" class="fields" role="form" method="post">
-        <g:hiddenField name="cellSourceId" value="${cellSource.id}"></g:hiddenField>
+        <g:hiddenField name="cellSourceId" value="${cellSource?.id}"></g:hiddenField>
         <g:render template="form" model="['cellSource': cellSource]"></g:render>
         <g:submitButton class="btn btn-primary" name="save" value="Save"/>
         <g:link class="btn btn-default" controller="item" action="show" id="${itemId}">Cancel</g:link>

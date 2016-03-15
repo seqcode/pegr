@@ -2825,4 +2825,8 @@ databaseChangeLog = {
 	include file: 'changeTreatment.groovy'
 
 	include file: 'removeProtocolDetails.groovy'
+
+	include file: 'addRunStats.groovy'
+
+	include file: 'addPoolSamples.groovy'
 }

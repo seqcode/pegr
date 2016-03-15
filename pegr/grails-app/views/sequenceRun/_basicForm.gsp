@@ -8,9 +8,9 @@
 </div>
 <div>
     <label>Date</label>
-    <g:datePicker name="date" default="${new Date()}"/>
+    <g:datePicker name="date" default="${run?.date ?: new Date()}"/>
 </div>
 <div>
-    <label>Note</label>
+    <label>Notes</label>
     <g:textArea name="note" value="${run?.note}"></g:textArea>
 </div>

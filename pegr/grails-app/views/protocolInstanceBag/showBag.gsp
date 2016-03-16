@@ -27,7 +27,7 @@
                         <h4 class="panel-title">
                             <a data-toggle="collapse" href="#items">Traced Samples</a>
                                 <g:if test="${!completed}">
-                                    <g:link action="searchItemForBag" id="${bag.id}" class="pull-right"><span class="glyphicon glyphicon-plus"></span> Add</g:link>
+                                    <g:link action="searchItemForBag" params="[bagId: bag?.id]" class="pull-right"><span class="glyphicon glyphicon-plus"></span> Add</g:link>
                                 </g:if>
                         </h4>
                     </div>                    

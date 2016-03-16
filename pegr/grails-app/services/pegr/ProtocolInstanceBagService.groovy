@@ -130,6 +130,7 @@ class ProtocolInstanceBagService {
 			item.parent = parent
 		}
         // save the item
+        item.user = springSecurityService.currentUser
         if (item.save(flush: true)) { 
             // add the item to the instance
             def instance = ProtocolInstance.get(instanceId)
@@ -382,6 +383,7 @@ class ProtocolInstanceBagService {
             throw new ProtocolInstanceBagException(message: "Parent not found!")
         }
         item.parent = sample.item
+        item.user = springSecurityService.currentUser
         if (item.save(flush: true)){
             sample.item = item
             sample.save()

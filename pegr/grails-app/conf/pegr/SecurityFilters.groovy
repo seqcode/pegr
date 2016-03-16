@@ -93,5 +93,38 @@ class SecurityFilters {
             }
         }
 
+        ProtocolInstanceBagEdit(controller: "protocolInstanceBag", action: "searchItemForBag|previewItemAndBag|addItemToBag|addSubBagToBag|removeItemFromBag") {
+            before = {
+                def bagId = params.long('bagId')
+                def bag = ProtocolInstanceBag.get(bagId)
+                if (bag.status != ProtocolStatus.COMPLETED) {
+                    return true
+                } else {
+                    flash.message = "The protocol instance bag is completed and no changes are allowed. Please contact lab admin if you have further questions."
+                    redirect(action: "showBag", id: bagId)
+                }
+            }    
+        }
+        
+        ProtocolInstanceEdit(controller: "protocolInstanceBag", action: "searchItemForInstance|searchItemForTypeInstance|previewItemInInstance|addPoolToInstance|addItemToInstance|saveItemInInstance|removeItemFromInstance|addIndex|searchAntibody|previewAntibody|addAntibodyToSample|removeAntibody|addChild|removeChild") {
+            before = {
+                def instanceId = params.long('instanceId') 
+                def instance = ProtocolInstance.get(instanceId)
+                if (instance.user) {
+                    def currUser = springSecurityService.currentUser
+                    if (!currUser.isAdmin() && item?.user != currUser) {
+                        render(view: '/login/denied')
+                        return false
+                    }
+                }                
+                if (instance?.bag) {
+                    if (instance.bag.status == ProtocolStatus.COMPLETED) {
+                        flash.message = "The protocol instance bag is completed and no changes are allowed. Please contact lab admin if you have further questions."
+                        redirect(action: "showBag", id: instance.bag.id)
+                    }
+                } 
+                return true
+            }
+        }
     }
 }

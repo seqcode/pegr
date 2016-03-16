@@ -59,8 +59,8 @@ class ProtocolInstanceBagController {
         }
     }
     
-   def searchItemForBag(Long id){
-        [bagId: id]       
+   def searchItemForBag(Long bagId){
+        [bagId: bagId]       
     }
     
     def previewItemAndBag(Long typeId, String barcode, Long bagId) {
@@ -186,8 +186,8 @@ class ProtocolInstanceBagController {
         }
     }
     
-    def searchItemForInstance(Long id){
-        [instanceId: id]       
+    def searchItemForInstance(Long instanceId){
+        [instanceId: instanceId]       
     }
     
     def searchItemForTypeInstance(Long instanceId, Long typeId){

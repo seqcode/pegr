@@ -110,9 +110,9 @@ class SecurityFilters {
             before = {
                 def instanceId = params.long('instanceId') 
                 def instance = ProtocolInstance.get(instanceId)
-                if (instance.user) {
+                if (instance?.user) {
                     def currUser = springSecurityService.currentUser
-                    if (!currUser.isAdmin() && item?.user != currUser) {
+                    if (!currUser.isAdmin() && instance.user != currUser) {
                         render(view: '/login/denied')
                         return false
                     }
@@ -123,6 +123,25 @@ class SecurityFilters {
                         redirect(action: "showBag", id: instance.bag.id)
                     }
                 } 
+                return true
+            }
+        }
+        
+        SequenceRunEdit(controller: "sequenceRun", action: "editInfo|update|searchPool|addPool|removeExperiment|updateGenomes|run") {
+            before = {
+                def runId = params.long('runId')
+                def run =  SequenceRun.get(runId)
+                if (run?.user) {
+                    def currUser = springSecurityService.currentUser
+                    if (!currUser.isAdmin() && run.user != currUser) {
+                        render(view: '/login/denied')
+                        return false
+                    }
+                }
+                if (run?.status == RunStatus.COMPLETED) {
+                    flash.message = "This sequence run is completed and no changes are allowed. Please contact lab admin if you have further questions."
+                    redirect(action: "show", id: runId)
+                }
                 return true
             }
         }

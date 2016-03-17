@@ -17,11 +17,11 @@
         </ul>
     </g:hasErrors>
     <g:form role="form" method="post" action="update" class="fields">
-        <g:hiddenField name="id" value="${run.id}"></g:hiddenField>
+        <g:hiddenField name="runId" value="${run.id}"></g:hiddenField>
         <g:render template="statsForm"></g:render>
         <div class="row well text-center">
             <g:submitButton class="btn btn-primary" name="Save"/>
-            <g:link action="edit" id="${run.id}" class="btn btn-default">Cancel</g:link>
+            <g:link action="edit" params="[runId:run.id]" class="btn btn-default">Cancel</g:link>
         </div>
     </g:form>
     <script>

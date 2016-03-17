@@ -149,6 +149,10 @@ grails.plugin.springsecurity.interceptUrlMap = [
     '/cellSource/**':   ['ROLE_MEMBER', 'ROLE_ADMIN'],
     '/item/**':         ['ROLE_MEMBER', 'ROLE_ADMIN'],
     '/sequenceRun/**':  ['ROLE_MEMBER', 'ROLE_ADMIN'],
+    '/sequenceRun/upload/**':     ['ROLE_ADMIN'],
+    '/sequenceRun/convertCsv/**': ['ROLE_ADMIN'],
+    '/sequenceRun/create/**':     ['ROLE_ADMIN'],
+    '/sequenceRun/save/**':       ['ROLE_ADMIN'],
 	'/**':              ['isAuthenticated()'] // everything else requires authenticated user
 ]
 grails.plugin.springsecurity.auth.loginFormUrl = "/login/form"

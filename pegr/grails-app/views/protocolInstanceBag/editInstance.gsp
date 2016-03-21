@@ -10,6 +10,9 @@
         <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
         </g:if>
+        <g:if test="${request.message}">
+        <div class="message" role="status">${request.message}</div>
+        </g:if>
         <h3>Protocol: ${protocolInstance?.protocol?.name} ${protocolInstance?.protocol?.protocolVersion}</h3>
         <div id="protocol-details" class="collapse in">
             <g:if test="${protocolInstance?.protocol?.description}">

@@ -168,6 +168,9 @@ class ProtocolInstanceBagController {
                 } else {
                     results = protocolInstanceBagService.getParentsAndChildrenForProcessingInstance(samples, protocol.startItemType, protocol.endItemType)                
                     toBeCompleted = protocolInstanceBagService.readyToBeCompleted(sharedItemAndPoolList, results, samples, protocol)
+                    if (protocol.endItemType && !samples) {
+                        request.message = "Please add traced samples on the Home page!"
+                    }
                     render(view: "editInstance", model: [protocolInstance: protocolInstance, 
                                                  sharedItemAndPoolList: sharedItemAndPoolList,
                                                  samples: samples,

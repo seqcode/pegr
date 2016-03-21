@@ -5,8 +5,13 @@
 </head>
 <body>                
     <div class="container-fluid">
-        <h5><g:link action="index"><span class="glyphicon glyphicon-home"></span> Home</g:link></h5>
-        <g:render template="/protocolInstanceBag/overview" bean="${bag}"></g:render>       
+        <h5><g:link action="index"><span class="glyphicon glyphicon-home"></span> List</g:link></h5>
+        <h4>
+            ${bag?.name} 
+            <small><span class="edit"><g:link action="edit" params="[bagId: bag?.id]">Edit</g:link></span> <span class="label label-default">${bag?.status}</span> </small> 
+        </h4>
+        <p>Start Time: <g:formatDate format="yyyy-MM-dd" date="${bag?.startTime}"/>
+        <g:if test="${bag?.endTime}">, End Time: <g:formatDate format="yyyy-MM-dd" date="${bag?.endTime}"/></g:if></p>   
         <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
         </g:if>

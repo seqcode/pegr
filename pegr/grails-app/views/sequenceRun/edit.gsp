@@ -13,7 +13,7 @@
             </div>
         </g:if>
     </div>
-    <h2>Sequence Run #${run.runNum}  <small><span class="label label-default">${run.status}</span></small></h2>
+    <h2>Sequence Run #${run.id}  <small><g:if test="${run.runNum}">(Old No.${run.runNum})</g:if> <span class="label label-default">${run.status}</span></small></h2>
     <div>
         <h3>Summary <g:link action="editInfo" params="[runId:run.id]"><span class="edit">Edit</span></g:link></h3>
         <g:render template="summaryDetails"></g:render>

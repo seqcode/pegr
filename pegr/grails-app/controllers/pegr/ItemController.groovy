@@ -181,7 +181,7 @@ class ItemController {
             String fileName = mpf.getOriginalFilename();
             String fileType = mpf.getContentType();
 
-            if(!mpf?.empty && mpf.size < 15 * 1024 * 1024 && allowedTypes.containsKey(fileType)) {
+            if(!mpf?.empty && mpf.size < 5 * 1024 * 1024 && allowedTypes.containsKey(fileType)) {
                 
                 File folder = itemService.getImageFolder(params.long('itemId')); 
                 if (!folder.exists()) { 
@@ -195,6 +195,8 @@ class ItemController {
                 } 
                 mpf.transferTo(fileDest)
                 flash.message = "Image uploaded!"
+            } else {
+                flash.message = "Please check the format and the size of the image."
             }
         } catch(Exception e) {
             log.error "Error: ${e.message}", e

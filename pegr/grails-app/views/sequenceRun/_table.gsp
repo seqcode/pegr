@@ -12,7 +12,8 @@
         <tbody>
             <g:each in="${runs}" var="run">
                 <tr>
-                    <td><g:link controller="sequenceRun" action="show" id="${run.id}">${run.runNum}</g:link></td>                                         <td>${run.status}</td>
+                    <td><g:link controller="sequenceRun" action="show" id="${run.id}">${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if></g:link></td>      
+                    <td>${run.status}</td>
                     <td>${run.platform}</td>
                     <td><g:formatDate format="yyyy-MM-dd" date="${run.date}"/></td>
                     <td>${run.user}</td>

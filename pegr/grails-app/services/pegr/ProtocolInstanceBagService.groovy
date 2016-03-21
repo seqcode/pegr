@@ -153,8 +153,18 @@ class ProtocolInstanceBagService {
         if (!protocolItem) {
             throw new ProtocolInstanceBagException(message: "Item not found in the protocol instance!")
         }
-        try {            
+        try {  
+            // remove the item from the protocol
             protocolItem.delete(flush: true)
+            // delete the item if it is the end pool in this protocol
+            def instance = ProtocolInstance.get(instanceId)
+            def item = Item.get(itemId)
+            if (instance.protocol.endPoolType == item.type) {
+                // delete the samples related to the pool
+                PoolSamples.executeUpdate("delete from PoolSamples where pool.id = :itemId", [itemId: itemId])
+                // delete the pool itself
+                item.delete()
+            }
         }catch(Exception e) { 
             log.error "Error: ${e.message}", e
             throw new ProtocolInstanceBagException(message: "Error removing the item!")

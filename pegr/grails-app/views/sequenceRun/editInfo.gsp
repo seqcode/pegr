@@ -21,7 +21,7 @@
         <g:render template="statsForm"></g:render>
         <div class="row well text-center">
             <g:submitButton class="btn btn-primary" name="Save"/>
-            <g:link action="edit" params="[runId:run.id]" class="btn btn-default">Cancel</g:link>
+            <g:link action="show" id="${run.id}" class="btn btn-default">Cancel</g:link>
         </div>
     </g:form>
     <script>

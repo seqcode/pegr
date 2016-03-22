@@ -46,6 +46,23 @@ class SequenceRunService {
         return messages
     }
     
+    @Transactional
+    void removePool(Long runId) {
+        def run = SequenceRun.get(runId)
+        if (run) {
+            def experiments = run.experiments 
+            experiments.each {
+                // remove all the sequencingExperiments from the sequence run
+                removeExperiment(it.id)
+            }
+            // remove the pool from the sequence run
+            run.poolItem = null
+            run.save()
+        } else {
+            throw new SequenceRunException(message: "Pool not found!")
+        }
+    }
+    
     List fetchSamplesInPool(Long poolItemId) {
         def pool = Item.get(poolItemId)
         if (!pool) {
@@ -58,6 +75,9 @@ class SequenceRunService {
     void removeExperiment(Long experimentId) {
         def experiment = SequencingExperiment.get(experimentId)
         if (experiment) {
+            // remove the associated alignments
+            SequenceAlignment.executeUpdate("delete SequenceAlignment where sequencingExperiment.id = :experimentId", [experimentId: experimentId])
+            // remove the experiment itself
             experiment.delete()
         } else {
             throw new SequenceRunException(message: "Experiment not found!")

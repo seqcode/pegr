@@ -33,7 +33,7 @@ class SequenceRunController {
     def show(Integer id) {
         def run = SequenceRun.get(id)
         if (run) {
-            if (run.status == RunStatus.COMPLETED) {
+            if (run.status != RunStatus.PREP) {
                 [run: run]
             } else {
                 redirect(action: "edit", params:[runId: id])   
@@ -101,7 +101,7 @@ class SequenceRunController {
                     run.runStats = new RunStats(params)
                 }
                 sequenceRunService.save(run)                   
-                redirect(action: "edit", params:[runId: runId])
+                redirect(action: "show", id:runId)
             } catch(SequenceRunException e) {
                 flash.message = e.message
                 render(view: "editInfo", model: [run: run])
@@ -140,10 +140,20 @@ class SequenceRunController {
         redirect(action: "edit", params: [runId: runId])
     }
     
+    def removePool(Long runId) {
+        try {
+            sequenceRunService.removePool(runId)
+            flash.message = "The master pool has been removed!"
+        } catch (SequenceRunException e) {
+            flash.message = e.message
+        }
+        redirect(action: "edit", params: [runId: runId])
+    }
+    
     def removeExperiment(Long experimentId, Long runId) {
         try {
             sequenceRunService.removeExperiment(experimentId)
-            flash.message = "Experiment deleted!"
+            flash.message = "Sequencing experiment deleted!"
         } catch (SequenceRunException e) {
             flash.message = e.message
         }

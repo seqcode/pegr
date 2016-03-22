@@ -6,8 +6,15 @@
 <body>
 <div class="container-fluid">
     <g:link action="index"><span class="glyphicon glyphicon-home"></span> Sequencing Run List</g:link>   
+    <div id="message" >
+        <g:if test="${flash.message}">
+             <div class="message" role="status">
+                ${flash.message}
+            </div>
+        </g:if>
+    </div>
     <h2>Sequence Run #${run.id}  <small><g:if test="${run.runNum}">(Old No.${run.runNum})</g:if> <span class="label label-default">${run.status}</span></small></h2>
-    <h3>Summary</h3>
+    <h3>Summary <g:if test="${run?.status!=pegr.RunStatus.COMPLETED}"> <g:link action="editInfo" params="[runId:run.id]"><span class="edit">Edit</span></g:link></g:if></h3>
     <g:render template="summaryDetails"></g:render>    
     <h3>Samples</h3>
     <table class="table table-striped">

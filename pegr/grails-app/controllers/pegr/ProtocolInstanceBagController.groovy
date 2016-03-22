@@ -59,7 +59,34 @@ class ProtocolInstanceBagController {
         }
     }
     
-   def searchItemForBag(Long bagId){
+    def updateBagAjax(Long bagId, String name) {
+        def message = null
+        protocolInstanceBagService.updateBag(bagId, name)
+        render name
+    }
+    
+    def deleteBag(Long bagId) {
+        try {
+            protocolInstanceBagService.deleteBag(bagId)
+            flash.message = "The protocol instance bag has been deleted!"
+        } catch (ProtocolInstanceBagException e) {
+            flash.message = e.message
+        }
+        redirect(action: "index")
+    }
+    
+    def reopenBag(Long bagId) {
+        try {
+            protocolInstanceBagService.reopenBag(bagId)
+            flash.message = "The protocol instance bag has been reopened!"
+            redirect(action: "showBag", id: bagId)
+        } catch (ProtocolInstanceBagException e) {
+            flash.message = e.message
+            redirect(action: "index")
+        }
+    }
+    
+    def searchItemForBag(Long bagId){
         [bagId: bagId]       
     }
     

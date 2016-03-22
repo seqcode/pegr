@@ -93,7 +93,7 @@ class SecurityFilters {
             }
         }
 
-        ProtocolInstanceBagEdit(controller: "protocolInstanceBag", action: "searchItemForBag|previewItemAndBag|addItemToBag|addSubBagToBag|removeItemFromBag") {
+        ProtocolInstanceBagEdit(controller: "protocolInstanceBag", action: "searchItemForBag|previewItemAndBag|addItemToBag|addSubBagToBag|removeItemFromBag|updateBagAjax") {
             before = {
                 def bagId = params.long('bagId')
                 def bag = ProtocolInstanceBag.get(bagId)
@@ -127,7 +127,7 @@ class SecurityFilters {
             }
         }
         
-        SequenceRunEdit(controller: "sequenceRun", action: "editInfo|update|searchPool|addPool|removeExperiment|updateGenomes|run") {
+        SequenceRunEdit(controller: "sequenceRun", action: "editInfo|update|searchPool|addPool|removePool|removeExperiment|updateGenomes|run") {
             before = {
                 def runId = params.long('runId')
                 def run =  SequenceRun.get(runId)

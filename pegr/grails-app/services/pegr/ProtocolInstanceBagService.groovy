@@ -429,4 +429,49 @@ class ProtocolInstanceBagService {
             it.addToBags(instance.bag)
         }
     }
+    
+    @Transactional
+    void updateBag(Long bagId, String name) {
+        def bag = ProtocolInstanceBag.get(bagId)
+        if (bag) {
+            bag.name = name
+            bag.save()
+        } else {
+            throw new ProtocolInstanceBagException(message: "Bag not found!")
+        }
+    }
+    
+    @Transactional
+    void reopenBag(Long bagId) {
+        def bag = ProtocolInstanceBag.get(bagId)
+        if (bag) {
+            bag.status = ProtocolStatus.PROCESSING
+            bag.save()
+        } else {
+            throw new ProtocolInstanceBagException(message: "Bag not found!")
+        }
+    }
+    
+    @Transactional
+    void deleteBag(Long bagId) {
+        def bag = ProtocolInstanceBag.get(bagId)
+        if (bag) {
+            def instances = ProtocolInstance.findAllByBag(bag)
+            instances.each {
+                // remove all the items from the instances
+                ProtocolInstanceItems.executeUpdate('delete ProtocolInstanceItems where protocolInstance.id = :instanceId', [instanceId: it.id])
+                // remove the instances in the bag
+                it.delete(flush: true)
+            }            
+            // remove all the samples from the bag
+            def samples = bag.tracedSamples
+            samples.each{
+                it.removeFromBags(bag).save(flush: true)
+            }
+            // remove the bag itself
+            bag.delete()
+        } else {
+            throw new ProtocolInstanceBagException(message: "Bag not found!")
+        }
+    }
 }

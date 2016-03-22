@@ -10,6 +10,13 @@
         <li><g:link action="completedBags">Completed</g:link></li>   
         <li><g:link action='create'>New</g:link></li>
     </ul>
+    <div id="message" >
+        <g:if test="${flash.message}">
+             <div class="message" role="status">
+                ${flash.message}
+            </div>
+        </g:if>
+    </div>
     <ul class="list-group">
         <g:each in="${bags}">
         <li class="list-group-item"><g:render template="/protocolInstanceBag/overview" bean="${it}"></g:render></li>

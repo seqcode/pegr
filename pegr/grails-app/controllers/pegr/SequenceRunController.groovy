@@ -9,6 +9,7 @@ class SequenceRunController {
     
     def csvConvertService
     
+    // list incomplete runs
     def index(Integer max){
         params.max = Math.min(max ?: 15, 100)
         if (!params.sort) {
@@ -32,10 +33,10 @@ class SequenceRunController {
     def show(Integer id) {
         def run = SequenceRun.get(id)
         if (run) {
-            if (run.status == RunStatus.COMPLETED) {
+            if (run.status != RunStatus.PREP) {
                 [run: run]
             } else {
-                redirect(action: "edit", id: id)   
+                redirect(action: "edit", params:[runId: id])   
             }
         } else {
             flash.message = "Sequence run not found!"
@@ -43,8 +44,8 @@ class SequenceRunController {
         }
     }
     
-    def edit(Integer id) {
-        def run = SequenceRun.get(id)
+    def edit(Integer runId) {
+        def run = SequenceRun.get(runId)
         if (run) {
             [run: run]
         } else {
@@ -67,7 +68,7 @@ class SequenceRunController {
         try {
             sequenceRunService.save(run)
             flash.message = "New sequence run created!"
-            redirect(action: "edit", id: run.id)
+            redirect(action: "edit", params: [runId: run.id])
         }catch(SequenceRunException e) {
             flash.message = e.message
             def largestRunNum = SequenceRun.createCriteria().get {
@@ -79,8 +80,8 @@ class SequenceRunController {
         }
     }
     
-    def editInfo(Long id) {
-        def run = SequenceRun.get(id)
+    def editInfo(Long runId) {
+        def run = SequenceRun.get(runId)
         if (run) {
             [run: run]
         } else {
@@ -89,8 +90,8 @@ class SequenceRunController {
         }
     }
     
-    def update(Long id) {
-        def run = SequenceRun.get(id)
+    def update(Long runId) {
+        def run = SequenceRun.get(runId)
         if (run) {
             try {
                 run.properties = params 
@@ -100,7 +101,7 @@ class SequenceRunController {
                     run.runStats = new RunStats(params)
                 }
                 sequenceRunService.save(run)                   
-                redirect(action: "edit", id: run.id)
+                redirect(action: "show", id:runId)
             } catch(SequenceRunException e) {
                 flash.message = e.message
                 render(view: "editInfo", model: [run: run])
@@ -136,17 +137,27 @@ class SequenceRunController {
         } catch (SequenceRunException e) {
             flash.message = e.message
         }
-        redirect(action: "edit", id: runId)
+        redirect(action: "edit", params: [runId: runId])
+    }
+    
+    def removePool(Long runId) {
+        try {
+            sequenceRunService.removePool(runId)
+            flash.message = "The master pool has been removed!"
+        } catch (SequenceRunException e) {
+            flash.message = e.message
+        }
+        redirect(action: "edit", params: [runId: runId])
     }
     
     def removeExperiment(Long experimentId, Long runId) {
         try {
             sequenceRunService.removeExperiment(experimentId)
-            flash.message = "Experiment deleted!"
+            flash.message = "Sequencing experiment deleted!"
         } catch (SequenceRunException e) {
             flash.message = e.message
         }
-        redirect(action: "edit", id: runId)
+        redirect(action: "edit", params: [runId: runId])
     }
     
     def updateGenomes(Long runId) {
@@ -165,7 +176,7 @@ class SequenceRunController {
             messages = "All genomes added successfully!"
         }
         flash.message = messages
-        redirect(action: "edit", id: runId)
+        redirect(action: "edit", params: [runId: runId])
     }
     
     def run(Long runId) {
@@ -174,7 +185,7 @@ class SequenceRunController {
             redirect(action: "show", id: runId)
         } catch(SequenceRunException e) {
             flash.message = e.message
-            redirect(action: "edit", id: runId)
+            redirect(action: "edit", params: [runId: runId])
         }
     }
     

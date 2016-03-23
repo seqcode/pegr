@@ -59,8 +59,35 @@ class ProtocolInstanceBagController {
         }
     }
     
-   def searchItemForBag(Long id){
-        [bagId: id]       
+    def updateBagAjax(Long bagId, String name) {
+        def message = null
+        protocolInstanceBagService.updateBag(bagId, name)
+        render name
+    }
+    
+    def deleteBag(Long bagId) {
+        try {
+            protocolInstanceBagService.deleteBag(bagId)
+            flash.message = "The protocol instance bag has been deleted!"
+        } catch (ProtocolInstanceBagException e) {
+            flash.message = e.message
+        }
+        redirect(action: "index")
+    }
+    
+    def reopenBag(Long bagId) {
+        try {
+            protocolInstanceBagService.reopenBag(bagId)
+            flash.message = "The protocol instance bag has been reopened!"
+            redirect(action: "showBag", id: bagId)
+        } catch (ProtocolInstanceBagException e) {
+            flash.message = e.message
+            redirect(action: "index")
+        }
+    }
+    
+    def searchItemForBag(Long bagId){
+        [bagId: bagId]       
     }
     
     def previewItemAndBag(Long typeId, String barcode, Long bagId) {
@@ -168,6 +195,9 @@ class ProtocolInstanceBagController {
                 } else {
                     results = protocolInstanceBagService.getParentsAndChildrenForProcessingInstance(samples, protocol.startItemType, protocol.endItemType)                
                     toBeCompleted = protocolInstanceBagService.readyToBeCompleted(sharedItemAndPoolList, results, samples, protocol)
+                    if (protocol.endItemType && !samples) {
+                        request.message = "Please add traced samples on the Home page!"
+                    }
                     render(view: "editInstance", model: [protocolInstance: protocolInstance, 
                                                  sharedItemAndPoolList: sharedItemAndPoolList,
                                                  samples: samples,
@@ -186,8 +216,8 @@ class ProtocolInstanceBagController {
         }
     }
     
-    def searchItemForInstance(Long id){
-        [instanceId: id]       
+    def searchItemForInstance(Long instanceId){
+        [instanceId: instanceId]       
     }
     
     def searchItemForTypeInstance(Long instanceId, Long typeId){

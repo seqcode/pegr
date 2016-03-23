@@ -17,7 +17,7 @@
     </g:hasErrors>
     <g:form action='edit' method="post" role="form" useToken="true">
         <g:render template='info' bean='${project}'/>
-        <g:hiddenField name="id" value="${project.id}" />
+        <g:hiddenField name="projectId" value="${project.id}" />
         <g:submitButton name='save' value='Save' class="btn btn-primary"/>
     </g:form>
     <script>

@@ -130,6 +130,7 @@ class ProtocolInstanceBagService {
 			item.parent = parent
 		}
         // save the item
+        item.user = springSecurityService.currentUser
         if (item.save(flush: true)) { 
             // add the item to the instance
             def instance = ProtocolInstance.get(instanceId)
@@ -152,8 +153,18 @@ class ProtocolInstanceBagService {
         if (!protocolItem) {
             throw new ProtocolInstanceBagException(message: "Item not found in the protocol instance!")
         }
-        try {            
+        try {  
+            // remove the item from the protocol
             protocolItem.delete(flush: true)
+            // delete the item if it is the end pool in this protocol
+            def instance = ProtocolInstance.get(instanceId)
+            def item = Item.get(itemId)
+            if (instance.protocol.endPoolType == item.type) {
+                // delete the samples related to the pool
+                PoolSamples.executeUpdate("delete from PoolSamples where pool.id = :itemId", [itemId: itemId])
+                // delete the pool itself
+                item.delete()
+            }
         }catch(Exception e) { 
             log.error "Error: ${e.message}", e
             throw new ProtocolInstanceBagException(message: "Error removing the item!")
@@ -382,6 +393,7 @@ class ProtocolInstanceBagService {
             throw new ProtocolInstanceBagException(message: "Parent not found!")
         }
         item.parent = sample.item
+        item.user = springSecurityService.currentUser
         if (item.save(flush: true)){
             sample.item = item
             sample.save()
@@ -415,6 +427,51 @@ class ProtocolInstanceBagService {
         new ProtocolInstanceItems(item: item, protocolInstance: instance).save()
         item.samplesInPool.each {
             it.addToBags(instance.bag)
+        }
+    }
+    
+    @Transactional
+    void updateBag(Long bagId, String name) {
+        def bag = ProtocolInstanceBag.get(bagId)
+        if (bag) {
+            bag.name = name
+            bag.save()
+        } else {
+            throw new ProtocolInstanceBagException(message: "Bag not found!")
+        }
+    }
+    
+    @Transactional
+    void reopenBag(Long bagId) {
+        def bag = ProtocolInstanceBag.get(bagId)
+        if (bag) {
+            bag.status = ProtocolStatus.PROCESSING
+            bag.save()
+        } else {
+            throw new ProtocolInstanceBagException(message: "Bag not found!")
+        }
+    }
+    
+    @Transactional
+    void deleteBag(Long bagId) {
+        def bag = ProtocolInstanceBag.get(bagId)
+        if (bag) {
+            def instances = ProtocolInstance.findAllByBag(bag)
+            instances.each {
+                // remove all the items from the instances
+                ProtocolInstanceItems.executeUpdate('delete ProtocolInstanceItems where protocolInstance.id = :instanceId', [instanceId: it.id])
+                // remove the instances in the bag
+                it.delete(flush: true)
+            }            
+            // remove all the samples from the bag
+            def samples = bag.tracedSamples
+            samples.each{
+                it.removeFromBags(bag).save(flush: true)
+            }
+            // remove the bag itself
+            bag.delete()
+        } else {
+            throw new ProtocolInstanceBagException(message: "Bag not found!")
         }
     }
 }

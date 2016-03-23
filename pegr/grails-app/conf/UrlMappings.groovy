@@ -7,6 +7,11 @@ class UrlMappings {
 			 action = "form"
 		}
         
+        "/login/full"{
+			controller = "auth"
+			 action = "form"
+		}
+        
         "/$controller/$action?/$id?(.$format)?"{
             constraints {
                 // apply constraints here

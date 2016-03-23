@@ -28,7 +28,7 @@
             </g:each>
             <g:if test="${extra && edit}">
                 <tr>
-                    <td colspan="5"><g:link action="searchItemForInstance" params="[id:instanceId]">Add <span class="glyphicon glyphicon-plus"></span></g:link></td>
+                    <td colspan="5"><g:link action="searchItemForInstance" params="[instanceId:instanceId]">Add <span class="glyphicon glyphicon-plus"></span></g:link></td>
                     <td></td>
                 </tr>
             </g:if>

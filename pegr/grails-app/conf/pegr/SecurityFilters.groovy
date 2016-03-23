@@ -10,32 +10,42 @@ class SecurityFilters {
         projectShow(controller:'project', action:'show') {
             before = {
                 def currUser = springSecurityService.currentUser
-                if (currUser.id == 1) {
+                if (currUser.isAdmin()) {
                     return true
                 }
                 def projectId = params.long('id')
                 if (ProjectUser.where {project.id == projectId && user == currUser}.get(max: 1)) {
                     return true                    
                 } else {
-                    flash.message = "Access denied!"
-                    redirect(controller: "project", action: "index")
+                    render(view: '/login/denied')
                     return false
                 }
             }
         }
         
-        projectEdit(controller:'project', action:'edit|addUserAjax|removeUserAjax') {
+        projectAllAndCreate(controller: 'project', action: 'create|all') {
             before = {
                 def currUser = springSecurityService.currentUser
-                if (currUser.id == 1) {
+                if (currUser.isAdmin()) {
+                    return true
+                } else {
+                    render(view: '/login/denied')
+                    return false
+                }
+            }    
+        }
+        
+        projectEdit(controller:'project', action:'edit|addUserAjax|removeUserAjax|editUserRoleAjax') {
+            before = {
+                def currUser = springSecurityService.currentUser
+                if (currUser.isAdmin()) {
                     return true
                 }
-                def projectId = params.long('id')
+                def projectId = params.long('projectId')
                 if (ProjectUser.where {project.id == projectId && user == currUser && projectRole == ProjectRole.OWNER}.get(max: 1)) {
                     return true                    
                 } else {
-                    flash.message = "Access denied!"
-                    redirect(controller: "project", action: "index")
+                    render(view: '/login/denied')
                     return false
                 }
             }
@@ -46,8 +56,7 @@ class SecurityFilters {
                 def antibodyId = params.long('antibodyId')
                 def antibody = Antibody.get(antibodyId)
                 def currUser = springSecurityService.currentUser
-                if (currUser.authorities.any { it.authority == "ROLE_ADMIN" }
-                   || antibody?.item?.user == currUser) {
+                if (currUser.isAdmin() || antibody?.item?.user == currUser) {
                     return true
                 } else {
                     render(view: '/login/denied')
@@ -61,8 +70,7 @@ class SecurityFilters {
                 def cellSourceId = params.long('cellSourceId')
                 def cellSource = CellSource.get(cellSourceId)
                 def currUser = springSecurityService.currentUser
-                if (currUser.authorities.any { it.authority == "ROLE_ADMIN" }
-                   || cellSource?.item?.user == currUser) {
+                if (currUser.isAdmin() || cellSource?.item?.user == currUser) {
                     return true
                 } else {
                     render(view: '/login/denied')
@@ -76,13 +84,65 @@ class SecurityFilters {
                 def itemId = params.long('itemId')
                 def item = Item.get(itemId)
                 def currUser = springSecurityService.currentUser
-                if (currUser.authorities.any { it.authority == "ROLE_ADMIN" }
-                   || item?.user == currUser) {
+                if (currUser.isAdmin() || item?.user == currUser) {
                     return true
                 } else {
                     render(view: '/login/denied')
                     return false
                 }
+            }
+        }
+
+        ProtocolInstanceBagEdit(controller: "protocolInstanceBag", action: "searchItemForBag|previewItemAndBag|addItemToBag|addSubBagToBag|removeItemFromBag|updateBagAjax") {
+            before = {
+                def bagId = params.long('bagId')
+                def bag = ProtocolInstanceBag.get(bagId)
+                if (bag.status != ProtocolStatus.COMPLETED) {
+                    return true
+                } else {
+                    flash.message = "The protocol instance bag is completed and no changes are allowed. Please contact lab admin if you have further questions."
+                    redirect(action: "showBag", id: bagId)
+                }
+            }    
+        }
+        
+        ProtocolInstanceEdit(controller: "protocolInstanceBag", action: "searchItemForInstance|searchItemForTypeInstance|previewItemInInstance|addPoolToInstance|addItemToInstance|saveItemInInstance|removeItemFromInstance|addIndex|searchAntibody|previewAntibody|addAntibodyToSample|removeAntibody|addChild|removeChild") {
+            before = {
+                def instanceId = params.long('instanceId') 
+                def instance = ProtocolInstance.get(instanceId)
+                if (instance?.user) {
+                    def currUser = springSecurityService.currentUser
+                    if (!currUser.isAdmin() && instance.user != currUser) {
+                        render(view: '/login/denied')
+                        return false
+                    }
+                }                
+                if (instance?.bag) {
+                    if (instance.bag.status == ProtocolStatus.COMPLETED) {
+                        flash.message = "The protocol instance bag is completed and no changes are allowed. Please contact lab admin if you have further questions."
+                        redirect(action: "showBag", id: instance.bag.id)
+                    }
+                } 
+                return true
+            }
+        }
+        
+        SequenceRunEdit(controller: "sequenceRun", action: "editInfo|update|searchPool|addPool|removePool|removeExperiment|updateGenomes|run") {
+            before = {
+                def runId = params.long('runId')
+                def run =  SequenceRun.get(runId)
+                if (run?.user) {
+                    def currUser = springSecurityService.currentUser
+                    if (!currUser.isAdmin() && run.user != currUser) {
+                        render(view: '/login/denied')
+                        return false
+                    }
+                }
+                if (run?.status == RunStatus.COMPLETED) {
+                    flash.message = "This sequence run is completed and no changes are allowed. Please contact lab admin if you have further questions."
+                    redirect(action: "show", id: runId)
+                }
+                return true
             }
         }
     }

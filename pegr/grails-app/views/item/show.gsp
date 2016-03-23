@@ -29,6 +29,10 @@
         <li>Location: ${item.location}</li>
         </g:if>	
 
+        <g:if test="${item?.user}">
+        <li>User: ${item.user}</li>
+        </g:if>
+        
         <g:if test="${item?.notes}">
         <li>Notes: ${item.notes}</li>
         </g:if>    
@@ -59,14 +63,14 @@
         <div class="form-group">
             <g:hiddenField name="itemId" value="${item.id}"></g:hiddenField>
             <input type="file" id="image" name="image"/>
-            <g:submitButton name="upload" value="Upload"/> (only jpeg, png, gif files)
+            <g:submitButton name="upload" value="Upload"/> (only jpeg, png, gif files, size limit: 5 MB)
         </div>
     </g:uploadForm>
     <g:if test="${item?.type?.category == pegr.ItemTypeCategory.OTHER || item?.type?.category == pegr.ItemTypeCategory.SAMPLE_POOL}">
         <h4>Related Protocol Instances</h4>
         <ul>
             <g:each in="${item.relatedInstances}">
-                <li><g:link controller="protocolInstanceBag" action="showInstance" id="${it.id}">${it.protocol}</g:link></li>
+                <li><g:link controller="protocolInstanceBag" action="showInstance" id="${it.id}"><g:formatDate format="yyyy-MM-dd" date="${it.startTime}"/> ${it.protocol}</g:link></li>
             </g:each>
         </ul>
     </g:if>

@@ -27,6 +27,10 @@
                 <li>Location: ${antibody.item.location}</li>
                 </g:if>	
 
+                <g:if test="${antibody.item?.user}">
+                <li>User: ${antibody.item.user}</li>
+                </g:if>
+                
                 <g:if test="${antibody.item?.notes}">
                 <li>Notes: ${antibody.item.notes}</li>
                 </g:if>    

@@ -14,6 +14,10 @@
     <li>Location: ${item.location}</li>
     </g:if>	
 
+    <g:if test="${item?.user}">
+    <li>User: ${item.user}</li>
+    </g:if>
+    
     <g:if test="${item?.notes}">
     <li>Notes: ${item.notes}</li>
     </g:if>    

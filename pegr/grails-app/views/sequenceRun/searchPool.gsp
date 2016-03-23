@@ -24,7 +24,7 @@
             <button type="button" onclick="getScan();"><span class="glyphicon glyphicon-qrcode"></span></button>
         </div>
         <g:submitButton class="btn btn-primary btn-sm" name="search" value="Search"/>
-        <g:link action="edit" id="${runId}" class="btn btn-default">Cancel</g:link>
+        <g:link action="edit" params="[runId:runId]" class="btn btn-default">Cancel</g:link>
     </g:form>    
 
     <script>

@@ -28,7 +28,7 @@ class ProjectService {
     }
     
     @Transactional
-    void addUser(ProjectUser projectUser) {
+    void saveUser(ProjectUser projectUser) {
         projectUser.save()
     }
     

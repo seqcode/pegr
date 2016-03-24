@@ -26,6 +26,7 @@ class SecurityFilters {
         projectAllAndCreate(controller: 'project', action: 'create|all') {
             before = {
                 def currUser = springSecurityService.currentUser
+                // only admin is allowed
                 if (currUser.isAdmin()) {
                     return true
                 } else {
@@ -38,9 +39,11 @@ class SecurityFilters {
         projectEdit(controller:'project', action:'edit|addUserAjax|removeUserAjax|editUserRoleAjax') {
             before = {
                 def currUser = springSecurityService.currentUser
+                // admin is allowed
                 if (currUser.isAdmin()) {
                     return true
                 }
+                // project owner is allowed
                 def projectId = params.long('projectId')
                 if (ProjectUser.where {project.id == projectId && user == currUser && projectRole == ProjectRole.OWNER}.get(max: 1)) {
                     return true                    
@@ -93,6 +96,7 @@ class SecurityFilters {
             }
         }
 
+        // before the bag is completed
         ProtocolInstanceBagEdit(controller: "protocolInstanceBag", action: "searchItemForBag|previewItemAndBag|addItemToBag|addSubBagToBag|removeItemFromBag|updateBagAjax") {
             before = {
                 def bagId = params.long('bagId')
@@ -106,7 +110,8 @@ class SecurityFilters {
             }    
         }
         
-        ProtocolInstanceEdit(controller: "protocolInstanceBag", action: "searchItemForInstance|searchItemForTypeInstance|previewItemInInstance|addPoolToInstance|addItemToInstance|saveItemInInstance|removeItemFromInstance|addIndex|searchAntibody|previewAntibody|addAntibodyToSample|removeAntibody|addChild|removeChild") {
+        // before the bag is completed and only admin/instance user is allowed 
+        ProtocolInstanceEdit(controller: "protocolInstanceBag", action: "searchItemForInstance|searchItemForTypeInstance|previewItemInInstance|addPoolToInstance|addItemToInstance|saveItemInInstance|removeItemFromInstance|addIndex|searchAntibody|previewAntibody|addAntibodyToSample|removeAntibody|addChild|removeChild|completeInstance") {
             before = {
                 def instanceId = params.long('instanceId') 
                 def instance = ProtocolInstance.get(instanceId)

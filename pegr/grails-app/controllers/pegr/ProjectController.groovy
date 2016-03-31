@@ -96,7 +96,9 @@ class ProjectController {
                authorized = true                    
             }          
             def samples = ProjectSamples.where {project==currentProject}.list(params).collect{it.sample}
-            [project: currentProject, projectUsers: projectUsers, samples: samples, sampleCount: currentProject.samples.size(), authorized: authorized]
+            def experiments = samples.collect{it.sequencingExperiments}.flatten()
+            def alignments = experiments.collect{it.alignments}.flatten()
+            [project: currentProject, projectUsers: projectUsers, samples: samples, experiments: experiments, alignments: alignments, sampleCount: currentProject.samples.size(), authorized: authorized]
         } else {
             flash.message = "Project not found!"
             redirect(action: "index")

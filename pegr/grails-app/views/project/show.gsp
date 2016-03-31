@@ -17,11 +17,34 @@
         </div>
         
 		<h3>Samples</h3>
-        <g:link action="addSamples" params="[projectId: project?.id]" class="btn btn-info">Create New Sample</g:link>
-        <g:link action="addSample" class="btn btn-info">Add Existing Sample</g:link>
-        <g:render template="/sample/table" model="['sampleList':samples]" />
-		<div class="pagination">
+
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#sample">Sample Information</a></li>
+            <li><a data-toggle="tab" href="#sequencing">Sequencing</a></li>
+            <li><a data-toggle="tab" href="#alignment">Alignment</a></li>
+            <li><a data-toggle="tab" href="#peak">Peak Statistics</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div id="sample" class="tab-pane fade in active">
+                <g:render template="/project/sampleTable" model="['sampleList':samples]" />
+            </div>
+            <div id="sequencing" class="tab-pane fade">
+                <g:render template="/project/sequencingTable" model="['experimentList':experiments]" />
+            </div>
+            <div id="alignment" class="tab-pane fade">
+                <g:render template="/project/alignmentTable" model="['alignmentList':alignments]" />
+            </div>
+            <div id="peak" class="tab-pane fade">
+                <g:render template="/project/peakTable" model="['alignmentList':alignments]" />
+            </div>
+        </div>
+        <div class="pagination">
             <g:paginate id="${project.id}" total="${sampleCount ?: 0}" max="50"/>
+        </div>        
+        <div>
+            <g:link action="addSamples" params="[projectId: project?.id]" class="btn btn-info">Create New Sample</g:link>
+            <g:link action="addSample" class="btn btn-info">Add Existing Sample</g:link>
         </div>
 	</div>
 		
@@ -111,6 +134,18 @@
         function closeModal() {
             $(".modal").modal('hide');
         }
+        
+        $(function(){
+          var hash = window.location.hash;
+          hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+
+          $('.nav-tabs a').click(function (e) {
+            $(this).tab('show');
+            var scrollmem = $('body').scrollTop() || $('html').scrollTop();
+            window.location.hash = this.hash;
+            $('html,body').scrollTop(scrollmem);
+          });
+        });
 	</script>
 </body>
 </html>

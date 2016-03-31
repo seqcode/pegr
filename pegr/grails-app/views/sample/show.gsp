@@ -26,6 +26,8 @@
                     <ul>
                         <g:each in="${sample.sequencingExperiments}">
                             <li>
+                                <h4><g:link controller="sequenceRun" action="show" id="${it.sequenceRun.id}">Sequence Run ${it.sequenceRun.id}(Old No.${it.sequenceRun.runNum})</g:link></h4>
+                                <g:render template="sequencingTable" model="['experiment':it]"></g:render>
                                 <g:each in="${it.alignments}">
                                     <li>Reference Genome: ${it.genome}</li>
                                 </g:each>

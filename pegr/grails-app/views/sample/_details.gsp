@@ -133,7 +133,18 @@
             <li>Publication Reference: ${sample.publicationReference}</li>
             </g:if>
 
-            <g:each in="${notes}"><li>${it.key}: ${it.value}</li></g:each>
+            <g:if test="${notes['Resin']}">
+            <li>Resin: ${notes['Resin']}</li>
+            </g:if>
+            
+            <g:if test="${notes['PCR Cycle']}">
+            <li>PCR Cycle: ${notes['PCR Cycle']}</li>
+            </g:if>
+            
+            <g:if test="${notes['note']}">
+            <li>Notes: ${notes['note']}</li>
+            </g:if>
+            
             <li>Index: <g:each in="${sample.sequenceIndices}">${it.sequence} </g:each></li>
         </ul>
     </div>     

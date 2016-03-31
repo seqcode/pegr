@@ -19,9 +19,9 @@
 		<h3>Samples</h3>
         <g:link action="addSamples" params="[projectId: project?.id]" class="btn btn-info">Create New Sample</g:link>
         <g:link action="addSample" class="btn btn-info">Add Existing Sample</g:link>
-        <g:render template="/sample/table" model="['sampleList':project?.samples]" />
+        <g:render template="/sample/table" model="['sampleList':samples]" />
 		<div class="pagination">
-            <g:paginate total="${sampleCount ?: 0}" />
+            <g:paginate id="${project.id}" total="${sampleCount ?: 0}" max="50"/>
         </div>
 	</div>
 		

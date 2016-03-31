@@ -25,6 +25,7 @@
                 <th>Antibody</th>
                 <th>Index</th>
                 <th>Genome Build</th>
+                <th>Project</th>
             </tr>
         </thead>
         <tbody>
@@ -34,7 +35,12 @@
                     <td>${it.sample?.cellSource?.strain}</td>
                     <td>${it.sample?.antibody}</td>
                     <td>${it.sample?.sequenceIndicesDetailString}</td>
-                    <td>${it.genomesString}</td>                        
+                    <td>${it.genomesString}</td>
+                    <td>
+                        <g:each in="${it.sample?.projects}">
+                            <g:link controller="project" action="show" id="${it.id}">${it.name}</g:link>; 
+                        </g:each>                        
+                    </td>
                 </tr>
             </g:each>              
             <tr>

@@ -94,8 +94,9 @@ class ProjectController {
                 authorized = true
             } else if (projectUsers.find { it.user == currUser && it.projectRole == ProjectRole.OWNER}) {
                authorized = true                    
-            }                
-            [project: currentProject, projectUsers: projectUsers, sampleCount: currentProject.samples.size(), authorized: authorized]
+            }          
+            def samples = ProjectSamples.where {project==currentProject}.list(params).collect{it.sample}
+            [project: currentProject, projectUsers: projectUsers, samples: samples, sampleCount: currentProject.samples.size(), authorized: authorized]
         } else {
             flash.message = "Project not found!"
             redirect(action: "index")

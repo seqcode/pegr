@@ -37,9 +37,15 @@
             </div>
             <div class="col-md-2 well">
                 <h3 class="text-center">Links</h3>
+                <div id="project">
+                    <h4>Projects</h4>
+                    <g:each in="${sample.projects}">
+                        <g:link controller="project" action="show" id="${it.id}"><g:formatDate format="yyyy-MM-dd" date="${it.dateCreated}"/> ${it}</g:link>
+                    </g:each>
+                </div>
                 <div id="seq">
                     <h4>Sequence Runs</h4>
-                    <g:each in="${sample.runs}"><a href="#"><g:formatDate format="yyyy-MM-dd" date="${it.date}"/></p></a></g:each>
+                    <g:each in="${sample.runs}"><g:link controller="sequenceRun" action="show" id="${it.id}"><g:formatDate format="yyyy-MM-dd" date="${it.date}"/> Run #${it.id} (Old No.${it.runNum})</g:link></g:each>
                 </div>  
                 <div id="bioRep">
                     <h4>Biological Replicates</h4>
@@ -49,10 +55,6 @@
                     <h4>Technical Replicates</h4>
                     <g:each in="${sample.techReps}">${it}</g:each>
                 </div>  
-                <div id="project">
-                    <h4>Projects</h4>
-                    <g:each in="${sample.projects}">${it}</g:each>
-                </div>
             </div>
         </div>
     </div>

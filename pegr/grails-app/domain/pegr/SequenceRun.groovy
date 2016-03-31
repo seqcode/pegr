@@ -13,7 +13,6 @@ class SequenceRun {
     RunStatus status
     RunStats runStats
     Item poolItem
-    Integer totalNumReads
 	
     List getExperiments() {
         return SequencingExperiment.where{sequenceRun == this}.list()
@@ -28,7 +27,6 @@ class SequenceRun {
         date nullable: true
         runStats nullable: true
         poolItem nullable: true
-        totalNumReads nullable: true
     }
 
 }

@@ -5,22 +5,30 @@ class ProjectController {
 	def springSecurityService
     def projectService
 	
-    def index(int max) {
-        params.max = Math.min(max ?:15, 100)
-
+    def index(int max, int offset) {
+        max = Math.min(max ?:15, 100)
         // get the current login user
 		def currentUser = springSecurityService.currentUser
 		
         // query the user's the projects
-        def query = ProjectUser.where {user == currentUser}
-        def projects = query.list(params).collect{it.project}
-        def totalCount = query.count()
+        def c = ProjectUser.createCriteria()
+        def projects = c.list(max: max, offset: offset) {
+            eq("user", currentUser)
+            project {
+                order("dateCreated", "desc")
+            }
+        }.collect{it.project}
+        // get the total count of projects linked to the user
+        def totalCount = ProjectUser.where {user == currentUser}.count()
         [projects: projects, totalCount: totalCount]
 	}
     
     def all(int max) {
         params.max = Math.min(max ?:15, 100)
-		
+		if (!params.sort) {
+            params.sort = "dateCreated"
+            params.order = "desc"
+        }
         // query all the projects
         def projects =  Project.list(params)
         [projects: projects, totalCount: Project.count()]

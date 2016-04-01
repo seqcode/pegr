@@ -20,7 +20,6 @@
 
         <ul class="nav nav-tabs">
             <li class="active"><a data-toggle="tab" href="#sample">Sample Information</a></li>
-            <li><a data-toggle="tab" href="#sequencing">Sequencing</a></li>
             <li><a data-toggle="tab" href="#alignment">Alignment</a></li>
             <li><a data-toggle="tab" href="#peak">Peak Statistics</a></li>
         </ul>
@@ -28,9 +27,6 @@
         <div class="tab-content">
             <div id="sample" class="tab-pane fade in active">
                 <g:render template="/project/sampleTable" model="['sampleList':samples]" />
-            </div>
-            <div id="sequencing" class="tab-pane fade">
-                <g:render template="/project/sequencingTable" model="['experimentList':experiments]" />
             </div>
             <div id="alignment" class="tab-pane fade">
                 <g:render template="/project/alignmentTable" model="['alignmentList':alignments]" />

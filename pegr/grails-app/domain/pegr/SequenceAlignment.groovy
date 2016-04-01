@@ -11,11 +11,7 @@ class SequenceAlignment {
 	CorePipeline corePipeline
 	Date date
 	boolean isPreferred
-    Integer mappedReadCount
-    Integer uniqueMappedReadCount
-    Integer dedupReadCount
-    Integer avgInsertSize
-    PeakStatistics peakStatistics
+    AlignmentStats alignmentStats
 	
     static constraints = {
 		readDbId nullable: true
@@ -25,11 +21,7 @@ class SequenceAlignment {
 		bamFilePath nullable: true, blank: true, maxSize: 1000
         corePipeline nullable: true
         date nullable: true
-        mappedReadCount nullable: true
-        uniqueMappedReadCount nullable: true
-        dedupReadCount nullable: true
-        avgInsertSize nullable: true
-        peakStatistics nullable: true
+        alignmentStats nullable: true
     }
     
     static mapping = {

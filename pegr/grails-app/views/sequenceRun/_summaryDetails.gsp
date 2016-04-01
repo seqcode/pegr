@@ -23,8 +23,7 @@
         <ul>
             <li>Library Volume (ul): ${run.runStats?.libraryVolume}</li>
             <li>Library Stock (fmol): ${run.runStats?.libraryStock}</li>
-            <li>Std Dev: ${run.runStats?.libraryStdDev}</li>
-            <li>% Std Dev: ${run.runStats?.pctLibraryStdDev}%</li>
+            <li>Std Dev: ${run.runStats?.libraryStdDev} <g:if test="${run.runStats?.pctLibraryStdDev}"> (${run.runStats?.pctLibraryStdDev}%)</g:if></li>
             <li>Cycles: ${run.runStats?.cycles}</li>
             <li>SR or PE: ${run.runStats?.srOrPe}</li>
             <li>Seq Ctrl: ${run.runStats?.seqCtrl}</li>
@@ -41,8 +40,8 @@
         <ul>
             <li>Cluster # (K/mm<sup>2</sup>): ${run.runStats?.clusterNum}</li> 
             <li># Read PF (M): ${run.runStats?.readPf}</li>
-            <li>% PF: ${run.runStats?.pctPf}%</li>
-            <li>% >= Q30: ${run.runStats?.pctQ30}%</li>
+            <li>% PF: <g:if test="${run.runStats?.pctPf}">${run.runStats?.pctPf}%</g:if></li>
+            <li>% >= Q30: <g:if test="${run.runStats?.pctQ30}">${run.runStats?.pctQ30}%</g:if></li>
             <li>Qidx: ${run.runStats?.qidx}</li>
         </ul>
     </div>
@@ -51,8 +50,8 @@
         <ul>
             <li>Total Reads: ${run.runStats?.totalReads}</li>
             <li>Unmatched Indices: ${run.runStats?.unmatchedIndices}</li>
-            <li>% Unmatched Indices: ${run.runStats?.pctUnmatchedIndices}%</li>
-            <li>% Aligned To PhiX: ${run.runStats?.pctAlignedToPhiX}%</li>    
+            <li>% Unmatched Indices: <g:if test="${run.runStats?.pctUnmatchedIndices}">${run.runStats?.pctUnmatchedIndices}%</g:if></li>
+            <li>% Aligned To PhiX: <g:if test="${run.runStats?.pctAlignedToPhiX}">${run.runStats?.pctAlignedToPhiX}%</g:if></li>    
         </ul>
     </div>
 </div>

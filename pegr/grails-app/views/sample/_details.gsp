@@ -113,6 +113,8 @@
         <ul>
             <li>Assay: ${sample.prtclInstSummary?.protocol}</li>
 
+            <li>Index: <g:each in="${sample.sequenceIndices}">${it.sequence} </g:each></li>
+            
             <g:if test="${sample?.requestedTagNumber}">
             <li>Requested Tag Number: ${sample.requestedTagNumber}</li>
             </g:if>
@@ -144,8 +146,6 @@
             <g:if test="${notes['note']}">
             <li>Notes: ${notes['note']}</li>
             </g:if>
-            
-            <li>Index: <g:each in="${sample.sequenceIndices}">${it.sequence} </g:each></li>
         </ul>
     </div>     
 

@@ -2,8 +2,6 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Sample</th>
-                <th>Run</th>
                 <th>Genome</th>   
                 <th>Peak Count</th>
                 <th>Peak Mean±Std</th>
@@ -22,8 +20,6 @@
         <tbody>
             <g:each in="${alignmentList}" var="alignment">
                 <tr>
-                    <td><g:link controller="sample" action="show" id="${alignment.sequencingExperiment?.sample?.id}">${alignment.sequencingExperiment?.sample?.id}</g:link></td>    
-                    <td><g:link controller="sequenceRun" action="show" id="${alignment.sequencingExperiment?.sequenceRun?.id}">${alignment.sequencingExperiment?.sequenceRun?.id} (Old ${alignment.sequencingExperiment?.sequenceRun?.runNum}) </g:link></td>
                     <td>${alignment.genome}</td> 
                     <td>${alignment.alignmentStats?.peaks}</td>
                     <td>${alignment.alignmentStats?.peakMean}<g:if test="${alignment.alignmentStats?.peakMeanStd}">

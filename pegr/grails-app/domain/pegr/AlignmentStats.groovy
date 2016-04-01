@@ -1,6 +1,18 @@
 package pegr
 
-class PeakStatistics {
+class AlignmentStats {
+    
+    Integer indexCount
+    Integer indexMismatch
+    Integer adapterCount
+    
+    Integer mappedReadCount
+    Integer uniqueMappedReadCount
+    Integer dedupReadCount
+    Integer avgInsertSize
+    Integer spikeInCount
+    Float ipStrength
+    
     String peakFilePath
     Integer peaks
     Integer singletons
@@ -18,6 +30,17 @@ class PeakStatistics {
     Integer repeatedRegions
     
     static constraints = {
+        indexCount nullable: true
+        indexMismatch nullable: true
+        adapterCount nullable: true
+        
+        mappedReadCount nullable: true
+        uniqueMappedReadCount nullable: true
+        dedupReadCount nullable: true
+        avgInsertSize nullable: true
+        spikeInCount nullable: true
+        ipStrength nullable: true
+        
         peakFilePath nullable: true
         peaks nullable: true
         singletons nullable: true

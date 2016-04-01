@@ -2,8 +2,6 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Sample ID</th>
-                <th>Sequence Run</th>
                 <th>Genome</th>
                 <th>Index Count</th>
                 <th>Mapped Read Count</th>
@@ -21,8 +19,6 @@
         <tbody>
             <g:each in="${alignmentList}" var="alignment">
                 <tr>
-                    <td><g:link controller="sample" action="show" id="${alignment.sequencingExperiment?.sample?.id}">${alignment.sequencingExperiment?.sample?.id}</g:link></td>    
-                    <td><g:link controller="sequenceRun" action="show" id="${alignment.sequencingExperiment?.sequenceRun?.id}">${alignment.sequencingExperiment?.sequenceRun?.id} (Old ${alignment.sequencingExperiment?.sequenceRun?.runNum}) </g:link></td>
                     <td>${alignment.genome}</td>
                     <td>${alignment.alignmentStats?.indexCount}</td>
                     <td>${alignment.alignmentStats?.mappedReadCount}</td>

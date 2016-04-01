@@ -2830,7 +2830,5 @@ databaseChangeLog = {
 
 	include file: 'addPoolSamples.groovy'
 
-	include file: 'addSummaryReport.groovy'
-
-	include file: 'removeDupTotalRead.groovy'
+	include file: 'addAlignmentStats.groovy'
 }

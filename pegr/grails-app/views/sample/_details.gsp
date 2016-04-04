@@ -109,7 +109,7 @@
     </div>
 
     <div id="protocol" class="col-sm-4">
-        <h4>Protocol</h4>            
+        <h4>Protocol <g:if test="${authorized}"><g:link controller="protocolInstanceBag" action="showProtocolDetailsForSample" params="[sampleId:sample?.id]" class="edit">Details</g:link></g:if></h4>            
         <ul>
             <li>Assay: ${sample.prtclInstSummary?.protocol}</li>
 

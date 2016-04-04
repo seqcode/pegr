@@ -3,6 +3,8 @@ import groovy.json.*
     
 class SampleController {
     
+    def springSecurityService
+    
     def index(Integer max) {
         params.max = Math.min(max ?: 15, 100)
         if (!params.sort) {
@@ -14,7 +16,7 @@ class SampleController {
         [sampleList: samples, sampleCount: Sample.count()]
     }
     
-	def show(Integer id) {
+	def show(Long id) {
 		def sample = Sample.get(id)
         def jsonSlurper = new JsonSlurper()
         def notes = [:]
@@ -28,7 +30,9 @@ class SampleController {
         }catch(Exception e){
             
         }        
-		[sample: sample, notes: notes]
+        def currentUser = springSecurityService.currentUser
+        def authorized = currentUser.isAdmin() ||  (currentUser.authorities.any { it.authority == "ROLE_MEMBER" }) 
+		[sample: sample, notes: notes, authorized: authorized]
 	}
     
     def showChecked(){

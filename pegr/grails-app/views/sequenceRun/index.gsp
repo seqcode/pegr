@@ -7,9 +7,11 @@
 <div class="container-fluid">
     <h4>Sequencing Runs</h4>
     <g:if test="${flash.message}">
-         <div class="message" role="status">
-            ${flash.message}
-        </div>
+        <g:each in="${flash.message}">
+            <div class="message" role="status">
+                ${it}
+             </div>
+         </g:each>   
     </g:if>
     
     <ul class="nav nav-tabs">

@@ -9,7 +9,7 @@
 <body>
     <div class="container-fluid">
         <div>
-            <g:link action="index"><span class="glyphicon glyphicon-home"></span> Home</g:link>
+            <g:link action="index"><span class="glyphicon glyphicon-home"></span> Sample List</g:link>
         </div>     
         <h3>
             Sample ${sample.id} 

@@ -1,5 +1,5 @@
 <div class="row">
-    <div id="cellSource" class="col-sm-4">
+    <div id="cellSource" class="col-sm-3">
         <h4>Cell Source</h4>
         <ul>
             <li>Strain: ${sample.cellSource?.strain?.name}</li>
@@ -57,7 +57,7 @@
             </g:if>
         </ul>
     </div>
-    <div id="antibody" class="col-sm-4">
+    <div id="antibody" class="col-sm-3">
         <h4>Antibody</h4>
         <ul>
             <g:if test="${sample.antibody?.company}">
@@ -108,45 +108,71 @@
         </ul>
     </div>
 
-    <div id="protocol" class="col-sm-4">
-        <h4>Protocol <g:if test="${authorized}"><g:link controller="protocolInstanceBag" action="showProtocolDetailsForSample" params="[sampleId:sample?.id]" class="edit">Details</g:link></g:if></h4>            
+    <div id="protocol" class="col-sm-3">
+        <h4>Protocol</h4>   
+        <g:if test="${sample?.prtclInstSummary}">
+            <ul>
+                <li>Assay: ${sample.prtclInstSummary.protocol}</li>
+
+                <g:if test="${notes['Resin']}">
+                <li>Resin: ${notes['Resin']}</li>
+                </g:if>
+
+                <g:if test="${notes['PCR Cycle']}">
+                <li>PCR Cycle: ${notes['PCR Cycle']}</li>
+                </g:if>
+            </ul>
+        </g:if>
+        <g:else>
+            <div class="subnumber">
+                <ol>
+                    <g:each in="${protocols}" var="bag">
+                        <li>
+                            <g:if test="${authorized}">
+                                <g:link controller="protocolInstanceBag" action="showBag" id="${bag.bag?.id}">${bag.bag?.name}</g:link>
+                                <ol>
+                                    <g:each in="${bag.protocolList}">
+                                        <li><g:link controller="protocolInstanceBag" action="showInstance" id="${it.id}">${it.protocol}</g:link>
+                                        <g:link controller="protocolInstanceBag" action="renderFile" params="[protocolId: it.protocol?.id]" target="_blank"><span class="glyphicon glyphicon-file"></span></g:link></li>
+                                    </g:each>
+                                </ol>
+                            </g:if>
+                            <g:else>
+                                ${bag.bag?.name}
+                                <ol>
+                                    <g:each in="${bag.protocolList}">
+                                        <li>${it.protocol} 
+                                            <g:link controller="protocolInstanceBag" action="renderFile" params="[protocolId: it.protocol?.id]" target="_blank"><span class="glyphicon glyphicon-file"></span></g:link></li>
+                                    </g:each>
+                                </ol>
+                            </g:else>
+                        </li>
+                    </g:each>
+                </ol>
+            </div>
+        </g:else>
+    </div>     
+
+    <div id="other" class="col-sm-3">      
+        <h4>Other</h4>
         <ul>
-            <li>Assay: ${sample.prtclInstSummary?.protocol}</li>
-
             <li>Index: <g:each in="${sample.sequenceIndices}">${it.sequence} </g:each></li>
-            
-            <g:if test="${sample?.requestedTagNumber}">
-            <li>Requested Tag Number: ${sample.requestedTagNumber}</li>
-            </g:if>
 
-            <g:if test="${sample?.volume}">
-            <li>Concentration: ${sample.volume}</li>
-            </g:if>
+            <li>Chromosome (ug): <g:if test="${sample?.chromosomeAmount}">${sample.chromosomeAmount}</g:if></li>
 
-            <g:if test="${sample?.cellNumber}">
-            <li>Cell Number: ${sample.cellNumber}</li>
-            </g:if>
+            <li>Avail. Cell# per aliquot (M): <g:if test="${sample?.cellNumber}">${sample.cellNumber}</g:if></li>
 
-            <g:if test="${sample?.chromosomeAmount}">
-            <li>Chromosome Amount: ${sample.chromosomeAmount}</li>
-            </g:if>
+            <li>Volume per aliquot (ul): <g:if test="${sample?.volume}">${sample.volume}</g:if></li>
+
+            <li>Requested Tags (M): <g:if test="${sample?.requestedTagNumber}">${sample.requestedTagNumber}</g:if></li>
 
             <g:if test="${sample?.publicationReference}">
             <li>Publication Reference: ${sample.publicationReference}</li>
-            </g:if>
-
-            <g:if test="${notes['Resin']}">
-            <li>Resin: ${notes['Resin']}</li>
-            </g:if>
-            
-            <g:if test="${notes['PCR Cycle']}">
-            <li>PCR Cycle: ${notes['PCR Cycle']}</li>
             </g:if>
             
             <g:if test="${notes['note']}">
             <li>Notes: ${notes['note']}</li>
             </g:if>
         </ul>
-    </div>     
-
+    </div>  
 </div>

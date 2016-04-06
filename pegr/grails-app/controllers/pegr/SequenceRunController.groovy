@@ -215,7 +215,7 @@ class SequenceRunController {
                                           basicCheck
                                          )
                 if (messages.size() == 0){
-                    flash.message = "CSV file uploaded!"
+                    flash.message = ["CSV file uploaded!",]
                 } else {
                     flash.message = messages                   
                 }

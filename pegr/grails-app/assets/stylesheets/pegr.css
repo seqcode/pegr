@@ -174,3 +174,16 @@ footer {
     color: #3f7fc0;
     background-color: white;
 }
+
+.subnumber OL { 
+    counter-reset: item;
+    padding-left: 10px;
+}
+.subnumber LI { 
+    display: block;
+}
+
+.subnumber LI:before { 
+    content: counters(item, ".") " "; 
+    counter-increment: item;
+}

@@ -416,18 +416,5 @@ class ProtocolInstanceBagController {
         response.outputStream.flush()
         render(contentType: "application/pdf", contentDisposition: "inline", file: file, fileName: file.getName())
     }
-        
-    def showProtocolDetailsForSample(Long sampleId) {
-        def sample = Sample.get(sampleId)
-        if (sample) {
-            def protocols = []
-            sample.bags.each{ linkedbag ->
-                protocols.push([bag:linkedbag, protocolList:ProtocolInstance.where{bag.id == linkedbag.id}.list(sort: "bagIdx", order: "asc")])
-            }
-            [protocols: protocols, sample: sample]
-        } else {
-            render status: 404
-        }
-    }
     
 }

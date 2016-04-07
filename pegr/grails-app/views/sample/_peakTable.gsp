@@ -25,7 +25,7 @@
                     <td>${alignment.alignmentStats?.peakMean}<g:if test="${alignment.alignmentStats?.peakMeanStd}">
                         ±${alignment.alignmentStats?.peakMeanStd}</g:if></td>
                     <td>
-                        ${alignment.alignmentStats?.peakMdian}<g:if test="${alignment.alignmentStats?.peakMeanStd}">±${alignment.alignmentStats?.peakMedianStd}</g:if></td> 
+                        ${alignment.alignmentStats?.peakMedian}<g:if test="${alignment.alignmentStats?.peakMedianStd}">±${alignment.alignmentStats?.peakMedianStd}</g:if></td> 
                     <td>${alignment.alignmentStats?.peakPairNos}</td>
                     <td>${alignment.alignmentStats?.peakPairWis}</td>
                     <td>${alignment.alignmentStats?.singletons}</td>

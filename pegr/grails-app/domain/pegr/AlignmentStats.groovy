@@ -16,13 +16,13 @@ class AlignmentStats {
     String peakFilePath
     Integer peaks
     Integer singletons
-    Integer peakMedian
-    Integer peakMean
-    Integer peakMedianStd
-    Integer peakMeanStd
-    Integer medianTagSingletons
-    Integer peakPairNos
-    Integer peakPairWis
+    Float peakMedian
+    Float peakMean
+    Float peakMedianStd
+    Float peakMeanStd
+    Float medianTagSingletons
+    Float peakPairNos
+    Float peakPairWis
     Float genomeCoverage
     Float seqDuplicationLevel
     Integer tssProximal

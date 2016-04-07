@@ -6,13 +6,16 @@
 
 
 /*
-select * into outfile '/Users/dus73/sampleStats.csv'
+select * into outfile '/Users/dus73/temp/sampleStats.csv'
 fields terminated by ','
+ESCAPED BY ""
 lines terminated by '\n'
-from  pughlab.PughLabSampleStatisticsInfo; 
+from  pughlab.PughLabSampleStatisticsInfo
+where uniq_id is not null;
 
-select * into outfile '/Users/dus73/peakStats.csv'
+select * into outfile '/Users/dus73/temp/peakStats.csv'
 fields terminated by ','
+ESCAPED BY ""
 lines terminated by '\n'
 from  pughlab.PughLabPeakStatisticsInfo;
 */

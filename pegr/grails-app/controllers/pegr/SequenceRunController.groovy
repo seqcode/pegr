@@ -207,12 +207,18 @@ class SequenceRunController {
                 File fileDest = new File(folder, filename)
                 mpf.transferTo(fileDest)
                 def user = springSecurityService.currentUser
-                csvConvertService.migrate(folderName + filename, 
+                def basicCheck = true
+                def messages = csvConvertService.migrate(folderName + filename, 
                                           RunStatus.PREP, 
                                           params.int("startLine"), 
-                                          params.int("endLine")
+                                          params.int("endLine"),
+                                          basicCheck
                                          )
-                flash.message = "CSV file uploaded!"
+                if (messages.size() == 0){
+                    flash.message = ["CSV file uploaded!",]
+                } else {
+                    flash.message = messages                   
+                }
             } else {
                 flash.message = "Only csv files are accepted!"
             }

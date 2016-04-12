@@ -144,6 +144,7 @@ grails.plugin.springsecurity.interceptUrlMap = [
 	'/*Admin/**':       ['ROLE_ADMIN'],
     '/project/all/**':  ['ROLE_ADMIN'],
     '/project/create/**':['ROLE_ADMIN'],
+    '/protocolInstanceBag/renderFile/**':['permitAll'],
     '/protocolInstanceBag/reopenBag/**':['ROLE_ADMIN'],
     '/protocolInstanceBag/deleteBag/**':['ROLE_ADMIN'],
     '/protocolInstanceBag/**': ['ROLE_MEMBER', 'ROLE_ADMIN'],

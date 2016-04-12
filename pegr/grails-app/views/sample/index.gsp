@@ -5,9 +5,13 @@
 </head>
 <body>
     <g:form action="showChecked">
-        <g:submitButton name="View Checked Samples" class="btn btn-default"></g:submitButton>
-        <g:remoteLink action="clearCheckedSampleAjax" class="btn btn-default">Clear All Checkboxes</g:remoteLink>
-        <g:link action="searchForm" class="btn btn-default pull-right">Search</g:link>    
+        <div class="row">
+            <div class="pull-right">
+                <g:submitButton name="View Checked Samples" class="btn btn-default"></g:submitButton>
+                <g:remoteLink action="clearCheckedSampleAjax" class="btn btn-default">Clear All Checkboxes</g:remoteLink>
+                <g:link action="searchForm" class="btn btn-default">Search</g:link>   
+            </div>
+        </div>
         <g:render template="table" model="['sampleList':sampleList]"></g:render>
     </g:form>
     <div class="pagination">

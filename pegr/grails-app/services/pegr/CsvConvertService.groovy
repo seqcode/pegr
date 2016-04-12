@@ -5,14 +5,19 @@ import com.opencsv.CSVReader
 import groovy.json.*
 import groovy.time.*
 
+class CsvConvertException extends RuntimeException {
+    String message
+}
+    
 class CsvConvertService {
     
     CsvConvertService() {}
 	
-	def migrate(String filename, RunStatus runStatus, int startLine, int endLine){
+	def migrate(String filename, RunStatus runStatus, int startLine, int endLine, boolean basicCheck){
 		
         def timeStart = new Date()
 		def lineNo = 0    
+        def messages = []
         
         def file = new FileReader(filename)
 		CSVReader reader = new CSVReader(file);
@@ -28,9 +33,10 @@ class CsvConvertService {
 		        break
 		    }
             try {
-                migrateOneRow(rawdata, runStatus)
+                migrateOneRow(rawdata, runStatus, basicCheck)
 		 	}catch(Exception e) {
 		        log.error "Error: line ${lineNo}. " + e
+                messages.push("Error: Line ${lineNo} ${e.message}")
 		        continue
 		    }   
 		}
@@ -38,9 +44,10 @@ class CsvConvertService {
         def timeStop = new Date()
         TimeDuration duration = TimeCategory.minus(timeStop, timeStart)
         println "Time: " + duration
+        return messages
 	}
 	
-    void migrateOneRow(String[] rawdata, RunStatus runStatus) {
+    void migrateOneRow(String[] rawdata, RunStatus runStatus, boolean basicCheck) {
 
         String[] cells = new String[rawdata.size()]
         rawdata.eachWithIndex{ d, idx -> 
@@ -52,6 +59,11 @@ class CsvConvertService {
             }
          }
         def data = getNamedData(cells)
+        
+        // stop if basiceCheck is true and this row does not have a run number
+        if (basicCheck && (!data.runStr || data.runStr == "Run #")) {
+            throw new CsvConvertException(message: "Run number is missing!")
+        }
         
         def runUser = getUser(data.userStr)
 
@@ -88,7 +100,7 @@ class CsvConvertService {
 
         def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl)
 
-        addIndexToSample(sample, data.indexStr, data.indexIdStr)
+        addIndexToSample(sample, data.indexStr, data.indexIdStr, basicCheck)
         addSampleToProject(project, sample)
 
         getPool(sample, results.sequenceRun, data.pool, data.volToPool, data.poolDate, data.quibitReading, data.quibitDilution, data.concentration, data.poolDilution)
@@ -99,14 +111,22 @@ class CsvConvertService {
 
     }
     
-    def addIndexToSample(Sample sample, String indexStr, String indexIdStr) { 
+    def addIndexToSample(Sample sample, String indexStr, String indexIdStr, boolean basicCheck) { 
         if (indexStr == null || indexStr == "unk"){
             return
         }
         def indexId = getInteger(indexIdStr)
-        def index = SequenceIndex.findByIndexIdAndSequence(indexId, indexStr)
-        if (!index) {
-            index = new SequenceIndex(indexId: indexId, sequence: indexStr, indexVersion: "UNKNOWN").save(failOnError: true)
+        def index
+        if (basicCheck) {
+            index = SequenceIndex.findByIndexIdAndSequenceAndStatus(indexId, indexStr, DictionaryStatus.Y)
+            if (!index) {
+                throw new CsvConvertException(message: "Index ID and String don't match!")
+            }
+        } else {
+            index = SequenceIndex.findByIndexIdAndSequence(indexId, indexStr)
+            if (!index) {
+                index = new SequenceIndex(indexId: indexId, sequence: indexStr, indexVersion: "UNKNOWN").save(failOnError: true)
+            }
         }
         if (index && sample) {
             new SampleSequenceIndices(sample: sample, index: index).save(failOnError: true)
@@ -729,7 +749,7 @@ class CsvConvertService {
 	    }
 	
 	    if (SequencingExperiment.findBySeqId(seqId)) {
-            throw new Exception(message: "SeqId ${seqId} already exists!")
+            throw new CsvConvertException(message: "SeqId ${seqId} already exists!")
 	    }
 	
 	    def run = SequenceRun.findByPlatformAndRunNum(platform, runNum)

@@ -460,7 +460,7 @@ class ProtocolInstanceBagService {
             instances.each {
                 // remove all the items from the instances
                 ProtocolInstanceItems.executeUpdate('delete ProtocolInstanceItems where protocolInstance.id = :instanceId', [instanceId: it.id])
-                // remove the instances in the bag
+                // delete the instances in the bag
                 it.delete(flush: true)
             }            
             // remove all the samples from the bag

@@ -3,6 +3,8 @@ import groovy.json.*
     
 class SampleController {
     
+    def springSecurityService
+    
     def index(Integer max) {
         params.max = Math.min(max ?: 15, 100)
         if (!params.sort) {
@@ -14,21 +16,32 @@ class SampleController {
         [sampleList: samples, sampleCount: Sample.count()]
     }
     
-	def show(Integer id) {
+	def show(Long id) {
 		def sample = Sample.get(id)
-        def jsonSlurper = new JsonSlurper()
-        def notes = [:]
-        try {
-            notes += jsonSlurper.parseText(sample.note)
-        }catch(Exception e){
-            
+        if (sample) {
+            def jsonSlurper = new JsonSlurper()
+            def notes = [:]
+            try {
+                notes += jsonSlurper.parseText(sample.note)
+            }catch(Exception e){
+
+            }
+            try {
+                notes += jsonSlurper.parseText(sample.prtclInstSummary.note)
+            }catch(Exception e){
+
+            }        
+            def protocols = []
+            sample.bags.each{ linkedbag ->
+                protocols.push([bag:linkedbag, protocolList:ProtocolInstance.where{bag.id == linkedbag.id}.list(sort: "bagIdx", order: "asc")])
+            }
+            def currentUser = springSecurityService.currentUser
+            def authorized = currentUser.isAdmin() ||  (currentUser.authorities.any { it.authority == "ROLE_MEMBER" }) 
+            [sample: sample, notes: notes, protocols: protocols, authorized: authorized]            
+        } else {
+            render status: 404
         }
-        try {
-            notes += jsonSlurper.parseText(sample.prtclInstSummary.note)
-        }catch(Exception e){
-            
-        }        
-		[sample: sample, notes: notes]
+
 	}
     
     def showChecked(){

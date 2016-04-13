@@ -141,7 +141,31 @@ class ProjectController {
         render template:"userTable", model: [projectUsers: projectUsers, message: message, authorized: true]
     }
     
-    def addSamples() {
+    def searchSample(Long projectId) {
+        def project = Project.get(projectId)
+        [project: project]
+    }
+    
+    def addExistingSamples(Long projectId, String sampleIds) {
+        def messages = projectService.addExistingSamples(projectId, sampleIds)
+        if (messages.size()) {
+            flash.messages = messages
+            redirect(action: "searchSample", params:[projectId: projectId])
+        } else {
+            redirect(action: "show", id: projectId)
+        }
+    }
+    
+    def addNewSamples() {
         
+    }
+    
+    def removeSample(Long sampleId, Long projectId) {
+        try {
+            projectService.removeSample(sampleId, projectId)
+        } catch(Exception e) {
+            flash.message = e.message
+        }
+        redirect(action: "show", id: projectId)
     }
 }

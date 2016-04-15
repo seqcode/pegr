@@ -12,7 +12,7 @@
 </ul>
 
 <div class="tab-content">
-    <div id="cellSource" class="tab-pane slide in active">
+    <div id="cellSource" class="tab-pane slide in active table-responsive">
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -29,15 +29,26 @@
             <tbody>
                 <g:each in="${1..3}">
                 <tr>
-                    
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                    
                 </tr>    
                 </g:each>
             </tbody>
         </table>
     </div>
-    <div id="antibody" class="tab-pane slide">
-        <table class="table table-striped">
+
+    <div id="antibody" class="tab-pane slide table-responsive">
+        <table class="table table-striped" style="margin-bottom: 200px">
             <thead>
                 <tr>
                     <th>Row #</th>

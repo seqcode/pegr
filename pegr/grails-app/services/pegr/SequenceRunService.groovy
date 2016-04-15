@@ -1,5 +1,7 @@
 package pegr
 import grails.transaction.Transactional
+import ch.silviowangler.groovy.util.builder.ICalendarBuilder
+import groovy.time.TimeCategory
 
 class SequenceRunException extends RuntimeException {
     String message
@@ -132,5 +134,29 @@ class SequenceRunService {
         // start the run by creating a job on remote server
         run.status = RunStatus.QUEUE
         run.save()
+    }
+    
+    byte[] calendarEventAsBytes(Long runId) {
+        def organizerName = "Pugh Sequencing Team"
+        def organizerEmail = "dus73@psu.edu"
+        def startTime 
+        def endTime
+        use(TimeCategory) {
+            startTime = new Date() + 1.week
+            endTime = startTime + 1.hour
+        }
+        
+        def builder = new ICalendarBuilder()
+        builder.calendar {
+            events {
+                event( start:    startTime, 
+                       end:      endTime, 
+                       summary:  "Sequence Run ${runId} Meeting") {
+                    organizer(name: organizerName, email: organizerEmail)
+                }
+            }
+        }
+
+        return builder.cal.toString().getBytes('UTF-8')
     }
 }

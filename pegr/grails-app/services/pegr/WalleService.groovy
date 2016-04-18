@@ -11,7 +11,6 @@ class WalleService {
 
     def grailsApplication
     def sshConfig
-    def walle
 
     final String RUNS_IN_QUEUE = "RunsInQueue"
     final String PRIOR_RUN_FOLDER = "PriorRunFolder"
@@ -20,14 +19,15 @@ class WalleService {
     final String CONFIG_FOLDER_NAME = "cegr_config"
     final int MAX_QUEUE_LENGTH = 24
     
-    def WalleService() {
-        walle = [
+    Map getWalle() {
+        def walle = [
             host : grailsApplication.config.walle.host,
             port : grailsApplication.config.walle.port.toInteger(),
             username : grailsApplication.config.walle.username,
             password : grailsApplication.config.walle.password,
             root : grailsApplication.config.walle.root
         ]
+        return walle
     }
     
     void addToQueue(Long runId) {
@@ -48,15 +48,14 @@ class WalleService {
         def previousRun = null
         String previousRunFolder = Chores.findByName(PRIOR_RUN_FOLDER)?.value
         if (previousRunFolder) {
-            preciousRun = SequenceRun.findByDirectoryName(previousRunFolder)
+            previousRun = SequenceRun.findByDirectoryName(previousRunFolder)
         }
         return previousRun
     }
     
     void createJob() {
-        if (grailsApplication.config == null) {
-            log.error "grailsApplication null"
-        }
+        
+        def walle = getWalle()
         
         def runIds = getQueuedRunIds()
         // return if no runs in the queue
@@ -111,6 +110,7 @@ class WalleService {
     }
     
     def findPriorInfoOnRemote() {
+        def walle = getWalle()
         def runInfoPath = new File(walle.root, RUN_INFO_FILE_NAME).getPath()
         def command = 'ls ' + runInfoPath 
         def rsh = new RemoteSSH(walle.host, walle.username, walle.password, '', command, '', walle.port)
@@ -119,6 +119,7 @@ class WalleService {
     }
     
     def getNewRunFolders() {
+        def walle = getWalle()
         String priorRunFolder = Chores.findByName(PRIOR_RUN_FOLDER)?.value
         // get all the folder names 
         def command = 'ls ' + walle.root + ' | sort'
@@ -177,6 +178,7 @@ class WalleService {
     }
     
     def moveFilesToRemote(File runInfoLocalFile, File configLocalFolder, String newRunRemotePath) {  
+        def walle = getWalle()
         // scp run info txt
         RemoteSCP rscp=new RemoteSCP(walle.host, walle.username, walle.password, runInfoLocalFile.getPath(), walle.root, walle.port)
         rscp.Result(sshConfig)

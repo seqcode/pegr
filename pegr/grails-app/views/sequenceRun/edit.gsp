@@ -57,8 +57,8 @@
     </div>
     <div class="row well text-center">
         <g:if test="${run.status == pegr.RunStatus.PREP}">
-            <g:link action="previewRun" params="[runId: run.id]" class="btn btn-success confirm">Submit</g:link>
-            <g:link action="sendEmail" params="[runId: run.id]" class="btn btn-success confirm">Email</g:link>
+            <g:link action="previewRun" params="[runId: run.id]" class="btn btn-success">Submit</g:link>
+
         </g:if>
         <g:else>
             <span class="btn btn-default">Submitted</span>

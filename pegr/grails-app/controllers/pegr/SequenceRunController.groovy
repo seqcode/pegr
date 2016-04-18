@@ -3,11 +3,10 @@ import static org.springframework.http.HttpStatus.*
 import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 class SequenceRunController {
-    def springSecurityService
-    
-    def sequenceRunService
-    
-    def csvConvertService
+    def springSecurityService    
+    def sequenceRunService    
+    def csvConvertService    
+    def walleService
     
     // list incomplete runs
     def index(Integer max){
@@ -180,9 +179,8 @@ class SequenceRunController {
     }
     
     def previewRun(Long runId) {
-        def walleService = new WalleService()
         def previousRun = walleService.getPreviousRun()
-        def currentRun = SequenceRun.get(rundId)
+        def currentRun = SequenceRun.get(runId)
         def newFolders = walleService.getNewRunFolders()
         [previousRun: previousRun, 
          currentRun: currentRun, 

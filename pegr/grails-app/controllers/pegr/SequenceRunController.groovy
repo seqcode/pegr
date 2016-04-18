@@ -179,6 +179,16 @@ class SequenceRunController {
         redirect(action: "edit", params: [runId: runId])
     }
     
+    def previewRun(Long runId) {
+        def walleService = new WalleService()
+        def previousRun = walleService.getPreviousRun()
+        def currentRun = SequenceRun.get(rundId)
+        def newFolders = walleService.getNewRunFolders()
+        [previousRun: previousRun, 
+         currentRun: currentRun, 
+         newFolders: newFolders]
+    }
+    
     def run(Long runId) {
         try {
             sequenceRunService.run(runId)

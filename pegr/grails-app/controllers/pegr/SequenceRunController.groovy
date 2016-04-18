@@ -180,9 +180,19 @@ class SequenceRunController {
     
     def previewRun(Long runId) {
         def previousRun = walleService.getPreviousRun()
-        def currentRun = SequenceRun.get(runId)
         def newFolders = walleService.getNewRunFolders()
-        [previousRun: previousRun, 
+        def queuedRunIds = walleService.getQueuedRunIds()
+        def queuedRuns = []
+        queuedRunIds.each{ runId, index ->
+            def run = SequenceRun.get(it)
+            queuedRuns.push([id: it, 
+                             runNum: run?.runNum, 
+                             directoryNme: index < newFolders.size() ? newFolders[index] : null])
+        }
+        def currentRun = SequenceRun.get(runId)
+        
+        [previousRun: previousRun,
+         queuedRuns: queuedRuns,
          currentRun: currentRun, 
          newFolders: newFolders]
     }

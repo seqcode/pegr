@@ -54,9 +54,16 @@
             </tr>
         </tbody>
     </table>
-    
-    <g:link action="run" params="[runId: currentRun.id]" class="btn btn-primary">Submit</g:link>
-    <g:link action="edit" params="[runId: currentRun.id]" class="btn btn-primary">Cancel</g:link>
+    <g:form action="run">
+        <g:hiddenField name="runId" value="${currentRun.id}"></g:hiddenField>
+        <div>
+            <h4>Schedule Meeting</h4>
+            <g:datePicker name="meetingTime" value="${meetingTime}"/>
+        </div>
+        <g:submitButton class="btn btn-primary" name="submit" value="Submit"></g:submitButton>
+        <g:link action="edit" params="[runId: currentRun.id]" class="btn btn-default">Cancel</g:link>
+    </g:form>
+
     <script>
         $("#nav-bench").addClass("active");
      </script>

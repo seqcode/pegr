@@ -2,6 +2,7 @@ package pegr
 import grails.transaction.Transactional
 import ch.silviowangler.groovy.util.builder.ICalendarBuilder
 import groovy.time.TimeCategory
+import java.text.SimpleDateFormat
 
 class SequenceRunException extends RuntimeException {
     String message
@@ -136,22 +137,26 @@ class SequenceRunService {
         run.save()
     }
     
-    byte[] calendarEventAsBytes(Long runId) {
+    byte[] calendarEventAsBytes(Long runId, Date meetingTime) {
         def organizerName = "Pugh Sequencing Team"
         def organizerEmail = "dus73@psu.edu"
-        def startTime 
+        
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        df.setTimeZone(TimeZone.getTimeZone("EST"));
+        Date startTime = isoFormat.parse(meetingTime);
         def endTime
         use(TimeCategory) {
-            startTime = new Date() + 1.week
             endTime = startTime + 1.hour
         }
-        
+
+
         def builder = new ICalendarBuilder()
         builder.calendar {
             events {
                 event( start:    startTime, 
                        end:      endTime, 
-                       summary:  "Sequence Run ${runId} Meeting") {
+                       summary:  "Sequence Run ${runId} Meeting",
+                       utc: false ) {
                     organizer(name: organizerName, email: organizerEmail)
                 }
             }

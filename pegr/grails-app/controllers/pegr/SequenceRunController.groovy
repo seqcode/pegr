@@ -1,6 +1,7 @@
 package pegr
 import static org.springframework.http.HttpStatus.*
 import org.springframework.web.multipart.MultipartHttpServletRequest 
+import groovy.time.TimeCategory
 
 class SequenceRunController {
     def springSecurityService    
@@ -193,36 +194,37 @@ class SequenceRunController {
         def currentRun = [id: runId,
                           runNum: SequenceRun.get(runId)?.runNum,
                           directoryName: queuedRunIds.size() < newFolders.size() ? newFolders[queuedRunIds.size()] : null]
+        def startTime
+        use(TimeCategory) {
+            def now = new Date() 
+            startTime = now.clearTime() + 10.hours + 1.week
+        }
         [previousRun: previousRun,
          queuedRuns: queuedRuns,
-         currentRun: currentRun]
+         currentRun: currentRun,
+         meetingTime: startTime]
     }
     
-    def run(Long runId) {
+    def run() {
         try {
+            def runId = Long.parseLong(params.runId)
+            def meetingTime = params.meetingTime
+            
             sequenceRunService.run(runId)
+            def bytes = sequenceRunService.calendarEventAsBytes(runId, meetingTime)
+            sendMail {
+                multipart true
+                to "dus73@psu.edu"
+                subject "[PEGR]Sequence Run ${runId} Meeting"
+                body "The meeting for Sequence Run ${runId} is scheduled on ${meetingTime}."
+                attachBytes "meeting.ics", "text/calendar", bytes 
+            }
+            flash.message = "Email sent!"
             redirect(action: "show", id: runId)
         } catch(SequenceRunException e) {
             flash.message = e.message
             redirect(action: "edit", params: [runId: runId])
         }
-    }
-    
-    def sendEmail(Long runId) {
-        try {
-            def bytes = sequenceRunService.calendarEventAsBytes(runId)
-            sendMail {
-                multipart true
-                to "dus73@psu.edu"
-                subject "[PEGR]Sequence Run ${runId} Meeting"
-                body 'The meeting for Sequence Run ${runId} has been scheduled!'
-                attachBytes "meeting.ics", "text/calendar", bytes 
-            }
-            flash.message = "Email sent!"
-        } catch(SequenceRunException e) {
-            flash.message = e.message
-        }
-        redirect(action: "edit", params: [runId: runId])
     }
     
     def upload() { 

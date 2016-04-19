@@ -15,7 +15,7 @@
         </thead>
         <tbody>
             <tr>
-                <td>#${previousRun.id} <g:if test="${previousRun.runNum}">(Old No.${previousRun.runNum})</g:if></td>
+                <td>Run#${previousRun.id} <g:if test="${previousRun.runNum}">(Old No.${previousRun.runNum})</g:if></td>
                 <td>${previousRun.directoryName}</td>
             </tr>
         </tbody>
@@ -30,12 +30,12 @@
             </tr>
         </thead>
         <tbody>
+            <g:each in="${queuedRuns}">
             <tr>
-                <g:each in="${queuedRuns}">
-                    <td>#${it.id} <g:if test="${it.runNum}">(Old No.${it.runNum})</g:if></td>
-                    <td>${it.directoryName}</td>
-                </g:each>
+                <td>Run#${it.id} <g:if test="${it.runNum}">(Old No.${it.runNum})</g:if></td>
+                <td>${it.directoryName}</td>    
             </tr>
+            </g:each>
         </tbody>
     </table>
     
@@ -49,7 +49,7 @@
         </thead>
         <tbody>
             <tr>
-                <td>#${currentRun.id} <g:if test="${currentRun.runNum}">(Old No.${currentRun.runNum})</g:if></td>
+                <td>Run#${currentRun.id} <g:if test="${currentRun.runNum}">(Old No.${currentRun.runNum})</g:if></td>
                 <td><g:if test="${currentRun.runNum}">${currentRun.directoryName}</g:if></td>
             </tr>
         </tbody>

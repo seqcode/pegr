@@ -25,7 +25,7 @@ class Strain {
         species nullable: true
         genotype nullable: true, blank: true
         parent nullable: true
-        geneticModification matches: '^[0-9A-Za-z -]+$', nullable: true, blank: true
+        geneticModification matches: '^[0-9A-Za-z -_]+$', nullable: true, blank: true
 		sourceLab nullable: true
 		note nullable: true, blank: true
         status nullable: true

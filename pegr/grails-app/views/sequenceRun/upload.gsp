@@ -4,6 +4,10 @@
     <meta name="layout" content="main"/>
 </head>
 <body>
+    <div class="message">
+        Difference between sacCer and sacCer_cegr: sacCer is the UCSC version which uses Roman numerals; sacCer_cegr is the Pugh lab version which uses numbers. Pugh lab samples should normally use sacCer_cegr.
+    </div>
+    
     <div class="container-fluid">
         <h3>Upload CSV File</h3>
         <g:uploadForm action="convertCsv" >

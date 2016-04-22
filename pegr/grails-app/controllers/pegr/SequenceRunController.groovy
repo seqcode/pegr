@@ -207,25 +207,30 @@ class SequenceRunController {
     
     def run() {
         try {
-            def runId = Long.parseLong(params.runId)
-            def meetingTime = params.meetingTime
-            
             sequenceRunService.run(runId)
-            def bytes = sequenceRunService.calendarEventAsBytes(runId, meetingTime)
-            sendMail {
-                multipart true
-                to "dus73@psu.edu"
-                subject "[PEGR]Sequence Run ${runId} Meeting"
-                body "The meeting for Sequence Run ${runId} is scheduled on ${meetingTime}."
-                attachBytes "meeting.ics", "text/calendar", bytes 
-            }
-            flash.message = "Email sent!"
             redirect(action: "show", id: runId)
         } catch(SequenceRunException e) {
             flash.message = e.message
             redirect(action: "edit", params: [runId: runId])
         }
     }
+    
+    def emailMeetingSchedule() {
+        def runId = Long.parseLong(params.runId)
+        def meetingTime = params.meetingTime
+            
+        def bytes = sequenceRunService.calendarEventAsBytes(runId, meetingTime)
+        sendMail {
+            multipart true
+            to "dus73@psu.edu"
+            subject "[PEGR]Sequence Run ${runId} Meeting"
+            body "The meeting for Sequence Run ${runId} is scheduled on ${meetingTime}."
+            attachBytes "meeting.ics", "text/calendar", bytes 
+        }
+        flash.message = "Email sent!"
+        redirect(action: "show", id: runId)
+    }
+    
     
     def upload() { 
     

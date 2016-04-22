@@ -54,7 +54,7 @@
             </tr>
         </tbody>
     </table>
-    <g:form action="run">
+    <g:form action="emailMeetingSchedule">
         <g:hiddenField name="runId" value="${currentRun.id}"></g:hiddenField>
         <div>
             <h4>Schedule Meeting</h4>

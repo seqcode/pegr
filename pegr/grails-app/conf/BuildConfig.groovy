@@ -76,6 +76,5 @@ grails.project.dependency.resolution = {
         compile "org.grails.plugins:remote-ssh:0.5"
         compile "org.grails.plugins:mail:1.0.7"
         compile "org.grails.plugins:quartz:1.0.1"
-        compile "org.grails.plugins:ic-alendar:0.4.6"
     }
 }

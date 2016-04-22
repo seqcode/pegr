@@ -1,8 +1,6 @@
 package pegr
 import grails.transaction.Transactional
-import ch.silviowangler.groovy.util.builder.ICalendarBuilder
 import groovy.time.TimeCategory
-import java.text.SimpleDateFormat
 
 class SequenceRunException extends RuntimeException {
     String message
@@ -137,31 +135,43 @@ class SequenceRunService {
         run.save()
     }
     
-    byte[] calendarEventAsBytes(Long runId, Date meetingTime) {
-        def organizerName = "Pugh Sequencing Team"
-        def organizerEmail = "dus73@psu.edu"
-        
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        df.setTimeZone(TimeZone.getTimeZone("EST"));
-        Date startTime = isoFormat.parse(meetingTime);
-        def endTime
+    def getCalendarTimeString(Date time) {
+        return time.format("yyyyMMdd'T'HHmmss'Z'")
+    }
+    
+    byte[] calendarEventAsBytes(Long runId, Date meetingTime) {        
+        def now = new Date()
+        def startTime = meetingTime
+        def endTime 
         use(TimeCategory) {
             endTime = startTime + 1.hour
         }
+        
+        def nowStr = getCalendarTimeString(now)
+        def startTimeStr = getCalendarTimeString(startTime)
+        def endTimeStr = getCalendarTimeString(endTime)
+        
+        def organizer = "dus73@psu.edu"
+        
+        def ical = """BEGIN:VCALENDAR
+PRODID:-
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VEVENT
+ORGANIZER;CN=GRETTA ARMSTRONG:mailto:${organizer}
+DTSTART;TZID="America/New_York":${startTimeStr}
+DTEND;TZID="America/New_York":${endTimeStr}
+TZOFFSETTO:-0500
+TZOFFSETFROM:-0400
+DTEND:${endTimeStr}
+SUMMARY:Sequence Run ${runId} Meeting
+UID:PEGR-SEQUENCING-MEETING-${nowStr}
+DTSTAMP:${nowStr}
+END:VEVENT
+END:VCALENDAR
+"""
 
-
-        def builder = new ICalendarBuilder()
-        builder.calendar {
-            events {
-                event( start:    startTime, 
-                       end:      endTime, 
-                       summary:  "Sequence Run ${runId} Meeting",
-                       utc: false ) {
-                    organizer(name: organizerName, email: organizerEmail)
-                }
-            }
-        }
-
-        return builder.cal.toString().getBytes('UTF-8')
+        return ical.getBytes('UTF-8')
     }
 }

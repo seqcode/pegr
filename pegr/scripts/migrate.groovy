@@ -6,17 +6,17 @@ def endLine = 96
 def version = "A"
 def basicCheck = false
 
-def indexMigrate = new ImportIndexService()
-indexMigrate.migrate(filename, version, DictionaryStatus.Y, startLine, endLine)
+//def indexMigrate = new ImportIndexService()
+//indexMigrate.migrate(filename, version, DictionaryStatus.Y, startLine, endLine)
 
 // import data
-filename = "files/samples.csv"
+filename = "files/Peconic_Database.csv"
 startLine = 4
-endLine = 12000
+endLine = 531//12000
 
 def dataMigrate = new CsvConvertService()
 dataMigrate.migrate(filename, RunStatus.COMPLETED, startLine, endLine, basicCheck)
 
-dataMigrate.getAllBioReplicate()
+//dataMigrate.getAllBioReplicate()
 
     

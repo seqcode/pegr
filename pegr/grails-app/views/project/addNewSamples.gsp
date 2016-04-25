@@ -12,7 +12,7 @@
 </ul>
 
 <div class="tab-content">
-    <div id="cellSource" class="tab-pane slide in active">
+    <div id="cellSource" class="tab-pane slide in active table-responsive">
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -29,15 +29,26 @@
             <tbody>
                 <g:each in="${1..3}">
                 <tr>
-                    
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                    
                 </tr>    
                 </g:each>
             </tbody>
         </table>
     </div>
-    <div id="antibody" class="tab-pane slide">
-        <table class="table table-striped">
+
+    <div id="antibody" class="tab-pane slide table-responsive">
+        <table class="table table-striped" style="margin-bottom: 200px">
             <thead>
                 <tr>
                     <th>Row #</th>
@@ -56,7 +67,7 @@
             <tbody>
                 <g:each in="${1..3}" var="counter">
                 <tr>
-                    <td>${counter}</td>
+                    <td id="antibody-counter">${counter}</td>
                     <td><g:select id="company" name="company.id" from="${pegr.Company.list()}" optionKey="id" value="${object?.company?.id}" noSelection="['': '']" class="tokenize-sample tokenize"/></td>
                     <td><g:textField name="catalogNumber" value="${object?.catalogNumber}"/></td>
                     <td><g:textField name="lotNumber" value="${object?.lotNumber}"/></td>
@@ -77,12 +88,25 @@
   </div>
 </div>
     
+<button id="add" class="pull-right">Add Row</button>
     
+<script>
+    var counter = 3
     
-    
-    <script>
+    $(function(){
         $("#nav-projects").addClass("active");
         $(".tokenize").tokenize();
-    </script>
+    });
+    
+    $("#add").click(function() {
+        $('#cellSource tbody>tr:last').clone(false).insertAfter('#cellSource tbody>tr:last');
+        $('#antibody tbody>tr:last').clone(false).insertAfter('#antibody tbody>tr:last');
+        $('#antibody tbody>tr:last #antibody-counter').text(++counter);
+        $('#antibody tbody>tr:last .Tokenize').remove();
+        $('#antibody tbody>tr:last .tokenize').tokenize();
+        return false;
+    });
+
+</script>
 </body>
 </html>

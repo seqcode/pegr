@@ -19,6 +19,9 @@
         <g:render template="summaryDetails"></g:render>
     </div>
     <h3>Samples</h3>
+    <div class="message">
+        Difference between sacCer and sacCer_cegr: sacCer is the UCSC version which uses Roman numerals; sacCer_cegr is the Pugh lab version which uses numbers. Pugh lab samples should normally use sacCer_cegr.
+    </div>
     <g:form action="updateGenomes" role="form" method="post">
         <g:hiddenField name="runId" value="${run.id}"></g:hiddenField>
         <table class="table table-striped">
@@ -57,7 +60,8 @@
     </div>
     <div class="row well text-center">
         <g:if test="${run.status == pegr.RunStatus.PREP}">
-            <g:link action="run" params="[runId: run.id]" class="btn btn-success confirm">Submit</g:link>
+            <g:link action="previewRun" params="[runId: run.id]" class="btn btn-success">Submit</g:link>
+
         </g:if>
         <g:else>
             <span class="btn btn-default">Submitted</span>

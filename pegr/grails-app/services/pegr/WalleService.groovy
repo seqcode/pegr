@@ -19,6 +19,17 @@ class WalleService {
     final String CONFIG_FOLDER_NAME = "cegr_config"
     final int MAX_QUEUE_LENGTH = 24
     
+    Map getWalle() {
+        def walle = [
+            host : grailsApplication.config.walle.host,
+            port : grailsApplication.config.walle.port.toInteger(),
+            username : grailsApplication.config.walle.username,
+            password : grailsApplication.config.walle.password,
+            root : grailsApplication.config.walle.root
+        ]
+        return walle
+    }
+    
     void addToQueue(Long runId) {
         def runsInQueue = Chores.findByName(RUNS_IN_QUEUE)
         if (runsInQueue) {
@@ -33,17 +44,18 @@ class WalleService {
         }    
     }
     
-    void createJob() {
-        if (grailsApplication.config == null) {
-            log.error "grailsApplication null"
+    def getPreviousRun() {
+        def previousRun = null
+        String previousRunFolder = Chores.findByName(PRIOR_RUN_FOLDER)?.value
+        if (previousRunFolder) {
+            previousRun = SequenceRun.findByDirectoryName(previousRunFolder)
         }
-        def walle = [
-            host : grailsApplication.config.walle.host,
-            port : grailsApplication.config.walle.port.toInteger(),
-            username : grailsApplication.config.walle.username,
-            password : grailsApplication.config.walle.password,
-            root : grailsApplication.config.walle.root
-        ]
+        return previousRun
+    }
+    
+    void createJob() {
+        
+        def walle = getWalle()
         
         def runIds = getQueuedRunIds()
         // return if no runs in the queue
@@ -59,25 +71,16 @@ class WalleService {
         Long runId = Long.parseLong(runIds[0])
         def run = SequenceRun.get(runId)
         // return if the prior run has not been processed by the remote server
-        if (findPriorInfoOnRemote(walle)) {
+        if (findPriorInfoOnRemote()) {
             log.warn "The last run has not been processed yet!"
             return
         }
         // get new folder name on the remote server
-        def newRunFolders = getNewRunFolders(walle)
+        def newRunFolders = getNewRunFolders()
         // return if no new folder has been created on the remote server
         if (newRunFolders.size() == 0) {
             return
         }        
-        if (newRunFolders.size() > 1) {
-            // notify the run user of multiple new folders on the remote server
-            String message = "More than one new folders found on Wall E!"
-            log.error message
-            run.status = RunStatus.ERROR
-            run.note = (run.note && run.note != "" && !run.note.contains(message)) ? "${run.note}; ${message}" : message
-            run.save()
-            return
-        }
         def newFolder = newRunFolders.first()
         def newRunRemotePath = new File(walle.root, newFolder).getPath()
         // update run object
@@ -89,7 +92,7 @@ class WalleService {
         // generate run info and parameter files
         def fileAndFolder = generateAndSendRunFiles(run, newRunRemotePath)
         // move files to the remote server
-        moveFilesToRemote(fileAndFolder.runInfoLocalFile, fileAndFolder.configLocalFolder, newRunRemotePath, walle)
+        moveFilesToRemote(fileAndFolder.runInfoLocalFile, fileAndFolder.configLocalFolder, newRunRemotePath)
         // update queue
         removeRunFromQueue()  
         updatePriorRunFolder(newFolder)
@@ -106,7 +109,8 @@ class WalleService {
         return runIds
     }
     
-    def findPriorInfoOnRemote(Map walle) {
+    def findPriorInfoOnRemote() {
+        def walle = getWalle()
         def runInfoPath = new File(walle.root, RUN_INFO_FILE_NAME).getPath()
         def command = 'ls ' + runInfoPath 
         def rsh = new RemoteSSH(walle.host, walle.username, walle.password, '', command, '', walle.port)
@@ -114,7 +118,8 @@ class WalleService {
         return result.find{ it == runInfoPath}
     }
     
-    def getNewRunFolders(Map walle) {
+    def getNewRunFolders() {
+        def walle = getWalle()
         String priorRunFolder = Chores.findByName(PRIOR_RUN_FOLDER)?.value
         // get all the folder names 
         def command = 'ls ' + walle.root + ' | sort'
@@ -172,7 +177,8 @@ class WalleService {
         return [runInfoLocalFile: runInfoLocalFile, configLocalFolder: configLocalFolder]
     }
     
-    def moveFilesToRemote(File runInfoLocalFile, File configLocalFolder, String newRunRemotePath, Map walle) {  
+    def moveFilesToRemote(File runInfoLocalFile, File configLocalFolder, String newRunRemotePath) {  
+        def walle = getWalle()
         // scp run info txt
         RemoteSCP rscp=new RemoteSCP(walle.host, walle.username, walle.password, runInfoLocalFile.getPath(), walle.root, walle.port)
         rscp.Result(sshConfig)

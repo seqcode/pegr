@@ -1,13 +1,13 @@
 package pegr
 import static org.springframework.http.HttpStatus.*
 import org.springframework.web.multipart.MultipartHttpServletRequest 
+import groovy.time.TimeCategory
 
 class SequenceRunController {
-    def springSecurityService
-    
-    def sequenceRunService
-    
-    def csvConvertService
+    def springSecurityService    
+    def sequenceRunService    
+    def csvConvertService    
+    def walleService
     
     // list incomplete runs
     def index(Integer max){
@@ -179,6 +179,32 @@ class SequenceRunController {
         redirect(action: "edit", params: [runId: runId])
     }
     
+    def previewRun(Long runId) {
+        def previousRun = walleService.getPreviousRun()
+        def newFolders = walleService.getNewRunFolders()
+        def queuedRunIds = walleService.getQueuedRunIds()
+        def queuedRuns = []
+        queuedRunIds.eachWithIndex { id, n ->
+             def run = SequenceRun.get(Long.parseLong(id))
+            queuedRuns.push([id: id, 
+                             runNum: run?.runNum, 
+                             directoryName: n < newFolders.size() ? newFolders[n] : null])
+
+        }
+        def currentRun = [id: runId,
+                          runNum: SequenceRun.get(runId)?.runNum,
+                          directoryName: queuedRunIds.size() < newFolders.size() ? newFolders[queuedRunIds.size()] : null]
+        def startTime
+        use(TimeCategory) {
+            def now = new Date() 
+            startTime = now.clearTime() + 10.hours + 1.week
+        }
+        [previousRun: previousRun,
+         queuedRuns: queuedRuns,
+         currentRun: currentRun,
+         meetingTime: startTime]
+    }
+    
     def run(Long runId) {
         try {
             sequenceRunService.run(runId)
@@ -188,6 +214,23 @@ class SequenceRunController {
             redirect(action: "edit", params: [runId: runId])
         }
     }
+    
+    def emailMeetingSchedule() {
+        def runId = Long.parseLong(params.runId)
+        def meetingTime = params.meetingTime
+            
+        def bytes = sequenceRunService.calendarEventAsBytes(runId, meetingTime)
+        sendMail {
+            multipart true
+            to "shaody8411@gmail.com"
+            subject "[PEGR]Sequence Run ${runId} Meeting"
+            body "The meeting for Sequence Run ${runId} is scheduled on ${meetingTime}."
+            attachBytes "meeting.ics", "text/calendar", bytes 
+        }
+        flash.message = "Email sent!"
+        redirect(action: "show", id: runId)
+    }
+    
     
     def upload() { 
     

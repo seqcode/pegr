@@ -812,109 +812,109 @@ class CsvConvertService {
     }
 	
 	def getNamedData(String[] data) {
-	    [laneStr: data[0],         
-	     // data[1]
-	     // data[2]
-	     indexIdStr: data[3],
-	     senderNameStr: data[4],
-	     senderEmail: data[5],
-	     senderPhone: data[6],
-	     dataToUser: data[7],
-	     dataToEmail: data[8],
-	     projectName: data[9],
-	     projectUser: data[10],
-	     projectUserEmail: data[11],     
-	     service: data[12],
-	     invoice: data[13],
-	     abCompName: data[14],
-	     abCatNum: data[15],
-	     abLotNum: data[16],
-	     abNotes: data[17],
-	     abClonal: data[18],
-	     abAnimal: data[19],
-	     ig: data[20],
-	     antigen: data[21],
-	     ulSampleSent: data[22],
-	     abConc: data[23],
-	     amountUseUg: data[24],
-	     amountUseUl: data[25],
-	     // data[26],
-	     // data[27],
-	     // abName: data[28],
-	     samplePrepUser: data[29],
-	     genus: data[30],
-	     species: data[31],
-	     strain: data[32],
-	     parentStrain: data[33],
-	     genotype: data[34],
-	     mutation: data[35],
-	     growthMedia: data[36],
-	     perturbation1: data[37],
-	     perturbation2: data[38],
-	     targetType: data[39], // changed
-	     // data[40],
-	     //bioRep: data[41],
-	     sampleId: data[42],
-	     bioRep1SampleId: data[43],
-	     bioRep2SampleId: data[44],
-	     sampleNotes: data[45],
-	     nTag: data[46],
-	     target: data[47],
-	     cTag: data[48],     
-	     chromAmount: data[49],
-	     cellNum: data[50],
-	     volume: data[51],
-	     assay: data[52],
-	     genomeBuild1: data[53],
-	     genomeBuild2: data[54],
-	     genomeBuild3: data[55],
-	     // data[56],
-	     dateReceived: data[57],
-	     receivingUser: data[58],
-	     inOrExternal: data[59],
-	     // data[60],
-	     inventoryNotes: data[61],
-	     chipUser: data[62],
-	     // data[63],
-	     chipDate: data[64],
-	     // data[65],
-	     protocolVersion: data[66],
-	     techRep: data[67],
-	     requestedTagNum: data[68],
-	     // cellNum: data[69],
-	     // data[70],
-	     // data[71],
-	     // chipQubit: data[72],
-	     // : data[73],
-	     // : data[74],
-	     resin: data[75],
-	     pool: data[76],
-	     volToPool: data[77],
-	     poolDate: data[78],
-	     PCRCycle: data[79],
-	     quibitReading: data[80],
-	     quibitDilution: data[81],
-	     concentration: data[82],
-	     poolDilution: data[83],
-	     // data[84],
-	     seqRepNum: data[85],
-	     seqRepId: data[86],
-	     rd1Start: data[87],
-	     rd1End: data[88],
-	     indexStart: data[89],
-	     indexEnd: data[90],
-	     rd2Start: data[91],
-	     rd2End: data[92],
-	     // data[93],
-	     runStr: data[94],
-	     // data[95],
-	     // data[96],
-	     // data9[7],
-	     // data[98],
-	     userStr: data[99],
-	     dateStr: data[100],
-	     fcidStr: data[101],
-         indexStr: data[113]
+	    [laneStr: data[0],         //A       
+	     // data[1]                //B
+	     // data[2]                //C
+         indexIdStr: data[3],      //D
+	     senderNameStr: data[4],   //E
+	     senderEmail: data[5],     //F
+	     senderPhone: data[6],     //G
+	     dataToUser: data[7],      //H
+	     dataToEmail: data[8],     //I
+	     projectName: data[9],     //J
+	     projectUser: data[10],    //K
+	     projectUserEmail: data[11],  //L   
+	     service: data[12],        //M
+	     invoice: data[13],        //N
+	     abCompName: data[14],     //O
+	     abCatNum: data[15],       //P
+	     abLotNum: data[16],       //Q
+	     abNotes: data[17],        //R
+	     abClonal: data[18],       //S
+	     abAnimal: data[19],       //T
+	     ig: data[20],             //U
+	     antigen: data[21],        //V
+	     ulSampleSent: data[22],   //W
+	     abConc: data[23],         //X 
+	     amountUseUg: data[24],    //Y
+	     amountUseUl: data[25],    //Z
+	     // data[26],              //AA
+	     // data[27],              //AB
+	     // abName: data[28],      //AC
+	     samplePrepUser: data[29], //AD
+	     genus: data[30],          //AE
+	     species: data[31],        //AF
+	     strain: data[32],         //AG
+	     parentStrain: data[33],   //AH        
+	     genotype: data[34],       //AI
+	     mutation: data[35],       //AJ    
+	     growthMedia: data[36],    //AK    
+	     perturbation1: data[37],  //AL
+	     perturbation2: data[38],  //AM
+	     targetType: data[39], // changed  //AN
+	     // data[40],              //AO
+	     //bioRep: data[41],       //AP
+	     sampleId: data[42],       //AQ
+	     bioRep1SampleId: data[43],//AR
+	     bioRep2SampleId: data[44],//AS
+	     sampleNotes: data[45],    //AT
+	     nTag: data[46],           //AU    
+	     target: data[47],         //AV
+	     cTag: data[48],           //AW
+	     chromAmount: data[49],    //AX
+	     cellNum: data[50],        //AY    
+	     volume: data[51],         //AZ
+	     assay: data[52],          //BA
+	     genomeBuild1: data[53],   //BB    
+	     genomeBuild2: data[54],   //BC
+	     genomeBuild3: data[55],   //BD    
+	     // data[56],              //BE    
+	     dateReceived: data[57],   //BF
+	     receivingUser: data[58],  //BG    
+	     inOrExternal: data[59],   //BH
+	     // data[60],              //BI
+	     inventoryNotes: data[61], //BJ
+	     chipUser: data[62],       //BK
+	     // data[63],              //BL
+	     chipDate: data[64],       //BM
+	     // data[65],              //BN
+	     protocolVersion: data[66],//BO
+	     techRep: data[67],        //BP
+	     requestedTagNum: data[68],//BQ
+	     // cellNum: data[69],     //BR
+	     // data[70],              //BS
+	     // data[71],              //BT
+	     // chipQubit: data[72],   //BU
+	     // : data[73],            //BV
+	     // : data[74],            //BW
+	     resin: data[75],          //BX
+	     pool: data[76],           //BY
+	     volToPool: data[77],      //BZ
+	     poolDate: data[78],       //CA
+	     PCRCycle: data[79],       //CB
+	     quibitReading: data[80],  //CC
+	     quibitDilution: data[81], //CD
+	     concentration: data[82],  //CE
+	     poolDilution: data[83],   //CF
+	     // data[84],              //CG
+	     seqRepNum: data[85],      //CH
+	     seqRepId: data[86],       //CI
+	     rd1Start: data[87],       //CJ
+	     rd1End: data[88],         //CK
+	     indexStart: data[89],     //CL
+	     indexEnd: data[90],       //CM
+	     rd2Start: data[91],       //CN
+	     rd2End: data[92],         //CO
+	     // data[93],              //CP
+	     runStr: data[94],         //CQ
+	     // data[95],              //CR
+	     // data[96],              //CS
+	     // data9[7],              //CT
+	     // data[98],              //CU
+	     userStr: data[99],        //CV
+	     dateStr: data[100],       //CW
+	     fcidStr: data[101],       //CX
+         indexStr: data[113]       //DJ
 	    ]
 	}
 }

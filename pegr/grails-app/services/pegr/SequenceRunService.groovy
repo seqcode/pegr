@@ -1,5 +1,6 @@
 package pegr
 import grails.transaction.Transactional
+import groovy.time.TimeCategory
 
 class SequenceRunException extends RuntimeException {
     String message
@@ -7,6 +8,7 @@ class SequenceRunException extends RuntimeException {
 
 class SequenceRunService {
     def springSecurityService
+    def walleService
     
     @Transactional
     void save(SequenceRun run) {
@@ -126,11 +128,66 @@ class SequenceRunService {
              throw new SequenceRunException(message: "Sequence run has already been submitted!")
         }
         
-        def walleService = new WalleService()
         walleService.addToQueue(runId)
         
         // start the run by creating a job on remote server
         run.status = RunStatus.QUEUE
         run.save()
+    }
+    
+    def getCalendarTimeString(Date time) {
+        return time.format("yyyyMMdd'T'HHmmss'Z'")
+    }
+    
+    byte[] calendarEventAsBytes(Long runId, Date meetingTime) {        
+        def now = new Date()
+        def startTime = meetingTime
+        def endTime 
+        use(TimeCategory) {
+            endTime = startTime + 1.hour
+        }
+        
+        def nowStr = getCalendarTimeString(now)
+        def startTimeStr = getCalendarTimeString(startTime)
+        def endTimeStr = getCalendarTimeString(endTime)
+        
+        def organizer = "Pugh Lab Sequencing"
+        def organizerEmail = "dus73@psu.edu"
+        
+        def ical = """BEGIN:VCALENDAR
+PRODID:-
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:America/New_York
+BEGIN:STANDARD
+DTSTART:16010101T020000
+TZOFFSETTO:-0500
+TZOFFSETFROM:-0400
+TZNAME:EST
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:16010101T020000
+TZOFFSETTO:-0400
+TZOFFSETFROM:-0500
+TZNAME:EDT
+END:DAYLIGHT
+END:VTIMEZONE
+BEGIN:VEVENT
+ORGANIZER;CN=${organizer}:mailto:${organizerEmail}
+DTSTART;TZID="America/New_York":${startTimeStr}
+DTEND;TZID="America/New_York":${endTimeStr}
+TZOFFSETTO:-0500
+TZOFFSETFROM:-0400
+DTEND:${endTimeStr}
+SUMMARY:Sequence Run ${runId} Meeting
+UID:PEGR-SEQUENCING-MEETING-${nowStr}
+DTSTAMP:${nowStr}
+END:VEVENT
+END:VCALENDAR
+"""
+
+        return ical.getBytes('UTF-8')
     }
 }

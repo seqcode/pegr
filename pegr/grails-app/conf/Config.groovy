@@ -61,7 +61,6 @@ grails {
     }
 }
 
-
 grails.converters.encoding = "UTF-8"
 // scaffolding templates configuration
 grails.scaffolding.templates.domainSuffix = 'Instance'
@@ -167,6 +166,8 @@ grails {
    mail {
      host = "ucs.psu.edu"
      port = 587
+     username = "dus73@psu.edu"
+     password = ""
      props = ["mail.smtp.starttls.enable":"true",				   
               "mail.smtp.port":"587"]
    }
@@ -174,9 +175,9 @@ grails {
 
 environments {
     development {
-        grails.mail.disabled=true
+        grails.mail.disabled=false
     }
     test {
-        grails.mail.disabled=true
+        grails.mail.disabled=false
     }
 }

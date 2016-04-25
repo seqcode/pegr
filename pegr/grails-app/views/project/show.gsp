@@ -4,6 +4,9 @@
     <meta name="layout" content="main"/>
 </head>
 <body>
+    <g:if test="${flash.message}">
+        <div class="message" role="status">${flash.message}</div>
+    </g:if>
 	<div><g:link action='index'>My Projects</g:link> -> Project ${project?.name} </div>
 	<div>
 		<h3>Project: ${project?.name} <g:if test="${authorized}"><g:link action="edit" params="[projectId:project?.id]" class="edit">Edit</g:link></g:if></h3>
@@ -26,7 +29,7 @@
 
         <div class="tab-content">
             <div id="sample" class="tab-pane fade in active">
-                <g:render template="/project/sampleTable" model="['sampleList':samples]" />
+                <g:render template="/project/sampleTable" model="['sampleList':samples, 'project':project]" />
             </div>
             <div id="alignment" class="tab-pane fade">
                 <g:render template="/project/alignmentTable" model="['alignmentList':alignments]" />
@@ -37,13 +40,15 @@
         </div>
         <div class="pagination">
             <g:paginate id="${project.id}" total="${sampleCount ?: 0}" max="50"/>
-        </div>        
-        <div>
-            <g:link action="addSamples" params="[projectId: project?.id]" class="btn btn-info">Create New Sample</g:link>
-            <g:link action="addSample" class="btn btn-info">Add Existing Sample</g:link>
-        </div>
+        </div>   
+        <g:if test="${authorized}">
+            <div>
+                <g:link action="addNewSamples" params="[projectId: project?.id]" class="btn btn-info">Create New Sample</g:link>
+                <g:link action="searchSample" params="[projectId: project?.id]" class="btn btn-info">Add Existing Sample</g:link>
+            </div>
+        </g:if>
 	</div>
-		
+    </br>
     <g:if test="${authorized}">
         <div id="addUser" class="modal fade" role="dialog">
             <div class="modal-dialog">
@@ -104,6 +109,7 @@
     
 	<script>
         $(function(){
+            $(".confirm").confirm();
             $("#nav-projects").addClass("active");
             if (!${authorized}) {
                 $(".edit").hide();

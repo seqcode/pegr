@@ -36,7 +36,7 @@ class SecurityFilters {
             }    
         }
         
-        projectEdit(controller:'project', action:'edit|addUserAjax|removeUserAjax|editUserRoleAjax') {
+        projectEdit(controller:'project', action:'edit|addUserAjax|removeUserAjax|editUserRoleAjax|removeSample|searchSample|addExistingSample|addNewSamples') {
             before = {
                 def currUser = springSecurityService.currentUser
                 // admin is allowed

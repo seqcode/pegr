@@ -151,15 +151,31 @@ class SequenceRunService {
         def startTimeStr = getCalendarTimeString(startTime)
         def endTimeStr = getCalendarTimeString(endTime)
         
-        def organizer = "dus73@psu.edu"
+        def organizer = "Pugh Lab Sequencing"
+        def organizerEmail = "dus73@psu.edu"
         
         def ical = """BEGIN:VCALENDAR
 PRODID:-
 VERSION:2.0
 CALSCALE:GREGORIAN
 METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:America/New_York
+BEGIN:STANDARD
+DTSTART:16010101T020000
+TZOFFSETTO:-0500
+TZOFFSETFROM:-0400
+TZNAME:EST
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:16010101T020000
+TZOFFSETTO:-0400
+TZOFFSETFROM:-0500
+TZNAME:EDT
+END:DAYLIGHT
+END:VTIMEZONE
 BEGIN:VEVENT
-ORGANIZER;CN=GRETTA ARMSTRONG:mailto:${organizer}
+ORGANIZER;CN=${organizer}:mailto:${organizerEmail}
 DTSTART;TZID="America/New_York":${startTimeStr}
 DTEND;TZID="America/New_York":${endTimeStr}
 TZOFFSETTO:-0500

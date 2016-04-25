@@ -205,7 +205,7 @@ class SequenceRunController {
          meetingTime: startTime]
     }
     
-    def run() {
+    def run(Long runId) {
         try {
             sequenceRunService.run(runId)
             redirect(action: "show", id: runId)
@@ -222,7 +222,7 @@ class SequenceRunController {
         def bytes = sequenceRunService.calendarEventAsBytes(runId, meetingTime)
         sendMail {
             multipart true
-            to "dus73@psu.edu"
+            to "shaody8411@gmail.com"
             subject "[PEGR]Sequence Run ${runId} Meeting"
             body "The meeting for Sequence Run ${runId} is scheduled on ${meetingTime}."
             attachBytes "meeting.ics", "text/calendar", bytes 

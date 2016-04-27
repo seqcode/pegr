@@ -1,4 +1,5 @@
 import groovy.json.*
+import org.apache.commons.lang.RandomStringUtils
     
 includeTargets << grailsScript("_GrailsInit")
 
@@ -98,6 +99,11 @@ target(tests: "Simple tests") {
     if(monoStr.contains("mono")) {
         println monoStr
     }
+
+    String charset = (('A'..'Z') + ('0'..'9') ).join()
+    Integer length = 32
+    String randomString = RandomStringUtils.random(length, charset.toCharArray())
+    println randomString
 }
 
 setDefaultTarget(tests)

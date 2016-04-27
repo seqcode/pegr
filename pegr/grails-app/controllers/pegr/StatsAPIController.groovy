@@ -6,15 +6,22 @@ import grails.converters.*
 class StatsAPIController {
     def alignmentStatsService
     
-    def save(StatsRegistrationCommand newStats) {
-        try {
-            def alignmentStats = alignmentStatsService.save(newStats)
-            render "success ${newStats}"
-            //    respond alignmentStats, status: 200
-        } catch(Exception e) {
-            log.error "Error: ${e.message}", e
-            render "failed Run${newStats.run}, Sample${newStats.sample}, Genome${newStats.genome}, mapped${newStats.mappedReads}: ${e.message}"
-            //respond newStats, status: 500
+    // to test the API: curl -i -X POST -H "Content-Type: application/json" -d '{"run":191,"sample":11293,"genome":"hg19","ipStrength":1.12}' localhost:8080/pegr/api/stats?apiKey=
+    def save(StatsRegistrationCommand newStats, String apiKey) {
+        def trueKey = Chores.findByName('GalaxyAPIKey').value
+        
+        if (apiKey == trueKey) {
+            try {
+                def alignmentStats = alignmentStatsService.save(newStats)
+                render "success ${newStats}"
+                //    respond alignmentStats, status: 200
+            } catch(Exception e) {
+                log.error "Error: ${e.message}", e
+                render "failed Run${newStats.run}, Sample${newStats.sample}, Genome${newStats.genome}, mapped${newStats.mappedReads}: ${e.message}"
+                //respond newStats, status: 500
+            }
+        } else {
+            render "failed: apiKey not recognized!"
         }
     }    
 
@@ -52,5 +59,3 @@ class StatsRegistrationCommand {
     String galaxyDatasetFilepath
 }
 
-// curl -i -X GET -H "Accept: application/json" -d '{"run":191,"sample":11293,"genome":"hg19"}' localhost:8080/pegr/api/stats
-// curl -i -X POST -H "Content-Type: application/json" -d '{"run":191,"sample":11293,"genome":"hg19","mappedReads":1000}' localhost:8080/pegr/api/stats

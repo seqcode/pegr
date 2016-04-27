@@ -12,6 +12,8 @@ class UrlMappings {
 			 action = "form"
 		}
         
+        "/api/stats"(resources:'statsAPI', includes:['save'])
+        
         "/$controller/$action?/$id?(.$format)?"{
             constraints {
                 // apply constraints here

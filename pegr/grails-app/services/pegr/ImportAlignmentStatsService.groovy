@@ -43,24 +43,24 @@ class ImportAlignmentStatsService {
                     def stats = alignment.alignmentStats
                     if (stats) {
                         stats.indexMismatch = data.indexMismatch
-                        stats.indexCount = data.indexCount
-                        stats.mappedReadCount = data.mappedReadCount 
-                        stats.uniqueMappedReadCount = data.uniqueMappedReadCount
+                        stats.totalReads = data.totalReads
+                        stats.mappedReads = data.mappedReads 
+                        stats.uniquelyMappedReads = data.uniquelyMappedReads
                         stats.spikeInCount = data.spikeInCount 
                         stats.adapterCount = data.adapterCount 
-                        stats.dedupReadCount = data.dedupReadCount 
+                        stats.dedupUniquelyMappedReads = data.dedupUniquelyMappedReads 
                         stats.avgInsertSize = data.avgInsertSize 
                         stats.ipStrength = data.ipStrength 
                         stats.save()
                     } else {
                         alignment.alignmentStats = new AlignmentStats(
                                 indexMismatch: data.indexMismatch, 
-                                indexCount: data.indexCount,
-                                mappedReadCount: data.mappedReadCount, 
-                                uniqueMappedReadCount: data.uniqueMappedReadCount,
+                                totalReads: data.totalReads,
+                                mappedReads: data.mappedReads, 
+                                uniquelyMappedReads: data.uniquelyMappedReads,
                                 spikeInCount: data.spikeInCount,
                                 adapterCount: data.adapterCount,
-                                dedupReadCount: data.dedupReadCount, 
+                                dedupUniquelyMappedReads: data.dedupUniquelyMappedReads, 
                                 avgInsertSize: data.avgInsertSize,
                                 ipStrength: data.ipStrength 
                             
@@ -233,10 +233,10 @@ class ImportAlignmentStatsService {
             ALIGNER_PARAMETERS : data[3],  
             READ_START         : data[4],  
             READ_END           : data[5],  
-            indexCount         : getInteger(data[6]),  
+            totalReads         : getInteger(data[6]),  
             INDEX_PERCENT      : data[7],  
-            mappedReadCount    : getInteger(data[8]),  
-            uniqueMappedReadCount  : getInteger(data[9]),  
+            mappedReads    : getInteger(data[8]),  
+            uniquelyMappedReads  : getInteger(data[9]),  
             COMMENT            : data[10],  
             UNIQ_ID            : data[11],  
             VERSION            : data[12],  
@@ -244,7 +244,7 @@ class ImportAlignmentStatsService {
             adapterCount       : getInteger(data[14]),  
             NON_UNIQ_COUNT     : data[15],  
             DUP_READ_COUNT     : data[16],  
-            dedupReadCount     : getInteger(data[17]),  
+            dedupUniquelyMappedReads     : getInteger(data[17]),  
             avgInsertSize      : getInteger(data[18]),  
             ipStrength         : getFloat(data[19]),  
         ]

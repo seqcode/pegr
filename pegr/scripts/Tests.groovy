@@ -1,4 +1,5 @@
 import groovy.json.*
+import org.apache.commons.lang.RandomStringUtils
     
 includeTargets << grailsScript("_GrailsInit")
 
@@ -80,20 +81,29 @@ target(tests: "Simple tests") {
     println "date: " + Date.parse("yyyy.MM.dd", date)
     
     // println Float.parseFloat("")
-    map = [name: 'John Doe', age: [42, 24]]
-    map['sampleId'] = "123"
-    def s = JsonOutput.toJson(map)
+    map = [name: 'John Doe', age: [42, 24], sampleId: 123]
+    def map2 = [name: 'Anna', age: [42, 24], sampleId: 234]
+    def input = [map, map2]
+    //map['sampleId'] = 123
+    def s = JsonOutput.toJson(input)
 
     println s
     
     def jsonSlurper = new JsonSlurper()
-    def object = jsonSlurper.parseText(s)
+    def objects = jsonSlurper.parseText(s)
+    def object = objects[0]
     println object.name
+    println object.sampleId
     
     def monoStr = "monolla"
     if(monoStr.contains("mono")) {
         println monoStr
     }
+
+    String charset = (('A'..'Z') + ('0'..'9') ).join()
+    Integer length = 32
+    String randomString = RandomStringUtils.random(length, charset.toCharArray())
+    println randomString
 }
 
 setDefaultTarget(tests)

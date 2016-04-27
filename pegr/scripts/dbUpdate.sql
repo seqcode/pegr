@@ -37,3 +37,5 @@ join project pr on pr.id = cnt_table.project_id order by run_num) as grouped;
 
 select s.id, r.run_num, i.invoice_num from sample s join invoice i on s.invoice_id = i.id join sequencing_experiment e on e.sample_id = s.id join sequence_run r on e.sequence_run_id = r.id where invoice_num like "%p00%" and r.run_num between 520 and 622;
 */
+
+// insert into chores (version, name, value) values (0, "GalaxyAPIKey", "0YG9B2LPLLDPP4B1LQQ0BB1LH75L8A3P");  

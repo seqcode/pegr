@@ -3,7 +3,7 @@
         <thead>
             <tr>
                 <th>Genome</th>
-                <th>Index Count</th>
+                <th>Read Count</th>
                 <th>Mapped Read Count</th>
                 <th>Uniquely Mapped Count</th>
                 <th>Deduplicated Count</th>
@@ -20,10 +20,10 @@
             <g:each in="${alignmentList}" var="alignment">
                 <tr>
                     <td>${alignment.genome}</td>
-                    <td>${alignment.alignmentStats?.indexCount}</td>
-                    <td>${alignment.alignmentStats?.mappedReadCount}</td>
-                    <td>${alignment.alignmentStats?.uniqueMappedReadCount}</td>
-                    <td>${alignment.alignmentStats?.dedupReadCount}</td>
+                    <td>${alignment.alignmentStats?.totalReads}</td>
+                    <td>${alignment.alignmentStats?.mappedReads}</td>
+                    <td>${alignment.alignmentStats?.uniquelyMappedReads}</td>
+                    <td>${alignment.alignmentStats?.dedupUniquelyMappedReads}</td>
                     <td>${alignment.alignmentStats?.indexMismatch}</td>
                     <td>${alignment.alignmentStats?.spikeInCount}</td>
                     <td>${alignment.alignmentStats?.adapterCount}</td>

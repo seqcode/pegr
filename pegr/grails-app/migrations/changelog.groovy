@@ -2831,4 +2831,6 @@ databaseChangeLog = {
 	include file: 'addPoolSamples.groovy'
 
 	include file: 'addAlignmentStats.groovy'
+
+	include file: 'changeStatsName.groovy'
 }

@@ -5,7 +5,7 @@
                 <th>Sample ID</th>
                 <th>Sequence Run</th>
                 <th>Genome</th>
-                <th>Index Count</th>
+                <th>Read Count</th>
                 <th>Mapped Read Count</th>
                 <th>Uniquely Mapped Count</th>
                 <th>Deduplicated Count</th>
@@ -23,10 +23,10 @@
                     <td><g:link controller="sample" action="show" id="${alignment.sequencingExperiment?.sample?.id}">${alignment.sequencingExperiment?.sample?.id}</g:link></td>    
                     <td><g:link controller="sequenceRun" action="show" id="${alignment.sequencingExperiment?.sequenceRun?.id}">${alignment.sequencingExperiment?.sequenceRun?.id} (Old ${alignment.sequencingExperiment?.sequenceRun?.runNum}) </g:link></td>
                     <td>${alignment.genome}</td>
-                    <td>${alignment.alignmentStats?.indexCount}</td>
-                    <td>${alignment.alignmentStats?.mappedReadCount}</td>
-                    <td>${alignment.alignmentStats?.uniqueMappedReadCount}</td>
-                    <td>${alignment.alignmentStats?.dedupReadCount}</td>
+                    <td>${alignment.alignmentStats?.totalReads}</td>
+                    <td>${alignment.alignmentStats?.mappedReads}</td>
+                    <td>${alignment.alignmentStats?.uniquelyMappedReads}</td>
+                    <td>${alignment.alignmentStats?.dedupUniquelyMappedReads}</td>
                     <td>${alignment.alignmentStats?.indexMismatch}</td>
                     <td>${alignment.alignmentStats?.spikeInCount}</td>
                     <td>${alignment.alignmentStats?.adapterCount}</td>

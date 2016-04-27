@@ -2,13 +2,13 @@ package pegr
 
 class AlignmentStats {
     
-    Integer indexCount
+    Integer totalReads //indexCount
     Integer indexMismatch
     Integer adapterCount
     
-    Integer mappedReadCount
-    Integer uniqueMappedReadCount
-    Integer dedupReadCount
+    Integer mappedReads // mappedReadCount
+    Integer uniquelyMappedReads // uniqueMappedReadCount
+    Integer dedupUniquelyMappedReads //dedupReadCount
     Integer avgInsertSize
     Integer spikeInCount
     Float ipStrength
@@ -29,14 +29,16 @@ class AlignmentStats {
     Integer tssDistal
     Integer repeatedRegions
     
+    String galaxyDatasetFilepath
+    
     static constraints = {
-        indexCount nullable: true
+        totalReads nullable: true
         indexMismatch nullable: true
         adapterCount nullable: true
         
-        mappedReadCount nullable: true
-        uniqueMappedReadCount nullable: true
-        dedupReadCount nullable: true
+        mappedReads nullable: true
+        uniquelyMappedReads nullable: true
+        dedupUniquelyMappedReads nullable: true
         avgInsertSize nullable: true
         spikeInCount nullable: true
         ipStrength nullable: true
@@ -56,6 +58,8 @@ class AlignmentStats {
         tssProximal nullable: true
         tssDistal nullable: true
         repeatedRegions nullable: true
+        
+        galaxyDatasetFilepath nullable: true, maxSize: 1000
     }
     
 }

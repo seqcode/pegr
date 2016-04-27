@@ -13,7 +13,7 @@ class StatsAPIController {
             //    respond alignmentStats, status: 200
         } catch(Exception e) {
             log.error "Error: ${e.message}", e
-            render "failed Run${newStats.run}, Sample${newStats.sample}, Genome${newStats.genome}, mapped${newStats.mappedReadCount}: ${e.message}"
+            render "failed Run${newStats.run}, Sample${newStats.sample}, Genome${newStats.genome}, mapped${newStats.mappedReads}: ${e.message}"
             //respond newStats, status: 500
         }
     }    
@@ -25,17 +25,16 @@ class StatsRegistrationCommand {
     Long run
     Long sample
     String genome
-
-    Integer indexCount
+        
+    Integer totalReads
     Integer indexMismatch
     Integer adapterCount    
-    Integer mappedReadCount
-    Integer uniqueMappedReadCount
-    Integer dedupReadCount
+    Integer mappedReads
+    Integer uniquelyMappedReads
+    Integer dedupUniquelyMappedReads
     Integer avgInsertSize
     Integer spikeInCount
     Float ipStrength
-    String peakFilePath
     Integer peaks
     Integer singletons
     Float peakMedian
@@ -49,8 +48,9 @@ class StatsRegistrationCommand {
     Float seqDuplicationLevel
     Integer tssProximal
     Integer tssDistal
-    Integer repeatedRegions
+    Integer repeatedRegions    
+    String galaxyDatasetFilepath
 }
 
 // curl -i -X GET -H "Accept: application/json" -d '{"run":191,"sample":11293,"genome":"hg19"}' localhost:8080/pegr/api/stats
-// curl -i -X POST -H "Content-Type: application/json" -d '{"run":191,"sample":11293,"genome":"hg19","mappedReadCount":1000}' localhost:8080/pegr/api/stats
+// curl -i -X POST -H "Content-Type: application/json" -d '{"run":191,"sample":11293,"genome":"hg19","mappedReads":1000}' localhost:8080/pegr/api/stats

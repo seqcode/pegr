@@ -13,15 +13,13 @@ class StatsAPIController {
         if (apiKey == trueKey) {
             try {
                 def alignmentStats = alignmentStatsService.save(newStats)
-                render "success ${newStats}"
-                //    respond alignmentStats, status: 200
+                render  status: 200
             } catch(Exception e) {
                 log.error "Error: ${e.message}", e
-                render "failed Run${newStats.run}, Sample${newStats.sample}, Genome${newStats.genome}, mapped${newStats.mappedReads}: ${e.message}"
-                //respond newStats, status: 500
+                render status: 500
             }
         } else {
-            render "failed: apiKey not recognized!"
+            render status: 401
         }
     }    
 

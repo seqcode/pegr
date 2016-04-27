@@ -56,10 +56,6 @@
     </table>
     <g:form action="run">
         <g:hiddenField name="runId" value="${currentRun.id}"></g:hiddenField>
-        <div>
-            <h4>Schedule Meeting</h4>
-            <g:datePicker name="meetingTime" value="${meetingTime}"/>
-        </div>
         <g:submitButton class="btn btn-primary" name="submit" value="Submit"></g:submitButton>
         <g:link action="edit" params="[runId: currentRun.id]" class="btn btn-default">Cancel</g:link>
     </g:form>

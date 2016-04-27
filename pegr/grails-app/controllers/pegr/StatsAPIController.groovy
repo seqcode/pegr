@@ -1,15 +1,23 @@
 package pegr
+import static org.springframework.http.HttpStatus.*
+import static org.springframework.http.HttpMethod.*
+import grails.converters.*
 
 class StatsAPIController {
     def alignmentStatsService
+    
     def save(StatsRegistrationCommand newStats) {
         try {
-            alignmentStatsService.save(newStats)
-            respond status: 200
+            def alignmentStats = alignmentStatsService.save(newStats)
+            render "success ${newStats}"
+            //    respond alignmentStats, status: 200
         } catch(Exception e) {
-            respond status: 500
+            log.error "Error: ${e.message}", e
+            render "failed Run${newStats.run}, Sample${newStats.sample}, Genome${newStats.genome}, mapped${newStats.mappedReadCount}: ${e.message}"
+            //respond newStats, status: 500
         }
     }    
+
 }
 
 
@@ -17,9 +25,32 @@ class StatsRegistrationCommand {
     Long run
     Long sample
     String genome
-    String mappedReadCount
-    String uniqueMappedReadCount
-    String dedupReadCount
+
+    Integer indexCount
+    Integer indexMismatch
+    Integer adapterCount    
+    Integer mappedReadCount
+    Integer uniqueMappedReadCount
+    Integer dedupReadCount
+    Integer avgInsertSize
+    Integer spikeInCount
+    Float ipStrength
+    String peakFilePath
+    Integer peaks
+    Integer singletons
+    Float peakMedian
+    Float peakMean
+    Float peakMedianStd
+    Float peakMeanStd
+    Float medianTagSingletons
+    Float peakPairNos
+    Float peakPairWis
+    Float genomeCoverage
+    Float seqDuplicationLevel
+    Integer tssProximal
+    Integer tssDistal
+    Integer repeatedRegions
 }
 
-// curl -i -X POST -H "Content-Type: application/json" -d '{"run":200}' localhost:8080/pegr/statsAPI
+// curl -i -X GET -H "Accept: application/json" -d '{"run":191,"sample":11293,"genome":"hg19"}' localhost:8080/pegr/api/stats
+// curl -i -X POST -H "Content-Type: application/json" -d '{"run":191,"sample":11293,"genome":"hg19","mappedReadCount":1000}' localhost:8080/pegr/api/stats

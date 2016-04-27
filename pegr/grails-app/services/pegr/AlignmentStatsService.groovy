@@ -7,24 +7,27 @@ class AlignmentStatsException extends RuntimeException {
 
 class AlignmentStatsService {
     @Transactional
-    void save(StatsRegistrationCommand newStats) {
-        def alignment = SequenceAlignment.where { sequencingExperiment.sequenceRun.id == newStats.run && sequenceingExperiment.sample.id == newStats.sample && genome.name == newStats.genome}.find()
-        if (alignment) {
-            def alignmentStats = alignment.alignmentStats
-            if (alignmentStats) {
-                copyProperties(newStats, alignmentStats)
-                alignmentStats.save()
-            } else {
-                alignmentStats = new AlignmentStats()
-                copyProperties(newStats, alignmentStats)
-                alignmentStats.save(flush:true)
-                alignment.alignmentStats = alignmentStats
-                alignment.save()
+    def save(StatsRegistrationCommand newStats) {
+        def experiment = SequencingExperiment.where {sequenceRun.id == newStats.run && sample.id == newStats.sample}.find()
+        def genome = Genome.findByName(newStats.genome)
+        if (experiment && genome) {
+            def alignment = SequenceAlignment.findBySequencingExperimentAndGenome(experiment, genome)
+            if (alignment) {
+                def alignmentStats = alignment.alignmentStats
+                if (alignmentStats) {
+                    copyProperties(newStats, alignmentStats)
+                    alignmentStats.save()
+                } else {
+                    alignmentStats = new AlignmentStats()
+                    copyProperties(newStats, alignmentStats)
+                    alignmentStats.save(flush:true)
+                    alignment.alignmentStats = alignmentStats
+                    alignment.save()
+                }
+                return alignmentStats
             }
-        } else {
-            throw new AlignmentStatsException(message: "Sequence Alignment not found!")
-        }
-        
+        } 
+        throw new AlignmentStatsException(message: "Sequence Alignment not found!")
     }
     
     def copyProperties(source, target) {

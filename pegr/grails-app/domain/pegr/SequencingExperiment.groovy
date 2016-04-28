@@ -1,7 +1,6 @@
 package pegr
 
 class SequencingExperiment {
-	String seqId
 	Sample sample
 	SequenceRun sequenceRun	
 	String fastqFilePath
@@ -24,7 +23,6 @@ class SequencingExperiment {
     }
     
     static constraints = {
-        seqId nullable: true, blank: true
         sequenceRun nullable: true        
         fastqFilePath nullable: true, blank: true, maxSize: 500
         readPositions nullable: true, blank: true

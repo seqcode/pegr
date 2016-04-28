@@ -12,7 +12,7 @@
             <g:link action="index"><span class="glyphicon glyphicon-home"></span> Sample List</g:link>
         </div>     
         <h3>
-            Sample ${sample.id} 
+            Sample ${sample.id} <g:if test="${sample.sourceId}">(${sample.source}#${sample.sourceId})</g:if>
             <small><span class="label label-default">${sample.status}</span></small> 
         </h3>
         <g:if test="${sample?.date}">

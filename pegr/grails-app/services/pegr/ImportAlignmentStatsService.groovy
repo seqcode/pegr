@@ -32,7 +32,8 @@ class ImportAlignmentStatsService {
                 } else if (data.UNIQ_ID.size() > 4) {
                     seqId = data.UNIQ_ID[0..4]
                 }                
-                def experiment = SequencingExperiment.findBySeqId(seqId)    
+                def sample = Sample.findBySourceId(seqId)
+                def experiment = SequencingExperiment.findBySample(sample)    
                 def alignment = SequenceAlignment.findBySequencingExperiment(experiment)
 
                 if (alignment) {
@@ -138,8 +139,9 @@ class ImportAlignmentStatsService {
                     seqId = data.PEAK_NAME[4..8]
                 } else if (data.PEAK_NAME.size() > 4) {
                     seqId = data.PEAK_NAME[0..4]
-                }                
-                def experiment = SequencingExperiment.findBySeqId(seqId)    
+                }
+                def sample = Sample.findBySourceId(seqId)
+                def experiment = SequencingExperiment.findBySample(sample)    
                 def alignment = SequenceAlignment.findBySequencingExperiment(experiment)
 
                 if (alignment) {

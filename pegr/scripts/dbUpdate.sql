@@ -39,3 +39,13 @@ select s.id, r.run_num, i.invoice_num from sample s join invoice i on s.invoice_
 */
 
 // insert into chores (version, name, value) values (0, "GalaxyAPIKey", "0YG9B2LPLLDPP4B1LQQ0BB1LH75L8A3P");  
+
+// UPDATE sample,sequencing_experiment SET sample.source_id = sequencing_experiment.seq_id where sample.id = sequencing_experiment.sample_id;
+
+// update sample set sample.source="Peconic" where sample.invoice_id in (select id from invoice where invoice_num like "%p00%");
+
+// update sample set sample.source="CollaboratorX" where sample.invoice_id in (select id from invoice where invoice_num like "%x00%");
+
+// update sample set sample.source="CollaboratorS" where sample.invoice_id in (select id from invoice where invoice_num like "%s00%");
+
+// update sample set source = "PughLab" where source is null;

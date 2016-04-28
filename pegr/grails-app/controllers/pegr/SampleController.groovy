@@ -95,6 +95,20 @@ class SampleController {
                         ilike "catalogNumber", "%${params.antibody}%"
                     }
                 }
+                if (params.id) {
+                    eq "id", Long.parseLong(params.id)
+                }
+                if (params.sourceId) {
+                    eq "sourceId", params.sourceId
+                }
+                if (params.source) {
+                    ilike "source", "%${params.source}%"
+                }
+                if (params.target) {
+                    target {
+                        ilike "name", "%${params.target}%"
+                    }
+                }
                 eq("status", SampleStatus.COMPLETED)
             }
             order("id", "desc")

@@ -19,6 +19,8 @@ class Sample {
 	ProtocolInstanceSummary prtclInstSummary
     Item item
     List bags
+    String source
+    String sourceId
     
     static hasMany = [bags: ProtocolInstanceBag]
     
@@ -74,6 +76,8 @@ class Sample {
 		prtclInstSummary nullable: true
         date nullable: true
         item nullable: true
+        source nullable: true
+        sourceId nullable: true
     }
     
     static mapping = {

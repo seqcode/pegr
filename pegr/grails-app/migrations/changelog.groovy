@@ -2833,4 +2833,8 @@ databaseChangeLog = {
 	include file: 'addAlignmentStats.groovy'
 
 	include file: 'changeStatsName.groovy'
+
+	include file: 'addSampleSource.groovy'
+
+	include file: 'removeSeqIdFromExp.groovy'
 }

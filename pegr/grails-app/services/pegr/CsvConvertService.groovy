@@ -98,14 +98,14 @@ class CsvConvertService {
 
         def prtcl = getProtocolInstanceSummary(data.chipUser, data.chipDate, data.protocolVersion, data.resin, data.PCRCycle, assay)
 
-        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl)
+        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId)
 
         addIndexToSample(sample, data.indexStr, data.indexIdStr, basicCheck)
         addSampleToProject(project, sample)
 
         getPool(sample, results.sequenceRun, data.pool, data.volToPool, data.poolDate, data.quibitReading, data.quibitDilution, data.concentration, data.poolDilution)
 
-        def seqExp = getSeqExperiment(sample, results.sequenceRun, results.seqId, data.rd1Start, data.rd1End, data.indexStart, data.indexEnd, data.rd2Start, data.rd2End)
+        def seqExp = getSeqExperiment(sample, results.sequenceRun, data.rd1Start, data.rd1End, data.indexStart, data.indexEnd, data.rd2Start, data.rd2End)
 
         [data.genomeBuild1, data.genomeBuild2, data.genomeBuild3].each{ getSeqAlign(it, seqExp, species) }
 
@@ -459,7 +459,7 @@ class CsvConvertService {
         return prtcl
     }
 	
-	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl) {
+	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId) {
 	    def note = [:]
 	    if (sampleNotes) {
 	        note['note'] = sampleNotes
@@ -474,7 +474,22 @@ class CsvConvertService {
 	        note['bioRep2'] = bioRep2SampleId
 	    }
 	    def date = getDate(dateStr)
-	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl).save( failOnError: true)
+        def source = "PughLab"
+        if (invoice.invoiceNum && invoice.invoiceNum.size() >= 4 && invoice.invoiceNum[1..3] ==~ /\d+/ ) {
+            switch (invoice.invoiceNum[0].toLowerCase()) {
+                case "p":
+                    source = "Peconic"
+                    break
+                case "x":
+                    source = "CustomerX"
+                    break
+                case "s":
+                    source = "CustomerS"
+                    break
+            }
+        }
+        
+	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source).save( failOnError: true)
 	    return sample
 	}
 	
@@ -579,7 +594,7 @@ class CsvConvertService {
 	    }
 	}
 	        
-	def getSeqExperiment(Sample sample, SequenceRun seqRun, String seqId, String rd1Start, String rd1End, String indexStart, String indexEnd, String rd2Start, String rd2End) {
+	def getSeqExperiment(Sample sample, SequenceRun seqRun, String rd1Start, String rd1End, String indexStart, String indexEnd, String rd2Start, String rd2End) {
 		def map = [:]
 		if(rd1Start || rd1End) {
 			map['rd1'] = [rd1Start, rd1End]
@@ -591,7 +606,7 @@ class CsvConvertService {
 			map['rd2'] = [rd2Start, rd2End]
 		}
 	    def readPositions = JsonOutput.toJson(map)
-	    def seqExp = new SequencingExperiment(seqId: seqId, sample: sample, sequenceRun: seqRun, readPositions: readPositions).save( failOnError: true)
+	    def seqExp = new SequencingExperiment(sample: sample, sequenceRun: seqRun, readPositions: readPositions).save( failOnError: true)
 	    return seqExp
 	}
 	        
@@ -748,7 +763,7 @@ class CsvConvertService {
 	         }
 	    }
 	
-	    if (SequencingExperiment.findBySeqId(seqId)) {
+	    if (Sample.findBySourceId(seqId)) {
             throw new CsvConvertException(message: "SeqId ${seqId} already exists!")
 	    }
 	

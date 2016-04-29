@@ -6,7 +6,7 @@ import grails.converters.*
 class StatsAPIController {
     def alignmentStatsService
     
-    // to test the API: curl -i -X POST -H "Content-Type: application/json" -d '{"run":191,"sample":11293,"genome":"hg19","ipStrength":1.12}' localhost:8080/pegr/api/stats?apiKey=
+    // to test the API: curl -i -X POST -H "Content-Type: application/json" -d '{"run":2,"sample":2,"genome":"sacCer3_cegr","ipStrength":1.12}' localhost:8080/pegr/api/stats?apiKey=
     def save(StatsRegistrationCommand newStats, String apiKey) {
         def trueKey = Chores.findByName('GalaxyAPIKey').value
         

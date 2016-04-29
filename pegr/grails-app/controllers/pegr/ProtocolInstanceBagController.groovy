@@ -60,7 +60,6 @@ class ProtocolInstanceBagController {
     }
     
     def updateBagAjax(Long bagId, String name) {
-        def message = null
         protocolInstanceBagService.updateBag(bagId, name)
         render name
     }

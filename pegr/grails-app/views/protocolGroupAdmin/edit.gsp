@@ -32,6 +32,7 @@
 				</fieldset>
 				<fieldset class="buttons">
 					<g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
+                    <g:link action="show" id="${protocolGroupInstance.id}">Cancel</g:link>
 				</fieldset>
 			</g:form>
 		</div>

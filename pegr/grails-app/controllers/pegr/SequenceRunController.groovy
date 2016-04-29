@@ -70,7 +70,7 @@ class SequenceRunController {
             flash.message = "New sequence run created!"
             redirect(action: "edit", params: [runId: run.id])
         }catch(SequenceRunException e) {
-            flash.message = e.message
+            request.message = e.message
             def largestRunNum = SequenceRun.createCriteria().get {
                 projections {
                     max "runNum"
@@ -103,7 +103,7 @@ class SequenceRunController {
                 sequenceRunService.save(run)                   
                 redirect(action: "show", id:runId)
             } catch(SequenceRunException e) {
-                flash.message = e.message
+                request.message = e.message
                 render(view: "editInfo", model: [run: run])
             }
         } else {
@@ -118,7 +118,7 @@ class SequenceRunController {
             if (poolItem) {
                 render(view: "previewPool", model: [runId: runId, poolItem: poolItem])
             } else {
-                flash.message = "Pool not found!"
+                request.message = "Pool not found!"
                 [runId: runId]
             }
         } else {

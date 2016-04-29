@@ -1,6 +1,7 @@
 package pegr.admin
 import pegr.AdminCategory
 import pegr.Protocol
+import pegr.ProtocolException
 import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 class ProtocolAdminController {
@@ -39,12 +40,23 @@ class ProtocolAdminController {
                     redirect(action: "show", id: protocol.id)
                 }catch(ProtocolException e) {
                     request.message = e.message
-                    render(view: "create", model: [protocol: protocol])
+                    render(view: "create", model: [protocol: protocol, 
+                        startItemTypeId:params.startItemTypeId,
+                        endItemTypeId:params.endItemTypeId,
+                        sharedItemTypeIds:params.sharedItemTypeIds,
+                        startPoolTypeId:params.startPoolTypeId,
+                        endPoolTypeId:params.endPoolTypeId])
                 }catch(Exception e) {
                     request.message = "Error saving this protocol!"
                     log.error "Error: ${e.message}", e
-                    render(view: "create", model: [protocol: protocol])
+                    render(view: "create", model: [protocol: protocol,
+                        startItemTypeId:params.startItemTypeId,
+                        endItemTypeId:params.endItemTypeId,
+                        sharedItemTypeIds:params.sharedItemTypeIds,
+                        startPoolTypeId:params.startPoolTypeId,
+                        endPoolTypeId:params.endPoolTypeId])
                 }
+
             }
         }
     }
@@ -71,15 +83,30 @@ class ProtocolAdminController {
                     redirect(action: "show", id: protocol.id)
                 }catch(ProtocolException e) {
                     request.message = e.message
-                    render(view: "edit", model: [protocol: protocol])
+                    render(view: "edit", model: [protocol: protocol,
+                        startItemTypeId:params.startItemTypeId,
+                        endItemTypeId:params.endItemTypeId,
+                        sharedItemTypeIds:params.sharedItemTypeIds,
+                        startPoolTypeId:params.startPoolTypeId,
+                        endPoolTypeId:params.endPoolTypeId])
                 }catch(Exception e) {
                     request.message = "Error updateing this protocol!"
                     log.error "Error: ${e.message}", e
-                    render(view: "edit", model: [protocol: protocol])
+                    render(view: "edit", model: [protocol: protocol,
+                        startItemTypeId:params.startItemTypeId,
+                        endItemTypeId:params.endItemTypeId,
+                        sharedItemTypeIds:params.sharedItemTypeIds,
+                        startPoolTypeId:params.startPoolTypeId,
+                        endPoolTypeId:params.endPoolTypeId])
                 }
             }
         }else {
-            [protocol: protocol]
+            [protocol: protocol,
+            startItemTypeId:protocol?.startItemType?.id,
+            endItemTypeId:protocol?.endItemType?.id,
+            sharedItemTypeIds:protocol?.sharedItemTypes*.id,
+            startPoolTypeId:protocol?.startPoolType?.id,
+            endPoolTypeId:protocol?.endPoolType?.id]
         }
     }
     
@@ -90,7 +117,7 @@ class ProtocolAdminController {
             flash.message = "Protocol deleted!"
             redirect(action: "index")
         }catch(ProtocolException e) {
-            request.message = e.message
+            flash.message = e.message
             redirect(action: "show", id: id)
         }
     }

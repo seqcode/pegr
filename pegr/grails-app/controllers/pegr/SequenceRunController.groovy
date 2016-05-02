@@ -85,7 +85,7 @@ class SequenceRunController {
         if (run) {
             [run: run]
         } else {
-            flash.message = e.message
+            flash.message = "Sequence run not found!"
             redirect(action: "index")
         }
     }
@@ -107,7 +107,7 @@ class SequenceRunController {
                 render(view: "editInfo", model: [run: run])
             }
         } else {
-            flash.message = e.message
+            flash.message = "Sequence run not found!"
             redirect(action: "index")
         }
     }
@@ -258,16 +258,16 @@ class SequenceRunController {
                                           basicCheck
                                          )
                 if (messages.size() == 0){
-                    flash.message = ["CSV file uploaded!",]
+                    flash.messageList = ["CSV file uploaded!",]
                 } else {
-                    flash.message = messages                   
+                    flash.messageList = messages                   
                 }
             } else {
-                flash.message = "Only csv files are accepted!"
+                flash.messageList = ["Only csv files are accepted!"]
             }
         } catch(Exception e) {
             log.error "Error: ${e.message}", e
-            flash.message = "Error uploading the file!"
+            flash.messageList = ["Error uploading the file!"]
         }
 
         redirect(action: "index")

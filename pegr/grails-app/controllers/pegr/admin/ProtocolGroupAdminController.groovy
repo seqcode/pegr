@@ -1,39 +1,47 @@
 package pegr.admin
 import pegr.AdminCategory
 import pegr.ProtocolGroup
+import pegr.ProtocolGroupException
 import grails.transaction.Transactional
 
 class ProtocolGroupAdminController {
 
     static scaffold = ProtocolGroup
 	public static AdminCategory category = AdminCategory.PROTOCOLS
+    def protocolGroupService
     
-    @Transactional
     def update() {
         withForm {
-            def protocolGroupInstance = ProtocolGroup.get(params.id)
+            def protocolGroup = ProtocolGroup.get(params.id)
             
-            if (protocolGroupInstance) {
+            if (protocolGroup) {
                 //remove old protocols
-                protocolGroupInstance.protocols.clear()
+                protocolGroup.protocols.clear()
                 
                 // update with new input
-                protocolGroupInstance.properties = params
+                protocolGroup.properties = params
                 try {
-                    if (protocolGroupInstance.save(flush: true)) {
-                        flash.message = "Protocol Group ${protocolGroupInstance.name} has been updated!"
-                        redirect(id: protocolGroupInstance.id, action: 'show')
-                    } else {
-                        flash.message = "Invalid inputs!"
-                        redirect(id: protocolGroupInstance.id, action: 'edit', params:[protocolGroupInstance: protocolGroupInstance])
-                    }
-                } catch(org.springframework.dao.OptimisticLockingFailureException e) {
-                    flash.message = "Oops! Please try again!"
-                    redirect(id: protocolGroupInstance.id, action: 'edit', params:[protocolGroupInstance: protocolGroupInstance])
+                    protocolGroupService.save(protocolGroup)
+                    flash.message = "Protocol Group ${protocolGroup.name} has been updated!"
+                    redirect(id: protocolGroup.id, action: 'show')
+                } catch(ProtocolGroupException e) {
+                    flash.message = e.message
+                    redirect(id: protocolGroup.id, action: 'edit', params:[protocolGroupInstance: protocolGroup])
                 }
             } else {
                 render status: 404
             }
+        }
+    }
+    
+    def delete(Long id) {
+        try {
+            protocolGroupService.delete(id)
+            flash.message = "Protocol Group #${id} has been deleted!"
+            redirect(action: "index")
+        } catch(ProtocolGroupException e) {
+            flash.message = e.message
+            redirect(action: "show", id: id)
         }
     }
 }

@@ -23,10 +23,6 @@
 				<g:if test="${strain?.name}">
 				<li>Name: ${strain.name}</li>
 				</g:if>
-							
-				<g:if test="${strain?.backgroundStrain}">
-				<li>Background Strain:<g:link controller="strainAdmin" action="show" id="${strain?.backgroundStrain?.id}">${strain?.backgroundStrain?.encodeAsHTML()}</g:link></li>
-				</g:if>
                 
                 <g:if test="${strain?.species}">
 				<li>Species: <g:link controller="speciesAdmin" action="show" id="${strain?.species?.id}">${strain?.species?.encodeAsHTML()}</g:link>					
@@ -56,6 +52,8 @@
 				<li>Note: ${strain.note}
 				</li>
 				</g:if>
+                
+                <li>Status: ${strain?.status?: "Not Approved"}</li>
 			</ul>
 			
 			<g:form  action='delete' method="DELETE" useToken="true">

@@ -7,9 +7,6 @@
 <body>
     <div>
         <g:link action="showBag" id="${protocolInstance?.bag?.id}"><span class="glyphicon glyphicon-home"></span> Home</g:link>
-        <g:if test="${flash.message}">
-        <div class="message" role="status">${flash.message}</div>
-        </g:if>
         <g:if test="${request.message}">
         <div class="message" role="status">${request.message}</div>
         </g:if>

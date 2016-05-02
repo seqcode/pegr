@@ -45,7 +45,7 @@ class ProjectController {
                     flash.message = "Successfully  created project ${project.name}"
                     redirect(action:"show", id:"${project.id}")
                 } catch (ProjectException e) {
-                    request.mesage = e.message
+                    request.message = e.message
                     render(view:'create', model:[project: project])
                 } catch (Exception e) {
                     log.error "Error: ${e.message}", e
@@ -71,12 +71,12 @@ class ProjectController {
                     flash.message = "Successfully  updated information for project ${project.name}"
                     redirect(action:"show", id:projectId)
                 } catch(ProjectException e) {
-                    reqeust.message = e.message
-                    [project: project]
+                    request.message = e.message
+                    render(view: 'edit', model: [project: project])
                 } catch(Exception e) {
                     log.error "Error: ${e.message}", e
                     request.message ="Oops! Please try again."
-                    [project: project]
+                    render(view: 'edit', model: [project: project])
                 }
             }
         }else {

@@ -21,37 +21,23 @@
 			<table class="table">
 			<thead>
 					<tr>
-					
 						<g:sortableColumn property="name" title="${message(code: 'strain.name.label', default: 'Name')}" />
-					
-						<th><g:message code="strain.genotype.label" default="Genotype" /></th>
-					
+                        <th><g:message code="strain.species.label" default="Species" /></th>
 						<th><g:message code="strain.parent.label" default="Parent" /></th>
-					
+					    <th><g:message code="strain.genotype.label" default="Genotype" /></th>
 						<th><g:message code="strain.sourceLab.label" default="Source Lab" /></th>
-					
-						<g:sortableColumn property="note" title="${message(code: 'strain.note.label', default: 'Note')}" />
-					
-						<th><g:message code="strain.species.label" default="Species" /></th>
-					
+						<th>Status</th>
 					</tr>
 				</thead>
 				<tbody>
 				<g:each in="${strainList}" status="i" var="strain">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-					
-						<td><g:link action="show" id="${strain.id}">${fieldValue(bean: strain, field: "name")}</g:link></td>
-					
-						<td>${fieldValue(bean: strain, field: "genotype")}</td>
-					
+						<td><g:link action="show" id="${strain.id}">${fieldValue(bean: strain, field: "name")}</g:link></td>					
+                        <td>${fieldValue(bean: strain, field: "species")}</td>
 						<td>${fieldValue(bean: strain, field: "parent")}</td>
-					
+				        <td>${fieldValue(bean: strain, field: "genotype")}</td>
 						<td>${fieldValue(bean: strain, field: "sourceLab")}</td>
-					
-						<td>${fieldValue(bean: strain, field: "note")}</td>
-					
-						<td>${fieldValue(bean: strain, field: "species")}</td>
-					
+						<td>${strain.status?: "Not Approved"}</td>
 					</tr>
 				</g:each>
 				</tbody>

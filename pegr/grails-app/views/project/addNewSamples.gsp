@@ -27,10 +27,10 @@
                 </tr>
             </thead>
             <tbody>
-                <g:each in="${1..3}">
+                <g:each in="${1..3}" var="counter">
                 <tr>
-                    <td></td>
-                    <td></td>
+                    <td id="cellsource-counter">${counter}</td>
+                    <td><g:select name="genus" from="${pegr.Species.withCriteria {projections { distinct('genusName') }}}" class="tokenize-sample tokenize" noSelection="['': '']"/></td>
                     <td></td>
                     <td></td>
                     <td></td>

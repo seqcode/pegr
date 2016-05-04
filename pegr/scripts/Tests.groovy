@@ -90,10 +90,10 @@ target(tests: "Simple tests") {
     println s
     
     def jsonSlurper = new JsonSlurper()
-    def objects = jsonSlurper.parseText(s)
-    def object = objects[0]
-    println object.name
-    println object.sampleId
+    def object = jsonSlurper.parseText('{"Note":"IgG coupled to invitrogen Dynabeads"}')
+    // def object = objects[0]
+    println object["Note"]
+    
     
     def monoStr = "monolla"
     if(monoStr.contains("mono")) {

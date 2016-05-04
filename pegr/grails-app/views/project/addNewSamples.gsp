@@ -57,6 +57,7 @@
                         <th>Mono/Poly</th>
                         <th>Ig Type</th>
                         <th>Concentration</th>
+                        <th>Notes</th>
                     </tr>
                 </thead>
                 <tbody>

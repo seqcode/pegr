@@ -4,6 +4,7 @@ class Sample {
 		
 	CellSource cellSource
 	Antibody antibody
+    String antibodyNotes
 	Target target
 	Integer requestedTagNumber
 	Integer chromosomeAmount // in ug
@@ -78,6 +79,7 @@ class Sample {
         item nullable: true
         source nullable: true
         sourceId nullable: true
+        antibodyNotes nullable: true, blank: true
     }
     
     static mapping = {

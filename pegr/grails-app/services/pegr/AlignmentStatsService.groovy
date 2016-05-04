@@ -14,26 +14,31 @@ class AlignmentStatsService {
             def alignment = SequenceAlignment.findBySequencingExperimentAndGenome(experiment, genome)
             if (alignment) {
                 def alignmentStats = alignment.alignmentStats
+                def results
                 if (alignmentStats) {
-                    copyProperties(newStats, alignmentStats)
+                    results = copyProperties(newStats, alignmentStats)
                     alignmentStats.save()
                 } else {
                     alignmentStats = new AlignmentStats()
-                    copyProperties(newStats, alignmentStats)
+                    results = copyProperties(newStats, alignmentStats)
                     alignmentStats.save(flush:true)
                     alignment.alignmentStats = alignmentStats
                     alignment.save()
                 }
-                return alignmentStats
+                return results
             }
         } 
-        throw new AlignmentStatsException(message: "Sequence Alignment not found!")
+        throw new AlignmentStatsException(message: "Sequence Alignment for Run ${newStats.run}, Sample ${newStats.sample} and Genome ${newStats.genome} not found!")
     }
     
     def copyProperties(source, target) {
+        def updatedProperties = []
         source.properties.each { key, value ->
-            if (target.hasProperty(key) && !(key in ['class', 'metaClass'])) 
+            if ( ! (key in ['run', 'sample', 'genome', 'class', 'metaClass']) && target.hasProperty(key) && value) {
                 target[key] = value
+                updatedProperties.push(key)
+            }
         }
+        return updatedProperties
     }
 }

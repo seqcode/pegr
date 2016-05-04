@@ -7,7 +7,6 @@ class SequenceAlignment {
 	Aligner aligner
 	AlignType alignType
 	String params
-	String bamFilePath
 	CorePipeline corePipeline
 	Date date
 	boolean isPreferred
@@ -18,7 +17,6 @@ class SequenceAlignment {
         aligner nullable: true
         alignType nullable: true
         params nullable: true, blank: true, maxSize: 2000
-		bamFilePath nullable: true, blank: true, maxSize: 1000
         corePipeline nullable: true
         date nullable: true
         alignmentStats nullable: true

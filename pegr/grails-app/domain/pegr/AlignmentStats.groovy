@@ -13,7 +13,6 @@ class AlignmentStats {
     Integer spikeInCount
     Float ipStrength
     
-    String peakFilePath
     Integer peaks
     Integer singletons
     Float peakMedian
@@ -29,7 +28,15 @@ class AlignmentStats {
     Integer tssDistal
     Integer repeatedRegions
     
-    String galaxyDatasetFilepath
+    String bamFile
+    String fastqFile
+    String genetrackFile
+    String cwpairFile
+    String memeFile
+    String fimoFile
+    String fourColorFig
+    String heatmapFig
+    String compositeFig
     
     static constraints = {
         totalReads nullable: true
@@ -43,7 +50,6 @@ class AlignmentStats {
         spikeInCount nullable: true
         ipStrength nullable: true
         
-        peakFilePath nullable: true
         peaks nullable: true
         singletons nullable: true
         peakMedian nullable: true
@@ -59,7 +65,16 @@ class AlignmentStats {
         tssDistal nullable: true
         repeatedRegions nullable: true
         
-        galaxyDatasetFilepath nullable: true, maxSize: 1000
+        bamFile nullable: true, blank: true, maxSize: 1000
+        fastqFile nullable: true, blank: true, maxSize: 1000
+        genetrackFile nullable: true, blank: true, maxSize: 1000
+        cwpairFile nullable: true, blank: true, maxSize: 1000
+        memeFile nullable: true, blank: true, maxSize: 1000
+        fimoFile nullable: true, blank: true, maxSize: 1000
+        fourColorFig nullable: true, blank: true, maxSize: 1000
+        heatmapFig nullable: true, blank: true, maxSize: 1000
+        compositeFig nullable: true, blank: true, maxSize: 1000
+
     }
     
 }

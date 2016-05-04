@@ -3,7 +3,6 @@ package pegr
 class SequencingExperiment {
 	Sample sample
 	SequenceRun sequenceRun	
-	String fastqFilePath
 	String publicDbId
     String readPositions
 	String note
@@ -24,7 +23,6 @@ class SequencingExperiment {
     
     static constraints = {
         sequenceRun nullable: true        
-        fastqFilePath nullable: true, blank: true, maxSize: 500
         readPositions nullable: true, blank: true
         readType nullable: true
 		note nullable: true, blank: true

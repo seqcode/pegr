@@ -14,6 +14,7 @@ class Antibody {
 	String inventoryId
 	String note
     Item item
+    Target defaultTarget
 	
 	String toString() {
 		catalogNumber
@@ -32,5 +33,6 @@ class Antibody {
 		inventoryId nullable: true, blank: true
 		note nullable: true, blank: true
         item nullable: true
+        defaultTarget nullable: true
     }
 }

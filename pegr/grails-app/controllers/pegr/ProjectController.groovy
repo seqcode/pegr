@@ -156,8 +156,9 @@ class ProjectController {
         }
     }
     
-    def addNewSamples() {
-        
+    def addNewSamples(Long projectId) {
+        def project = Project.get(projectId)
+        [project: project]
     }
     
     def removeSample(Long sampleId, Long projectId) {

@@ -43,7 +43,7 @@
         </div>   
         <g:if test="${authorized}">
             <div>
-                <g:link action="addNewSamples" params="[projectId: project?.id]" class="btn btn-info">Create New Sample</g:link>
+                <g:link action="addNewSamples" params="[projectId: project?.id]" class="btn btn-info">Create New Samples</g:link>
                 <g:link action="searchSample" params="[projectId: project?.id]" class="btn btn-info">Add Existing Sample</g:link>
             </div>
         </g:if>

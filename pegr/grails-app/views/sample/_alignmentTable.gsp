@@ -13,7 +13,6 @@
                 <th>Avg. Insert Size</th>
                 <th>IP Strength</th> 
                 <th>Genome Coverage</th>   
-                <th>Bam File</th>
             </tr>
         </thead>
         <tbody>
@@ -30,7 +29,6 @@
                     <td>${alignment.alignmentStats?.avgInsertSize}</td>
                     <td>${alignment.alignmentStats?.ipStrength}</td>
                     <td>${alignment.alignmentStats?.genomeCoverage}</td>
-                    <td>${alignment.bamFilePath}</td>
                 </tr>
             </g:each>              
             <tr>

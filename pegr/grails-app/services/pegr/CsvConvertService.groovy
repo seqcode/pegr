@@ -78,7 +78,7 @@ class CsvConvertService {
 
         def target = getTarget(data.target, data.targetType, data.nTag, data.cTag)
 
-        def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.ulSampleSent, data.abConc, data.amountUseUg, data.amountUseUl)
+        def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.abConc)
 
         def species = getSpecies(data.genus, data.species)
 
@@ -93,12 +93,25 @@ class CsvConvertService {
 
         addTreatment(cellSource, data.perturbation1)
         addTreatment(cellSource, data.perturbation2)
-
+        
         def assay = getAssay(data.assay)
 
         def prtcl = getProtocolInstanceSummary(data.chipUser, data.chipDate, data.protocolVersion, data.resin, data.PCRCycle, assay)
+        
+        def abnoteMap = [:]
+        if (data.ulSampleSent) {
+            abnoteMap['Volume Sent (ul)'] = data.ulSampleSent
+        }
+        if (data.amountUseUg) {
+            abnoteMap['Usage Per ChIP (ug)'] = data.amountUseUg
+        }
+        if (data.amountUseUl) {
+            abnoteMap['Usage Per ChIP (ul)'] = data.amountUseUl
+        }
 
-        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId)
+        def abNotes = JsonOutput.toJson(abnoteMap)
+        
+        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes)
 
         addIndexToSample(sample, data.indexStr, data.indexIdStr, basicCheck)
         addSampleToProject(project, sample)
@@ -264,7 +277,7 @@ class CsvConvertService {
 	    return invoice
 	}
 	
-	def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNotes, String abClonal, String abAnimal, String ig, String antigen, String ulSent, String abConc, String ugPerChIP, String ulPerChIP) {
+	def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNotes, String abClonal, String abAnimal, String ig, String antigen, String abConc) {
 		def company = getCompany(abCompName)
 		def abHost = getAbHost(abAnimal)
 		def clonal = getClonal(abClonal)
@@ -286,31 +299,15 @@ class CsvConvertService {
             catNum = catNum.replaceAll("_", "-")
             catNum = catNum.replaceAll("[^0-9A-Za-z -]", "")
         }
-        
-        def noteMap = [:]
-        if (abNotes) {
-            noteMap['Note'] = abNotes
-        }
-        if (ulSent) {
-            noteMap['Volume Sent (ul)'] = ulSent
-        }
-        if (ugPerChIP) {
-            noteMap['Usage Per ChIP (ug)'] = ugPerChIP
-        }
-        if (ulPerChIP) {
-            noteMap['Usage Per ChIP (ul)'] = ulPerChIP
-        }
-
-        def notes = JsonOutput.toJson(noteMap)
 		
-	    def antibodies = Antibody.findAllByCompanyAndCatalogNumberAndAbHostAndClonalAndIgTypeAndImmunogeneAndLotNumberAndNote(company, catNum, abHost, clonal, igType, antigen, abLotNum, notes)
+	    def antibodies = Antibody.findAllByCompanyAndCatalogNumberAndAbHostAndClonalAndIgTypeAndImmunogeneAndLotNumberAndNote(company, catNum, abHost, clonal, igType, antigen, abLotNum, abNotes)
         
         float err = 0.000001
         def antibody = antibodies.find {
             it.concentration > concentration - err && it.concentration < concentration + err
         }
 	    if (!antibody) {	        
-	        antibody = new Antibody(company: company, catalogNumber: catNum, abHost: abHost, clonal: clonal, concentration: concentration, igType: igType, immunogene: antigen, lotNumber: abLotNum, note: notes).save( failOnError: true)
+	        antibody = new Antibody(company: company, catalogNumber: catNum, abHost: abHost, clonal: clonal, concentration: concentration, igType: igType, immunogene: antigen, lotNumber: abLotNum, note: abNotes).save( failOnError: true)
 	    }	        
 		return antibody
 	}
@@ -408,7 +405,7 @@ class CsvConvertService {
 	    }
 	    def perturbation = CellSourceTreatment.findByName(perturbStr)
 	    if(!perturbation) {
-	        perturbation = new CellSourceTreatment(name: perturbStr).save( failOnError: true)
+	        perturbation = new CellSourceTreatment(name: perturbStr).save(failOnError: true)
 	    }
 	    if(perturbation && cellSource) {
             if (!CellSourceTreatments.findByCellSourceAndTreatment(cellSource, perturbation)) {
@@ -459,7 +456,7 @@ class CsvConvertService {
         return prtcl
     }
 	
-	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId) {
+	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId, String abNotes) {
 	    def note = [:]
 	    if (sampleNotes) {
 	        note['note'] = sampleNotes
@@ -489,7 +486,7 @@ class CsvConvertService {
             }
         }
         
-	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source).save( failOnError: true)
+	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes).save( failOnError: true)
 	    return sample
 	}
 	

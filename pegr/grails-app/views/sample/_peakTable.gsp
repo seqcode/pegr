@@ -14,7 +14,6 @@
                 <th>TSS Distal</th>
                 <th>TSS Proximal</th>
                 <th>Repeated Regions</th>
-                <th>Peak File</th>
             </tr>
         </thead>
         <tbody>
@@ -34,7 +33,6 @@
                     <td>${alignment.alignmentStats?.tssDistal}</td>
                     <td>${alignment.alignmentStats?.tssProximal}</td>
                     <td>${alignment.alignmentStats?.repeatedRegions}</td>
-                    <td>${alignment.alignmentStats?.peakFilePath}</td>
                 </tr>
             </g:each>              
         </tbody>

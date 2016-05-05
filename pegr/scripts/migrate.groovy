@@ -27,22 +27,27 @@ dataMigrate.migrate(filename, RunStatus.COMPLETED, startLine, endLine, basicChec
 def jsonSlurper = new JsonSlurper()
 Sample.list().each{ sample ->
     if (sample.antibody?.note) {
-        def note = jsonSlurper.parseText(sample.antibody.note)
-        def abnoteMap = [:]
-        if (note['Volume Sent (ul)']) {
-            abnoteMap['Volume Sent (ul)'] = note['Volume Sent (ul)']
-        }
-        if (note['Usage Per ChIP (ug)']) {
-            abnoteMap['Usage Per ChIP (ug)'] = note['Usage Per ChIP (ug)']
-        }
-        if (note['Usage Per ChIP (ul)']) {
-            abnoteMap['Usage Per ChIP (ul)'] = note['Usage Per ChIP (ul)']
-        }
-        sample.antibodyNotes = JsonOutput.toJson(abnoteMap)
-        sample.save()
-        if (note['Note']) {
-            sample.antibody.note = note['Note']
+        try {
+            def note = jsonSlurper.parseText(sample.antibody.note)
+            def abnoteMap = [:]
+            if (note['Volume Sent (ul)']) {
+                abnoteMap['Volume Sent (ul)'] = note['Volume Sent (ul)']
+            }
+            if (note['Usage Per ChIP (ug)']) {
+                abnoteMap['Usage Per ChIP (ug)'] = note['Usage Per ChIP (ug)']
+            }
+            if (note['Usage Per ChIP (ul)']) {
+                abnoteMap['Usage Per ChIP (ul)'] = note['Usage Per ChIP (ul)']
+            }
+            sample.antibodyNotes = JsonOutput.toJson(abnoteMap)
+            sample.save()
+            sample.antibody.note = null
+            if (note['Note']) {
+                sample.antibody.note = note['Note']
+            }
             sample.antibody.save()
+        }catch(Exception e) {
+            println "Sample ${sample.id} is not migrated!"
         }
     }
     

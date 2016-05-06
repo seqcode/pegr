@@ -41,7 +41,7 @@
                         <td><g:select name="provider" from="${pegr.User.list()}" noSelection="['': '']" class="select2" style="width: 150px"></g:select></td>
                         <td><g:select name="sendTo" from="${pegr.User.list()}" noSelection="['': '']" class="select2" style="width: 150px"></g:select></td>
                         <td><g:select name="species" from="${pegr.Species.list()}" noSelection="['': '']" class="select2" style="width: 250px"/></td>
-                        <td><g:select name="parentStrain" from="${pegr.Strain.list()}" optionKey="id" noSelection="['': '']" class="select2"  style="width: 150px" /></td>
+                        <td><select id="select-parent-strain"  style="width: 150px" /></td>
                         <td><g:select id="strain" name="strain" from="${pegr.Strain.list()}" noSelection="['': '']" onchange="strainChanged(this.value);" optionKey="id" class="select2" style="width: 150px"/></td>
                         <td><g:textField name="genotype"></g:textField></td>
                         <td><g:textField name="mutation"></g:textField></td>
@@ -111,11 +111,41 @@
 </g:form>
 <script>
     var counter = 3
-    
-    $(function(){
-        $("#nav-projects").addClass("active");
-        $(".confirm").confirm();
-        $(".select2").select2();
+    $("#nav-projects").addClass("active");
+    $(".confirm").confirm();
+    $(".select2").select2();
+
+    $("#select-parent-strain").select2({
+         ajax: {
+            url: "/project/fetchParentStrains",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+              return {
+                q: params.term, // search term
+                page: params.page
+              };
+            },
+            processResults: function (data, params) {
+              // parse the results into the format expected by Select2
+              // since we are using custom formatting functions we do not need to
+              // alter the remote JSON data, except to indicate that infinite
+              // scrolling can be used
+              params.page = params.page || 1;
+
+              return {
+                results: data.items,
+                pagination: {
+                  more: (params.page * 30) < data.total_count
+                }
+              };
+            },
+            cache: true
+          },
+          escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+          minimumInputLength: 1,
+          templateResult: formatRepo, // omitted for brevity, see the source of this page
+          templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
     });
     
     $("#add").click(function() {

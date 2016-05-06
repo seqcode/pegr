@@ -62,6 +62,6 @@ class CellSourceController {
         def treatments = cellSource ? cellSource.treatments : []
         // add the new treatment to the cellSource for preview (not saved yet)
         treatments.push(treatment)
-        render g.select(multiple:"multiple", name:"treatments", from:CellSourceTreatment.list(sort:'name'), optionKey:"id", value: treatments*.id, class:"tokenize tokenize-sample")
+        render g.select(multiple:"multiple", name:"treatments", from:CellSourceTreatment.list(sort:'name'), optionKey:"id", value: treatments*.id, class:"select2")
     }
 }

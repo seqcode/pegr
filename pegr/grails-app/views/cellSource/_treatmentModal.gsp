@@ -25,6 +25,5 @@
 <script>
     function cleanup() {
         $('#new-treatment').modal('hide');
-        $(".tokenize").tokenize({newElements: false});
     }
 </script>

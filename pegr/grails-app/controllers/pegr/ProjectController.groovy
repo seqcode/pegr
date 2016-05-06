@@ -156,9 +156,10 @@ class ProjectController {
         }
     }
     
-    def addNewSamples(Long projectId) {
+    def addNewSamples(Long projectId, Long assayId) {
         def project = Project.get(projectId)
-        [project: project]
+        def assay = Assay.get(assayId)
+        [project: project, assay: assay]
     }
     
     def removeSample(Long sampleId, Long projectId) {

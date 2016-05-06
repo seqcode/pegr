@@ -43,12 +43,34 @@
         </div>   
         <g:if test="${authorized}">
             <div>
-                <g:link action="addNewSamples" params="[projectId: project?.id]" class="btn btn-info">Create New Samples</g:link>
+                <button data-toggle="modal" data-target="#selectAssay" class="btn btn-info">Create New Samples</button>
                 <g:link action="searchSample" params="[projectId: project?.id]" class="btn btn-info">Add Existing Sample</g:link>
             </div>
         </g:if>
 	</div>
-    </br>
+    </br>          
+    
+    <div id="selectAssay" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>Select Assay</h4>
+                </div>
+                <div class="modal-body">
+                    <g:form action="addNewSamples" class="fields" role="form" method="get">
+                        <g:hiddenField name="projectId" value="${project.id}"></g:hiddenField>
+                        <div>
+                            <label>Assay</label> 
+                            <g:select name="assayId" optionKey="id" from="${pegr.Assay.list()}" noSelection="['null': '-- choose --']" /> 
+                        </div>
+                        <g:submitButton class="btn btn-primary" name="submit" value="OK"/>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </g:form>                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <g:if test="${authorized}">
         <div id="addUser" class="modal fade" role="dialog">
             <div class="modal-dialog">

@@ -20,13 +20,14 @@
                         <th></th>
                         <th>Sample Provider</th>
                         <th>Send Data to</th>
-                        <th>Species <button data-toggle="modal" data-target="#new-species" class="edit"> <span class="glyphicon glyphicon-plus"></span> New</button></th>
+                        <th>Genus</th>
+                        <th>Species</th>
                         <th>Parent Strain</th>
-                        <th>Strain <button data-toggle="modal" data-target="#new-strain" class="edit"> <span class="glyphicon glyphicon-plus"></span> New</button></th>
+                        <th>Strain</th>
                         <th>Genotype</th>
                         <th>Mutation</th>
                         <th>Prep User</th>
-                        <th>Growth Media <button data-toggle="modal" data-target="#new-growth-media" class="edit"> <span class="glyphicon glyphicon-plus"></span> New</button></th>
+                        <th>Growth Media</th>
                         <th>Treatments <button data-toggle="modal" data-target="#new-treatment" class="edit"> <span class="glyphicon glyphicon-plus"></span> New</button></th>                       
                         <th>Chrom. (ug)</th>
                         <th>Cell# (M)</th>
@@ -38,20 +39,52 @@
                 <tbody>
                     <tr>
                         <td id="sample-counter">${counter}</td>
-                        <td><g:select name="provider" from="${pegr.User.list()}" noSelection="['': '']" class="select2" style="width: 150px"></g:select></td>
-                        <td><g:select name="sendTo" from="${pegr.User.list()}" noSelection="['': '']" class="select2" style="width: 150px"></g:select></td>
-                        <td><g:select name="species" from="${pegr.Species.list()}" noSelection="['': '']" class="select2" style="width: 250px"/></td>
-                        <td><select id="select-parent-strain"  style="width: 150px" /></td>
-                        <td><g:select id="strain" name="strain" from="${pegr.Strain.list()}" noSelection="['': '']" onchange="strainChanged(this.value);" optionKey="id" class="select2" style="width: 150px"/></td>
-                        <td><g:textField name="genotype"></g:textField></td>
-                        <td><g:textField name="mutation"></g:textField></td>
-                        <td><g:select name="prepUser" from="${pegr.User.list()}" noSelection="['': '']"  class="select2"  style="width: 150px" ></g:select></td>
-                        <td><g:select id="growthMedia" name="growthMedia.id" from="${pegr.GrowthMedia.list()}" optionKey="id" noSelection="['': '']" class="select2" style="width: 150px"/></td>
-                        <td><g:select multiple="multiple" name="treatments" from="${pegr.CellSourceTreatment.list(sort:'name')}" optionKey="id"   class="select2" style="width: 300px"></g:select></td>
+                        <td>
+                            <g:select id="provider" name="provider" from="${pegr.User.list()}" noSelection="['': '']" class="direct-select2" style="width: 150px"></g:select>
+                        </td>
+                        <td>
+                            <g:select id="sendTo" name="sendTo" from="${pegr.User.list()}" noSelection="['': '']" class="direct-select2" style="width: 150px"></g:select>
+                        </td>
+                        <td>
+                            <select id="genus" name="genus" onchange="genusChanged(this.value);" style="width: 150px">
+                                <option></option>
+                            </select>
+                        </td>
+                        <td>
+                            <select id="species" name="species" onchange="speciesChanged(this.value);" style="width: 150px">
+                                <option></option>
+                            </select>
+                        </td>
+                        <td>
+                            <select id="parent-strain" name="parentStrain" onchange="parentStrainChanged(this.value);" style="width: 150px">
+                                <option></option>
+                            </select>
+                        </td>
+                        <td>
+                            <select id="strain" name="strain" onchange="strainChanged(this.value);" style="width: 150px" >
+                                <option></option>
+                            </select>
+                        </td>
+                        <td>
+                            <select id="genotype" name="genotype" style="width: 300px">
+                                <option></option>
+                            </select></td>
+                        <td>
+                            <g:textField id="mutation" name="mutation" style="width: 150px">
+                                <option></option>
+                            </g:textField>
+                        </td>
+                        <td><g:select name="prepUser" from="${pegr.User.list()}" noSelection="['': '']" class="direct-select2" style="width: 150px" ></g:select></td>
+                        <td>
+                            <select id="growth-media" name="growthMedia" style="width: 150px">
+                                <option></option>
+                            </select>
+                        </td>
+                        <td><g:select multiple="multiple" name="treatments" from="${pegr.CellSourceTreatment.list(sort:'name')}" optionKey="id" class="direct-select2" style="width: 300px"></g:select></td>
                         <td><g:textField name="chrom"></g:textField></td>
                         <td><g:textField name="cellNum"></g:textField></td>
                         <td><g:textField name="volume"></g:textField></td>
-                        <td><g:select name="genome.id" from="${pegr.Genome.list()}" noSelection="['': '']" class="select2" style="width: 150px"></g:select></td>
+                        <td><g:select name="genome.id" from="${pegr.Genome.list()}" noSelection="['': '']" class="direct-select2" style="width: 150px"></g:select></td>
                         <td><g:textField name="note" style="width: 500px"></g:textField></td>
                     </tr>    
                 </tbody>
@@ -113,40 +146,56 @@
     var counter = 3
     $("#nav-projects").addClass("active");
     $(".confirm").confirm();
-    $(".select2").select2();
+    $(".direct-select2").select2();
+    $.ajax({url: "/pegr/cellSource/fetchGenusAjax", success: function(result) {
+        $("#genus").select2({
+            data: result
+        });
+    }})
 
-    $("#select-parent-strain").select2({
-         ajax: {
-            url: "/project/fetchParentStrains",
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-              return {
-                q: params.term, // search term
-                page: params.page
-              };
-            },
-            processResults: function (data, params) {
-              // parse the results into the format expected by Select2
-              // since we are using custom formatting functions we do not need to
-              // alter the remote JSON data, except to indicate that infinite
-              // scrolling can be used
-              params.page = params.page || 1;
-
-              return {
-                results: data.items,
-                pagination: {
-                  more: (params.page * 30) < data.total_count
-                }
-              };
-            },
-            cache: true
-          },
-          escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
-          minimumInputLength: 1,
-          templateResult: formatRepo, // omitted for brevity, see the source of this page
-          templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
-    });
+    function genusChanged(genus) {
+        $.ajax({url: "/pegr/cellSource/fetchSpeciesAjax?genus="+genus, success: function(result){
+            $("#species").select2({
+                data: result
+            });
+        }});
+    }
+    
+    function speciesChanged(speciesId) {
+        $.ajax({url: "/pegr/cellSource/fetchParentStrainAjax?speciesId="+speciesId, success: function(result){
+            $("#parent-strain").select2({
+                data: result
+            });
+        }});
+        
+        $.ajax({url: "/pegr/cellSource/fetchGrowthMedia?speciesId="+speciesId, success: function(result){
+            $("#growth-media").select2({
+                data: result
+            });
+        }});
+    }
+            
+    function parentStrainChanged(parentStrain) {
+        $.ajax({url: "/pegr/cellSource/fetchStrainNameAjax?parentStrain="+parentStrain, success: function(result){
+            $("#strain").select2({
+                data: result
+            });
+        }});
+    }
+    
+    function strainChanged(strainName) {
+        $.ajax({url: "/pegr/cellSource/fetchGenotypeAjax?strainName="+strainName, success: function(result){
+            $("#genotype").select2({
+                data: result
+            });
+        }});
+            
+        $.ajax({url: "/pegr/cellSource/fetchMutationAjax?strainName="+strainName, success: function(result){
+            $("#mutation").select2({
+                data: result
+            });
+        }});
+    }
     
     $("#add").click(function() {
         $('#sample tbody>tr:last').clone(false).insertAfter('#sample tbody>tr:last');
@@ -157,11 +206,8 @@
         return false;
     });
 
-    function strainChanged(strainId) {
-        $.ajax({url: "/pegr/cellSource/showStrainDetailsAjax/"+strainId, success: function(result){
-            $("#strainDetails").html(result)
-        }});
-    }
+
+
 </script>
 </body>
 </html>

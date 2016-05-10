@@ -65,8 +65,8 @@ class CellSourceController {
     }
     
     def fetchGrowthMediaAjax(Long speciesId) {
-        def growthMedias = GrwothMedia.where {species.id == speciesId}
-        render objectToSelect2Data(growthMedias)
+        def growthMedias = GrowthMedia.where {species.id == speciesId}
+        render objectToSelect2Data(growthMedias) as JSON
     }
     
     /* ---------------------------- Obsolete -------------------------- */

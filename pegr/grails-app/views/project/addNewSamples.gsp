@@ -51,17 +51,17 @@
                             </select>
                         </td>
                         <td>
-                            <select id="species" name="species" onchange="speciesChanged(this.value);" style="width: 150px">
+                            <select id="species" name="species" onchange="speciesChanged(this.value);" class="direct-select2" style="width: 150px">
                                 <option></option>
                             </select>
                         </td>
                         <td>
-                            <select id="parent-strain" name="parentStrain" onchange="parentStrainChanged(this.value);" style="width: 150px">
+                            <select id="parent-strain" name="parentStrain" onchange="parentStrainChanged(this.value);" class="direct-select2" style="width: 150px">
                                 <option></option>
                             </select>
                         </td>
                         <td>
-                            <select id="strain" name="strain" onchange="strainChanged(this.value);" style="width: 150px" >
+                            <select id="strain" name="strain" onchange="strainChanged(this.value);" class="direct-select2" style="width: 150px" >
                                 <option></option>
                             </select>
                         </td>
@@ -84,7 +84,7 @@
                         <td><g:textField name="chrom"></g:textField></td>
                         <td><g:textField name="cellNum"></g:textField></td>
                         <td><g:textField name="volume"></g:textField></td>
-                        <td><g:select name="genome.id" from="${pegr.Genome.list()}" noSelection="['': '']" class="direct-select2" style="width: 150px"></g:select></td>
+                        <td><g:select name="genome.id" from="${pegr.Genome.list()}" noSelection="['': '']" multiple="multiple" class="direct-select2" style="width: 150px"></g:select></td>
                         <td><g:textField name="note" style="width: 500px"></g:textField></td>
                     </tr>    
                 </tbody>
@@ -147,35 +147,47 @@
     $("#nav-projects").addClass("active");
     $(".confirm").confirm();
     $(".direct-select2").select2();
+    
     $.ajax({url: "/pegr/cellSource/fetchGenusAjax", success: function(result) {
         $("#genus").select2({
             data: result
         });
     }})
 
+    $("#species").prop("disabled", true);
+    $("#parent-strain").prop("disabled", true);
+    $("#strain").prop("disabled", true);
+    $("#genotype").prop("disabled", true);
+    $("#mutation").prop("disabled", true);
+    $("#growth-media").prop("disabled", true);
+
     function genusChanged(genus) {
+        $("#species").html('').select2({data: [{id: '', text: ''}]});
         $.ajax({url: "/pegr/cellSource/fetchSpeciesAjax?genus="+genus, success: function(result){
             $("#species").select2({
                 data: result
             });
         }});
+        $("#species").prop("disabled", false);
     }
     
     function speciesChanged(speciesId) {
-        $.ajax({url: "/pegr/cellSource/fetchParentStrainAjax?speciesId="+speciesId, success: function(result){
+        $("#parent-strain").html('').select2({data: [{id: '', text: ''}]});
+        $.ajax({url: "/pegr/cellSource/fetchParentStrainAjax?speciesId="+speciesId, success: function(parents){
             $("#parent-strain").select2({
-                data: result
+                data: parents
             });
         }});
-        
-        $.ajax({url: "/pegr/cellSource/fetchGrowthMedia?speciesId="+speciesId, success: function(result){
+        $("#parent-strain").html('').select2({data: [{id: '', text: ''}]});
+        $.ajax({url: "/pegr/cellSource/fetchGrowthMediaAjax?speciesId="+speciesId, success: function(medias){
             $("#growth-media").select2({
-                data: result
+                data: medias
             });
         }});
     }
             
     function parentStrainChanged(parentStrain) {
+        $("#strain").html('').select2({data: [{id: '', text: ''}]});
         $.ajax({url: "/pegr/cellSource/fetchStrainNameAjax?parentStrain="+parentStrain, success: function(result){
             $("#strain").select2({
                 data: result
@@ -184,12 +196,13 @@
     }
     
     function strainChanged(strainName) {
+        $("#genotype").html('').select2({data: [{id: '', text: ''}]});
         $.ajax({url: "/pegr/cellSource/fetchGenotypeAjax?strainName="+strainName, success: function(result){
             $("#genotype").select2({
                 data: result
             });
         }});
-            
+        $("#mutation").html('').select2({data: [{id: '', text: ''}]});
         $.ajax({url: "/pegr/cellSource/fetchMutationAjax?strainName="+strainName, success: function(result){
             $("#mutation").select2({
                 data: result

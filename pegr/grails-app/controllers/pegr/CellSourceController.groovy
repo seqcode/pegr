@@ -45,12 +45,18 @@ class CellSourceController {
     }
     
     def fetchParentStrainAjax(Long speciesId) {
-        def strains = Strain.executeQuery("select distinct s.name from Strain s where s.species.id = ?", [speciesId])
-        render stringToSelect2Data(strains) as JSON
+        def strains = Strain.executeQuery("select distinct s.parent.name from Strain s where s.species.id = ?", [speciesId])
+        def nullStrain = ["Unknown"]
+        render stringToSelect2Data(nullStrain + strains) as JSON
     }
     
-    def fetchStrainNameAjax(String parentStrain) {
-        def strains = Strain.executeQuery("select distinct s.name from Strain s where s.parent.name = ?", [parentStrain])
+    def fetchStrainNameAjax(String parentStrain, Long speciesId) {
+        def strains
+        if (parentStrain == "Unknown") {
+            strains = Strain.executeQuery("select distinct s.name from Strain s where s.parent is null and s.species.id = ?", [speciesId]) 
+        } else {
+            strains = Strain.executeQuery("select distinct s.name from Strain s where s.parent.name = ?", [parentStrain])
+        }
         render stringToSelect2Data(strains) as JSON
     }
     
@@ -59,14 +65,26 @@ class CellSourceController {
         render stringToSelect2Data(genotypes) as JSON
     }
     
-    def fetchMutationaAjax(String strainName) {
-        def mutations = Strain.executeQuery("select distinct s.geneticModification from Strain s where s.name = ?", [strainName])
+    def fetchMutationAjax(String strainName, String genotype) {
+        def mutations = Strain.executeQuery("select distinct s.geneticModification from Strain s where s.name = ? and s.genotype = ?", [strainName, genotype])
         render stringToSelect2Data(mutations) as JSON
     }
     
     def fetchGrowthMediaAjax(Long speciesId) {
-        def growthMedias = GrowthMedia.where {species.id == speciesId}
+        def selectedSpecies = Species.get(speciesId)
+        def growthMedias = GrowthMedia.where { (species == null) || (species == selectedSpecies) }
         render objectToSelect2Data(growthMedias) as JSON
+    }
+        
+    def addTreatment(Long cellSourceId) {
+        // save the new treatment
+        def treatment = new CellSourceTreatment(params)
+        cellSourceService.addTreatment(treatment)
+        def cellSource = CellSource.get(cellSourceId)
+        def treatments = cellSource ? cellSource.treatments : []
+        // add the new treatment to the cellSource for preview (not saved yet)
+        treatments.push(treatment)
+        render g.select(multiple:"multiple", name:"treatments", from:CellSourceTreatment.list(sort:'name'), optionKey:"id", value: treatments*.id, class:"select2")
     }
     
     /* ---------------------------- Obsolete -------------------------- */
@@ -89,17 +107,6 @@ class CellSourceController {
         def selectedSpecies = Species.get(id)
         def growthMedias = GrowthMedia.where{species == null || species == selectedSpecies}.list(sort:'name')
         render g.select(id: 'growthMedia', name:'growthMedia.id', from: growthMedias, optionKey: 'id', noSelection:[null:''])
-    }
-    
-    def addTreatment(Long cellSourceId) {
-        // save the new treatment
-        def treatment = new CellSourceTreatment(params)
-        cellSourceService.addTreatment(treatment)
-        def cellSource = CellSource.get(cellSourceId)
-        def treatments = cellSource ? cellSource.treatments : []
-        // add the new treatment to the cellSource for preview (not saved yet)
-        treatments.push(treatment)
-        render g.select(multiple:"multiple", name:"treatments", from:CellSourceTreatment.list(sort:'name'), optionKey:"id", value: treatments*.id, class:"select2")
     }
     
     def stringToSelect2Data(def strings) {

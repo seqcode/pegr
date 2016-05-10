@@ -40,10 +40,10 @@
                     <tr>
                         <td id="sample-counter">${counter}</td>
                         <td>
-                            <g:select id="provider" name="provider" from="${pegr.User.list()}" noSelection="['': '']" class="direct-select2" style="width: 150px"></g:select>
+                            <g:select id="provider" name="provider" from="${pegr.User.list()}" noSelection="['': '']" class="no-tag-select2" style="width: 150px"></g:select>
                         </td>
                         <td>
-                            <g:select id="sendTo" name="sendTo" from="${pegr.User.list()}" noSelection="['': '']" class="direct-select2" style="width: 150px"></g:select>
+                            <g:select id="sendTo" name="sendTo" from="${pegr.User.list()}" noSelection="['': '']" class="no-tag-select2" style="width: 150px"></g:select>
                         </td>
                         <td>
                             <select id="genus" name="genus" onchange="genusChanged(this.value);" style="width: 150px">
@@ -51,47 +51,49 @@
                             </select>
                         </td>
                         <td>
-                            <select id="species" name="species" onchange="speciesChanged(this.value);" class="direct-select2" style="width: 150px">
+                            <select id="species" name="species" onchange="speciesChanged(this.value);" class="tag-select2" style="width: 150px">
                                 <option></option>
                             </select>
                         </td>
                         <td>
-                            <select id="parent-strain" name="parentStrain" onchange="parentStrainChanged(this.value);" class="direct-select2" style="width: 150px">
+                            <select id="parent-strain" name="parentStrain" onchange="parentStrainChanged(this.value);" class="tag-select2" style="width: 150px">
                                 <option></option>
                             </select>
                         </td>
                         <td>
-                            <select id="strain" name="strain" onchange="strainChanged(this.value);" class="direct-select2" style="width: 150px" >
+                            <select id="strain" name="strain" onchange="strainChanged(this.value);" class="tag-select2" style="width: 150px" >
                                 <option></option>
                             </select>
                         </td>
                         <td>
-                            <select id="genotype" name="genotype" style="width: 300px">
+                            <select id="genotype" name="genotype" onchange="genotypeChanged(this.value);" class="tag-select2" style="width: 300px">
                                 <option></option>
                             </select></td>
                         <td>
-                            <g:textField id="mutation" name="mutation" style="width: 150px">
-                                <option></option>
-                            </g:textField>
-                        </td>
-                        <td><g:select name="prepUser" from="${pegr.User.list()}" noSelection="['': '']" class="direct-select2" style="width: 150px" ></g:select></td>
-                        <td>
-                            <select id="growth-media" name="growthMedia" style="width: 150px">
+                            <select id="mutation" name="mutation" class="tag-select2" style="width: 150px">
                                 <option></option>
                             </select>
                         </td>
-                        <td><g:select multiple="multiple" name="treatments" from="${pegr.CellSourceTreatment.list(sort:'name')}" optionKey="id" class="direct-select2" style="width: 300px"></g:select></td>
+                        <td><g:select name="prepUser" from="${pegr.User.list()}" noSelection="['': '']" class="no-tag-select2" style="width: 150px" ></g:select></td>
+                        <td>
+                            <select id="growth-media" name="growthMedia" class="tag-select2" style="width: 150px">
+                                <option></option>
+                            </select>
+                        </td>
+                        <td>
+                            <g:select multiple="multiple" id ="treatments" name="treatments" from="${pegr.CellSourceTreatment.list(sort:'name')}" optionKey="id" class="no-tag-select2" style="width: 300px"></g:select>
+                        </td>
                         <td><g:textField name="chrom"></g:textField></td>
                         <td><g:textField name="cellNum"></g:textField></td>
                         <td><g:textField name="volume"></g:textField></td>
-                        <td><g:select name="genome.id" from="${pegr.Genome.list()}" noSelection="['': '']" multiple="multiple" class="direct-select2" style="width: 150px"></g:select></td>
+                        <td>
+                            <g:select name="genome.id" from="${pegr.Genome.list()}" noSelection="['': '']" multiple="multiple" class="no-tag-select2" style="width: 150px"></g:select>
+                        </td>
                         <td><g:textField name="note" style="width: 500px"></g:textField></td>
                     </tr>    
                 </tbody>
             </table>
         </div>
-
-        <g:render template="/cellSource/treatmentModal"></g:render>
         <div id="antibody" class="tab-pane slide table-responsive">
             <table class="table table-striped" style="margin-bottom: 200px">
                 <thead>
@@ -142,15 +144,25 @@
         <g:link action="show" id="${project.id}" class="btn btn-default">Cancel</g:link>
     </div>
 </g:form>
+    
+<g:render template="/cellSource/treatmentModal"></g:render>
 <script>
-    var counter = 3
+    var counter = 1
+    var tagPlaceholder = "Select or type..."
+    var noTagPlaceholder = "Select..."
     $("#nav-projects").addClass("active");
     $(".confirm").confirm();
-    $(".direct-select2").select2();
+    
+    $(".tag-select2").select2({
+        tags: true
+    });
+    
+    $(".no-tag-select2").select2();
     
     $.ajax({url: "/pegr/cellSource/fetchGenusAjax", success: function(result) {
         $("#genus").select2({
-            data: result
+            data: result,
+            tags: true
         });
     }})
 
@@ -162,52 +174,87 @@
     $("#growth-media").prop("disabled", true);
 
     function genusChanged(genus) {
-        $("#species").html('').select2({data: [{id: '', text: ''}]});
+        $("#species").html('').select2({
+            data: [{id: '', text: ''}],
+            tags: true
+        });
         $.ajax({url: "/pegr/cellSource/fetchSpeciesAjax?genus="+genus, success: function(result){
             $("#species").select2({
-                data: result
+                data: result,
+                tags: true
             });
         }});
         $("#species").prop("disabled", false);
     }
     
     function speciesChanged(speciesId) {
-        $("#parent-strain").html('').select2({data: [{id: '', text: ''}]});
+        $("#parent-strain").html('').select2({
+            data: [{id: '', text: ''}],
+            tags: true
+        });
         $.ajax({url: "/pegr/cellSource/fetchParentStrainAjax?speciesId="+speciesId, success: function(parents){
             $("#parent-strain").select2({
-                data: parents
+                data: parents,
+                tags: true
             });
         }});
-        $("#parent-strain").html('').select2({data: [{id: '', text: ''}]});
+        $("#parent-strain").prop("disabled", false);
+        
+        $("#growth-media").html('').select2({
+            data: [{id: '', text: ''}],
+            tags: true
+        });
         $.ajax({url: "/pegr/cellSource/fetchGrowthMediaAjax?speciesId="+speciesId, success: function(medias){
             $("#growth-media").select2({
-                data: medias
+                data: medias,
+                tags: true
             });
         }});
+        $("#growth-media").prop("disabled", false);
     }
             
     function parentStrainChanged(parentStrain) {
-        $("#strain").html('').select2({data: [{id: '', text: ''}]});
-        $.ajax({url: "/pegr/cellSource/fetchStrainNameAjax?parentStrain="+parentStrain, success: function(result){
+        $("#strain").html('').select2({
+            data: [{id: '', text: ''}],
+            tags: true
+        });
+        var speciesId = $("#species").val()
+        $.ajax({url: "/pegr/cellSource/fetchStrainNameAjax?parentStrain="+parentStrain+"&speciesId="+speciesId, success: function(result){
             $("#strain").select2({
-                data: result
+                data: result,
+                tags: true
             });
         }});
+        $("#strain").prop("disabled", false);
     }
     
     function strainChanged(strainName) {
-        $("#genotype").html('').select2({data: [{id: '', text: ''}]});
+        $("#genotype").html('').select2({
+            data: [{id: '', text: ''}],
+            tags: true
+        });
         $.ajax({url: "/pegr/cellSource/fetchGenotypeAjax?strainName="+strainName, success: function(result){
             $("#genotype").select2({
-                data: result
+                data: result,
+                tags: true
             });
         }});
-        $("#mutation").html('').select2({data: [{id: '', text: ''}]});
-        $.ajax({url: "/pegr/cellSource/fetchMutationAjax?strainName="+strainName, success: function(result){
+        $("#genotype").prop("disabled", false);
+    }
+    
+    function genotypeChanged(genotype) {
+        $("#mutation").html('').select2({
+            data: [{id: '', text: ''}],
+            tags: true
+        });
+        var strainName = $("#strain").val()
+        $.ajax({url: "/pegr/cellSource/fetchMutationAjax?strainName="+strainName+"&genotype="+genotype, success: function(result){
             $("#mutation").select2({
-                data: result
+                data: result,
+                tags: true
             });
         }});
+        $("#mutation").prop("disabled", false);
     }
     
     $("#add").click(function() {

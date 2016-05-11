@@ -28,7 +28,7 @@
                         <th>Mutation</th>
                         <th>Prep User</th>
                         <th>Growth Media</th>
-                        <th>Treatments <button data-toggle="modal" data-target="#new-treatment" class="edit"> <span class="glyphicon glyphicon-plus"></span> New</button></th>                       
+                        <th>Treatments</th>                       
                         <th>Chrom. (ug)</th>
                         <th>Cell# (M)</th>
                         <th>Volume (ul)</th>
@@ -40,10 +40,14 @@
                     <tr>
                         <td id="sample-counter">${counter}</td>
                         <td>
-                            <g:select id="provider" name="provider" from="${pegr.User.list()}" noSelection="['': '']" class="no-tag-select2" style="width: 150px"></g:select>
+                            <select id="provider" name="provider" style="width: 150px">
+                                <option></option>
+                            </select>
                         </td>
                         <td>
-                            <g:select id="sendTo" name="sendTo" from="${pegr.User.list()}" noSelection="['': '']" class="no-tag-select2" style="width: 150px"></g:select>
+                            <select id="sendTo" name="sendTo" style="width: 150px">
+                                <option></option>
+                            </select>
                         </td>
                         <td>
                             <select id="genus" name="genus" onchange="genusChanged(this.value);" style="width: 150px">
@@ -74,20 +78,28 @@
                                 <option></option>
                             </select>
                         </td>
-                        <td><g:select name="prepUser" from="${pegr.User.list()}" noSelection="['': '']" class="no-tag-select2" style="width: 150px" ></g:select></td>
+                        <td>
+                            <select id="prepUser" name="prepUser" style="width: 150px" >
+                                <option></option>
+                            </select>
+                        </td>
                         <td>
                             <select id="growth-media" name="growthMedia" class="tag-select2" style="width: 150px">
                                 <option></option>
                             </select>
                         </td>
                         <td>
-                            <g:select multiple="multiple" id ="treatments" name="treatments" from="${pegr.CellSourceTreatment.list(sort:'name')}" optionKey="id" class="no-tag-select2" style="width: 300px"></g:select>
+                            <select multiple="multiple" id ="treatments" name="treatments" style="width: 300px">
+                                <option></option>
+                            </select>
                         </td>
                         <td><g:textField name="chrom"></g:textField></td>
                         <td><g:textField name="cellNum"></g:textField></td>
                         <td><g:textField name="volume"></g:textField></td>
                         <td>
-                            <g:select name="genome.id" from="${pegr.Genome.list()}" noSelection="['': '']" multiple="multiple" class="no-tag-select2" style="width: 150px"></g:select>
+                            <select multiple="multiple" id="genomes" name="genomes" class="no-tag-select2" style="width: 150px">
+                                <option></option>
+                            </select>
                         </td>
                         <td><g:textField name="note" style="width: 500px"></g:textField></td>
                     </tr>    
@@ -112,31 +124,55 @@
                         <th>ug to use/std ChIP</th>
                         <th>ul to use/std ChIP</th>
                         <th>Target</th>
+                        <th>C-Term</th>
+                        <th>N-Term</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td id="antibody-counter">${counter}</td>
-                        <td><g:select id="company" name="company.id" from="${pegr.Company.list()}" optionKey="id" value="${object?.company?.id}" noSelection="['': '']" class="select2-sample select2"/></td>
-                        <td><g:textField name="catalogNumber" from="${[]}" class="select2-sample select2"/></td>
-                        <td><g:textField name="lotNumber" value="${object?.lotNumber}"/></td>
-                        <td><g:select id="abHost" name="abHost.id" from="${pegr.AbHost.list()}" optionKey="id" required="" value="${object?.abHost?.id}" class="select2-sample select2" noSelection="['': '']"/></td>
-                        <td><g:textField name="immunogene" value="${object?.immunogene}"/></td>
-                        <td><g:select name="clonal" from="${pegr.MonoPolyClonal?.values()}" keys="${pegr.MonoPolyClonal.values()*.name()}" value="${object?.clonal?.name()}"  noSelection="['null': '']" /></td>
-                        <td><g:select id="igType" name="igType.id" from="${pegr.IgType.list()}" optionKey="id" value="${object?.igType?.id}" noSelection="['': '']" class="select2-sample select2"/></td>
-                        <td><g:field name="concentration" value="${fieldValue(bean: object, field: 'concentration')}" /></td>
-                        <td><g:textField name="abNotes"></g:textField></td>
-                        <td><g:textField name="abVolumePerSample"></g:textField></td>
-                        <td><g:textField name="ugPerChip"></g:textField></td>
-                        <td><g:textField name="ulPerChip"></g:textField></td>
-                        <td><g:select name="target" from="${pegr.Target}" noSelection="['': '']"></g:select> </td>
+                        <td>
+                            <select id="company" name="company.id" onchange="companyChanged(this.value);" style="width: 200px">
+                                <option></option>
+                            </select>
+                        </td>
+                        <td>
+                            <select id="catalog" name="catalogNumber" class="tag-select2" style="width: 150px">
+                                <option></option>
+                            </select>
+                        </td>
+                        <td>
+                            <input name="lotNumber"/>
+                        </td>
+                        <td>
+                            <select id="abHost" name="abHost.id" class="tag-select2" style="width: 150px">
+                                <option></option>
+                            </select>
+                        </td>
+                        <td>
+                            <select id="immunogene" name="immunogene" class="tag-select2" style="width: 150px">
+                                <option></option>
+                            </select>
+                        </td>
+                        <td>
+                            <g:select name="clonal" from="${pegr.MonoPolyClonal?.values()}" keys="${pegr.MonoPolyClonal.values()*.name()}" noSelection="['null': '']" class="no-tag-select2" style="width: 150px"/>
+                        </td>
+                        <td>
+                            <g:select id="igType" name="igType.id" from="${pegr.IgType.list()}" optionKey="id" value="${object?.igType?.id}" noSelection="['': '']" class="tag-select2"/>
+                        </td>
+                        <td><input name="concentration" /></td>
+                        <td><input name="abNotes"></td>
+                        <td><input name="abVolumePerSample"></td>
+                        <td><input name="ugPerChip"></td>
+                        <td><input name="ulPerChip"></td>
+                        <td><input name="target"></td>
+                        <td><input name="cterm"></td>
+                        <td><input name="nterm"></td>
                     </tr>    
                 </tbody>
             </table>
         </div>
     </div>
-
-    
     
     <button id="add" class="pull-right">Add Row</button>
     <div>
@@ -145,43 +181,82 @@
     </div>
 </g:form>
     
-<g:render template="/cellSource/treatmentModal"></g:render>
-<script>
-    var counter = 1
-    var tagPlaceholder = "Select or type..."
-    var noTagPlaceholder = "Select..."
+<script>    
     $("#nav-projects").addClass("active");
     $(".confirm").confirm();
     
+    var counter = 1 // count of rows
+    
+    var tagPlaceholder = "Select or type..."
+    var noTagPlaceholder = "Select..."
+    
     $(".tag-select2").select2({
+        placeholder: tagPlaceholder,
         tags: true
     });
     
-    $(".no-tag-select2").select2();
+    $(".no-tag-select2").select2({
+        placeholder: noTagPlaceholder
+    });
     
+    $.ajax({url: "/pegr/cellSource/fetchUserAjax", success: function(result) {
+        $("#provider").select2({
+            data: result,
+            placeholder: noTagPlaceholder
+        });
+        $("#sendTo").select2({
+            data: result,
+            placeholder: noTagPlaceholder
+        });
+        $("#prepUser").select2({
+            data: result,
+            placeholder: noTagPlaceholder
+        });
+    }})
+        
     $.ajax({url: "/pegr/cellSource/fetchGenusAjax", success: function(result) {
         $("#genus").select2({
             data: result,
-            tags: true
+            tags: true,
+            placeholder: tagPlaceholder
         });
     }})
 
+    $.ajax({url: "/pegr/cellSource/fetchTreatmentsAjax", success: function(result) {
+        $("#treatments").select2({
+            data: result,
+            tags: true,
+            placeholder: tagPlaceholder
+        });
+    }})
+    
+    $.ajax({url: "/pegr/cellSource/fetchCompanyAjax", success: function(result) {
+        $("#company").select2({
+            data: result,
+            tags: true,
+            placeholder: tagPlaceholder
+        });
+    }})
+    
     $("#species").prop("disabled", true);
     $("#parent-strain").prop("disabled", true);
     $("#strain").prop("disabled", true);
     $("#genotype").prop("disabled", true);
     $("#mutation").prop("disabled", true);
     $("#growth-media").prop("disabled", true);
+    $("#genomes").prop("disabled", true);
 
     function genusChanged(genus) {
         $("#species").html('').select2({
             data: [{id: '', text: ''}],
-            tags: true
+            tags: true,
+            placeholder: tagPlaceholder
         });
         $.ajax({url: "/pegr/cellSource/fetchSpeciesAjax?genus="+genus, success: function(result){
             $("#species").select2({
                 data: result,
-                tags: true
+                tags: true,
+                placeholder: tagPlaceholder
             });
         }});
         $("#species").prop("disabled", false);
@@ -190,39 +265,57 @@
     function speciesChanged(speciesId) {
         $("#parent-strain").html('').select2({
             data: [{id: '', text: ''}],
-            tags: true
+            tags: true,
+            placeholder: tagPlaceholder
         });
         $.ajax({url: "/pegr/cellSource/fetchParentStrainAjax?speciesId="+speciesId, success: function(parents){
             $("#parent-strain").select2({
                 data: parents,
-                tags: true
+                tags: true,
+                placeholder: tagPlaceholder
             });
         }});
         $("#parent-strain").prop("disabled", false);
         
         $("#growth-media").html('').select2({
             data: [{id: '', text: ''}],
-            tags: true
+            tags: true,
+            placeholder: tagPlaceholder
         });
+        
         $.ajax({url: "/pegr/cellSource/fetchGrowthMediaAjax?speciesId="+speciesId, success: function(medias){
             $("#growth-media").select2({
                 data: medias,
-                tags: true
+                tags: true,
+                placeholder: tagPlaceholder
             });
         }});
         $("#growth-media").prop("disabled", false);
+        
+        $("#genomes").html('').select2({
+            data: [{id: '', text: ''}],
+        });
+        $.ajax({url: "/pegr/cellSource/fetchGenomeAjax?speciesId="+speciesId, success: function(genomes){
+            $("#genomes").select2({
+                data: genomes,
+                placeholder: noTagPlaceholder
+            });
+        }});
+        $("#genomes").prop("disabled", false);
     }
             
     function parentStrainChanged(parentStrain) {
         $("#strain").html('').select2({
             data: [{id: '', text: ''}],
-            tags: true
+            tags: true,
+            placeholder: tagPlaceholder
         });
         var speciesId = $("#species").val()
         $.ajax({url: "/pegr/cellSource/fetchStrainNameAjax?parentStrain="+parentStrain+"&speciesId="+speciesId, success: function(result){
             $("#strain").select2({
                 data: result,
-                tags: true
+                tags: true,
+                placeholder: tagPlaceholder
             });
         }});
         $("#strain").prop("disabled", false);
@@ -231,12 +324,14 @@
     function strainChanged(strainName) {
         $("#genotype").html('').select2({
             data: [{id: '', text: ''}],
-            tags: true
+            tags: true,
+            placeholder: tagPlaceholder
         });
         $.ajax({url: "/pegr/cellSource/fetchGenotypeAjax?strainName="+strainName, success: function(result){
             $("#genotype").select2({
                 data: result,
-                tags: true
+                tags: true,
+                placeholder: tagPlaceholder
             });
         }});
         $("#genotype").prop("disabled", false);
@@ -245,16 +340,34 @@
     function genotypeChanged(genotype) {
         $("#mutation").html('').select2({
             data: [{id: '', text: ''}],
-            tags: true
+            tags: true,
+            placeholder: tagPlaceholder
         });
         var strainName = $("#strain").val()
         $.ajax({url: "/pegr/cellSource/fetchMutationAjax?strainName="+strainName+"&genotype="+genotype, success: function(result){
             $("#mutation").select2({
                 data: result,
-                tags: true
+                tags: true,
+                placeholder: tagPlaceholder
             });
         }});
         $("#mutation").prop("disabled", false);
+    }
+    
+    function companyChanged(companyId) {
+        $("#catalog").html('').select2({
+            data: [{id: '', text: ''}],
+            tags: true,
+            placeholder: tagPlaceholder
+        });
+        $.ajax({url: "/pegr/cellSource/fetchCatalogAjax?companyId="+companyId, success: function(result){
+            $("#catalog").select2({
+                data: result,
+                tags: true,
+                placeholder: tagPlaceholder
+            });
+        }});
+        $("#catalog").prop("disabled", false);
     }
     
     $("#add").click(function() {
@@ -265,8 +378,6 @@
         $('#antibody tbody>tr:last .select2').select2();
         return false;
     });
-
-
 
 </script>
 </body>

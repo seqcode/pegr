@@ -5271,7 +5271,7 @@ S2.define('select2/core',[
         }
       } else {
         if (key === KEYS.ENTER || key === KEYS.SPACE ||
-            (key === KEYS.DOWN && evt.altKey)) {
+            (key === KEYS.DOWN)) {
           self.open();
 
           evt.preventDefault();

@@ -1,7 +1,7 @@
 <div class="modal fade" id="new-treatment" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
-            <g:formRemote name="addTreatment" method="post" update="treatments" onSuccess="afterAddTreatment(result);" url="[controller:'cellSource', action:'addTreatment']">
+            <g:formRemote name="addTreatment" method="post" update="treatments" onSuccess="afterAddTreatment();" url="[controller:'cellSource', action:'addTreatment']">
                 <div class="modal-header">New Treatment</div>
                 <div class="modal-body fields">
                     <g:hiddenField name="cellSourceId" value="${cellSource?.id}"></g:hiddenField>
@@ -25,6 +25,5 @@
 <script>
     function afterAddTreatment() {
         $('#new-treatment').modal('hide');
-        $("#treatments").select2({})
     }
 </script>

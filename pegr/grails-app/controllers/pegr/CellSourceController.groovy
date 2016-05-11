@@ -34,6 +34,11 @@ class CellSourceController {
         }
     }
         
+    def fetchUserAjax() {
+        def users = User.list().collect{[it.id, it.toString()]}
+        render arrayToSelect2Data(users) as JSON
+    }
+    
     def fetchGenusAjax() {
         def genusList = Species.executeQuery("select distinct s.genusName from Species s")
         render stringToSelect2Data(genusList) as JSON
@@ -42,6 +47,11 @@ class CellSourceController {
     def fetchSpeciesAjax(String genus) {
         def species = Species.findAllByGenusName(genus)
         render objectToSelect2Data(species) as JSON
+    }
+    
+    def fetchGenomeAjax(Long speciesId) {
+        def genomes = Genome.executeQuery("select g.id, g.name from Genome g where g.species.id = ?", [speciesId])
+        render arrayToSelect2Data(genomes) as JSON
     }
     
     def fetchParentStrainAjax(Long speciesId) {
@@ -75,16 +85,33 @@ class CellSourceController {
         def growthMedias = GrowthMedia.where { (species == null) || (species == selectedSpecies) }
         render objectToSelect2Data(growthMedias) as JSON
     }
-        
-    def addTreatment(Long cellSourceId) {
-        // save the new treatment
-        def treatment = new CellSourceTreatment(params)
-        cellSourceService.addTreatment(treatment)
-        def cellSource = CellSource.get(cellSourceId)
-        def treatments = cellSource ? cellSource.treatments : []
-        // add the new treatment to the cellSource for preview (not saved yet)
-        treatments.push(treatment)
-        render g.select(multiple:"multiple", name:"treatments", from:CellSourceTreatment.list(sort:'name'), optionKey:"id", value: treatments*.id, class:"select2")
+    
+    def fetchTreatmentsAjax() {
+        def treatments = CellSourceTreatment.executeQuery("select t.id, t.name from CellSourceTreatment t")
+        render arrayToSelect2Data(treatments) as JSON
+    }
+    
+    def fetchCompanyAjax() {
+        def companies = Company.executeQuery("select c.id, c.name from Company c")
+        render arrayToSelect2Data(companies) as JSON
+    }
+    
+    def fetchCatalogAjax(Long companyId) {
+        def catalogs = Antibody.executeQuery("select distinct a.catalogNumber from Antibody a where a.company.id = ?", [companyId])
+        render stringToSelect2Data(catalogs) as JSON
+    }
+    
+    // helper methods
+    def stringToSelect2Data(def strings) {
+        return strings.collect {s -> [id: s, text: s]}
+    }
+    
+    def objectToSelect2Data(def objects) {
+        return objects.collect {o -> [id: o.id, text: o.name]}
+    }
+    
+    def arrayToSelect2Data(def arrays) {
+        return arrays.collect{a -> [id: a[0], text: a[1]]}
     }
     
     /* ---------------------------- Obsolete -------------------------- */
@@ -109,11 +136,14 @@ class CellSourceController {
         render g.select(id: 'growthMedia', name:'growthMedia.id', from: growthMedias, optionKey: 'id', noSelection:[null:''])
     }
     
-    def stringToSelect2Data(def strings) {
-        return strings.collect {s -> [id: s, text: s]}
-    }
-    
-    def objectToSelect2Data(def objects) {
-        return objects.collect {o -> [id: o.id, text: o.name]}
+    def addTreatment(Long cellSourceId) {
+        // save the new treatment
+        def treatment = new CellSourceTreatment(params)
+        cellSourceService.addTreatment(treatment)
+        def cellSource = CellSource.get(cellSourceId)
+        def treatments = cellSource ? cellSource.treatments : []
+        // add the new treatment to the cellSource for preview (not saved yet)
+        treatments.push(treatment)
+        render g.select(multiple:"multiple", name:"treatments", from:CellSourceTreatment.list(sort:'name'), optionKey:"id", value: treatments*.id, class:"select2")
     }
 }

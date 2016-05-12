@@ -2,6 +2,20 @@
 <head>
     <title>Workbench</title> 
     <meta name="layout" content="main"/>
+    <style>
+        .sample {
+            background-image: none;
+            background-color: #d9edf7;
+        }
+        .antibody {
+            background-image: none;
+            background-color: #FFFFCC;
+        }
+        .target {
+            background-image: none;
+            background-color: #FFD4CC;
+        }
+    </style>
 </head>
 <body>
 <g:form action="saveNewSample" method="post">
@@ -13,14 +27,8 @@
         <li><a href="#target-group" class="btn btn-default">Target</a></li>
     </ul>
     <div class="table-responsive">
-        <table class="table table-striped"  style="margin-bottom: 200px">
+        <table class="table table-striped table-bordered" style="margin-bottom: 200px">
             <thead>
-                <tr>
-                    <th></th>
-                    <th colspan="16" id="sample-group">Sample</th>
-                    <th colspan="12" id="antibody-group">Antibody</th>
-                    <th colspan="4" id="target-group">Target</th>
-                </tr>
                 <tr>
                     <th></th>
                     <th>Sample Provider</th>
@@ -59,7 +67,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td id="sample-counter"><button onclick="removeRow(this)"><span class="glyphicon glyphicon-trash"></span></button></td>
+                    <td><a href="#" class="removeRow"><span class="glyphicon glyphicon-trash"></span></a></td>
                     <td>
                         <select id="provider" name="provider" style="width: 150px">
                             <option></option>
@@ -174,7 +182,7 @@
                             <option></option>
                         </select>
                     </td>
-                </tr>    
+                </tr>
             </tbody>
         </table>
     </div>
@@ -187,78 +195,83 @@
 </g:form>
     
 <script>    
-    $("#nav-projects").addClass("active");
-    $(".confirm").confirm();
-    
-    var counter = 1 // count of rows
-    
     var tagPlaceholder = "Select or type..."
     var noTagPlaceholder = "Select..."
     
-    $(".tag-select2").select2({
-        placeholder: tagPlaceholder,
-        tags: true
+    $(document).ready(function(){
+        $("#nav-projects").addClass("active");
+        $(".confirm").confirm();
+        initializeSelect2s();
     });
     
-    $(".no-tag-select2").select2({
-        placeholder: noTagPlaceholder
-    });
-    
-    $.ajax({url: "/pegr/cellSource/fetchUserAjax", success: function(result) {
-        $("#provider").select2({
-            data: result,
-            placeholder: noTagPlaceholder
+    // select2 initialize
+    function initializeSelect2s() {
+        $(".tag-select2").select2({
+            placeholder: tagPlaceholder,
+            tags: true
         });
-        $("#sendTo").select2({
-            data: result,
-            placeholder: noTagPlaceholder
-        });
-        $("#prepUser").select2({
-            data: result,
-            placeholder: noTagPlaceholder
-        });
-    }})
-        
-    $.ajax({url: "/pegr/cellSource/fetchGenusAjax", success: function(result) {
-        $("#genus").select2({
-            data: result,
-            tags: true,
-            placeholder: tagPlaceholder
-        });
-    }})
 
-    $.ajax({url: "/pegr/cellSource/fetchTreatmentsAjax", success: function(result) {
-        $("#treatments").select2({
-            data: result,
-            tags: true,
-            placeholder: tagPlaceholder
+        $(".no-tag-select2").select2({
+            placeholder: noTagPlaceholder
         });
-    }})
+
+        $.ajax({url: "/pegr/cellSource/fetchUserAjax", success: function(result) {
+            $("#provider").select2({
+                data: result,
+                placeholder: noTagPlaceholder
+            });
+            $("#sendTo").select2({
+                data: result,
+                placeholder: noTagPlaceholder
+            });
+            $("#prepUser").select2({
+                data: result,
+                placeholder: noTagPlaceholder
+            });
+        }})
+
+        $.ajax({url: "/pegr/cellSource/fetchGenusAjax", success: function(result) {
+            $("#genus").select2({
+                data: result,
+                tags: true,
+                placeholder: tagPlaceholder
+            });
+        }})
+
+        $.ajax({url: "/pegr/cellSource/fetchTreatmentsAjax", success: function(result) {
+            $("#treatments").select2({
+                data: result,
+                tags: true,
+                placeholder: tagPlaceholder
+            });
+        }})
+
+        $.ajax({url: "/pegr/cellSource/fetchCompanyAjax", success: function(result) {
+            $("#company").select2({
+                data: result,
+                tags: true,
+                placeholder: tagPlaceholder
+            });
+        }})
+
+        $.ajax({url: "/pegr/cellSource/fetchCatalogAjax", success: function(result){
+            $("#catalog").select2({
+                data: result,
+                tags: true,
+                placeholder: tagPlaceholder
+            });
+        }});
+
+        $.ajax({url: "/pegr/cellSource/fetchImmunogeneAjax", success: function(result){
+            $("#immunogene").select2({
+                data: result,
+                tags: true,
+                placeholder: tagPlaceholder
+            });
+        }});
+    }
     
-    $.ajax({url: "/pegr/cellSource/fetchCompanyAjax", success: function(result) {
-        $("#company").select2({
-            data: result,
-            tags: true,
-            placeholder: tagPlaceholder
-        });
-    }})
-    
-    $.ajax({url: "/pegr/cellSource/fetchCatalogAjax", success: function(result){
-        $("#catalog").select2({
-            data: result,
-            tags: true,
-            placeholder: tagPlaceholder
-        });
-    }});
-    
-    $.ajax({url: "/pegr/cellSource/fetchImmunogeneAjax", success: function(result){
-        $("#immunogene").select2({
-            data: result,
-            tags: true,
-            placeholder: tagPlaceholder
-        });
-    }});
-    
+    // disable the dependent fields in cascade selections
     $("#species").prop("disabled", true);
     $("#parent-strain").prop("disabled", true);
     $("#strain").prop("disabled", true);
@@ -271,6 +284,7 @@
     $("#cterm").prop("disabled", true);
     $("#nterm").prop("disabled", true);
     
+    // ajax calls in cascade selections
     function genusChanged(genus) {
         $("#species").html('').select2({
             data: [{id: '', text: ''}],
@@ -413,12 +427,17 @@
         $("#cterm").prop("disabled", false);
     }
     
+    // remove row
+    $("a.removeRow").click(function(event){
+        event.preventDefault();
+        $(this).closest("tr").remove();
+    });
+    
+    // add new row at the bottom and copy the value of last row
     $("#add").click(function() {
-        $('#sample tbody>tr:last').clone(false).insertAfter('#sample tbody>tr:last');
-        $('#antibody tbody>tr:last').clone(false).insertAfter('#antibody tbody>tr:last');
-        $('#antibody tbody>tr:last #antibody-counter').text(++counter);
-        $('#antibody tbody>tr:last .select2').remove();
-        $('#antibody tbody>tr:last .select2').select2();
+        $('tbody>tr:last').clone(false).insertAfter('tbody>tr:last');
+        $('tbody>tr:last .select2').remove();
+        //$('tbody>tr:last .select2').select2();
         return false;
     });
 

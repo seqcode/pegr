@@ -96,9 +96,28 @@ class CellSourceController {
         render arrayToSelect2Data(companies) as JSON
     }
     
-    def fetchCatalogAjax(Long companyId) {
-        def catalogs = Antibody.executeQuery("select distinct a.catalogNumber from Antibody a where a.company.id = ?", [companyId])
+    def fetchCatalogAjax() {
+        def catalogs = Antibody.executeQuery("select distinct a.catalogNumber from Antibody a")
         render stringToSelect2Data(catalogs) as JSON
+    }
+    
+    def fetchImmunogeneAjax() {
+        def immunogenes = Antibody.executeQuery("select distinct a.immunogene from Antibody a")
+        render stringToSelect2Data(immunogenes) as JSON
+    }
+    
+    def fetchDefaultTargetAjax(String immunogene) {
+        def target = Antibody.findByImmunogene(immunogene)?.defaultTarget
+        def result = [targetTypeId: target?.targetType?.id, target: target?.name, cterm: target?.cTermTag]
+        render result as JSON
+    }
+    
+    def fetchTargetAjax(Long targetTypeId) {
+        def targets = Target.where {targetType.id == targetTypeId}.list()
+        def result = [targets: stringToSelect2Data(targets.collect{it.name}.unique()),
+                     nterms: stringToSelect2Data(targets.collect{it.nTermTag}.unique()),
+                     cterms: stringToSelect2Data(targets.collect{it.cTermTag}.unique())]
+        render result as JSON
     }
     
     // helper methods

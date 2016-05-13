@@ -10,8 +10,7 @@ class CsvConvertException extends RuntimeException {
 }
     
 class CsvConvertService {
-    
-    CsvConvertService() {}
+    def sampleService
 	
 	def migrate(String filename, RunStatus runStatus, int startLine, int endLine, boolean basicCheck){
 		
@@ -76,7 +75,7 @@ class CsvConvertService {
 
         def invoice = getInvoice(data.service, data.invoice)
 
-        def target = getTarget(data.target, data.targetType, data.nTag, data.cTag)
+        def target = antibodyService.getTarget(data.target, data.targetType, data.nTag, data.cTag)
 
         def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.abConc)
 
@@ -114,7 +113,7 @@ class CsvConvertService {
         def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes)
 
         addIndexToSample(sample, data.indexStr, data.indexIdStr, basicCheck)
-        addSampleToProject(project, sample)
+        sampleService.addSampleToProject(project, sample)
 
         getPool(sample, results.sequenceRun, data.pool, data.volToPool, data.poolDate, data.quibitReading, data.quibitDilution, data.concentration, data.poolDilution)
 
@@ -145,12 +144,6 @@ class CsvConvertService {
             new SampleSequenceIndices(sample: sample, index: index).save(failOnError: true)
         } 
     }
-    
-	def addSampleToProject(Project project, Sample sample) {
-	    if(project && sample) {
-	        new ProjectSamples(project: project, sample: sample).save( failOnError: true)
-	    }
-	}
 	
     def getUser(String userStr) {
         return getUser(userStr, null, null)
@@ -281,7 +274,7 @@ class CsvConvertService {
 		def company = getCompany(abCompName)
 		def abHost = getAbHost(abAnimal)
 		def clonal = getClonal(abClonal)
-		def igType = getIgType(ig)
+		def igType = antibodyService.getIgType(ig)
 		def concentration = getFloat(abConc)
         
         if (antigen == "No ab" || antigen == "NoAb") {
@@ -647,70 +640,7 @@ class CsvConvertService {
 	    return clonal
 	}
 	
-	def getIgType(String igStr) {
-	    if (igStr == null) {
-	        return null
-	    }
-	    def igType = IgType.findByName(igStr)
-	    if (!igType) {
-	        igType = new IgType(name: igStr).save( failOnError: true)
-	    }
-	    return igType
-	}
-	
-	def getTarget(String targetStr, String targetTypeStr, String nTag, String cTag) {
-	    if ([targetStr, cTag, nTag].every{ it == null }) {
-	        return null
-	    }
-        if(targetStr) {
-            targetStr = targetStr.replaceAll("_", "-")
-            targetStr = targetStr.replaceAll("\\?", "")
-            targetStr = targetStr.trim()
-        }
-        
-	    def target = Target.findByNameAndCTermTagAndNTermTag(targetStr, cTag, nTag)
-	    if (!target) {
-	        def type = getTargetType(targetTypeStr)
-	        target = new Target(name: targetStr, cTermTag: cTag, nTermTag: nTag, targetType: type).save( failOnError: true)
-	    }
-	    return target
-	}
-	
-	def getTargetType(String str) {
-	    if (str == null) {
-	        return null
-	    }
-	    def type = TargetType.findByName(str)
-	    if (!type) {
-	        type = new TargetType(name: str).save( failOnError: true)
-	    }
-	    return type
-	}
-	
-	def getAbHost(String abHostName) {
-	    if (abHostName == null) {
-	        return null
-	    }
-	    def abHost = AbHost.createCriteria().get{
-	        eq("name", abHostName, [ignoreCase: true])
-	        maxResults(1)
-	    }
-	    if(!abHost) {
-	        abHost = new AbHost(name: abHostName).save( failOnError: true)
-	    }
-	    return abHost
-	}
-	
-	def getCompany(String companyStr) {
-	    if (companyStr == null) {
-	        return null
-	    }    
-	    def company = Company.findByName(companyStr)
-	    if(!company) {
-	        company = new Company(name: companyStr).save( failOnError: true)
-	    }
-	    return company
-	}
+
     
     def getInteger(String s) {
         def i = 0

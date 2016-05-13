@@ -69,4 +69,27 @@ class ProjectService {
         }
         return messages
     }
+    
+    @Transactional
+    saveNewSamples(Long assayId, Long projectId, SampleListCommand samples) {
+        // get assay
+        def assay = Assay.get(assayId)
+        if (!assay) {
+            throw new ProjectException(message: "Assay not found!")
+        }
+        // get project
+        def project = Project.get(projectId)
+        if (!project) {
+            throw new ProjectException(message: "Project not found!")
+        }
+        samples.each { data ->
+            // save sample
+            def cellSource = new CellSource(providerUser: providerId)
+            def sample = new Sample(sendDataTo)
+            data.providerId
+            data.sendToId
+            // add sample to the project
+            new ProjectSamples(project: project, sample: sample).save()
+        }
+    }
 }

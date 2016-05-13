@@ -170,4 +170,25 @@ class ProjectController {
         }
         redirect(action: "show", id: projectId)
     }
+    
+    def saveNewSamples(Long assayId, Long projectId, SampleListCommand samples) {
+        try {
+            projectService.saveNewSamples(assayId, projectId, samples)
+            flash.message = "New samples added!"
+            redirect(action: "show, id: projectId")
+        } catch(ProjectException e) {
+            
+        }
+    }
+}
+
+
+class SampleCommand {
+    Long providerId
+    Long sendToId
+    
+}
+
+class SampleListCommand {
+    List<Sample> samples = []
 }

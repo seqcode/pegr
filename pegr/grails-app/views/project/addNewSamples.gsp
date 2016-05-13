@@ -18,9 +18,10 @@
     </style>
 </head>
 <body>
-<g:form action="saveNewSample" method="post">
+<g:form action="saveNewSamples" method="post">
     <h4>Assay: ${assay?.name}</h4>
     <g:hiddenField name="assayId" value="${assay?.id}"></g:hiddenField>
+    <g:hiddenField name="projectId" value="${project?.id}"></g:hiddenField>
     <ul class="nav nav-pills">
         <li><a href="#sample-group" class="btn btn-default">Sample</a></li>
         <li><a href="#antibody-group" class="btn btn-default">Antibody</a></li>
@@ -72,19 +73,19 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                <tr id="tr1">
                     <td><a href="#" class="removeRow"><span class="glyphicon glyphicon-trash"></span></a></td>
                     <td>
-                        <select id="provider" name="provider" style="width: 150px">
+                        <select class="provider" name="sample[].providerId" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select id="sendTo" name="sendTo" style="width: 150px">
+                        <select class="sendTo" name="sample[].sendToId" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
-                    <td>
+               <%--     <td>
                         <select id="genus" name="genus" onchange="genusChanged(this.value);" style="width: 150px">
                             <option></option>
                         </select>
@@ -188,6 +189,7 @@
                             <option></option>
                         </select>
                     </td>
+                        --%>
                 </tr>
             </tbody>
         </table>
@@ -201,32 +203,32 @@
 </g:form>
     
 <script>    
-    var tagPlaceholder = "Select or type..."
-    var noTagPlaceholder = "Select..."
+    var tagPlaceholder = "Select or type...";
+    var noTagPlaceholder = "Select...";
     
     $(document).ready(function(){
         $("#nav-projects").addClass("active");
         $(".confirm").confirm();
-        initializeSelect2s();
+        initializeSelect2s(1);
     });
     
     // select2 initialize
-    function initializeSelect2s() {
-        $(".tag-select2").select2({
+    function initializeSelect2s(count) {
+        $("#tr"+count+" .tag-select2").select2({
             placeholder: tagPlaceholder,
             tags: true
         });
 
-        $(".no-tag-select2").select2({
+        $("#tr"+count+" .no-tag-select2").select2({
             placeholder: noTagPlaceholder
         });
 
         $.ajax({url: "/pegr/cellSource/fetchUserAjax", success: function(result) {
-            $("#provider").select2({
+            $("#tr"+count+" .provider").select2({
                 data: result,
                 placeholder: noTagPlaceholder
             });
-            $("#sendTo").select2({
+            $("#tr"+count+" .sendTo").select2({
                 data: result,
                 placeholder: noTagPlaceholder
             });
@@ -234,8 +236,8 @@
                 data: result,
                 placeholder: noTagPlaceholder
             });
-        }})
-
+        }});
+/*
         $.ajax({url: "/pegr/cellSource/fetchGenusAjax", success: function(result) {
             $("#genus").select2({
                 data: result,
@@ -275,8 +277,9 @@
                 placeholder: tagPlaceholder
             });
         }});
+*/
     }
-    
+/*    
     // disable the dependent fields in cascade selections
     $("#species").prop("disabled", true);
     $("#parent-strain").prop("disabled", true);
@@ -432,7 +435,7 @@
         $("#nterm").prop("disabled", false);
         $("#cterm").prop("disabled", false);
     }
-    
+    */
     // remove row
     $("a.removeRow").click(function(event){
         event.preventDefault();
@@ -440,10 +443,28 @@
     });
     
     // add new row at the bottom and copy the value of last row
+    var count = 1;
     $("#add").click(function() {
-        $('tbody>tr:last').clone(false).insertAfter('tbody>tr:last');
+        var oldVal = [];
+        $('tbody>tr:last select').each(function(index){
+           oldVal.push($(this).val()); 
+        });
+        count++;
+        $('tbody').append(
+            $('<tr/>')
+                .attr("id", "tr"+count)
+                .append($('tbody>tr:last>*').clone(false))
+        );
+        
+        // activate select2 for the new row
         $('tbody>tr:last .select2').remove();
-        //$('tbody>tr:last .select2').select2();
+        initializeSelect2s(count);
+
+        // copy the values from the last row to the new row
+        $('tbody>tr:last select').each(function(index){
+           $(this).val(oldVal[index]); 
+        });
+
         return false;
     });
 

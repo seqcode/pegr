@@ -31,6 +31,12 @@
             <thead>
                 <tr>
                     <th></th>
+                    <th colspan="16" id="sample-group" class="sample">Sample</th>
+                    <th colspan="12" id="antibody-group" class="antibody">Antibody</th>
+                    <th colspan="4" id="target-group" class="target">Target</th>
+                </tr>
+                <tr>
+                    <th></th>
                     <th>Sample Provider</th>
                     <th>Send Data to</th>
                     <th>Genus</th>

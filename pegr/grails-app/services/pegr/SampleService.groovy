@@ -3,43 +3,55 @@ import grails.transaction.Transactional
 
 class SampleService {
     @Transactional
+    saveNewSamples(Long assayId, Long projectId, SampleListCommand samples) {
+        // get assay
+        def assay = Assay.get(assayId)
+        if (!assay) {
+            throw new ProjectException(message: "Assay not found!")
+        }
+        // get project
+        def project = Project.get(projectId)
+        if (!project) {
+            throw new ProjectException(message: "Project not found!")
+        }
+        samples.each { data ->
+            // save sample
+            def cellSource = new CellSource(providerUser: providerId)
+            def sample = new Sample(sendDataTo)
+            data.providerId
+            data.sendToId
+            // add sample to the project
+            addSampleToProject(project, sample)
+        }
+    }
+    
+    @Transactional
     def addSampleToProject(Project project, Sample sample) {
 	    if(project && sample) {
 	        new ProjectSamples(project: project, sample: sample).save( failOnError: true)
 	    }
 	}
     
-    def saveStrain(Species species, String strainStr, String parentStrainStr, String genotypeStr, String mutationStr) {  
-        // get the parent strain and tissue
-        def parentStrain = null
-        def parentTissue = getTissue(parentStrainStr)
-        if (parentStrainStr && !parentTissue) {
-            parentStrain = Strain.findByName(parentStrainStr)
-            if (!parentStrain) {
+    @Transactional
+    def getStrain(Species species, String strainStr, String parentStrainStr, String genotypeStr, String mutationStr) {  
+        // get the parent strain
+        parentStrain = Strain.findByName(parentStrainStr)
+        if (!parentStrain) {
                 parentStrain = new Strain(name: parentStrainStr, species: species).save(failOnError: true) 
-            }
         }
-        
-        // get strain and tissue
-        def strain = null
-        def tissue = getTissue(strainStr)
-        if (!tissue) {
-            tissue = parentTissue
-			if (strainStr || parentStrain || genotypeStr || mutationStr) {
-	            strain = Strain.findByNameAndParentAndGenotypeAndGeneticModification(strainStr, parentStrain, genotypeStr, mutationStr)
-	            if (!strain) {
-	                strain = new Strain(name: strainStr, 
-	                                    species: species, 
-	                                    genotype: genotypeStr, 
-	                                    parent: parentStrain, 
-	                                    geneticModification: mutationStr).save( failOnError: true)
-	            }
-			}
+        // get strain and tissue        
+        strain = Strain.findByNameAndParentAndGenotypeAndGeneticModification(strainStr, parentStrain, genotypeStr, mutationStr)
+        if (!strain) {
+            strain = new Strain(name: strainStr, 
+                                species: species, 
+                                genotype: genotypeStr, 
+                                parent: parentStrain, 
+                                geneticModification: mutationStr).save( failOnError: true)
         }
-        
-        return [strain: strain, tissue: tissue]	    
+        return strain
 	}
 	
+    @Transactional
 	def getSpecies(String genusStr, String speciesStr) {
 	    if(genusStr == null && speciesStr == null) {
 	        return null
@@ -57,6 +69,7 @@ class SampleService {
 	    return species
 	}
 	
+    @Transactional
 	def getGrowthMedia(String mediaStr, Species species) {
 	    if(mediaStr == null) {
 	        return null
@@ -73,12 +86,11 @@ class SampleService {
 	    return media
 	}
 	
-	
-	def getCellSource( String samplePrepUser, GrowthMedia growthMedia, Strain strain, User provider, Inventory inventory, Tissue tissue) {
+    @Transactional
+	def getCellSource(User prepUser, GrowthMedia growthMedia, Strain strain, User provider, Inventory inventory, Tissue tissue) {
 	    if (!strain) {
 	        return null
-	    }
-		def prepUser = getUser(samplePrepUser)
+	    }		
 	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, prepUser: prepUser, inventory: inventory, tissue: tissue).save( failOnError: true)
 	    return cellSource
 	}
@@ -98,37 +110,10 @@ class SampleService {
 		} 
 	}
     
+    @Transactional
     def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId, String abNotes) {
-	    def note = [:]
-	    if (sampleNotes) {
-	        note['note'] = sampleNotes
-	    }
-        if (sampleId) {
-            note['sampleId'] = sampleId
-        }
-	    if (bioRep1SampleId) {
-	        note['bioRep1'] = bioRep1SampleId
-	    }
-	    if (bioRep2SampleId) {
-	        note['bioRep2'] = bioRep2SampleId
-	    }
-	    def date = getDate(dateStr)
-        def source = "PughLab"
-        if (invoice.invoiceNum && invoice.invoiceNum.size() >= 4 && invoice.invoiceNum[1..3] ==~ /\d+/ ) {
-            switch (invoice.invoiceNum[0].toLowerCase()) {
-                case "p":
-                    source = "Peconic"
-                    break
-                case "x":
-                    source = "CustomerX"
-                    break
-                case "s":
-                    source = "CustomerS"
-                    break
-            }
-        }
-        
-	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes).save( failOnError: true)
+        def now = new Date()
+	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: sampleNotes, status: SampleStatus.CREATED, date: now, sendDataTo: dataTo, antibodyNotes: abNotes).save(failOnError: true)
 	    return sample
 	}
     

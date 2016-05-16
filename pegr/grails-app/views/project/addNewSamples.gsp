@@ -85,111 +85,110 @@
                             <option></option>
                         </select>
                     </td>
-               <%--     <td>
-                        <select id="genus" name="genus" onchange="genusChanged(this.value);" style="width: 150px">
+                    <td>
+                        <select class="genus" name="sample[].genus" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select id="species" name="species" onchange="speciesChanged(this.value);" class="tag-select2" style="width: 150px">
+                        <select name="sample[].speciesId" onchange="speciesChanged(this.value);" class="species tag-select2" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select id="parent-strain" name="parentStrain" onchange="parentStrainChanged(this.value);" class="tag-select2" style="width: 150px">
+                        <select name="sample[].parentStrain" onchange="parentStrainChanged(this.value);" class="parent-strain tag-select2" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select id="strain" name="strain" onchange="strainChanged(this.value);" class="tag-select2" style="width: 150px" required>
+                        <select name="sample[].strain" onchange="strainChanged(this.value);" class="strain tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select id="genotype" name="genotype" onchange="genotypeChanged(this.value);" class="tag-select2" style="width: 300px">
+                        <select name="sample[].genotype" onchange="genotypeChanged(this.value);" class="genotype tag-select2" style="width: 300px">
                             <option></option>
                         </select></td>
                     <td>
-                        <select id="mutation" name="mutation" class="tag-select2" style="width: 150px">
+                        <select name="sample[].mutation" class="mutation tag-select2" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select id="prepUser" name="prepUser" style="width: 150px" >
+                        <select class="prepUser" name="sample[].prepUserId" style="width: 150px" >
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select id="growth-media" name="growthMedia" class="tag-select2" style="width: 150px" required>
+                        <select name="sample[].growthMediaId" class="growth-media tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select multiple="multiple" id ="treatments" name="treatments" style="width: 300px">
+                        <select multiple="multiple" class="treatments" name="sample[].treatmentId" style="width: 300px">
                             <option></option>
                         </select>
                     </td>
-                    <td><g:textField name="chrom"></g:textField></td>
-                    <td><g:textField name="cellNum"></g:textField></td>
-                    <td><g:textField name="volume"></g:textField></td>
+                    <td><g:textField name="sample[].chrom"></g:textField></td>
+                    <td><g:textField name="sample[].cellNum"></g:textField></td>
+                    <td><g:textField name="sample[].volume"></g:textField></td>
                     <td>
-                        <select multiple="multiple" id="genomes" name="genomes" class="no-tag-select2" style="width: 150px" required>
+                        <select multiple="multiple" name="sample[].genomeId" class="genomes no-tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td><g:textField name="note" style="width: 500px"></g:textField></td>
 
                     <td>
-                        <select id="company" name="companyId" style="width: 200px">
+                        <select class="company" name="sample[].companyId" style="width: 200px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select id="catalog" name="catalogNumber" class="tag-select2" style="width: 150px" required>
+                        <select class="catalog" name="sample[].catalogNumber" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <input name="lotNumber"/>
+                        <input name="sample[].lotNumber"/>
                     </td>
                     <td>
-                        <g:select id="abHost" name="abHostId" from="${pegr.AbHost.list()}" optionKey="id" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
+                        <g:select name="sample[].abHostId" from="${pegr.AbHost.list()}" optionKey="id" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
                     </td>
                     <td>
-                        <select id="immunogene" name="immunogene" onchange="immunogeneChanged(this.value);" style="width: 150px">
+                        <select class="immunogene" name="sample[].immunogene" onchange="immunogeneChanged(this.value);" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <g:select name="clonal" from="${pegr.MonoPolyClonal?.values()}" keys="${pegr.MonoPolyClonal.values()*.name()}" noSelection="['': '']" class="no-tag-select2" style="width: 150px"/>
+                        <g:select name="sample[].clonal" from="${pegr.MonoPolyClonal?.values()}" keys="${pegr.MonoPolyClonal.values()*.name()}" noSelection="['': '']" class="no-tag-select2" style="width: 150px"/>
                     </td>
                     <td>
-                        <g:select id="igType" name="igType.id" from="${pegr.IgType.list()}" optionKey="id" noSelection="['': '']" class="tag-select2" style="width: 150px"/>
+                        <g:select name="sample[].igTypeId" from="${pegr.IgType.list()}" optionKey="id" noSelection="['': '']" class="tag-select2" style="width: 150px"/>
                     </td>
-                    <td><input name="concentration" /></td>
-                    <td><input name="abNotes"></td>
-                    <td><input name="abVolumePerSample"></td>
-                    <td><input name="ugPerChip"></td>
-                    <td><input name="ulPerChip"></td>
+                    <td><input name="sample[].concentration" /></td>
+                    <td><input name="sample[].abNotes"></td>
+                    <td><input name="sample[].abVolumePerSample"></td>
+                    <td><input name="sample[].ugPerChip"></td>
+                    <td><input name="sample[].ulPerChip"></td>
                     <td>
-                        <g:select id="target-type" name="targetTypeId" from="${pegr.TargetType.list()}" optionKey="id" noSelection="['': '']" onchange="targetTypeChanged(this.value);" class="tag-select2" style="width: 150px"></g:select>
+                        <g:select name="sample[].targetTypeId" from="${pegr.TargetType.list()}" optionKey="id" noSelection="['': '']" onchange="targetTypeChanged(this.value);" class="target-type tag-select2" style="width: 150px"></g:select>
                     </td>
                     <td>
-                        <select id="target" name="target" class="tag-select2" style="width: 150px" required>
+                        <select name="sample[].target" class="target tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select id="cterm" name="cterm" class="tag-select2" style="width: 150px">
+                        <select name="sample[].cterm" class="cterm tag-select2" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select id="nterm" name="nterm" class="tag-select2" style="width: 150px">
+                        <select name="sample[].nterm" class="nterm tag-select2" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
-                        --%>
                 </tr>
             </tbody>
         </table>
@@ -232,14 +231,14 @@
                 data: result,
                 placeholder: noTagPlaceholder
             });
-            $("#prepUser").select2({
+            $("#tr"+count+" .prepUser").select2({
                 data: result,
                 placeholder: noTagPlaceholder
             });
         }});
-/*
+
         $.ajax({url: "/pegr/cellSource/fetchGenusAjax", success: function(result) {
-            $("#genus").select2({
+            $("#tr"+count+" .genus").select2({
                 data: result,
                 tags: true,
                 placeholder: tagPlaceholder
@@ -247,7 +246,7 @@
         }})
 
         $.ajax({url: "/pegr/cellSource/fetchTreatmentsAjax", success: function(result) {
-            $("#treatments").select2({
+            $("#tr"+count+" .treatments").select2({
                 data: result,
                 tags: true,
                 placeholder: tagPlaceholder
@@ -255,7 +254,7 @@
         }})
 
         $.ajax({url: "/pegr/cellSource/fetchCompanyAjax", success: function(result) {
-            $("#company").select2({
+            $("#tr"+count+" .company").select2({
                 data: result,
                 tags: true,
                 placeholder: tagPlaceholder
@@ -263,7 +262,7 @@
         }})
 
         $.ajax({url: "/pegr/cellSource/fetchCatalogAjax", success: function(result){
-            $("#catalog").select2({
+            $("#tr"+count+" .catalog").select2({
                 data: result,
                 tags: true,
                 placeholder: tagPlaceholder
@@ -271,44 +270,45 @@
         }});
 
         $.ajax({url: "/pegr/cellSource/fetchImmunogeneAjax", success: function(result){
-            $("#immunogene").select2({
+            $("#tr"+count+" .immunogene").select2({
                 data: result,
                 tags: true,
                 placeholder: tagPlaceholder
             });
         }});
-*/
     }
-/*    
+    
     // disable the dependent fields in cascade selections
-    $("#species").prop("disabled", true);
-    $("#parent-strain").prop("disabled", true);
-    $("#strain").prop("disabled", true);
-    $("#genotype").prop("disabled", true);
-    $("#mutation").prop("disabled", true);
-    $("#growth-media").prop("disabled", true);
-    $("#genomes").prop("disabled", true);
-    $("#target-type").prop("disabled", true);
-    $("#target").prop("disabled", true);
-    $("#cterm").prop("disabled", true);
-    $("#nterm").prop("disabled", true);
+    $(".species").prop("disabled", true);
+    $(".parent-strain").prop("disabled", true);
+    $(".strain").prop("disabled", true);
+    $(".genotype").prop("disabled", true);
+    $(".mutation").prop("disabled", true);
+    $(".growth-media").prop("disabled", true);
+    $(".genomes").prop("disabled", true);
+    $(".target-type").prop("disabled", true);
+    $(".target").prop("disabled", true);
+    $(".cterm").prop("disabled", true);
+    $(".nterm").prop("disabled", true);
     
     // ajax calls in cascade selections
-    function genusChanged(genus) {
-        $("#species").html('').select2({
+    $(".genus").on("change", function() {
+        $(this).addClass("test");
+        var $species = $(this).closest("tr").find(".species");
+        $species.html('').select2({
             data: [{id: '', text: ''}],
             tags: true,
             placeholder: tagPlaceholder
         });
-        $.ajax({url: "/pegr/cellSource/fetchSpeciesAjax?genus="+genus, success: function(result){
-            $("#species").select2({
+        $.ajax({url: "/pegr/cellSource/fetchSpeciesAjax?genus="+$(this).val(), success: function(result){
+            $species.select2({
                 data: result,
                 tags: true,
                 placeholder: tagPlaceholder
             });
         }});
-        $("#species").prop("disabled", false);
-    }
+        $species.prop("disabled", false);
+    });
     
     function speciesChanged(speciesId) {
         $("#parent-strain").html('').select2({
@@ -435,7 +435,7 @@
         $("#nterm").prop("disabled", false);
         $("#cterm").prop("disabled", false);
     }
-    */
+
     // remove row
     $("a.removeRow").click(function(event){
         event.preventDefault();

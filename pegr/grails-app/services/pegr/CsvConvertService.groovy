@@ -79,19 +79,20 @@ class CsvConvertService {
 
         def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.abConc)
 
-        def species = getSpecies(data.genus, data.species)
+        def species = sampleService.getSpecies(data.genus, data.species)
 
         def strainAndTissue = getStrainTissue(species, data.strain, data.parentStrain, data.genotype, data.mutation)
         def strain = strainAndTissue.strain
         def tissue = strainAndTissue.tissue
 
-        def growthMedia = getGrowthMedia(data.growthMedia, species)
+        def growthMedia = sampleService.getGrowthMedia(data.growthMedia, species)
 
         def inventory = getInventory(data.dateReceived, data.receivingUser, data.inOrExternal, data.inventoryNotes)
-        def cellSource = getCellSource(data.samplePrepUser, growthMedia, strain, cellProvider, inventory, tissue)
+        def prepUser = getUser(samplePrepUser)
+        def cellSource = sampleService.getCellSource(prepUser, growthMedia, strain, cellProvider, inventory, tissue)
 
-        addTreatment(cellSource, data.perturbation1)
-        addTreatment(cellSource, data.perturbation2)
+        sampleService.addTreatment(cellSource, data.perturbation1)
+        sampleService.addTreatment(cellSource, data.perturbation2)
         
         def assay = getAssay(data.assay)
 
@@ -271,8 +272,8 @@ class CsvConvertService {
 	}
 	
 	def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNotes, String abClonal, String abAnimal, String ig, String antigen, String abConc) {
-		def company = getCompany(abCompName)
-		def abHost = getAbHost(abAnimal)
+		def company = antibodyService.getCompany(abCompName)
+		def abHost = antibodyService.getAbHost(abAnimal)
 		def clonal = getClonal(abClonal)
 		def igType = antibodyService.getIgType(ig)
 		def concentration = getFloat(abConc)
@@ -347,64 +348,6 @@ class CsvConvertService {
         }
         
         return [strain: strain, tissue: tissue]	    
-	}
-	
-	def getSpecies(String genusStr, String speciesStr) {
-	    if(genusStr == null && speciesStr == null) {
-	        return null
-	    }
-		if (genusStr == null) {
-			genusStr = "Unknown"
-		}
-		if (speciesStr == null) {
-			speciesStr = "Unknown"
-		}
-	    def species = Species.findByNameAndGenusName(speciesStr, genusStr)
-	    if(!species) {
-	        species = new Species(name: speciesStr, genusName: genusStr).save( failOnError: true)
-	    }
-	    return species
-	}
-	
-	def getGrowthMedia(String mediaStr, Species species) {
-	    if(mediaStr == null) {
-	        return null
-	    }
-	    def media = GrowthMedia.findByName(mediaStr)
-	    if(!media) {
-	        media = new GrowthMedia(name: mediaStr, species: species).save( failOnError: true)
-	    } else {
-	        if(media.species != species) {
-	            media.species = null
-				media.save( failOnError: true)
-	        }
-	    }
-	    return media
-	}
-	
-	
-	def getCellSource( String samplePrepUser, GrowthMedia growthMedia, Strain strain, User provider, Inventory inventory, Tissue tissue) {
-	    if (!strain) {
-	        return null
-	    }
-		def prepUser = getUser(samplePrepUser)
-	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, prepUser: prepUser, inventory: inventory, tissue: tissue).save( failOnError: true)
-	    return cellSource
-	}
-	
-	def addTreatment(CellSource cellSource, String perturbStr) {
-	    if(perturbStr == null) {
-	        return null
-	    }
-	    def perturbation = CellSourceTreatment.findByName(perturbStr)
-	    if(!perturbation) {
-	        perturbation = new CellSourceTreatment(name: perturbStr).save(failOnError: true)
-	    }
-	    if(perturbation && cellSource) {
-            if (!CellSourceTreatments.findByCellSourceAndTreatment(cellSource, perturbation)) {
-                new CellSourceTreatments(cellSource: cellSource, treatment: perturbation).save( failOnError: true)
-            }			
-		} 
 	}
     
     def getProtocolInstanceSummary(String chipUser, String chipDate, String v, String resin, String PCRCycle, Assay assay){

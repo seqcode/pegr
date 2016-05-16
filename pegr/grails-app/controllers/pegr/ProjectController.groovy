@@ -173,7 +173,7 @@ class ProjectController {
     
     def saveNewSamples(Long assayId, Long projectId, SampleListCommand samples) {
         try {
-            projectService.saveNewSamples(assayId, projectId, samples)
+            sampleService.saveNewSamples(assayId, projectId, samples)
             flash.message = "New samples added!"
             redirect(action: "show, id: projectId")
         } catch(ProjectException e) {

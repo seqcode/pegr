@@ -15,11 +15,16 @@ class SampleService {
             throw new ProjectException(message: "Project not found!")
         }
         samples.each { data ->
+            // save cell source
+            def prepUser = User.get(data.prepUserId)
+            def growthMedia
+            def strain
+            def provider = User.get(data.providerId)
+            def tissue
+            def cellSource = getCellSource(prepUser, growthMedia, strain, provider, tissue)
             // save sample
-            def cellSource = new CellSource(providerUser: providerId)
-            def sample = new Sample(sendDataTo)
-            data.providerId
-            data.sendToId
+            def dataTo = User.get(data.sendToId)
+            def sample = getSample(cellSource, antibody, target, cellNum, chromAmount, volume, requestedTagNum, sampleNotes, dataTo, abNotes)
             // add sample to the project
             addSampleToProject(project, sample)
         }
@@ -87,11 +92,11 @@ class SampleService {
 	}
 	
     @Transactional
-	def getCellSource(User prepUser, GrowthMedia growthMedia, Strain strain, User provider, Inventory inventory, Tissue tissue) {
+	def getCellSource(User prepUser, GrowthMedia growthMedia, Strain strain, User provider, Tissue tissue) {
 	    if (!strain) {
 	        return null
 	    }		
-	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, prepUser: prepUser, inventory: inventory, tissue: tissue).save( failOnError: true)
+	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, prepUser: prepUser,  tissue: tissue).save( failOnError: true)
 	    return cellSource
 	}
 	
@@ -111,7 +116,7 @@ class SampleService {
 	}
     
     @Transactional
-    def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId, String abNotes) {
+    def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, User dataTo, String abNotes) {
         def now = new Date()
 	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: sampleNotes, status: SampleStatus.CREATED, date: now, sendDataTo: dataTo, antibodyNotes: abNotes).save(failOnError: true)
 	    return sample

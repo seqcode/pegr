@@ -32,7 +32,7 @@
             <thead>
                 <tr>
                     <th></th>
-                    <th colspan="16" id="sample-group" class="sample">Sample</th>
+                    <th colspan="17" id="sample-group" class="sample">Sample</th>
                     <th colspan="12" id="antibody-group" class="antibody">Antibody</th>
                     <th colspan="4" id="target-group" class="target">Target</th>
                 </tr>
@@ -46,6 +46,7 @@
                     <th>Strain</th>
                     <th>Genotype</th>
                     <th>Mutation</th>
+                    <th>Tissue</th>
                     <th>Prep User</th>
                     <th>Growth Media</th>
                     <th>Treatments</th>                       
@@ -91,28 +92,31 @@
                         </select>
                     </td>
                     <td>
-                        <select name="sample[].speciesId" onchange="speciesChanged(this.value);" class="species tag-select2" style="width: 150px">
+                        <select name="sample[].speciesId" class="species tag-select2" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="sample[].parentStrain" onchange="parentStrainChanged(this.value);" class="parent-strain tag-select2" style="width: 150px">
+                        <select name="sample[].parentStrain" class="parent-strain tag-select2" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="sample[].strain" onchange="strainChanged(this.value);" class="strain tag-select2" style="width: 150px" required>
+                        <select name="sample[].strain" class="strain tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="sample[].genotype" onchange="genotypeChanged(this.value);" class="genotype tag-select2" style="width: 300px">
+                        <select name="sample[].genotype" class="genotype tag-select2" style="width: 300px">
                             <option></option>
                         </select></td>
                     <td>
                         <select name="sample[].mutation" class="mutation tag-select2" style="width: 150px">
                             <option></option>
                         </select>
+                    </td>
+                    <td>
+                        <g:select name="sample[].tissue" from="${pegr.Tissue.list()}" optionKey="id" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
                     </td>
                     <td>
                         <select class="prepUser" name="sample[].prepUserId" style="width: 150px" >
@@ -156,7 +160,7 @@
                         <g:select name="sample[].abHostId" from="${pegr.AbHost.list()}" optionKey="id" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
                     </td>
                     <td>
-                        <select class="immunogene" name="sample[].immunogene" onchange="immunogeneChanged(this.value);" style="width: 150px">
+                        <select class="immunogene" name="sample[].immunogene" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
@@ -172,7 +176,7 @@
                     <td><input name="sample[].ugPerChip"></td>
                     <td><input name="sample[].ulPerChip"></td>
                     <td>
-                        <g:select name="sample[].targetTypeId" from="${pegr.TargetType.list()}" optionKey="id" noSelection="['': '']" onchange="targetTypeChanged(this.value);" class="target-type tag-select2" style="width: 150px"></g:select>
+                        <g:select name="sample[].targetTypeId" from="${pegr.TargetType.list()}" optionKey="id" noSelection="['': '']" class="target-type tag-select2" style="width: 150px"></g:select>
                     </td>
                     <td>
                         <select name="sample[].target" class="target tag-select2" style="width: 150px" required>
@@ -293,14 +297,15 @@
     
     // ajax calls in cascade selections
     $(".genus").on("change", function() {
-        $(this).addClass("test");
-        var $species = $(this).closest("tr").find(".species");
+        var genus = $(this).val();
+        
+        var $species = $(this).closest("tr").find(".species");        
         $species.html('').select2({
             data: [{id: '', text: ''}],
             tags: true,
             placeholder: tagPlaceholder
         });
-        $.ajax({url: "/pegr/cellSource/fetchSpeciesAjax?genus="+$(this).val(), success: function(result){
+        $.ajax({url: "/pegr/cellSource/fetchSpeciesAjax?genus="+genus, success: function(result){
             $species.select2({
                 data: result,
                 tags: true,
@@ -310,99 +315,121 @@
         $species.prop("disabled", false);
     });
     
-    function speciesChanged(speciesId) {
-        $("#parent-strain").html('').select2({
+    $(".species").on("change", function() {
+        var speciesId = $(this).val();
+        
+        var $parentStrain = $(this).closest("tr").find(".parent-strain");
+        $parentStrain.html('').select2({
             data: [{id: '', text: ''}],
             tags: true,
             placeholder: tagPlaceholder
         });
         $.ajax({url: "/pegr/cellSource/fetchParentStrainAjax?speciesId="+speciesId, success: function(parents){
-            $("#parent-strain").select2({
+            $parentStrain.select2({
                 data: parents,
                 tags: true,
                 placeholder: tagPlaceholder
             });
         }});
-        $("#parent-strain").prop("disabled", false);
+        $parentStrain.prop("disabled", false);
         
-        $("#growth-media").html('').select2({
+        var $growthMedia = $(this).closest("tr").find(".growth.media");
+        $growthMedia.html('').select2({
             data: [{id: '', text: ''}],
             tags: true,
             placeholder: tagPlaceholder
         });
         
         $.ajax({url: "/pegr/cellSource/fetchGrowthMediaAjax?speciesId="+speciesId, success: function(medias){
-            $("#growth-media").select2({
+            $growthMedia.select2({
                 data: medias,
                 tags: true,
                 placeholder: tagPlaceholder
             });
         }});
-        $("#growth-media").prop("disabled", false);
+        $growthMedia.prop("disabled", false);
         
-        $("#genomes").html('').select2({
+        var $genomes = $(this).closest("tr").find(".genomes");
+        $genomes.html('').select2({
             data: [{id: '', text: ''}],
         });
         $.ajax({url: "/pegr/cellSource/fetchGenomeAjax?speciesId="+speciesId, success: function(genomes){
-            $("#genomes").select2({
+            $genomes.select2({
                 data: genomes,
                 placeholder: noTagPlaceholder
             });
         }});
-        $("#genomes").prop("disabled", false);
-    }
+        $genomes.prop("disabled", false);
+    });
             
-    function parentStrainChanged(parentStrain) {
-        $("#strain").html('').select2({
+    $(".parent-strain").on("change", function() {
+        var parentStrain = $(this).val();
+        var speciesId = $(this).closest("tr").find(".species").val();
+        
+        var $strain = $(this).closest("tr").find(".strain")
+        $strain.html('').select2({
             data: [{id: '', text: ''}],
             tags: true,
             placeholder: tagPlaceholder
         });
-        var speciesId = $("#species").val()
+        
         $.ajax({url: "/pegr/cellSource/fetchStrainNameAjax?parentStrain="+parentStrain+"&speciesId="+speciesId, success: function(result){
-            $("#strain").select2({
+            $strain.select2({
                 data: result,
                 tags: true,
                 placeholder: tagPlaceholder
             });
         }});
-        $("#strain").prop("disabled", false);
-    }
+        $strain.prop("disabled", false);
+    });
     
-    function strainChanged(strainName) {
-        $("#genotype").html('').select2({
+    $(".strain").on("change", function(){
+        var strainName = $(this).val();
+        
+        var $genotype = $(this).closest("tr").find(".genotype");
+        $genotype.html('').select2({
             data: [{id: '', text: ''}],
             tags: true,
             placeholder: tagPlaceholder
         });
         $.ajax({url: "/pegr/cellSource/fetchGenotypeAjax?strainName="+strainName, success: function(result){
-            $("#genotype").select2({
+            $genotype.select2({
                 data: result,
                 tags: true,
                 placeholder: tagPlaceholder
             });
         }});
-        $("#genotype").prop("disabled", false);
-    }
+        $genotype.prop("disabled", false);
+    });
     
-    function genotypeChanged(genotype) {
-        $("#mutation").html('').select2({
+    $(".genotype").on("change", function() {
+        var strainName = $(this).closest("tr").find(".strain").val();
+        var genotype = $(this).val();
+        
+        $mutation = $(this).closest("tr").find(".mutation");
+        $mutation.html('').select2({
             data: [{id: '', text: ''}],
             tags: true,
             placeholder: tagPlaceholder
         });
         var strainName = $("#strain").val()
         $.ajax({url: "/pegr/cellSource/fetchMutationAjax?strainName="+strainName+"&genotype="+genotype, success: function(result){
-            $("#mutation").select2({
+            $mutation.select2({
                 data: result,
                 tags: true,
                 placeholder: tagPlaceholder
             });
         }});
-        $("#mutation").prop("disabled", false);
-    }
+        $mutation.prop("disabled", false);
+    });
     
-    function immunogeneChanged(immunogene) {
+    $(".immunogene").on("change", function() {
+        var immunogene = $(this).val();
+        
+        var $targetType = $(this).closest("tr").find(".target-type");
+        var $target = $(this).closest("tr").find(".target");
+        var $cterm = $(this).closest("tr").find(".cterm");
+        var $nterm = $(this).closest("tr").find(".nterm");
         $.ajax({url: "/pegr/cellSource/fetchDefaultTargetAjax?immunogene="+immunogene, success: function(result){
             $("#target-type").val(result.targetTypeId);
             $("#target-type").prop("disabled", false);
@@ -411,30 +438,35 @@
             $("#cterm").val(result.cterm);
             $("#nterm").val(result.nterm);
         }});
-    }
+    });
                 
-    function targetTypeChanged(targetTypeId) {
+    $(".target-type").on("change", function() {
+        var targetTypeId = $(this).val();
+                
+        var $target = $(this).closest("tr").find(".target");
+        var $cterm = $(this).closest("tr").find(".cterm");
+        var $nterm = $(this).closest("tr").find(".nterm");
         $.ajax({url: "/pegr/cellSource/fetchTargetAjax?targetTypeId="+targetTypeId, success: function(result){
-            $("#target").select2({
+            $target.select2({
                 data: result.targets,
                 tags: true,
                 placeholder: tagPlaceholder
             });
-            $("#nterm").select2({
+            $nterm.select2({
                 data: result.nterms,
                 tags: true,
                 placeholder: tagPlaceholder
             });
-            $("#cterm").select2({
+            $cterm.select2({
                 data: result.cterms,
                 tags: true,
                 placeholder: tagPlaceholder
             });
         }});
-        $("#target").prop("disabled", false);
-        $("#nterm").prop("disabled", false);
-        $("#cterm").prop("disabled", false);
-    }
+        $target.prop("disabled", false);
+        $nterm.prop("disabled", false);
+        $cterm.prop("disabled", false);
+    });
 
     // remove row
     $("a.removeRow").click(function(event){
@@ -445,26 +477,42 @@
     // add new row at the bottom and copy the value of last row
     var count = 1;
     $("#add").click(function() {
-        var oldVal = [];
-        $('tbody>tr:last select').each(function(index){
-           oldVal.push($(this).val()); 
-        });
+        $orig = $("#tr"+count);
         count++;
+        
+        $('select', $orig).each(function(index){
+           $(this).select2("destroy");
+        });
         $('tbody').append(
             $('<tr/>')
                 .attr("id", "tr"+count)
-                .append($('tbody>tr:last>*').clone(false))
+                .append(
+                    $orig.children().clone(true))
         );
         
-        // activate select2 for the new row
-        $('tbody>tr:last .select2').remove();
-        initializeSelect2s(count);
-
-        // copy the values from the last row to the new row
+        /*
         $('tbody>tr:last select').each(function(index){
-           $(this).val(oldVal[index]); 
+           $(this).select2("destroy");
+        });
+        $("#tr2 .provider").val($("#tr1 .provider").val());
+
+        $('#tr1 select').each(function(index){
+           $(this).select2();
+        });
+        
+        $('#tr2 select').each(function(index){
+           $(this).select2();
+        });
+        
+        $('tbody>tr:last .data').each(function(index){
+           oldVal[index] = $(this).val(); 
         });
 
+        // copy the values from the last row to the new row
+        $('tbody>tr:last .data').each(function(index){
+           $(this).val(oldVal[index]); 
+        });
+        */
         return false;
     });
 

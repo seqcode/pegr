@@ -88,7 +88,7 @@ class CsvConvertService {
         def growthMedia = sampleService.getGrowthMedia(data.growthMedia, species)
 
         def inventory = getInventory(data.dateReceived, data.receivingUser, data.inOrExternal, data.inventoryNotes)
-        def prepUser = getUser(samplePrepUser)
+        def prepUser = getUser(data.samplePrepUser)
         def cellSource = sampleService.getCellSource(prepUser, growthMedia, strain, cellProvider, inventory, tissue)
 
         sampleService.addTreatment(cellSource, data.perturbation1)

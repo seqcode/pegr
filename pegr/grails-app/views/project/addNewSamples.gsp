@@ -77,17 +77,17 @@
                 <tr id="tr1">
                     <td><a href="#" class="removeRow"><span class="glyphicon glyphicon-trash"></span></a></td>
                     <td>
-                        <select class="provider" name="sample[].providerId" style="width: 150px">
+                        <select class="provider no-tag-select2" name="sample[].providerId" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select class="sendTo" name="sample[].sendToId" style="width: 150px">
+                        <select class="sendTo no-tag-select2" name="sample[].sendToId" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select class="genus" name="sample[].genus" style="width: 150px">
+                        <select class="genus tag-select2" name="sample[].genus" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
@@ -119,7 +119,7 @@
                         <g:select name="sample[].tissue" from="${pegr.Tissue.list()}" optionKey="id" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
                     </td>
                     <td>
-                        <select class="prepUser" name="sample[].prepUserId" style="width: 150px" >
+                        <select class="prepUser no-tag-select2" name="sample[].prepUserId" style="width: 150px" >
                             <option></option>
                         </select>
                     </td>
@@ -129,7 +129,7 @@
                         </select>
                     </td>
                     <td>
-                        <select multiple="multiple" class="treatments" name="sample[].treatmentId" style="width: 300px">
+                        <select multiple="multiple" class="treatments tag-select2" name="sample[].treatmentId" style="width: 300px">
                             <option></option>
                         </select>
                     </td>
@@ -144,12 +144,12 @@
                     <td><g:textField name="note" style="width: 500px"></g:textField></td>
 
                     <td>
-                        <select class="company" name="sample[].companyId" style="width: 200px">
+                        <select class="company tag-select2" name="sample[].companyId" style="width: 200px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select class="catalog" name="sample[].catalogNumber" style="width: 150px" required>
+                        <select class="catalog tag-select2" name="sample[].catalogNumber" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
@@ -160,7 +160,7 @@
                         <g:select name="sample[].abHostId" from="${pegr.AbHost.list()}" optionKey="id" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
                     </td>
                     <td>
-                        <select class="immunogene" name="sample[].immunogene" style="width: 150px">
+                        <select class="immunogene tag-select2" name="sample[].immunogene" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
@@ -333,7 +333,7 @@
         }});
         $parentStrain.prop("disabled", false);
         
-        var $growthMedia = $(this).closest("tr").find(".growth.media");
+        var $growthMedia = $(this).closest("tr").find(".growth-media");
         $growthMedia.html('').select2({
             data: [{id: '', text: ''}],
             tags: true,
@@ -431,12 +431,12 @@
         var $cterm = $(this).closest("tr").find(".cterm");
         var $nterm = $(this).closest("tr").find(".nterm");
         $.ajax({url: "/pegr/cellSource/fetchDefaultTargetAjax?immunogene="+immunogene, success: function(result){
-            $("#target-type").val(result.targetTypeId);
-            $("#target-type").prop("disabled", false);
+            $targetType.val(result.targetTypeId);
+            $targetType.prop("disabled", false);
             
-            $("#target").val(result.target);
-            $("#cterm").val(result.cterm);
-            $("#nterm").val(result.nterm);
+            $target.val(result.target);
+            $cterm.val(result.cterm);
+            $nterm.val(result.nterm);
         }});
     });
                 
@@ -477,7 +477,7 @@
     // add new row at the bottom and copy the value of last row
     var count = 1;
     $("#add").click(function() {
-        $orig = $("#tr"+count);
+        var $orig = $("#tr"+count);
         count++;
         
         $('select', $orig).each(function(index){
@@ -489,30 +489,39 @@
                 .append(
                     $orig.children().clone(true))
         );
-        
-        /*
-        $('tbody>tr:last select').each(function(index){
-           $(this).select2("destroy");
-        });
-        $("#tr2 .provider").val($("#tr1 .provider").val());
 
-        $('#tr1 select').each(function(index){
-           $(this).select2();
+        var $cloned = $("#tr"+count)
+        $('select', $cloned).each(function(index){
+            $(this).val($('select', $orig).eq(index).val());
+        });
+        $('input', $cloned).each(function(index){
+            $(this).val($('select', $orig).eq(index).val());
         });
         
-        $('#tr2 select').each(function(index){
-           $(this).select2();
+        $('.tag-select2', $orig).each(function(index){
+           $(this).select2({            
+               tags: true,
+               placeholder: tagPlaceholder});
         });
-        
-        $('tbody>tr:last .data').each(function(index){
-           oldVal[index] = $(this).val(); 
+        $('.tag-select2', $cloned).each(function(index){
+           $(this).select2({
+                tags: true,
+                placeholder: tagPlaceholder
+           });
+        });
+           
+        $('.no-tag-select2', $orig).each(function(index){
+           $(this).select2({            
+               tags: false,
+               placeholder: noTagPlaceholder});
+        });
+        $('.no-tag-select2', $cloned).each(function(index){
+           $(this).select2({
+                tags: false,
+                placeholder: noTagPlaceholder
+           });
         });
 
-        // copy the values from the last row to the new row
-        $('tbody>tr:last .data').each(function(index){
-           $(this).val(oldVal[index]); 
-        });
-        */
         return false;
     });
 

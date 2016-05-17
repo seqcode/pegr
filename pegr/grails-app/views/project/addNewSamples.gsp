@@ -23,9 +23,9 @@
     <g:hiddenField name="assayId" value="${assay?.id}"></g:hiddenField>
     <g:hiddenField name="projectId" value="${project?.id}"></g:hiddenField>
     <ul class="nav nav-pills">
-        <li><a href="#sample-group" class="btn btn-default">Sample</a></li>
-        <li><a href="#antibody-group" class="btn btn-default">Antibody</a></li>
-        <li><a href="#target-group" class="btn btn-default">Target</a></li>
+        <li><a href="#sample-group" class="btn btn-default sample">Sample</a></li>
+        <li><a href="#antibody-group" class="btn btn-default antibody">Antibody</a></li>
+        <li><a href="#target-group" class="btn btn-default target">Target</a></li>
     </ul>
     <div class="table-responsive">
         <table class="table table-striped table-bordered" style="margin-bottom: 200px">

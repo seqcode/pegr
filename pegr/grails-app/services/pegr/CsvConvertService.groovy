@@ -11,6 +11,7 @@ class CsvConvertException extends RuntimeException {
     
 class CsvConvertService {
     def sampleService
+    def antibodyService
 	
 	def migrate(String filename, RunStatus runStatus, int startLine, int endLine, boolean basicCheck){
 		
@@ -89,7 +90,7 @@ class CsvConvertService {
 
         def inventory = getInventory(data.dateReceived, data.receivingUser, data.inOrExternal, data.inventoryNotes)
         def prepUser = getUser(data.samplePrepUser)
-        def cellSource = sampleService.getCellSource(prepUser, growthMedia, strain, cellProvider, inventory, tissue)
+        def cellSource = getCellSource(prepUser, growthMedia, strain, cellProvider, inventory, tissue)
 
         sampleService.addTreatment(cellSource, data.perturbation1)
         sampleService.addTreatment(cellSource, data.perturbation2)
@@ -392,6 +393,14 @@ class CsvConvertService {
         return prtcl
     }
 	
+    def getCellSource(User prepUser, GrowthMedia growthMedia, Strain strain, User provider, Inventory inventory, Tissue tissue) {
+	    if (!strain) {
+	        return null
+	    }
+	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, prepUser: prepUser, inventory: inventory, tissue: tissue).save( failOnError: true)
+	    return cellSource
+	}
+    
 	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId, String abNotes) {
 	    def note = [:]
 	    if (sampleNotes) {

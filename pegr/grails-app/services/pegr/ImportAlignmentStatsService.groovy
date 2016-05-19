@@ -5,7 +5,7 @@ import groovy.json.*
     
 class ImportAlignmentStatsService {
     ImportAlignmentStatsService() {}
-    
+ /*   
     void migrateSampleStats(String filename, int startLine, int endLine) {
         def lineNo = 0    
         
@@ -112,6 +112,7 @@ class ImportAlignmentStatsService {
 		        continue
 		    }   
 		}
+
     }
     
     
@@ -275,5 +276,5 @@ class ImportAlignmentStatsService {
             repeatedRegions       : getInteger(data[18]),  
         ]
     }
-    
+*/    
 }

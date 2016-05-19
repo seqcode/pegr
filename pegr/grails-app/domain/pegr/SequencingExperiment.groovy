@@ -6,7 +6,13 @@ class SequencingExperiment {
 	String publicDbId
     String readPositions
 	String note
-	ReadType readType
+	ReadType readType 
+    
+    String fastqFile
+    String fastqcReport
+    Integer totalReads
+    Integer indexMismatch
+    Integer adapterCount
 	
     List getAlignments() {
         return SequenceAlignment.where{sequencingExperiment == this}.list()
@@ -27,5 +33,11 @@ class SequencingExperiment {
         readType nullable: true
 		note nullable: true, blank: true
 		publicDbId nullable: true, blank: true
+                
+        fastqFile nullable: true, blank: true, maxSize: 1000
+        fastqcReport nullable: true, blank: true, maxSize: 1000
+        totalReads nullable: true
+        indexMismatch nullable: true
+        adapterCount nullable: true
 	}
 }

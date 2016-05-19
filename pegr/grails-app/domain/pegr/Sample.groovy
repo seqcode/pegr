@@ -22,6 +22,7 @@ class Sample {
     List bags
     String source
     String sourceId
+    Assay assay
     
     static hasMany = [bags: ProtocolInstanceBag]
     
@@ -80,6 +81,7 @@ class Sample {
         source nullable: true
         sourceId nullable: true
         antibodyNotes nullable: true, blank: true
+        assay nullable: true
     }
     
     static mapping = {

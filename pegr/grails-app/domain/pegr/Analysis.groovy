@@ -16,7 +16,7 @@ class Analysis {
         pipeline nullable: true
         workflowId nullable: true, blank: true
         parameters nullable: true, blank: true
-        statistics nallable: true, blank: true
+        statistics nullable: true, blank: true
         datasets nullable: true, blank: true
         note nullable: true, blank: true
     }

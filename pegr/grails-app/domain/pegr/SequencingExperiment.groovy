@@ -10,9 +10,9 @@ class SequencingExperiment {
     
     String fastqFile
     String fastqcReport
-    Integer totalReads
+    Long totalReads
     Integer indexMismatch
-    Integer adapterCount
+    Long adapterCount
 	
     List getAlignments() {
         return SequenceAlignment.where{sequencingExperiment == this}.list()

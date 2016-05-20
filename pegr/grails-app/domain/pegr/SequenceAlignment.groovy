@@ -12,9 +12,9 @@ class SequenceAlignment {
     
     String bamFile
     String peHistogram
-    Integer mappedReads
-    Integer uniquelyMappedReads
-    Integer dedupUniquelyMappedReads
+    Long mappedReads
+    Long uniquelyMappedReads
+    Long dedupUniquelyMappedReads
     Float seqDuplicationLevel
 	Float avgInsertSize
     Float stdDevInsertSize

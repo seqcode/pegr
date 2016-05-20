@@ -2838,5 +2838,5 @@ databaseChangeLog = {
 
 	include file: 'removeSeqIdFromExp.groovy'
 
-	include file: 'changeAlignmentAndDownstream.groovy'
+	include file: 'addAnalysis.groovy'
 }

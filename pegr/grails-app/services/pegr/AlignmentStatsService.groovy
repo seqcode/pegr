@@ -11,8 +11,8 @@ class AlignmentStatsService {
     
     @Transactional
     def save(StatsRegistrationCommand data, String apiUser) {
-        log.error data.run
         def pipeline = getPipeline(apiUser)
+        
         // check required fields
         def requiredFields = ["run", "sample", "genome", "toolId", "workflowId", "toolCategory"]
         requiredFields.each { field ->
@@ -37,19 +37,31 @@ class AlignmentStatsService {
         def analysis = new Analysis(alignment: alignment,
                                     tool: data.toolId,
                                     pipeline: pipeline,
-                                    category: data.toolCategrory,
+                                    category: data.toolCategory,
                                     workflowId: data.workflowId,
                                     parameters: data.parameters,
-                                    statistics: data.statistics,
-                                    datasets: data.datasets)
-        analysis.save()
+                                    statistics: JsonOutput.toJson(data.statistics),
+                                    datasets: JsonOutput.toJson(data.datasets))
+        analysis.save(failOnError: true)
+        if (!analysis.save()) {
+            log.error analysis.errors
+            throw new AlignmentStatsException(message: "Error saving the analysis ${analysis}!")
+        }
 
         // store named fields
         if (data.statistics) {
-            copyProperties(data.statistics, alignment)
-            alignment.save()
-
-            copyProperties(data.statistics, experiment)
+            def updatedInAlignment = copyProperties(data.statistics, alignment)
+            if (updatedInAlignment.size() > 0) {
+                if (!alignment.save()) {
+                    log.error "Error saving ${updatedInAlignment} in Alignment!"
+                }
+            } 
+            def updatedInExperiment = copyProperties(data.statistics, experiment)
+            if (updatedInExperiment.size() > 0) {
+                if (!experiment.save()) {
+                    log.error "Error saving ${updatedInExperiment} in Experiment!"
+                }
+            } 
             experiment.save()   
         }
 
@@ -63,8 +75,8 @@ class AlignmentStatsService {
     
     def copyProperties(source, target) {
         def updatedProperties = []
-        source.properties.each { key, value ->
-            if ( ! (key in ['run', 'sample', 'genome', 'class', 'metaClass']) && target.hasProperty(key) && value) {
+        source.each { key, value ->
+            if (target.hasProperty(key) && value) {
                 target[key] = value
                 updatedProperties.push(key)
             }

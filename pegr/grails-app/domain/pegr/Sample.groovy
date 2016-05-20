@@ -6,10 +6,10 @@ class Sample {
 	Antibody antibody
     String antibodyNotes
 	Target target
-	Integer requestedTagNumber
-	Integer chromosomeAmount // in ug
-	Integer cellNumber // in M
-	Integer volume //ul per aliqu used for the assay
+	Long requestedTagNumber
+	Float chromosomeAmount // in ug
+	Long cellNumber // in M
+	Float volume //ul per aliqu used for the assay
 	String publicationReference
 	SampleStatus status
     Date date

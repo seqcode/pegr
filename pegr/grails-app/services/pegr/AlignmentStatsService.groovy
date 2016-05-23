@@ -42,7 +42,6 @@ class AlignmentStatsService {
                                     parameters: data.parameters,
                                     statistics: JsonOutput.toJson(data.statistics),
                                     datasets: JsonOutput.toJson(data.datasets))
-        analysis.save(failOnError: true)
         if (!analysis.save()) {
             log.error analysis.errors
             throw new AlignmentStatsException(message: "Error saving the analysis ${analysis}!")
@@ -62,7 +61,6 @@ class AlignmentStatsService {
                     log.error "Error saving ${updatedInExperiment} in Experiment!"
                 }
             } 
-            experiment.save()   
         }
 
         return        
@@ -76,7 +74,7 @@ class AlignmentStatsService {
     def copyProperties(source, target) {
         def updatedProperties = []
         source.each { key, value ->
-            if (target.hasProperty(key) && value) {
+            if (target.hasProperty(key) && value != null) {
                 target[key] = value
                 updatedProperties.push(key)
             }

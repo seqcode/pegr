@@ -5,7 +5,7 @@ import groovy.json.*
     
 class ImportAlignmentStatsService {
     ImportAlignmentStatsService() {}
- /*   
+    
     void migrateSampleStats(String filename, int startLine, int endLine) {
         def lineNo = 0    
         
@@ -37,36 +37,22 @@ class ImportAlignmentStatsService {
                 def alignment = SequenceAlignment.findBySequencingExperiment(experiment)
 
                 if (alignment) {
+                    // experiment
+                    experiment.indexMismatch = data.indexMismatch
+                    experiment.totalReads = data.totalReads
+                    experiment.adapterCount = data.adapterCount 
+                    experiment.save(flush: true)
+                    
+                    // alignment
+                    alignment.mappedReads = data.mappedReads 
+                    alignment.uniquelyMappedReads = data.uniquelyMappedReads
+                    alignment.dedupUniquelyMappedReads = data.dedupUniquelyMappedReads 
+                    alignment.avgInsertSize = data.avgInsertSize 
+
                     def params = [:]
                     if (data.ALIGNER_PARAMETERS == "-m 1") {
                         params["aligner"] = "-m 1"
                     } 
-                    def stats = alignment.alignmentStats
-                    if (stats) {
-                        stats.indexMismatch = data.indexMismatch
-                        stats.totalReads = data.totalReads
-                        stats.mappedReads = data.mappedReads 
-                        stats.uniquelyMappedReads = data.uniquelyMappedReads
-                        stats.spikeInCount = data.spikeInCount 
-                        stats.adapterCount = data.adapterCount 
-                        stats.dedupUniquelyMappedReads = data.dedupUniquelyMappedReads 
-                        stats.avgInsertSize = data.avgInsertSize 
-                        stats.ipStrength = data.ipStrength 
-                        stats.save()
-                    } else {
-                        alignment.alignmentStats = new AlignmentStats(
-                                indexMismatch: data.indexMismatch, 
-                                totalReads: data.totalReads,
-                                mappedReads: data.mappedReads, 
-                                uniquelyMappedReads: data.uniquelyMappedReads,
-                                spikeInCount: data.spikeInCount,
-                                adapterCount: data.adapterCount,
-                                dedupUniquelyMappedReads: data.dedupUniquelyMappedReads, 
-                                avgInsertSize: data.avgInsertSize,
-                                ipStrength: data.ipStrength 
-                            
-                        ).save(flush: true)
-                    }
                     
                     switch (data.ALIGNER_SOFTWARE) {
                         case "BWA":
@@ -106,6 +92,19 @@ class ImportAlignmentStatsService {
                     }
                     alignment.params = JsonOutput.toJson(params)
                     alignment.save()
+                    
+                    def stats = [:]
+                    if (data.spikeInCount) {
+                        stats["spikeInCount"] = data.spikeInCount 
+                    }
+                    if (data.ipStrength) {
+                        stats["ipStrength"] = data.ipStrength 
+                    }
+                    if (stats.size > 0) {
+                        new Analysis(alignment: alignment,
+                                     tool:"Unkonwn",
+                                     statistics: JsonOutput.toJson(stats)).save()
+                    }
                 }
 		 	}catch(Exception e) {
 		        log.error "Error: line ${lineNo}. " + e
@@ -146,41 +145,20 @@ class ImportAlignmentStatsService {
                 def alignment = SequenceAlignment.findBySequencingExperiment(experiment)
 
                 if (alignment) {
-                    def stats = alignment.alignmentStats
-                    if (stats) {
-                        stats.peakFilePath = data.peakFilePath
-                        stats.peaks = data.peaks 
-                        stats.singletons = data.singletons
-                        stats.peakMedian = data.peakMedian
-                        stats.peakMean = data.peakMean
-                        stats.peakMedianStd = data.peakMedianStd
-                        stats.peakMeanStd = data.peakMeanStd
-                        stats.medianTagSingletons = data.medianTagSingletons
-                        stats.peakPairNos = data.peakPairNos
-                        stats.peakPairWis = data.peakPairWis
-                        stats.genomeCoverage = data.genomeCoverage
-                        stats.seqDuplicationLevel = data.seqDuplicationLevel
-                        stats.tssProximal = data.tssProximal
-                        stats.tssDistal = data.tssDistal
-                        stats.repeatedRegions = data.repeatedRegions
-                        stats.save()
-                    } else {
-                        alignment.alignmentStats = new AlignmentStats(
-                            peakFilePath : data.peakFilePath,
-                            peaks : data.peaks ,
-                            singletons : data.singletons,
-                            peakMedian : data.peakMedian,
-                            peakMean : data.peakMean,
-                            peakMedianStd : data.peakMedianStd,
-                            peakMeanStd : data.peakMeanStd,
-                            medianTagSingletons : data.medianTagSingletons,
-                            peakPairNos : data.peakPairNos,
-                            peakPairWis : data.peakPairWis,
-                            genomeCoverage : data.genomeCoverage,
-                            seqDuplicationLevel : data.seqDuplicationLevel,
-                            tssProximal : data.tssProximal,
-                            tssDistal : data.tssDistal,
-                            repeatedRegions : data.repeatedRegions).save(flush: true)
+                    alignment.genomeCoverage = data.genomeCoverage
+                    alignment.seqDuplicationLevel = data.seqDuplicationLevel
+                    alignment.save()
+                    
+                    def stats = [:]
+                    ["peakFile", "peaks", "singletons", "peakMedian", "peakMean", "peakMedianStd", "peakMeanStd", "MedianTagSingletons", "peakPairNos", "peakPairWis", "tssProximal", "tssDistal", "repeatedRegions"].each { property ->
+                        if (data[property]) {
+                            stats[property] = data[property]
+                        }
+                    }
+                    if (stats.size() > 0) {
+                        new Analysis(alignment: alignment,
+                                     tool:"Unkonwn",
+                                     statistics: JsonOutput.toJson(stats)).save()
                     }
                 }
             }catch(Exception e) {
@@ -258,7 +236,7 @@ class ImportAlignmentStatsService {
             PEAK_ID               : data[0],  
             SUMMARY_REPORT        : data[1],  
             PEAK_NAME             : data[2],  
-            peakFilePath          : data[3],  
+            peakFile              : data[3],  
             peaks                 : getInteger(data[4]),  
             singletons            : getInteger(data[5]),  
             peakMedian            : getFloat(data[6]),  
@@ -276,5 +254,5 @@ class ImportAlignmentStatsService {
             repeatedRegions       : getInteger(data[18]),  
         ]
     }
-*/    
+    
 }

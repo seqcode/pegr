@@ -24,7 +24,6 @@
         <ul class="nav nav-tabs">
             <li class="active"><a data-toggle="tab" href="#sample">Sample Information</a></li>
             <li><a data-toggle="tab" href="#alignment">Alignment</a></li>
-            <li><a data-toggle="tab" href="#peak">Peak Statistics</a></li>
         </ul>
 
         <div class="tab-content">
@@ -33,9 +32,6 @@
             </div>
             <div id="alignment" class="tab-pane fade">
                 <g:render template="/project/alignmentTable" model="['alignmentList':alignments]" />
-            </div>
-            <div id="peak" class="tab-pane fade">
-                <g:render template="/project/peakTable" model="['alignmentList':alignments]" />
             </div>
         </div>
         <div class="pagination">

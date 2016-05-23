@@ -6,14 +6,13 @@
                 <th>Sequence Run</th>
                 <th>Genome</th>
                 <th>Read Count</th>
+                <th>Index Mismatch</th>
+                <th>Adapter Count</th>
                 <th>Mapped Read Count</th>
                 <th>Uniquely Mapped Count</th>
                 <th>Deduplicated Count</th>
-                <th>Index Mismatch</th>
-                <th>Spike-in Count</th>
-                <th>Adapter Count</th>
-                <th>Avg. Insert Size</th>
-                <th>IP Strength</th> 
+                <th>Duplication Level</th>
+                <th>Insert Size</th>
                 <th>Genome Coverage</th>   
             </tr>
         </thead>
@@ -23,16 +22,15 @@
                     <td><g:link controller="sample" action="show" id="${alignment.sequencingExperiment?.sample?.id}">${alignment.sequencingExperiment?.sample?.id}</g:link></td>    
                     <td><g:link controller="sequenceRun" action="show" id="${alignment.sequencingExperiment?.sequenceRun?.id}">${alignment.sequencingExperiment?.sequenceRun?.id} (Old ${alignment.sequencingExperiment?.sequenceRun?.runNum}) </g:link></td>
                     <td>${alignment.genome}</td>
-                    <td>${alignment.alignmentStats?.totalReads}</td>
-                    <td>${alignment.alignmentStats?.mappedReads}</td>
-                    <td>${alignment.alignmentStats?.uniquelyMappedReads}</td>
-                    <td>${alignment.alignmentStats?.dedupUniquelyMappedReads}</td>
-                    <td>${alignment.alignmentStats?.indexMismatch}</td>
-                    <td>${alignment.alignmentStats?.spikeInCount}</td>
-                    <td>${alignment.alignmentStats?.adapterCount}</td>
-                    <td>${alignment.alignmentStats?.avgInsertSize}</td>
-                    <td>${alignment.alignmentStats?.ipStrength}</td>
-                    <td>${alignment.alignmentStats?.genomeCoverage}</td>
+                    <td>${alignment.sequencingExperiment?.totalReads}</td>
+                    <td>${alignment.sequencingExperiment?.indexMismatch}</td>
+                    <td>${alignment.sequencingExperiment?.adapterCount}</td>
+                    <td>${alignment.mappedReads}</td>
+                    <td>${alignment.uniquelyMappedReads}</td>
+                    <td>${alignment.dedupUniquelyMappedReads}</td>
+                    <th>${alignment.seqDuplicationLevel}</th>
+                    <td>${alignment.avgInsertSize} <g:if test="${alignment.stdDevInsertSize}">&plusmn;${alignment.stdDevInsertSize}</g:if></td>
+                    <td>${alignment.genomeCoverage}</td>
                 </tr>
             </g:each>              
             <tr>

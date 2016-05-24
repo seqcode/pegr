@@ -16,12 +16,16 @@ class SampleService {
         }
         samples.each { data ->
             // save cell source
-            def prepUser = User.get(data.prepUserId)
-            def growthMedia
-            def strain
             def provider = User.get(data.providerId)
-            def tissue
+            def sendTo = User.get(data.sendToId)
+            def species = getSpecies(data.genus, data.speciesId)
+            def strain = getStrain(species, data.strain, data.parentStrain, data.genotype, data.mutation)
+            def tissue = getTissue(data.tissue)
+            def prepUser = User.get(data.prepUserId)
+            def growthMedia = getGrowthMedia(data.growthMediaId, species)            
             def cellSource = getCellSource(prepUser, growthMedia, strain, provider, tissue)
+            data.treatments
+            addTreatment(cellSource, treatments)
             // save sample
             def dataTo = User.get(data.sendToId)
             def sample = getSample(cellSource, antibody, target, cellNum, chromAmount, volume, requestedTagNum, sampleNotes, dataTo, abNotes)
@@ -29,6 +33,9 @@ class SampleService {
             addSampleToProject(project, sample)
         }
     }
+    
+    @Transactional
+    def get
     
     @Transactional
     def addSampleToProject(Project project, Sample sample) {
@@ -44,7 +51,7 @@ class SampleService {
         if (!parentStrain) {
                 parentStrain = new Strain(name: parentStrainStr, species: species).save(failOnError: true) 
         }
-        // get strain and tissue        
+        // get strain     
         strain = Strain.findByNameAndParentAndGenotypeAndGeneticModification(strainStr, parentStrain, genotypeStr, mutationStr)
         if (!strain) {
             strain = new Strain(name: strainStr, 
@@ -67,6 +74,9 @@ class SampleService {
 		if (speciesStr == null) {
 			speciesStr = "Unknown"
 		}
+        if (speciesStr.isInteger()) {
+            return Species.get(speciesStr.toInteger())
+        }
 	    def species = Species.findByNameAndGenusName(speciesStr, genusStr)
 	    if(!species) {
 	        species = new Species(name: speciesStr, genusName: genusStr).save( failOnError: true)
@@ -79,6 +89,9 @@ class SampleService {
 	    if(mediaStr == null) {
 	        return null
 	    }
+        if (mediaStr.isInteger()) {
+            return GrowthMedia.get(mediaStr.toInteger())
+        }
 	    def media = GrowthMedia.findByName(mediaStr)
 	    if(!media) {
 	        media = new GrowthMedia(name: mediaStr, species: species).save( failOnError: true)

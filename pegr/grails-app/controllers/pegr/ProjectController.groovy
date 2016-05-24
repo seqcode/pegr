@@ -4,6 +4,7 @@ class ProjectController {
     
 	def springSecurityService
     def projectService
+    def sampleService
 	
     def index(int max, int offset) {
         max = Math.min(max ?:15, 100)
@@ -175,9 +176,10 @@ class ProjectController {
         try {
             sampleService.saveNewSamples(assayId, projectId, samples)
             flash.message = "New samples added!"
-            redirect(action: "show, id: projectId")
+            redirect(action: "show", id: projectId)
         } catch(ProjectException e) {
-            
+            flash.message = e.message
+            redirect(action: "addNewSamples", params:[projectId: projectId, assayId: assayId])
         }
     }
 }

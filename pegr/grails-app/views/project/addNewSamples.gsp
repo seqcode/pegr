@@ -18,6 +18,9 @@
     </style>
 </head>
 <body>
+    <g:if test="${flash.message}">
+        <div class="message" role="status">${flash.message}</div>
+    </g:if>
 <g:form action="saveNewSamples" method="post">
     <h4>Assay: ${assay?.name}</h4>
     <g:hiddenField name="assayId" value="${assay?.id}"></g:hiddenField>
@@ -157,7 +160,7 @@
                         <input name="sample[].lotNumber"/>
                     </td>
                     <td>
-                        <g:select name="sample[].abHostId" from="${pegr.AbHost.list()}" optionKey="id" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
+                        <g:select name="sample[].abHostId" from="${pegr.AbHost.list()}" optionKey="id" noSelection="['':'']" class="tag-select2 host" style="width: 150px"></g:select>
                     </td>
                     <td>
                         <select class="immunogene tag-select2" name="sample[].immunogene" style="width: 150px">
@@ -165,12 +168,12 @@
                         </select>
                     </td>
                     <td>
-                        <g:select name="sample[].clonal" from="${pegr.MonoPolyClonal?.values()}" keys="${pegr.MonoPolyClonal.values()*.name()}" noSelection="['': '']" class="no-tag-select2" style="width: 150px"/>
+                        <g:select name="sample[].clonal" from="${pegr.MonoPolyClonal?.values()}" keys="${pegr.MonoPolyClonal.values()*.name()}" noSelection="['': '']" class="no-tag-select2 clonal" style="width: 150px"/>
                     </td>
                     <td>
-                        <g:select name="sample[].igTypeId" from="${pegr.IgType.list()}" optionKey="id" noSelection="['': '']" class="tag-select2" style="width: 150px"/>
+                        <g:select name="sample[].igTypeId" from="${pegr.IgType.list()}" optionKey="id" noSelection="['': '']" class="tag-select2 ig" style="width: 150px"/>
                     </td>
-                    <td><input name="sample[].concentration" /></td>
+                    <td><input name="sample[].concentration" class="conc"/></td>
                     <td><input name="sample[].abNotes"></td>
                     <td><input name="sample[].abVolumePerSample"></td>
                     <td><input name="sample[].ugPerChip"></td>
@@ -200,7 +203,7 @@
     
     <button id="add" class="pull-right">Add Row</button>
     <div>
-        <g:submitButton name="save" class="btn btn-primary confirm" value="Save"></g:submitButton>
+        <g:submitButton name="save" class="btn btn-primary" value="Save"></g:submitButton>
         <g:link action="show" id="${project.id}" class="btn btn-default">Cancel</g:link>
     </div>
 </g:form>
@@ -211,7 +214,6 @@
     
     $(document).ready(function(){
         $("#nav-projects").addClass("active");
-        $(".confirm").confirm();
         initializeSelect2s(1);
     });
     
@@ -257,7 +259,7 @@
             });
         }})
 
-        $.ajax({url: "/pegr/cellSource/fetchCompanyAjax", success: function(result) {
+        $.ajax({url: "/pegr/antibody/fetchCompanyAjax", success: function(result) {
             $("#tr"+count+" .company").select2({
                 data: result,
                 tags: true,
@@ -265,7 +267,7 @@
             });
         }})
 
-        $.ajax({url: "/pegr/cellSource/fetchCatalogAjax", success: function(result){
+        $.ajax({url: "/pegr/antibody/fetchCatalogAjax", success: function(result){
             $("#tr"+count+" .catalog").select2({
                 data: result,
                 tags: true,
@@ -273,9 +275,28 @@
             });
         }});
 
-        $.ajax({url: "/pegr/cellSource/fetchImmunogeneAjax", success: function(result){
+        $.ajax({url: "/pegr/antibody/fetchImmunogeneAjax", success: function(result){
             $("#tr"+count+" .immunogene").select2({
                 data: result,
+                tags: true,
+                placeholder: tagPlaceholder
+            });
+        }});
+        
+            
+        $.ajax({url: "/pegr/antibody/fetchTargetAjax", success: function(result){
+            $("#tr"+count+" .target").select2({
+                data: result.targets,
+                tags: true,
+                placeholder: tagPlaceholder
+            });
+            $("#tr"+count+" .nterm").select2({
+                data: result.nterms,
+                tags: true,
+                placeholder: tagPlaceholder
+            });
+            $("#tr"+count+" .cterm").select2({
+                data: result.cterms,
                 tags: true,
                 placeholder: tagPlaceholder
             });
@@ -423,49 +444,36 @@
         $mutation.prop("disabled", false);
     });
     
-    $(".immunogene").on("change", function() {
-        var immunogene = $(this).val();
+    $(".catalog").on("change", function() {
+        var catalog = $(this).val();
         
+        var $host = $(this).closest("tr").find(".host");
+        var $immunogene = $(this).closest("tr").find(".immunogene");
+        var $clonal = $(this).closest("tr").find(".clonal");
+        var $ig = $(this).closest("tr").find(".ig");
+        var $conc = $(this).closest("tr").find(".conc");
         var $targetType = $(this).closest("tr").find(".target-type");
         var $target = $(this).closest("tr").find(".target");
         var $cterm = $(this).closest("tr").find(".cterm");
         var $nterm = $(this).closest("tr").find(".nterm");
-        $.ajax({url: "/pegr/cellSource/fetchDefaultTargetAjax?immunogene="+immunogene, success: function(result){
-            $targetType.val(result.targetTypeId);
-            $targetType.prop("disabled", false);
+        
+        $.ajax({url: "/pegr/antibody/fetchAntibodyAjax?catalog="+catalog, success: function(result){
+            $host.val(result.host).trigger("change");
+            $immunogene.val(result.immunogene).trigger("change");
+            $clonal.val(result.clonal).trigger("change");
+            $ig.val(result.ig).trigger("change");
+            $conc.val(result.conc);
             
-            $target.val(result.target);
-            $cterm.val(result.cterm);
-            $nterm.val(result.nterm);
-        }});
-    });
-                
-    $(".target-type").on("change", function() {
-        var targetTypeId = $(this).val();
-                
-        var $target = $(this).closest("tr").find(".target");
-        var $cterm = $(this).closest("tr").find(".cterm");
-        var $nterm = $(this).closest("tr").find(".nterm");
-        $.ajax({url: "/pegr/cellSource/fetchTargetAjax?targetTypeId="+targetTypeId, success: function(result){
-            $target.select2({
-                data: result.targets,
-                tags: true,
-                placeholder: tagPlaceholder
-            });
-            $nterm.select2({
-                data: result.nterms,
-                tags: true,
-                placeholder: tagPlaceholder
-            });
-            $cterm.select2({
-                data: result.cterms,
-                tags: true,
-                placeholder: tagPlaceholder
-            });
-        }});
-        $target.prop("disabled", false);
-        $nterm.prop("disabled", false);
-        $cterm.prop("disabled", false);
+            $targetType.val(result.targetTypeId).trigger("change");
+            $target.val(result.target).trigger("change");
+            $cterm.val(result.cterm).trigger("change");
+            $nterm.val(result.nterm).trigger("change");
+            
+            $targetType.prop("disabled", false);
+            $target.prop("disabled", false);
+            $cterm.prop("disabled", false);
+            $nterm.prop("disabled", false);
+        }});   
     });
 
     // remove row
@@ -477,7 +485,7 @@
     // add new row at the bottom and copy the value of last row
     var count = 1;
     $("#add").click(function() {
-        var $orig = $("#tr"+count);
+        var $orig = $("tr").last(); //$("#tr"+count);
         count++;
         
         $('select', $orig).each(function(index){
@@ -495,7 +503,7 @@
             $(this).val($('select', $orig).eq(index).val());
         });
         $('input', $cloned).each(function(index){
-            $(this).val($('select', $orig).eq(index).val());
+            $(this).val($('input', $orig).eq(index).val());
         });
         
         $('.tag-select2', $orig).each(function(index){

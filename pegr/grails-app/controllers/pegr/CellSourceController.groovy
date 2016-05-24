@@ -6,7 +6,8 @@ class CellSourceController {
     def springSecurityService
     def protocolInstanceBagService
     def cellSourceService
-	
+	def utilityService
+    
     def edit(Long cellSourceId) {
         def cellSource = CellSource.get(cellSourceId)
         if (cellSource) {
@@ -34,30 +35,31 @@ class CellSourceController {
         }
     }
         
+    /* ----------------------------- Ajax ----------------------*/
     def fetchUserAjax() {
         def users = User.list().collect{[it.id, it.toString()]}
-        render arrayToSelect2Data(users) as JSON
+        render utilityService.arrayToSelect2Data(users) as JSON
     }
     
     def fetchGenusAjax() {
         def genusList = Species.executeQuery("select distinct s.genusName from Species s")
-        render stringToSelect2Data(genusList) as JSON
+        render utilityService.stringToSelect2Data(genusList) as JSON
     }
     
     def fetchSpeciesAjax(String genus) {
         def species = Species.findAllByGenusName(genus)
-        render objectToSelect2Data(species) as JSON
+        render utilityService.objectToSelect2Data(species) as JSON
     }
     
     def fetchGenomeAjax(Long speciesId) {
         def genomes = Genome.executeQuery("select g.id, g.name from Genome g where g.species.id = ?", [speciesId])
-        render arrayToSelect2Data(genomes) as JSON
+        render utilityService.arrayToSelect2Data(genomes) as JSON
     }
     
     def fetchParentStrainAjax(Long speciesId) {
         def strains = Strain.executeQuery("select distinct s.parent.name from Strain s where s.species.id = ?", [speciesId])
         def nullStrain = ["Unknown"]
-        render stringToSelect2Data(nullStrain + strains) as JSON
+        render utilityService.stringToSelect2Data(nullStrain + strains) as JSON
     }
     
     def fetchStrainNameAjax(String parentStrain, Long speciesId) {
@@ -67,70 +69,28 @@ class CellSourceController {
         } else {
             strains = Strain.executeQuery("select distinct s.name from Strain s where s.parent.name = ?", [parentStrain])
         }
-        render stringToSelect2Data(strains) as JSON
+        render utilityService.stringToSelect2Data(strains) as JSON
     }
     
     def fetchGenotypeAjax(String strainName) {
         def genotypes = Strain.executeQuery("select distinct s.genotype from Strain s where s.name = ?", [strainName])
-        render stringToSelect2Data(genotypes) as JSON
+        render utilityService.stringToSelect2Data(genotypes) as JSON
     }
     
     def fetchMutationAjax(String strainName, String genotype) {
         def mutations = Strain.executeQuery("select distinct s.geneticModification from Strain s where s.name = ? and s.genotype = ?", [strainName, genotype])
-        render stringToSelect2Data(mutations) as JSON
+        render utilityService.stringToSelect2Data(mutations) as JSON
     }
     
     def fetchGrowthMediaAjax(Long speciesId) {
         def selectedSpecies = Species.get(speciesId)
         def growthMedias = GrowthMedia.where { (species == null) || (species == selectedSpecies) }
-        render objectToSelect2Data(growthMedias) as JSON
+        render utilityService.objectToSelect2Data(growthMedias) as JSON
     }
     
     def fetchTreatmentsAjax() {
         def treatments = CellSourceTreatment.executeQuery("select t.id, t.name from CellSourceTreatment t")
-        render arrayToSelect2Data(treatments) as JSON
-    }
-    
-    def fetchCompanyAjax() {
-        def companies = Company.executeQuery("select c.id, c.name from Company c")
-        render arrayToSelect2Data(companies) as JSON
-    }
-    
-    def fetchCatalogAjax() {
-        def catalogs = Antibody.executeQuery("select distinct a.catalogNumber from Antibody a")
-        render stringToSelect2Data(catalogs) as JSON
-    }
-    
-    def fetchImmunogeneAjax() {
-        def immunogenes = Antibody.executeQuery("select distinct a.immunogene from Antibody a")
-        render stringToSelect2Data(immunogenes) as JSON
-    }
-    
-    def fetchDefaultTargetAjax(String immunogene) {
-        def target = Antibody.findByImmunogene(immunogene)?.defaultTarget
-        def result = [targetTypeId: target?.targetType?.id, target: target?.name, cterm: target?.cTermTag]
-        render result as JSON
-    }
-    
-    def fetchTargetAjax(Long targetTypeId) {
-        def targets = Target.where {targetType.id == targetTypeId}.list()
-        def result = [targets: stringToSelect2Data(targets.collect{it.name}.unique()),
-                     nterms: stringToSelect2Data(targets.collect{it.nTermTag}.unique()),
-                     cterms: stringToSelect2Data(targets.collect{it.cTermTag}.unique())]
-        render result as JSON
-    }
-    
-    // helper methods
-    def stringToSelect2Data(def strings) {
-        return strings.collect {s -> [id: s, text: s]}
-    }
-    
-    def objectToSelect2Data(def objects) {
-        return objects.collect {o -> [id: o.id, text: o.name]}
-    }
-    
-    def arrayToSelect2Data(def arrays) {
-        return arrays.collect{a -> [id: a[0], text: a[1]]}
+        render utilityService.arrayToSelect2Data(treatments) as JSON
     }
     
     /* ---------------------------- Obsolete -------------------------- */

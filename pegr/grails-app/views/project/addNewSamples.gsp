@@ -35,7 +35,7 @@
             <thead>
                 <tr>
                     <th></th>
-                    <th colspan="17" id="sample-group" class="sample">Sample</th>
+                    <th colspan="18" id="sample-group" class="sample">Sample</th>
                     <th colspan="12" id="antibody-group" class="antibody">Antibody</th>
                     <th colspan="4" id="target-group" class="target">Target</th>
                 </tr>
@@ -56,6 +56,7 @@
                     <th>Chrom. (ug)</th>
                     <th>Cell# (M)</th>
                     <th>Volume (ul)</th>
+                    <th>Requested Tags (M)</th>
                     <th>Reference Genome(s)</th>
                     <th>Notes</th> 
                     <th>Company</th>
@@ -77,122 +78,123 @@
                 </tr>
             </thead>
             <tbody>
-                <tr id="tr1">
+                <tr id="tr0">
                     <td><a href="#" class="removeRow"><span class="glyphicon glyphicon-trash"></span></a></td>
                     <td>
-                        <select class="provider no-tag-select2" name="sample[].providerId" style="width: 150px">
+                        <select class="provider no-tag-select2" name="samples[0].providerId" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select class="sendTo no-tag-select2" name="sample[].sendToId" style="width: 150px">
+                        <select class="sendTo no-tag-select2" name="samples[0].sendToId" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select class="genus tag-select2" name="sample[].genus" style="width: 150px">
+                        <select class="genus tag-select2" name="samples[0].genus" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="sample[].speciesId" class="species tag-select2" style="width: 150px">
+                        <select name="samples[0].speciesId" class="species tag-select2" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="sample[].parentStrain" class="parent-strain tag-select2" style="width: 150px">
+                        <select name="samples[0].parentStrain" class="parent-strain tag-select2" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="sample[].strain" class="strain tag-select2" style="width: 150px" required>
+                        <select name="samples[0].strain" class="strain tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="sample[].genotype" class="genotype tag-select2" style="width: 300px">
+                        <select name="samples[0].genotype" class="genotype tag-select2" style="width: 300px">
                             <option></option>
                         </select></td>
                     <td>
-                        <select name="sample[].mutation" class="mutation tag-select2" style="width: 150px">
+                        <select name="samples[0].mutation" class="mutation tag-select2" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <g:select name="sample[].tissue" from="${pegr.Tissue.list()}" optionKey="id" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
+                        <g:select name="samples[0].tissue" from="${pegr.Tissue.list()}" optionKey="id" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
                     </td>
                     <td>
-                        <select class="prepUser no-tag-select2" name="sample[].prepUserId" style="width: 150px" >
+                        <select class="prepUser no-tag-select2" name="samples[0].prepUserId" style="width: 150px" >
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="sample[].growthMediaId" class="growth-media tag-select2" style="width: 150px" required>
+                        <select name="samples[0].growthMediaId" class="growth-media tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select multiple="multiple" class="treatments tag-select2" name="sample[].treatmentId" style="width: 300px">
+                        <select multiple="multiple" class="treatments tag-select2" name="samples[0].treatmentId" style="width: 300px">
                             <option></option>
                         </select>
                     </td>
-                    <td><g:textField name="sample[].chrom"></g:textField></td>
-                    <td><g:textField name="sample[].cellNum"></g:textField></td>
-                    <td><g:textField name="sample[].volume"></g:textField></td>
+                    <td><g:textField name="samples[0].chrom"></g:textField></td>
+                    <td><g:textField name="samples[0].cellNum"></g:textField></td>
+                    <td><g:textField name="samples[0].volume"></g:textField></td>
+                    <td><g:textField name="samples[0].requestedTags"></g:textField></td>
                     <td>
-                        <select multiple="multiple" name="sample[].genomeId" class="genomes no-tag-select2" style="width: 150px" required>
+                        <select multiple="multiple" name="samples[0].genomeId" class="genomes no-tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
-                    <td><g:textField name="note" style="width: 500px"></g:textField></td>
+                    <td><g:textField name="sampleNotes" style="width: 500px"></g:textField></td>
 
                     <td>
-                        <select class="company tag-select2" name="sample[].companyId" style="width: 200px">
+                        <select class="company tag-select2" name="samples[0].company" style="width: 200px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select class="catalog tag-select2" name="sample[].catalogNumber" style="width: 150px" required>
+                        <select class="catalog tag-select2" name="samples[0].catalogNumber" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <input name="sample[].lotNumber"/>
+                        <input name="samples[0].lotNumber"/>
                     </td>
                     <td>
-                        <g:select name="sample[].abHostId" from="${pegr.AbHost.list()}" optionKey="id" noSelection="['':'']" class="tag-select2 host" style="width: 150px"></g:select>
+                        <g:select name="samples[0].abHostId" from="${pegr.AbHost.list()}" optionKey="id" noSelection="['':'']" class="tag-select2 host" style="width: 150px"></g:select>
                     </td>
                     <td>
-                        <select class="immunogene tag-select2" name="sample[].immunogene" style="width: 150px">
+                        <select class="immunogene tag-select2" name="samples[0].immunogene" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <g:select name="sample[].clonal" from="${pegr.MonoPolyClonal?.values()}" keys="${pegr.MonoPolyClonal.values()*.name()}" noSelection="['': '']" class="no-tag-select2 clonal" style="width: 150px"/>
+                        <g:select name="samples[0].clonal" from="${pegr.MonoPolyClonal?.values()}" keys="${pegr.MonoPolyClonal.values()*.name()}" noSelection="['': '']" class="no-tag-select2 clonal" style="width: 150px"/>
                     </td>
                     <td>
-                        <g:select name="sample[].igTypeId" from="${pegr.IgType.list()}" optionKey="id" noSelection="['': '']" class="tag-select2 ig" style="width: 150px"/>
+                        <g:select name="samples[0].igTypeId" from="${pegr.IgType.list()}" optionKey="id" noSelection="['': '']" class="tag-select2 ig" style="width: 150px"/>
                     </td>
-                    <td><input name="sample[].concentration" class="conc"/></td>
-                    <td><input name="sample[].abNotes"></td>
-                    <td><input name="sample[].abVolumePerSample"></td>
-                    <td><input name="sample[].ugPerChip"></td>
-                    <td><input name="sample[].ulPerChip"></td>
+                    <td><input name="samples[0].abConcentration" class="conc"/></td>
+                    <td><input name="samples[0].abNotes"></td>
+                    <td><input name="samples[0].abVolumePerSample"></td>
+                    <td><input name="samples[0].ugPerChip"></td>
+                    <td><input name="samples[0].ulPerChip"></td>
                     <td>
-                        <g:select name="sample[].targetTypeId" from="${pegr.TargetType.list()}" optionKey="id" noSelection="['': '']" class="target-type tag-select2" style="width: 150px"></g:select>
+                        <g:select name="samples[0].targetTypeId" from="${pegr.TargetType.list()}" optionKey="id" noSelection="['': '']" class="target-type tag-select2" style="width: 150px"></g:select>
                     </td>
                     <td>
-                        <select name="sample[].target" class="target tag-select2" style="width: 150px" required>
+                        <select name="samples[0].target" class="target tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="sample[].cterm" class="cterm tag-select2" style="width: 150px">
+                        <select name="samples[0].cterm" class="cterm tag-select2" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="sample[].nterm" class="nterm tag-select2" style="width: 150px">
+                        <select name="samples[0].nterm" class="nterm tag-select2" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
@@ -211,10 +213,11 @@
 <script>    
     var tagPlaceholder = "Select or type...";
     var noTagPlaceholder = "Select...";
+    var count = 0;
     
     $(document).ready(function(){
         $("#nav-projects").addClass("active");
-        initializeSelect2s(1);
+        initializeSelect2s(count);
     });
     
     // select2 initialize
@@ -483,29 +486,30 @@
     });
     
     // add new row at the bottom and copy the value of last row
-    var count = 1;
     $("#add").click(function() {
-        var $orig = $("tr").last(); //$("#tr"+count);
+        var $orig = $("tr").last();
         count++;
-        
+        // disable select2
         $('select', $orig).each(function(index){
            $(this).select2("destroy");
         });
+        // copy the row
         $('tbody').append(
             $('<tr/>')
                 .attr("id", "tr"+count)
                 .append(
                     $orig.children().clone(true))
         );
-
         var $cloned = $("#tr"+count)
-        $('select', $cloned).each(function(index){
-            $(this).val($('select', $orig).eq(index).val());
+        $('select, input', $cloned).each(function(index){
+            // copy the values  
+            $(this).val($('select, input', $orig).eq(index).val());
+            // increase index in the names
+            $(this).attr('name', function(index, name){
+                return name.replace(/(\d+)/, count)
+            });
         });
-        $('input', $cloned).each(function(index){
-            $(this).val($('input', $orig).eq(index).val());
-        });
-        
+        // re-enable select2
         $('.tag-select2', $orig).each(function(index){
            $(this).select2({            
                tags: true,
@@ -529,7 +533,6 @@
                 placeholder: noTagPlaceholder
            });
         });
-
         return false;
     });
 

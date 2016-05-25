@@ -138,8 +138,8 @@ class AntibodyController {
     
     /* ----------------------------- Ajax ----------------------*/
      def fetchCompanyAjax() {
-        def companies = Company.executeQuery("select c.id, c.name from Company c")
-        render utilityService.arrayToSelect2Data(companies) as JSON
+        def companies = Company.executeQuery("select c.name from Company c")
+        render utilityService.stringToSelect2Data(companies) as JSON
     }
     
     def fetchCatalogAjax() {

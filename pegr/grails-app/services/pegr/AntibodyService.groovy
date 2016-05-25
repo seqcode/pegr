@@ -8,6 +8,7 @@ class AntibodyException extends RuntimeException {
 
 class AntibodyService {
     def itemService
+    def utilityService
     
     @Transactional
     def delete(Long id) {
@@ -54,9 +55,8 @@ class AntibodyService {
 		def company = getCompany(abCompName)
 		def abHost = getAbHost(abAnimal)
 		def clonal = getClonal(abClonal)
-		def igType = saveIgType(ig)
-		def concentration = getFloat(abConc)
-        
+		def igType = getIgType(ig)
+		def concentration = utilityService.getFloat(abConc)
 		def catNum = abCatNum
 		
 	    def antibodies = Antibody.findAllByCompanyAndCatalogNumberAndAbHostAndClonalAndIgTypeAndImmunogeneAndLotNumberAndNote(company, catNum, abHost, clonal, igType, antigen, abLotNum, abNotes)
@@ -71,11 +71,27 @@ class AntibodyService {
 		return antibody
 	}
     
+    
+    def getClonal(String clonalStr) {
+	    def clonal = null
+        if (clonalStr) {
+            if (clonalStr.contains("mono")) {
+                clonal = MonoPolyClonal.Mono
+            } else if (clonalStr.contains("poly")) {
+                clonal = MonoPolyClonal.Poly
+            }
+        }
+	    return clonal
+	}
+    
     @Transactional
 	def getIgType(String igStr) {
 	    if (igStr == null) {
 	        return null
 	    }
+        if (igStr.isInteger()) {
+            return IgType.get(igStr.toInteger())
+        }
 	    def igType = IgType.findByName(igStr)
 	    if (!igType) {
 	        igType = new IgType(name: igStr).save( failOnError: true)
@@ -105,6 +121,9 @@ class AntibodyService {
 	    if (str == null) {
 	        return null
 	    }
+        if (str.isInteger()) {
+            return TargetType.get(str.toInteger())
+        }
 	    def type = TargetType.findByName(str)
 	    if (!type) {
 	        type = new TargetType(name: str).save( failOnError: true)
@@ -112,16 +131,19 @@ class AntibodyService {
 	    return type
 	}
 	
-	def getAbHost(String abHostName) {
-	    if (abHostName == null) {
+	def getAbHost(String abHostStr) {
+	    if (abHostStr == null) {
 	        return null
 	    }
+        if (abHostStr.isInteger()) {
+            return AbHost.get(abHostStr.toInteger())
+        }
 	    def abHost = AbHost.createCriteria().get{
-	        eq("name", abHostName, [ignoreCase: true])
+	        eq("name", abHostStr, [ignoreCase: true])
 	        maxResults(1)
 	    }
 	    if(!abHost) {
-	        abHost = new AbHost(name: abHostName).save( failOnError: true)
+	        abHost = new AbHost(name: abHostStr).save( failOnError: true)
 	    }
 	    return abHost
 	}

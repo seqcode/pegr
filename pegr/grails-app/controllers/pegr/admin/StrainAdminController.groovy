@@ -17,16 +17,15 @@ class StrainAdminController {
     def show(Long id) {
         def strain = Strain.get(id)
         
-        [strain: strain, geneticModifications:strain.geneticModifications]
+        [strain: strain]
     }
     
     def create() {
         if(request.method == "POST") {
             withForm{
                 def strain = new Strain(params)
-                def geneticModificationIds = params.list('geneticModifications')
                 try {
-                    strainService.save(strain, geneticModificationIds)
+                    strainService.save(strain)
                     flash.message = "New strain saved!"
                     redirect(action: "show", id: strain.id)
                 } catch(StrainException e) {
@@ -50,22 +49,21 @@ class StrainAdminController {
         if(request.method == "POST") {
             withForm{
                 strain.properties = params
-                def geneticModifications = params.list('geneticModifications')
                 try {
-                    strainService.save(strain, geneticModifications)
+                    strainService.save(strain)
                     flash.message = "Strain update!"
                     redirect(action: "show", id: strain.id)
                 }catch(StrainException e) {
                     request.message = e.message
-                    render(view: "edit", model: [strain: strain, geneticModifications: strain.geneticModifications])
+                    render(view: "edit", model: [strain: strain])
                 }catch(Exception e) {
                     request.message = e.message
                     log.error "Error: ${e.message}", e
-                    render(view: "edit", model: [strain: strain, geneticModifications: strain.geneticModifications])
+                    render(view: "edit", model: [strain: strain])
                 }
             }
         }else {
-            [strain: strain, geneticModifications: strain.geneticModifications]
+            [strain: strain]
         }
     }
     

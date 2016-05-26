@@ -60,7 +60,6 @@ class ProtocolInstanceBagController {
     }
     
     def updateBagAjax(Long bagId, String name) {
-        def message = null
         protocolInstanceBagService.updateBag(bagId, name)
         render name
     }
@@ -72,7 +71,7 @@ class ProtocolInstanceBagController {
         } catch (ProtocolInstanceBagException e) {
             flash.message = e.message
         }
-        redirect(action: "index")
+        redirect(action: "processingBags")
     }
     
     def reopenBag(Long bagId) {
@@ -82,7 +81,7 @@ class ProtocolInstanceBagController {
             redirect(action: "showBag", id: bagId)
         } catch (ProtocolInstanceBagException e) {
             flash.message = e.message
-            redirect(action: "index")
+            redirect(action: "processingBags")
         }
     }
     
@@ -244,7 +243,7 @@ class ProtocolInstanceBagController {
                 }
             } else {
                 flash.message = "Protocol instance not found!"
-                redirect(action: "index")
+                redirect(action: "processingBags")
             }
         } else {
             if (item) {
@@ -324,7 +323,7 @@ class ProtocolInstanceBagController {
     def completeBag(Long bagId) {
         try {
             protocolInstanceBagService.completeBag(bagId)
-            redirect(action:"index")
+            redirect(action:"processingBags")
         } catch(ProtocolInstanceBagException e){
             flash.message = e.message
             redirect(action: "showBag", id: bagId)

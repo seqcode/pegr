@@ -4,6 +4,7 @@ class ProjectController {
     
 	def springSecurityService
     def projectService
+    def sampleService
 	
     def index(int max, int offset) {
         max = Math.min(max ?:15, 100)
@@ -45,7 +46,7 @@ class ProjectController {
                     flash.message = "Successfully  created project ${project.name}"
                     redirect(action:"show", id:"${project.id}")
                 } catch (ProjectException e) {
-                    request.mesage = e.message
+                    request.message = e.message
                     render(view:'create', model:[project: project])
                 } catch (Exception e) {
                     log.error "Error: ${e.message}", e
@@ -71,12 +72,12 @@ class ProjectController {
                     flash.message = "Successfully  updated information for project ${project.name}"
                     redirect(action:"show", id:projectId)
                 } catch(ProjectException e) {
-                    reqeust.message = e.message
-                    [project: project]
+                    request.message = e.message
+                    render(view: 'edit', model: [project: project])
                 } catch(Exception e) {
                     log.error "Error: ${e.message}", e
                     request.message ="Oops! Please try again."
-                    [project: project]
+                    render(view: 'edit', model: [project: project])
                 }
             }
         }else {
@@ -156,8 +157,10 @@ class ProjectController {
         }
     }
     
-    def addNewSamples() {
-        
+    def addNewSamples(Long projectId, Long assayId) {
+        def project = Project.get(projectId)
+        def assay = Assay.get(assayId)
+        [project: project, assay: assay]
     }
     
     def removeSample(Long sampleId, Long projectId) {
@@ -168,4 +171,60 @@ class ProjectController {
         }
         redirect(action: "show", id: projectId)
     }
+    
+    def saveNewSamples(SampleListCommand command) {
+        try {
+            log.error "Assay: ${command.assayId}, samples: ${command.samples}"
+            sampleService.saveNewSamples(command.assayId, command.projectId, command.samples)
+            flash.message = "New samples added!"
+            redirect(action: "show", id: command.projectId)
+        } catch(ProjectException e) {
+            flash.message = e.message
+            redirect(action: "addNewSamples", params:[projectId: command.projectId, assayId: command.assayId])
+        }
+    }
+}
+
+
+class SampleCommand {
+    Long providerId
+    Long sendToId
+    String genus
+    String speciesId
+    String parentStrain
+    String strain
+    String genotype
+    String mutation
+    String tissue
+    Long prepUserId
+    String growthMediaId
+    String treatmentId
+    String chrom
+    String cellNum
+    String volume
+    String requestedTags
+    String genomeId
+    String sampleNotes
+    String company
+    String catalogNumber
+    String lotNumber
+    String abHostId
+    String immunogene
+    String clonal
+    String igTypeId
+    String abConcentration
+    String abNotes
+    String abVolumePerSample
+    String ugPerChip
+    String ulPerChip
+    String targetTypeId
+    String target
+    String cterm
+    String nterm
+}
+
+class SampleListCommand {
+    Long assayId
+    Long projectId
+    List<SampleCommand> samples = [].withLazyDefault { new SampleCommand() } 
 }

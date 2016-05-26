@@ -22,13 +22,18 @@
         <div id="seq">
             <h4>Sequencing Experiments</h4>
             <ol>
-                <g:each in="${sample.sequencingExperiments}">
+                <g:each in="${sample.sequencingExperiments}" var="experiment">
                     <li>
-                        <h5><g:link controller="sequenceRun" action="show" id="${it.sequenceRun.id}">Sequence Run ${it.sequenceRun.id}(Old No.${it.sequenceRun.runNum})</g:link></h5>
+                        <h5><g:link controller="sequenceRun" action="show" id="${experiment.sequenceRun.id}">Sequence Run ${experiment.sequenceRun.id}(Old No.${experiment.sequenceRun.runNum})</g:link></h5>
+                        <g:render template="experimentTable" model="['experiment':experiment]"></g:render>
                         <h5>Alignments</h5>
-                        <g:render template="alignmentTable" model="['alignmentList':it.alignments]"></g:render>
-                        <h5>Peak Statistics</h5>
-                        <g:render template="peakTable" model="['alignmentList':it.alignments]"></g:render>
+                        <ul>
+                            <g:each in="${experiment.alignments}" var="alignment">
+                                <li>
+                                    <g:render template="alignmentTable" model="['alignment':alignment]"></g:render>
+                                </li>
+                            </g:each>
+                        </ul>
                     </li>
                 </g:each>
 

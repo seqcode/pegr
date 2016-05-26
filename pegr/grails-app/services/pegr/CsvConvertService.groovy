@@ -10,8 +10,8 @@ class CsvConvertException extends RuntimeException {
 }
     
 class CsvConvertService {
-    
-    CsvConvertService() {}
+    def sampleService
+    def antibodyService
 	
 	def migrate(String filename, RunStatus runStatus, int startLine, int endLine, boolean basicCheck){
 		
@@ -76,32 +76,46 @@ class CsvConvertService {
 
         def invoice = getInvoice(data.service, data.invoice)
 
-        def target = getTarget(data.target, data.targetType, data.nTag, data.cTag)
+        def target = antibodyService.getTarget(data.target, data.targetType, data.nTag, data.cTag)
 
-        def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.ulSampleSent, data.abConc, data.amountUseUg, data.amountUseUl)
+        def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.abConc)
 
-        def species = getSpecies(data.genus, data.species)
+        def species = sampleService.getSpecies(data.genus, data.species)
 
         def strainAndTissue = getStrainTissue(species, data.strain, data.parentStrain, data.genotype, data.mutation)
         def strain = strainAndTissue.strain
         def tissue = strainAndTissue.tissue
 
-        def growthMedia = getGrowthMedia(data.growthMedia, species)
+        def growthMedia = sampleService.getGrowthMedia(data.growthMedia, species)
 
         def inventory = getInventory(data.dateReceived, data.receivingUser, data.inOrExternal, data.inventoryNotes)
-        def cellSource = getCellSource(data.samplePrepUser, growthMedia, strain, cellProvider, inventory, tissue)
+        def prepUser = getUser(data.samplePrepUser)
+        def cellSource = getCellSource(prepUser, growthMedia, strain, cellProvider, inventory, tissue)
 
-        addTreatment(cellSource, data.perturbation1)
-        addTreatment(cellSource, data.perturbation2)
-
+        sampleService.addTreatment(cellSource, data.perturbation1)
+        sampleService.addTreatment(cellSource, data.perturbation2)
+        
         def assay = getAssay(data.assay)
 
         def prtcl = getProtocolInstanceSummary(data.chipUser, data.chipDate, data.protocolVersion, data.resin, data.PCRCycle, assay)
+        
+        def abnoteMap = [:]
+        if (data.ulSampleSent) {
+            abnoteMap['Volume Sent (ul)'] = data.ulSampleSent
+        }
+        if (data.amountUseUg) {
+            abnoteMap['Usage Per ChIP (ug)'] = data.amountUseUg
+        }
+        if (data.amountUseUl) {
+            abnoteMap['Usage Per ChIP (ul)'] = data.amountUseUl
+        }
 
-        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId)
+        def abNotes = JsonOutput.toJson(abnoteMap)
+        
+        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes, assay: assay)
 
         addIndexToSample(sample, data.indexStr, data.indexIdStr, basicCheck)
-        addSampleToProject(project, sample)
+        sampleService.addSampleToProject(project, sample)
 
         getPool(sample, results.sequenceRun, data.pool, data.volToPool, data.poolDate, data.quibitReading, data.quibitDilution, data.concentration, data.poolDilution)
 
@@ -132,12 +146,6 @@ class CsvConvertService {
             new SampleSequenceIndices(sample: sample, index: index).save(failOnError: true)
         } 
     }
-    
-	def addSampleToProject(Project project, Sample sample) {
-	    if(project && sample) {
-	        new ProjectSamples(project: project, sample: sample).save( failOnError: true)
-	    }
-	}
 	
     def getUser(String userStr) {
         return getUser(userStr, null, null)
@@ -264,11 +272,11 @@ class CsvConvertService {
 	    return invoice
 	}
 	
-	def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNotes, String abClonal, String abAnimal, String ig, String antigen, String ulSent, String abConc, String ugPerChIP, String ulPerChIP) {
-		def company = getCompany(abCompName)
-		def abHost = getAbHost(abAnimal)
+	def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNotes, String abClonal, String abAnimal, String ig, String antigen, String abConc) {
+		def company = antibodyService.getCompany(abCompName)
+		def abHost = antibodyService.getAbHost(abAnimal)
 		def clonal = getClonal(abClonal)
-		def igType = getIgType(ig)
+		def igType = antibodyService.getIgType(ig)
 		def concentration = getFloat(abConc)
         
         if (antigen == "No ab" || antigen == "NoAb") {
@@ -286,31 +294,15 @@ class CsvConvertService {
             catNum = catNum.replaceAll("_", "-")
             catNum = catNum.replaceAll("[^0-9A-Za-z -]", "")
         }
-        
-        def noteMap = [:]
-        if (abNotes) {
-            noteMap['Note'] = abNotes
-        }
-        if (ulSent) {
-            noteMap['Volume Sent (ul)'] = ulSent
-        }
-        if (ugPerChIP) {
-            noteMap['Usage Per ChIP (ug)'] = ugPerChIP
-        }
-        if (ulPerChIP) {
-            noteMap['Usage Per ChIP (ul)'] = ulPerChIP
-        }
-
-        def notes = JsonOutput.toJson(noteMap)
 		
-	    def antibodies = Antibody.findAllByCompanyAndCatalogNumberAndAbHostAndClonalAndIgTypeAndImmunogeneAndLotNumberAndNote(company, catNum, abHost, clonal, igType, antigen, abLotNum, notes)
+	    def antibodies = Antibody.findAllByCompanyAndCatalogNumberAndAbHostAndClonalAndIgTypeAndImmunogeneAndLotNumberAndNote(company, catNum, abHost, clonal, igType, antigen, abLotNum, abNotes)
         
         float err = 0.000001
         def antibody = antibodies.find {
             it.concentration > concentration - err && it.concentration < concentration + err
         }
 	    if (!antibody) {	        
-	        antibody = new Antibody(company: company, catalogNumber: catNum, abHost: abHost, clonal: clonal, concentration: concentration, igType: igType, immunogene: antigen, lotNumber: abLotNum, note: notes).save( failOnError: true)
+	        antibody = new Antibody(company: company, catalogNumber: catNum, abHost: abHost, clonal: clonal, concentration: concentration, igType: igType, immunogene: antigen, lotNumber: abLotNum, note: abNotes).save( failOnError: true)
 	    }	        
 		return antibody
 	}
@@ -358,64 +350,6 @@ class CsvConvertService {
         
         return [strain: strain, tissue: tissue]	    
 	}
-	
-	def getSpecies(String genusStr, String speciesStr) {
-	    if(genusStr == null && speciesStr == null) {
-	        return null
-	    }
-		if (genusStr == null) {
-			genusStr = "Unknown"
-		}
-		if (speciesStr == null) {
-			speciesStr = "Unknown"
-		}
-	    def species = Species.findByNameAndGenusName(speciesStr, genusStr)
-	    if(!species) {
-	        species = new Species(name: speciesStr, genusName: genusStr).save( failOnError: true)
-	    }
-	    return species
-	}
-	
-	def getGrowthMedia(String mediaStr, Species species) {
-	    if(mediaStr == null) {
-	        return null
-	    }
-	    def media = GrowthMedia.findByName(mediaStr)
-	    if(!media) {
-	        media = new GrowthMedia(name: mediaStr, species: species).save( failOnError: true)
-	    } else {
-	        if(media.species != species) {
-	            media.species = null
-				media.save( failOnError: true)
-	        }
-	    }
-	    return media
-	}
-	
-	
-	def getCellSource( String samplePrepUser, GrowthMedia growthMedia, Strain strain, User provider, Inventory inventory, Tissue tissue) {
-	    if (!strain) {
-	        return null
-	    }
-		def prepUser = getUser(samplePrepUser)
-	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, prepUser: prepUser, inventory: inventory, tissue: tissue).save( failOnError: true)
-	    return cellSource
-	}
-	
-	def addTreatment(CellSource cellSource, String perturbStr) {
-	    if(perturbStr == null) {
-	        return null
-	    }
-	    def perturbation = CellSourceTreatment.findByName(perturbStr)
-	    if(!perturbation) {
-	        perturbation = new CellSourceTreatment(name: perturbStr).save( failOnError: true)
-	    }
-	    if(perturbation && cellSource) {
-            if (!CellSourceTreatments.findByCellSourceAndTreatment(cellSource, perturbation)) {
-                new CellSourceTreatments(cellSource: cellSource, treatment: perturbation).save( failOnError: true)
-            }			
-		} 
-	}
     
     def getProtocolInstanceSummary(String chipUser, String chipDate, String v, String resin, String PCRCycle, Assay assay){
         def protocol = null
@@ -459,7 +393,15 @@ class CsvConvertService {
         return prtcl
     }
 	
-	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId) {
+    def getCellSource(User prepUser, GrowthMedia growthMedia, Strain strain, User provider, Inventory inventory, Tissue tissue) {
+	    if (!strain) {
+	        return null
+	    }
+	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, prepUser: prepUser, inventory: inventory, tissue: tissue).save( failOnError: true)
+	    return cellSource
+	}
+    
+	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId, String abNotes, Assay assay) {
 	    def note = [:]
 	    if (sampleNotes) {
 	        note['note'] = sampleNotes
@@ -489,7 +431,7 @@ class CsvConvertService {
             }
         }
         
-	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source).save( failOnError: true)
+	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes, assay: assay).save( failOnError: true)
 	    return sample
 	}
 	
@@ -650,70 +592,7 @@ class CsvConvertService {
 	    return clonal
 	}
 	
-	def getIgType(String igStr) {
-	    if (igStr == null) {
-	        return null
-	    }
-	    def igType = IgType.findByName(igStr)
-	    if (!igType) {
-	        igType = new IgType(name: igStr).save( failOnError: true)
-	    }
-	    return igType
-	}
-	
-	def getTarget(String targetStr, String targetTypeStr, String nTag, String cTag) {
-	    if ([targetStr, cTag, nTag].every{ it == null }) {
-	        return null
-	    }
-        if(targetStr) {
-            targetStr = targetStr.replaceAll("_", "-")
-            targetStr = targetStr.replaceAll("\\?", "")
-            targetStr = targetStr.trim()
-        }
-        
-	    def target = Target.findByNameAndCTermTagAndNTermTag(targetStr, cTag, nTag)
-	    if (!target) {
-	        def type = getTargetType(targetTypeStr)
-	        target = new Target(name: targetStr, cTermTag: cTag, nTermTag: nTag, targetType: type).save( failOnError: true)
-	    }
-	    return target
-	}
-	
-	def getTargetType(String str) {
-	    if (str == null) {
-	        return null
-	    }
-	    def type = TargetType.findByName(str)
-	    if (!type) {
-	        type = new TargetType(name: str).save( failOnError: true)
-	    }
-	    return type
-	}
-	
-	def getAbHost(String abHostName) {
-	    if (abHostName == null) {
-	        return null
-	    }
-	    def abHost = AbHost.createCriteria().get{
-	        eq("name", abHostName, [ignoreCase: true])
-	        maxResults(1)
-	    }
-	    if(!abHost) {
-	        abHost = new AbHost(name: abHostName).save( failOnError: true)
-	    }
-	    return abHost
-	}
-	
-	def getCompany(String companyStr) {
-	    if (companyStr == null) {
-	        return null
-	    }    
-	    def company = Company.findByName(companyStr)
-	    if(!company) {
-	        company = new Company(name: companyStr).save( failOnError: true)
-	    }
-	    return company
-	}
+
     
     def getInteger(String s) {
         def i = 0

@@ -11,6 +11,7 @@
 //= require bootstrap
 //= require pegr
 //= require multipleselect
+//= require select2
 
 if (typeof jQuery !== 'undefined') {
 	(function($) {

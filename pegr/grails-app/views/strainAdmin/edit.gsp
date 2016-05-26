@@ -15,8 +15,8 @@
 
 		<div id="edit-strain" class="content scaffold-edit" role="main">
 			<h3><g:message code="default.edit.label" args="[entityName]" /></h3>
-			<g:if test="${flash.message}">
-			<div class="message" role="status">${flash.message}</div>
+			<g:if test="${request.message}">
+			<div class="message" role="status">${request.message}</div>
 			</g:if>
 			<g:hasErrors bean="${strain}">
 			<ul class="errors" role="alert">

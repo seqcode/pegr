@@ -8,8 +8,8 @@
 </head>
 <body onhashchange="getHash()">
     <g:link action="index"><span class="glyphicon glyphicon-home"></span> Sequencing Run List</g:link>   
-    <g:if test="${flash.message}">
-        <div class="message" role="status">${flash.message}</div>
+    <g:if test="${request.message}">
+        <div class="message" role="status">${request.message}</div>
     </g:if>   
     <h2>Search Pool</h2>    
     <g:form class="fields" role="form" action="searchPool" method="post">

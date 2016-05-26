@@ -90,10 +90,10 @@ target(tests: "Simple tests") {
     println s
     
     def jsonSlurper = new JsonSlurper()
-    def objects = jsonSlurper.parseText(s)
-    def object = objects[0]
-    println object.name
-    println object.sampleId
+    def object = jsonSlurper.parseText(s)// '{"Note":"IgG coupled to invitrogen Dynabeads"}')
+    // def object = objects[0]
+    println object[1]["age"]
+    
     
     def monoStr = "monolla"
     if(monoStr.contains("mono")) {
@@ -104,6 +104,18 @@ target(tests: "Simple tests") {
     Integer length = 32
     String randomString = RandomStringUtils.random(length, charset.toCharArray())
     println randomString
+    
+    def results = [run: 200, sample: 10000, genome: "hg19", galaxy_tool_id: "xxx", galaxy_workflow_id: "xxx", statistics_category: "more_diagrams", statistics: [totalReads: 10000, adapterCount: 1000], files: [[url: "xxx", type: "png"], [url: "xxx", type: "png"]]]
+    def results_json = JsonOutput.toJson(results)
+    println results_json
+    def results_parsed = jsonSlurper.parseText(results_json)
+    println results_parsed.sample
+    println JsonOutput.toJson(results_parsed.files)
+    println JsonOutput.toJson(results_parsed.statistics)
+    
+    s ='{"run":2,"sample":2,"genome":"sacCer3_cegr","toolId":"toolxxx","workflowId":"workflowxxx","toolCategory":"Categoryxxx","parameters":"a=1,b=2","statistics":{"numberOfPeaks":10000,"peakMedian":2000,"peakMean":30000,"peakMedianStd":4000,"peakMeanStd":50000,"medianTagSingletons":6000},"datasets":[{"uri":"xxx/xxx/xxx","type":"xxx"}]}'
+    results_parsed = jsonSlurper.parseText(s)
+    println results_parsed.run
 }
 
 setDefaultTarget(tests)

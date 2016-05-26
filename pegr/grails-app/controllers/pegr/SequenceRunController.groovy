@@ -70,7 +70,7 @@ class SequenceRunController {
             flash.message = "New sequence run created!"
             redirect(action: "edit", params: [runId: run.id])
         }catch(SequenceRunException e) {
-            flash.message = e.message
+            request.message = e.message
             def largestRunNum = SequenceRun.createCriteria().get {
                 projections {
                     max "runNum"
@@ -85,7 +85,7 @@ class SequenceRunController {
         if (run) {
             [run: run]
         } else {
-            flash.message = e.message
+            flash.message = "Sequence run not found!"
             redirect(action: "index")
         }
     }
@@ -103,11 +103,11 @@ class SequenceRunController {
                 sequenceRunService.save(run)                   
                 redirect(action: "show", id:runId)
             } catch(SequenceRunException e) {
-                flash.message = e.message
+                request.message = e.message
                 render(view: "editInfo", model: [run: run])
             }
         } else {
-            flash.message = e.message
+            flash.message = "Sequence run not found!"
             redirect(action: "index")
         }
     }
@@ -118,7 +118,7 @@ class SequenceRunController {
             if (poolItem) {
                 render(view: "previewPool", model: [runId: runId, poolItem: poolItem])
             } else {
-                flash.message = "Pool not found!"
+                request.message = "Pool not found!"
                 [runId: runId]
             }
         } else {
@@ -258,16 +258,16 @@ class SequenceRunController {
                                           basicCheck
                                          )
                 if (messages.size() == 0){
-                    flash.message = ["CSV file uploaded!",]
+                    flash.messageList = ["CSV file uploaded!",]
                 } else {
-                    flash.message = messages                   
+                    flash.messageList = messages                   
                 }
             } else {
-                flash.message = "Only csv files are accepted!"
+                flash.messageList = ["Only csv files are accepted!"]
             }
         } catch(Exception e) {
             log.error "Error: ${e.message}", e
-            flash.message = "Error uploading the file!"
+            flash.messageList = ["Error uploading the file!"]
         }
 
         redirect(action: "index")

@@ -6,8 +6,8 @@
 <body>
 <div class="container-fluid">
     <h3>Edit Sequencing Run</h3>
-    <g:if test="${flash.message}">
-    <div class="message" role="status">${flash.message}</div>
+    <g:if test="${request.message}">
+    <div class="message" role="status">${request.message}</div>
     </g:if>
     <g:hasErrors bean="${run}">
         <ul class="errors" role="alert">

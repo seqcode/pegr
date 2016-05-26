@@ -15,8 +15,8 @@
 
 		<div id="edit-protocol" class="content scaffold-edit" role="main">
 			<h3><g:message code="default.edit.label" args="[entityName]" /></h3>
-			<g:if test="${flash.message}">
-			<div class="message" role="status">${flash.message}</div>
+			<g:if test="${request.message}">
+			<div class="message" role="status">${request.message}</div>
 			</g:if>
 			<g:hasErrors bean="${protocol}">
 			<ul class="errors" role="alert">
@@ -32,6 +32,7 @@
 				</fieldset>
 				<fieldset class="buttons">
 					<g:submitButton class="save" name="save" value="save" />
+                    <g:link action="show" id="${protocol.id}">Cancel</g:link>
 				</fieldset>
 			</g:form>
 		</div>

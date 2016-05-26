@@ -50,7 +50,7 @@
 <div>
     <label>Treatments</label>
     <span id="treatments">
-    <g:select multiple="multiple" name="treatments" from="${pegr.CellSourceTreatment.list(sort:'name')}" optionKey="id" value="${cellSource?.treatments}" class="tokenize tokenize-sample"></g:select>
+    <g:select multiple="multiple" name="treatments" from="${pegr.CellSourceTreatment.list(sort:'name')}" optionKey="id" value="${cellSource?.treatments}" class="select2"></g:select>
     </span>
     <a href="#" class="edit" data-toggle="modal" data-target="#new-treatment"><span class="glyphicon glyphicon-plus"></span>New</a>
 </div>
@@ -77,7 +77,7 @@
 
 <script>
     $(document).ready(function(){
-        $(".tokenize").tokenize({newElements: false});
+        $(".select2").select2();
         if($( "#species option:selected" ).text() != "Other") {
             $("#speciesForm").hide();
         }

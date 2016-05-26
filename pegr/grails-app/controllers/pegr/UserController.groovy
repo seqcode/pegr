@@ -45,7 +45,7 @@ class UserController {
                     flash.message = "Your address has been updated!"
                     redirect(action: "profile")
                 } else {
-                    flash.message = "Invalid input!" 
+                    request.message = "Invalid input!" 
                     render(view:'editAddress', model:[address: address])
                 }
             }

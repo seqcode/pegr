@@ -3,11 +3,16 @@ package pegr
 class SequencingExperiment {
 	Sample sample
 	SequenceRun sequenceRun	
-	String fastqFilePath
 	String publicDbId
     String readPositions
 	String note
-	ReadType readType
+	ReadType readType 
+    
+    String fastqFile
+    String fastqcReport
+    Long totalReads
+    Integer indexMismatch
+    Long adapterCount
 	
     List getAlignments() {
         return SequenceAlignment.where{sequencingExperiment == this}.list()
@@ -24,10 +29,15 @@ class SequencingExperiment {
     
     static constraints = {
         sequenceRun nullable: true        
-        fastqFilePath nullable: true, blank: true, maxSize: 500
         readPositions nullable: true, blank: true
         readType nullable: true
 		note nullable: true, blank: true
 		publicDbId nullable: true, blank: true
+                
+        fastqFile nullable: true, blank: true, maxSize: 1000
+        fastqcReport nullable: true, blank: true, maxSize: 1000
+        totalReads nullable: true
+        indexMismatch nullable: true
+        adapterCount nullable: true
 	}
 }

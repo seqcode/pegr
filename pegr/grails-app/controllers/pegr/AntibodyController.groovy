@@ -1,8 +1,10 @@
 package pegr
+import grails.converters.*
 
 class AntibodyController {
     def itemService
     def antibodyService
+    def utilityService
     
     def index(){
         redirect(action: "list")
@@ -133,5 +135,44 @@ class AntibodyController {
             redirect(action: 'show', id: antibodyId)
         }        
     }
+    
+    /* ----------------------------- Ajax ----------------------*/
+     def fetchCompanyAjax() {
+        def companies = Company.executeQuery("select c.name from Company c")
+        render utilityService.stringToSelect2Data(companies) as JSON
+    }
+    
+    def fetchCatalogAjax() {
+        def catalogs = Antibody.executeQuery("select distinct a.catalogNumber from Antibody a")
+        render utilityService.stringToSelect2Data(catalogs) as JSON
+    }
+    
+    def fetchImmunogeneAjax() {
+        def immunogenes = Antibody.executeQuery("select distinct a.immunogene from Antibody a")
+        render utilityService.stringToSelect2Data(immunogenes) as JSON
+    }
+    
+    def fetchAntibodyAjax(String catalog) {
+        def antibody = Antibody.findByCatalogNumber(catalog)
+        def result = [host: antibody?.abHost?.id, 
+                immunogene: antibody?.immunogene, 
+                clonal: antibody?.clonal.name(), 
+                ig: antibody?.igType?.id, 
+                conc: antibody.concentration,
+                targetTypeId: antibody?.defaultTarget?.targetType?.id, 
+                target: antibody?.defaultTarget?.name, 
+                cterm: antibody?.defaultTarget?.cTermTag,
+                nterm: antibody?.defaultTarget?.nTermTag] 
+        render result as JSON
+    }
+    
+    def fetchTargetAjax() {
+        def targets = Target.list()
+        def result = [targets: utilityService.stringToSelect2Data(targets.collect{it.name}.unique()),
+                     nterms: utilityService.stringToSelect2Data(targets.collect{it.nTermTag}.unique()),
+                     cterms: utilityService.stringToSelect2Data(targets.collect{it.cTermTag}.unique())]
+        render result as JSON
+    }
+    
     
 }

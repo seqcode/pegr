@@ -7,8 +7,8 @@
     <h2>Profile</h2>
     <div class="profile">
         <h3>Address </h3>   
-        <g:if test="${flash.message}">
-			<div class="message" role="status">${flash.message}</div>
+        <g:if test="${request.message}">
+			<div class="message" role="status">${request.message}</div>
         </g:if>
         <g:hasErrors>
             <div class="errors">

@@ -4,11 +4,12 @@ class Sample {
 		
 	CellSource cellSource
 	Antibody antibody
+    String antibodyNotes
 	Target target
-	Integer requestedTagNumber
-	Integer chromosomeAmount // in ug
-	Integer cellNumber // in M
-	Integer volume //ul per aliqu used for the assay
+	Long requestedTagNumber
+	Float chromosomeAmount // in ug
+	Long cellNumber // in M
+	Float volume //ul per aliqu used for the assay
 	String publicationReference
 	SampleStatus status
     Date date
@@ -21,6 +22,8 @@ class Sample {
     List bags
     String source
     String sourceId
+    Assay assay
+    String requestedGenomes
     
     static hasMany = [bags: ProtocolInstanceBag]
     
@@ -78,6 +81,9 @@ class Sample {
         item nullable: true
         source nullable: true
         sourceId nullable: true
+        antibodyNotes nullable: true, blank: true
+        assay nullable: true
+        requestedGenomes nullable: true, blank: true
     }
     
     static mapping = {

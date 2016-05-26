@@ -7,7 +7,6 @@ class SampleSequenceIndices {
     Integer setId
     
     static constraints = {
-        sample unique: 'index'
         setId nullable: true
     }
     

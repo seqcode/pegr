@@ -41,7 +41,7 @@
                         <td><g:link controller="sample" action="show" id="${it.sample.id}">${it.sample?.id}</g:link></td>
                         <td>${it.sample?.cellSource?.strain}</td>
                         <td>${it.sample?.antibody}</td>
-                        <td>${it.sample?.sequenceIndicesDetailString}</td>
+                        <td>${it.sample?.sequenceIndicesString}</td>
                         <td>
                             <g:hiddenField name="experimentId" value="${it.id}"></g:hiddenField>
                             <g:select multiple="multiple" name="genomes${it.id}" from="${pegr.Genome.list()}" optionKey="id" value="${it.genomes}" class="select2"></g:select>

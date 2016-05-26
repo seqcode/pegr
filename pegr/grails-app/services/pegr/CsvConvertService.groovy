@@ -43,7 +43,7 @@ class CsvConvertService {
         
         def timeStop = new Date()
         TimeDuration duration = TimeCategory.minus(timeStop, timeStart)
-        println "Time: " + duration
+        println "Time to upload the CSV file: " + duration
         return messages
 	}
 	
@@ -112,7 +112,7 @@ class CsvConvertService {
 
         def abNotes = JsonOutput.toJson(abnoteMap)
         
-        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes, assay: assay)
+        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes, assay)
 
         addIndexToSample(sample, data.indexStr, data.indexIdStr, basicCheck)
         sampleService.addSampleToProject(project, sample)
@@ -126,25 +126,32 @@ class CsvConvertService {
     }
     
     def addIndexToSample(Sample sample, String indexStr, String indexIdStr, boolean basicCheck) { 
+        if (!sample) {
+            throw new CsvConvertException(message: "Sample cannot be null when adding index!")
+        }
         if (indexStr == null || indexStr == "unk"){
             return
         }
-        def indexId = getInteger(indexIdStr)
-        def index
         if (basicCheck) {
-            index = SequenceIndex.findByIndexIdAndSequenceAndStatus(indexId, indexStr, DictionaryStatus.Y)
-            if (!index) {
-                throw new CsvConvertException(message: "Index ID and String don't match!")
+            def indexList = indexStr.split(",")*.trim()
+            def setId = 1
+            indexList.each { indices ->
+                indices.split("-")*.trim().each {
+                    def index = SequenceIndex.findBySequenceAndStatus(it, DictionaryStatus.Y)
+                    if (!index) {
+                        throw new CsvConvertException(message: "Incorrect index ${it}!")
+                    }
+                    new SampleSequenceIndices(sample: sample, index: index, setId: setId).save(failOnError: true)
+                }
+                setId++
             }
         } else {
-            index = SequenceIndex.findByIndexIdAndSequence(indexId, indexStr)
+            def index = SequenceIndex.findByIndexIdAndSequence(indexIdStr, indexStr)
             if (!index) {
-                index = new SequenceIndex(indexId: indexId, sequence: indexStr, indexVersion: "UNKNOWN").save(failOnError: true)
+                index = new SequenceIndex(indexId: indexIdStr, sequence: indexStr, indexVersion: "UNKNOWN").save(failOnError: true)
             }
-        }
-        if (index && sample) {
             new SampleSequenceIndices(sample: sample, index: index).save(failOnError: true)
-        } 
+        }
     }
 	
     def getUser(String userStr) {
@@ -647,9 +654,9 @@ class CsvConvertService {
 	    }
 	
 	    def run = SequenceRun.findByPlatformAndRunNum(platform, runNum)
-	    if (!run) {                     
+	    if (!run) {                 
 	         run = new SequenceRun(runNum: runNum, platform: platform, status: runStatus, user: user)
-	
+
 	         // lane
 	         run.lane = getInteger(laneStr)
 	

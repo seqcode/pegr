@@ -156,7 +156,7 @@
     <div id="other" class="col-sm-3">      
         <h4>Other</h4>
         <ul>
-            <li>Index: <g:each in="${sample.sequenceIndices}">${it.sequence} </g:each></li>
+            <li>Index: ${sample.sequenceIndicesString}</li>
 
             <li>Chromosome (ug): <g:if test="${sample?.chromosomeAmount}">${sample.chromosomeAmount}</g:if></li>
 

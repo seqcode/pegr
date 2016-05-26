@@ -2839,6 +2839,4 @@ databaseChangeLog = {
 	include file: 'removeSeqIdFromExp.groovy'
 
 	include file: 'addAnalysis.groovy'
-
-	include file: 'addRequestedGenome.groovy'
 }

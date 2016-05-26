@@ -34,7 +34,7 @@
                     <td><g:link controller="sample" action="show" id="${it.sample.id}">${it.sample?.id}</g:link></td>
                     <td>${it.sample?.cellSource?.strain}</td>
                     <td>${it.sample?.antibody}</td>
-                    <td>${it.sample?.sequenceIndicesDetailString}</td>
+                    <td>${it.sample?.sequenceIndicesString}</td>
                     <td>${it.genomesString}</td>
                     <td>
                         <g:each in="${it.sample?.projects}">

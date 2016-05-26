@@ -35,20 +35,13 @@ class Sample {
         return SequencingExperiment.where{sample == this}.list()
     }
     
-    List getSequenceIndices() {
-        return SampleSequenceIndices.where{sample == this}.collect{it.index}
-    }
-    
     String getSequenceIndicesString() {
-        def indices = SampleSequenceIndices.where{sample == this}.collect{it.index.indexId}
-        def s = indices.join(", ")
-        return s
-    }
-    
-    String getSequenceIndicesDetailString() {
-        def indices = SampleSequenceIndices.where{sample == this}.collect{it.index}
-        def s = indices.collect{"${it.indexId}.${it.sequence}"}.join(", ")
-        return s
+        def indexDict = SampleSequenceIndices.where{sample == this}.groupBy({it -> it.setId})
+        def indexList = []
+        indexDict.each{ key, value ->
+            indexList.push(value*.index*.sequence.join("-"))
+        }
+        return indexList.join(",")
     }
     
     List getProjects() {

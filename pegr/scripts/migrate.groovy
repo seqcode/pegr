@@ -2,11 +2,11 @@ package pegr
 import groovy.json.*
     
 // import index
-def filename = "files/indices.csv"
+def filename = "files/SequenceIndex.csv"
 def startLine = 1
-def endLine = 96
-def version = "A"
-def basicCheck = false
+def endLine = 40
+def version = "B"
+def basicCheck = false   
 
 //def indexMigrate = new ImportIndexService()
 //indexMigrate.migrate(filename, version, DictionaryStatus.Y, startLine, endLine)
@@ -23,7 +23,7 @@ dataMigrate.migrate(filename, RunStatus.COMPLETED, startLine, endLine, basicChec
 //dataMigrate.getAllBioReplicate()
 
 // migrate antibody notes
-
+/*
 def jsonSlurper = new JsonSlurper()
 Sample.list().each{ sample ->
     if (sample.antibody?.note) {
@@ -52,3 +52,4 @@ Sample.list().each{ sample ->
     }
     
 }
+*/

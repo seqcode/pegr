@@ -45,7 +45,7 @@
                     </g:if>
                     <g:hiddenField name="sampleId" value="${sample.id}"/>
                     <g:if test="${protocolInstance?.protocol?.addIndex}">
-                        <td><g:textField name="indexId" value="${sample.sequenceIndicesString}" /></td>
+                        <td><g:textField name="indexId" value="${sample.sequenceIndicesString}" size="50"/></td>
                     </g:if>
                 </tr>
             </g:each>

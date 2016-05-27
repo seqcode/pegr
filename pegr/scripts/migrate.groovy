@@ -8,8 +8,8 @@ def endLine = 40
 def version = "B"
 def basicCheck = false   
 
-//def indexMigrate = new ImportIndexService()
-//indexMigrate.migrate(filename, version, DictionaryStatus.Y, startLine, endLine)
+def indexMigrate = new ImportIndexService()
+indexMigrate.migrate(filename, version, DictionaryStatus.Y, startLine, endLine)
 
 // import data
 /*
@@ -23,33 +23,49 @@ dataMigrate.migrate(filename, RunStatus.COMPLETED, startLine, endLine, basicChec
 //dataMigrate.getAllBioReplicate()
 
 // migrate antibody notes
-/*
+
 def jsonSlurper = new JsonSlurper()
 Sample.list().each{ sample ->
-    if (sample.antibody?.note) {
+    if (sample.antibody?.note && sample.antibody.note[0] == "{") {
         try {
-            def note = jsonSlurper.parseText(sample.antibody.note)
-            def abnoteMap = [:]
-            if (note['Volume Sent (ul)']) {
-                abnoteMap['Volume Sent (ul)'] = note['Volume Sent (ul)']
+            def note
+            try {
+                note = jsonSlurper.parseText(sample.antibody.note)
+            } catch (Exception e){
             }
-            if (note['Usage Per ChIP (ug)']) {
-                abnoteMap['Usage Per ChIP (ug)'] = note['Usage Per ChIP (ug)']
+            if (note){
+                def abnoteMap = [:]
+                if (note.containsKey('Volume Sent (ul)')) {
+                    abnoteMap['Volume Sent (ul)'] = note['Volume Sent (ul)']
+                }
+                if (note.containsKey('Usage Per ChIP (ug)')) {
+                    abnoteMap['Usage Per ChIP (ug)'] = note['Usage Per ChIP (ug)']
+                }
+                if (note.containsKey('Usage Per ChIP (ul)')) {
+                    abnoteMap['Usage Per ChIP (ul)'] = note['Usage Per ChIP (ul)']
+                }
+                sample.antibodyNotes = JsonOutput.toJson(abnoteMap)
+                sample.save()
             }
-            if (note['Usage Per ChIP (ul)']) {
-                abnoteMap['Usage Per ChIP (ul)'] = note['Usage Per ChIP (ul)']
-            }
-            sample.antibodyNotes = JsonOutput.toJson(abnoteMap)
-            sample.save()
-            sample.antibody.note = null
-            if (note['Note']) {
-                sample.antibody.note = note['Note']
-            }
-            sample.antibody.save()
         }catch(Exception e) {
             println "Sample ${sample.id} is not migrated!"
         }
     }
-    
 }
-*/
+Antibody.list().each { antibody ->
+    if (antibody?.note && antibody.note[0] == "{" ){
+       try {
+       	   def note
+           try {
+               note = jsonSlurper.parseText(antibody.note)
+           } catch (Exception e) {
+           }
+           if (note && note.containsKey("Note")) {
+              antibody.note = note["Note"]
+              antibody.save()
+           }
+        }catch(Exception e) {
+           println "Antibody ${antibody.id} is not cleaned!"
+        }
+    }
+}

@@ -75,7 +75,13 @@ class AlignmentStatsService {
         def updatedProperties = []
         source.each { key, value ->
             if (target.hasProperty(key) && value != null) {
-                target[key] = value
+                try {
+                    target[key] = value
+                } catch(org.codehaus.groovy.runtime.typehandling.GroovyCastException e) {
+                    log.error e
+                    throw new AlignmentStatsException(message: e.message)
+                }
+                
                 updatedProperties.push(key)
             }
         }

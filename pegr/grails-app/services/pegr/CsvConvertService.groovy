@@ -136,12 +136,14 @@ class CsvConvertService {
             def indexList = indexStr.split(",")*.trim()
             def setId = 1
             indexList.each { indices ->
+                def indexInSet = 1
                 indices.split("-")*.trim().each {
                     def index = SequenceIndex.findBySequenceAndStatus(it, DictionaryStatus.Y)
                     if (!index) {
                         throw new CsvConvertException(message: "Incorrect index ${it}!")
                     }
-                    new SampleSequenceIndices(sample: sample, index: index, setId: setId).save(failOnError: true)
+                    new SampleSequenceIndices(sample: sample, index: index, setId: setId, indexInSet: indexInSet).save(failOnError: true)
+                    indexInSet++
                 }
                 setId++
             }

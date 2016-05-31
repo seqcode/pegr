@@ -218,12 +218,14 @@ class ProtocolInstanceBagService {
             def indexStrings = indecies[idx].split(",")*.trim()
             def setId = 1
             indexStrings.each { 
+                def indexInSet = 1
                 it.split("-")*.trim().each{ indexSequence ->
                     def index = SequenceIndex.findBySequenceAndStatus(indexSequence, DictionaryStatus.Y)
                     if (!index) {
                         throw new ProtocolInstanceBagException(message: "Index ${indexSequence} not found!")
                     }          
-                    new SampleSequenceIndices(sample: sample, index: index, setId: setId).save()
+                    new SampleSequenceIndices(sample: sample, index: index, setId: setId, indexInSet: indexInSet).save()
+                    indexInSet++
                 }
                 setId++
             }       

@@ -49,3 +49,7 @@ select s.id, r.run_num, i.invoice_num from sample s join invoice i on s.invoice_
 // update sample set sample.source="CollaboratorS" where sample.invoice_id in (select id from invoice where invoice_num like "%s00%");
 
 // update sample set source = "PughLab" where source is null;
+
+// update sample_sequence_indices set index_in_set = 2 where mod(id, 2)= 1 and set_id is not null;
+
+// update sample_sequence_indices set index_in_set = 1 where mod(id, 2)= 0 and set_id is not null;

@@ -8,8 +8,10 @@ def endLine = 40
 def version = "B"
 def basicCheck = false   
 
+/*
 def indexMigrate = new ImportIndexService()
 indexMigrate.migrate(filename, version, DictionaryStatus.Y, startLine, endLine)
+*/
 
 // import data
 /*
@@ -24,6 +26,7 @@ dataMigrate.migrate(filename, RunStatus.COMPLETED, startLine, endLine, basicChec
 
 // migrate antibody notes
 
+/*
 def jsonSlurper = new JsonSlurper()
 Sample.list().each{ sample ->
     if (sample.antibody?.note && sample.antibody.note[0] == "{") {
@@ -69,3 +72,5 @@ Antibody.list().each { antibody ->
         }
     }
 }
+*/
+

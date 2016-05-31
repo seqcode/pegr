@@ -11,7 +11,7 @@ class Sample {
 	Long cellNumber // in M
 	Float volume //ul per aliqu used for the assay
 	String publicationReference
-	SampleStatus status
+    SampleStatus status
     Date date
 	CellSource spikeInCellSource
 	String note
@@ -24,6 +24,7 @@ class Sample {
     String sourceId
     Assay assay
     String requestedGenomes
+    SampleAudit audit
     
     static hasMany = [bags: ProtocolInstanceBag]
     
@@ -39,7 +40,7 @@ class Sample {
         def indexDict = SampleSequenceIndices.where{sample == this}.groupBy({it -> it.setId})
         def indexList = []
         indexDict.each{ key, value ->
-            indexList.push(value*.index*.sequence.join("-"))
+            indexList.push(value.sort{it.indexInSet}*.index*.sequence.join("-"))
         }
         return indexList.join(",")
     }
@@ -77,6 +78,7 @@ class Sample {
         antibodyNotes nullable: true, blank: true
         assay nullable: true
         requestedGenomes nullable: true, blank: true
+        audit nullable: true
     }
     
     static mapping = {

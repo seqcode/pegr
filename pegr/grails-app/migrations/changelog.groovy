@@ -2841,4 +2841,6 @@ databaseChangeLog = {
 	include file: 'addAnalysis.groovy'
 
 	include file: 'addSampleAudit.groovy'
+
+	include file: 'sampleDataType.groovy'
 }

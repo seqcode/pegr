@@ -1,21 +1,27 @@
 package pegr
 import grails.transaction.Transactional
+import groovy.json.*
+    
+class SampleException extends RuntimeException {
+    String message
+}
 
 class SampleService {
     def antibodyService
     def utilityService
     
     @Transactional
-    saveNewSamples(Long assayId, Long projectId, List samples) {
+    def saveNewSamples(Long assayId, Long projectId, List samples) {
+        def message = "Samples saved! "
         // get assay
         def assay = Assay.get(assayId)
         if (!assay) {
-            throw new ProjectException(message: "Assay not found!")
+            throw new SampleException(message: "Assay not found!")
         }
         // get project
         def project = Project.get(projectId)
         if (!project) {
-            throw new ProjectException(message: "Project not found!")
+            throw new SampleException(message: "Project not found!")
         }
         samples.each { data ->
             def provider = User.get(data.providerId)
@@ -23,29 +29,46 @@ class SampleService {
             def species = getSpecies(data.genus, data.speciesId)
             def strain = getStrain(species, data.strain, data.parentStrain, data.genotype, data.mutation)
             def tissue = getTissue(data.tissue)
-            def prepUser = User.get(data.prepUserId)
             def growthMedia = getGrowthMedia(data.growthMediaId, species)        
             
             // save cell source
-            def cellSource = getCellSource(prepUser, growthMedia, strain, provider, tissue)
-            data.treatmentId.each { treatmentStr ->
-                addTreatment(cellSource, treatmentStr)
+            def cellSource = getCellSource(growthMedia, strain, provider, tissue)
+            if (data.treatments) {
+                data.treatments.split(",").each { treatmentStr ->
+                    addTreatment(cellSource, treatmentStr)
+                }
             }
             // save the antibody
             def antibody = antibodyService.getAntibody(data.company,  data.catalogNumber, data.lotNumber, data.abNotes, data.clonal, data.abHostId, data.igTypeId, data.immunogene, data.abConcentration)
                 
             // save the target
             def target = antibodyService.getTarget(data.target, data.targetTypeId, data.nterm, data.cterm)
-                
-            // put requested genomes into sample notes
-            def requestedGenomes = data.genomeId?.join(",")
             
             // save sample
-            def sample = getSample(cellSource, antibody, target, data.cellNum, data.chrom, data.volume, data.requestedTags, data.sampleNotes, sendTo, data.abNotes, requestedGenomes, assay)
+            def abnoteMap = [:]
+            if (data.abVolumePerSample) {
+                abnoteMap['Volume Sent (ul)'] = data.abVolumePerSample
+            }
+            if (data.ugPerChip) {
+                abnoteMap['Usage Per ChIP (ug)'] = data.ugPerChip
+            }
+            if (data.ulPerChip) {
+                abnoteMap['Usage Per ChIP (ul)'] = data.ulPerChip
+            }
+
+            def abNotes = JsonOutput.toJson(abnoteMap)
+            def sample = getSample(cellSource, antibody, target, data.cellNum, data.chrom, data.volume, data.requestedTags, data.sampleNotes, sendTo, abNotes, data.genomes, assay)
             
+            // add index
+            try {
+                splitAndAddIndexToSample(sample, indexStr)
+            } catch(SampleException e) {
+                message += "Index is not added correctly to sample ${sample.id}! "
+            }
             // add sample to the project
             addSampleToProject(project, sample)
         }
+        return message
     }
     
     @Transactional
@@ -131,11 +154,11 @@ class SampleService {
 	}
 	
     @Transactional
-	def getCellSource(User prepUser, GrowthMedia growthMedia, Strain strain, User provider, Tissue tissue) {
+	def getCellSource(GrowthMedia growthMedia, Strain strain, User provider, Tissue tissue) {
 	    if (!strain) {
 	        return null
 	    }		
-	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, prepUser: prepUser,  tissue: tissue).save( failOnError: true)
+	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, tissue: tissue).save( failOnError: true)
 	    return cellSource
 	}
 	
@@ -143,9 +166,6 @@ class SampleService {
 	    if(treatmentStr == null) {
 	        return null
 	    }
-        if (treatmentStr.isInteger()) {
-            return CellSourceTreatment.get(treatmentStr.toInteger())
-        }
 	    def treatment = CellSourceTreatment.findByName(treatmentStr)
 	    if(!treatment) {
 	        treatment = new CellSourceTreatment(name: treatmentStr).save(failOnError: true)
@@ -164,4 +184,24 @@ class SampleService {
 	    return sample
 	}
     
+    @Transactional
+    def splitAndAddIndexToSample(Sample sample, String indexStr) {
+        if (sample == null || indexStr == null) {
+            return
+        }
+        def indexList = indexStr.split(",")*.trim()
+        def setId = 1
+        indexList.each { indices ->
+            def indexInSet = 1
+            indices.split("-")*.trim().each {
+                def index = SequenceIndex.findBySequenceAndStatus(it, DictionaryStatus.Y)
+                if (!index) {
+                    throw new SampleException(message: "Incorrect index ${it}!")
+                }
+                new SampleSequenceIndices(sample: sample, index: index, setId: setId, indexInSet: indexInSet).save(failOnError: true)
+                indexInSet++
+            }
+            setId++
+        }
+    }
 }

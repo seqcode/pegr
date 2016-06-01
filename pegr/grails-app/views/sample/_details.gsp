@@ -92,6 +92,22 @@
             <li>External ID: ${sample.antibody.externalId}</li>
             </g:if>  
 
+            <g:if test="${notes?.containsKey('Volume Sent (ul)')}">
+            <li>Volume Sent (ul): ${notes['Volume Sent (ul)']}</li>
+            </g:if> 
+            
+            <g:if test="${notes?.containsKey('Usage Per ChIP (ug)')}">
+            <li>Usage Per ChIP (ug): ${notes['Usage Per ChIP (ug)']}</li>
+            </g:if> 
+            
+            <g:if test="${notes?.containsKey('Usage Per ChIP (ul)')}">
+            <li>Usage Per ChIP (ug): ${notes['Usage Per ChIP (ul)']}</li>
+            </g:if> 
+                   
+            <g:if test="${sample.antibody?.note}">
+            <li>Notes: ${sample.antibody?.note}</li>
+            </g:if>
+            
             <li>Target: ${sample.target?.name}</li>
             <g:if test="${sample.target?.targetType}">
             <li>Type: ${sample.target.targetType}</li>
@@ -103,7 +119,7 @@
             <li>N-Tag: ${sample.target.nTermTag}</li>
             </g:if>
             <g:if test="${sample.target?.note}">
-            <li>C-Tag: ${sample.target.note}</li>
+            <li>Target Notes: ${sample.target.note}</li>
             </g:if>
         </ul>
     </div>
@@ -166,12 +182,16 @@
 
             <li>Requested Tags (M): <g:if test="${sample?.requestedTagNumber}">${sample.requestedTagNumber}</g:if></li>
 
+            <li>Reference genomes: ${sample?.requestedGenomes}</li>
+            
+            <li>Send data to: ${sample?.sendDataTo}</li>
+            
             <g:if test="${sample?.publicationReference}">
             <li>Publication Reference: ${sample.publicationReference}</li>
             </g:if>
             
-            <g:if test="${notes['note']}">
-            <li>Notes: ${notes['note']}</li>
+            <g:if test="${sample.note}">
+            <li>Notes: ${sample.note}</li>
             </g:if>
         </ul>
     </div>  

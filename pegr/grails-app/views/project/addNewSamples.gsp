@@ -50,7 +50,6 @@
                     <th>Genotype</th>
                     <th>Mutation</th>
                     <th>Tissue</th>
-                    <th>Prep User</th>
                     <th>Growth Media</th>
                     <th>Treatments</th>                       
                     <th>Chrom. (ug)</th>
@@ -58,6 +57,7 @@
                     <th>Volume (ul)</th>
                     <th>Requested Tags (M)</th>
                     <th>Reference Genome(s)</th>
+                    <th>Index (Optional)</th>
                     <th>Notes</th> 
                     <th>Company</th>
                     <th>Catalog</th>
@@ -68,9 +68,9 @@
                     <th>Ig Type</th>
                     <th>Conc.(ug/ul)</th>
                     <th>Notes</th>
-                    <th>ul/sample sent</th>
-                    <th>ug to use/std ChIP</th>
-                    <th>ul to use/std ChIP</th>
+                    <th>Volume Sent (ul)</th>
+                    <th>Usage Per ChIP (ug)</th>
+                    <th>Usage Per ChIP (ul)</th>
                     <th>Target Type</th>
                     <th>Target</th>
                     <th>C-Term</th>
@@ -123,17 +123,12 @@
                         <g:select name="samples[0].tissue" from="${pegr.Tissue.list()}" optionKey="id" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
                     </td>
                     <td>
-                        <select class="prepUser no-tag-select2" name="samples[0].prepUserId" style="width: 150px" >
-                            <option></option>
-                        </select>
-                    </td>
-                    <td>
                         <select name="samples[0].growthMediaId" class="growth-media tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select multiple="multiple" class="treatments tag-select2" name="samples[0].treatmentId" style="width: 300px">
+                        <select multiple="multiple" class="treatments tag-select2" name="samples[0].treatments" style="width: 300px">
                             <option></option>
                         </select>
                     </td>
@@ -142,11 +137,12 @@
                     <td><g:textField name="samples[0].volume"></g:textField></td>
                     <td><g:textField name="samples[0].requestedTags"></g:textField></td>
                     <td>
-                        <select multiple="multiple" name="samples[0].genomeId" class="genomes no-tag-select2" style="width: 150px" required>
+                        <select multiple="multiple" name="samples[0].genomes" class="genomes no-tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
-                    <td><g:textField name="sampleNotes" style="width: 500px"></g:textField></td>
+                    <td><g:textField name="samples[0].indices"></g:textField></td>
+                    <td><g:textField name="samples[0].sampleNotes" style="width: 300px"></g:textField></td>
 
                     <td>
                         <select class="company tag-select2" name="samples[0].company" style="width: 200px">
@@ -237,10 +233,6 @@
                 placeholder: noTagPlaceholder
             });
             $("#tr"+count+" .sendTo").select2({
-                data: result,
-                placeholder: noTagPlaceholder
-            });
-            $("#tr"+count+" .prepUser").select2({
                 data: result,
                 placeholder: noTagPlaceholder
             });

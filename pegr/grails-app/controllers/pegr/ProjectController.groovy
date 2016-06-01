@@ -174,9 +174,8 @@ class ProjectController {
     
     def saveNewSamples(SampleListCommand command) {
         try {
-            log.error "Assay: ${command.assayId}, samples: ${command.samples}"
-            sampleService.saveNewSamples(command.assayId, command.projectId, command.samples)
-            flash.message = "New samples added!"
+            def message = sampleService.saveNewSamples(command.assayId, command.projectId, command.samples)
+            flash.message = message
             redirect(action: "show", id: command.projectId)
         } catch(ProjectException e) {
             flash.message = e.message
@@ -196,14 +195,14 @@ class SampleCommand {
     String genotype
     String mutation
     String tissue
-    Long prepUserId
     String growthMediaId
-    String treatmentId
+    String treatments
     String chrom
     String cellNum
     String volume
     String requestedTags
-    String genomeId
+    String genomes
+    String indices
     String sampleNotes
     String company
     String catalogNumber

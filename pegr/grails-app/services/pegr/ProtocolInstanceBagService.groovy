@@ -9,6 +9,7 @@ class ProtocolInstanceBagException extends RuntimeException {
 class ProtocolInstanceBagService {
     def springSecurityService
     def itemService
+    def sampleService
     
     @Transactional
     ProtocolInstanceBag savePrtclInstBag(Long protocolGroupId, String name, Date startTime) {
@@ -212,23 +213,7 @@ class ProtocolInstanceBagService {
                 throw new ProtocolInstanceBagException(message: "Sample not found!")
             }
             SampleSequenceIndices.executeUpdate("delete from SampleSequenceIndices where sample.id = :sampleId", [sampleId: sampleId])
-            if (indecies[idx] == null || indecies[idx] == "") {
-                return
-            }
-            def indexStrings = indecies[idx].split(",")*.trim()
-            def setId = 1
-            indexStrings.each { 
-                def indexInSet = 1
-                it.split("-")*.trim().each{ indexSequence ->
-                    def index = SequenceIndex.findBySequenceAndStatus(indexSequence, DictionaryStatus.Y)
-                    if (!index) {
-                        throw new ProtocolInstanceBagException(message: "Index ${indexSequence} not found!")
-                    }          
-                    new SampleSequenceIndices(sample: sample, index: index, setId: setId, indexInSet: indexInSet).save()
-                    indexInSet++
-                }
-                setId++
-            }       
+            sampleService.splitAndAddIndexToSample(sample, indecies[idx])
         }
     }
     

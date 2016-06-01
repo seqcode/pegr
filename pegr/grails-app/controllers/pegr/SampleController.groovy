@@ -22,15 +22,15 @@ class SampleController {
             def jsonSlurper = new JsonSlurper()
             def notes = [:]
             try {
-                notes += jsonSlurper.parseText(sample.note)
-            }catch(Exception e){
-
-            }
-            try {
                 notes += jsonSlurper.parseText(sample.prtclInstSummary.note)
             }catch(Exception e){
 
-            }        
+            }       
+            try {
+                notes += jsonSlurper.parseText(sample.antibodyNotes)
+            }catch(Exception e){
+
+            }
             def protocols = []
             sample.bags.each{ linkedbag ->
                 protocols.push([bag:linkedbag, protocolList:ProtocolInstance.where{bag.id == linkedbag.id}.list(sort: "bagIdx", order: "asc")])

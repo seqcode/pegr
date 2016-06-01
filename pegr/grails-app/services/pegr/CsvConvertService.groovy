@@ -133,20 +133,7 @@ class CsvConvertService {
             return
         }
         if (basicCheck) {
-            def indexList = indexStr.split(",")*.trim()
-            def setId = 1
-            indexList.each { indices ->
-                def indexInSet = 1
-                indices.split("-")*.trim().each {
-                    def index = SequenceIndex.findBySequenceAndStatus(it, DictionaryStatus.Y)
-                    if (!index) {
-                        throw new CsvConvertException(message: "Incorrect index ${it}!")
-                    }
-                    new SampleSequenceIndices(sample: sample, index: index, setId: setId, indexInSet: indexInSet).save(failOnError: true)
-                    indexInSet++
-                }
-                setId++
-            }
+            sampleService.splitAndAddIndexToSample(sample, indexStr)
         } else {
             def index = SequenceIndex.findByIndexIdAndSequence(indexIdStr, indexStr)
             if (!index) {
@@ -385,7 +372,7 @@ class CsvConvertService {
         if (assay) {
 	        protocol = Protocol.findByNameAndProtocolVersion(assay.name, v)  
 	        if (!protocol) {
-	            protocol = new Protocol(name: assay.name, protocolVersion: v).save( failOnError: true)
+	            protocol = new Protocol(name: assay.name, protocolVersion: v, assay: assay).save( failOnError: true)
 	        }
 	    }
 	    // get note

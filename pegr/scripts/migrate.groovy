@@ -18,11 +18,11 @@ indexMigrate.migrate(filename, version, DictionaryStatus.Y, startLine, endLine)
 filename = "files/Peconic_Database.csv"
 startLine = 4
 endLine = 531//12000
-
-def dataMigrate = new CsvConvertService()
-dataMigrate.migrate(filename, RunStatus.COMPLETED, startLine, endLine, basicCheck)
 */
-//dataMigrate.getAllBioReplicate()
+def dataMigrate = new CsvConvertService()
+//dataMigrate.migrate(filename, RunStatus.COMPLETED, startLine, endLine, basicCheck)
+
+dataMigrate.getAllBioReplicate()
 
 // migrate antibody notes
 

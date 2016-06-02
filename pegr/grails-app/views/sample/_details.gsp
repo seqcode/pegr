@@ -58,7 +58,7 @@
         </ul>
     </div>
     <div id="antibody" class="col-sm-3">
-        <h4>Antibody</h4>
+        <h4>Antibody <g:if test="${authorized}"><g:link controller="antibody" action="show" id="${sample?.antibody?.id}"><span class="glyphicon glyphicon-qrcode"></span></g:link></g:if></h4>
         <ul>
             <g:if test="${sample.antibody?.company}">
             <li>Company: ${sample.antibody?.company}</li>

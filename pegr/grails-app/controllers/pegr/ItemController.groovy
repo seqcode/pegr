@@ -33,7 +33,8 @@ class ItemController {
     def show(Long id) {
         def item = Item.get(id)
         if(!item) {
-            render status: 404
+            render(view: "/404")
+            return
         }
         def folder = itemService.getImageFolder(id)
         def images = folder.listFiles().findAll{getFileExtension(it.name) in allowedTypes.values()}

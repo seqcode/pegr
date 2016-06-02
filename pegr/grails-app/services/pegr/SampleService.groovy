@@ -7,6 +7,7 @@ class SampleException extends RuntimeException {
 }
 
 class SampleService {
+    def springSecurityService
     def antibodyService
     def utilityService
     
@@ -203,5 +204,22 @@ class SampleService {
             }
             setId++
         }
+    }
+    
+    @Transactional
+    def addItem(Sample sample, Item item) {
+        if (!item?.type) {
+            throw new SampleException(message: "Missing item type!")
+        }
+        if (!item?.barcode) {
+            throw new SampleException(message: "Missing barcode!")
+        }
+        if (Item.where { type.id == item.type.id && barcode == item.barcode}.find()) {
+            throw new SampleException(message: "Barcode ${item.barcode} has been used! Please choose another barcode.")
+        }
+        item.user = springSecurityService.currentUser
+        item.save()
+        sample.item = item
+        sample.save()
     }
 }

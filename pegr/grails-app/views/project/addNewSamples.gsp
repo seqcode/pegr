@@ -91,17 +91,17 @@
                         </select>
                     </td>
                     <td>
-                        <select class="genus tag-select2" name="samples[0].genus" style="width: 150px">
+                        <select class="genus tag-select2" name="samples[0].genus" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="samples[0].speciesId" class="species tag-select2" style="width: 150px">
+                        <select name="samples[0].speciesId" class="species tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="samples[0].parentStrain" class="parent-strain tag-select2" style="width: 150px">
+                        <select name="samples[0].parentStrain" class="parent-strain tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
@@ -132,10 +132,10 @@
                             <option></option>
                         </select>
                     </td>
-                    <td><g:textField name="samples[0].chrom"></g:textField></td>
-                    <td><g:textField name="samples[0].cellNum"></g:textField></td>
-                    <td><g:textField name="samples[0].volume"></g:textField></td>
-                    <td><g:textField name="samples[0].requestedTags"></g:textField></td>
+                    <td><g:textField name="samples[0].chrom" class="number"></g:textField></td>
+                    <td><g:textField name="samples[0].cellNum" class="number"></g:textField></td>
+                    <td><g:textField name="samples[0].volume" class="number"></g:textField></td>
+                    <td><g:textField name="samples[0].requestedTags" class="number"></g:textField></td>
                     <td>
                         <select multiple="multiple" name="samples[0].genomes" class="genomes no-tag-select2" style="width: 150px" required>
                             <option></option>
@@ -214,6 +214,12 @@
     $(document).ready(function(){
         $("#nav-projects").addClass("active");
         initializeSelect2s(count);
+    });
+    
+    // jquery validation
+    $("form").validate();
+    jQuery.validator.addClassRules('number', {
+       number: true 
     });
     
     // select2 initialize
@@ -525,6 +531,8 @@
                 placeholder: noTagPlaceholder
            });
         });
+        $("form").validate();
+
         return false;
     });
 

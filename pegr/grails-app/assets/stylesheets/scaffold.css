@@ -189,6 +189,7 @@ fieldset.embedded legend {
 	        box-shadow: 0 0 0.25em #b2d1ff;
 }
 
+.error,
 .errors {
     margin: 0;
 	background: #fff3f3;

@@ -61,7 +61,7 @@ class SampleService {
             
             // add index
             try {
-                splitAndAddIndexToSample(sample, indexStr)
+                splitAndAddIndexToSample(sample, data.indices)
             } catch(SampleException e) {
                 message += "Index is not added correctly to sample ${sample.id}! "
             }

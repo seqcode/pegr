@@ -52,12 +52,13 @@ class ProtocolInstanceBagService {
                 cellSource = CellSource.findByItem(csItem)
             }
             if (cellSource) {
-                sample = new Sample(item: item, cellSource: cellSource, status: SampleStatus.CREATED)
+                sample = new Sample(item: item, cellSource: cellSource)
             } else {
                 throw new ProtocolInstanceBagException(message: "No cell source found for this item!")
             }            
         }
         try {
+            sample.status = SampleStatus.PREP
             sample.addToBags(bag).save()
         } catch(Exception e) {
             log.error "Error: ${e.message}", e
@@ -435,13 +436,14 @@ class ProtocolInstanceBagService {
                 // remove all the items from the instances
                 ProtocolInstanceItems.executeUpdate('delete ProtocolInstanceItems where protocolInstance.id = :instanceId', [instanceId: it.id])
                 // delete the instances in the bag
-                it.delete(flush: true)
+                it.delete()
             }            
             // remove all the samples from the bag
-            def samples = bag.tracedSamples
-            samples.each{
-                it.removeFromBags(bag).save(flush: true)
+            def samples = bag.tracedSamples.toList()
+            for (sample in samples) {
+                sample.removeFromBags(bag)
             }
+            
             // remove the bag itself
             bag.delete()
         } else {

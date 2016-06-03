@@ -9,17 +9,7 @@
         </ul>
     </div>
     <div class="col-md-3">
-        <h4>Master Pool
-            <g:if test="${run?.poolItem}">
-                <g:link controller="item" action="show" params="['id':run.poolItem.id]" class="edit">Link</g:link>
-                <g:if test="${run?.status==pegr.RunStatus.PREP}">
-                    <g:link action="removePool" params="['runId':run.id]" class="edit confirm">Remove</g:link>
-                </g:if>
-            </g:if>
-            <g:elseif test="${run?.status==pegr.RunStatus.PREP}">
-                <g:link action="searchPool" params="['runId':run.id]" class="edit">Add</g:link>
-            </g:elseif>
-        </h4>
+        <h4>Master Pool</h4>
         <ul>
             <li>Library Volume (ul): ${run.runStats?.libraryVolume}</li>
             <li>Library Stock (fmol): ${run.runStats?.libraryStock}</li>

@@ -128,14 +128,13 @@ class SequenceRunController {
     
     def addPool(Long poolItemId, Long runId) {
         try {
-            def messages = sequenceRunService.addPool(poolItemId, runId)
-            if (messages.size() > 0) {
-                flash.message = messages.join("</br>")
-            } else {
-                flash.message = "All samples in the bag has been included!"
-            }
+            sequenceRunService.addPool(poolItemId, runId)
+            flash.message = "Success! All samples have been added to the sequence run."
         } catch (SequenceRunException e) {
             flash.message = e.message
+        } catch (Exception e) {
+            flash.message = "An unexpected error has occured!"
+            log.error e
         }
         redirect(action: "edit", params: [runId: runId])
     }
@@ -146,6 +145,23 @@ class SequenceRunController {
             flash.message = "The master pool has been removed!"
         } catch (SequenceRunException e) {
             flash.message = e.message
+        }
+        redirect(action: "edit", params: [runId: runId])
+    }
+    
+    def addSamplesById(Long runId, String sampleIds) {
+        try {
+            def unknownSampleIds = sequenceRunService.addSamplesById(runId, sampleIds)
+            if (unknownSampleIds.size() > 0) {
+                flash.message = "Unknown Samples ${unknownSampleIds} are not added to the sequence Run!"
+            } else {
+                flash.message = "Success! All samples have been added to the sequence run."
+            }           
+        } catch(SequenceRunException e) {
+            flash.message = e.message
+        } catch (Exception e) {
+            flash.message = "An unexpected error has occured!"
+            log.error e
         }
         redirect(action: "edit", params: [runId: runId])
     }

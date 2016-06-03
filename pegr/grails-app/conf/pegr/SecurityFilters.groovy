@@ -132,7 +132,7 @@ class SecurityFilters {
             }
         }
         
-        SequenceRunEdit(controller: "sequenceRun", action: "editInfo|update|searchPool|addPool|removePool|removeExperiment|updateGenomes|run") {
+        SequenceRunEdit(controller: "sequenceRun", action: "editInfo|update|searchPool|addPool|removePool|addSamplesById|removeExperiment|updateGenomes|run") {
             before = {
                 def runId = params.long('runId')
                 def run =  SequenceRun.get(runId)

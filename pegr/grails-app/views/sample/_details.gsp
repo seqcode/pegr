@@ -107,7 +107,9 @@
             <g:if test="${sample.antibody?.note}">
             <li>Notes: ${sample.antibody?.note}</li>
             </g:if>
-            
+        </ul>
+        <h4>Target</h4>
+        <ul>
             <li>Target: ${sample.target?.name}</li>
             <g:if test="${sample.target?.targetType}">
             <li>Type: ${sample.target.targetType}</li>
@@ -126,47 +128,43 @@
 
     <div id="protocol" class="col-sm-3">
         <h4>Protocol</h4>   
-        <g:if test="${sample?.prtclInstSummary}">
-            <ul>
-                <li>Assay: ${sample.prtclInstSummary.protocol}</li>
-
+        <ul>
+            <li>Assay: ${sample.assay}</li>
+            <g:if test="${sample?.prtclInstSummary}">
                 <g:if test="${notes['Resin']}">
                 <li>Resin: ${notes['Resin']}</li>
                 </g:if>
-
                 <g:if test="${notes['PCR Cycle']}">
                 <li>PCR Cycle: ${notes['PCR Cycle']}</li>
                 </g:if>
-            </ul>
-        </g:if>
-        <g:else>
-            <div class="subnumber">
-                <ol>
-                    <g:each in="${protocols}" var="bag">
-                        <li>
-                            <g:if test="${authorized}">
-                                <g:link controller="protocolInstanceBag" action="showBag" id="${bag.bag?.id}">${bag.bag?.name}</g:link>
-                                <ol>
-                                    <g:each in="${bag.protocolList}">
-                                        <li><g:link controller="protocolInstanceBag" action="showInstance" id="${it.id}">${it.protocol}</g:link>
+            </g:if>
+        </ul>
+        <div class="subnumber">
+            <ol>
+                <g:each in="${protocols}" var="bag">
+                    <li>
+                        <g:if test="${authorized}">
+                            <g:link controller="protocolInstanceBag" action="showBag" id="${bag.bag?.id}">${bag.bag?.name}</g:link>
+                            <ol>
+                                <g:each in="${bag.protocolList}">
+                                    <li><g:link controller="protocolInstanceBag" action="showInstance" id="${it.id}">${it.protocol}</g:link>
+                                    <g:link controller="protocolInstanceBag" action="renderFile" params="[protocolId: it.protocol?.id]" target="_blank"><span class="glyphicon glyphicon-file"></span></g:link></li>
+                                </g:each>
+                            </ol>
+                        </g:if>
+                        <g:else>
+                            ${bag.bag?.name}
+                            <ol>
+                                <g:each in="${bag.protocolList}">
+                                    <li>${it.protocol} 
                                         <g:link controller="protocolInstanceBag" action="renderFile" params="[protocolId: it.protocol?.id]" target="_blank"><span class="glyphicon glyphicon-file"></span></g:link></li>
-                                    </g:each>
-                                </ol>
-                            </g:if>
-                            <g:else>
-                                ${bag.bag?.name}
-                                <ol>
-                                    <g:each in="${bag.protocolList}">
-                                        <li>${it.protocol} 
-                                            <g:link controller="protocolInstanceBag" action="renderFile" params="[protocolId: it.protocol?.id]" target="_blank"><span class="glyphicon glyphicon-file"></span></g:link></li>
-                                    </g:each>
-                                </ol>
-                            </g:else>
-                        </li>
-                    </g:each>
-                </ol>
-            </div>
-        </g:else>
+                                </g:each>
+                            </ol>
+                        </g:else>
+                    </li>
+                </g:each>
+            </ol>
+        </div>
     </div>     
 
     <div id="other" class="col-sm-3">      

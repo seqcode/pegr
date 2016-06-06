@@ -2843,4 +2843,6 @@ databaseChangeLog = {
 	include file: 'addSampleAudit.groovy'
 
 	include file: 'sampleDataType.groovy'
+    
+    include file: 'removeDownStream.groovy'
 }

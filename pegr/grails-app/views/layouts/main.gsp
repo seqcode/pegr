@@ -30,7 +30,6 @@
 	       	<sec:ifAllGranted roles="ROLE_ADMIN"><li id="nav-admin"><g:link controller="admin">Admin</g:link></li></sec:ifAllGranted>
 	      </ul>
 	    <ul class="nav navbar-nav navbar-right">
-		  <li><a href="#"><span class="glyphicon glyphicon-envelope"></span> Message</a></li>
 		  <li class="dropdown">
 		    <a href="#" class="dropdown-toggle"  data-toggle="dropdown">
 		    	<span class="glyphicon glyphicon-user"></span>${sec.username()}<span class="caret"></span>

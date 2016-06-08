@@ -48,6 +48,7 @@ class StatsRegistrationCommand {
     String genome
     String toolId
     String workflowId
+    String historyId
     String toolCategory
     String parameters
     Map statistics

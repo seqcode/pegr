@@ -2845,4 +2845,6 @@ databaseChangeLog = {
 	include file: 'sampleDataType.groovy'
     
     include file: 'removeDownStream.groovy'
+
+	include file: 'addHistoryId.groovy'
 }

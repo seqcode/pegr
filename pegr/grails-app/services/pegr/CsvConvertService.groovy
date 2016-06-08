@@ -34,9 +34,12 @@ class CsvConvertService {
 		    }
             try {
                 migrateOneRow(rawdata, runStatus, basicCheck)
-		 	}catch(Exception e) {
+		 	} catch(CsvConvertException e) {
+                messages.push("Error: Line ${lineNo}. ${e.message}")
+		        continue
+		    } catch(Exception e) {
 		        log.error "Error: line ${lineNo}. " + e
-                messages.push("Error: Line ${lineNo} ${e.message}")
+                messages.push("Error: Line ${lineNo}.")
 		        continue
 		    }   
 		}
@@ -133,7 +136,11 @@ class CsvConvertService {
             return
         }
         if (basicCheck) {
-            sampleService.splitAndAddIndexToSample(sample, indexStr)
+            try {
+                sampleService.splitAndAddIndexToSample(sample, indexStr)
+            } catch (SampleException e) {
+                throw new CsvConvertException(message: e.message)
+            }
         } else {
             def index = SequenceIndex.findByIndexIdAndSequence(indexIdStr, indexStr)
             if (!index) {

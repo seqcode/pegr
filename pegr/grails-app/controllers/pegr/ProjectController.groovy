@@ -148,13 +148,20 @@ class ProjectController {
     }
     
     def addExistingSamples(Long projectId, String sampleIds) {
-        def messages = projectService.addExistingSamples(projectId, sampleIds)
-        if (messages.size()) {
-            flash.messages = messages
-            redirect(action: "searchSample", params:[projectId: projectId])
-        } else {
-            redirect(action: "show", id: projectId)
+        try {
+            def unknownSampleIds = projectService.addExistingSamples(projectId, sampleIds)
+            if (unknownSampleIds.size() > 0) {
+                flash.messages = "Unknown Samples ${unknownSampleIds} are not added to the project!"
+            } else {
+                flash.message = "Success! All samples have been added to the project."
+            }
+        } catch (ProjectException e) {
+            flash.message = e.message
+        } catch (Exception e) {
+            flash.message = "An unexpected error has occured!"
+            log.error e
         }
+        redirect(action: "show", id: projectId)
     }
     
     def addNewSamples(Long projectId, Long assayId) {

@@ -7,7 +7,8 @@ class ProjectException extends RuntimeException {
 
 class ProjectService {
     def springSecurityService
-    
+    def utilityService
+
     @Transactional
     void save(Project project) {
         if (!project.save(flush: true)) {   
@@ -49,25 +50,29 @@ class ProjectService {
     }
     
     @Transactional
-    List addExistingSamples(Long projectId, String sampleIds) {
+    def addExistingSamples(Long projectId, String sampleIds) {
+        def project = Project.get(projectId)
+        if (!project) {
+            throw new ProjectException(message: "Project not found!")
+        }
         def messages = []
         def addedIds = []
-        def idList = sampleIds.split(',')*.trim()
-        idList.each{
-            try {
-                def sampleId = Long.parseLong(it)
-                def project = Project.get(projectId)
-                def sample = Sample.get(sampleId)
-                new ProjectSamples(project: project, sample: sample).save()
-                addedIds.push(sample.id)
-            } catch (Exception e) {
-                messages.push("Error adding Sample ${it}: ${e.message};")
+        def ids
+        try {
+            ids = utilityService.parseSetOfNumbers(sampleIds)
+        } catch (UtilityException e) {
+            throw new ProjectException(message: e.message)
+        }
+        def unknownSampleIds = []
+        ids.each{ sampleId ->
+            def sample = Sample.get(sampleId)
+            if (!sample) {
+                unknownSampleIds << sampleId
+            } else if (!ProjectSamples.findByProjectAndSample(project, sample)){
+                new ProjectSamples(project: project, sample: sample).save(failOnError: true)
             }
         }
-       if (addedIds.size()) {
-            messages.push("Samples [${addedIds.join(',')}] have been added to the project!")
-        }
-        return messages
+        return unknownSampleIds
     }
     
 }

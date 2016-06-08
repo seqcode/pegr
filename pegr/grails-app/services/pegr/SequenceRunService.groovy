@@ -13,6 +13,7 @@ class DuplicatedSampleException extends RuntimeException {
 class SequenceRunService {
     def springSecurityService
     def walleService
+    def utilityService
     
     @Transactional
     void save(SequenceRun run) {
@@ -93,25 +94,11 @@ class SequenceRunService {
         if (sampleIds == null || sampleIds == "") {
             throw new SequenceRunException(message: "No sample ID!")
         }
-        Set ids = []
-        sampleIds.split(",")*.trim().each{ spanStr ->
-            def span = spanStr.split("-")*.trim()
-            if (span.size() == 1) {
-                ids += stringToId(span[0])
-            } else if (span.size() == 2) {
-                def x1 = stringToId(span[0])
-                def x2 = stringToId(span[1])
-                if (x1 > x2) {
-                    def y = x1
-                    x1 = x2
-                    x2 = y
-                }
-                (x1..x2).each {
-                    ids << it
-                }
-            } else if(span.size() > 2) {
-                throw new SequenceRunException(message: "Error in the sample IDs!")
-            }
+        Set ids 
+        try {
+            ids = utilityService.parseSetOfNumbers(sampleIds)
+        } catch (UtilityException e) {
+            throw new SequenceRunException(message: e.message)
         }
         Set unknownSampleIds = []
         ids.each { id ->
@@ -123,16 +110,6 @@ class SequenceRunService {
             }
         }
         return unknownSampleIds
-    }
-    
-    def stringToId(String s) {
-        def id
-        try {
-            id = Long.parseLong(s)
-        } catch (Exception e){
-            throw new SequenceRunException(message: "Error in the sample ID ${s}!")
-        }
-        return id
     }
     
     @Transactional

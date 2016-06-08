@@ -1,5 +1,5 @@
 package pegr
-import grails.transaction.Transactional
+import grails.transaction.*
 import com.opencsv.CSVParser
 import com.opencsv.CSVReader
 import groovy.json.*
@@ -9,10 +9,12 @@ class CsvConvertException extends RuntimeException {
     String message
 }
     
+@Transactional
 class CsvConvertService {
     def sampleService
     def antibodyService
 	
+    @NotTransactional
 	def migrate(String filename, RunStatus runStatus, int startLine, int endLine, boolean basicCheck){
 		
         def timeStart = new Date()

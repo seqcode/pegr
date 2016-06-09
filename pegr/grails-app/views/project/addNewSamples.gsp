@@ -18,6 +18,7 @@
     </style>
 </head>
 <body>
+    <a href="#" onclick="window.open('${createLink(uri:'/help/sampleSubmissionHelp.html')}', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><u>Help</u></a>
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
@@ -50,7 +51,6 @@
                     <th>Genotype</th>
                     <th>Mutation</th>
                     <th>Tissue</th>
-                    <th>Prep User</th>
                     <th>Growth Media</th>
                     <th>Treatments</th>                       
                     <th>Chrom. (ug)</th>
@@ -58,6 +58,7 @@
                     <th>Volume (ul)</th>
                     <th>Requested Tags (M)</th>
                     <th>Reference Genome(s)</th>
+                    <th>Index (Optional)</th>
                     <th>Notes</th> 
                     <th>Company</th>
                     <th>Catalog</th>
@@ -68,9 +69,9 @@
                     <th>Ig Type</th>
                     <th>Conc.(ug/ul)</th>
                     <th>Notes</th>
-                    <th>ul/sample sent</th>
-                    <th>ug to use/std ChIP</th>
-                    <th>ul to use/std ChIP</th>
+                    <th>Volume Sent (ul)</th>
+                    <th>Usage Per ChIP (ug)</th>
+                    <th>Usage Per ChIP (ul)</th>
                     <th>Target Type</th>
                     <th>Target</th>
                     <th>C-Term</th>
@@ -91,22 +92,22 @@
                         </select>
                     </td>
                     <td>
-                        <select class="genus tag-select2" name="samples[0].genus" style="width: 150px">
+                        <select class="genus tag-select2" name="samples[0].genus" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="samples[0].speciesId" class="species tag-select2" style="width: 150px">
+                        <select name="samples[0].speciesId" class="species tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="samples[0].parentStrain" class="parent-strain tag-select2" style="width: 150px">
+                        <select name="samples[0].parentStrain" class="parent-strain tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="samples[0].strain" class="strain tag-select2" style="width: 150px" required>
+                        <select name="samples[0].strain" class="strain tag-select2 textcontrol" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
@@ -115,7 +116,7 @@
                             <option></option>
                         </select></td>
                     <td>
-                        <select name="samples[0].mutation" class="mutation tag-select2" style="width: 150px">
+                        <select name="samples[0].mutation" class="mutation tag-select2 textcontrol" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
@@ -123,30 +124,26 @@
                         <g:select name="samples[0].tissue" from="${pegr.Tissue.list()}" optionKey="id" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
                     </td>
                     <td>
-                        <select class="prepUser no-tag-select2" name="samples[0].prepUserId" style="width: 150px" >
+                        <select name="samples[0].growthMediaId" class="growth-media tag-select2 textcontrol" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="samples[0].growthMediaId" class="growth-media tag-select2" style="width: 150px" required>
+                        <select multiple="multiple" class="treatments tag-select2 textcontrol" name="samples[0].treatments" style="width: 300px">
                             <option></option>
                         </select>
                     </td>
+                    <td><g:textField name="samples[0].chrom" class="isnumber"></g:textField></td>
+                    <td><g:textField name="samples[0].cellNum" class="isnumber"></g:textField></td>
+                    <td><g:textField name="samples[0].volume" class="isnumber"></g:textField></td>
+                    <td><g:textField name="samples[0].requestedTags" class="isnumber"></g:textField></td>
                     <td>
-                        <select multiple="multiple" class="treatments tag-select2" name="samples[0].treatmentId" style="width: 300px">
+                        <select multiple="multiple" name="samples[0].genomes" class="genomes no-tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
-                    <td><g:textField name="samples[0].chrom"></g:textField></td>
-                    <td><g:textField name="samples[0].cellNum"></g:textField></td>
-                    <td><g:textField name="samples[0].volume"></g:textField></td>
-                    <td><g:textField name="samples[0].requestedTags"></g:textField></td>
-                    <td>
-                        <select multiple="multiple" name="samples[0].genomeId" class="genomes no-tag-select2" style="width: 150px" required>
-                            <option></option>
-                        </select>
-                    </td>
-                    <td><g:textField name="sampleNotes" style="width: 500px"></g:textField></td>
+                    <td><g:textField name="samples[0].indices"></g:textField></td>
+                    <td><g:textField name="samples[0].sampleNotes" style="width: 300px"></g:textField></td>
 
                     <td>
                         <select class="company tag-select2" name="samples[0].company" style="width: 200px">
@@ -154,7 +151,7 @@
                         </select>
                     </td>
                     <td>
-                        <select class="catalog tag-select2" name="samples[0].catalogNumber" style="width: 150px" required>
+                        <select class="catalog tag-select2 textcontrol" name="samples[0].catalogNumber" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
@@ -175,16 +172,16 @@
                     <td>
                         <g:select name="samples[0].igTypeId" from="${pegr.IgType.list()}" optionKey="id" noSelection="['': '']" class="tag-select2 ig" style="width: 150px"/>
                     </td>
-                    <td><input name="samples[0].abConcentration" class="conc"/></td>
+                    <td><input name="samples[0].abConcentration" class="conc isnumber"/></td>
                     <td><input name="samples[0].abNotes"></td>
-                    <td><input name="samples[0].abVolumePerSample"></td>
-                    <td><input name="samples[0].ugPerChip"></td>
-                    <td><input name="samples[0].ulPerChip"></td>
+                    <td><input name="samples[0].abVolumePerSample" class="isnumber"></td>
+                    <td><input name="samples[0].ugPerChip" class="isnumber"></td>
+                    <td><input name="samples[0].ulPerChip" class="isnumber"></td>
                     <td>
                         <g:select name="samples[0].targetTypeId" from="${pegr.TargetType.list()}" optionKey="id" noSelection="['': '']" class="target-type tag-select2" style="width: 150px"></g:select>
                     </td>
                     <td>
-                        <select name="samples[0].target" class="target tag-select2" style="width: 150px" required>
+                        <select name="samples[0].target" class="target tag-select2 textcontrol" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
@@ -218,6 +215,22 @@
     $(document).ready(function(){
         $("#nav-projects").addClass("active");
         initializeSelect2s(count);
+            
+        // jquery validation
+        jQuery.validator.addMethod("textrule", function(value, element) {
+            return this.optional(element) || /^[a-zA-Z0-9-]+$/.test(value);
+        }, "Only a-z, A-Z, 0-9 and '-' are allowed!");
+
+        jQuery.validator.addClassRules({
+            textcontrol: {
+                textrule: true
+            },
+            isnumber: {
+                number: true
+            }
+        });
+
+        $("form").validate();
     });
     
     // select2 initialize
@@ -237,10 +250,6 @@
                 placeholder: noTagPlaceholder
             });
             $("#tr"+count+" .sendTo").select2({
-                data: result,
-                placeholder: noTagPlaceholder
-            });
-            $("#tr"+count+" .prepUser").select2({
                 data: result,
                 placeholder: noTagPlaceholder
             });
@@ -533,6 +542,8 @@
                 placeholder: noTagPlaceholder
            });
         });
+        $("form").validate();
+
         return false;
     });
 

@@ -5,10 +5,11 @@ class SampleSequenceIndices {
     Sample sample
     SequenceIndex index
     Integer setId
+    Integer indexInSet
     
     static constraints = {
-        sample unique: 'index'
         setId nullable: true
+        indexInSet nullable: true
     }
     
     static mapping = {

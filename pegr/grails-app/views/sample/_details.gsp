@@ -58,7 +58,7 @@
         </ul>
     </div>
     <div id="antibody" class="col-sm-3">
-        <h4>Antibody</h4>
+        <h4>Antibody <g:if test="${authorized}"><g:link controller="antibody" action="show" id="${sample?.antibody?.id}"><span class="glyphicon glyphicon-qrcode"></span></g:link></g:if></h4>
         <ul>
             <g:if test="${sample.antibody?.company}">
             <li>Company: ${sample.antibody?.company}</li>
@@ -92,6 +92,24 @@
             <li>External ID: ${sample.antibody.externalId}</li>
             </g:if>  
 
+            <g:if test="${notes?.containsKey('Volume Sent (ul)')}">
+            <li>Volume Sent (ul): ${notes['Volume Sent (ul)']}</li>
+            </g:if> 
+            
+            <g:if test="${notes?.containsKey('Usage Per ChIP (ug)')}">
+            <li>Usage Per ChIP (ug): ${notes['Usage Per ChIP (ug)']}</li>
+            </g:if> 
+            
+            <g:if test="${notes?.containsKey('Usage Per ChIP (ul)')}">
+            <li>Usage Per ChIP (ug): ${notes['Usage Per ChIP (ul)']}</li>
+            </g:if> 
+                   
+            <g:if test="${sample.antibody?.note}">
+            <li>Notes: ${sample.antibody?.note}</li>
+            </g:if>
+        </ul>
+        <h4>Target</h4>
+        <ul>
             <li>Target: ${sample.target?.name}</li>
             <g:if test="${sample.target?.targetType}">
             <li>Type: ${sample.target.targetType}</li>
@@ -103,60 +121,56 @@
             <li>N-Tag: ${sample.target.nTermTag}</li>
             </g:if>
             <g:if test="${sample.target?.note}">
-            <li>C-Tag: ${sample.target.note}</li>
+            <li>Target Notes: ${sample.target.note}</li>
             </g:if>
         </ul>
     </div>
 
     <div id="protocol" class="col-sm-3">
         <h4>Protocol</h4>   
-        <g:if test="${sample?.prtclInstSummary}">
-            <ul>
-                <li>Assay: ${sample.prtclInstSummary.protocol}</li>
-
+        <ul>
+            <li>Assay: ${sample.assay}</li>
+            <g:if test="${sample?.prtclInstSummary}">
                 <g:if test="${notes['Resin']}">
                 <li>Resin: ${notes['Resin']}</li>
                 </g:if>
-
                 <g:if test="${notes['PCR Cycle']}">
                 <li>PCR Cycle: ${notes['PCR Cycle']}</li>
                 </g:if>
-            </ul>
-        </g:if>
-        <g:else>
-            <div class="subnumber">
-                <ol>
-                    <g:each in="${protocols}" var="bag">
-                        <li>
-                            <g:if test="${authorized}">
-                                <g:link controller="protocolInstanceBag" action="showBag" id="${bag.bag?.id}">${bag.bag?.name}</g:link>
-                                <ol>
-                                    <g:each in="${bag.protocolList}">
-                                        <li><g:link controller="protocolInstanceBag" action="showInstance" id="${it.id}">${it.protocol}</g:link>
+            </g:if>
+        </ul>
+        <div class="subnumber">
+            <ol>
+                <g:each in="${protocols}" var="bag">
+                    <li>
+                        <g:if test="${authorized}">
+                            <g:link controller="protocolInstanceBag" action="showBag" id="${bag.bag?.id}">${bag.bag?.name}</g:link>
+                            <ol>
+                                <g:each in="${bag.protocolList}">
+                                    <li><g:link controller="protocolInstanceBag" action="showInstance" id="${it.id}">${it.protocol}</g:link>
+                                    <g:link controller="protocolInstanceBag" action="renderFile" params="[protocolId: it.protocol?.id]" target="_blank"><span class="glyphicon glyphicon-file"></span></g:link></li>
+                                </g:each>
+                            </ol>
+                        </g:if>
+                        <g:else>
+                            ${bag.bag?.name}
+                            <ol>
+                                <g:each in="${bag.protocolList}">
+                                    <li>${it.protocol} 
                                         <g:link controller="protocolInstanceBag" action="renderFile" params="[protocolId: it.protocol?.id]" target="_blank"><span class="glyphicon glyphicon-file"></span></g:link></li>
-                                    </g:each>
-                                </ol>
-                            </g:if>
-                            <g:else>
-                                ${bag.bag?.name}
-                                <ol>
-                                    <g:each in="${bag.protocolList}">
-                                        <li>${it.protocol} 
-                                            <g:link controller="protocolInstanceBag" action="renderFile" params="[protocolId: it.protocol?.id]" target="_blank"><span class="glyphicon glyphicon-file"></span></g:link></li>
-                                    </g:each>
-                                </ol>
-                            </g:else>
-                        </li>
-                    </g:each>
-                </ol>
-            </div>
-        </g:else>
+                                </g:each>
+                            </ol>
+                        </g:else>
+                    </li>
+                </g:each>
+            </ol>
+        </div>
     </div>     
 
     <div id="other" class="col-sm-3">      
         <h4>Other</h4>
         <ul>
-            <li>Index: <g:each in="${sample.sequenceIndices}">${it.sequence} </g:each></li>
+            <li>Index: ${sample.sequenceIndicesString}</li>
 
             <li>Chromosome (ug): <g:if test="${sample?.chromosomeAmount}">${sample.chromosomeAmount}</g:if></li>
 
@@ -166,12 +180,16 @@
 
             <li>Requested Tags (M): <g:if test="${sample?.requestedTagNumber}">${sample.requestedTagNumber}</g:if></li>
 
+            <li>Reference genomes: ${sample?.requestedGenomes}</li>
+            
+            <li>Send data to: ${sample?.sendDataTo}</li>
+            
             <g:if test="${sample?.publicationReference}">
             <li>Publication Reference: ${sample.publicationReference}</li>
             </g:if>
             
-            <g:if test="${notes['note']}">
-            <li>Notes: ${notes['note']}</li>
+            <g:if test="${sample.note}">
+            <li>Notes: ${sample.note}</li>
             </g:if>
         </ul>
     </div>  

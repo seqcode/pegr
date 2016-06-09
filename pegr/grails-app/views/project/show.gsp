@@ -7,7 +7,6 @@
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
-	<div><g:link action='index'>My Projects</g:link> -> Project ${project?.name} </div>
 	<div>
 		<h3>Project: ${project?.name} <g:if test="${authorized}"><g:link action="edit" params="[projectId:project?.id]" class="edit">Edit</g:link></g:if></h3>
 		<p>Created: ${project?.dateCreated}, updated: ${project?.lastUpdated}</p>
@@ -20,7 +19,6 @@
         </div>
         
 		<h3>Samples</h3>
-
         <ul class="nav nav-tabs">
             <li class="active"><a data-toggle="tab" href="#sample">Sample Information</a></li>
             <li><a data-toggle="tab" href="#alignment">Alignment</a></li>
@@ -46,28 +44,28 @@
 	</div>
     </br>          
     
-    <div id="selectAssay" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4>Select Assay</h4>
-                </div>
-                <div class="modal-body">
-                    <g:form action="addNewSamples" class="fields" role="form" method="get">
-                        <g:hiddenField name="projectId" value="${project.id}"></g:hiddenField>
-                        <div>
-                            <label>Assay</label> 
-                            <g:select name="assayId" optionKey="id" from="${pegr.Assay.list()}" noSelection="['null': '-- choose --']" /> 
-                        </div>
-                        <g:submitButton class="btn btn-primary" name="submit" value="OK"/>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    </g:form>                    
+    <g:if test="${authorized}">
+        <div id="selectAssay" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4>Select Assay</h4>
+                    </div>
+                    <div class="modal-body">
+                        <g:form action="addNewSamples" class="fields" role="form" method="get">
+                            <g:hiddenField name="projectId" value="${project.id}"></g:hiddenField>
+                            <div>
+                                <label>Assay</label> 
+                                <g:select name="assayId" optionKey="id" from="${pegr.Assay.list()}" noSelection="['null': '-- choose --']" /> 
+                            </div>
+                            <g:submitButton class="btn btn-primary" name="submit" value="OK"/>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        </g:form>                    
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     
-    <g:if test="${authorized}">
         <div id="addUser" class="modal fade" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -79,7 +77,7 @@
                             <g:hiddenField name="projectId" value="${project.id}"></g:hiddenField>
                             <div>
                                 <label for="userId">User</label> 
-                                <g:select id="userId" name="userId" optionKey="id" from="${pegr.User.list()}" noSelection="['null': '-- choose --']" /> 
+                                <g:select id="userId" name="userId" optionKey="id" from="${pegr.User.list()}" noSelection="['null': '']" style="width: 250px"/> 
                             </div>
                             <div>
                                 <label for="projectRole">Project Role</label>
@@ -105,10 +103,7 @@
                     <div class="modal-body">
                         <form class="fields" role="form" method="post">
                             <g:hiddenField name="projectId" value="${project.id}"></g:hiddenField>
-                            <div>
-                                <label for="userId">User</label> 
-                                <g:select id="userId" name="userId" optionKey="id" from="${pegr.User.list()}" noSelection="['null': '-- choose --']" /> 
-                            </div>
+                            <g:hiddenField name="userId" id="hiddenUserId"></g:hiddenField>
                             <div>
                                 <label for="projectRole">Project Role</label>
                                 <g:select id="projectRole" name="projectRole" from="${pegr.ProjectRole.values()}" keys="${pegr.ProjectRole.values()*.name()}" noSelection="['null': '-- choose --']" /> 
@@ -132,6 +127,7 @@
             if (!${authorized}) {
                 $(".edit").hide();
             }
+            $("#userId").select2();
         });
 
         function removeUser(userId, projectId) {
@@ -148,7 +144,7 @@
         }
         
         function showEditRole(userId) {
-            $(".modal-body #userId").val(userId);
+            $(".modal-body #hiddenUserId").val(userId);
         }
 
         function closeModal() {

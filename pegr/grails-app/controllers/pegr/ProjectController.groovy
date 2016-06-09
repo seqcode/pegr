@@ -148,13 +148,20 @@ class ProjectController {
     }
     
     def addExistingSamples(Long projectId, String sampleIds) {
-        def messages = projectService.addExistingSamples(projectId, sampleIds)
-        if (messages.size()) {
-            flash.messages = messages
-            redirect(action: "searchSample", params:[projectId: projectId])
-        } else {
-            redirect(action: "show", id: projectId)
+        try {
+            def unknownSampleIds = projectService.addExistingSamples(projectId, sampleIds)
+            if (unknownSampleIds.size() > 0) {
+                flash.messages = "Unknown Samples ${unknownSampleIds} are not added to the project!"
+            } else {
+                flash.message = "Success! All samples have been added to the project."
+            }
+        } catch (ProjectException e) {
+            flash.message = e.message
+        } catch (Exception e) {
+            flash.message = "An unexpected error has occured!"
+            log.error e
         }
+        redirect(action: "show", id: projectId)
     }
     
     def addNewSamples(Long projectId, Long assayId) {
@@ -174,9 +181,8 @@ class ProjectController {
     
     def saveNewSamples(SampleListCommand command) {
         try {
-            log.error "Assay: ${command.assayId}, samples: ${command.samples}"
-            sampleService.saveNewSamples(command.assayId, command.projectId, command.samples)
-            flash.message = "New samples added!"
+            def message = sampleService.saveNewSamples(command.assayId, command.projectId, command.samples)
+            flash.message = message
             redirect(action: "show", id: command.projectId)
         } catch(ProjectException e) {
             flash.message = e.message
@@ -196,14 +202,14 @@ class SampleCommand {
     String genotype
     String mutation
     String tissue
-    Long prepUserId
     String growthMediaId
-    String treatmentId
+    String treatments
     String chrom
     String cellNum
     String volume
     String requestedTags
-    String genomeId
+    String genomes
+    String indices
     String sampleNotes
     String company
     String catalogNumber

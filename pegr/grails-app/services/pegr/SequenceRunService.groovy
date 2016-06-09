@@ -6,9 +6,14 @@ class SequenceRunException extends RuntimeException {
     String message
 }
 
+class DuplicatedSampleException extends RuntimeException {
+    
+}
+
 class SequenceRunService {
     def springSecurityService
     def walleService
+    def utilityService
     
     @Transactional
     void save(SequenceRun run) {
@@ -33,19 +38,26 @@ class SequenceRunService {
         }       
         run.poolItem = Item.get(poolItemId)
         run.save()
-        def messages = []
         def samples = fetchSamplesInPool(poolItemId)
         samples.each {
-            if (SequencingExperiment.findBySampleAndSequenceRun(it, run)) {
-                messages.push("Sample already included in this run!")
-            } else {
-                def experiment = new SequencingExperiment(sample: it, sequenceRun: run) 
-                if (!experiment.save(flush: true)) {
-                    message.push("Error including this sample to the sequence run!")
-                } 
+            addSampleToRun(it, run)
+        }
+    }
+    
+    @Transactional
+    def addSampleToRun(Sample sample, SequenceRun run) {
+        if (!SequencingExperiment.findBySampleAndSequenceRun(sample, run)) {
+            def experiment = new SequencingExperiment(sample: sample, sequenceRun: run) 
+            experiment.save(failOnError: true)
+            if (sample.requestedGenomes && sample.requestedGenomes != "") {
+                sample.requestedGenomes.split(",")*.trim().unique().each{ genomeName ->
+                    def genome = Genome.findByName(genomeName)
+                    if (genome) {                            
+                        new SequenceAlignment(genome: genome, sequencingExperiment: experiment).save()
+                    }
+                }
             }
         }
-        return messages
     }
     
     @Transactional
@@ -71,6 +83,33 @@ class SequenceRunService {
             throw new SequenceRunException(message: "Pool not found!")
         }
         return pool.samplesInPool
+    }
+    
+    @Transactional
+    def addSamplesById(Long runId, String sampleIds) {
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            throw new SequenceRunException(message: "Sequence run not found!")
+        }   
+        if (sampleIds == null || sampleIds == "") {
+            throw new SequenceRunException(message: "No sample ID!")
+        }
+        Set ids 
+        try {
+            ids = utilityService.parseSetOfNumbers(sampleIds)
+        } catch (UtilityException e) {
+            throw new SequenceRunException(message: e.message)
+        }
+        Set unknownSampleIds = []
+        ids.each { id ->
+            def sample = Sample.get(id)
+            if (!sample) {
+                unknownSampleIds << id
+            } else {
+                addSampleToRun(sample, run)
+            }
+        }
+        return unknownSampleIds
     }
     
     @Transactional

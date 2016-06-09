@@ -52,8 +52,8 @@ class CellSourceController {
     }
     
     def fetchGenomeAjax(Long speciesId) {
-        def genomes = Genome.executeQuery("select g.id, g.name from Genome g where g.species.id = ?", [speciesId])
-        render utilityService.arrayToSelect2Data(genomes) as JSON
+        def genomes = Genome.executeQuery("select g.name from Genome g where g.species.id = ?", [speciesId])
+        render utilityService.stringToSelect2Data(genomes) as JSON
     }
     
     def fetchParentStrainAjax(Long speciesId) {
@@ -89,8 +89,8 @@ class CellSourceController {
     }
     
     def fetchTreatmentsAjax() {
-        def treatments = CellSourceTreatment.executeQuery("select t.id, t.name from CellSourceTreatment t")
-        render utilityService.arrayToSelect2Data(treatments) as JSON
+        def treatments = CellSourceTreatment.executeQuery("select t.name from CellSourceTreatment t")
+        render utilityService.stringToSelect2Data(treatments) as JSON
     }
     
     /* ---------------------------- Obsolete -------------------------- */

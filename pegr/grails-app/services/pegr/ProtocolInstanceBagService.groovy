@@ -9,6 +9,7 @@ class ProtocolInstanceBagException extends RuntimeException {
 class ProtocolInstanceBagService {
     def springSecurityService
     def itemService
+    def sampleService
     
     @Transactional
     ProtocolInstanceBag savePrtclInstBag(Long protocolGroupId, String name, Date startTime) {
@@ -51,12 +52,13 @@ class ProtocolInstanceBagService {
                 cellSource = CellSource.findByItem(csItem)
             }
             if (cellSource) {
-                sample = new Sample(item: item, cellSource: cellSource, status: SampleStatus.CREATED)
+                sample = new Sample(item: item, cellSource: cellSource)
             } else {
                 throw new ProtocolInstanceBagException(message: "No cell source found for this item!")
             }            
         }
         try {
+            sample.status = SampleStatus.PREP
             sample.addToBags(bag).save()
         } catch(Exception e) {
             log.error "Error: ${e.message}", e
@@ -204,42 +206,15 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    void addIndex(List sampleId, List indexIds) {
-        def newSampleIndices = []
-        def indexIdSet = []
-        def toDelete = []
-        sampleId.eachWithIndex { id, idx ->
-            def sample = Sample.get(Long.parseLong(id))
+    void addIndex(List sampleIds, List indecies) {
+        sampleIds.eachWithIndex { sampleIdStr, idx ->
+            def sampleId = Long.parseLong(sampleIdStr)
+            def sample = Sample.get(sampleId)
             if (!sample) {
                 throw new ProtocolInstanceBagException(message: "Sample not found!")
             }
-            toDelete.addAll(SampleSequenceIndices.findAllBySample(sample))
-            if (indexIds[idx] != "") {
-                def indexStrings = indexIds[idx].split(",")*.trim()
-                indexStrings.each{ 
-                    def indexId = Long.parseLong(it)
-                    if (indexId in indexIdSet) {
-                        throw new ProtocolInstanceBagException(message: "Index ${indexId} has been used for more than twice!")
-                    }
-                    def index = SequenceIndex.findByIndexIdAndStatus(indexId, DictionaryStatus.Y)
-                    if (!index) {
-                        throw new ProtocolInstanceBagException(message: "Index ${indexId} not found!")
-                    }          
-                    indexIdSet.push(indexId)
-                    def oldIndex = toDelete.find{it.index == index && it.sample == sample}
-                    if (oldIndex) {
-                        toDelete.remove(oldIndex)
-                    } else {
-                        newSampleIndices.push(new SampleSequenceIndices(sample: sample, index: index))
-                    }
-                }       
-            }
-        }
-        toDelete.each {
-            it.delete()
-        }
-        newSampleIndices.each {
-            it.save()
+            SampleSequenceIndices.executeUpdate("delete from SampleSequenceIndices where sample.id = :sampleId", [sampleId: sampleId])
+            sampleService.splitAndAddIndexToSample(sample, indecies[idx])
         }
     }
     
@@ -253,7 +228,7 @@ class ProtocolInstanceBagService {
             }
         }
         if (protocol.addIndex) {
-            if (samples.any {it.sequenceIndices.empty}) {
+            if (samples.any { it.sequenceIndicesString == null || it.sequenceIndicesString == "" }) {
                 return false
             }
         }
@@ -461,13 +436,14 @@ class ProtocolInstanceBagService {
                 // remove all the items from the instances
                 ProtocolInstanceItems.executeUpdate('delete ProtocolInstanceItems where protocolInstance.id = :instanceId', [instanceId: it.id])
                 // delete the instances in the bag
-                it.delete(flush: true)
+                it.delete()
             }            
             // remove all the samples from the bag
-            def samples = bag.tracedSamples
-            samples.each{
-                it.removeFromBags(bag).save(flush: true)
+            def samples = bag.tracedSamples.toList()
+            for (sample in samples) {
+                sample.removeFromBags(bag)
             }
+            
             // remove the bag itself
             bag.delete()
         } else {

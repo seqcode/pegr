@@ -119,7 +119,7 @@ class AntibodyService {
     
 	def getTargetType(String str) {
 	    if (str == null) {
-	        return null
+	        return TargetType.findByName("unknown")
 	    }
         if (str.isInteger()) {
             return TargetType.get(str.toInteger())

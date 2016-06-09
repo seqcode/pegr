@@ -2,7 +2,7 @@ package pegr
 
 class SequenceIndex {
 	String indexVersion
-	Integer indexId
+	String indexId
 	String sequence 
 	String oligo
 	DictionaryStatus status

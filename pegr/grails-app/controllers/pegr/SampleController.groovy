@@ -4,6 +4,7 @@ import groovy.json.*
 class SampleController {
     
     def springSecurityService
+    def sampleService
     
     def index(Integer max) {
         params.max = Math.min(max ?: 15, 100)
@@ -22,15 +23,15 @@ class SampleController {
             def jsonSlurper = new JsonSlurper()
             def notes = [:]
             try {
-                notes += jsonSlurper.parseText(sample.note)
-            }catch(Exception e){
-
-            }
-            try {
                 notes += jsonSlurper.parseText(sample.prtclInstSummary.note)
             }catch(Exception e){
 
-            }        
+            }       
+            try {
+                notes += jsonSlurper.parseText(sample.antibodyNotes)
+            }catch(Exception e){
+
+            }
             def protocols = []
             sample.bags.each{ linkedbag ->
                 protocols.push([bag:linkedbag, protocolList:ProtocolInstance.where{bag.id == linkedbag.id}.list(sort: "bagIdx", order: "asc")])
@@ -39,10 +40,44 @@ class SampleController {
             def authorized = currentUser.isAdmin() ||  (currentUser.authorities.any { it.authority == "ROLE_MEMBER" }) 
             [sample: sample, notes: notes, protocols: protocols, authorized: authorized]            
         } else {
-            render status: 404
+            render(view: "/404")
         }
 
 	}
+    
+    def showItem(Long sampleId) {
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            if (sample.item) {
+                redirect(controller: "item", action: "show", id: sample.item.id)
+            } else {
+                def types = ItemType.where{ category == ItemTypeCategory.TRACED_SAMPLE }.list()
+                render(view: "addBarcode", model: [sampleId: sampleId, types: types])
+            }
+        } else {
+            render(view: "/404")
+        }
+    }
+    
+    def saveBarcode(Long sampleId) {
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            def item = new Item(params)
+            try {
+                sampleService.addItem(sample, item)
+                flash.message = "Barcode added!"
+            } catch (SampleException e) {
+                flash.message = e.message
+            } catch (Exception e) {
+                log.error e
+                flash.message = "Error saving the barcode to the sample!"
+            }
+            redirect(action: "show", id: sampleId)
+        } else {
+            render(view: "/404")
+        }
+    }
+    
     
     def showChecked(){
         

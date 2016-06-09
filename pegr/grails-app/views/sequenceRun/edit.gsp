@@ -19,9 +19,39 @@
         <g:render template="summaryDetails"></g:render>
     </div>
     <h3>Samples</h3>
-    <div class="message">
-        Difference between sacCer and sacCer_cegr: sacCer is the UCSC version which uses Roman numerals; sacCer_cegr is the Pugh lab version which uses numbers. Pugh lab samples should normally use sacCer_cegr.
-    </div>
+    <g:if test="${run?.status==pegr.RunStatus.PREP}">
+        Add <button type="button" class="edit" data-toggle="modal" data-target="#add-samples-by-id">by sample ID</button>
+        <g:if test="${run?.poolItem == null}">
+            or <g:link action="searchPool" params="['runId':run.id]" class="edit">by Master Pool</g:link>
+        </g:if>
+        <g:link action="removePool" params="['runId':run.id]" class="edit confirm pull-right">Remove All</g:link>
+        
+        <div id="add-samples-by-id" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <g:form action="addSamplesById">
+                        <div class="modal-header">
+                            <h3 class="modal-title">Add Samples to Sequence Run #${run.id}</h3>
+                        </div>
+                        <div class="modal-body">
+                            <g:hiddenField name="runId" value="${run.id}"></g:hiddenField>
+                            <small class="form-group">
+                                <label>Sample IDs </label>
+                                <input name="sampleIds" type="text" class="form-control">
+                                <br/>
+                                <p>e.g. 1-10, 11, 15</p>
+                            </small>
+                        </div>
+                        <div class="modal-footer">
+                            <g:submitButton name="save" value="Save" class="btn btn-primary"></g:submitButton>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </g:form>
+                </div>
+            </div>
+        </div>
+    </g:if>
+    
     <g:form action="updateGenomes" role="form" method="post">
         <g:hiddenField name="runId" value="${run.id}"></g:hiddenField>
         <table class="table table-striped">
@@ -41,7 +71,7 @@
                         <td><g:link controller="sample" action="show" id="${it.sample.id}">${it.sample?.id}</g:link></td>
                         <td>${it.sample?.cellSource?.strain}</td>
                         <td>${it.sample?.antibody}</td>
-                        <td>${it.sample?.sequenceIndicesDetailString}</td>
+                        <td>${it.sample?.sequenceIndicesString}</td>
                         <td>
                             <g:hiddenField name="experimentId" value="${it.id}"></g:hiddenField>
                             <g:select multiple="multiple" name="genomes${it.id}" from="${pegr.Genome.list()}" optionKey="id" value="${it.genomes}" class="select2"></g:select>
@@ -57,6 +87,9 @@
             </tbody>
           </table>
     </g:form>
+    <div class="message">
+        Difference between sacCer and sacCer_cegr: sacCer is the UCSC version which uses Roman numerals; sacCer_cegr is the Pugh lab version which uses numbers. Pugh lab samples should normally use sacCer_cegr.
+    </div>
     </div>
     <div class="row well text-center">
         <g:if test="${run.status == pegr.RunStatus.PREP}">

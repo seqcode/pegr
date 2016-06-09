@@ -18,7 +18,7 @@
     <g:if test="${subBag}">
         <g:link action="addSubBagToBag" params="[subBagId: subBag.id, bagId: bagId]" class="btn btn-primary">Add Entire Bag</g:link>
     </g:if>
-    <g:link action="searchItemForBag" id="${bagId}" class="btn btn-primary">Cancel</g:link>
+    <g:link action="searchItemForBag" params="[bagId:bagId]" class="btn btn-primary">Cancel</g:link>
     <script>
         $("#nav-bench").addClass("active");
      </script>

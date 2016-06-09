@@ -14,7 +14,7 @@ class AlignmentStatsService {
         def pipeline = getPipeline(apiUser)
         
         // check required fields
-        def requiredFields = ["run", "sample", "genome", "toolId", "workflowId", "toolCategory"]
+        def requiredFields = ["run", "sample", "genome", "toolId", "workflowId", "historyId", "toolCategory"]
         requiredFields.each { field ->
             if (!data.properties[field]) {
                 throw new AlignmentStatsException(message: "Missing ${field}!")
@@ -34,14 +34,17 @@ class AlignmentStatsService {
             throw new AlignmentStatsException(message: "Sequence Alignment for Run ${data.run}, Sample ${data.sample} and Genome ${data.genome} not found!")
         }
         // save the data
+        def statisticsStr = data.statistics ? JsonOutput.toJson(data.statistics) : null
+        def datasetsStr = data.datasets ? JsonOutput.toJson(data.datasets) : null
         def analysis = new Analysis(alignment: alignment,
                                     tool: data.toolId,
                                     pipeline: pipeline,
                                     category: data.toolCategory,
                                     workflowId: data.workflowId,
+                                    historyId: data.historyId,
                                     parameters: data.parameters,
-                                    statistics: JsonOutput.toJson(data.statistics),
-                                    datasets: JsonOutput.toJson(data.datasets))
+                                    statistics: statisticsStr,
+                                    datasets: datasetsStr)
         if (!analysis.save()) {
             log.error analysis.errors
             throw new AlignmentStatsException(message: "Error saving the analysis ${analysis}!")
@@ -49,13 +52,13 @@ class AlignmentStatsService {
 
         // store named fields
         if (data.statistics) {
-            def updatedInAlignment = copyProperties(data.statistics, alignment)
+            def updatedInAlignment = copyProperties(data.statistics, alignment, data.historyId)
             if (updatedInAlignment.size() > 0) {
                 if (!alignment.save()) {
                     log.error "Error saving ${updatedInAlignment} in Alignment!"
                 }
             } 
-            def updatedInExperiment = copyProperties(data.statistics, experiment)
+            def updatedInExperiment = copyProperties(data.statistics, experiment, data.historyId)
             if (updatedInExperiment.size() > 0) {
                 if (!experiment.save()) {
                     log.error "Error saving ${updatedInExperiment} in Experiment!"
@@ -71,11 +74,44 @@ class AlignmentStatsService {
         return pipeline
     }
     
-    def copyProperties(source, target) {
+    def copyProperties(source, target, historyId) {
         def updatedProperties = []
         source.each { key, value ->
             if (target.hasProperty(key) && value != null) {
-                target[key] = value
+                try {
+                    // Special handling of fastqFile and fastqcReport: there could be two files for each sample.
+                    if ( key in ["fastqFile", "fastqcReport"] ) {
+                        def dic = null
+                        if ( target[key] ) {
+                            // If the target field has already been filled, check the prior historyId.   
+                            def jsonSlurper = new JsonSlurper()
+                            try {
+                                dic = jsonSlurper.parseText(target[key])
+                                if (dic.historyId == historyId) {
+                                    // if the historyId is the same, add the new file; else overide.
+                                    if (!(value in dic.files)) {
+                                        while (dic.files.size() > 1) {
+                                            dic.files.pop()
+                                        }
+                                        dic.files.push(value)
+                                    }
+                                } else {
+                                    dic = null
+                                }
+                            } catch (Exception e) {
+                            }                          
+                        } 
+                        if (!dic) {
+                            dic = [historyId: historyId, files: [value]]
+                        }   
+                        target[key] = JsonOutput.toJson(dic)
+                    } else {
+                        target[key] = value
+                    }
+                } catch(org.codehaus.groovy.runtime.typehandling.GroovyCastException e) {
+                    log.error e
+                    throw new AlignmentStatsException(message: e.message)
+                }                
                 updatedProperties.push(key)
             }
         }

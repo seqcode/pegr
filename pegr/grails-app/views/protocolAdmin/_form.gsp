@@ -34,8 +34,8 @@
 
 <div>    
     <label>Add-on </label>
-    <g:checkBox name="addAntibody"/> Antibody 
-    <g:checkBox name="addIndex" /> Index
+    <g:checkBox name="addAntibody" value="${protocol?.addAntibody}"/> Antibody 
+    <g:checkBox name="addIndex" value="${protocol?.addIndex}"/> Index
 </div>
 
 <h4>Sample Pool</h4>

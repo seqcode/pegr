@@ -49,3 +49,15 @@ select s.id, r.run_num, i.invoice_num from sample s join invoice i on s.invoice_
 // update sample set sample.source="CollaboratorS" where sample.invoice_id in (select id from invoice where invoice_num like "%s00%");
 
 // update sample set source = "PughLab" where source is null;
+
+// update sample_sequence_indices set index_in_set = 2 where mod(id, 2)= 1 and set_id is not null;
+
+// update sample_sequence_indices set index_in_set = 1 where mod(id, 2)= 0 and set_id is not null;
+
+// update sample, protocol_instance_summary, protocol set sample.assay_id = protocol.assay_id where sample.prtcl_inst_summary_id = protocol_instance_summary.id and protocol_instance_summary.protocol_id=protocol.id and protocol.assay_id is not null;
+
+// update protocol, assay set protocol.assay_id = assay.id where protocol.name = assay.name
+
+// insert into organization (version, name, class) values (0, "Pugh Lab", "pegr.Lab");
+
+// update user set affiliation_id = 81 where username = "bfp2"; // check affiliation_id! "labadmin"

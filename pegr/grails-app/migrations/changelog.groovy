@@ -2840,5 +2840,11 @@ databaseChangeLog = {
 
 	include file: 'addAnalysis.groovy'
 
-	include file: 'addRequestedGenome.groovy'
+	include file: 'addSampleAudit.groovy'
+
+	include file: 'sampleDataType.groovy'
+    
+    include file: 'removeDownStream.groovy'
+
+	include file: 'addHistoryId.groovy'
 }

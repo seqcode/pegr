@@ -1,5 +1,5 @@
 package pegr
-import grails.transaction.Transactional
+import grails.transaction.*
 import com.opencsv.CSVParser
 import com.opencsv.CSVReader
 import groovy.json.*
@@ -9,10 +9,12 @@ class CsvConvertException extends RuntimeException {
     String message
 }
     
+@Transactional
 class CsvConvertService {
     def sampleService
     def antibodyService
 	
+    @NotTransactional
 	def migrate(String filename, RunStatus runStatus, int startLine, int endLine, boolean basicCheck){
 		
         def timeStart = new Date()
@@ -34,16 +36,19 @@ class CsvConvertService {
 		    }
             try {
                 migrateOneRow(rawdata, runStatus, basicCheck)
-		 	}catch(Exception e) {
+		 	} catch(CsvConvertException e) {
+                messages.push("Error: Line ${lineNo}. ${e.message}")
+		        continue
+		    } catch(Exception e) {
 		        log.error "Error: line ${lineNo}. " + e
-                messages.push("Error: Line ${lineNo} ${e.message}")
+                messages.push("Error: Line ${lineNo}.")
 		        continue
 		    }   
 		}
         
         def timeStop = new Date()
         TimeDuration duration = TimeCategory.minus(timeStop, timeStart)
-        println "Time: " + duration
+        println "Time to upload the CSV file: " + duration
         return messages
 	}
 	
@@ -112,7 +117,7 @@ class CsvConvertService {
 
         def abNotes = JsonOutput.toJson(abnoteMap)
         
-        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes, assay: assay)
+        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes, assay)
 
         addIndexToSample(sample, data.indexStr, data.indexIdStr, basicCheck)
         sampleService.addSampleToProject(project, sample)
@@ -126,25 +131,25 @@ class CsvConvertService {
     }
     
     def addIndexToSample(Sample sample, String indexStr, String indexIdStr, boolean basicCheck) { 
+        if (!sample) {
+            throw new CsvConvertException(message: "Sample cannot be null when adding index!")
+        }
         if (indexStr == null || indexStr == "unk"){
             return
         }
-        def indexId = getInteger(indexIdStr)
-        def index
         if (basicCheck) {
-            index = SequenceIndex.findByIndexIdAndSequenceAndStatus(indexId, indexStr, DictionaryStatus.Y)
-            if (!index) {
-                throw new CsvConvertException(message: "Index ID and String don't match!")
+            try {
+                sampleService.splitAndAddIndexToSample(sample, indexStr)
+            } catch (SampleException e) {
+                throw new CsvConvertException(message: e.message)
             }
         } else {
-            index = SequenceIndex.findByIndexIdAndSequence(indexId, indexStr)
+            def index = SequenceIndex.findByIndexIdAndSequence(indexIdStr, indexStr)
             if (!index) {
-                index = new SequenceIndex(indexId: indexId, sequence: indexStr, indexVersion: "UNKNOWN").save(failOnError: true)
+                index = new SequenceIndex(indexId: indexIdStr, sequence: indexStr, indexVersion: "UNKNOWN").save(failOnError: true)
             }
-        }
-        if (index && sample) {
             new SampleSequenceIndices(sample: sample, index: index).save(failOnError: true)
-        } 
+        }
     }
 	
     def getUser(String userStr) {
@@ -376,7 +381,7 @@ class CsvConvertService {
         if (assay) {
 	        protocol = Protocol.findByNameAndProtocolVersion(assay.name, v)  
 	        if (!protocol) {
-	            protocol = new Protocol(name: assay.name, protocolVersion: v).save( failOnError: true)
+	            protocol = new Protocol(name: assay.name, protocolVersion: v, assay: assay).save( failOnError: true)
 	        }
 	    }
 	    // get note
@@ -647,9 +652,9 @@ class CsvConvertService {
 	    }
 	
 	    def run = SequenceRun.findByPlatformAndRunNum(platform, runNum)
-	    if (!run) {                     
+	    if (!run) {                 
 	         run = new SequenceRun(runNum: runNum, platform: platform, status: runStatus, user: user)
-	
+
 	         // lane
 	         run.lane = getInteger(laneStr)
 	

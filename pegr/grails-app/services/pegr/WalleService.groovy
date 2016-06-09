@@ -168,7 +168,7 @@ class WalleService {
                     def xmlName = generateXmlFile(alignment, run.id, experiment.sample.id, idx, configLocalFolder)
                     xmlNames.push(xmlName)
                 }
-                def indicesString = experiment.sample?.sequenceIndices.collect{it.sequence}.join(",")
+                def indicesString = experiment.sample?.sequenceIndicesString
                 def xmlNamesString= xmlNames.join(",")
                 def data = "${run.id} ; ${experiment.sample?.id} ; ${indicesString} ; ${xmlNamesString}"           
                 it.println data

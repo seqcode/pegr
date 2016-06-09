@@ -17,7 +17,7 @@
                     <td>${sample.cellSource} </td>
                     <td>${sample.antibody}</td>
                     <td>${sample.target}</td>
-                    <td>${sample.prtclInstSummary}</td>
+                    <td>${sample.assay}</td>
                     <td><g:if test="${authorized}"><g:link action="removeSample" params="[sampleId:sample.id, projectId:project?.id]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link></g:if></td>
                 </tr>
             </g:each>              

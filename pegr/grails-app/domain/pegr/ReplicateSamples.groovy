@@ -1,7 +1,8 @@
 package pegr
 
-class TechnicalReplicateSamples {
-    TechnicalReplicateSet set
+class ReplicateSamples {
+
+    ReplicateSet set
     Sample sample
     
     static constraints = {

@@ -455,16 +455,17 @@ class CsvConvertService {
 		        def sample2 = getSampleFromSampleId(note.bioRep2)
 		        def sample1 = getSampleFromSampleId(note.bioRep1)
 		        if (sample2 || sample1) {
-		            def set = BiologicalReplicateSamples.findBySample(sample)?.set  
+		            def sets = ReplicateSamples.findAllBySample(sample)*.set  
+                    def set = sets.find {it.type == ReplicateType.BIOLOGICAL}
 		            if (!set) {
-		                set = new BiologicalReplicateSet().save( failOnError: true)
-		                new BiologicalReplicateSamples(set: set, sample: sample).save( failOnError: true)
+		                set = new ReplicateSet(type: ReplicateType.BIOLOGICAL).save( failOnError: true)
+		                new ReplicateSamples(set: set, sample: sample).save( failOnError: true)
 		            }
 		            if (set && sample2) {
-		                new BiologicalReplicateSamples(set: set, sample: sample2).save()
+		                new ReplicateSamples(set: set, sample: sample2).save()
 		            }
 		            if (set && sample1) {
-		                new BiologicalReplicateSamples(set: set, sample: sample1).save()
+		                new ReplicateSamples(set: set, sample: sample1).save()
 		            }
 		        }
 		        sample.note = note.note

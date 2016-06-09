@@ -126,7 +126,7 @@ class SequenceRunService {
     }
     
     @Transactional
-    void updateGenome(String experimentIdStr, List genomeIds) {
+    void updateSample(String experimentIdStr, List genomeIds, Long readTypeId) {
         Long experimentId = Long.parseLong(experimentIdStr) 
         def experiment = SequencingExperiment.get(experimentId) 
         if (!experiment) {
@@ -153,6 +153,11 @@ class SequenceRunService {
         }
         toAdd.each{
             it.save()
+        }
+        def readType = ReadType.get(readTypeId)
+        if (readType && experiment.readType != readType) {
+            experiment.readType = readType
+            experiment.save()
         }
     }
     

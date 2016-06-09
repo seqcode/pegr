@@ -19,10 +19,16 @@
             </div>
 
             <div class="form-group">
-                <input type="file" name="file"/>
-                <g:submitButton name="upload" value="Upload"/> (only csv files)
+                <input type="file" name="file"/> (only csv files)
+            </div>
+            <div class="form-group">
+                <g:submitButton name="upload" value="Upload" class="btn btn-primary"/>
+                <g:link action="index" class="btn btn-default">Cancel</g:link>
             </div>
         </g:uploadForm>
     </div>
+    <script>
+        $("#nav-bench").addClass("active");
+     </script>
 </body>
 </html>

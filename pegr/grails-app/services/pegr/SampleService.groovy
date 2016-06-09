@@ -62,7 +62,11 @@ class SampleService {
             
             // add index
             try {
-                splitAndAddIndexToSample(sample, data.indices)
+                if (data.indexType == "ID") {
+                    splitIdAndAddIndexToSample(sample, data.indices)
+                } else {
+                    splitAndAddIndexToSample(sample, data.indices)
+                }
             } catch(SampleException e) {
                 message += "Index is not added correctly to sample ${sample.id}! "
             }
@@ -196,6 +200,27 @@ class SampleService {
             def indexInSet = 1
             indices.split("-")*.trim().each {
                 def index = SequenceIndex.findBySequenceAndStatus(it, DictionaryStatus.Y)
+                if (!index) {
+                    throw new SampleException(message: "Incorrect index ${it}!")
+                }
+                new SampleSequenceIndices(sample: sample, index: index, setId: setId, indexInSet: indexInSet).save(failOnError: true)
+                indexInSet++
+            }
+            setId++
+        }
+    }
+    
+    @Transactional
+    def splitIdAndAddIndexToSample(Sample sample, String indexStr) {
+        if (sample == null || indexStr == null) {
+            return
+        }
+        def indexList = indexStr.split(",")*.trim()
+        def setId = 1
+        indexList.each { indices ->
+            def indexInSet = 1
+            indices.split("-")*.trim().each {
+                def index = SequenceIndex.findBySequenceIndexAndStatus(it, DictionaryStatus.Y)
                 if (!index) {
                     throw new SampleException(message: "Incorrect index ${it}!")
                 }

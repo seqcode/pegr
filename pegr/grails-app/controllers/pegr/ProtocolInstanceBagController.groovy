@@ -420,4 +420,7 @@ class ProtocolInstanceBagController {
         }
     }
     
+    def help() {
+        render(view: "help")
+    }
 }

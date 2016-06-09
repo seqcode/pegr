@@ -189,6 +189,15 @@ class ProjectController {
             redirect(action: "addNewSamples", params:[projectId: command.projectId, assayId: command.assayId])
         }
     }
+    
+    def projectRoleHelp() {
+        render(view: "projectRoleHelp")
+    }
+    
+    def sampleSubmissionHelp() {
+        def allIndices = SequenceIndex.findAllByStatus(DictionaryStatus.Y).groupBy({ it -> it.indexVersion })
+        render(view: "sampleSubmissionHelp", model: [allIndices: allIndices])
+    }
 }
 
 
@@ -227,6 +236,7 @@ class SampleCommand {
     String target
     String cterm
     String nterm
+    String indexType
 }
 
 class SampleListCommand {

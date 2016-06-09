@@ -6,6 +6,7 @@
 <body>
     <div class="container-fluid">
         <h4>New Protocol Instance Bag</h4>
+            <a href="#" onclick="window.open('${g.createLink(action:'help')}', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><u>Help</u></a>
         <form role="form" method="post" action="savePrtclInstBag" class="fields">
             <div>
                 <label>Name</label>

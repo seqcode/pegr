@@ -1,20 +1,11 @@
 <html>
     <head>
         <title>PEGR Help - Project Role</title>
-        <style>
-            .border-table {
-                border-collapse: collapse;
-                text-align:center;
-            }
-
-            .border-table td, .border-table th {
-                border: 1px solid black;
-            }
-        </style>  
+        <asset:stylesheet href="application.css"/>
     </head>
     <body>
         <h3>Project Role</h3>
-        <table class="border-table">
+        <table class="table-bordered">
             <thead>
                 <th></th>
                 <th>Owner</th>

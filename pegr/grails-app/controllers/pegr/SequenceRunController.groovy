@@ -33,11 +33,7 @@ class SequenceRunController {
     def show(Integer id) {
         def run = SequenceRun.get(id)
         if (run) {
-            if (run.status != RunStatus.PREP) {
-                [run: run]
-            } else {
-                redirect(action: "edit", params:[runId: id])   
-            }
+            [run: run]
         } else {
             flash.message = "Sequence run not found!"
             redirect(action: "index")
@@ -176,14 +172,14 @@ class SequenceRunController {
         redirect(action: "edit", params: [runId: runId])
     }
     
-    def updateGenomes(Long runId) {
+    def updateSamples(Long runId) {
         def messages = ""
         def expIds = params.list('experimentId')
         expIds.each{
-            def paramsName = "genomes${it}"
-            def genomeIds = params.list(paramsName)
+            def genomeIds = params.list("genomes${it}")
+            def readTypeId = params.long("readType${it}")
             try {
-                sequenceRunService.updateGenome(it, genomeIds)
+                sequenceRunService.updateSample(it, genomeIds, readTypeId)
             } catch (SequenceRunException e) {
                 messages += "<p>e.message</p>"
             } 
@@ -192,7 +188,7 @@ class SequenceRunController {
             messages = "All genomes added successfully!"
         }
         flash.message = messages
-        redirect(action: "edit", params: [runId: runId])
+        redirect(action: "show", id: runId)
     }
     
     def previewRun(Long runId) {

@@ -14,10 +14,6 @@
         </g:if>
     </div>
     <h2>Sequence Run #${run.id}  <small><g:if test="${run.runNum}">(Old No.${run.runNum})</g:if> <span class="label label-default">${run.status}</span></small></h2>
-    <div>
-        <h3>Summary <g:link action="editInfo" params="[runId:run.id]"><span class="edit">Edit</span></g:link></h3>
-        <g:render template="summaryDetails"></g:render>
-    </div>
     <h3>Samples</h3>
     <g:if test="${run?.status==pegr.RunStatus.PREP}">
         Add <button type="button" class="edit" data-toggle="modal" data-target="#add-samples-by-id">by sample ID</button>
@@ -52,7 +48,7 @@
         </div>
     </g:if>
     
-    <g:form action="updateGenomes" role="form" method="post">
+    <g:form action="updateSamples" role="form" method="post">
         <g:hiddenField name="runId" value="${run.id}"></g:hiddenField>
         <table class="table table-striped">
             <thead>
@@ -61,7 +57,8 @@
                     <th>Strain</th>
                     <th>Antibody</th>
                     <th>Index</th>
-                    <th>Genome Build <g:submitButton class="edit" name="save" value="Save"></g:submitButton></th>
+                    <th>Read Type</th>
+                    <th>Genome Build</th>
                     <th></th>
                 </tr>
             </thead>
@@ -72,8 +69,11 @@
                         <td>${it.sample?.cellSource?.strain}</td>
                         <td>${it.sample?.antibody}</td>
                         <td>${it.sample?.sequenceIndicesString}</td>
+                        <g:hiddenField name="experimentId" value="${it.id}"></g:hiddenField>
                         <td>
-                            <g:hiddenField name="experimentId" value="${it.id}"></g:hiddenField>
+                            <g:select name="readType${it.id}" from="${pegr.ReadType.list()}" optionKey="id" value="${it.readType?.id?:1}"></g:select>
+                        </td>
+                        <td>                            
                             <g:select multiple="multiple" name="genomes${it.id}" from="${pegr.Genome.list()}" optionKey="id" value="${it.genomes}" class="select2"></g:select>
                         </td>                        
                         <td>
@@ -86,20 +86,16 @@
                 </tr>
             </tbody>
           </table>
+        <div class="text-center">
+            <g:submitButton class="btn btn-primary" name="save" value="Save"></g:submitButton>
+            <g:link action="show" id="${run.id}" class="btn btn-default">Cancel</g:link>
+        </div>
     </g:form>
     <div class="message">
         Difference between sacCer and sacCer_cegr: sacCer is the UCSC version which uses Roman numerals; sacCer_cegr is the Pugh lab version which uses numbers. Pugh lab samples should normally use sacCer_cegr.
     </div>
     </div>
-    <div class="row well text-center">
-        <g:if test="${run.status == pegr.RunStatus.PREP}">
-            <g:link action="previewRun" params="[runId: run.id]" class="btn btn-success">Submit</g:link>
 
-        </g:if>
-        <g:else>
-            <span class="btn btn-default">Submitted</span>
-        </g:else>
-    </div>
     <script>
         $("#nav-bench").addClass("active");
         $(".confirm").confirm();

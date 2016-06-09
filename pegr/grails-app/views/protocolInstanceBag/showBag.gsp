@@ -5,6 +5,7 @@
 </head>
 <body>                
     <div class="container-fluid">
+        <a href="#" onclick="window.open('${g.createLink(action:'help')}', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><u>Help</u></a>
         <ul class="nav nav-tabs">
             <li><g:link action="index"><span class="glyphicon glyphicon-home"></span> List</g:link></li>
             <g:if test="${completed}">

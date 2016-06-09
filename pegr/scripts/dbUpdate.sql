@@ -61,3 +61,6 @@ select s.id, r.run_num, i.invoice_num from sample s join invoice i on s.invoice_
 // insert into organization (version, name, class) values (0, "Pugh Lab", "pegr.Lab");
 
 // update user set affiliation_id = 81 where username = "bfp2"; // check affiliation_id! "labadmin"
+
+insert into read_type (version, short_name, name) values (0, "PE","Paired End");
+insert into read_type (version, short_name, name) values (0, "SR","Single Read");

@@ -18,7 +18,7 @@
     </style>
 </head>
 <body>
-    <a href="#" onclick="window.open('${createLink(uri:'/help/sampleSubmissionHelp.html')}', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><u>Help</u></a>
+    <a href="#" onclick="window.open('${g.createLink(action:'sampleSubmissionHelp')}', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><u>Help</u></a>
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
@@ -58,7 +58,9 @@
                     <th>Volume (ul)</th>
                     <th>Requested Tags (M)</th>
                     <th>Reference Genome(s)</th>
-                    <th>Index (Optional)</th>
+                    <th><a href="#" onclick="window.open('${g.createLink(action:'sampleSubmissionHelp', fragment:'sequence-index')}', 'Help: Sample Submission', 'width=600,height=400' )">Index <span class="glyphicon glyphicon-question-sign"></span></a> 
+                        <label class="radio-inline"><input type="radio" name="indexType">ID</label>
+                        <label class="radio-inline"><input type="radio" name="indexType">Sequence</label></th>
                     <th>Notes</th> 
                     <th>Company</th>
                     <th>Catalog</th>
@@ -142,7 +144,7 @@
                             <option></option>
                         </select>
                     </td>
-                    <td><g:textField name="samples[0].indices"></g:textField></td>
+                    <td><g:textField name="samples[0].indices" style="width:200px"></g:textField></td>
                     <td><g:textField name="samples[0].sampleNotes" style="width: 300px"></g:textField></td>
 
                     <td>

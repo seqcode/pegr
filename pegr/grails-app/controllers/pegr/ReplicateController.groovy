@@ -3,6 +3,7 @@ package pegr
 class ReplicateController {
     def replicateService
     def sampleService
+    def springSecurity
     
     def saveAjax(String sampleIds, String type, Long currentSampleId) {
         def message = null
@@ -32,7 +33,8 @@ class ReplicateController {
         if (samples.size() < 2) {
             flash.message = "There is ${samples.size()} sample in the set. Please add more samples or delete this replicate set!"
         }
-        [samples: samples, set: set]
+        def authorized = 
+        [samples: samples, set: set, authorized: authorized]
     }
     
     def addSamples(Long setId, Long sampleIds) {

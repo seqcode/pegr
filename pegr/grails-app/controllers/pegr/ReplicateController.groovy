@@ -1,36 +1,38 @@
 package pegr
 
 class ReplicateController {
-    replicateService
+    def replicateService
+    def sampleService
     
-    def create(ReplicateType type) {        
-    }
-    
-    def save(String sampleIds, ReplicateType type) {
+    def saveAjax(String sampleIds, String type, Long currentSampleId) {
+        def message = null
         try {
-            def results = replicateService.save(sampleIds, type)
+            def results = replicateService.save(currentSampleId, sampleIds, type)
             if (results.unknownIds.size() > 0) {
-                flash.message = "Samples ${results.unknownIds} are not found!"
-            } else {
-                flash.message = "Success! Replicate set has been created."
+                message = "Samples ${results.unknownIds} are not found!"
             }
-            redirect(action: "show", id: results.setId)
         } catch(ReplicateException e) {
-            flash.message = e.message
-            redirect(action: "create")
+            message = e.message
         } catch(Exception e) {
             log.error e
-            flash.message = "Error creating the replicate set!"
-            redirect(action: "create")
+            message = "Error creating the replicate set!"
         }
+        def sample = Sample.get(currentSampleId)
+        def replicates = sampleService.getReplicates(sample)
+        render template: "/sample/replicates", model: [replicates: replicates, message: message]
     }
     
     def show(Long id) {
-        def samples = ReplicateSamples.where{set.id == id}
+        def set = ReplicateSet.get(id)
+        if (!set) {
+            render(view: "/404")
+            return
+        }
+        def samples = ReplicateSamples.where{set.id == id}.collect{it.sample}
         if (samples.size() < 2) {
             flash.message = "There is ${samples.size()} sample in the set. Please add more samples or delete this replicate set!"
         }
-        [samples: samples]
+        [samples: samples, set: set]
     }
     
     def addSamples(Long setId, Long sampleIds) {

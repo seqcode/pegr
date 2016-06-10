@@ -9,7 +9,7 @@
         </g:if>
         <div>
             <h3>${set.type} Replicate Set ${set.id}</h3>
-            <g:render template="/project/sampleTable" model="['samples':samples]" />
+            <g:render template="/project/sampleTable" model="['sampleList':samples]" />
         </div>
     </body>
 </html>

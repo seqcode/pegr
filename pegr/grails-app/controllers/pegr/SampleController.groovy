@@ -36,12 +36,10 @@ class SampleController {
             sample.bags.each{ linkedbag ->
                 protocols.push([bag:linkedbag, protocolList:ProtocolInstance.where{bag.id == linkedbag.id}.list(sort: "bagIdx", order: "asc")])
             }
-            def replicateSets = ReplicateSamples.findAllBySample(sample).collect{it.set}
-            def bioReps = replicateSets.find{it.type == ReplicateType.BIOLOGICAL}
-            def techReps = replicateSets.find{it.type == ReplicateType.TECHNICAL}
+            def replicates = sampleService.getReplicates(sample)
             def currentUser = springSecurityService.currentUser
             def authorized = currentUser.isAdmin() ||  (currentUser.authorities.any { it.authority == "ROLE_MEMBER" }) 
-            [sample: sample, notes: notes, protocols: protocols, authorized: authorized]            
+            [sample: sample, notes: notes, protocols: protocols, authorized: authorized, replicates: replicates]        
         } else {
             render(view: "/404")
         }

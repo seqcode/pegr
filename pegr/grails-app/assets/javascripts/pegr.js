@@ -18,3 +18,6 @@ function getHash(){
     }
 }
 
+function closeModal() {
+    $(".modal").modal('hide');
+}

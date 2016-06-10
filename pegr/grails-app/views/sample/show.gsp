@@ -43,19 +43,9 @@
 
             </ol>
         </div>
-
-        <div id="bioRep">
-            <h4>Biological Replicates <g:link controller="replicate" action="create" params="[type: ${pegr.ReplicateType.BIOLOGICAL}]" class="edit">Add</g:link></h4>
-            <g:each in="${bioReps}">
-                <g:link controller="replicate" action="show" id="${it.id}">Set ${it.id}</g:link>
-            </g:each>
-        </div>  
-        <div id="techRep">
-            <h4>Technical Replicates <g:link controller="replicate" action="create" params="[type: ${pegr.ReplicateType.TECHNICAL}]" class="edit">Add</g:link></h4>
-            <g:each in="${techReps}">
-                <g:link controller="replicate" action="show" id="${it.id}">Set ${it.id}</g:link>
-            </g:each>
-        </div> 
+        <div id="replicates">
+            <g:render template="replicates" model="[replicates: replicates]"></g:render>
+        </div>
         <div id="project">
             <h4>Related Projects</h4>
             <ol>
@@ -65,8 +55,39 @@
             </ol>
         </div>
     </div>
+    <div id="addReplicate" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add Replicate Set</h3>
+                </div>
+                <div class="modal-body">
+                    <form role="form" method="post" class="fields">
+                        <div>
+                            <label>Type</label>
+                            <g:select id="replicateType" name="type" from="${pegr.ReplicateType.values()}" keys="${pegr.ReplicateType.values()*.name()}"></g:select>
+                        </div>
+                        <div>
+                            <label>Current Sample ID</label>
+                            <input name="currentSampleId" value="${sample.id}" readonly>
+                        </div>
+                        <g:render template="/sample/inputSampleIds"></g:render>
+                        <g:submitToRemote type="button" class="btn btn-primary" name="save" value="Save" data-dismiss="modal"
+                                          url="[controller: 'replicate', action: 'saveAjax']"
+                                          update="[success: 'replicates']"
+                                          onComplete="closeModal()"/>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script>
-        $("#nav-metadata").addClass("active");      
+        $("#nav-metadata").addClass("active");     
+        function initialReplicateForm(type) {
+            $("#replicateType").val(type)            
+        }
     </script>
 </body>
 </html>

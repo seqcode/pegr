@@ -32,10 +32,7 @@
                         <div class="modal-body">
                             <g:hiddenField name="runId" value="${run.id}"></g:hiddenField>
                             <small class="form-group">
-                                <label>Sample IDs </label>
-                                <input name="sampleIds" type="text" class="form-control">
-                                <br/>
-                                <p>e.g. 1-10, 11, 15</p>
+                                <g:render template="/sample/inputSampleIds"></g:render>
                             </small>
                         </div>
                         <div class="modal-footer">
@@ -101,6 +98,5 @@
         $(".confirm").confirm();
         $(".select2").select2();
      </script>
-</div>
 </body>
 </html>

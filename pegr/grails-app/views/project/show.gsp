@@ -41,8 +41,8 @@
                 <g:link action="searchSample" params="[projectId: project?.id]" class="btn btn-info">Add Existing Sample</g:link>
             </div>
         </g:if>
-	</div>
-    </br>          
+    </div>
+    <br/>         
     
     <g:if test="${authorized}">
         <div id="selectAssay" class="modal fade" role="dialog">
@@ -145,10 +145,6 @@
         
         function showEditRole(userId) {
             $(".modal-body #hiddenUserId").val(userId);
-        }
-
-        function closeModal() {
-            $(".modal").modal('hide');
         }
         
         $(function(){

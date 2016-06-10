@@ -8,15 +8,17 @@ class ReplicateException extends RuntimeException {
 class ReplicateService {
     def utilityService
     
-    def save(String sampleIds, type) {
+    def save(Long currentSampleId, String sampleIds, String type) {
         def ids
         try {
             ids = utilityService.parseSetOfNumbers(sampleIds)
         } catch (UtilityException e) {
             throw new ReplicateException(message: e.message)
         }
-        def set = new ReplicateSet(type: type).save()
+        def set = new ReplicateSet(type: type)
+        set.save(flush: true, failOnError: true)
         def unknownIds = []
+        ids << currentSampleId
         ids.each { id ->
             def sample = Sample.get(id)
             if (sample) {
@@ -51,7 +53,7 @@ class ReplicateService {
     }
     
     def removeSample(Long setId, Long sampleId) {
-        def repSample = ReplicateSamples.where {set.id == setId && sample.Id == sampleId}.find()
+        def repSample = ReplicateSamples.where {set.id == setId && sample.id == sampleId}.find()
         if (repSample) {
             repSample.delete()
             return true

@@ -35,7 +35,7 @@ class UtilityService {
         try {
             n = Long.parseLong(s)
         } catch (Exception e){
-            throw new UtilityException(message: "${s} cannot be converted to Long!")
+            throw new UtilityException(message: "String ${s} cannot be converted to Long!")
         }
         return n
     }
@@ -43,6 +43,9 @@ class UtilityService {
     // parse String to a set of numbers
     def parseSetOfNumbers(String s) {
         Set ids = []
+        if(s == null || s == "") {
+            return ids
+        }
         s.split(",")*.trim().each{ spanStr ->
             def span = spanStr.split("-")*.trim()
             if (span.size() == 1) {

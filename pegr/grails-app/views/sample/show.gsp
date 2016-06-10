@@ -45,12 +45,16 @@
         </div>
 
         <div id="bioRep">
-            <h4>Biological Replicates</h4>
-            <g:each in="${sample.bioReps}">${it}</g:each>
+            <h4>Biological Replicates <g:link controller="replicate" action="create" params="[type: ${pegr.ReplicateType.BIOLOGICAL}]" class="edit">Add</g:link></h4>
+            <g:each in="${bioReps}">
+                <g:link controller="replicate" action="show" id="${it.id}">Set ${it.id}</g:link>
+            </g:each>
         </div>  
         <div id="techRep">
-            <h4>Technical Replicates</h4>
-            <g:each in="${sample.techReps}">${it}</g:each>
+            <h4>Technical Replicates <g:link controller="replicate" action="create" params="[type: ${pegr.ReplicateType.TECHNICAL}]" class="edit">Add</g:link></h4>
+            <g:each in="${techReps}">
+                <g:link controller="replicate" action="show" id="${it.id}">Set ${it.id}</g:link>
+            </g:each>
         </div> 
         <div id="project">
             <h4>Related Projects</h4>

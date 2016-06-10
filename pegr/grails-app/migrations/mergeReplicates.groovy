@@ -1,6 +1,9 @@
 databaseChangeLog = {
-
-	changeSet(author: "dus73 (generated)", id: "1465502382011-1") {
+    changeSet(author: "dus73 (generated)", id: "1465502382011-1") {
+		dropForeignKeyConstraint(baseTableName: "biological_replicate_set", baseTableSchemaName: "pegr", constraintName: "FK_giwv376p7duup0ii9vm5a41vt")
+	}
+    
+	changeSet(author: "dus73 (generated)", id: "1465502382011-2") {
         dropColumn(tableName: "biological_replicate_set", columnName: "project_id")
         addColumn(tableName: "biological_replicate_set") {
             column(name: "type", type: "varchar(255)") {
@@ -8,16 +11,12 @@ databaseChangeLog = {
             }
         }
 	}
-
-    changeSet(author: "dus73 (generated)", id: "1465502382011-2") {
+    
+    changeSet(author: "dus73 (generated)", id: "1465502382011-3") {
         renameTable(oldTableName: "biological_replicate_set", newTableName: "replicate_set")
     }
     
-    changeSet(author: "dus73 (generated)", id: "1465502382011-9") {
-		dropForeignKeyConstraint(baseTableName: "biological_replicate_set", baseTableSchemaName: "pegr", constraintName: "FK_giwv376p7duup0ii9vm5a41vt")
-	}
-    
-    changeSet(author: "dus73 (generated)", id: "1465502382011-3") {
+    changeSet(author: "dus73 (generated)", id: "1465502382011-4") {
         renameTable(oldTableName: "biological_replicate_samples", newTableName: "replicate_samples")
 	}
     

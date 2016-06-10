@@ -49,14 +49,6 @@ class Sample {
         return ProjectSamples.where{sample == this}.collect{it.project}
     }
     
-    List getBioReps(){
-        return BiologicalReplicateSamples.where{sample == this}.list()
-    }
-    
-    List getTechReps(){
-        return TechnicalReplicateSamples.where{sample == this}.list()
-    }
-    
     static constraints = {
 		cellSource nullable: true
 		antibody nullable: true

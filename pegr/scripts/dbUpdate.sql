@@ -64,3 +64,5 @@ select s.id, r.run_num, i.invoice_num from sample s join invoice i on s.invoice_
 
 insert into read_type (version, short_name, name) values (0, "PE","Paired End");
 insert into read_type (version, short_name, name) values (0, "SR","Single Read");
+
+update replicate_set set type="BIOLOGICAL";

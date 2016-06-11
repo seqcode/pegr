@@ -75,4 +75,15 @@ class ProjectService {
         return unknownSampleIds
     }
     
+    def authToEdit(Project project) {
+        def authorized = false
+        def currUser = springSecurityService.currentUser
+        if (currUser.isAdmin()) {
+            authorized = true
+        } else if (projectUsers.find { it.user == currUser && it.projectRole == ProjectRole.OWNER}) {
+           authorized = true                    
+        }   
+        return authorized
+    }
+    
 }

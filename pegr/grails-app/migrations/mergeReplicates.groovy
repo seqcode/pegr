@@ -1,10 +1,6 @@
 databaseChangeLog = {
-    changeSet(author: "dus73 (generated)", id: "1465502382011-1") {
-		dropForeignKeyConstraint(baseTableName: "biological_replicate_set", baseTableSchemaName: "pegr", constraintName: "FK_giwv376p7duup0ii9vm5a41vt")
-	}
     
 	changeSet(author: "dus73 (generated)", id: "1465502382011-2") {
-        dropColumn(tableName: "biological_replicate_set", columnName: "project_id")
         addColumn(tableName: "biological_replicate_set") {
             column(name: "type", type: "varchar(255)") {
                 constraints(nullable: "false")

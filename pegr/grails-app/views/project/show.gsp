@@ -41,6 +41,11 @@
                 <g:link action="searchSample" params="[projectId: project?.id]" class="btn btn-info">Add Existing Sample</g:link>
             </div>
         </g:if>
+        
+        <h3>Replicates <g:if test="${authorized}"><button data-toggle="modal" data-target="#addReplicate" class="edit">Add</button></g:if></h3>
+        <div id="replicates">
+            <g:render template="/replicate/list" model="['replicates':replicates]"></g:render>
+        </div>
     </div>
     <br/>         
     
@@ -60,7 +65,7 @@
                             </div>
                             <g:submitButton class="btn btn-primary" name="submit" value="OK"/>
                             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        </g:form>                    
+                        </g:form>         
                     </div>
                 </div>
             </div>
@@ -114,6 +119,31 @@
                                               onComplete="closeModal()"/>
                             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                         </form>                    
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="addReplicate" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Add Replicate Set</h3>
+                    </div>
+                    <div class="modal-body">
+                        <form role="form" method="post" class="fields">
+                            <div>
+                                <label>Type</label>
+                                <g:select id="replicateType" name="type" from="${pegr.ReplicateType.values()}" keys="${pegr.ReplicateType.values()*.name()}"></g:select>
+                            </div>
+                            <g:render template="/sample/inputSampleIds"></g:render>
+                            <g:hiddenField name="projectId" value="${project.id}"></g:hiddenField>
+                            <g:submitToRemote type="button" class="btn btn-primary" name="save" value="Save" data-dismiss="modal"
+                                              url="[controller: 'replicate', action: 'saveAjax']"
+                                              update="[success: 'replicates']"
+                                              onComplete="closeModal()"/>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        </form>
                     </div>
                 </div>
             </div>

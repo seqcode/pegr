@@ -5,6 +5,7 @@ class ProjectController {
 	def springSecurityService
     def projectService
     def sampleService
+    def replicateService
 	
     def index(int max, int offset) {
         max = Math.min(max ?:15, 100)
@@ -89,17 +90,12 @@ class ProjectController {
 		def currentProject = Project.get(id)
         if (currentProject) {
             def projectUsers = ProjectUser.where { project==currentProject}.list()
-            def authorized = false
-            def currUser = springSecurityService.currentUser
-            if (currUser.isAdmin()) {
-                authorized = true
-            } else if (projectUsers.find { it.user == currUser && it.projectRole == ProjectRole.OWNER}) {
-               authorized = true                    
-            }          
+            def authorized = projectService.authToEdit(currentProject)
             def samples = ProjectSamples.where {project==currentProject}.list(params).collect{it.sample}
             def experiments = samples.collect{it.sequencingExperiments}.flatten()
             def alignments = experiments.collect{it.alignments}.flatten()
-            [project: currentProject, projectUsers: projectUsers, samples: samples, experiments: experiments, alignments: alignments, sampleCount: currentProject.samples.size(), authorized: authorized]
+            def replicates = replicateService.getReplicates(currentProject)
+            [project: currentProject, projectUsers: projectUsers, samples: samples, experiments: experiments, alignments: alignments, sampleCount: currentProject.samples.size(), replicates: replicates, authorized: authorized]
         } else {
             flash.message = "Project not found!"
             redirect(action: "index")

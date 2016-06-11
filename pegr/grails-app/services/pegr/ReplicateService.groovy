@@ -8,20 +8,20 @@ class ReplicateException extends RuntimeException {
 class ReplicateService {
     def utilityService
     
-    def save(Long currentSampleId, String sampleIds, String type) {
+    @Transactional
+    def save(String sampleIds, String type, Project project) {
         def ids
         try {
             ids = utilityService.parseSetOfNumbers(sampleIds)
         } catch (UtilityException e) {
             throw new ReplicateException(message: e.message)
         }
-        def set = new ReplicateSet(type: type)
+        def set = new ReplicateSet(type: type, project: project)
         set.save(flush: true, failOnError: true)
         def unknownIds = []
-        ids << currentSampleId
         ids.each { id ->
             def sample = Sample.get(id)
-            if (sample) {
+            if (sample && ProjectSamples.findBySampleAndProject(sample, project)) {                
                 new ReplicateSamples(set: set, sample: sample).save()
             } else {
                 unknownIds << id
@@ -30,10 +30,15 @@ class ReplicateService {
         return [setId: set.id, unknownIds: unknownIds]
     }
     
-    def addSamples(Long setId, Long sampleIds) {
+    @Transactional
+    def addSamples(Long setId, String sampleIds) {
         def set = ReplicateSet.get(setId)
+        def unknownIds = []
         if (!set) {
             throw new ReplicateException(message: "Replicate set not found!")
+        }
+        if (sampleIds == null || sampleIds == "") {
+            throw new ReplicateException(message: "Empty input!")
         }
         def ids
         try {
@@ -43,7 +48,7 @@ class ReplicateService {
         }
         ids.each { id ->
             def sample = Sample.get(id)
-            if (sample) {
+            if (sample && ProjectSamples.findBySampleAndProject(sample, set.project)) {
                 new ReplicateSamples(set: set, sample: sample).save()
             } else {
                 unknownIds << id
@@ -52,6 +57,7 @@ class ReplicateService {
         return unknownIds
     }
     
+    @Transactional
     def removeSample(Long setId, Long sampleId) {
         def repSample = ReplicateSamples.where {set.id == setId && sample.id == sampleId}.find()
         if (repSample) {
@@ -62,12 +68,33 @@ class ReplicateService {
         }
     }
     
-    def delete(Long setId) {
-        def set = ReplicateSet.get(setId)
+    @Transactional
+    def delete(Long id) {
+        def set = ReplicateSet.get(id)
         if (!set) {
             throw new ReplicateException(message: "Replicate not found!")
         } else {
+            def projectId = set.project?.id
+            def repSamples = ReplicateSamples.findAllBySet(set)
+            repSamples.each {
+                it.delete()
+            }
             set.delete()
-        }
+            return projectId
+        }        
+    }
+    
+    def getReplicates(Sample sample) {
+        def replicateSets = ReplicateSamples.findAllBySample(sample).collect{it.set}
+        def bioReps = replicateSets.findAll {it.type == ReplicateType.BIOLOGICAL}
+        def techReps = replicateSets.findAll {it.type == ReplicateType.TECHNICAL}
+        [Biological: bioReps, Technical: techReps]
+    }
+    
+    def getReplicates(Project project) {
+        def replicateSets = ReplicateSet.findAllByProject(project)
+        def bioReps = replicateSets.findAll {it.type == ReplicateType.BIOLOGICAL}
+        def techReps = replicateSets.findAll {it.type == ReplicateType.TECHNICAL}
+        [Biological: bioReps, Technical: techReps]
     }
 }

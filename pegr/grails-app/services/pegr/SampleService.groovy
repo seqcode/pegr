@@ -248,10 +248,4 @@ class SampleService {
         sample.save()
     }
     
-    def getReplicates(Sample sample) {
-        def replicateSets = ReplicateSamples.findAllBySample(sample).collect{it.set}
-        def bioReps = replicateSets.findAll {it.type == ReplicateType.BIOLOGICAL}
-        def techReps = replicateSets.findAll {it.type == ReplicateType.TECHNICAL}
-        [bioReps: bioReps, techReps: techReps]
-    }
 }

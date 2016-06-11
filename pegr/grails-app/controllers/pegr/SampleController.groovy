@@ -5,6 +5,7 @@ class SampleController {
     
     def springSecurityService
     def sampleService
+    def replicateService
     
     def index(Integer max) {
         params.max = Math.min(max ?: 15, 100)
@@ -36,7 +37,7 @@ class SampleController {
             sample.bags.each{ linkedbag ->
                 protocols.push([bag:linkedbag, protocolList:ProtocolInstance.where{bag.id == linkedbag.id}.list(sort: "bagIdx", order: "asc")])
             }
-            def replicates = sampleService.getReplicates(sample)
+            def replicates = replicateService.getReplicates(sample)
             def currentUser = springSecurityService.currentUser
             def authorized = currentUser.isAdmin() ||  (currentUser.authorities.any { it.authority == "ROLE_MEMBER" }) 
             [sample: sample, notes: notes, protocols: protocols, authorized: authorized, replicates: replicates]        

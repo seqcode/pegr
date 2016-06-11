@@ -43,8 +43,9 @@
 
             </ol>
         </div>
+        <h4>Replicates</h4>
         <div id="replicates">
-            <g:render template="replicates" model="[replicates: replicates]"></g:render>
+            <g:render template="/replicate/list" model="[replicates: replicates]"></g:render>
         </div>
         <div id="project">
             <h4>Related Projects</h4>
@@ -55,39 +56,9 @@
             </ol>
         </div>
     </div>
-    <div id="addReplicate" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Add Replicate Set</h3>
-                </div>
-                <div class="modal-body">
-                    <form role="form" method="post" class="fields">
-                        <div>
-                            <label>Type</label>
-                            <g:select id="replicateType" name="type" from="${pegr.ReplicateType.values()}" keys="${pegr.ReplicateType.values()*.name()}"></g:select>
-                        </div>
-                        <div>
-                            <label>Current Sample ID</label>
-                            <input name="currentSampleId" value="${sample.id}" readonly>
-                        </div>
-                        <g:render template="/sample/inputSampleIds"></g:render>
-                        <g:submitToRemote type="button" class="btn btn-primary" name="save" value="Save" data-dismiss="modal"
-                                          url="[controller: 'replicate', action: 'saveAjax']"
-                                          update="[success: 'replicates']"
-                                          onComplete="closeModal()"/>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
     
     <script>
         $("#nav-metadata").addClass("active");     
-        function initialReplicateForm(type) {
-            $("#replicateType").val(type)            
-        }
     </script>
 </body>
 </html>

@@ -4,6 +4,9 @@
         <meta name="layout" content="main"/>
     </head>
     <body>
+        <g:if test="${set?.project}">
+            <h4><g:link controller="project" action="show" id="${set?.project?.id}"><span class="glyphicon glyphicon-home"></span> Project: ${set?.project}</g:link></h4>
+        </g:if>
         <g:if test="${flash.message}">
             <div class="message" role="status">${flash.message}</div>
         </g:if>

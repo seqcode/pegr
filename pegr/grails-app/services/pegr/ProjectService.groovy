@@ -80,7 +80,7 @@ class ProjectService {
         def currUser = springSecurityService.currentUser
         if (currUser.isAdmin()) {
             authorized = true
-        } else if (projectUsers.find { it.user == currUser && it.projectRole == ProjectRole.OWNER}) {
+        } else if (ProjectUser.where { project == project && user == currUser && projectRole == ProjectRole.OWNER}.find()) {
            authorized = true                    
         }   
         return authorized

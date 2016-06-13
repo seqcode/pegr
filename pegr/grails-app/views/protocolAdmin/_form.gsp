@@ -20,8 +20,8 @@
 </div>
 
 <div>
-    <label for="sharedItem">Shared Item Types </br>(multi-select)</label>
-    <g:select name="sharedItemTypeIds" id="sharedItem" from="${pegr.ItemType.where{category==pegr.ItemTypeCategory.OTHER}.list(sort:'name')}" optionKey="id" value="${sharedItemTypeIds}" multiple="multiple" size="20"/>
+    <label for="sharedItem">Shared Item Types (multi-select)</label>
+    <g:select name="sharedItemTypeIds" id="sharedItem" from="${pegr.ItemType.where{category==pegr.ItemTypeCategory.OTHER}.list(sort:'name')}" optionKey="id" value="${sharedItemTypeIds}" multiple="multiple" size="10"/>
 </div>
 
 <h4>Traced Samples</h4>
@@ -47,4 +47,6 @@
     <g:select name="endPoolTypeId" from="${pegr.ItemType.where{category==pegr.ItemTypeCategory.SAMPLE_POOL}.list(sort:'name')}" optionKey="id" value="${endPoolTypeId}" noSelection="['null':'N/A']"/>
 </div>
 
-<h4>Protocol approved? <g:select name="status" from="${pegr.DictionaryStatus.values()}" value="${protocol?.status}"/></h4>
+<sec:ifAllGranted roles="ROLE_ADMIN">
+    <h4>Protocol approved? <g:select name="status" from="${pegr.DictionaryStatus.values()}" value="${protocol?.status}"/></h4>
+</sec:ifAllGranted>

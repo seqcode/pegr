@@ -31,14 +31,14 @@ class ProtocolInstanceBagController {
     }
         
     def create() {
-        def admin = User.get(1)
-        def protocolGroups = ProtocolGroup.where { (user == admin) || (user == null) || (user == springSecurityService.currentUser)}
-        [protocolGroups: protocolGroups]
+        def user = springSecurityService.currentUser
+        def protocolGroups = ProtocolGroup.list()
+        [protocolGroups: protocolGroups, user: user]
     }
     
     def savePrtclInstBag() {        
         try {
-            def prtclInstBag = protocolInstanceBagService.savePrtclInstBag(Long.parseLong(params.protocolGroupId), params.name, params.startTime)
+            def prtclInstBag = protocolInstanceBagService.savePrtclInstBag(Long.parseLong(params.protocolGroupId), params.bagName, params.startTime)
             redirect(action: "showBag", id: prtclInstBag.id)
         }catch( ProtocolInstanceBagException e) {
             flash.message = e.message
@@ -422,5 +422,29 @@ class ProtocolInstanceBagController {
     
     def help() {
         render(view: "help")
+    }
+    
+        
+    def saveAjax() {
+        def protocolGroup = ProtocolGroup.get(param.long('protocolGroupId'))
+        def protocol = new Protocol(params)
+        protocol.user = springSecurityService.currentUser
+        def protocolItemTypeIds = [ 
+                (pegr.ProtocolItemFunction.PARENT) : [params.long('startItemTypeId')],
+                (pegr.ProtocolItemFunction.CHILD) : [params.long('endItemTypeId')],
+                (pegr.ProtocolItemFunction.SHARED) : params.list('sharedItemTypeIds'),
+                (pegr.ProtocolItemFunction.START_POOL) : [params.long('startPoolTypeId')],
+                (pegr.ProtocolItemFunction.END_POOL) : [params.long('endPoolTypeId')]
+        ]
+        try {
+            protocolService.save(protocol, protocolItemTypeIds)
+            message = "New protocol saved!"
+        }catch(ProtocolException e) {
+            message = e.message
+        }catch(Exception e) {
+            message = "Error saving this protocol!"
+            log.error "Error: ${e.message}", e
+        }
+        render(template: "/protocolGroupAdmin/selectProtocols", model: [message: message, protocolGroup: protocolGroup])
     }
 }

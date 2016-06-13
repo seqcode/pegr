@@ -1,4 +1,5 @@
 package pegr
+import groovy.sql.Sql
 
 /**
  * The class of security filters defines the user's authorization to 
@@ -6,6 +7,7 @@ package pegr
  */
 class SecurityFilters {
 
+    def dataSource
     def springSecurityService
     def projectService
     
@@ -237,14 +239,24 @@ class SecurityFilters {
         }
         
         /**
-         * ADMIN is allowed to see all samples; 
-         * MEMBERs are allowed to see all lab samples;
+         * ADMIN and MEMBERS are allowed to see all samples; 
+         * Others are only allowed to see their projects' samples;
          */        
         sampleShow(controller:'sample', action:'show') {
             before = {
-                def user = springSecurity.currentUser
-                if (user.isAdmin()) {
+                def user = springSecurityService.currentUser
+                if (user.isAdmin() || user.authorities.any { it.authority == "ROLE_MEMBER" }) {
                     return true
+                } else {
+                    def sampleId = params.long('id')
+                    def sql = new Sql(dataSource)
+                    def count = sql.rows("SELECT count(*) as cnt FROM project_user pu JOIN project_samples ps ON pu.project_id = ps.project_id WHERE pu.user_id = ${user.id} and ps.sample_id = ${sampleId}") 
+                    if (count[0].cnt > 0) {
+                        return true
+                    } else {
+                        render(view: '/login/denied')
+                        return false
+                    }                    
                 }
                
             }    
@@ -252,3 +264,4 @@ class SecurityFilters {
         
     }
 }
+

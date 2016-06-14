@@ -12,7 +12,7 @@ class ProtocolInstanceBagService {
     def sampleService
     
     @Transactional
-    ProtocolInstanceBag savePrtclInstBag(Long protocolGroupId, String name, Date startTime) {
+    ProtocolInstanceBag savePrtclInstBagByGroup(Long protocolGroupId, String name, Date startTime) {
         def protocolGroup = ProtocolGroup.get(protocolGroupId)
         if(protocolGroup == null) {
             throw new ProtocolInstanceBagException(message: "protocol Group not found!")
@@ -24,13 +24,31 @@ class ProtocolInstanceBagService {
         try {
             prtclInstBag.save(flush: true)
             protocolGroup.protocols.eachWithIndex { it, n ->
-            new ProtocolInstance(protocol: it, bag: prtclInstBag, bagIdx: n, status: ProtocolStatus.INACTIVE).save(flush: true)
+                new ProtocolInstance(protocol: it, bag: prtclInstBag, bagIdx: n, status: ProtocolStatus.INACTIVE).save(flush: true)
             }
         } catch (Exception e) {         
             log.error "Error: ${e.message}", e
             throw new ProtocolInstanceBagException(message: "Error saving this protocol instance bag!")
         }
 
+        return prtclInstBag
+    }
+    
+    @Transactional
+    ProtocolInstanceBag savePrtclInstBagByProtocols(List protocols, String name, Date startTime) {
+        def prtclInstBag = new ProtocolInstanceBag(name: name,
+                                                  status: ProtocolStatus.PROCESSING,
+                                                  startTime: startTime)
+        try {
+            prtclInstBag.save(flush: true)
+            protocols.eachWithIndex { it, n ->
+                def protocol = Protocol.get(Long.parseLong(it))
+                new ProtocolInstance(protocol: protocol, bag: prtclInstBag, bagIdx: n, status: ProtocolStatus.INACTIVE).save(flush: true)
+            }
+        } catch (Exception e) {         
+            log.error "Error: ${e.message}", e
+            throw new ProtocolInstanceBagException(message: "Error saving this protocol instance bag!")
+        }
         return prtclInstBag
     }
     

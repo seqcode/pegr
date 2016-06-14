@@ -262,6 +262,45 @@ class SecurityFilters {
             }    
         }
         
+        /**
+         * Only the protocol's user or ADMIN can edit or delete the protocol.
+         */
+        protocolEdit(controller: 'protocol', action: 'edit|delete') {
+            before = {
+                def user = springSecurityService.currentUser
+                if (user.isAdmin()) {
+                    return true
+                } else {
+                    def protocol = Protocol.get(params.long('id'))
+                    if (protocol.user == user) {
+                        return true
+                    } else {
+                        render(view: '/login/denied')
+                        return false
+                    }
+                }
+            }
+        }
+        
+        /**
+         * Only the protocol's user or ADMIN can upload or delete the protocol's file.
+         */
+        protocolEdit(controller: 'protocol', action: 'upload|deleteFile') {
+            before = {
+                def user = springSecurityService.currentUser
+                if (user.isAdmin()) {
+                    return true
+                } else {
+                    def protocol = Protocol.get(params.long('protocolId'))
+                    if (protocol.user == user) {
+                        return true
+                    } else {
+                        render(view: '/login/denied')
+                        return false
+                    }
+                }
+            }
+        }
     }
 }
 

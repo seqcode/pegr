@@ -38,7 +38,6 @@
             <g:submitButton class="btn btn-primary" name="Save"/>
             <g:link action="index" class="btn btn-default">Cancel</g:link>
         </form>
-        <g:render template="/protocolGroupAdmin/createProtocolModal"></g:render>
         <br>
     </div>
     <script>

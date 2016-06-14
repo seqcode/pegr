@@ -39,7 +39,7 @@ class ProtocolInstanceBagController {
     
     def savePrtclInstBag() {        
         try {
-            def prtclInstBag = protocolInstanceBagService.savePrtclInstBag(Long.parseLong(params.protocolGroupId), params.bagName, params.startTime)
+            def prtclInstBag = (params.protocolInput == "defined") ? protocolInstanceBagService.savePrtclInstBagByGroup(Long.parseLong(params.protocolGroupId), params.bagName, params.startTime) : protocolInstanceBagService.savePrtclInstBagByProtocols(params.list('protocols'), params.bagName, params.startTime)
             redirect(action: "showBag", id: prtclInstBag.id)
         }catch( ProtocolInstanceBagException e) {
             flash.message = e.message
@@ -424,33 +424,5 @@ class ProtocolInstanceBagController {
     def help() {
         render(view: "help")
     }
-    
-        
-    def saveProtocolAjax() {
-        def protocolGroup = ProtocolGroup.get(params.long('protocolGroupId'))
-        def protocol = new Protocol(params)
-        protocol.user = springSecurityService.currentUser
-        def protocolItemTypeIds = [ 
-                (pegr.ProtocolItemFunction.PARENT) : [params.long('startItemTypeId')],
-                (pegr.ProtocolItemFunction.CHILD) : [params.long('endItemTypeId')],
-                (pegr.ProtocolItemFunction.SHARED) : params.list('sharedItemTypeIds'),
-                (pegr.ProtocolItemFunction.START_POOL) : [params.long('startPoolTypeId')],
-                (pegr.ProtocolItemFunction.END_POOL) : [params.long('endPoolTypeId')]
-        ]
-        def message = null
-        try {
-            protocolService.save(protocol, protocolItemTypeIds)
-            protocolService.uploadFile( (MultipartHttpServletRequest)request, protocol.id, "file")
-            message = "New protocol ${protocol} saved!"
-            render(template: "/protocolGroupAdmin/selectProtocols", model: [message: message, protocolGroup: protocolGroup])
-        } catch(ProtocolException e) {
-            message = "<div class='message' role='status'>${e.message}</div>"
-            log.error message
-            render text: message, status: 500
-        } catch(Exception e) {
-            message = "<div class='message' role='status'>Error saving this protocol!</div>"
-            log.error "Error: ${e.message}", e
-            render text: message, status: 500
-        }        
-    }
+
 }

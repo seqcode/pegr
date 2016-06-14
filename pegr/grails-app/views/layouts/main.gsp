@@ -26,7 +26,8 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Work Bench</a>
                     <ul class="dropdown-menu">
                         <li><g:link controller="ProtocolInstanceBag" action="processingBags" >Sample Prep</g:link></li>
-                        <li><g:link controller="item" method="post" asynchronous="false" onSuccess="location.reload()">Items</g:link></li>
+                        <li><g:link controller="item">Items</g:link></li>
+                        <li><g:link controller="protocol">Protocols</g:link></li>
                         <li><g:link controller="sequenceRun">Sequencing</g:link></li>
                     </ul>
                 </li>

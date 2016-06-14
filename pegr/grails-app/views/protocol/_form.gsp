@@ -28,6 +28,8 @@
 <div>
     <label for="startItem">Start State</label>
     <g:select name="startItemTypeId" id="startItem" from="${pegr.ItemType.where{category==pegr.ItemTypeCategory.TRACED_SAMPLE}.list(sort:'name')}" optionKey="id" value="${startItemTypeId}" noSelection="['null':'N/A']"/>
+</div>
+<div>
     <label for="endItem">End State</label>
     <g:select name="endItemTypeId" id="endItem" from="${pegr.ItemType.where{category==pegr.ItemTypeCategory.TRACED_SAMPLE}.list(sort:'name')}" optionKey="id" value="${endItemTypeId}" noSelection="['null':'N/A']"/>
 </div>

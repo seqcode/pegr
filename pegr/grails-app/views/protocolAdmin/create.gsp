@@ -22,10 +22,13 @@
 				</g:eachError>
 			</ul>
 			</g:hasErrors>
-			<g:form action='create' useToken="true" >
+			<g:form action='create' useToken="true" enctype="multipart/form-data">
 				<fieldset class="form fields">
 					<g:render template="form"/>
 				</fieldset>
+                <div class="form-group">
+                    <label><input type="file" id="file" name="file"/>(only pdf files)</label>
+                </div>
 				<fieldset class="buttons">
 					<g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
 				</fieldset>

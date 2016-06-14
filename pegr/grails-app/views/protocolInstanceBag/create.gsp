@@ -34,14 +34,11 @@
             </div>
             <div id="custom-protocols" class="fields well">
                 <g:render template="/protocolGroupAdmin/form"></g:render>
-                <h4>Create New Protocol</h4>
-                <label>Defined by ${user}</label>
-                <g:hiddenField name="userId" value="${user.id}"></g:hiddenField>
-                <g:render template="/protocolAdmin/form"></g:render>
             </div>
             <g:submitButton class="btn btn-primary" name="Save"/>
             <g:link action="index" class="btn btn-default">Cancel</g:link>
         </form>
+        <g:render template="/protocolGroupAdmin/createProtocolModal"></g:render>
         <br>
     </div>
     <script>

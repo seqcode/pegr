@@ -1,11 +1,6 @@
 <%@ page import="pegr.ProtocolGroup" %>
 
-<div class="${hasErrors(bean: protocolGroupInstance, field: 'name', 'error')} required">
-	<label for="name">Name	<span class="required-indicator">*</span></label>
-	<g:textField name="name" required="" value="${protocolGroupInstance?.name}"/>
-</div>
-
-<h4>Protocols <button class="edit" data-toggle="modal" data-target="#create-protocol">Create New Protocol</button> </h4>
+<h4>Protocols <a href="#" class="edit" data-toggle="modal" data-target="#create-protocol">New</a> </h4>
 <div class="row" id="select-protocols">
     <g:render template="/protocolGroupAdmin/selectProtocols"></g:render>
 </div>

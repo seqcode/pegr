@@ -1,4 +1,5 @@
 package pegr
+import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 class ProtocolInstanceBagController {
 
@@ -425,8 +426,8 @@ class ProtocolInstanceBagController {
     }
     
         
-    def saveAjax() {
-        def protocolGroup = ProtocolGroup.get(param.long('protocolGroupId'))
+    def saveProtocolAjax() {
+        def protocolGroup = ProtocolGroup.get(params.long('protocolGroupId'))
         def protocol = new Protocol(params)
         protocol.user = springSecurityService.currentUser
         def protocolItemTypeIds = [ 
@@ -436,15 +437,20 @@ class ProtocolInstanceBagController {
                 (pegr.ProtocolItemFunction.START_POOL) : [params.long('startPoolTypeId')],
                 (pegr.ProtocolItemFunction.END_POOL) : [params.long('endPoolTypeId')]
         ]
+        def message = null
         try {
             protocolService.save(protocol, protocolItemTypeIds)
-            message = "New protocol saved!"
-        }catch(ProtocolException e) {
-            message = e.message
-        }catch(Exception e) {
-            message = "Error saving this protocol!"
+            protocolService.uploadFile( (MultipartHttpServletRequest)request, protocol.id, "file")
+            message = "New protocol ${protocol} saved!"
+            render(template: "/protocolGroupAdmin/selectProtocols", model: [message: message, protocolGroup: protocolGroup])
+        } catch(ProtocolException e) {
+            message = "<div class='message' role='status'>${e.message}</div>"
+            log.error message
+            render text: message, status: 500
+        } catch(Exception e) {
+            message = "<div class='message' role='status'>Error saving this protocol!</div>"
             log.error "Error: ${e.message}", e
-        }
-        render(template: "/protocolGroupAdmin/selectProtocols", model: [message: message, protocolGroup: protocolGroup])
+            render text: message, status: 500
+        }        
     }
 }

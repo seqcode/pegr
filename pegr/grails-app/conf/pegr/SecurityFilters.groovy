@@ -203,7 +203,8 @@ class SecurityFilters {
         }  
         
         /** 
-         * If the replicate belongs to a project, the right to delete the replicate set is the same as the right to edit that project, that is 
+         * If the replicate belongs to a project, the right to delete the replicate set is the same 
+         * as the right to edit that project, that is 
          * the user is an admin or is an owner of the project; else, only the 
          * admin is allowed to delete the set.  
          */

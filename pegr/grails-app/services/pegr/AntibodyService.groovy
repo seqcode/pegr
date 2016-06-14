@@ -51,6 +51,13 @@ class AntibodyService {
     }
     
     @Transactional
+    def save(Item item, AntibodyCommand cmd){
+        def antibody = getAntibody(cmd.company, cmd.catalogNumber, cmd.lotNumber, null, cmd.clonal, cmd.abHostId, cmd.igTypeId, cmd.immunogene, cmd.concentration)
+        save(item, antibody)
+        return antibody
+    }
+    
+    @Transactional
     def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNotes, String abClonal, String abAnimal, String ig, String antigen, String abConc) {
 		def company = getCompany(abCompName)
 		def abHost = getAbHost(abAnimal)

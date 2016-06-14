@@ -33,29 +33,36 @@ class AntibodyController {
         [item: item, antibody: antibody]
     }
     
-    def save() {
-        withForm{        
-            def item = new Item(params)
-            def antibody = new Antibody(params)
+    def save(Item item, AntibodyCommand antibodyCommand) {
+        withForm{
             try {
-                antibodyService.save(item, antibody)
-                flash.message = "New traced sample added!"
+                def antibody = antibodyService.save(item, antibodyCommand)
+                flash.message = "New antibody added!"
                 redirect(action: "show", id: antibody.id)
             }catch(ItemException e) {
                 request.message = e.message
-                render(view: "create", model: [item:item, antibody: antibody])
+                render(view: "create", model: [item:item, antibody: antibodyCommand])
             }catch(Exception e) {
                 log.error "Error: ${e.message}", e
                 request.message = "Error saving this item!"
-                render(view: "create", model: [item:item, antibody: antibody])
+                render(view: "create", model: [item:item, antibody: antibodyCommand])
             }
         }
     }
     
     def edit(Long antibodyId){
         def antibody = Antibody.get(antibodyId)
-        antibody.properties = params
-        [antibody: antibody]
+        def antibodyCommand = new AntibodyCommand(   
+            id : antibody.id,
+            company : antibody.company.name,
+            catalogNumber : antibody.catalogNumber,
+            lotNumber : antibody.lotNumber,
+            abHostId : antibody.abHost?.id,
+            immunogene : antibody.immunogene,
+            clonal : antibody.clonal,
+            igTypeId : antibody.igType?.id,
+            concentration : antibody.concentration)
+        [antibody: antibodyCommand]
     }
     
     def update(Long antibodyId) {
@@ -174,5 +181,16 @@ class AntibodyController {
         render result as JSON
     }
     
-    
+}
+
+class AntibodyCommand {
+    String id
+    String company
+    String catalogNumber
+    String lotNumber
+    String abHostId
+    String immunogene
+    String clonal
+    String igTypeId
+    String concentration
 }

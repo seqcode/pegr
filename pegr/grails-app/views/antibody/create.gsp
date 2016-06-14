@@ -16,10 +16,10 @@
         </div>
     </g:hasErrors>
     <g:form action="save" class="fields" role="form" method="post" useToken="true">
-        <g:submitButton class="btn btn-primary" name="save" value="Save"/>
-        <g:link class="btn btn-default" action="list">Cancel</g:link>
         <g:render template="/item/form" model="['item':item]"/>
         <g:render template="/antibody/form" model="['antibody':antibody]"></g:render>
+        <g:submitButton class="btn btn-primary" name="save" value="Save"/>
+        <g:link class="btn btn-default" action="list">Cancel</g:link>
     </g:form>
 
     <script>

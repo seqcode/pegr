@@ -18,12 +18,12 @@
         </div>
     </g:hasErrors>
     <g:form action="saveWithCellSource" class="fields" role="form" method="post" useToken="true">
-        <g:submitButton class="btn btn-primary" name="save" value="Save"/>
-        <g:link class="btn btn-default" action="list" params="[typeId:item.type.id]">Cancel</g:link>
         <h4>Item Information</h4>
         <g:render template="form" model="['item':item]"/>
         <h4>Cell Source Information</h4>
         <g:render template="/cellSource/form" model="['cellSource':cellSource]"></g:render>
+        <g:submitButton class="btn btn-primary" name="save" value="Save"/>
+        <g:link class="btn btn-default" action="list" params="[typeId:item.type.id]">Cancel</g:link>
     </g:form>
     <g:render template="/cellSource/treatmentModal"></g:render>
     <script>

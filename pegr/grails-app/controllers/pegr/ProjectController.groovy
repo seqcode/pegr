@@ -199,6 +199,8 @@ class ProjectController {
 
 class SampleCommand {
     Long providerId
+    Long providerLabId
+    String bioSourceId
     Long sendToId
     String genus
     String speciesId
@@ -207,7 +209,10 @@ class SampleCommand {
     String genotype
     String mutation
     String tissue
-    String growthMediaId
+    String age
+    String sex
+    String histology
+    String growthMedia
     String treatments
     String chrom
     String cellNum
@@ -219,16 +224,16 @@ class SampleCommand {
     String company
     String catalogNumber
     String lotNumber
-    String abHostId
+    String abHost
     String immunogene
     String clonal
-    String igTypeId
+    String igType
     String abConcentration
     String abNotes
     String abVolumePerSample
     String ugPerChip
     String ulPerChip
-    String targetTypeId
+    String targetType
     String target
     String cterm
     String nterm

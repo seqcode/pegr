@@ -8,6 +8,39 @@ class CellSourceController {
     def cellSourceService
 	def utilityService
     
+        
+    def create(Item item, CellSource cellSource) {
+        [item: item, cellSource: cellSource]
+    }
+    
+    def save() {
+        withForm{        
+            def item = new Item(params)
+            def cellSource = new CellSource(params)
+            def treatments = params.list("treatments")
+            if (!(cellSource?.strain?.id)) {
+                cellSource.strain = new Strain(params)
+                cellSource.strain.name = params.strainName
+                if (!(cellSource?.strain?.species?.id)) {
+                    cellSource.strain.species = new Species(genusName:params.genusName, 
+                                                            name: params.speciesName)
+                }
+            }
+            try {
+                cellSourceService.save(item, cellSource, treatments)
+                flash.message = "New traced sample added!"
+                redirect(action: "show", id: item.id)
+            }catch(ItemException e) {
+                request.message = e.message
+                render(view: "createTracedSample", model: [item:item, cellSource: cellSource])
+            }catch(Exception e) {
+                log.error "Error: ${e.message}", e
+                request.message = "Error saving this item!"
+                render(view: "createTracedSample", model: [item:item, cellSource: cellSource])
+            }
+        }
+    }
+    
     def edit(Long cellSourceId) {
         def cellSource = CellSource.get(cellSourceId)
         if (cellSource) {
@@ -58,17 +91,11 @@ class CellSourceController {
     
     def fetchParentStrainAjax(Long speciesId) {
         def strains = Strain.executeQuery("select distinct s.parent.name from Strain s where s.species.id = ?", [speciesId])
-        def nullStrain = ["Unknown"]
-        render utilityService.stringToSelect2Data(nullStrain + strains) as JSON
+        render utilityService.stringToSelect2Data(strains) as JSON
     }
     
     def fetchStrainNameAjax(String parentStrain, Long speciesId) {
-        def strains
-        if (parentStrain == "Unknown") {
-            strains = Strain.executeQuery("select distinct s.name from Strain s where s.parent is null and s.species.id = ?", [speciesId]) 
-        } else {
-            strains = Strain.executeQuery("select distinct s.name from Strain s where s.parent.name = ?", [parentStrain])
-        }
+        def strains = Strain.executeQuery("select distinct s.name from Strain s where s.parent.name = ? and s.species.id = ?", [parentStrain, speciesId])
         render utilityService.stringToSelect2Data(strains) as JSON
     }
     
@@ -84,37 +111,15 @@ class CellSourceController {
     
     def fetchGrowthMediaAjax(Long speciesId) {
         def selectedSpecies = Species.get(speciesId)
-        def growthMedias = GrowthMedia.where { (species == null) || (species == selectedSpecies) }
-        render utilityService.objectToSelect2Data(growthMedias) as JSON
+        def growthMedias = GrowthMedia.where { (species == null) || (species == selectedSpecies) }.collect{it.name}
+        render utilityService.stringToSelect2Data(growthMedias) as JSON
     }
     
     def fetchTreatmentsAjax() {
         def treatments = CellSourceTreatment.executeQuery("select t.name from CellSourceTreatment t")
         render utilityService.stringToSelect2Data(treatments) as JSON
     }
-    
-    /* ---------------------------- Obsolete -------------------------- */
-    def fetchStrainsForSpeciesAjax(Long id) {
-        def selectedSpecies = Species.get(id)
-        def strains = Strain.where {species == selectedSpecies}.list(sort:'name')
-        render g.select(id: 'strain', name: 'strain.id', from: strains, optionKey: 'id', noSelection:[null:'Other'], onchange: "strainChanged(this.value);")
-    }
-    
-    def showStrainDetailsAjax(Long id) {
-        if (id) {
-            def strain = Strain.get(id)
-            render(template:"strainDetails", model: ['strain': strain])
-        } else {
-            render(template:"strainForm")
-        }
-    }
-    
-    def fetchGrowthMediasForSpeciesAjax(Long id) {
-        def selectedSpecies = Species.get(id)
-        def growthMedias = GrowthMedia.where{species == null || species == selectedSpecies}.list(sort:'name')
-        render g.select(id: 'growthMedia', name:'growthMedia.id', from: growthMedias, optionKey: 'id', noSelection:[null:''])
-    }
-    
+
     def addTreatment(Long cellSourceId) {
         // save the new treatment
         def treatment = new CellSourceTreatment(params)
@@ -125,4 +130,22 @@ class CellSourceController {
         treatments.push(treatment)
         render g.select(multiple:"multiple", name:"treatments", from:CellSourceTreatment.list(sort:'name'), optionKey:"id", value: treatments*.id, class:"select2")
     }
+}
+
+class CellSourceCommand {
+    String genus
+    String speciesId
+    String parentStrain
+    String strain
+    String genotype
+    String mutation
+    String tissue
+    String age
+    String sex
+    String histology
+    String growthMedia
+    String treatments
+    Long providerId
+    Long providerLabId
+    String bioSourceId
 }

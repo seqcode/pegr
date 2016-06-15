@@ -5,20 +5,39 @@ class UtilityException extends RuntimeException {
 }
 
 class UtilityService {
-    // helper methods for Select2
+   /** 
+    * Helper method for Select2. It converts a collection of strings to a collection 
+    * of maps with both id and text to be the string.
+    * @param strings a collection of strings
+    * @return a collection of maps with both "id" and "text" to be the string.
+    */
     def stringToSelect2Data(def strings) {
         return strings.collect {s -> [id: s, text: s]}
     }
     
+   /**
+    * Helper method for Select2. It converts a collection of objects to a collection
+    * of maps with "id" to be the object's ID and "text" to be the object's name.
+    * @param objects a collection of objects which must have properties "id" and "name".
+    * @return a collection of maps with "id" to be object's ID and "text" to be object's name.  
+    */
     def objectToSelect2Data(def objects) {
         return objects.collect {o -> [id: o.id, text: o.name]}
     }
     
+   /**
+    * Helper method for Select2. It converts a collection of arrays to a collection
+    * of maps with "id" to be array's first element, and "text" to be the second.
+    * @param arrays a collection of arrays
+    * @return a collection of maps
+    */
     def arrayToSelect2Data(def arrays) {
         return arrays.collect{a -> [id: a[0], text: a[1]]}
     }
     
-    // convert String to Float
+   /**
+    * Convert String to Float.
+    */    
     def getFloat(String s) {
 	    def f
 	    try {
@@ -29,7 +48,9 @@ class UtilityService {
 	    return f
 	}
     
-    // convert String to Long    
+   /**
+    * Convert String to Long.
+    */        
     def getLong(String s) {
         def n
         try {
@@ -40,7 +61,9 @@ class UtilityService {
         return n
     }
     
-    // parse String to a set of numbers
+   /**
+    * Parse String to a set of numbers.
+    */     
     def parseSetOfNumbers(String s) {
         Set ids = []
         if(s == null || s == "") {
@@ -66,5 +89,21 @@ class UtilityService {
             }
         }
         return ids
+    }
+    
+   /**
+    * Trim input string. If the trimed string is empty, return null.
+    * @param orig input string
+    * @return trimed string
+    */    
+    def cleanString(String orig) {
+        def s = null
+        if (orig) {
+            s = orig.trim()
+            if (s == "") {
+                s = null
+            }            
+        }
+        return s
     }
 }

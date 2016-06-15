@@ -25,12 +25,12 @@ class AntibodyController {
         }
     }
 
-    def create(Item item, Antibody antibody, String barcode) {
+    def create(Item item, AntibodyCommand antibodyCommand, String barcode) {
         if (!item) {
             def type = ItemType.findByName("Antibody")
             item = new Item(barcode: barcode, type: type)
         }                
-        [item: item, antibody: antibody]
+        [item: item, antibody: antibodyCommand]
     }
     
     def save(Item item, AntibodyCommand antibodyCommand) {
@@ -159,12 +159,12 @@ class AntibodyController {
     
     def fetchAntibodyAjax(String catalog) {
         def antibody = Antibody.findByCatalogNumber(catalog)
-        def result = [host: antibody?.abHost?.id, 
+        def result = [host: antibody?.abHost?.name, 
                 immunogene: antibody?.immunogene, 
                 clonal: antibody?.clonal?.name(), 
-                ig: antibody?.igType?.id, 
+                ig: antibody?.igType?.name, 
                 conc: antibody?.concentration,
-                targetTypeId: antibody?.defaultTarget?.targetType?.id, 
+                targetType: antibody?.defaultTarget?.targetType?.name, 
                 target: antibody?.defaultTarget?.name, 
                 cterm: antibody?.defaultTarget?.cTermTag,
                 nterm: antibody?.defaultTarget?.nTermTag] 
@@ -186,9 +186,9 @@ class AntibodyCommand {
     String company
     String catalogNumber
     String lotNumber
-    String abHostId
+    String abHost
     String immunogene
     String clonal
-    String igTypeId
+    String igType
     String concentration
 }

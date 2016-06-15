@@ -30,20 +30,20 @@
         <li><a href="#sample-group" class="btn btn-default sample">Sample</a></li>
         <li><a href="#antibody-group" class="btn btn-default antibody">Antibody</a></li>
         <li><a href="#target-group" class="btn btn-default target">Target</a></li>
+        <li><a href="#other-group" class="btn btn-default other">Other</a></li>
     </ul>
     <div class="table-responsive">
         <table class="table table-striped table-bordered" style="margin-bottom: 200px">
             <thead>
                 <tr>
                     <th></th>
-                    <th colspan="18" id="sample-group" class="sample">Sample</th>
+                    <th colspan="19" id="sample-group" class="sample">Sample</th>
                     <th colspan="12" id="antibody-group" class="antibody">Antibody</th>
                     <th colspan="4" id="target-group" class="target">Target</th>
+                    <th colspan="4" id="other-group" class="other"></th>
                 </tr>
                 <tr>
                     <th></th>
-                    <th>Sample Provider</th>
-                    <th>Send Data to</th>
                     <th>Genus</th>
                     <th>Species</th>
                     <th>Parent Strain</th>
@@ -51,6 +51,9 @@
                     <th>Genotype</th>
                     <th>Mutation</th>
                     <th>Tissue</th>
+                    <th>Age</th>
+                    <th>Sex</th>
+                    <th>Histology</th>
                     <th>Growth Media</th>
                     <th>Treatments</th>                       
                     <th>Chrom. (ug)</th>
@@ -78,21 +81,15 @@
                     <th>Target</th>
                     <th>C-Term</th>
                     <th>N-Term</th>
+                    <th>Sample Provider</th>
+                    <th>Sample Provider Lab</th>
+                    <th>Biological Source ID</th>
+                    <th>Send Data to</th>
                 </tr>
             </thead>
             <tbody>
                 <tr id="tr0">
                     <td><a href="#" class="removeRow"><span class="glyphicon glyphicon-trash"></span></a></td>
-                    <td>
-                        <select class="provider no-tag-select2" name="samples[0].providerId" style="width: 150px">
-                            <option></option>
-                        </select>
-                    </td>
-                    <td>
-                        <select class="sendTo no-tag-select2" name="samples[0].sendToId" style="width: 150px">
-                            <option></option>
-                        </select>
-                    </td>
                     <td>
                         <select class="genus tag-select2" name="samples[0].genus" style="width: 150px" required>
                             <option></option>
@@ -116,17 +113,25 @@
                     <td>
                         <select name="samples[0].genotype" class="genotype tag-select2" style="width: 300px">
                             <option></option>
-                        </select></td>
+                        </select>
+                    </td>
                     <td>
                         <select name="samples[0].mutation" class="mutation tag-select2 textcontrol" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <g:select name="samples[0].tissue" from="${pegr.Tissue.list()}" optionKey="id" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
+                        <g:select name="samples[0].tissue" from="${pegr.Tissue.list()}" optionKey="name" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
+                    </td>
+                    <td><input name="samples[0].age"></td>
+                    <td>
+                        <g:select name="samples[0].sex" from="${pegr.Sex.list()}" optionKey="name" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
                     </td>
                     <td>
-                        <select name="samples[0].growthMediaId" class="growth-media tag-select2 textcontrol" style="width: 150px" required>
+                        <g:select name="samples[0].histology" from="${pegr.Histology.list()}" optionKey="name" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
+                    </td>
+                    <td>
+                        <select name="samples[0].growthMedia" class="growth-media tag-select2 textcontrol" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
@@ -161,7 +166,7 @@
                         <input name="samples[0].lotNumber"/>
                     </td>
                     <td>
-                        <g:select name="samples[0].abHostId" from="${pegr.AbHost.list()}" optionKey="id" noSelection="['':'']" class="tag-select2 host" style="width: 150px"></g:select>
+                        <g:select name="samples[0].abHost" from="${pegr.AbHost.list()}" optionKey="name" noSelection="['':'']" class="tag-select2 host" style="width: 150px"></g:select>
                     </td>
                     <td>
                         <select class="immunogene tag-select2" name="samples[0].immunogene" style="width: 150px">
@@ -172,7 +177,7 @@
                         <g:select name="samples[0].clonal" from="${pegr.MonoPolyClonal?.values()}" keys="${pegr.MonoPolyClonal.values()*.name()}" noSelection="['': '']" class="no-tag-select2 clonal" style="width: 150px"/>
                     </td>
                     <td>
-                        <g:select name="samples[0].igTypeId" from="${pegr.IgType.list()}" optionKey="id" noSelection="['': '']" class="tag-select2 ig" style="width: 150px"/>
+                        <g:select name="samples[0].igType" from="${pegr.IgType.list()}" optionKey="name" noSelection="['': '']" class="tag-select2 ig" style="width: 150px"/>
                     </td>
                     <td><input name="samples[0].abConcentration" class="conc isnumber"/></td>
                     <td><input name="samples[0].abNotes"></td>
@@ -180,7 +185,7 @@
                     <td><input name="samples[0].ugPerChip" class="isnumber"></td>
                     <td><input name="samples[0].ulPerChip" class="isnumber"></td>
                     <td>
-                        <g:select name="samples[0].targetTypeId" from="${pegr.TargetType.list()}" optionKey="id" noSelection="['': '']" class="target-type tag-select2" style="width: 150px"></g:select>
+                        <g:select name="samples[0].targetType" from="${pegr.TargetType.list()}" optionKey="name" noSelection="['': '']" class="target-type tag-select2" style="width: 150px"></g:select>
                     </td>
                     <td>
                         <select name="samples[0].target" class="target tag-select2 textcontrol" style="width: 150px" required>
@@ -194,6 +199,22 @@
                     </td>
                     <td>
                         <select name="samples[0].nterm" class="nterm tag-select2" style="width: 150px">
+                            <option></option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="provider no-tag-select2" name="samples[0].providerId" style="width: 150px">
+                            <option></option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="provider no-tag-select2" name="samples[0].providerLabId" style="width: 150px">
+                            <option></option>
+                        </select>
+                    </td>
+                    <td><input name="samples[0].bioSourceId"></td>
+                    <td>
+                        <select class="sendTo no-tag-select2" name="samples[0].sendToId" style="width: 150px">
                             <option></option>
                         </select>
                     </td>

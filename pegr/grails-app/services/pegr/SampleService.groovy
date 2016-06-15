@@ -11,6 +11,13 @@ class SampleService {
     def antibodyService
     def utilityService
     
+   /**
+    * Save a list of new samples that belong to the sample project and use the same assay.
+    * @param assayId assay's ID
+    * @param projectId project's ID
+    * @param samples a list of samples
+    * @return message message about wrong indices
+    */
     @Transactional
     def saveNewSamples(Long assayId, Long projectId, List samples) {
         def message = "Samples saved! "
@@ -26,24 +33,27 @@ class SampleService {
         }
         samples.each { data ->
             def provider = User.get(data.providerId)
+            def providerLab = Lab.get(data.providerLabId)
             def sendTo = User.get(data.sendToId)
             def species = getSpecies(data.genus, data.speciesId)
             def strain = getStrain(species, data.strain, data.parentStrain, data.genotype, data.mutation)
             def tissue = getTissue(data.tissue)
-            def growthMedia = getGrowthMedia(data.growthMediaId, species)        
+            def sex = getSex(data.sex)
+            def histology = getHistology(data.histology)
+            def growthMedia = getGrowthMedia(data.growthMedia, species)        
             
             // save cell source
-            def cellSource = getCellSource(growthMedia, strain, provider, tissue)
+            def cellSource = getCellSource(growthMedia, strain, provider, providerLab, data.bioSourceId, tissue, data.age, sex, histology)
             if (data.treatments) {
                 data.treatments.split(",").each { treatmentStr ->
                     addTreatment(cellSource, treatmentStr)
                 }
             }
             // save the antibody
-            def antibody = antibodyService.getAntibody(data.company,  data.catalogNumber, data.lotNumber, data.abNotes, data.clonal, data.abHostId, data.igTypeId, data.immunogene, data.abConcentration)
+            def antibody = antibodyService.getAntibody(data.company,  data.catalogNumber, data.lotNumber, data.abNotes, data.clonal, data.abHost, data.igType, data.immunogene, data.abConcentration)
                 
             // save the target
-            def target = antibodyService.getTarget(data.target, data.targetTypeId, data.nterm, data.cterm)
+            def target = antibodyService.getTarget(data.target, data.targetType, data.nterm, data.cterm)
             
             // save sample
             def abnoteMap = [:]
@@ -84,13 +94,19 @@ class SampleService {
 	}
     
     @Transactional
-    def getStrain(Species species, String strainStr, String parentStrainStr, String genotypeStr, String mutationStr) {  
-        // get the parent strain
+    def getStrain(Species species, String _strainStr, String _parentStrainStr, String _genotypeStr, String _mutationStr) {  
+        // clean input strings
+        def parentStrainStr = utilityService.cleanString(_parentStrainStr)
+        def strainStr = utilityService.cleanString(_strainStr)
+        def genotypeStr = utilityService.cleanString(_genotypeStr)
+        def mutationStr = utilityService.cleanString(_mutationStr)
+        
+        // get the parent strain        
         def parentStrain = Strain.findByName(parentStrainStr)
         if (!parentStrain) {
                 parentStrain = new Strain(name: parentStrainStr, species: species).save(failOnError: true) 
         }
-        // get strain     
+        // get strain    
         def strain = Strain.findByNameAndParentAndGenotypeAndGeneticModification(strainStr, parentStrain, genotypeStr, mutationStr)
         if (!strain) {
             strain = new Strain(name: strainStr, 
@@ -103,12 +119,10 @@ class SampleService {
 	}
 	
     @Transactional
-    def getTissue(String tissueStr) {
+    def getTissue(String _tissueStr) {
+        def tissueStr = utilityService.cleanString(_tissueStr)
         if (tissueStr == null) {
             return null
-        }
-        if (tissueStr.isInteger()) {
-            return Tissue.get(tissueStr.toInteger())
         }
         def tissue = Tissue.findByName(tissueStr)
         if (!tissue) {
@@ -118,7 +132,35 @@ class SampleService {
     }
     
     @Transactional
-	def getSpecies(String genusStr, String speciesStr) {
+    def getSex(String _sexStr) {
+        def sexStr = utilityService.cleanString(_sexStr)
+        if (sexStr == null) {
+            return null
+        }
+        def sex = Sex.findByName(sexStr)
+        if (!sex) {
+            sex = new Sex(name: sexStr).save(failOnError: true)
+        }
+        return sex
+    }
+    
+    @Transactional
+    def getHistology(String _histologyStr) {
+        def histologyStr = utilityService.cleanString(_histologyStr)
+        if (histologyStr == null) {
+            return null
+        }
+        def histology = Histology.findByName(histologyStr)
+        if (!histology) {
+            histology = new Histology(name: histologyStr).save(failOnError: true)
+        }
+        return histology
+    }
+    
+    @Transactional
+	def getSpecies(String _genusStr, String _speciesStr) {
+        def genusStr = utilityService.cleanString(_genusStr)
+        def speciesStr = utilityService.cleanString(_speciesStr)
 	    if(genusStr == null && speciesStr == null) {
 	        return null
 	    }
@@ -139,13 +181,11 @@ class SampleService {
 	}
 	
     @Transactional
-	def getGrowthMedia(String mediaStr, Species species) {
+	def getGrowthMedia(String _mediaStr, Species species) {
+        def mediaStr = utilityService.cleanString(_mediaStr)
 	    if(mediaStr == null) {
 	        return null
 	    }
-        if (mediaStr.isInteger()) {
-            return GrowthMedia.get(mediaStr.toInteger())
-        }
 	    def media = GrowthMedia.findByName(mediaStr)
 	    if(!media) {
 	        media = new GrowthMedia(name: mediaStr, species: species).save( failOnError: true)
@@ -159,15 +199,18 @@ class SampleService {
 	}
 	
     @Transactional
-	def getCellSource(GrowthMedia growthMedia, Strain strain, User provider, Tissue tissue) {
+	def getCellSource(GrowthMedia growthMedia, Strain strain, User provider, Lab providerLab, String _bioSourceId, Tissue tissue, String _age, Sex sex, Histology histology) {
 	    if (!strain) {
 	        return null
 	    }		
-	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, tissue: tissue).save( failOnError: true)
+        def age = utilityService.cleanString(_age)
+        def bioSourceId = utilityService.cleanString(_bioSourceId)
+	    def cellSource = new CellSource(providerUser: provider, providerLab: providerLab, biologicalSourceId: bioSourceId, strain: strain, growthMedia: growthMedia, tissue: tissue, age: age, sex: sex, histology: histology).save( failOnError: true)
 	    return cellSource
 	}
 	
-	def addTreatment(CellSource cellSource, String treatmentStr) {
+	def addTreatment(CellSource cellSource, String _treatmentStr) {
+        def treatmentStr = utilityService.cleanString(_treatmentStr)
 	    if(treatmentStr == null) {
 	        return null
 	    }

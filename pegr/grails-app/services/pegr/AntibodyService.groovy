@@ -96,8 +96,9 @@ class AntibodyService {
 	}
     
     
-    def getClonal(String clonalStr) {
+    def getClonal(String _clonalStr) {
 	    def clonal = null
+        def clonalStr = utilityService.cleanString(_clonalStr)
         if (clonalStr) {
             if (clonalStr.toLowerCase().contains("mono")) {
                 clonal = MonoPolyClonal.Mono
@@ -109,13 +110,11 @@ class AntibodyService {
 	}
     
     @Transactional
-	def getIgType(String igStr) {
+	def getIgType(String _igStr) {
+        def igStr = utilityService.cleanString(_igStr)
 	    if (igStr == null) {
 	        return null
 	    }
-        if (igStr.isInteger()) {
-            return IgType.get(igStr.toInteger())
-        }
 	    def igType = IgType.findByName(igStr)
 	    if (!igType) {
 	        igType = new IgType(name: igStr).save( failOnError: true)
@@ -124,7 +123,12 @@ class AntibodyService {
 	}
 	
     @Transactional
-	def getTarget(String targetStr, String targetTypeStr, String nTag, String cTag) {
+	def getTarget(String _targetStr, String _targetTypeStr, String _nTag, String _cTag) {
+        def targetStr = utilityService.cleanString(_targetStr)
+        def targetTypeStr = utilityService.cleanString(_targetTypeStr)
+        def nTag = utilityService.cleanString(_nTag)
+        def cTag = utilityService.cleanString(_cTag)
+        
 	    if ([targetStr, cTag, nTag].every{ it == null }) {
 	        return null
 	    }
@@ -141,12 +145,10 @@ class AntibodyService {
 	}
 	
     
-	def getTargetType(String str) {
-	    if (str == null) {
-	        return TargetType.findByName("unknown")
-	    }
-        if (str.isInteger()) {
-            return TargetType.get(str.toInteger())
+	def getTargetType(String _str) {
+        def str = utilityService.cleanString(_str)
+        if (!str) {
+            return null
         }
 	    def type = TargetType.findByName(str)
 	    if (!type) {
@@ -155,13 +157,11 @@ class AntibodyService {
 	    return type
 	}
 	
-	def getAbHost(String abHostStr) {
+	def getAbHost(String _abHostStr) {
+        def abHostStr = utilityService.cleanString(_abHostStr)
 	    if (abHostStr == null) {
 	        return null
 	    }
-        if (abHostStr.isInteger()) {
-            return AbHost.get(abHostStr.toInteger())
-        }
 	    def abHost = AbHost.createCriteria().get{
 	        eq("name", abHostStr, [ignoreCase: true])
 	        maxResults(1)
@@ -172,7 +172,8 @@ class AntibodyService {
 	    return abHost
 	}
 	
-	def getCompany(String companyStr) {
+	def getCompany(String _companyStr) {
+        def companyStr = utilityService.cleanString(_companyStr)
 	    if (companyStr == null) {
 	        return null
 	    }    

@@ -4,7 +4,8 @@
     <meta name="layout" content="main"/>
 </head>
 <body  onhashchange="getHash()">
-<div >
+<div class="container-fluid">
+    <h3>Edit Antibody</h3>
     <g:if test="${request.message}">
         <div class="message" role="status">${request.message}</div>
     </g:if>

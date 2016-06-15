@@ -57,6 +57,23 @@ class AntibodyService {
         return antibody
     }
     
+    def update(Long antibodyId, AntibodyCommand cmd) {
+        def antibody = Antibody.get(antibodyId)
+        if (antibody) {
+            antibody.with {
+                company = getCompany(cmd.company)
+                catalogNumber = cmd.catalogNumber
+                lotNumber = cmd.lotNumber
+                clonal = getClonal(cmd.clonal)
+                abHost = getAbHost(cmd.abHostId)
+                igType = getIgType(cmd.igTypeId)
+                immunogene = cmd.immunogene
+                concentration = utilityService.getFloat(cmd.concentration)
+            }
+            save(antibody)
+        }
+    }
+    
     @Transactional
     def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNotes, String abClonal, String abAnimal, String ig, String antigen, String abConc) {
 		def company = getCompany(abCompName)
@@ -65,7 +82,7 @@ class AntibodyService {
 		def igType = getIgType(ig)
 		def concentration = utilityService.getFloat(abConc)
 		def catNum = abCatNum
-		
+
 	    def antibodies = Antibody.findAllByCompanyAndCatalogNumberAndAbHostAndClonalAndIgTypeAndImmunogeneAndLotNumberAndNote(company, catNum, abHost, clonal, igType, antigen, abLotNum, abNotes)
         
         float err = 0.000001
@@ -82,9 +99,9 @@ class AntibodyService {
     def getClonal(String clonalStr) {
 	    def clonal = null
         if (clonalStr) {
-            if (clonalStr.contains("mono")) {
+            if (clonalStr.toLowerCase().contains("mono")) {
                 clonal = MonoPolyClonal.Mono
-            } else if (clonalStr.contains("poly")) {
+            } else if (clonalStr.toLowerCase().contains("poly")) {
                 clonal = MonoPolyClonal.Poly
             }
         }

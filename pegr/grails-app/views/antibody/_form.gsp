@@ -1,45 +1,45 @@
-<%@ page import="pegr.Antibody" %>
-<div class="${hasErrors(bean: antibody, field: 'company', 'error')} ">
+<div>
 	<label for="company">Company</label>
-	<g:select class="company" name="company" from="[]" value="${antibody?.company}" noSelection="['': '']" style="width: 200px">
-    </g:select>
-</div>
-
-<div class="${hasErrors(bean: antibody, field: 'catalogNumber', 'error')} ">
-	<label for="catalogNumber">Catalog Number</label>
-	<select class="catalog tag-select2 textcontrol" name="catalogNumber" value="${antibody?.catalogNumber}" style="width: 150px" required>
-        <option></option>
+	<select class="company" name="company" style="width: 200px">
+        <option value="${antibody?.company}" selected>${antibody?.company}</option>
     </select>
 </div>
 
-<div class="${hasErrors(bean: antibody, field: 'lotNumber', 'error')} ">
+<div>
+	<label for="catalogNumber">Catalog Number</label>
+	<select class="catalog textcontrol" name="catalogNumber" style="width: 150px" required>
+        <option value="${antibody?.catalogNumber}" selected>${antibody?.catalogNumber}</option>
+    </select>
+</div>
+
+<div>
 	<label for="lotNumber">Lot Number</label>
 	<g:textField name="lotNumber" value="${antibody?.lotNumber}"/>
 </div>
 
-<div class="${hasErrors(bean: antibody, field: 'abHost', 'error')} required">
+<div>
 	<label for="abHost">Ab Host</label>
 	<g:select id="abHost" name="abHostId" from="${pegr.AbHost.list()}" optionKey="id" noSelection="['':'']" class="tag-select2 host"  value="${antibody?.abHostId}"/>
 </div>
 
-<div class="${hasErrors(bean: antibody, field: 'immunogene', 'error')} ">
+<div>
 	<label for="immunogene">Immunogene</label>
-    <select class="immunogene tag-select2" name="immunogene" value="antibody?.immunogene" style="width: 150px">
-        <option></option>
+    <select class="immunogene" name="immunogene" style="width: 150px">
+        <option value="${antibody?.immunogene}" selected>${antibody?.immunogene}</option>
     </select>
 </div>
 
-<div class="${hasErrors(bean: antibody, field: 'clonal', 'error')} ">
+<div>
 	<label for="clonal">Mono/Poly Clonal</label>
 	<g:select name="clonal" from="${pegr.MonoPolyClonal?.values()}" keys="${pegr.MonoPolyClonal.values()*.name()}" value="${antibody?.clonal}"  noSelection="['': '']" class="no-tag-select2 clonal"/>
 </div>
 
-<div class="${hasErrors(bean: antibody, field: 'igType', 'error')} ">
+<div>
 	<label for="igType">Ig Type</label>
 	<g:select id="igType" name="igTypeId" from="${pegr.IgType.list()}" optionKey="id" value="${antibody?.igTypeId}" class="tag-select2 ig" noSelection="['null': '']"/>
 </div>
 
-<div class="${hasErrors(bean: antibody, field: 'concentration', 'error')} required">
+<div>
 	<label for="concentration">Concentration (ug/ul)</label>
 	<g:textField name="concentration" value="${antibody?.concentration}" class="conc isnumber"/>
 </div>
@@ -81,20 +81,6 @@
                 placeholder: tagPlaceholder
             });
         }});
-        
-        // jquery validation
-        jQuery.validator.addMethod("textrule", function(value, element) {
-            return this.optional(element) || /^[a-zA-Z0-9-]+$/.test(value);
-        }, "Only a-z, A-Z, 0-9 and '-' are allowed!");
-
-        jQuery.validator.addClassRules({
-            textcontrol: {
-                textrule: true
-            },
-            isnumber: {
-                number: true
-            }
-        });
 
         $("form").validate();
     });

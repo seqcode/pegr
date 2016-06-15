@@ -65,11 +65,9 @@ class AntibodyController {
         [antibody: antibodyCommand]
     }
     
-    def update(Long antibodyId) {
-        def antibody = Antibody.get(antibodyId)
-        antibody.properties = params
+    def update(Long antibodyId, AntibodyCommand cmd) {
         try {
-            antibodyService.save(antibody)
+            antibodyService.update(antibodyId, cmd)
             flash.message = "Antibody update!"
             redirect(action: "show", id: antibodyId)
         }catch(ItemException e) {
@@ -163,9 +161,9 @@ class AntibodyController {
         def antibody = Antibody.findByCatalogNumber(catalog)
         def result = [host: antibody?.abHost?.id, 
                 immunogene: antibody?.immunogene, 
-                clonal: antibody?.clonal.name(), 
+                clonal: antibody?.clonal?.name(), 
                 ig: antibody?.igType?.id, 
-                conc: antibody.concentration,
+                conc: antibody?.concentration,
                 targetTypeId: antibody?.defaultTarget?.targetType?.id, 
                 target: antibody?.defaultTarget?.name, 
                 cterm: antibody?.defaultTarget?.cTermTag,

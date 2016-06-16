@@ -8,7 +8,7 @@
 <div>
 	<label>Species</label>
 	<select name="speciesId" class="species tag-select2" style="width: 150px" required>
-        <option value="${cellSource?.speciesId}" selected>${cellSource?.speciesId}</option>
+        <option value="${cellSource?.speciesId}" selected>${cellSource?.speciesName}</option>
     </select>
 </div>
 
@@ -71,9 +71,9 @@
 <div>
     <label>Treatments</label>
     <span id="treatments">
-    <select multiple="multiple" class="treatments tag-select2 textcontrol" name="treatments" style="width: 300px">
+    <select multiple="multiple" class="treatments tag-select2" name="treatments" style="width: 300px">
         <g:each in="${cellSource?.treatments}">
-            <option value="${it}">${it}</option>
+            <option value="${it}" selected>${it}</option>
         </g:each>        
     </select>
     <a href="#" class="edit" data-toggle="modal" data-target="#new-treatment">+New</a>
@@ -82,17 +82,17 @@
 
 <div>
     <label>Provider User </label>
-    <g:select id="providerUser" name="providerUserId" from="${pegr.User.list()}" optionKey="id" value="${cellSource?.providerUser?.id}" noSelection="['null': '']" class="no-tag-select2"/>
+    <g:select name="providerId" from="${pegr.User.list()}" optionKey="id" value="${cellSource?.providerId}" noSelection="['null': '']" class="no-tag-select2"/>
 </div>
 
 <div>
     <label>Provider Lab</label>
-    <g:select id="providerLab" name="providerLabId" from="${pegr.Lab.list()}" optionKey="id" value="${cellSource?.providerLab?.id}" noSelection="['null': '']" class="no-tag-select2"/>
+    <g:select name="providerLabId" from="${pegr.Lab.list()}" optionKey="id" value="${cellSource?.providerLabId}" noSelection="['null': '']" class="no-tag-select2"/>
 </div>
 
 <div>
     <label>Biological Source ID</label>
-    <g:textField name="biologicalSourceId" maxlength="50" value="${cellSource?.biologicalSourceId}"/>
+    <g:textField name="bioSourceId" maxlength="50" value="${cellSource?.bioSourceId}"/>
 </div>
 
 <script>

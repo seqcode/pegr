@@ -57,17 +57,17 @@ class AntibodyService {
         return antibody
     }
     
-    def update(Long antibodyId, AntibodyCommand cmd) {
-        def antibody = Antibody.get(antibodyId)
+    def update(AntibodyCommand cmd) {
+        def antibody = Antibody.get(cmd.id)
         if (antibody) {
             antibody.with {
                 company = getCompany(cmd.company)
-                catalogNumber = cmd.catalogNumber
-                lotNumber = cmd.lotNumber
+                catalogNumber = utilityService.cleanString(cmd.catalogNumber)
+                lotNumber = utilityService.cleanString(cmd.lotNumber)
                 clonal = getClonal(cmd.clonal)
-                abHost = getAbHost(cmd.abHostId)
-                igType = getIgType(cmd.igTypeId)
-                immunogene = cmd.immunogene
+                abHost = getAbHost(cmd.abHost)
+                igType = getIgType(cmd.igType)
+                immunogene = utilityService.cleanString(cmd.immunogene)
                 concentration = utilityService.getFloat(cmd.concentration)
             }
             save(antibody)
@@ -75,13 +75,15 @@ class AntibodyService {
     }
     
     @Transactional
-    def getAntibody(String abCompName, String abCatNum, String abLotNum, String abNotes, String abClonal, String abAnimal, String ig, String antigen, String abConc) {
+    def getAntibody(String abCompName, String _catNum, String _lotNum, String abNotes, String abClonal, String host, String ig, String _antigen, String abConc) {
 		def company = getCompany(abCompName)
-		def abHost = getAbHost(abAnimal)
+		def abHost = getAbHost(host)
 		def clonal = getClonal(abClonal)
 		def igType = getIgType(ig)
 		def concentration = utilityService.getFloat(abConc)
-		def catNum = abCatNum
+		def catNum = utilityService.cleanString(_catNum)
+        def lotNum = utilityService.cleanString(_lotNum)
+        def antigen = utilityService.cleanString(_antigen)
 
 	    def antibodies = Antibody.findAllByCompanyAndCatalogNumberAndAbHostAndClonalAndIgTypeAndImmunogeneAndLotNumberAndNote(company, catNum, abHost, clonal, igType, antigen, abLotNum, abNotes)
         

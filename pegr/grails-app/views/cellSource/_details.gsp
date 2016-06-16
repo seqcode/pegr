@@ -12,31 +12,31 @@
         </ul>
 	
 	<g:if test="${cellSource?.sex}">
-	<li>Sex:${cellSource.sex}	</li>
+	<li>Sex: ${cellSource.sex}	</li>
 	</g:if>
     
     <g:if test="${cellSource?.age}">
-	<li>Age:${cellSource.age}	</li>
+	<li>Age: ${cellSource.age}	</li>
 	</g:if>
     
     <g:if test="${cellSource?.tissue}">
-	<li>Tissue:${cellSource.tissue}	</li>
+	<li>Tissue: ${cellSource.tissue}	</li>
 	</g:if>
 	
     <g:if test="${cellSource?.histology}">
-	<li>Histology:${cellSource.histology}	</li>
+	<li>Histology: ${cellSource.histology}	</li>
 	</g:if>
     
     <g:if test="${cellSource?.growthMedia}">
-	<li>Growth Media:${cellSource.growthMedia}	</li>
+	<li>Growth Media: ${cellSource.growthMedia}	</li>
 	</g:if>
 	
     <li>Provider: 
 	<g:if test="${cellSource?.providerUser}">
-	   ${cellSource.providerUser}
+	    ${cellSource.providerUser}
 	</g:if>
 	<g:if test="${cellSource?.providerLab}">
-        , ${cellSource.providerLab}
+        ${cellSource.providerLab}
 	</g:if>
     </li>
     

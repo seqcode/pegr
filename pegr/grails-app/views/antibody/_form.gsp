@@ -19,7 +19,7 @@
 
 <div>
 	<label for="abHost">Ab Host</label>
-	<g:select id="abHost" name="abHostId" from="${pegr.AbHost.list()}" optionKey="id" noSelection="['':'']" class="tag-select2 host"  value="${antibody?.abHostId}"/>
+	<g:select id="abHost" name="abHost" from="${pegr.AbHost.list()}" optionKey="name" noSelection="['':'']" class="tag-select2 host"  value="${antibody?.abHost}"/>
 </div>
 
 <div>
@@ -36,7 +36,7 @@
 
 <div>
 	<label for="igType">Ig Type</label>
-	<g:select id="igType" name="igTypeId" from="${pegr.IgType.list()}" optionKey="id" value="${antibody?.igTypeId}" class="tag-select2 ig" noSelection="['null': '']"/>
+	<g:select id="igType" name="igType" from="${pegr.IgType.list()}" optionKey="name" value="${antibody?.igType}" class="tag-select2 ig" noSelection="['null': '']"/>
 </div>
 
 <div>

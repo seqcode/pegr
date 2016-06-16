@@ -13,23 +13,12 @@ class CellSourceController {
         [item: item, cellSource: cellSource]
     }
     
-    def save() {
-        withForm{        
-            def item = new Item(params)
-            def cellSource = new CellSource(params)
-            def treatments = params.list("treatments")
-            if (!(cellSource?.strain?.id)) {
-                cellSource.strain = new Strain(params)
-                cellSource.strain.name = params.strainName
-                if (!(cellSource?.strain?.species?.id)) {
-                    cellSource.strain.species = new Species(genusName:params.genusName, 
-                                                            name: params.speciesName)
-                }
-            }
+    def save(Item item, CellSourceCommand cmd) {
+        withForm {
             try {
-                cellSourceService.save(item, cellSource, treatments)
+                cellSourceService.save(item, cmd)
                 flash.message = "New traced sample added!"
-                redirect(action: "show", id: item.id)
+                redirect(controller: "item", action: "show", id: cmd.itemId)
             }catch(ItemException e) {
                 request.message = e.message
                 render(view: "createTracedSample", model: [item:item, cellSource: cellSource])
@@ -43,29 +32,47 @@ class CellSourceController {
     
     def edit(Long cellSourceId) {
         def cellSource = CellSource.get(cellSourceId)
-        if (cellSource) {
-            cellSource.properties = params
+        if (!cellSource) {
+            render(view: "/404")
+            return
         }
-        [cellSource: cellSource, itemId: cellSource?.item?.id]
+        def cmd = new CellSourceCommand(
+            cellSourceId: cellSource.id,
+            itemId: cellSource.item?.id,
+            genus: cellSource.strain?.species?.genusName,
+            speciesId: cellSource.strain?.species?.id,
+            speciesName: cellSource.strain?.species?.name,
+            parentStrain: cellSource.strain?.parent?.name,
+            strain: cellSource.strain?.name,
+            genotype: cellSource.strain?.genotype,
+            mutation: cellSource.strain?.geneticModification,
+            tissue: cellSource.tissue?.name,
+            age: cellSource.age,
+            sex: cellSource.sex?.name,
+            histology: cellSource.histology?.name,
+            growthMedia: cellSource.growthMedia?.name,
+            treatments: cellSource.treatments,
+            providerId: cellSource.providerUser?.id,
+            providerLabId: cellSource.providerLab?.id,
+            bioSourceId: cellSource.biologicalSourceId
+        )
+        [cellSource: cmd, itemId: cellSource?.item?.id]
     }
     
-    def update(Long cellSourceId) {
-        def cellSource = CellSource.get(cellSourceId)
-        if (cellSource) {
-            cellSource.properties = params
-            def treatments = params.list("treatments")
-            try {
-                cellSourceService.save(cellSource, treatments)
-                flash.message = "Cell source information updated!"
-                redirect(controller: "item", action:"show", id: cellSource?.item?.id)
-            } catch (ItemException e) {
-                flash.message = e.message
-                redirect(action: "edit", cellSourceId: cellSourceId)
-            }
-        } else {
-            flash.message = "Cell source not found!"
-            redirect(controller: "item", action: "list")
+    def update(CellSourceCommand cmd) {
+        try {
+            cellSourceService.update(cmd)
+            flash.message = "Cell source information updated!"
+            redirect(controller: "item", action:"show", id: cmd?.itemId)
+        } catch (ItemException e) {
+            flash.message = e.message
+            render(view: "edit", model: [cellSource: cmd])
+        } catch (Exception e) {
+            request.message = "Error updating the antibody!"
+            log.error "Error: ${e.message}", e
+            render(view:'edit', model:[antibody: cmd])
         }
+
     }
         
     /* ----------------------------- Ajax ----------------------*/
@@ -133,8 +140,11 @@ class CellSourceController {
 }
 
 class CellSourceCommand {
+    Long cellSourceId
+    Long itemId
     String genus
     String speciesId
+    String speciesName
     String parentStrain
     String strain
     String genotype
@@ -144,7 +154,7 @@ class CellSourceCommand {
     String sex
     String histology
     String growthMedia
-    String treatments
+    List treatments
     Long providerId
     Long providerLabId
     String bioSourceId

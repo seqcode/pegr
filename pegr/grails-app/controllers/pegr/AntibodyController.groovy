@@ -52,26 +52,34 @@ class AntibodyController {
     
     def edit(Long antibodyId){
         def antibody = Antibody.get(antibodyId)
+        if (!antibody) {
+            render(view: "/404")
+            return
+        }
         def antibodyCommand = new AntibodyCommand(   
             id : antibody.id,
-            company : antibody.company.name,
+            company : antibody.company?.name,
             catalogNumber : antibody.catalogNumber,
             lotNumber : antibody.lotNumber,
-            abHostId : antibody.abHost?.id,
+            abHost : antibody.abHost?.name,
             immunogene : antibody.immunogene,
             clonal : antibody.clonal,
-            igTypeId : antibody.igType?.id,
+            igType : antibody.igType?.name,
             concentration : antibody.concentration)
         [antibody: antibodyCommand]
     }
     
-    def update(Long antibodyId, AntibodyCommand cmd) {
+    def update(AntibodyCommand cmd) {
         try {
-            antibodyService.update(antibodyId, cmd)
+            antibodyService.update(cmd)
             flash.message = "Antibody update!"
             redirect(action: "show", id: antibodyId)
-        }catch(ItemException e) {
+        } catch(ItemException e) {
             request.message = e.message
+            render(view:'edit', model:[antibody: antibody])
+        } catch(Exception e) {
+            request.message = "Error updating the antibody!"
+            log.error "Error: ${e.message}", e
             render(view:'edit', model:[antibody: antibody])
         }
     }

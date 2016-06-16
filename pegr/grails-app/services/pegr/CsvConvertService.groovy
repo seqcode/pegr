@@ -11,6 +11,7 @@ class CsvConvertException extends RuntimeException {
     
 @Transactional
 class CsvConvertService {
+    def cellSourceService
     def sampleService
     def antibodyService
 	
@@ -85,20 +86,20 @@ class CsvConvertService {
 
         def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.abConc)
 
-        def species = sampleService.getSpecies(data.genus, data.species)
+        def species = cellSourceService.getSpecies(data.genus, data.species)
 
         def strainAndTissue = getStrainTissue(species, data.strain, data.parentStrain, data.genotype, data.mutation)
         def strain = strainAndTissue.strain
         def tissue = strainAndTissue.tissue
 
-        def growthMedia = sampleService.getGrowthMedia(data.growthMedia, species)
+        def growthMedia = cellSourceService.getGrowthMedia(data.growthMedia, species)
 
         def inventory = getInventory(data.dateReceived, data.receivingUser, data.inOrExternal, data.inventoryNotes)
         def prepUser = getUser(data.samplePrepUser)
         def cellSource = getCellSource(prepUser, growthMedia, strain, cellProvider, inventory, tissue)
 
-        sampleService.addTreatment(cellSource, data.perturbation1)
-        sampleService.addTreatment(cellSource, data.perturbation2)
+        cellSourceService.addTreatment(cellSource, data.perturbation1)
+        cellSourceService.addTreatment(cellSource, data.perturbation2)
         
         def assay = getAssay(data.assay)
 

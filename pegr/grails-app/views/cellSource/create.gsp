@@ -17,7 +17,7 @@
             <g:renderErrors bean="${item}" as="list"/>
         </div>
     </g:hasErrors>
-    <g:form action="saveWithCellSource" class="fields" role="form" method="post" useToken="true">
+    <g:form controller="cellSource" action="save" class="fields" role="form" method="post" useToken="true">
         <h4>Item Information</h4>
         <g:render template="form" model="['item':item]"/>
         <h4>Cell Source Information</h4>

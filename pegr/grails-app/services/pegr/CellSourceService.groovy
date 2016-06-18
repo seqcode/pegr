@@ -20,7 +20,7 @@ class CellSourceService {
                 tissue = getTissue(cmd.tissue)
                 sex = getSex(cmd.sex)
                 histology = getHistology(cmd.histology)
-                growthMedia = getGrowthMedia(cmd.growthMedia)
+                growthMedia = getGrowthMedia(cmd.growthMedia, species)
                 age = utilityService.cleanString(cmd.age)
                 biologicalSourceId = utilityService.cleanString(cmd.bioSourceId)
                 providerUser = User.get(cmd.providerId)
@@ -33,17 +33,17 @@ class CellSourceService {
             }
             // save cell source's treatments
             def toDelete = CellSourceTreatments.where{cellSource == cellSource}.list()
-            treatments.each {
-                def treatmentId = Long.parseLong(it)
-                def oldTreatment = toDelete.find{it.treatment.id == treatmentId}
-                if (oldTreatment) {
-                    toDelete.remove(oldTreatment)
-                } else {
-                    def treatment = CellSourceTreatment.get(treatmentId)
-                    if (treatment) {
-                        new CellSourceTreatments(cellSource: cellSource, treatment: treatment).save()
+            if (cmd.treatments) {
+                cmd.treatments.split(",").each { treatmentName ->
+                    def oldTreatment = toDelete.find{it.treatment.name == treatmentName}
+                    if (oldTreatment) {
+                        toDelete.remove(oldTreatment)
                     } else {
-                        throw new ItemException(message: "Treatment not found!")
+                        def treatment = CellSourceTreatment.findByName(treatmentName)
+                        if (!treatment) {
+                            treatment = new CellSourceTreatment(name: treatmentName).save(failOnError: true)
+                        }
+                        new CellSourceTreatments(cellSource: cellSource, treatment: treatment).save()
                     }
                 }
             }
@@ -129,11 +129,7 @@ class CellSourceService {
 	def getSpecies(String _genusStr, String _speciesStr) {
         def genusStr = utilityService.cleanString(_genusStr)
         def speciesStr = utilityService.cleanString(_speciesStr)
-        
-        if (speciesStr.isInteger()) {
-            return Species.get(speciesStr.toInteger())
-        }
-        
+
 	    if(genusStr == null && speciesStr == null) {
 	        return null
 	    }
@@ -144,6 +140,10 @@ class CellSourceService {
 			speciesStr = "Unknown"
 		}
 
+        if (speciesStr.isInteger()) {
+            return Species.get(speciesStr.toInteger())
+        }
+        
 	    def species = Species.findByNameAndGenusName(speciesStr, genusStr)
 	    if(!species) {
 	        species = new Species(name: speciesStr, genusName: genusStr).save( failOnError: true)

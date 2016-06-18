@@ -18,7 +18,7 @@ class CellSourceController {
             try {
                 cellSourceService.save(item, cmd)
                 flash.message = "New traced sample added!"
-                redirect(controller: "item", action: "show", id: cmd.itemId)
+                redirect(controller: "item", action: "show", id: item.id)
             }catch(ItemException e) {
                 request.message = e.message
                 render(view: "createTracedSample", model: [item:item, cellSource: cellSource])
@@ -51,12 +51,11 @@ class CellSourceController {
             sex: cellSource.sex?.name,
             histology: cellSource.histology?.name,
             growthMedia: cellSource.growthMedia?.name,
-            treatments: cellSource.treatments,
             providerId: cellSource.providerUser?.id,
             providerLabId: cellSource.providerLab?.id,
             bioSourceId: cellSource.biologicalSourceId
         )
-        [cellSource: cmd, itemId: cellSource?.item?.id]
+        [cellSource: cmd, treatments: cellSource.treatments]
     }
     
     def update(CellSourceCommand cmd) {
@@ -66,11 +65,11 @@ class CellSourceController {
             redirect(controller: "item", action:"show", id: cmd?.itemId)
         } catch (ItemException e) {
             flash.message = e.message
-            render(view: "edit", model: [cellSource: cmd])
+            redirect(action: "edit", params: [cellSourceId: cmd.cellSourceId])
         } catch (Exception e) {
-            request.message = "Error updating the antibody!"
+            flash.message = "Error updating the antibody!"
             log.error "Error: ${e.message}", e
-            render(view:'edit', model:[antibody: cmd])
+            redirect(action: "edit", params: [cellSourceId: cmd.cellSourceId])
         }
 
     }
@@ -127,16 +126,6 @@ class CellSourceController {
         render utilityService.stringToSelect2Data(treatments) as JSON
     }
 
-    def addTreatment(Long cellSourceId) {
-        // save the new treatment
-        def treatment = new CellSourceTreatment(params)
-        cellSourceService.addTreatment(treatment)
-        def cellSource = CellSource.get(cellSourceId)
-        def treatments = cellSource ? cellSource.treatments : []
-        // add the new treatment to the cellSource for preview (not saved yet)
-        treatments.push(treatment)
-        render g.select(multiple:"multiple", name:"treatments", from:CellSourceTreatment.list(sort:'name'), optionKey:"id", value: treatments*.id, class:"select2")
-    }
 }
 
 class CellSourceCommand {
@@ -154,7 +143,7 @@ class CellSourceCommand {
     String sex
     String histology
     String growthMedia
-    List treatments
+    String treatments
     Long providerId
     Long providerLabId
     String bioSourceId

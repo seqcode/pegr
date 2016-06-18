@@ -72,11 +72,10 @@
     <label>Treatments</label>
     <span id="treatments">
     <select multiple="multiple" class="treatments tag-select2" name="treatments" style="width: 300px">
-        <g:each in="${cellSource?.treatments}">
+        <g:each in="${treatments}">
             <option value="${it}" selected>${it}</option>
         </g:each>        
     </select>
-    <a href="#" class="edit" data-toggle="modal" data-target="#new-treatment">+New</a>
     </span>
 </div>
 
@@ -143,15 +142,6 @@
             });
         }});
     }
-    
-    // disable the dependent fields in cascade selections
-    $(".species").prop("disabled", true);
-    $(".parent-strain").prop("disabled", true);
-    $(".strain").prop("disabled", true);
-    $(".genotype").prop("disabled", true);
-    $(".mutation").prop("disabled", true);
-    $(".growth-media").prop("disabled", true);
-    $(".genomes").prop("disabled", true);
     
     // ajax calls in cascade selections
     $(".genus").on("change", function() {

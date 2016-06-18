@@ -25,9 +25,16 @@
         <g:submitButton class="btn btn-primary" name="save" value="Save"/>
         <g:link class="btn btn-default" action="list" params="[typeId:item.type.id]">Cancel</g:link>
     </g:form>
-    <g:render template="/cellSource/treatmentModal"></g:render>
     <script>
         $("#nav-bench").addClass("active");
+        // disable the dependent fields in cascade selections
+        $(".species").prop("disabled", true);
+        $(".parent-strain").prop("disabled", true);
+        $(".strain").prop("disabled", true);
+        $(".genotype").prop("disabled", true);
+        $(".mutation").prop("disabled", true);
+        $(".growth-media").prop("disabled", true);
+        $(".genomes").prop("disabled", true);
      </script>
 </div>
 </body>

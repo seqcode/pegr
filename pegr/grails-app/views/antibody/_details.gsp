@@ -8,7 +8,7 @@
     </g:if>
 
     <g:if test="${object?.lotNumber}">
-    <li>Lot Number:${object.lotNumber}</li>
+    <li>Lot Number: ${object.lotNumber}</li>
     </g:if>
     
     <g:if test="${object?.abHost}">

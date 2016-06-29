@@ -13,9 +13,10 @@
     <g:hasErrors>
         <div class="errors">
             <g:renderErrors bean="${item}" as="list"/>
+            <g:renderErrors bean="${antibody}" as="list"/>
         </div>
     </g:hasErrors>
-    <g:form action="save" class="fields" role="form" method="post" useToken="true">
+    <g:form controller="antibody" action="save" class="fields" role="form" method="post" useToken="true">
         <g:render template="/item/form" model="['item':item]"/>
         <g:render template="/antibody/form" model="['antibody':antibody]"></g:render>
         <g:submitButton class="btn btn-primary" name="save" value="Save"/>

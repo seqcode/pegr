@@ -72,7 +72,7 @@ class ItemController {
                     item = new Item(type: itemType, barcode: barcode)
                     switch (itemType.category) {
                         case ItemTypeCategory.ANTIBODY:
-                            redirect(controller: "antibody", action: "create", params: [barcode:barcode])
+                            render(view: "/antibody/create", model: [item:item])
                             break
                         case ItemTypeCategory.TRACED_SAMPLE:
                             render(view: "/cellSource/create", model: [item: item])

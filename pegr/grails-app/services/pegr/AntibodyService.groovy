@@ -52,7 +52,7 @@ class AntibodyService {
     
     @Transactional
     def save(Item item, AntibodyCommand cmd){
-        def antibody = getAntibody(cmd.company, cmd.catalogNumber, cmd.lotNumber, null, cmd.clonal, cmd.abHostId, cmd.igTypeId, cmd.immunogene, cmd.concentration)
+        def antibody = getAntibody(cmd.company, cmd.catalogNumber, cmd.lotNumber, null, cmd.clonal, cmd.abHost, cmd.igType, cmd.immunogene, cmd.concentration)
         save(item, antibody)
         return antibody
     }
@@ -85,14 +85,14 @@ class AntibodyService {
         def lotNum = utilityService.cleanString(_lotNum)
         def antigen = utilityService.cleanString(_antigen)
 
-	    def antibodies = Antibody.findAllByCompanyAndCatalogNumberAndAbHostAndClonalAndIgTypeAndImmunogeneAndLotNumberAndNote(company, catNum, abHost, clonal, igType, antigen, abLotNum, abNotes)
+	    def antibodies = Antibody.findAllByCompanyAndCatalogNumberAndAbHostAndClonalAndIgTypeAndImmunogeneAndLotNumberAndNote(company, catNum, abHost, clonal, igType, antigen, lotNum, abNotes)
         
         float err = 0.000001
         def antibody = antibodies.find {
             it.concentration > concentration - err && it.concentration < concentration + err
         }
 	    if (!antibody) {	        
-	        antibody = new Antibody(company: company, catalogNumber: catNum, abHost: abHost, clonal: clonal, concentration: concentration, igType: igType, immunogene: antigen, lotNumber: abLotNum, note: abNotes).save( failOnError: true)
+	        antibody = new Antibody(company: company, catalogNumber: catNum, abHost: abHost, clonal: clonal, concentration: concentration, igType: igType, immunogene: antigen, lotNumber: lotNum, note: abNotes).save( failOnError: true)
 	    }	        
 		return antibody
 	}

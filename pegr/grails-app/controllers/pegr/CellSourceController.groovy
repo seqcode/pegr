@@ -8,11 +8,6 @@ class CellSourceController {
     def cellSourceService
 	def utilityService
     
-        
-    def create(Item item, CellSource cellSource) {
-        [item: item, cellSource: cellSource]
-    }
-    
     def save(Item item, CellSourceCommand cmd) {
         withForm {
             try {
@@ -21,11 +16,11 @@ class CellSourceController {
                 redirect(controller: "item", action: "show", id: item.id)
             }catch(ItemException e) {
                 request.message = e.message
-                render(view: "createTracedSample", model: [item:item, cellSource: cellSource])
+                render(view: "createTracedSample", model: [item:item, cellSource: cmd])
             }catch(Exception e) {
                 log.error "Error: ${e.message}", e
                 request.message = "Error saving this item!"
-                render(view: "createTracedSample", model: [item:item, cellSource: cellSource])
+                render(view: "createTracedSample", model: [item:item, cellSource: cmd])
             }
         }
     }

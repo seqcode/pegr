@@ -15,6 +15,7 @@
     <g:hasErrors>
         <div class="errors">
             <g:renderErrors bean="${item}" as="list"/>
+            <g:renderErrors bean="${cellSource}" as="list"/>
         </div>
     </g:hasErrors>
     <g:form controller="cellSource" action="save" class="fields" role="form" method="post" useToken="true">

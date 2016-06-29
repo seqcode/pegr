@@ -24,14 +24,6 @@ class AntibodyController {
             render status: 404
         }
     }
-
-    def create(Item item, AntibodyCommand antibodyCommand, String barcode) {
-        if (!item) {
-            def type = ItemType.findByName("Antibody")
-            item = new Item(barcode: barcode, type: type)
-        }                
-        [item: item, antibody: antibodyCommand]
-    }
     
     def save(Item item, AntibodyCommand antibodyCommand) {
         withForm{
@@ -73,14 +65,14 @@ class AntibodyController {
         try {
             antibodyService.update(cmd)
             flash.message = "Antibody update!"
-            redirect(action: "show", id: antibodyId)
+            redirect(action: "show", id: cmd.id)
         } catch(ItemException e) {
             request.message = e.message
-            render(view:'edit', model:[antibody: antibody])
+            render(view:'edit', model:[antibody: cmd])
         } catch(Exception e) {
             request.message = "Error updating the antibody!"
             log.error "Error: ${e.message}", e
-            render(view:'edit', model:[antibody: antibody])
+            render(view:'edit', model:[antibody: cmd])
         }
     }
     

@@ -24,7 +24,6 @@
                 <th>Strain</th>
                 <th>Antibody</th>
                 <th>Index</th>
-                <th>Read Type</th>
                 <th>Genome Build</th>
                 <th>Project</th>
             </tr>
@@ -36,7 +35,6 @@
                     <td>${it.sample?.cellSource?.strain}</td>
                     <td>${it.sample?.antibody}</td>
                     <td>${it.sample?.sequenceIndicesString}</td>
-                    <td>${it.readType}</td>
                     <td>${it.genomesString}</td>
                     <td>
                         <g:each in="${it.sample?.projects}">
@@ -50,6 +48,41 @@
             </tr>
         </tbody>
     </table>
+    <h3>Read Type and Positions</h3>
+    <p>Read Type: ${run.experiments[0]}</p>
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th>Start</th>
+                <th>End</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Read 1</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Index 1</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Index 2</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Read 2</td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+
     <div class="row well text-center">
         <g:if test="${run.status == pegr.RunStatus.PREP}">
             <g:link action="previewRun" params="[runId: run.id]" class="btn btn-success">Submit</g:link>

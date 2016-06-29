@@ -52,7 +52,9 @@ class AntibodyService {
     
     @Transactional
     def save(Item item, AntibodyCommand cmd){
+        def target = getTarget(cmd.target, cmd.targetType, cmd.nterm, cmd.cterm)
         def antibody = getAntibody(cmd.company, cmd.catalogNumber, cmd.lotNumber, null, cmd.clonal, cmd.abHost, cmd.igType, cmd.immunogene, cmd.concentration)
+        antibody.defaultTarget = target
         save(item, antibody)
         return antibody
     }
@@ -60,6 +62,7 @@ class AntibodyService {
     def update(AntibodyCommand cmd) {
         def antibody = Antibody.get(cmd.id)
         if (antibody) {
+            def newTarget = getTarget(cmd.target, cmd.targetType, cmd.nterm, cmd.cterm)
             antibody.with {
                 company = getCompany(cmd.company)
                 catalogNumber = utilityService.cleanString(cmd.catalogNumber)
@@ -69,6 +72,7 @@ class AntibodyService {
                 igType = getIgType(cmd.igType)
                 immunogene = utilityService.cleanString(cmd.immunogene)
                 concentration = utilityService.getFloat(cmd.concentration)
+                defaultTarget = newTarget
             }
             save(antibody)
         }

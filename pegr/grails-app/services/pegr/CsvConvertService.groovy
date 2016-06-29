@@ -549,7 +549,14 @@ class CsvConvertService {
 			map['rd1'] = [rd1Start, rd1End]
 		}
 		if(indexStart || indexEnd) {
-			map['index'] = [indexStart, indexEnd]
+            def indexStartList = indexStart.split(",")
+            def indexEndList = indexEnd.split(",")
+            if (indexStartList.size() == 1) {
+                map['index'] = [indexStart, indexEnd]
+            } else {
+                map['index1'] = [indexStartList[0], indexEndList[0]]
+                map['index2'] = [indexStartList[1], indexEndList[1]]
+            }
 		}
 		if(rd2Start || rd2End) {
 			map['rd2'] = [rd2Start, rd2End]

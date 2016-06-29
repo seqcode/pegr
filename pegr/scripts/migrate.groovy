@@ -18,15 +18,14 @@ indexMigrate.migrate(filename, version, DictionaryStatus.Y, startLine, endLine)
 filename = "files/Peconic_Database.csv"
 startLine = 4
 endLine = 531//12000
-*/
+
 def dataMigrate = new CsvConvertService()
 //dataMigrate.migrate(filename, RunStatus.COMPLETED, startLine, endLine, basicCheck)
 
 dataMigrate.getAllBioReplicate()
+*/
 
 // migrate antibody notes
-
-/*
 def jsonSlurper = new JsonSlurper()
 Sample.list().each{ sample ->
     if (sample.antibody?.note && sample.antibody.note[0] == "{") {
@@ -63,14 +62,18 @@ Antibody.list().each { antibody ->
                note = jsonSlurper.parseText(antibody.note)
            } catch (Exception e) {
            }
-           if (note && note.containsKey("Note")) {
-              antibody.note = note["Note"]
-              antibody.save()
+           if (note) {
+               if (note.containsKey("Note")) {
+                   antibody.note = note["Note"]
+               } else {
+                   antibody.note = null
+               }
+               antibody.save()
            }
         }catch(Exception e) {
            println "Antibody ${antibody.id} is not cleaned!"
         }
     }
 }
-*/
+
 

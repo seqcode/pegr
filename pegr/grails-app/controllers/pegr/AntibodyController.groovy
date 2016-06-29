@@ -57,7 +57,12 @@ class AntibodyController {
             immunogene : antibody.immunogene,
             clonal : antibody.clonal,
             igType : antibody.igType?.name,
-            concentration : antibody.concentration)
+            concentration : antibody.concentration,
+            targetType : antibody.defaultTarget?.targetType,
+            target : antibody.defaultTarget?.name,
+            cterm : antibody.defaultTarget?.cTermTag,
+            nterm : antibody.defaultTarget?.nTermTag
+        )
         [antibody: antibodyCommand]
     }
     
@@ -191,4 +196,8 @@ class AntibodyCommand {
     String clonal
     String igType
     String concentration
+    String targetType
+    String target
+    String cterm
+    String nterm
 }

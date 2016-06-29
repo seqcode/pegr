@@ -47,7 +47,8 @@ class ItemController {
                     tmp = tmp.parent
                 }
                 def cellSource = CellSource.findByItem(item)
-                [item: item, images: images, traces: traces, cellSource: cellSource]
+                def sample = Sample.findByItem(item)
+                [item: item, images: images, traces: traces, cellSource: cellSource, sample: sample]
                 break
             default:
                 [item: item, images: images]

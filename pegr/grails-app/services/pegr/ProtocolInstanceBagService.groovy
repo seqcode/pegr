@@ -77,6 +77,14 @@ class ProtocolInstanceBagService {
         }
         try {
             sample.status = SampleStatus.PREP
+
+            // iterate the protocols and add assay to sample if assay is defined
+            ProtocolInstance.findByBag(bag).each {
+                if (it.protocol?.assay) {
+                    sample.assay = it.protocol?.assay
+                }
+            }
+            
             sample.addToBags(bag).save()
         } catch(Exception e) {
             log.error "Error: ${e.message}", e

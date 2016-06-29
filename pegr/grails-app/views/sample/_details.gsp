@@ -101,7 +101,7 @@
             </g:if> 
             
             <g:if test="${notes?.containsKey('Usage Per ChIP (ul)')}">
-            <li>Usage Per ChIP (ug): ${notes['Usage Per ChIP (ul)']}</li>
+            <li>Usage Per ChIP (ul): ${notes['Usage Per ChIP (ul)']}</li>
             </g:if> 
                    
             <g:if test="${sample.antibody?.note}">
@@ -137,6 +137,8 @@
                 <g:if test="${notes['PCR Cycle']}">
                 <li>PCR Cycle: ${notes['PCR Cycle']}</li>
                 </g:if>
+                <li>Technician: ${sample?.prtclInstSummary?.user?.fullName}</li>
+                <li>Date: <g:formatDate format="yyyy-MM-dd" date="${sample?.prtclInstSummary?.endTime}"/></li>
             </g:if>
         </ul>
         <div class="subnumber">

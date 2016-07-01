@@ -35,6 +35,7 @@ class AlignmentStatsService {
         }
         // save the data
         def statisticsStr = data.statistics ? JsonOutput.toJson(data.statistics) : null
+        log.error data.datasets
         def datasetsStr = data.datasets ? JsonOutput.toJson(data.datasets) : null
         def analysis = new Analysis(alignment: alignment,
                                     tool: data.toolId,

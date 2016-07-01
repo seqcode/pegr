@@ -16,23 +16,20 @@
         </div>     
         <h3>
             Sample ${sample.id} <g:if test="${sample.sourceId}">(${sample.source}#${sample.sourceId})</g:if>
+            <g:if test="${sampleEditAuth}"><g:link controller="sample" action="showItem" params="[sampleId:sample?.id]"><span class="glyphicon glyphicon-qrcode"></span></g:link></g:if>
             <small><span class="label label-default">${sample.status}</span></small> 
-            <g:if test="${editAuth}">
-                <g:link action="edit" params="[sampleId:sample?.id]" class="edit pull-right">Edit</g:link>
-            </g:if>
         </h3>
-        
         <g:if test="${sample?.date}">
             <p>Date: <g:formatDate format="yyyy-MM-dd" date="${sample.date}"/></p>
         </g:if>
-        <g:render template="details" model="['sample': sample]"></g:render>
+        <g:render template="/sample/details" model="['sample': sample]"></g:render>
         <div id="seq">
             <h4>Sequencing Experiments</h4>
             <ol>
                 <g:each in="${sample.sequencingExperiments}" var="experiment">
                     <li>
                         <h5><g:link controller="sequenceRun" action="show" id="${experiment.sequenceRun.id}">Sequence Run ${experiment.sequenceRun.id}(Old No.${experiment.sequenceRun.runNum})</g:link></h5>
-                        <g:render template="experimentTable" model="['experiment':experiment]"></g:render>
+                        <g:render template="/sample/experimentTable" model="['experiment':experiment]"></g:render>
                         <h5>Alignments</h5>
                         <ul>
                             <g:each in="${experiment.alignments}" var="alignment">

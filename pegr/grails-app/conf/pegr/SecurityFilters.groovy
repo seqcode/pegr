@@ -10,6 +10,7 @@ class SecurityFilters {
     def dataSource
     def springSecurityService
     def projectService
+    def sampleService
     
     def filters = {
         
@@ -45,17 +46,29 @@ class SecurityFilters {
             }    
         }
         
-        projectEdit(controller:'project', action:'edit|addUserAjax|removeUserAjax|editUserRoleAjax|removeSample|searchSample|addExistingSample|addNewSamples') {
+        projectEdit(controller:'project', action:'edit|addUserAjax|removeUserAjax|editUserRoleAjax') {
             before = {
                 def project = Project.get(params.long('projectId'))
-                if (projectService.authToEdit(project)) {
+                if (projectService.projectEditAuth(project)) {
                     return true                  
                 } else {
                     render(view: '/login/denied')
                     return false
                 }
             }
-        }     
+        }
+        
+        projectSampleEdit(controller:'project', action:'removeSample|searchSample|addExistingSample|addNewSamples') {
+            before = {
+                def project = Project.get(params.long('projectId'))
+                if (projectService.sampleEditAuth(project)) {
+                    return true                  
+                } else {
+                    render(view: '/login/denied')
+                    return false
+                }
+            }
+        }
                 
         AntibodyEdit(controller: 'antibody', action: 'edit|update|delete|editItem|updateItem|addBarcode') {
             before = {
@@ -193,7 +206,7 @@ class SecurityFilters {
             before = {
                 def replicateId = params.long('setId')
                 def project = ReplicateSet.get(replicateId)?.project
-                if (projectService.authToEdit(project)) {
+                if (projectService.sampleEditAuth(project)) {
                     return true
                 } else {
                     render(view: '/login/denied')
@@ -212,7 +225,7 @@ class SecurityFilters {
             before = {
                 def replicateId = params.long('id')
                 def project = ReplicateSet.get(replicateId)?.project
-                if (projectService.authToEdit(project)) {
+                if (projectService.sampleEditAuth(project)) {
                     return true
                 } else {
                     render(view: '/login/denied')
@@ -230,7 +243,7 @@ class SecurityFilters {
         replicateCreate(controller:'replicate', action:'saveAjax') {
             before = {
                 def project = Project.get(params.long('projectId'))
-                if (projectService.authToEdit(project)) {
+                if (projectService.sampleEditAuth(project)) {
                     return true
                 } else {
                     render(view: '/login/denied')
@@ -258,9 +271,23 @@ class SecurityFilters {
                         render(view: '/login/denied')
                         return false
                     }                    
-                }
-               
+                }               
             }    
+        }
+        
+        /**
+         * ADMIN, MEMBERS and Project Owner/Participants are allowed to edit the sample
+         */
+        sampleEdit(controller:'sample', action:'edit') {
+            before = {
+                def sample = Sample.get(params.long('sampleId'))
+                if (sampleService.editAuth(sample)) {
+                    return true
+                } else {
+                    render(view: '/login/denied')
+                    return false
+                }
+            }
         }
         
         /**

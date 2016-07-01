@@ -1,6 +1,7 @@
 package pegr
 import grails.transaction.Transactional
 import groovy.json.*
+import groovy.sql.Sql
     
 class SampleException extends RuntimeException {
     String message
@@ -11,6 +12,28 @@ class SampleService {
     def antibodyService
     def utilityService
     def cellSourceService
+    def replicateService
+    
+    def getSampleDetails(Sample sample) {
+        def jsonSlurper = new JsonSlurper()
+        def notes = [:]
+        try {
+            notes += jsonSlurper.parseText(sample.prtclInstSummary.note)
+        }catch(Exception e){
+
+        }       
+        try {
+            notes += jsonSlurper.parseText(sample.antibodyNotes)
+        }catch(Exception e){
+
+        }
+        def protocols = []
+        sample.bags.each{ linkedbag ->
+            protocols.push([bag:linkedbag, protocolList:ProtocolInstance.where{bag.id == linkedbag.id}.list(sort: "bagIdx", order: "asc")])
+        }
+        def replicates = replicateService.getReplicates(sample)
+        return [sample: sample, notes: notes, protocols: protocols, replicates: replicates] 
+    }
     
    /**
     * Save a list of new samples that belong to the sample project and use the same assay.
@@ -149,4 +172,21 @@ class SampleService {
         sample.save()
     }
     
+    
+    def editAuth(Sample sample) {
+        def user = springSecurityService.currentUser
+        if (user.isAdmin() || user.authorities.any { it.authority == "ROLE_MEMBER" }) {
+            return true
+        } else {
+            def sampleId = params.long('id')
+            def sql = new Sql(dataSource)
+            def count = sql.rows("SELECT count(*) as cnt FROM project_user pu JOIN project_samples ps ON pu.project_id = ps.project_id WHERE pu.user_id = ${user.id} and ps.sample_id = ${sampleId} and pu.project_role in (${ProjectRole.OWNER}, ${ProjectRole.PARTICIPANT})") 
+            if (count[0].cnt > 0) {
+                return true
+            } else {
+                render(view: '/login/denied')
+                return false
+            }                    
+        }          
+    }
 }

@@ -17,11 +17,11 @@
                 <td>${projectUser.user.fullName} (${projectUser.user.username})</td>
                 <td>${projectUser.user.affiliation}</td>
                 <td>${projectUser.projectRole} 
-                    <g:if test="${authorized}">
+                    <g:if test="${projectEditAuth}">
                         <button class="edit" data-toggle="modal" data-target="#editUserRole" onclick="showEditRole(${projectUser.user.id})">Edit</button>
                     </g:if>
                 </td>
-                <g:if test="${authorized}">
+                <g:if test="${projectEditAuth}">
                 <td><a href="#" onclick="removeUser(${projectUser.user.id}, ${projectUser.project.id})"><span class="glyphicon glyphicon-remove"></span></a></td>
                 </g:if>
             </tr>

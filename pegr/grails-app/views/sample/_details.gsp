@@ -58,7 +58,11 @@
         </ul>
     </div>
     <div id="antibody" class="col-sm-3">
-        <h4>Antibody <g:if test="${authorized}"><g:link controller="antibody" action="show" id="${sample?.antibody?.id}"><span class="glyphicon glyphicon-qrcode"></span></g:link></g:if></h4>
+        <h4>Antibody 
+            <g:if test="${sampleEditAuth}">
+                <g:link controller="antibody" action="show" id="${sample?.antibody?.id}"><span class="glyphicon glyphicon-qrcode"></span></g:link>
+            </g:if>
+        </h4>
         <ul>
             <g:if test="${sample.antibody?.company}">
             <li>Company: ${sample.antibody?.company}</li>
@@ -145,7 +149,7 @@
             <ol>
                 <g:each in="${protocols}" var="bag">
                     <li>
-                        <g:if test="${authorized}">
+                        <g:if test="${sampleEditAuth}">
                             <g:link controller="protocolInstanceBag" action="showBag" id="${bag.bag?.id}">${bag.bag?.name}</g:link>
                             <ol>
                                 <g:each in="${bag.protocolList}">
@@ -170,7 +174,11 @@
     </div>     
 
     <div id="other" class="col-sm-3">      
-        <h4>Other</h4>
+        <h4>Other
+            <g:if test="${sampleEditAuth}">
+                <g:link controller="sample" action="editOther" id="${sample?.id}"><span class="glyphicon glyphicon-qrcode"></span></g:link>
+            </g:if>
+        </h4>
         <ul>
             <li>Index: ${sample.sequenceIndicesString}</li>
 

@@ -8,12 +8,12 @@
         <div class="message" role="status">${flash.message}</div>
     </g:if>
 	<div>
-		<h3>Project: ${project?.name} <g:if test="${authorized}"><g:link action="edit" params="[projectId:project?.id]" class="edit">Edit</g:link></g:if></h3>
+		<h3>Project: ${project?.name} <g:if test="${projectEditAuth}"><g:link action="edit" params="[projectId:project?.id]" class="edit">Edit</g:link></g:if></h3>
 		<p>Created: ${project?.dateCreated}, updated: ${project?.lastUpdated}</p>
 		<p>Description: ${project?.description}</p>
         <p>Funding: ${project?.funding}</p>
         
-        <h3>Users <g:if test="${authorized}"><button class="edit" data-toggle="modal" data-target="#addUser">Add</button></g:if></h3>
+        <h3>Users <g:if test="${projectEditAuth}"><button class="edit" data-toggle="modal" data-target="#addUser">Add</button></g:if></h3>
         <div id="project-users">
             <g:render template="userTable"/>
         </div>
@@ -35,21 +35,21 @@
         <div class="pagination">
             <g:paginate id="${project.id}" total="${sampleCount ?: 0}" max="50"/>
         </div>   
-        <g:if test="${authorized}">
+        <g:if test="${sampleEditAuth}">
             <div>
                 <button data-toggle="modal" data-target="#selectAssay" class="btn btn-info">Create New Samples</button>
                 <g:link action="searchSample" params="[projectId: project?.id]" class="btn btn-info">Add Existing Sample</g:link>
             </div>
         </g:if>
         
-        <h3>Replicates <g:if test="${authorized}"><button data-toggle="modal" data-target="#addReplicate" class="edit">Add</button></g:if></h3>
+        <h3>Replicates <g:if test="${sampleEditAuth}"><button data-toggle="modal" data-target="#addReplicate" class="edit">Add</button></g:if></h3>
         <div id="replicates">
             <g:render template="/replicate/list" model="['replicates':replicates]"></g:render>
         </div>
     </div>
     <br/>         
     
-    <g:if test="${authorized}">
+    <g:if test="${sampleEditAuth}">
         <div id="selectAssay" class="modal fade" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -154,9 +154,6 @@
         $(function(){
             $(".confirm").confirm();
             $("#nav-projects").addClass("active");
-            if (!${authorized}) {
-                $(".edit").hide();
-            }
             $("#userId").select2();
         });
 

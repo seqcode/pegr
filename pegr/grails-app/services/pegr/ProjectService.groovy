@@ -75,7 +75,7 @@ class ProjectService {
         return unknownSampleIds
     }
     
-    def authToEdit(Project project) {
+    def projectEditAuth(Project project) {
         def authorized = false
         def currUser = springSecurityService.currentUser
         if (currUser.isAdmin()) {
@@ -83,6 +83,19 @@ class ProjectService {
         } else if (ProjectUser.where { project == project && user == currUser && projectRole == ProjectRole.OWNER}.find()) {
            authorized = true                    
         }   
+        return authorized
+    }
+    
+    def sampleEditAuth(Project project) {
+        def authorized = false
+        def currUser = springSecurityService.currentUser
+        if (currUser.isAdmin()) {
+            authorized = true
+        } else if (ProjectUser.where { project == project && user == currUser && projectRole == ProjectRole.OWNER}.find()) {
+           authorized = true                    
+        } else if (ProjectUser.where { project == project && user == currUser && projectRole == ProjectRole.PARTICIPANT}.find()) {
+           authorized = true                    
+        }     
         return authorized
     }
     

@@ -20,6 +20,13 @@
                     <td>&#10003;</td>
                     <td>&#10003;</td>
                     <td></td>
+                </tr>                
+                <tr>
+                    <td>Add/remove/edit samples</td>
+                    <td>&#10003;</td>
+                    <td>&#10003;</td>
+                    <td></td>
+                    <td></td>
                 </tr>
                 <tr>
                     <td>Edit project name, description, funding</td>
@@ -30,13 +37,6 @@
                 </tr>
                 <tr>
                     <td>Add/remove user, edit role</td>
-                    <td>&#10003;</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Add/remove samples</td>
                     <td>&#10003;</td>
                     <td></td>
                     <td></td>

@@ -5,7 +5,6 @@ class SampleController {
     
     def springSecurityService
     def sampleService
-    def replicateService
     
     def index(Integer max) {
         params.max = Math.min(max ?: 15, 100)
@@ -19,28 +18,11 @@ class SampleController {
     }
     
 	def show(Long id) {
-		def sample = Sample.get(id)
+        def sample = Sample.get(id)
         if (sample) {
-            def jsonSlurper = new JsonSlurper()
-            def notes = [:]
-            try {
-                notes += jsonSlurper.parseText(sample.prtclInstSummary.note)
-            }catch(Exception e){
-
-            }       
-            try {
-                notes += jsonSlurper.parseText(sample.antibodyNotes)
-            }catch(Exception e){
-
-            }
-            def protocols = []
-            sample.bags.each{ linkedbag ->
-                protocols.push([bag:linkedbag, protocolList:ProtocolInstance.where{bag.id == linkedbag.id}.list(sort: "bagIdx", order: "asc")])
-            }
-            def replicates = replicateService.getReplicates(sample)
-            def currentUser = springSecurityService.currentUser
-            def authorized = currentUser.isAdmin() ||  (currentUser.authorities.any { it.authority == "ROLE_MEMBER" }) 
-            [sample: sample, notes: notes, protocols: protocols, authorized: authorized, replicates: replicates]        
+            def result = sampleService.getSampleDetails(sample)
+            def editAuth = sampleService.editAuth(sample)
+            result << [editAuth: editAuth]
         } else {
             render(view: "/404")
         }

@@ -7,9 +7,8 @@ class UserException extends RuntimeException {
     User user
 }
 
-@Transactional
 class UserService {
-    
+    @Transactional
     User updateUser(UserInfoCommand uic, Long userId){
 
         def user = User.get(userId)
@@ -27,5 +26,25 @@ class UserService {
             throw new UserException(message: "Oops! Please try again!")
         }
         
+    }
+    
+    @Transactional
+    def updateByAdmin(User user, List roles) {
+        user.save()
+        def toDelete = UserRole.findAllByUser(user)
+        roles.each { roleId ->
+            def role = Role.get(roleId)
+            if (role) {
+                def old = toDelete.find { it.role == role }
+                if (old) {
+                    toDelete.remove(old)
+                } else {
+                    new UserRole(user: user, role: role).save()
+                }   
+            }                     
+        }
+        toDelete.each {
+            it.delete()
+        }
     }
 }

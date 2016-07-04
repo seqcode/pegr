@@ -276,7 +276,7 @@ class SecurityFilters {
         }
         
         /**
-         * ADMIN, MEMBERS and Project Owner/Participants are allowed to edit the sample
+         * ADMIN and Project Owner/Participants are allowed to edit the sample
          */
         sampleEdit(controller:'sample', action:'edit') {
             before = {

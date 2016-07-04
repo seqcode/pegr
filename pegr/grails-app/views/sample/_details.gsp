@@ -1,6 +1,6 @@
 <div class="row">
     <div id="cellSource" class="col-sm-3">
-        <h4>Cell Source</h4>
+        <h4>Cell Source <g:if test="${sampleEditAuth}"><g:link controller="item" action="show" id="${sample?.cellSource?.item?.id}" class="edit">Edit</g:link></g:if></h4>
         <ul>
             <li>Strain: ${sample.cellSource?.strain?.name}</li>
             <li>Species: ${sample.cellSource?.strain?.species}</li>
@@ -60,7 +60,7 @@
     <div id="antibody" class="col-sm-3">
         <h4>Antibody 
             <g:if test="${sampleEditAuth}">
-                <g:link controller="antibody" action="show" id="${sample?.antibody?.id}"><span class="glyphicon glyphicon-qrcode"></span></g:link>
+                <g:link controller="antibody" action="show" id="${sample?.antibody?.id}" class="edit">Edit</g:link>
             </g:if>
         </h4>
         <ul>
@@ -112,7 +112,8 @@
             <li>Notes: ${sample.antibody?.note}</li>
             </g:if>
         </ul>
-        <h4>Target</h4>
+        <h4>Target <g:if test="${sampleEditAuth}"><g:link action="editTarget" params="[sampleId: sample.id]" class="edit">Edit</g:link></g:if>
+        </h4>
         <ul>
             <li>Target: ${sample.target?.name}</li>
             <g:if test="${sample.target?.targetType}">
@@ -131,7 +132,7 @@
     </div>
 
     <div id="protocol" class="col-sm-3">
-        <h4>Protocol</h4>   
+        <h4>Protocol <g:if test="${sampleEditAuth}"><g:link action="editProtocol" params="[sampleId: sample.id]" class="edit">Edit</g:link></g:if></h4>   
         <ul>
             <li>Assay: ${sample.assay}</li>
             <g:if test="${sample?.prtclInstSummary}">
@@ -176,7 +177,7 @@
     <div id="other" class="col-sm-3">      
         <h4>Other
             <g:if test="${sampleEditAuth}">
-                <g:link controller="sample" action="editOther" id="${sample?.id}"><span class="glyphicon glyphicon-qrcode"></span></g:link>
+                <g:link controller="sample" action="editOther" params="[sampleId:sample?.id]" class="edit">Edit</g:link>
             </g:if>
         </h4>
         <ul>
@@ -190,7 +191,7 @@
 
             <li>Requested Tags (M): <g:if test="${sample?.requestedTagNumber}">${sample.requestedTagNumber}</g:if></li>
 
-            <li>Reference genomes: ${sample?.requestedGenomes}</li>
+            <li>Requested genomes: ${sample?.requestedGenomes}</li>
             
             <li>Send data to: ${sample?.sendDataTo}</li>
             

@@ -99,6 +99,51 @@ class SampleService {
     }
     
     @Transactional
+    def updateOther(Sample sample, String indexType, String indices) {
+        try {
+            sample.save()
+        } catch (Exception e) {
+            throw new SampleException(message: "Error saving the sample!")
+        }
+        
+        if (indexType == "ID") {  
+            if (sample.sequenceIndicesIdString != indices) {
+                cleanIndices(sample)
+                splitIdAndAddIndexToSample(sample, indices)
+            }            
+        } else {
+            if (sample.sequenceIndicesString != indices) {
+                cleanIndices(sample)
+                splitAndAddIndexToSample(sample, indices)
+            }
+        }               
+    }
+    
+    @Transactional
+    def updateProtocol(Sample sample, Long assayId, String resin, Integer pcr, Long userId, String endTime) {
+        sample.assay = Assay.get(assayId)
+        if (!sample.prtclInstSummary) {
+            sample.prtclInstSummary = new ProtocolInstanceSummary()
+        }
+        sample.prtclInstSummary.user = User.get(userId)
+        sample.prtclInstSummary.endTime = Date.parse("E MMM dd H:m:s z yyyy", endTime)
+        def note = ['Resin':resin, 'PCR Cycle': pcr]
+        sample.prtclInstSummary.note = JsonOutput.toJson(note)
+        sample.save()
+    } 
+    
+    @Transactional
+    def updateTarget(Sample sample, String targetName, String targetType, String nterm, String cterm) {
+        def target = antibodyService.getTarget(targetName, targetType, nterm, cterm)
+        sample.target = target
+        sample.save()
+    }
+    
+    def cleanIndices(Sample sample) {
+        SampleSequenceIndices.executeUpdate("delete from SampleSequenceIndices where sample.id=?", [sample.id])
+    }
+    
+    @Transactional
     def addSampleToProject(Project project, Sample sample) {
 	    if(project && sample) {
 	        new ProjectSamples(project: project, sample: sample).save( failOnError: true)
@@ -172,10 +217,14 @@ class SampleService {
         sample.save()
     }
     
-    
+    /**
+     * Authorization to edit the given sample: Admin or 
+     * the owner or participant in the project which the sample belong to
+     * @param sample the given sample
+     **/
     def editAuth(Sample sample) {
         def user = springSecurityService.currentUser
-        if (user.isAdmin() || user.authorities.any { it.authority == "ROLE_MEMBER" }) {
+        if (user.isAdmin()) {
             return true
         } else {
             def sampleId = params.long('id')

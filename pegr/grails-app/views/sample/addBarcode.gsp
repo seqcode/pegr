@@ -28,6 +28,7 @@
              <g:textField id="location" name="location" />
         </div>
         <g:submitButton class="btn btn-primary btn-sm" name="save" value="Save"/>
+        <g:link action="edit" params="[sampleId: sampleId]" class="btn btn-default">Cancel</g:link>
     </g:form> 
 </body>
 </html>

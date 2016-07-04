@@ -5,6 +5,7 @@ class SampleController {
     
     def springSecurityService
     def sampleService
+    def utilityService
     
     def index(Integer max) {
         params.max = Math.min(max ?: 15, 100)
@@ -26,8 +27,105 @@ class SampleController {
         } else {
             render(view: "/404")
         }
-
 	}
+    
+    def edit(Long sampleId) {
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            def result = sampleService.getSampleDetails(sample)
+        } else {
+            render(view: "/404")
+        }
+    }
+    
+    def editOther(Long sampleId) {
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            def species = sample.cellSource?.strain?.species
+            def genomes 
+            if (species) {
+                genomes = Genome.executeQuery("select g.name from Genome g where g.species.id = ?", [species.id])
+            } else {
+                genomes = Genome.executeQuery("select g.name from Genome g")
+            }            
+            [sample: sample, genomes: genomes]
+        } else {
+            render(view: "/404")
+        }
+    }
+    
+    def updateOther(Long sampleId, String indexType, String indices) {
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            sample.properties = params
+            try {
+                sampleService.updateOther(sample, indexType, indices)
+                flash.message = "Success updating the sample!"
+                redirect(action: "edit", params: [sampleId: sampleId])
+            } catch (SampleException e) {
+                flash.message = e.message
+                redirect(action: "editOther", params: [sampleId: sampleId])
+            }
+        } else {
+            render(view: "/404")
+        }
+    }
+    
+    def editProtocol(Long sampleId) {
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            def notes = [:]
+            try {
+                def jsonSlurper = new JsonSlurper()
+                notes += jsonSlurper.parseText(sample.prtclInstSummary.note)
+            } catch(Exception e) {
+                
+            }
+            [sample: sample, notes:notes]
+        } else {
+            render(view: "/404")
+        }
+    }
+    
+    def updateProtocol(Long sampleId, Long assayId, String resin, Integer pcr, Long userId, String endTime) {
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            try {
+                sampleService.updateProtocol(sample, assayId, resin, pcr, userId, endTime)
+                redirect(action: "edit", params: [sampleId: sampleId])
+            } catch(SampleException e) {
+                flash.message = e.message
+                redirect(action: "editProtocol", params: [sampleId: sampleId])
+            }
+        } else {
+            render(view: "/404")
+        }
+    }
+    
+    def editTarget(Long sampleId) {
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            def target = sample.target ?: sample.antibody?.defaultTarget
+            [sample: sample, target: target]
+        } else {
+            render(view: "/404")
+        }
+    }
+    
+    def updateTarget(Long sampleId, String type, String target, String cterm, String nterm) {
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            try {
+                sampleService.updateTarget(sample, target, type, nterm, cterm)
+                redirect(action: "edit", params: [sampleId: sampleId])
+            } catch(SampleException e) {
+                flash.message = e.message
+                redirect(action: "editProtocol", params: [sampleId: sampleId])
+            }
+        } else {
+            render(view: "/404")
+        }
+    }
     
     def showItem(Long sampleId) {
         def sample = Sample.get(sampleId)

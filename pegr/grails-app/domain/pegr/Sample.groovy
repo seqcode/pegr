@@ -45,6 +45,15 @@ class Sample {
         return indexList.join(",")
     }
     
+    String getSequenceIndicesIdString() {
+        def indexDict = SampleSequenceIndices.where{sample == this}.groupBy({it -> it.setId})
+        def indexList = []
+        indexDict.each{ key, value ->
+            indexList.push(value.sort{it.indexInSet}*.index*.indexId.join("-"))
+        }
+        return indexList.join(",")
+    }
+    
     List getProjects() {
         return ProjectSamples.where{sample == this}.collect{it.project}
     }

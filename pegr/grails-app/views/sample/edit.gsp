@@ -16,13 +16,14 @@
         </div>     
         <h3>
             Sample ${sample.id} <g:if test="${sample.sourceId}">(${sample.source}#${sample.sourceId})</g:if>
-            <g:if test="${sampleEditAuth}"><g:link controller="sample" action="showItem" params="[sampleId:sample?.id]"><span class="glyphicon glyphicon-qrcode"></span></g:link></g:if>
+            <g:link controller="sample" action="showItem" params="[sampleId:sample?.id]"><span class="glyphicon glyphicon-qrcode"></span></g:link>
             <small><span class="label label-default">${sample.status}</span></small> 
+            <g:link action="show" id="${sample.id}" class="edit pull-right">Show</g:link>
         </h3>
         <g:if test="${sample?.date}">
             <p>Date: <g:formatDate format="yyyy-MM-dd" date="${sample.date}"/></p>
         </g:if>
-        <g:render template="/sample/details" model="['sample': sample]"></g:render>
+        <g:render template="/sample/details" model="['sample': sample, 'sampleEditAuth':true]"></g:render>
         <div id="seq">
             <h4>Sequencing Experiments</h4>
             <ol>

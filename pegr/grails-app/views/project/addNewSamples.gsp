@@ -208,9 +208,7 @@
                         </select>
                     </td>
                     <td>
-                        <select class="provider no-tag-select2" name="samples[0].providerLabId" style="width: 150px">
-                            <option></option>
-                        </select>
+                        <g:select class="no-tag-select2" name="samples[0].providerLabId" from="${pegr.Lab.list()}" optionKey="id" noSelection="['':'']" style="width: 150px"></g:select>
                     </td>
                     <td><input name="samples[0].bioSourceId"></td>
                     <td>

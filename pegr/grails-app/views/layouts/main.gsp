@@ -25,9 +25,9 @@
                 <li id="nav-bench" class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Work Bench</a>
                     <ul class="dropdown-menu">
-                        <li><g:link controller="ProtocolInstanceBag" action="processingBags" >Sample Prep</g:link></li>
                         <li><g:link controller="item">Items</g:link></li>
                         <li><g:link controller="protocol">Protocols</g:link></li>
+                        <li><g:link controller="ProtocolInstanceBag" action="processingBags" >Sample Prep</g:link></li>
                         <li><g:link controller="sequenceRun">Sequencing</g:link></li>
                     </ul>
                 </li>

@@ -8,7 +8,6 @@ class ItemController {
     def private final allowedTypes = ['image/png':'png', 'image/jpeg':'jpg', 'image/jpg':'jpg', 'image/gif':'gif']
     
     def itemService
-    def cellSourceService
     
     def index(){
         redirect(action: "list", params: [typeId: 1])

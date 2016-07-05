@@ -14,10 +14,10 @@
                                 <ul>
                                     <g:if test="${sample.cellSource}">
                                         <li>- <g:link action="editCellSource" params="[sampleId:sample.id, cellSourceId:sample.cellSource.id]">Edit this cell source.</g:link></li>
-                                        <li>- <g:link action="previewCellSource" params="[sampleId:sample.id]">Change to an existing cell source.</g:link></li>
+                                        <li>- <g:link action="searchCellSource" params="[sampleId:sample.id]">Change to an existing cell source.</g:link></li>
                                         </g:if>
                                     <g:else>
-                                        <li>- <g:link action="previewCellSource" params="[sampleId:sample.id]">Add an existing cell source.</g:link></li>
+                                        <li>- <g:link action="searchCellSource" params="[sampleId:sample.id]">Add an existing cell source.</g:link></li>
                                     </g:else>
                                     <li>- <g:link action="editCellSource" params="[sampleId:sample.id]">Create a new cell source.</g:link></li>
                                 </ul>

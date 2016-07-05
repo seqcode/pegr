@@ -41,11 +41,15 @@ class AntibodyService {
     
     @Transactional
     def save(Item item, Antibody antibody){
-        itemService.save(item)            
+        try {
+            itemService.save(item)          
+        } catch (ItemException e) {
+            throw new AntibodyException(message: e.message)
+        }
         if(antibody){
             antibody.item = item 
             if (!antibody.save(flush: true)) {
-                throw new ItemException(message: "Invalid inputs for antibody!")
+                throw new AntibodyException(message: "Invalid inputs for antibody!")
             }
         }
     }
@@ -59,8 +63,20 @@ class AntibodyService {
         return antibody
     }
     
+    @Transactional
+    def saveInSample(Long sampleId, AntibodyCommand cmd, Item item) {
+        def sample = Sample.get(sampleId)
+        if (!sample) {
+            throw new AntibodyException(message: "Sample not found!")
+        }
+        def antibody = save(item, cmd)
+        sample.antibody = antibody
+        sample.save()
+    }
+    
+    @Transactional
     def update(AntibodyCommand cmd) {
-        def antibody = Antibody.get(cmd.id)
+        def antibody = Antibody.get(cmd.antibodyId)
         if (antibody) {
             def newTarget = getTarget(cmd.target, cmd.targetType, cmd.nterm, cmd.cterm)
             antibody.with {
@@ -76,6 +92,45 @@ class AntibodyService {
             }
             save(antibody)
         }
+        return antibody
+    }
+    
+    @Transactional
+    def update(AntibodyCommand cmd, Item item) {
+        def antibody = update(cmd)
+        try {
+            if (antibody.item) {
+                antibody.item.properties = item
+                antibody.item.save()
+            } else {
+                try {
+                    itemService.save(item)
+                } catch (ItemException e) {
+                    throw new ItemException(message: e.message)
+                }
+                antibody.item = item
+                antibody.save()
+            }
+        } catch (Exception e) {
+            log.error e
+            throw new AntibodyException(message: "Error saving the item!")
+        }
+    }
+    
+    @Transactional
+    def addAntibodyToSample(Long sampleId, Long itemId) {
+        def sample = Sample.get(sampleId)
+        def antibody = Antibody.where {item.id == itemId}.get(max: 1)
+        if (!sample) {
+            throw new AntibodyException(message: "Sample not found!")
+        }
+        if (!antibody) {
+            throw new AntibodyException(message: "Antibody not found!")
+        }
+        if (sample && antibody) {
+            sample.antibody = antibody
+            sample.save()
+        } 
     }
     
     @Transactional

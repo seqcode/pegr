@@ -1,17 +1,21 @@
 <html>
 <head>
-    <title>Workbench</title> 
+    <title>PEGR - Sample</title> 
     <meta name="layout" content="main"/>
+    <script type="text/javascript" >
+        var changingHash=false;
+    </script>
 </head>
-<body  onhashchange="getHash()">
+<body onhashchange="getHash()">
 <div class="container-fluid">
     <h3>Edit Antibody for Sample ${sampleId}</h3>
     <g:form action="updateAntibody" role="form" method="post">
         <g:hiddenField name="sampleId" value="${sampleId}"></g:hiddenField>
+        <g:hiddenField name="antibodyId" value="${antibodyId}"></g:hiddenField>
         <div class="row">
             <div class="col-md-6 fields">
                 <h4>Barcode Information</h4>
-                <g:render template="/item/formWithBarcode" model="[item: item]"></g:render>
+                <g:render template="/item/formWithBarcode" model="[item: item, 'itemTypeOptions':itemTypeOptions]"></g:render>
             </div>
             <div class="col-md-6 fields">
                 <h4>Antibody Information</h4>

@@ -31,7 +31,7 @@ class AntibodyController {
                 def antibody = antibodyService.save(item, antibodyCommand)
                 flash.message = "New antibody added!"
                 redirect(action: "show", id: antibody.id)
-            }catch(ItemException e) {
+            }catch(AntibodyException e) {
                 request.message = e.message
                 render(view: "create", model: [item:item, antibody: antibodyCommand])
             }catch(Exception e) {
@@ -49,7 +49,7 @@ class AntibodyController {
             return
         }
         def antibodyCommand = new AntibodyCommand(   
-            id : antibody.id,
+            antibodyId : antibody.id,
             company : antibody.company?.name,
             catalogNumber : antibody.catalogNumber,
             lotNumber : antibody.lotNumber,
@@ -70,8 +70,8 @@ class AntibodyController {
         try {
             antibodyService.update(cmd)
             flash.message = "Antibody update!"
-            redirect(action: "show", id: cmd.id)
-        } catch(ItemException e) {
+            redirect(action: "show", id: cmd.antibodyId)
+        } catch(AntibodyException e) {
             request.message = e.message
             render(view:'edit', model:[antibody: cmd])
         } catch(Exception e) {
@@ -119,7 +119,7 @@ class AntibodyController {
                         antibodyService.save(item, antibody)
                         flash.message = "Barcode added!"
                         redirect(action: "show", id: antibodyId)
-                    }catch(ItemException e) {
+                    }catch(AntibodyException e) {
                         request.message = e.message
                         render(view: "addBarcode", model: [item:item, antibodyId: antibodyId])
                     }                    
@@ -187,7 +187,7 @@ class AntibodyController {
 }
 
 class AntibodyCommand {
-    String id
+    Long antibodyId
     String company
     String catalogNumber
     String lotNumber

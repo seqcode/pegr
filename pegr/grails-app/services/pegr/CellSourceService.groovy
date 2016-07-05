@@ -57,28 +57,64 @@ class CellSourceService {
     @Transactional
     def update(CellSourceCommand cmd, Item item){
         def cellSource = update(cmd)
-        try {
-           if (cellSource.item) {
-                cellSource.item.properties = item
-                cellSource.item.save()
-            } else {
-                item.save()
-                cellSource.item = item
-                cellSource.save()
-            }
-        } catch (Exception e) {
-            log.error e
-            throw new CellSourceException(message: "Error saving the item!")
-        }
 
+        if (cellSource.item) {
+            try {
+                cellSource.item.properties = item
+                cellSource.item.save()        
+            } catch (Exception e) {
+                log.error e
+                throw new CellSourceException(message: "Error saving the item!")
+            }
+        } else {
+            try {
+                itemService.save(item)
+            } catch (ItemException e) {
+               throw new CellSourceException(message: e.message)
+            }
+            cellSource.item = item
+            cellSource.save()
+        }
     }
     
     @Transactional
     def save(Item item, CellSourceCommand cmd){
-        itemService.save(item) 
+        try {
+            itemService.save(item) 
+        } catch (ItemException e) {
+           throw new CellSourceException(message: e.message)
+        }
         def cellSource = getCellSource(cmd)
         cellSource.item = item 
         cellSource.save()
+        return cellSource
+    }
+    
+    @Transactional
+    def saveInSample(Long sampleId, CellSourceCommand cmd, Item item) {
+        def sample = Sample.get(sampleId)
+        if (!sample) {
+            throw new CellSourceException(message: "Sample not found!")
+        }
+        def cellSource = save(item, cmd)
+        sample.cellSource = cellSource
+        sample.save()
+    }
+    
+    @Transactional
+    def addCellSourceToSample(Long sampleId, Long itemId) {
+        def sample = Sample.get(sampleId)
+        def cellSource = CellSource.where {item.id == itemId}.get(max: 1)
+        if (!sample) {
+            throw new CellSourceException(message: "Sample not found!")
+        }
+        if (!cellSource) {
+            throw new CellSourceException(message: "Cell Source not found!")
+        }
+        if (sample && cellSource) {
+            sample.cellSource = cellSource
+            sample.save()
+        } 
     }
     
     @Transactional

@@ -1,9 +1,12 @@
 <html>
 <head>
     <meta name="layout" content="main">
-    <title>Sample</title>
+    <title>PEGR - Sample</title>
+    <script type="text/javascript" >
+        var changingHash=false;
+    </script>
 </head>
-<body>
+<body  onhashchange="getHash()">
     <div class="container-fluid">
         <h3>Edit Sample ${sample?.id}</h3>
         <g:form action="updateCellSource" class="fields">
@@ -21,12 +24,7 @@
     </div> 
     <script>
         $(document).ready(function(){
-            $("#nav-metadata").addClass("active");        
-            $("form").validate();
-            var noTagPlaceholder = "Select...";
-            $(".no-tag-select2").select2({
-                placeholder: noTagPlaceholder
-            }); 
+            $("#nav-metadata").addClass("active");
         });
     </script>
 </body>

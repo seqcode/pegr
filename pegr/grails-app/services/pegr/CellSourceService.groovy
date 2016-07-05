@@ -29,7 +29,7 @@ class CellSourceService {
             
             // save cell source
             if (!cellSource.save(flush: true)) {
-                throw new ItemException(message: "Invalid inputs for cell source!")
+                throw new CellSourceException(message: "Invalid inputs for cell source!")
             }
             // save cell source's treatments
             def toDelete = CellSourceTreatments.where{cellSource == cellSource}.list()
@@ -51,7 +51,27 @@ class CellSourceService {
                 it.delete()
             }
         }
+        return cellSource
     }       
+    
+    @Transactional
+    def update(CellSourceCommand cmd, Item item){
+        def cellSource = update(cmd)
+        try {
+           if (cellSource.item) {
+                cellSource.item.properties = item
+                cellSource.item.save()
+            } else {
+                item.save()
+                cellSource.item = item
+                cellSource.save()
+            }
+        } catch (Exception e) {
+            log.error e
+            throw new CellSourceException(message: "Error saving the item!")
+        }
+
+    }
     
     @Transactional
     def save(Item item, CellSourceCommand cmd){

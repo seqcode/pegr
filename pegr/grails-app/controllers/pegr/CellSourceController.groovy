@@ -58,11 +58,11 @@ class CellSourceController {
             cellSourceService.update(cmd)
             flash.message = "Cell source information updated!"
             redirect(controller: "item", action:"show", id: cmd?.itemId)
-        } catch (ItemException e) {
+        } catch (CellSourceException e) {
             flash.message = e.message
             redirect(action: "edit", params: [cellSourceId: cmd.cellSourceId])
         } catch (Exception e) {
-            flash.message = "Error updating the antibody!"
+            flash.message = "Error updating the cell source!"
             log.error "Error: ${e.message}", e
             redirect(action: "edit", params: [cellSourceId: cmd.cellSourceId])
         }

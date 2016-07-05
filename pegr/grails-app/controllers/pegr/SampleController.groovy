@@ -5,6 +5,8 @@ class SampleController {
     
     def springSecurityService
     def sampleService
+    def antibodyService
+    def itemService
     def utilityService
     
     def index(Integer max) {
@@ -125,6 +127,87 @@ class SampleController {
         } else {
             render(view: "/404")
         }
+    }
+    
+    def editAntibody(Long sampleId){
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            def antibody = sample.antibody
+            def antibodyCommand = null
+            def item = null
+            if (antibody) {
+                antibodyCommand = new AntibodyCommand(   
+                    id : antibody.id,
+                    company : antibody.company?.name,
+                    catalogNumber : antibody.catalogNumber,
+                    lotNumber : antibody.lotNumber,
+                    abHost : antibody.abHost?.name,
+                    immunogene : antibody.immunogene,
+                    clonal : antibody.clonal,
+                    igType : antibody.igType?.name,
+                    concentration : antibody.concentration,
+                    targetType : antibody.defaultTarget?.targetType,
+                    target : antibody.defaultTarget?.name,
+                    cterm : antibody.defaultTarget?.cTermTag,
+                    nterm : antibody.defaultTarget?.nTermTag
+                )
+                item = antibody.item
+            } 
+            [antibody: antibodyCommand, item: item, sampleId: sampleId]
+        } else {
+            render(view: "/404")
+        }
+    }
+    
+    def updateAntibody(Long sampleId, AntibodyCommand cmd, Item item) {
+        try {
+            antibodyService.update(cmd)
+            flash.message = "Antibody update!"
+            redirect(action: "show", id: cmd.id)
+        } catch(ItemException e) {
+            request.message = e.message
+            render(view:'edit', model:[antibody: cmd])
+        } catch(Exception e) {
+            request.message = "Error updating the antibody!"
+            log.error "Error: ${e.message}", e
+            render(view:'edit', model:[antibody: cmd])
+        }
+    }
+    
+    def searchAntibody(Long sampleId) {
+        
+    }
+    
+    def previewAntibody(Long sampleId) {
+        
+    }
+    
+    def editCellSource(Long sampleId, Long cellSourceId) {
+        def cellSource = cellSourceId ? CellSource.get(cellSourceId) : null
+        def item = cellSource?.item
+        def itemTypeOptions = ItemType.where {category==ItemTypeCategory.TRACED_SAMPLE}.list()
+        [cellSource: cellSource, item: item, sampleId: sampleId, cellSourceId: cellSourceId, itemTypeOptions: itemTypeOptions]
+    }
+    
+    def updateCellSource(Long sampleId, Long cellSourceId, CellSourceCommand cmd, Item item) {
+        if (cellSourceId) {
+            try {
+                cellSourceService.update(cmd, item)
+                flash.message = "Cell source information updated!"
+                redirect(action:"edit", params:[sampleId: sampleId])
+            } catch (CellSourceException e) {
+                flash.message = e.message
+                redirect(action: "editCellSource", params: [sampleId: sampleId, cellSourceId: cellSourceId])
+            }
+        }
+    }
+    
+    def searchCellSource(Long sampleId) {
+        [sampleId: sampleId]
+    }
+    
+    def previewCellSource(Long sampleId) {
+        [sampleId: sampleId]
     }
     
     def showItem(Long sampleId) {

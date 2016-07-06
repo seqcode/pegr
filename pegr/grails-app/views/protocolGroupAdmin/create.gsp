@@ -24,12 +24,17 @@
 			</g:hasErrors>
 			<g:form action='save' useToken="true" >
 				<fieldset class="form fields">
+                    <div class="${hasErrors(bean: protocolGroupInstance, field: 'name', 'error')} required">
+                        <label for="name">Name	<span class="required-indicator">*</span></label>
+                        <g:textField name="name" required="" value="${protocolGroupInstance?.name}"/>
+                    </div>
 					<g:render template="form"/>
 				</fieldset>
 				<fieldset class="buttons">
 					<g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
 				</fieldset>
 			</g:form>
+            <g:render template="/protocolGroupAdmin/createProtocolModal"></g:render>
 		</div>
 	</body>
 </html>

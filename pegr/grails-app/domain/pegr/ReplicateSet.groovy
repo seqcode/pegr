@@ -1,7 +1,8 @@
 package pegr
 
-class TechnicalReplicateSet {
+class ReplicateSet {
 
+    ReplicateType type
     Project project
     
     static constraints = {

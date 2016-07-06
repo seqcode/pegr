@@ -12,7 +12,7 @@ class ProtocolInstanceBagService {
     def sampleService
     
     @Transactional
-    ProtocolInstanceBag savePrtclInstBag(Long protocolGroupId, String name, Date startTime) {
+    ProtocolInstanceBag savePrtclInstBagByGroup(Long protocolGroupId, String name, Date startTime) {
         def protocolGroup = ProtocolGroup.get(protocolGroupId)
         if(protocolGroup == null) {
             throw new ProtocolInstanceBagException(message: "protocol Group not found!")
@@ -24,13 +24,31 @@ class ProtocolInstanceBagService {
         try {
             prtclInstBag.save(flush: true)
             protocolGroup.protocols.eachWithIndex { it, n ->
-            new ProtocolInstance(protocol: it, bag: prtclInstBag, bagIdx: n, status: ProtocolStatus.INACTIVE).save(flush: true)
+                new ProtocolInstance(protocol: it, bag: prtclInstBag, bagIdx: n, status: ProtocolStatus.INACTIVE).save(flush: true)
             }
         } catch (Exception e) {         
             log.error "Error: ${e.message}", e
             throw new ProtocolInstanceBagException(message: "Error saving this protocol instance bag!")
         }
 
+        return prtclInstBag
+    }
+    
+    @Transactional
+    ProtocolInstanceBag savePrtclInstBagByProtocols(List protocols, String name, Date startTime) {
+        def prtclInstBag = new ProtocolInstanceBag(name: name,
+                                                  status: ProtocolStatus.PROCESSING,
+                                                  startTime: startTime)
+        try {
+            prtclInstBag.save(flush: true)
+            protocols.eachWithIndex { it, n ->
+                def protocol = Protocol.get(Long.parseLong(it))
+                new ProtocolInstance(protocol: protocol, bag: prtclInstBag, bagIdx: n, status: ProtocolStatus.INACTIVE).save(flush: true)
+            }
+        } catch (Exception e) {         
+            log.error "Error: ${e.message}", e
+            throw new ProtocolInstanceBagException(message: "Error saving this protocol instance bag!")
+        }
         return prtclInstBag
     }
     
@@ -59,6 +77,14 @@ class ProtocolInstanceBagService {
         }
         try {
             sample.status = SampleStatus.PREP
+
+            // iterate the protocols and add assay to sample if assay is defined
+            ProtocolInstance.findByBag(bag).each {
+                if (it.protocol?.assay) {
+                    sample.assay = it.protocol?.assay
+                }
+            }
+            
             sample.addToBags(bag).save()
         } catch(Exception e) {
             log.error "Error: ${e.message}", e
@@ -206,7 +232,7 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    void addIndex(List sampleIds, List indecies) {
+    void addIndex(List sampleIds, List indecies, String indexType) {
         sampleIds.eachWithIndex { sampleIdStr, idx ->
             def sampleId = Long.parseLong(sampleIdStr)
             def sample = Sample.get(sampleId)
@@ -214,7 +240,15 @@ class ProtocolInstanceBagService {
                 throw new ProtocolInstanceBagException(message: "Sample not found!")
             }
             SampleSequenceIndices.executeUpdate("delete from SampleSequenceIndices where sample.id = :sampleId", [sampleId: sampleId])
-            sampleService.splitAndAddIndexToSample(sample, indecies[idx])
+            try {
+                if (indexType == "ID") {
+                    sampleService.splitIdAndAddIndexToSample(sample, indecies[idx])
+                } else {
+                    sampleService.splitAndAddIndexToSample(sample, indecies[idx])
+                }
+            } catch (SampleException e) {
+                 throw new ProtocolInstanceBagException(message: e.message)
+            }
         }
     }
     

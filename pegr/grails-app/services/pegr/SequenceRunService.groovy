@@ -39,15 +39,16 @@ class SequenceRunService {
         run.poolItem = Item.get(poolItemId)
         run.save()
         def samples = fetchSamplesInPool(poolItemId)
+        def positions = run.experiments?.getAt(0)?.readPositions
         samples.each {
-            addSampleToRun(it, run)
+            addSampleToRun(it, run, positions)
         }
     }
     
     @Transactional
-    def addSampleToRun(Sample sample, SequenceRun run) {
+    def addSampleToRun(Sample sample, SequenceRun run, String positions) {
         if (!SequencingExperiment.findBySampleAndSequenceRun(sample, run)) {
-            def experiment = new SequencingExperiment(sample: sample, sequenceRun: run) 
+            def experiment = new SequencingExperiment(sample: sample, sequenceRun: run, readPositions: positions) 
             experiment.save(failOnError: true)
             if (sample.requestedGenomes && sample.requestedGenomes != "") {
                 sample.requestedGenomes.split(",")*.trim().unique().each{ genomeName ->
@@ -90,7 +91,8 @@ class SequenceRunService {
         def run = SequenceRun.get(runId)
         if (!run) {
             throw new SequenceRunException(message: "Sequence run not found!")
-        }   
+        }  
+        def positions = run.experiments?.getAt(0)?.readPositions
         if (sampleIds == null || sampleIds == "") {
             throw new SequenceRunException(message: "No sample ID!")
         }
@@ -106,7 +108,7 @@ class SequenceRunService {
             if (!sample) {
                 unknownSampleIds << id
             } else {
-                addSampleToRun(sample, run)
+                addSampleToRun(sample, run, positions)
             }
         }
         return unknownSampleIds
@@ -126,7 +128,7 @@ class SequenceRunService {
     }
     
     @Transactional
-    void updateGenome(String experimentIdStr, List genomeIds) {
+    void updateSample(String experimentIdStr, List genomeIds, Long readTypeId) {
         Long experimentId = Long.parseLong(experimentIdStr) 
         def experiment = SequencingExperiment.get(experimentId) 
         if (!experiment) {
@@ -152,6 +154,23 @@ class SequenceRunService {
             it.delete()
         }
         toAdd.each{
+            it.save()
+        }
+        def readType = ReadType.get(readTypeId)
+        if (readType && experiment.readType != readType) {
+            experiment.readType = readType
+            experiment.save()
+        }
+    }
+    
+    @Transactional
+    void updateRead(Long runId, String readPositions) {
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            throw new SequenceRunException(message: "Sequence Run not found!")
+        }
+        run.experiments.each {
+            it.readPositions = readPositions
             it.save()
         }
     }

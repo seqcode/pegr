@@ -2847,4 +2847,6 @@ databaseChangeLog = {
     include file: 'removeDownStream.groovy'
 
 	include file: 'addHistoryId.groovy'
+
+	include file: 'mergeReplicates.groovy'
 }

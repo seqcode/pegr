@@ -17,16 +17,21 @@
 	    </div>
 	    <div class="collapse navbar-collapse" id="myNavbar">
 	      <ul class="nav navbar-nav">
-  	        <li id="nav-metadata"><g:link controller="sample">Metadata</g:link></li>
-	        <li id="nav-projects"><g:link controller="project">My Projects</g:link></li>
-  	        <li id="nav-bench" class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Work Bench</a>
-                <ul class="dropdown-menu">
-                    <li><g:link controller="ProtocolInstanceBag" action="processingBags" >Sample Prep</g:link></li>
-                    <li><g:link controller="item" method="post" asynchronous="false" onSuccess="location.reload()">Items</g:link></li>
-                    <li><g:link controller="sequenceRun">Sequencing</g:link></li>
-                </ul>
-            </li>
+              <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MEMBER">
+  	             <li id="nav-metadata"><g:link controller="sample">Metadata</g:link></li>
+              </sec:ifAnyGranted>
+	          <li id="nav-projects"><g:link controller="project">My Projects</g:link></li>
+              <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MEMBER">
+                <li id="nav-bench" class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Work Bench</a>
+                    <ul class="dropdown-menu">
+                        <li><g:link controller="item">Items</g:link></li>
+                        <li><g:link controller="protocol">Protocols</g:link></li>
+                        <li><g:link controller="ProtocolInstanceBag" action="processingBags" >Sample Prep</g:link></li>
+                        <li><g:link controller="sequenceRun">Sequencing</g:link></li>
+                    </ul>
+                </li>
+              </sec:ifAnyGranted>
 	       	<sec:ifAllGranted roles="ROLE_ADMIN"><li id="nav-admin"><g:link controller="admin">Admin</g:link></li></sec:ifAllGranted>
 	      </ul>
 	    <ul class="nav navbar-nav navbar-right">

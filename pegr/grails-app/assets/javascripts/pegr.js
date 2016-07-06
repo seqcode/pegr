@@ -18,3 +18,20 @@ function getHash(){
     }
 }
 
+function closeModal() {
+    $(".modal").modal('hide');
+}
+
+// jquery validation
+jQuery.validator.addMethod("textrule", function(value, element) {
+    return this.optional(element) || /^[a-zA-Z0-9-]+$/.test(value);
+}, "Only a-z, A-Z, 0-9 and '-' are allowed!");
+
+jQuery.validator.addClassRules({
+    textcontrol: {
+        textrule: true
+    },
+    isnumber: {
+        number: true
+    }
+});

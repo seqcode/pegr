@@ -11,6 +11,7 @@ class CsvConvertException extends RuntimeException {
     
 @Transactional
 class CsvConvertService {
+    def cellSourceService
     def sampleService
     def antibodyService
 	
@@ -85,20 +86,20 @@ class CsvConvertService {
 
         def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.abConc)
 
-        def species = sampleService.getSpecies(data.genus, data.species)
+        def species = cellSourceService.getSpecies(data.genus, data.species)
 
         def strainAndTissue = getStrainTissue(species, data.strain, data.parentStrain, data.genotype, data.mutation)
         def strain = strainAndTissue.strain
         def tissue = strainAndTissue.tissue
 
-        def growthMedia = sampleService.getGrowthMedia(data.growthMedia, species)
+        def growthMedia = cellSourceService.getGrowthMedia(data.growthMedia, species)
 
         def inventory = getInventory(data.dateReceived, data.receivingUser, data.inOrExternal, data.inventoryNotes)
         def prepUser = getUser(data.samplePrepUser)
         def cellSource = getCellSource(prepUser, growthMedia, strain, cellProvider, inventory, tissue)
 
-        sampleService.addTreatment(cellSource, data.perturbation1)
-        sampleService.addTreatment(cellSource, data.perturbation2)
+        cellSourceService.addTreatment(cellSource, data.perturbation1)
+        cellSourceService.addTreatment(cellSource, data.perturbation2)
         
         def assay = getAssay(data.assay)
 
@@ -455,16 +456,17 @@ class CsvConvertService {
 		        def sample2 = getSampleFromSampleId(note.bioRep2)
 		        def sample1 = getSampleFromSampleId(note.bioRep1)
 		        if (sample2 || sample1) {
-		            def set = BiologicalReplicateSamples.findBySample(sample)?.set  
+		            def sets = ReplicateSamples.findAllBySample(sample)*.set  
+                    def set = sets.find {it.type == ReplicateType.BIOLOGICAL}
 		            if (!set) {
-		                set = new BiologicalReplicateSet().save( failOnError: true)
-		                new BiologicalReplicateSamples(set: set, sample: sample).save( failOnError: true)
+		                set = new ReplicateSet(type: ReplicateType.BIOLOGICAL).save( failOnError: true)
+		                new ReplicateSamples(set: set, sample: sample).save( failOnError: true)
 		            }
 		            if (set && sample2) {
-		                new BiologicalReplicateSamples(set: set, sample: sample2).save()
+		                new ReplicateSamples(set: set, sample: sample2).save()
 		            }
 		            if (set && sample1) {
-		                new BiologicalReplicateSamples(set: set, sample: sample1).save()
+		                new ReplicateSamples(set: set, sample: sample1).save()
 		            }
 		        }
 		        sample.note = note.note
@@ -547,7 +549,14 @@ class CsvConvertService {
 			map['rd1'] = [rd1Start, rd1End]
 		}
 		if(indexStart || indexEnd) {
-			map['index'] = [indexStart, indexEnd]
+            def indexStartList = indexStart.split(",")
+            def indexEndList = indexEnd.split(",")
+            if (indexStartList.size() == 1) {
+                map['index'] = [indexStart, indexEnd]
+            } else {
+                map['index1'] = [indexStartList[0], indexEndList[0]]
+                map['index2'] = [indexStartList[1], indexEndList[1]]
+            }
 		}
 		if(rd2Start || rd2End) {
 			map['rd2'] = [rd2Start, rd2End]

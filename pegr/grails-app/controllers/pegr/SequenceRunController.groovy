@@ -2,6 +2,7 @@ package pegr
 import static org.springframework.http.HttpStatus.*
 import org.springframework.web.multipart.MultipartHttpServletRequest 
 import groovy.time.TimeCategory
+import groovy.json.*
 
 class SequenceRunController {
     def springSecurityService    
@@ -30,21 +31,22 @@ class SequenceRunController {
         [runs: runs]
     }
     
-    def show(Integer id) {
+    def show(Long id) {
         def run = SequenceRun.get(id)
         if (run) {
-            if (run.status != RunStatus.PREP) {
-                [run: run]
-            } else {
-                redirect(action: "edit", params:[runId: id])   
+            def read = null
+            if (run.experiments.getAt(0)?.readPositions) {
+                def jsonSlurper = new JsonSlurper()
+                read = jsonSlurper.parseText(run.experiments[0].readPositions)           
             }
+            [run: run, read: read]
         } else {
             flash.message = "Sequence run not found!"
             redirect(action: "index")
         }
     }
     
-    def edit(Integer runId) {
+    def edit(Long runId) {
         def run = SequenceRun.get(runId)
         if (run) {
             [run: run]
@@ -52,6 +54,48 @@ class SequenceRunController {
             flash.message = "Sequence run not found!"
             redirect(action: "index")
         }
+    }
+    
+    def editRead(Long runId) {
+        def run = SequenceRun.get(runId)
+        if (run) {
+            def read = null
+            if (run.experiments.getAt(0)?.readPositions) {
+                def jsonSlurper = new JsonSlurper()
+                read = jsonSlurper.parseText(run.experiments[0].readPositions)
+            }
+            def indexType = read?.containsKey("index") ? "single" : "duo"
+            [run: run, read: read, indexType: indexType]
+        } else {
+            flash.message = "Please add samples first!"
+            redirect(action: "show", id: runId)
+        }
+    }
+    
+    def updateRead(Long runId, String indexType) {
+        def readPositions
+        def posMap
+        if (indexType == "single") {
+            posMap = [
+                rd1: [params.rd1Start, params.rd1End], 
+                index: [params.indexStart, params.indexEnd], 
+                rd2: [params.rd2Start, params.rd2End]]
+            
+        } else {
+            posMap = [
+                rd1: [params.rd1Start, params.rd1End], 
+                index1: [params.index1Start, params.index1End], 
+                index2: [params.index2Start, params.index2End], 
+                rd2: [params.rd2Start, params.rd2End]]
+        }
+        readPositions = JsonOutput.toJson(posMap)
+        try {
+            sequenceRunService.updateRead(runId, readPositions)
+            flash.message = "Success updating the read type and read positions!"
+        } catch(SequenceRunException e) {
+            flash.message = e.message
+        }
+        redirect(action: "show", id: runId)
     }
     
     def create() {
@@ -176,14 +220,14 @@ class SequenceRunController {
         redirect(action: "edit", params: [runId: runId])
     }
     
-    def updateGenomes(Long runId) {
+    def updateSamples(Long runId) {
         def messages = ""
         def expIds = params.list('experimentId')
         expIds.each{
-            def paramsName = "genomes${it}"
-            def genomeIds = params.list(paramsName)
+            def genomeIds = params.list("genomes${it}")
+            def readTypeId = params.long("readType${it}")
             try {
-                sequenceRunService.updateGenome(it, genomeIds)
+                sequenceRunService.updateSample(it, genomeIds, readTypeId)
             } catch (SequenceRunException e) {
                 messages += "<p>e.message</p>"
             } 
@@ -192,7 +236,7 @@ class SequenceRunController {
             messages = "All genomes added successfully!"
         }
         flash.message = messages
-        redirect(action: "edit", params: [runId: runId])
+        redirect(action: "show", id: runId)
     }
     
     def previewRun(Long runId) {
@@ -230,23 +274,6 @@ class SequenceRunController {
             redirect(action: "edit", params: [runId: runId])
         }
     }
-    
-    def emailMeetingSchedule() {
-        def runId = Long.parseLong(params.runId)
-        def meetingTime = params.meetingTime
-            
-        def bytes = sequenceRunService.calendarEventAsBytes(runId, meetingTime)
-        sendMail {
-            multipart true
-            to "shaody8411@gmail.com"
-            subject "[PEGR]Sequence Run ${runId} Meeting"
-            body "The meeting for Sequence Run ${runId} is scheduled on ${meetingTime}."
-            attachBytes "meeting.ics", "text/calendar", bytes 
-        }
-        flash.message = "Email sent!"
-        redirect(action: "show", id: runId)
-    }
-    
     
     def upload() { 
     

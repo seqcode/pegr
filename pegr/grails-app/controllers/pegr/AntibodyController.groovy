@@ -24,50 +24,60 @@ class AntibodyController {
             render status: 404
         }
     }
-
-    def create(Item item, Antibody antibody, String barcode) {
-        if (!item) {
-            def type = ItemType.findByName("Antibody")
-            item = new Item(barcode: barcode, type: type)
-        }                
-        [item: item, antibody: antibody]
-    }
     
-    def save() {
-        withForm{        
-            def item = new Item(params)
-            def antibody = new Antibody(params)
+    def save(Item item, AntibodyCommand antibodyCommand) {
+        withForm{
             try {
-                antibodyService.save(item, antibody)
-                flash.message = "New traced sample added!"
+                def antibody = antibodyService.save(item, antibodyCommand)
+                flash.message = "New antibody added!"
                 redirect(action: "show", id: antibody.id)
-            }catch(ItemException e) {
+            }catch(AntibodyException e) {
                 request.message = e.message
-                render(view: "create", model: [item:item, antibody: antibody])
+                render(view: "create", model: [item:item, antibody: antibodyCommand])
             }catch(Exception e) {
                 log.error "Error: ${e.message}", e
                 request.message = "Error saving this item!"
-                render(view: "create", model: [item:item, antibody: antibody])
+                render(view: "create", model: [item:item, antibody: antibodyCommand])
             }
         }
     }
     
     def edit(Long antibodyId){
         def antibody = Antibody.get(antibodyId)
-        antibody.properties = params
-        [antibody: antibody]
+        if (!antibody) {
+            render(view: "/404")
+            return
+        }
+        def antibodyCommand = new AntibodyCommand(   
+            antibodyId : antibody.id,
+            company : antibody.company?.name,
+            catalogNumber : antibody.catalogNumber,
+            lotNumber : antibody.lotNumber,
+            abHost : antibody.abHost?.name,
+            immunogene : antibody.immunogene,
+            clonal : antibody.clonal,
+            igType : antibody.igType?.name,
+            concentration : antibody.concentration,
+            targetType : antibody.defaultTarget?.targetType,
+            target : antibody.defaultTarget?.name,
+            cterm : antibody.defaultTarget?.cTermTag,
+            nterm : antibody.defaultTarget?.nTermTag
+        )
+        [antibody: antibodyCommand]
     }
     
-    def update(Long antibodyId) {
-        def antibody = Antibody.get(antibodyId)
-        antibody.properties = params
+    def update(AntibodyCommand cmd) {
         try {
-            antibodyService.save(antibody)
+            antibodyService.update(cmd)
             flash.message = "Antibody update!"
-            redirect(action: "show", id: antibodyId)
-        }catch(ItemException e) {
+            redirect(action: "show", id: cmd.antibodyId)
+        } catch(AntibodyException e) {
             request.message = e.message
-            render(view:'edit', model:[antibody: antibody])
+            render(view:'edit', model:[antibody: cmd])
+        } catch(Exception e) {
+            request.message = "Error updating the antibody!"
+            log.error "Error: ${e.message}", e
+            render(view:'edit', model:[antibody: cmd])
         }
     }
     
@@ -109,7 +119,7 @@ class AntibodyController {
                         antibodyService.save(item, antibody)
                         flash.message = "Barcode added!"
                         redirect(action: "show", id: antibodyId)
-                    }catch(ItemException e) {
+                    }catch(AntibodyException e) {
                         request.message = e.message
                         render(view: "addBarcode", model: [item:item, antibodyId: antibodyId])
                     }                    
@@ -154,12 +164,12 @@ class AntibodyController {
     
     def fetchAntibodyAjax(String catalog) {
         def antibody = Antibody.findByCatalogNumber(catalog)
-        def result = [host: antibody?.abHost?.id, 
+        def result = [host: antibody?.abHost?.name, 
                 immunogene: antibody?.immunogene, 
-                clonal: antibody?.clonal.name(), 
-                ig: antibody?.igType?.id, 
-                conc: antibody.concentration,
-                targetTypeId: antibody?.defaultTarget?.targetType?.id, 
+                clonal: antibody?.clonal?.name(), 
+                ig: antibody?.igType?.name, 
+                conc: antibody?.concentration,
+                targetType: antibody?.defaultTarget?.targetType?.name, 
                 target: antibody?.defaultTarget?.name, 
                 cterm: antibody?.defaultTarget?.cTermTag,
                 nterm: antibody?.defaultTarget?.nTermTag] 
@@ -174,5 +184,20 @@ class AntibodyController {
         render result as JSON
     }
     
-    
+}
+
+class AntibodyCommand {
+    Long antibodyId
+    String company
+    String catalogNumber
+    String lotNumber
+    String abHost
+    String immunogene
+    String clonal
+    String igType
+    String concentration
+    String targetType
+    String target
+    String cterm
+    String nterm
 }

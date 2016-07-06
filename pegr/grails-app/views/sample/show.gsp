@@ -16,9 +16,12 @@
         </div>     
         <h3>
             Sample ${sample.id} <g:if test="${sample.sourceId}">(${sample.source}#${sample.sourceId})</g:if>
-            <g:if test="${authorized}"><g:link action="showItem" params="[sampleId:sample?.id]"><span class="glyphicon glyphicon-qrcode"></span></g:link></g:if>
             <small><span class="label label-default">${sample.status}</span></small> 
+            <g:if test="${editAuth}">
+                <g:link action="edit" params="[sampleId:sample?.id]" class="edit pull-right">Edit</g:link>
+            </g:if>
         </h3>
+        
         <g:if test="${sample?.date}">
             <p>Date: <g:formatDate format="yyyy-MM-dd" date="${sample.date}"/></p>
         </g:if>
@@ -43,15 +46,10 @@
 
             </ol>
         </div>
-
-        <div id="bioRep">
-            <h4>Biological Replicates</h4>
-            <g:each in="${sample.bioReps}">${it}</g:each>
-        </div>  
-        <div id="techRep">
-            <h4>Technical Replicates</h4>
-            <g:each in="${sample.techReps}">${it}</g:each>
-        </div> 
+        <h4>Replicates</h4>
+        <div id="replicates">
+            <g:render template="/replicate/list" model="[replicates: replicates]"></g:render>
+        </div>
         <div id="project">
             <h4>Related Projects</h4>
             <ol>
@@ -61,8 +59,9 @@
             </ol>
         </div>
     </div>
+    
     <script>
-        $("#nav-metadata").addClass("active");      
+        $("#nav-metadata").addClass("active");     
     </script>
 </body>
 </html>

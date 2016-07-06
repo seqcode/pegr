@@ -20,14 +20,16 @@
 </div>
 
 <div>
-    <label for="sharedItem">Shared Item Types </br>(multi-select)</label>
-    <g:select name="sharedItemTypeIds" id="sharedItem" from="${pegr.ItemType.where{category==pegr.ItemTypeCategory.OTHER}.list(sort:'name')}" optionKey="id" value="${sharedItemTypeIds}" multiple="multiple" size="20"/>
+    <label for="sharedItem">Shared Item Types (multi-select)</label>
+    <g:select name="sharedItemTypeIds" id="sharedItem" from="${pegr.ItemType.where{category==pegr.ItemTypeCategory.OTHER}.list(sort:'name')}" optionKey="id" value="${sharedItemTypeIds}" multiple="multiple" size="10"/>
 </div>
 
 <h4>Traced Samples</h4>
 <div>
     <label for="startItem">Start State</label>
     <g:select name="startItemTypeId" id="startItem" from="${pegr.ItemType.where{category==pegr.ItemTypeCategory.TRACED_SAMPLE}.list(sort:'name')}" optionKey="id" value="${startItemTypeId}" noSelection="['null':'N/A']"/>
+</div>
+<div>
     <label for="endItem">End State</label>
     <g:select name="endItemTypeId" id="endItem" from="${pegr.ItemType.where{category==pegr.ItemTypeCategory.TRACED_SAMPLE}.list(sort:'name')}" optionKey="id" value="${endItemTypeId}" noSelection="['null':'N/A']"/>
 </div>
@@ -47,4 +49,6 @@
     <g:select name="endPoolTypeId" from="${pegr.ItemType.where{category==pegr.ItemTypeCategory.SAMPLE_POOL}.list(sort:'name')}" optionKey="id" value="${endPoolTypeId}" noSelection="['null':'N/A']"/>
 </div>
 
-<h4>Protocol approved? <g:select name="status" from="${pegr.DictionaryStatus.values()}" value="${protocol?.status}"/></h4>
+<sec:ifAllGranted roles="ROLE_ADMIN">
+    <h4>Protocol approved? <g:select name="status" from="${pegr.DictionaryStatus.values()}" value="${protocol?.status}"/></h4>
+</sec:ifAllGranted>

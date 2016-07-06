@@ -1,6 +1,7 @@
 package pegr
 import grails.transaction.Transactional
 import groovy.json.*
+import groovy.sql.Sql
     
 class SampleException extends RuntimeException {
     String message
@@ -10,7 +11,37 @@ class SampleService {
     def springSecurityService
     def antibodyService
     def utilityService
+    def cellSourceService
+    def replicateService
     
+    def getSampleDetails(Sample sample) {
+        def jsonSlurper = new JsonSlurper()
+        def notes = [:]
+        try {
+            notes += jsonSlurper.parseText(sample.prtclInstSummary.note)
+        }catch(Exception e){
+
+        }       
+        try {
+            notes += jsonSlurper.parseText(sample.antibodyNotes)
+        }catch(Exception e){
+
+        }
+        def protocols = []
+        sample.bags.each{ linkedbag ->
+            protocols.push([bag:linkedbag, protocolList:ProtocolInstance.where{bag.id == linkedbag.id}.list(sort: "bagIdx", order: "asc")])
+        }
+        def replicates = replicateService.getReplicates(sample)
+        return [sample: sample, notes: notes, protocols: protocols, replicates: replicates] 
+    }
+    
+   /**
+    * Save a list of new samples that belong to the sample project and use the same assay.
+    * @param assayId assay's ID
+    * @param projectId project's ID
+    * @param samples a list of samples
+    * @return message message about wrong indices
+    */
     @Transactional
     def saveNewSamples(Long assayId, Long projectId, List samples) {
         def message = "Samples saved! "
@@ -25,25 +56,16 @@ class SampleService {
             throw new SampleException(message: "Project not found!")
         }
         samples.each { data ->
-            def provider = User.get(data.providerId)
             def sendTo = User.get(data.sendToId)
-            def species = getSpecies(data.genus, data.speciesId)
-            def strain = getStrain(species, data.strain, data.parentStrain, data.genotype, data.mutation)
-            def tissue = getTissue(data.tissue)
-            def growthMedia = getGrowthMedia(data.growthMediaId, species)        
             
-            // save cell source
-            def cellSource = getCellSource(growthMedia, strain, provider, tissue)
-            if (data.treatments) {
-                data.treatments.split(",").each { treatmentStr ->
-                    addTreatment(cellSource, treatmentStr)
-                }
-            }
+            // save the cell source
+            def cellSource = cellSourceService.getCellSource(data)
+            
             // save the antibody
-            def antibody = antibodyService.getAntibody(data.company,  data.catalogNumber, data.lotNumber, data.abNotes, data.clonal, data.abHostId, data.igTypeId, data.immunogene, data.abConcentration)
+            def antibody = antibodyService.getAntibody(data.company,  data.catalogNumber, data.lotNumber, data.abNotes, data.clonal, data.abHost, data.igType, data.immunogene, data.abConcentration)
                 
             // save the target
-            def target = antibodyService.getTarget(data.target, data.targetTypeId, data.nterm, data.cterm)
+            def target = antibodyService.getTarget(data.target, data.targetType, data.nterm, data.cterm)
             
             // save sample
             def abnoteMap = [:]
@@ -62,7 +84,11 @@ class SampleService {
             
             // add index
             try {
-                splitAndAddIndexToSample(sample, data.indices)
+                if (data.indexType == "ID") {
+                    splitIdAndAddIndexToSample(sample, data.indices)
+                } else {
+                    splitAndAddIndexToSample(sample, data.indices)
+                }
             } catch(SampleException e) {
                 message += "Index is not added correctly to sample ${sample.id}! "
             }
@@ -73,110 +99,57 @@ class SampleService {
     }
     
     @Transactional
+    def updateOther(Sample sample, String indexType, String indices) {
+        try {
+            sample.save()
+        } catch (Exception e) {
+            throw new SampleException(message: "Error saving the sample!")
+        }
+        
+        if (indexType == "ID") {  
+            if (sample.sequenceIndicesIdString != indices) {
+                cleanIndices(sample)
+                splitIdAndAddIndexToSample(sample, indices)
+            }            
+        } else {
+            if (sample.sequenceIndicesString != indices) {
+                cleanIndices(sample)
+                splitAndAddIndexToSample(sample, indices)
+            }
+        }               
+    }
+    
+    @Transactional
+    def updateProtocol(Sample sample, Long assayId, String resin, Integer pcr, Long userId, String endTime) {
+        sample.assay = Assay.get(assayId)
+        if (!sample.prtclInstSummary) {
+            sample.prtclInstSummary = new ProtocolInstanceSummary()
+        }
+        sample.prtclInstSummary.user = User.get(userId)
+        sample.prtclInstSummary.endTime = Date.parse("E MMM dd H:m:s z yyyy", endTime)
+        def note = ['Resin':resin, 'PCR Cycle': pcr]
+        sample.prtclInstSummary.note = JsonOutput.toJson(note)
+        sample.save()
+    } 
+    
+    @Transactional
+    def updateTarget(Sample sample, String targetName, String targetType, String nterm, String cterm) {
+        def target = antibodyService.getTarget(targetName, targetType, nterm, cterm)
+        sample.target = target
+        sample.save()
+    }
+    
+    def cleanIndices(Sample sample) {
+        SampleSequenceIndices.executeUpdate("delete from SampleSequenceIndices where sample.id=?", [sample.id])
+    }
+    
+    @Transactional
     def addSampleToProject(Project project, Sample sample) {
 	    if(project && sample) {
 	        new ProjectSamples(project: project, sample: sample).save( failOnError: true)
 	    }
 	}
     
-    @Transactional
-    def getStrain(Species species, String strainStr, String parentStrainStr, String genotypeStr, String mutationStr) {  
-        // get the parent strain
-        def parentStrain = Strain.findByName(parentStrainStr)
-        if (!parentStrain) {
-                parentStrain = new Strain(name: parentStrainStr, species: species).save(failOnError: true) 
-        }
-        // get strain     
-        def strain = Strain.findByNameAndParentAndGenotypeAndGeneticModification(strainStr, parentStrain, genotypeStr, mutationStr)
-        if (!strain) {
-            strain = new Strain(name: strainStr, 
-                                species: species, 
-                                genotype: genotypeStr, 
-                                parent: parentStrain, 
-                                geneticModification: mutationStr).save( failOnError: true)
-        }
-        return strain
-	}
-	
-    @Transactional
-    def getTissue(String tissueStr) {
-        if (tissueStr == null) {
-            return null
-        }
-        if (tissueStr.isInteger()) {
-            return Tissue.get(tissueStr.toInteger())
-        }
-        def tissue = Tissue.findByName(tissueStr)
-        if (!tissue) {
-            tissue = new Tissue(name: tissueStr).save( failOnError: true)
-        }
-        return tissue
-    }
-    
-    @Transactional
-	def getSpecies(String genusStr, String speciesStr) {
-	    if(genusStr == null && speciesStr == null) {
-	        return null
-	    }
-		if (genusStr == null) {
-			genusStr = "Unknown"
-		}
-		if (speciesStr == null) {
-			speciesStr = "Unknown"
-		}
-        if (speciesStr.isInteger()) {
-            return Species.get(speciesStr.toInteger())
-        }
-	    def species = Species.findByNameAndGenusName(speciesStr, genusStr)
-	    if(!species) {
-	        species = new Species(name: speciesStr, genusName: genusStr).save( failOnError: true)
-	    }
-	    return species
-	}
-	
-    @Transactional
-	def getGrowthMedia(String mediaStr, Species species) {
-	    if(mediaStr == null) {
-	        return null
-	    }
-        if (mediaStr.isInteger()) {
-            return GrowthMedia.get(mediaStr.toInteger())
-        }
-	    def media = GrowthMedia.findByName(mediaStr)
-	    if(!media) {
-	        media = new GrowthMedia(name: mediaStr, species: species).save( failOnError: true)
-	    } else {
-	        if(media.species != species) {
-	            media.species = null
-				media.save( failOnError: true)
-	        }
-	    }
-	    return media
-	}
-	
-    @Transactional
-	def getCellSource(GrowthMedia growthMedia, Strain strain, User provider, Tissue tissue) {
-	    if (!strain) {
-	        return null
-	    }		
-	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, tissue: tissue).save( failOnError: true)
-	    return cellSource
-	}
-	
-	def addTreatment(CellSource cellSource, String treatmentStr) {
-	    if(treatmentStr == null) {
-	        return null
-	    }
-	    def treatment = CellSourceTreatment.findByName(treatmentStr)
-	    if(!treatment) {
-	        treatment = new CellSourceTreatment(name: treatmentStr).save(failOnError: true)
-	    }
-	    if(treatment && cellSource) {
-            if (!CellSourceTreatments.findByCellSourceAndTreatment(cellSource, treatment)) {
-                new CellSourceTreatments(cellSource: cellSource, treatment: treatment).save( failOnError: true)
-            }			
-		} 
-	}
     
     @Transactional
     def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, User dataTo, String abNotes, String requestedGenomes, Assay assay) {
@@ -207,6 +180,27 @@ class SampleService {
     }
     
     @Transactional
+    def splitIdAndAddIndexToSample(Sample sample, String indexStr) {
+        if (sample == null || indexStr == null) {
+            return
+        }
+        def indexList = indexStr.split(",")*.trim()
+        def setId = 1
+        indexList.each { indices ->
+            def indexInSet = 1
+            indices.split("-")*.trim().each {
+                def index = SequenceIndex.findByIndexIdAndStatus(it, DictionaryStatus.Y)
+                if (!index) {
+                    throw new SampleException(message: "Incorrect index ${it}!")
+                }
+                new SampleSequenceIndices(sample: sample, index: index, setId: setId, indexInSet: indexInSet).save(failOnError: true)
+                indexInSet++
+            }
+            setId++
+        }
+    }
+    
+    @Transactional
     def addItem(Sample sample, Item item) {
         if (!item?.type) {
             throw new SampleException(message: "Missing item type!")
@@ -221,5 +215,27 @@ class SampleService {
         item.save()
         sample.item = item
         sample.save()
+    }
+    
+    /**
+     * Authorization to edit the given sample: Admin or 
+     * the owner or participant in the project which the sample belong to
+     * @param sample the given sample
+     **/
+    def editAuth(Sample sample) {
+        def user = springSecurityService.currentUser
+        if (user.isAdmin()) {
+            return true
+        } else {
+            def sampleId = params.long('id')
+            def sql = new Sql(dataSource)
+            def count = sql.rows("SELECT count(*) as cnt FROM project_user pu JOIN project_samples ps ON pu.project_id = ps.project_id WHERE pu.user_id = ${user.id} and ps.sample_id = ${sampleId} and pu.project_role in (${ProjectRole.OWNER}, ${ProjectRole.PARTICIPANT})") 
+            if (count[0].cnt > 0) {
+                return true
+            } else {
+                render(view: '/login/denied')
+                return false
+            }                    
+        }          
     }
 }

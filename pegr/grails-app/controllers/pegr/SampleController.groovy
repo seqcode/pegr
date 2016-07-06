@@ -5,6 +5,10 @@ class SampleController {
     
     def springSecurityService
     def sampleService
+    def antibodyService
+    def cellSourceService
+    def itemService
+    def utilityService
     
     def index(Integer max) {
         params.max = Math.min(max ?: 15, 100)
@@ -18,32 +22,265 @@ class SampleController {
     }
     
 	def show(Long id) {
-		def sample = Sample.get(id)
+        def sample = Sample.get(id)
         if (sample) {
-            def jsonSlurper = new JsonSlurper()
-            def notes = [:]
-            try {
-                notes += jsonSlurper.parseText(sample.prtclInstSummary.note)
-            }catch(Exception e){
-
-            }       
-            try {
-                notes += jsonSlurper.parseText(sample.antibodyNotes)
-            }catch(Exception e){
-
-            }
-            def protocols = []
-            sample.bags.each{ linkedbag ->
-                protocols.push([bag:linkedbag, protocolList:ProtocolInstance.where{bag.id == linkedbag.id}.list(sort: "bagIdx", order: "asc")])
-            }
-            def currentUser = springSecurityService.currentUser
-            def authorized = currentUser.isAdmin() ||  (currentUser.authorities.any { it.authority == "ROLE_MEMBER" }) 
-            [sample: sample, notes: notes, protocols: protocols, authorized: authorized]            
+            def result = sampleService.getSampleDetails(sample)
+            def editAuth = sampleService.editAuth(sample)
+            result << [editAuth: editAuth]
         } else {
             render(view: "/404")
         }
-
 	}
+    
+    def edit(Long sampleId) {
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            def result = sampleService.getSampleDetails(sample)
+        } else {
+            render(view: "/404")
+        }
+    }
+    
+    def editOther(Long sampleId) {
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            def species = sample.cellSource?.strain?.species
+            def genomes 
+            if (species) {
+                genomes = Genome.executeQuery("select g.name from Genome g where g.species.id = ?", [species.id])
+            } else {
+                genomes = Genome.executeQuery("select g.name from Genome g")
+            }            
+            [sample: sample, genomes: genomes]
+        } else {
+            render(view: "/404")
+        }
+    }
+    
+    def updateOther(Long sampleId, String indexType, String indices) {
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            sample.properties = params
+            try {
+                sampleService.updateOther(sample, indexType, indices)
+                flash.message = "Success updating the sample!"
+                redirect(action: "edit", params: [sampleId: sampleId])
+            } catch (SampleException e) {
+                flash.message = e.message
+                redirect(action: "editOther", params: [sampleId: sampleId])
+            }
+        } else {
+            render(view: "/404")
+        }
+    }
+    
+    def editProtocol(Long sampleId) {
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            def notes = [:]
+            try {
+                def jsonSlurper = new JsonSlurper()
+                notes += jsonSlurper.parseText(sample.prtclInstSummary.note)
+            } catch(Exception e) {
+                
+            }
+            [sample: sample, notes:notes]
+        } else {
+            render(view: "/404")
+        }
+    }
+    
+    def updateProtocol(Long sampleId, Long assayId, String resin, Integer pcr, Long userId, String endTime) {
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            try {
+                sampleService.updateProtocol(sample, assayId, resin, pcr, userId, endTime)
+                redirect(action: "edit", params: [sampleId: sampleId])
+            } catch(SampleException e) {
+                flash.message = e.message
+                redirect(action: "editProtocol", params: [sampleId: sampleId])
+            }
+        } else {
+            render(view: "/404")
+        }
+    }
+    
+    def editTarget(Long sampleId) {
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            def target = sample.target ?: sample.antibody?.defaultTarget
+            [sample: sample, target: target]
+        } else {
+            render(view: "/404")
+        }
+    }
+    
+    def updateTarget(Long sampleId, String type, String target, String cterm, String nterm) {
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            try {
+                sampleService.updateTarget(sample, target, type, nterm, cterm)
+                redirect(action: "edit", params: [sampleId: sampleId])
+            } catch(SampleException e) {
+                flash.message = e.message
+                redirect(action: "editProtocol", params: [sampleId: sampleId])
+            }
+        } else {
+            render(view: "/404")
+        }
+    }
+    
+    def editAntibody(Long sampleId, Long antibodyId){
+        def cmd
+        def item
+        if (antibodyId == null) {
+            // create
+            cmd = new AntibodyCommand()
+        } else {
+            def antibody = Antibody.get(antibodyId)
+            if (!antibody) {
+                render(view: "/404")
+                return
+            }
+            cmd = new AntibodyCommand(   
+                antibodyId : antibody.id,
+                company : antibody.company?.name,
+                catalogNumber : antibody.catalogNumber,
+                lotNumber : antibody.lotNumber,
+                abHost : antibody.abHost?.name,
+                immunogene : antibody.immunogene,
+                clonal : antibody.clonal,
+                igType : antibody.igType?.name,
+                concentration : antibody.concentration,
+                targetType : antibody.defaultTarget?.targetType,
+                target : antibody.defaultTarget?.name,
+                cterm : antibody.defaultTarget?.cTermTag,
+                nterm : antibody.defaultTarget?.nTermTag
+            )
+            item = antibody.item
+        }
+        def itemTypeOptions = ItemType.where {category==ItemTypeCategory.ANTIBODY}.list()
+        [antibody: cmd, item: item, sampleId: sampleId, antibodyId: antibodyId, itemTypeOptions: itemTypeOptions]
+    }
+    
+    def updateAntibody(Long sampleId, Long antibodyId, AntibodyCommand cmd, Item item) {
+        try {
+            if (antibodyId) {
+                log.error item
+                antibodyService.update(cmd, item)
+            } else {
+                antibodyService.saveInSample(sampleId, cmd, item)
+            }
+            flash.message = "Antibody update!"
+            redirect(action: "edit", params: [sampleId: sampleId])
+        } catch(AntibodyException e) {
+            flash.message = e.message
+            redirect(action:'editAntibody', params: [sampleId: sampleId, antibodyId: antibodyId])
+        }
+    }
+    
+    def searchAntibody(Long sampleId) {
+        def itemTypeOptions = ItemType.where {category==ItemTypeCategory.ANTIBODY}.list()
+        [sampleId: sampleId, itemTypeOptions: itemTypeOptions]
+    }
+    
+    def previewAntibody(Long sampleId, Long typeId, String barcode) {
+        def item = Item.where{type.id == typeId && barcode == barcode}.get(max: 1)
+        if (item) {
+            [sampleId: sampleId, item: item]    
+        } else {
+            flash.message = "Antibody not found!"
+        }
+    }
+    
+    def addAntibodyToSample(Long sampleId, Long itemId) {
+        try {
+            antibodyService.addAntibodyToSample(sampleId, itemId)
+            flash.message = "Antibody updated!"
+        } catch (AntibodyException e) {
+            flash.message = e.message
+        }
+        redirect(action: "edit", params: [sampleId: sampleId])
+    }
+    
+    def editCellSource(Long sampleId, Long cellSourceId) {
+        def cmd
+        def item
+        def treatments
+        if (cellSourceId == null) {
+            // create
+            cmd = new CellSourceCommand()
+        } else {
+            // edit 
+            def cellSource = CellSource.get(cellSourceId)
+            if (!cellSource) {
+                render(view: "/404")
+                return
+            }
+            cmd = new CellSourceCommand(
+                cellSourceId: cellSource.id,
+                itemId: cellSource.item?.id,
+                genus: cellSource.strain?.species?.genusName,
+                speciesId: cellSource.strain?.species?.id,
+                speciesName: cellSource.strain?.species?.name,
+                parentStrain: cellSource.strain?.parent?.name,
+                strain: cellSource.strain?.name,
+                genotype: cellSource.strain?.genotype,
+                mutation: cellSource.strain?.geneticModification,
+                tissue: cellSource.tissue?.name,
+                age: cellSource.age,
+                sex: cellSource.sex?.name,
+                histology: cellSource.histology?.name,
+                growthMedia: cellSource.growthMedia?.name,
+                providerId: cellSource.providerUser?.id,
+                providerLabId: cellSource.providerLab?.id,
+                bioSourceId: cellSource.biologicalSourceId
+            )
+            item = cellSource.item
+            treatments = cellSource.treatments
+        }
+        def itemTypeOptions = ItemType.where {category==ItemTypeCategory.TRACED_SAMPLE}.list()
+        [cellSource: cmd, item: item, treatments: treatments, sampleId: sampleId, cellSourceId: cellSourceId, itemTypeOptions: itemTypeOptions]
+    }
+    
+    def updateCellSource(Long sampleId, Long cellSourceId, CellSourceCommand cmd, Item item) {
+        try {
+            if (cellSourceId) {
+                cellSourceService.update(cmd, item)
+            } else {
+                cellSourceService.saveInSample(sampleId, cmd, item)
+            }            
+            flash.message = "Cell source information updated!"
+            redirect(action:"edit", params:[sampleId: sampleId])
+        } catch (CellSourceException e) {
+            flash.message = e.message
+            redirect(action: "editCellSource", params: [sampleId: sampleId, cellSourceId: cellSourceId])
+        }
+    }
+    
+    def searchCellSource(Long sampleId) {
+        def itemTypeOptions = ItemType.where {category==ItemTypeCategory.TRACED_SAMPLE}.list()
+        [sampleId: sampleId, itemTypeOptions: itemTypeOptions]
+    }
+    
+    def previewCellSource(Long sampleId, Long typeId, String barcode) {
+        def item = Item.where{type.id == typeId && barcode == barcode}.get(max: 1)
+        if (item) {
+            [sampleId: sampleId, item: item]    
+        } else {
+            flash.message = "Cell source not found!"
+        }            
+    }
+    
+    def addCellSourceToSample(Long sampleId, Long itemId) {
+        try {
+            cellSourceService.addCellSourceToSample(sampleId, itemId)
+            flash.message = "Cell Source updated!"
+        } catch (CellSourceException e) {
+            flash.message = e.message
+        }
+        redirect(action: "edit", params: [sampleId: sampleId])
+    }
     
     def showItem(Long sampleId) {
         def sample = Sample.get(sampleId)

@@ -61,3 +61,23 @@ select s.id, r.run_num, i.invoice_num from sample s join invoice i on s.invoice_
 // insert into organization (version, name, class) values (0, "Pugh Lab", "pegr.Lab");
 
 // update user set affiliation_id = 81 where username = "bfp2"; // check affiliation_id! "labadmin"
+
+insert into read_type (version, short_name, name) values (0, "PE","Paired End");
+insert into read_type (version, short_name, name) values (0, "SR","Single Read");
+
+update replicate_set set type="BIOLOGICAL";
+
+update antibody set immunogene = "Unknown" where immunogene is null;
+
+update antibody set catalog_number = "Unknown" where catalog_number is null;
+
+insert into strain (version, name) values(0, "Unknown");
+select id from strain where name = "Unknown";
+update strain set parent_id = ________ where parent_id is null;
+
+update target_type set name = "Unknown" where name = "unknown";
+
+update sequencing_experiment set read_positions = '{"rd1":["1","40"],"index1":["41","48"],"index2":["49","56"],"rd2":["57","92"]}' where read_positions = '{"rd1":["1","40"],"index":["41,49","48,57"],"rd2":["58","93"]}';
+
+update user set enabled = false;
+update user set enabled = true where id in (1,3, 173);

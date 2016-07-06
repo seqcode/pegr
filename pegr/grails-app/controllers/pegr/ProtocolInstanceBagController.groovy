@@ -1,4 +1,5 @@
 package pegr
+import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 class ProtocolInstanceBagController {
 
@@ -31,14 +32,14 @@ class ProtocolInstanceBagController {
     }
         
     def create() {
-        def admin = User.get(1)
-        def protocolGroups = ProtocolGroup.where { (user == admin) || (user == null) || (user == springSecurityService.currentUser)}
-        [protocolGroups: protocolGroups]
+        def user = springSecurityService.currentUser
+        def protocolGroups = ProtocolGroup.list()
+        [protocolGroups: protocolGroups, user: user]
     }
     
     def savePrtclInstBag() {        
         try {
-            def prtclInstBag = protocolInstanceBagService.savePrtclInstBag(Long.parseLong(params.protocolGroupId), params.name, params.startTime)
+            def prtclInstBag = (params.protocolInput == "defined") ? protocolInstanceBagService.savePrtclInstBagByGroup(Long.parseLong(params.protocolGroupId), params.bagName, params.startTime) : protocolInstanceBagService.savePrtclInstBagByProtocols(params.list('protocols'), params.bagName, params.startTime)
             redirect(action: "showBag", id: prtclInstBag.id)
         }catch( ProtocolInstanceBagException e) {
             flash.message = e.message
@@ -331,11 +332,11 @@ class ProtocolInstanceBagController {
 
     }
     
-    def addIndex(Long instanceId) {
+    def addIndex(Long instanceId, String indexType) {
         def sampleId = params.list('sampleId')
         def indexIds = params.list('indexId')
         try {
-            protocolInstanceBagService.addIndex(sampleId, indexIds)
+            protocolInstanceBagService.addIndex(sampleId, indexIds, indexType)
             flash.message = "Index saved!"            
         } catch (ProtocolInstanceBagException e) {
             flash.message = e.message  
@@ -420,4 +421,8 @@ class ProtocolInstanceBagController {
         }
     }
     
+    def help() {
+        render(view: "help")
+    }
+
 }

@@ -332,11 +332,11 @@ class ProtocolInstanceBagController {
 
     }
     
-    def addIndex(Long instanceId) {
+    def addIndex(Long instanceId, String indexType) {
         def sampleId = params.list('sampleId')
         def indexIds = params.list('indexId')
         try {
-            protocolInstanceBagService.addIndex(sampleId, indexIds)
+            protocolInstanceBagService.addIndex(sampleId, indexIds, indexType)
             flash.message = "Index saved!"            
         } catch (ProtocolInstanceBagException e) {
             flash.message = e.message  

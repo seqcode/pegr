@@ -232,7 +232,7 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    void addIndex(List sampleIds, List indecies) {
+    void addIndex(List sampleIds, List indecies, String indexType) {
         sampleIds.eachWithIndex { sampleIdStr, idx ->
             def sampleId = Long.parseLong(sampleIdStr)
             def sample = Sample.get(sampleId)
@@ -240,7 +240,15 @@ class ProtocolInstanceBagService {
                 throw new ProtocolInstanceBagException(message: "Sample not found!")
             }
             SampleSequenceIndices.executeUpdate("delete from SampleSequenceIndices where sample.id = :sampleId", [sampleId: sampleId])
-            sampleService.splitAndAddIndexToSample(sample, indecies[idx])
+            try {
+                if (indexType == "ID") {
+                    sampleService.splitIdAndAddIndexToSample(sample, indecies[idx])
+                } else {
+                    sampleService.splitAndAddIndexToSample(sample, indecies[idx])
+                }
+            } catch (SampleException e) {
+                 throw new ProtocolInstanceBagException(message: e.message)
+            }
         }
     }
     

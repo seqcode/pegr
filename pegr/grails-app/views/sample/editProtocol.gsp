@@ -5,6 +5,9 @@
 </head>
 <body>
     <div class="container-fluid">
+        <g:if test="${flash.message}">
+            <div class="message" role="status">${flash.message}</div>
+        </g:if>
         <h3>Edit Sample ${sample?.id}</h3>
         <g:form action="updateProtocol" class="fields">
             <g:hiddenField name="sampleId" value="${sample.id}"></g:hiddenField>

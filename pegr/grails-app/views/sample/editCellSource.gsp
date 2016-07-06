@@ -7,6 +7,9 @@
     </script>
 </head>
 <body  onhashchange="getHash()">
+    <g:if test="${flash.message}">
+        <div class="message" role="status">${flash.message}</div>
+    </g:if>
     <div class="container-fluid">
         <h3>Edit Sample ${sample?.id}</h3>
         <g:form action="updateCellSource" class="fields">

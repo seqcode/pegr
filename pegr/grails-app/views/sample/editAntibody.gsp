@@ -8,6 +8,9 @@
 </head>
 <body onhashchange="getHash()">
 <div class="container-fluid">
+    <g:if test="${flash.message}">
+        <div class="message" role="status">${flash.message}</div>
+    </g:if>
     <h3>Edit Antibody for Sample ${sampleId}</h3>
     <g:form action="updateAntibody" role="form" method="post">
         <g:hiddenField name="sampleId" value="${sampleId}"></g:hiddenField>

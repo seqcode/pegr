@@ -189,7 +189,7 @@ class SampleService {
         indexList.each { indices ->
             def indexInSet = 1
             indices.split("-")*.trim().each {
-                def index = SequenceIndex.findBySequenceIndexAndStatus(it, DictionaryStatus.Y)
+                def index = SequenceIndex.findByIndexIdAndStatus(it, DictionaryStatus.Y)
                 if (!index) {
                     throw new SampleException(message: "Incorrect index ${it}!")
                 }

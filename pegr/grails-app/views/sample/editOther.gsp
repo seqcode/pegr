@@ -5,13 +5,16 @@
 </head>
 <body>
     <div class="container-fluid">
+        <g:if test="${flash.message}">
+            <div class="message" role="status">${flash.message}</div>
+        </g:if>
         <h3>Edit Sample ${sample?.id}</h3>
         <g:form action="updateOther" class="fields">
             <g:hiddenField name="sampleId" value="${sample.id}"></g:hiddenField>
             <div>
                 <label>Index <a href="#" onclick="window.open('${g.createLink(controller: 'project',action:'sampleSubmissionHelp', fragment:'sequence-index')}', 'Help: Sample Submission', 'width=600,height=400' )"><span class="glyphicon glyphicon-question-sign"></span></a> </label>
-                <label class="radio-inline"><input type="radio" name="indexType">ID</label>
-                <label class="radio-inline"><input type="radio" name="indexType" checked>Sequence</label>
+                <label class="radio-inline"><input type="radio" name="indexType" value="ID">ID</label>
+                <label class="radio-inline"><input type="radio" name="indexType" value="Sequence" checked>Sequence</label>
                 <g:textField name="indices" style="width:200px" value="${sample.sequenceIndicesString}"></g:textField>
                 
             </div>

@@ -6,9 +6,10 @@
 </head>
 <body>
     <div>
+        <a href="#" onclick="window.open('${g.createLink(action:'help')}', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><u>Help</u></a>
         <g:link action="showBag" id="${protocolInstance?.bag?.id}"><span class="glyphicon glyphicon-home"></span> Home</g:link>
-        <g:if test="${request.message}">
-        <div class="message" role="status">${request.message}</div>
+        <g:if test="${flash.message}">
+        <div class="message" role="status">${flash.message}</div>
         </g:if>
         <h3>Protocol: ${protocolInstance?.protocol?.name} ${protocolInstance?.protocol?.protocolVersion}</h3>
         <div id="protocol-details" class="collapse in">

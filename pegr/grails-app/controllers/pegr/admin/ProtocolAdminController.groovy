@@ -36,6 +36,7 @@ class ProtocolAdminController {
                 ]
                 try {
                     protocolService.save(protocol, protocolItemTypeIds)
+                    protocolService.uploadFile( (MultipartHttpServletRequest)request, protocol.id, "file")
                     flash.message = "New protocol saved!"
                     redirect(action: "show", id: protocol.id)
                 }catch(ProtocolException e) {
@@ -124,20 +125,8 @@ class ProtocolAdminController {
     
     def upload(Long protocolId) {
         try {
-            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  
-            def mpf = mpr.getFile("file");
-            String fileName = mpf.getOriginalFilename();
-            String fileType = mpf.getContentType();
-
-            if(!mpf?.empty && mpf.size < 100 * 1024 * 1024 && fileType == "application/pdf") {                
-                File folder = protocolService.getProtocolFolder(); 
-                if (!folder.exists()) { 
-                    folder.mkdirs(); 
-                } 
-                File fileDest = protocolService.getProtocolFile(protocolId) 
-                mpf.transferTo(fileDest)
-                flash.message = "Protocol uploaded!"
-            }
+            protocolService.uploadFile( (MultipartHttpServletRequest)request, protocolId, "file")
+            flash.message = "Protocol uploaded!"
         } catch(Exception e) {
             log.error "Error: ${e.message}", e
             flash.message = "Error uploading the file!"

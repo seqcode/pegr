@@ -4,6 +4,8 @@ class ProjectController {
     
 	def springSecurityService
     def projectService
+    def sampleService
+    def replicateService
 	
     def index(int max, int offset) {
         max = Math.min(max ?:15, 100)
@@ -88,17 +90,13 @@ class ProjectController {
 		def currentProject = Project.get(id)
         if (currentProject) {
             def projectUsers = ProjectUser.where { project==currentProject}.list()
-            def authorized = false
-            def currUser = springSecurityService.currentUser
-            if (currUser.isAdmin()) {
-                authorized = true
-            } else if (projectUsers.find { it.user == currUser && it.projectRole == ProjectRole.OWNER}) {
-               authorized = true                    
-            }          
+            def projectEditAuth = projectService.projectEditAuth(currentProject)
+            def sampleEditAuth = projectService.sampleEditAuth(currentProject)
             def samples = ProjectSamples.where {project==currentProject}.list(params).collect{it.sample}
             def experiments = samples.collect{it.sequencingExperiments}.flatten()
             def alignments = experiments.collect{it.alignments}.flatten()
-            [project: currentProject, projectUsers: projectUsers, samples: samples, experiments: experiments, alignments: alignments, sampleCount: currentProject.samples.size(), authorized: authorized]
+            def replicates = replicateService.getReplicates(currentProject)
+            [project: currentProject, projectUsers: projectUsers, samples: samples, experiments: experiments, alignments: alignments, sampleCount: currentProject.samples.size(), replicates: replicates, projectEditAuth: projectEditAuth, sampleEditAuth: sampleEditAuth]
         } else {
             flash.message = "Project not found!"
             redirect(action: "index")
@@ -147,13 +145,20 @@ class ProjectController {
     }
     
     def addExistingSamples(Long projectId, String sampleIds) {
-        def messages = projectService.addExistingSamples(projectId, sampleIds)
-        if (messages.size()) {
-            flash.messages = messages
-            redirect(action: "searchSample", params:[projectId: projectId])
-        } else {
-            redirect(action: "show", id: projectId)
+        try {
+            def unknownSampleIds = projectService.addExistingSamples(projectId, sampleIds)
+            if (unknownSampleIds.size() > 0) {
+                flash.messages = "Unknown Samples ${unknownSampleIds} are not added to the project!"
+            } else {
+                flash.message = "Success! All samples have been added to the project."
+            }
+        } catch (ProjectException e) {
+            flash.message = e.message
+        } catch (Exception e) {
+            flash.message = "An unexpected error has occured!"
+            log.error e
         }
+        redirect(action: "show", id: projectId)
     }
     
     def addNewSamples(Long projectId, Long assayId) {
@@ -171,24 +176,73 @@ class ProjectController {
         redirect(action: "show", id: projectId)
     }
     
-    def saveNewSamples(Long assayId, Long projectId, SampleListCommand samples) {
+    def saveNewSamples(SampleListCommand command) {
         try {
-            sampleService.saveNewSamples(assayId, projectId, samples)
-            flash.message = "New samples added!"
-            redirect(action: "show, id: projectId")
+            def message = sampleService.saveNewSamples(command.assayId, command.projectId, command.samples)
+            flash.message = message
+            redirect(action: "show", id: command.projectId)
         } catch(ProjectException e) {
-            
+            flash.message = e.message
+            redirect(action: "addNewSamples", params:[projectId: command.projectId, assayId: command.assayId])
         }
+    }
+    
+    def projectRoleHelp() {
+        render(view: "projectRoleHelp")
+    }
+    
+    def sampleSubmissionHelp() {
+        def allIndices = SequenceIndex.findAllByStatus(DictionaryStatus.Y).groupBy({ it -> it.indexVersion })
+        render(view: "sampleSubmissionHelp", model: [allIndices: allIndices])
     }
 }
 
 
 class SampleCommand {
     Long providerId
+    Long providerLabId
+    String bioSourceId
     Long sendToId
-    
+    String genus
+    String speciesId
+    String parentStrain
+    String strain
+    String genotype
+    String mutation
+    String tissue
+    String age
+    String sex
+    String histology
+    String growthMedia
+    String treatments
+    String chrom
+    String cellNum
+    String volume
+    String requestedTags
+    String genomes
+    String indices
+    String sampleNotes
+    String company
+    String catalogNumber
+    String lotNumber
+    String abHost
+    String immunogene
+    String clonal
+    String igType
+    String abConcentration
+    String abNotes
+    String abVolumePerSample
+    String ugPerChip
+    String ulPerChip
+    String targetType
+    String target
+    String cterm
+    String nterm
+    String indexType
 }
 
 class SampleListCommand {
-    List<Sample> samples = []
+    Long assayId
+    Long projectId
+    List<SampleCommand> samples = [].withLazyDefault { new SampleCommand() } 
 }

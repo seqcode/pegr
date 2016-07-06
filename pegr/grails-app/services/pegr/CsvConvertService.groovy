@@ -1,5 +1,5 @@
 package pegr
-import grails.transaction.Transactional
+import grails.transaction.*
 import com.opencsv.CSVParser
 import com.opencsv.CSVReader
 import groovy.json.*
@@ -9,10 +9,13 @@ class CsvConvertException extends RuntimeException {
     String message
 }
     
+@Transactional
 class CsvConvertService {
+    def cellSourceService
     def sampleService
     def antibodyService
 	
+    @NotTransactional
 	def migrate(String filename, RunStatus runStatus, int startLine, int endLine, boolean basicCheck){
 		
         def timeStart = new Date()
@@ -34,16 +37,19 @@ class CsvConvertService {
 		    }
             try {
                 migrateOneRow(rawdata, runStatus, basicCheck)
-		 	}catch(Exception e) {
+		 	} catch(CsvConvertException e) {
+                messages.push("Error: Line ${lineNo}. ${e.message}")
+		        continue
+		    } catch(Exception e) {
 		        log.error "Error: line ${lineNo}. " + e
-                messages.push("Error: Line ${lineNo} ${e.message}")
+                messages.push("Error: Line ${lineNo}.")
 		        continue
 		    }   
 		}
         
         def timeStop = new Date()
         TimeDuration duration = TimeCategory.minus(timeStop, timeStart)
-        println "Time: " + duration
+        println "Time to upload the CSV file: " + duration
         return messages
 	}
 	
@@ -80,20 +86,20 @@ class CsvConvertService {
 
         def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.abConc)
 
-        def species = sampleService.getSpecies(data.genus, data.species)
+        def species = cellSourceService.getSpecies(data.genus, data.species)
 
         def strainAndTissue = getStrainTissue(species, data.strain, data.parentStrain, data.genotype, data.mutation)
         def strain = strainAndTissue.strain
         def tissue = strainAndTissue.tissue
 
-        def growthMedia = sampleService.getGrowthMedia(data.growthMedia, species)
+        def growthMedia = cellSourceService.getGrowthMedia(data.growthMedia, species)
 
         def inventory = getInventory(data.dateReceived, data.receivingUser, data.inOrExternal, data.inventoryNotes)
         def prepUser = getUser(data.samplePrepUser)
         def cellSource = getCellSource(prepUser, growthMedia, strain, cellProvider, inventory, tissue)
 
-        sampleService.addTreatment(cellSource, data.perturbation1)
-        sampleService.addTreatment(cellSource, data.perturbation2)
+        cellSourceService.addTreatment(cellSource, data.perturbation1)
+        cellSourceService.addTreatment(cellSource, data.perturbation2)
         
         def assay = getAssay(data.assay)
 
@@ -112,7 +118,7 @@ class CsvConvertService {
 
         def abNotes = JsonOutput.toJson(abnoteMap)
         
-        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes)
+        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes, assay)
 
         addIndexToSample(sample, data.indexStr, data.indexIdStr, basicCheck)
         sampleService.addSampleToProject(project, sample)
@@ -126,25 +132,25 @@ class CsvConvertService {
     }
     
     def addIndexToSample(Sample sample, String indexStr, String indexIdStr, boolean basicCheck) { 
+        if (!sample) {
+            throw new CsvConvertException(message: "Sample cannot be null when adding index!")
+        }
         if (indexStr == null || indexStr == "unk"){
             return
         }
-        def indexId = getInteger(indexIdStr)
-        def index
         if (basicCheck) {
-            index = SequenceIndex.findByIndexIdAndSequenceAndStatus(indexId, indexStr, DictionaryStatus.Y)
-            if (!index) {
-                throw new CsvConvertException(message: "Index ID and String don't match!")
+            try {
+                sampleService.splitAndAddIndexToSample(sample, indexStr)
+            } catch (SampleException e) {
+                throw new CsvConvertException(message: e.message)
             }
         } else {
-            index = SequenceIndex.findByIndexIdAndSequence(indexId, indexStr)
+            def index = SequenceIndex.findByIndexIdAndSequence(indexIdStr, indexStr)
             if (!index) {
-                index = new SequenceIndex(indexId: indexId, sequence: indexStr, indexVersion: "UNKNOWN").save(failOnError: true)
+                index = new SequenceIndex(indexId: indexIdStr, sequence: indexStr, indexVersion: "UNKNOWN").save(failOnError: true)
             }
-        }
-        if (index && sample) {
             new SampleSequenceIndices(sample: sample, index: index).save(failOnError: true)
-        } 
+        }
     }
 	
     def getUser(String userStr) {
@@ -376,7 +382,7 @@ class CsvConvertService {
         if (assay) {
 	        protocol = Protocol.findByNameAndProtocolVersion(assay.name, v)  
 	        if (!protocol) {
-	            protocol = new Protocol(name: assay.name, protocolVersion: v).save( failOnError: true)
+	            protocol = new Protocol(name: assay.name, protocolVersion: v, assay: assay).save( failOnError: true)
 	        }
 	    }
 	    // get note
@@ -401,7 +407,7 @@ class CsvConvertService {
 	    return cellSource
 	}
     
-	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId, String abNotes) {
+	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId, String abNotes, Assay assay) {
 	    def note = [:]
 	    if (sampleNotes) {
 	        note['note'] = sampleNotes
@@ -431,7 +437,7 @@ class CsvConvertService {
             }
         }
         
-	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes).save( failOnError: true)
+	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes, assay: assay).save( failOnError: true)
 	    return sample
 	}
 	
@@ -450,16 +456,17 @@ class CsvConvertService {
 		        def sample2 = getSampleFromSampleId(note.bioRep2)
 		        def sample1 = getSampleFromSampleId(note.bioRep1)
 		        if (sample2 || sample1) {
-		            def set = BiologicalReplicateSamples.findBySample(sample)?.set  
+		            def sets = ReplicateSamples.findAllBySample(sample)*.set  
+                    def set = sets.find {it.type == ReplicateType.BIOLOGICAL}
 		            if (!set) {
-		                set = new BiologicalReplicateSet().save( failOnError: true)
-		                new BiologicalReplicateSamples(set: set, sample: sample).save( failOnError: true)
+		                set = new ReplicateSet(type: ReplicateType.BIOLOGICAL).save( failOnError: true)
+		                new ReplicateSamples(set: set, sample: sample).save( failOnError: true)
 		            }
 		            if (set && sample2) {
-		                new BiologicalReplicateSamples(set: set, sample: sample2).save()
+		                new ReplicateSamples(set: set, sample: sample2).save()
 		            }
 		            if (set && sample1) {
-		                new BiologicalReplicateSamples(set: set, sample: sample1).save()
+		                new ReplicateSamples(set: set, sample: sample1).save()
 		            }
 		        }
 		        sample.note = note.note
@@ -542,7 +549,14 @@ class CsvConvertService {
 			map['rd1'] = [rd1Start, rd1End]
 		}
 		if(indexStart || indexEnd) {
-			map['index'] = [indexStart, indexEnd]
+            def indexStartList = indexStart.split(",")
+            def indexEndList = indexEnd.split(",")
+            if (indexStartList.size() == 1) {
+                map['index'] = [indexStart, indexEnd]
+            } else {
+                map['index1'] = [indexStartList[0], indexEndList[0]]
+                map['index2'] = [indexStartList[1], indexEndList[1]]
+            }
 		}
 		if(rd2Start || rd2End) {
 			map['rd2'] = [rd2Start, rd2End]
@@ -647,9 +661,9 @@ class CsvConvertService {
 	    }
 	
 	    def run = SequenceRun.findByPlatformAndRunNum(platform, runNum)
-	    if (!run) {                     
+	    if (!run) {                 
 	         run = new SequenceRun(runNum: runNum, platform: platform, status: runStatus, user: user)
-	
+
 	         // lane
 	         run.lane = getInteger(laneStr)
 	

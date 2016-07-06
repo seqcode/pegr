@@ -1,6 +1,32 @@
 <div class="row">
     <div id="cellSource" class="col-sm-3">
-        <h4>Cell Source</h4>
+        <h4>Cell Source 
+            <g:if test="${sampleEditAuth}">
+                <a href="#" class="edit" data-toggle="modal" data-target="#editCellSourceModal">Edit</a>
+                <div id="editCellSourceModal" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Please select</h4>
+                            </div>
+                            <div class="modal-body">
+                                <ul>
+                                    <g:if test="${sample.cellSource}">
+                                        <li>- <g:link action="editCellSource" params="[sampleId:sample.id, cellSourceId:sample.cellSource.id]">Edit this cell source.</g:link></li>
+                                        <li>- <g:link action="searchCellSource" params="[sampleId:sample.id]">Change to an existing cell source.</g:link></li>
+                                        </g:if>
+                                    <g:else>
+                                        <li>- <g:link action="searchCellSource" params="[sampleId:sample.id]">Add an existing cell source.</g:link></li>
+                                    </g:else>
+                                    <li>- <g:link action="editCellSource" params="[sampleId:sample.id]">Create a new cell source.</g:link></li>
+                                </ul>
+                            </div>
+                        </div>
+                  </div>
+                </div>
+            </g:if>
+        </h4>
         <ul>
             <li>Strain: ${sample.cellSource?.strain?.name}</li>
             <li>Species: ${sample.cellSource?.strain?.species}</li>
@@ -58,7 +84,33 @@
         </ul>
     </div>
     <div id="antibody" class="col-sm-3">
-        <h4>Antibody</h4>
+        <h4>Antibody 
+            <g:if test="${sampleEditAuth}">
+                <button type="button" class="edit" data-toggle="modal" data-target="#editAntibodyModal">Edit</button>
+                <div id="editAntibodyModal" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Please select</h4>
+                            </div>
+                            <div class="modal-body">
+                                <ul>
+                                    <g:if test="${sample.antibody}">
+                                        <li>- <g:link action="editAntibody" params="[sampleId:sample.id, antibodyId:sample.antibody.id]">Edit this antibody.</g:link></li>
+                                        <li>- <g:link action="previewAntibody" params="[sampleId:sample.id]">Change to an existing antibody.</g:link></li>
+                                        </g:if>
+                                    <g:else>
+                                        <li>- <g:link action="previewAntibody" params="[sampleId:sample.id]">Add an existing antibody.</g:link></li>
+                                    </g:else>
+                                    <li>- <g:link action="editAntibody" params="[sampleId:sample.id]">Create a new antibody.</g:link></li>
+                                </ul>
+                            </div>
+                        </div>
+                  </div>
+                </div>
+            </g:if>
+        </h4>
         <ul>
             <g:if test="${sample.antibody?.company}">
             <li>Company: ${sample.antibody?.company}</li>
@@ -92,6 +144,25 @@
             <li>External ID: ${sample.antibody.externalId}</li>
             </g:if>  
 
+            <g:if test="${notes?.containsKey('Volume Sent (ul)')}">
+            <li>Volume Sent (ul): ${notes['Volume Sent (ul)']}</li>
+            </g:if> 
+            
+            <g:if test="${notes?.containsKey('Usage Per ChIP (ug)')}">
+            <li>Usage Per ChIP (ug): ${notes['Usage Per ChIP (ug)']}</li>
+            </g:if> 
+            
+            <g:if test="${notes?.containsKey('Usage Per ChIP (ul)')}">
+            <li>Usage Per ChIP (ul): ${notes['Usage Per ChIP (ul)']}</li>
+            </g:if> 
+                   
+            <g:if test="${sample.antibody?.note}">
+            <li>Notes: ${sample.antibody?.note}</li>
+            </g:if>
+        </ul>
+        <h4>Target <g:if test="${sampleEditAuth}"><g:link action="editTarget" params="[sampleId: sample.id]" class="edit">Edit</g:link></g:if>
+        </h4>
+        <ul>
             <li>Target: ${sample.target?.name}</li>
             <g:if test="${sample.target?.targetType}">
             <li>Type: ${sample.target.targetType}</li>
@@ -103,60 +174,62 @@
             <li>N-Tag: ${sample.target.nTermTag}</li>
             </g:if>
             <g:if test="${sample.target?.note}">
-            <li>C-Tag: ${sample.target.note}</li>
+            <li>Target Notes: ${sample.target.note}</li>
             </g:if>
         </ul>
     </div>
 
     <div id="protocol" class="col-sm-3">
-        <h4>Protocol</h4>   
-        <g:if test="${sample?.prtclInstSummary}">
-            <ul>
-                <li>Assay: ${sample.prtclInstSummary.protocol}</li>
-
+        <h4>Protocol <g:if test="${sampleEditAuth}"><g:link action="editProtocol" params="[sampleId: sample.id]" class="edit">Edit</g:link></g:if></h4>   
+        <ul>
+            <li>Assay: ${sample.assay}</li>
+            <g:if test="${sample?.prtclInstSummary}">
                 <g:if test="${notes['Resin']}">
                 <li>Resin: ${notes['Resin']}</li>
                 </g:if>
-
                 <g:if test="${notes['PCR Cycle']}">
                 <li>PCR Cycle: ${notes['PCR Cycle']}</li>
                 </g:if>
-            </ul>
-        </g:if>
-        <g:else>
-            <div class="subnumber">
-                <ol>
-                    <g:each in="${protocols}" var="bag">
-                        <li>
-                            <g:if test="${authorized}">
-                                <g:link controller="protocolInstanceBag" action="showBag" id="${bag.bag?.id}">${bag.bag?.name}</g:link>
-                                <ol>
-                                    <g:each in="${bag.protocolList}">
-                                        <li><g:link controller="protocolInstanceBag" action="showInstance" id="${it.id}">${it.protocol}</g:link>
+                <li>Technician: ${sample?.prtclInstSummary?.user?.fullName}</li>
+                <li>Date: <g:formatDate format="yyyy-MM-dd" date="${sample?.prtclInstSummary?.endTime}"/></li>
+            </g:if>
+        </ul>
+        <div class="subnumber">
+            <ol>
+                <g:each in="${protocols}" var="bag">
+                    <li>
+                        <g:if test="${sampleEditAuth}">
+                            <g:link controller="protocolInstanceBag" action="showBag" id="${bag.bag?.id}">${bag.bag?.name}</g:link>
+                            <ol>
+                                <g:each in="${bag.protocolList}">
+                                    <li><g:link controller="protocolInstanceBag" action="showInstance" id="${it.id}">${it.protocol}</g:link>
+                                    <g:link controller="protocolInstanceBag" action="renderFile" params="[protocolId: it.protocol?.id]" target="_blank"><span class="glyphicon glyphicon-file"></span></g:link></li>
+                                </g:each>
+                            </ol>
+                        </g:if>
+                        <g:else>
+                            ${bag.bag?.name}
+                            <ol>
+                                <g:each in="${bag.protocolList}">
+                                    <li>${it.protocol} 
                                         <g:link controller="protocolInstanceBag" action="renderFile" params="[protocolId: it.protocol?.id]" target="_blank"><span class="glyphicon glyphicon-file"></span></g:link></li>
-                                    </g:each>
-                                </ol>
-                            </g:if>
-                            <g:else>
-                                ${bag.bag?.name}
-                                <ol>
-                                    <g:each in="${bag.protocolList}">
-                                        <li>${it.protocol} 
-                                            <g:link controller="protocolInstanceBag" action="renderFile" params="[protocolId: it.protocol?.id]" target="_blank"><span class="glyphicon glyphicon-file"></span></g:link></li>
-                                    </g:each>
-                                </ol>
-                            </g:else>
-                        </li>
-                    </g:each>
-                </ol>
-            </div>
-        </g:else>
+                                </g:each>
+                            </ol>
+                        </g:else>
+                    </li>
+                </g:each>
+            </ol>
+        </div>
     </div>     
 
     <div id="other" class="col-sm-3">      
-        <h4>Other</h4>
+        <h4>Other
+            <g:if test="${sampleEditAuth}">
+                <g:link controller="sample" action="editOther" params="[sampleId:sample?.id]" class="edit">Edit</g:link>
+            </g:if>
+        </h4>
         <ul>
-            <li>Index: <g:each in="${sample.sequenceIndices}">${it.sequence} </g:each></li>
+            <li>Index: ${sample.sequenceIndicesString}</li>
 
             <li>Chromosome (ug): <g:if test="${sample?.chromosomeAmount}">${sample.chromosomeAmount}</g:if></li>
 
@@ -166,12 +239,16 @@
 
             <li>Requested Tags (M): <g:if test="${sample?.requestedTagNumber}">${sample.requestedTagNumber}</g:if></li>
 
+            <li>Requested genomes: ${sample?.requestedGenomes}</li>
+            
+            <li>Send data to: ${sample?.sendDataTo}</li>
+            
             <g:if test="${sample?.publicationReference}">
             <li>Publication Reference: ${sample.publicationReference}</li>
             </g:if>
             
-            <g:if test="${notes['note']}">
-            <li>Notes: ${notes['note']}</li>
+            <g:if test="${sample.note}">
+            <li>Notes: ${sample.note}</li>
             </g:if>
         </ul>
     </div>  

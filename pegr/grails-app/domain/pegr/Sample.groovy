@@ -6,12 +6,12 @@ class Sample {
 	Antibody antibody
     String antibodyNotes
 	Target target
-	Long requestedTagNumber
-	Float chromosomeAmount // in ug
-	Long cellNumber // in M
-	Float volume //ul per aliqu used for the assay
+	Double requestedTagNumber
+	Double chromosomeAmount // in ug
+	Double cellNumber // in M
+	Double volume //ul per aliqu used for the assay
 	String publicationReference
-	SampleStatus status
+    SampleStatus status
     Date date
 	CellSource spikeInCellSource
 	String note
@@ -23,6 +23,8 @@ class Sample {
     String source
     String sourceId
     Assay assay
+    String requestedGenomes
+    SampleAudit audit
     
     static hasMany = [bags: ProtocolInstanceBag]
     
@@ -34,32 +36,26 @@ class Sample {
         return SequencingExperiment.where{sample == this}.list()
     }
     
-    List getSequenceIndices() {
-        return SampleSequenceIndices.where{sample == this}.collect{it.index}
-    }
-    
     String getSequenceIndicesString() {
-        def indices = SampleSequenceIndices.where{sample == this}.collect{it.index.indexId}
-        def s = indices.join(", ")
-        return s
+        def indexDict = SampleSequenceIndices.where{sample == this}.groupBy({it -> it.setId})
+        def indexList = []
+        indexDict.each{ key, value ->
+            indexList.push(value.sort{it.indexInSet}*.index*.sequence.join("-"))
+        }
+        return indexList.join(",")
     }
     
-    String getSequenceIndicesDetailString() {
-        def indices = SampleSequenceIndices.where{sample == this}.collect{it.index}
-        def s = indices.collect{"${it.indexId}.${it.sequence}"}.join(", ")
-        return s
+    String getSequenceIndicesIdString() {
+        def indexDict = SampleSequenceIndices.where{sample == this}.groupBy({it -> it.setId})
+        def indexList = []
+        indexDict.each{ key, value ->
+            indexList.push(value.sort{it.indexInSet}*.index*.indexId.join("-"))
+        }
+        return indexList.join(",")
     }
     
     List getProjects() {
         return ProjectSamples.where{sample == this}.collect{it.project}
-    }
-    
-    List getBioReps(){
-        return BiologicalReplicateSamples.where{sample == this}.list()
-    }
-    
-    List getTechReps(){
-        return TechnicalReplicateSamples.where{sample == this}.list()
     }
     
     static constraints = {
@@ -82,6 +78,8 @@ class Sample {
         sourceId nullable: true
         antibodyNotes nullable: true, blank: true
         assay nullable: true
+        requestedGenomes nullable: true, blank: true
+        audit nullable: true
     }
     
     static mapping = {

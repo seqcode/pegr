@@ -2839,4 +2839,14 @@ databaseChangeLog = {
 	include file: 'removeSeqIdFromExp.groovy'
 
 	include file: 'addAnalysis.groovy'
+
+	include file: 'addSampleAudit.groovy'
+
+	include file: 'sampleDataType.groovy'
+    
+    include file: 'removeDownStream.groovy'
+
+	include file: 'addHistoryId.groovy'
+
+	include file: 'mergeReplicates.groovy'
 }

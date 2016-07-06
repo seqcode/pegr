@@ -14,7 +14,9 @@
                 <th>Antibody</th>
             </g:if>
             <g:if test="${protocolInstance.protocol.addIndex}">
-                <th>Index <g:submitButton name="save" class="edit"></g:submitButton></th>
+                <th><a href="#" onclick="window.open('${g.createLink(controller:'project',action:'sampleSubmissionHelp', fragment:'sequence-index')}', 'Help: Sample Submission', 'width=600,height=400' )">Index <span class="glyphicon glyphicon-question-sign"></span></a> 
+                        <label class="radio-inline"><input type="radio" name="indexType" value="ID">ID</label>
+                        <label class="radio-inline"><input type="radio" name="indexType" value="Sequence" checked>Sequence</label></th>
             </g:if>        
         </thead>
         <tbody>            
@@ -45,13 +47,14 @@
                     </g:if>
                     <g:hiddenField name="sampleId" value="${sample.id}"/>
                     <g:if test="${protocolInstance?.protocol?.addIndex}">
-                        <td><g:textField name="indexId" value="${sample.sequenceIndicesString}" /></td>
+                        <td><g:textField name="indexId" value="${sample.sequenceIndicesString}" size="50"/></td>
                     </g:if>
                 </tr>
             </g:each>
         </tbody>
     </table>
+    <div class="row">
+        <g:submitButton name="save" class="btn btn-primary pull-right" value="Save Index"></g:submitButton>
+    </div>
+    
 </g:form>
-<g:if test="${protocolInstance?.protocol?.addIndex}">
-    <p>* multiple indices for a single sample should be separated by comma ","</p>
-</g:if>

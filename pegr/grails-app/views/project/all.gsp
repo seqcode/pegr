@@ -12,6 +12,7 @@
         <g:link action='index'  class="btn btn-info">My Projects</g:link>
         <g:link action='all'  class="btn btn-info active"></span>All Projects</g:link>
         <g:link action='create'  class="btn btn-info" ><span class="glyphicon glyphicon-plus"></span>Add Project</g:link>
+    </div>
     </sec:ifAllGranted>
     <ul class="list-group" id="allProjects">
         <g:render template="overview" collection="${projects}" var="project"/>

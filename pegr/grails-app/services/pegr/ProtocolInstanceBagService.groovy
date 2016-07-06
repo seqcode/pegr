@@ -9,9 +9,10 @@ class ProtocolInstanceBagException extends RuntimeException {
 class ProtocolInstanceBagService {
     def springSecurityService
     def itemService
+    def sampleService
     
     @Transactional
-    ProtocolInstanceBag savePrtclInstBag(Long protocolGroupId, String name, Date startTime) {
+    ProtocolInstanceBag savePrtclInstBagByGroup(Long protocolGroupId, String name, Date startTime) {
         def protocolGroup = ProtocolGroup.get(protocolGroupId)
         if(protocolGroup == null) {
             throw new ProtocolInstanceBagException(message: "protocol Group not found!")
@@ -23,13 +24,31 @@ class ProtocolInstanceBagService {
         try {
             prtclInstBag.save(flush: true)
             protocolGroup.protocols.eachWithIndex { it, n ->
-            new ProtocolInstance(protocol: it, bag: prtclInstBag, bagIdx: n, status: ProtocolStatus.INACTIVE).save(flush: true)
+                new ProtocolInstance(protocol: it, bag: prtclInstBag, bagIdx: n, status: ProtocolStatus.INACTIVE).save(flush: true)
             }
         } catch (Exception e) {         
             log.error "Error: ${e.message}", e
             throw new ProtocolInstanceBagException(message: "Error saving this protocol instance bag!")
         }
 
+        return prtclInstBag
+    }
+    
+    @Transactional
+    ProtocolInstanceBag savePrtclInstBagByProtocols(List protocols, String name, Date startTime) {
+        def prtclInstBag = new ProtocolInstanceBag(name: name,
+                                                  status: ProtocolStatus.PROCESSING,
+                                                  startTime: startTime)
+        try {
+            prtclInstBag.save(flush: true)
+            protocols.eachWithIndex { it, n ->
+                def protocol = Protocol.get(Long.parseLong(it))
+                new ProtocolInstance(protocol: protocol, bag: prtclInstBag, bagIdx: n, status: ProtocolStatus.INACTIVE).save(flush: true)
+            }
+        } catch (Exception e) {         
+            log.error "Error: ${e.message}", e
+            throw new ProtocolInstanceBagException(message: "Error saving this protocol instance bag!")
+        }
         return prtclInstBag
     }
     
@@ -51,12 +70,21 @@ class ProtocolInstanceBagService {
                 cellSource = CellSource.findByItem(csItem)
             }
             if (cellSource) {
-                sample = new Sample(item: item, cellSource: cellSource, status: SampleStatus.CREATED)
+                sample = new Sample(item: item, cellSource: cellSource)
             } else {
                 throw new ProtocolInstanceBagException(message: "No cell source found for this item!")
             }            
         }
         try {
+            sample.status = SampleStatus.PREP
+
+            // iterate the protocols and add assay to sample if assay is defined
+            ProtocolInstance.findByBag(bag).each {
+                if (it.protocol?.assay) {
+                    sample.assay = it.protocol?.assay
+                }
+            }
+            
             sample.addToBags(bag).save()
         } catch(Exception e) {
             log.error "Error: ${e.message}", e
@@ -204,42 +232,23 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    void addIndex(List sampleId, List indexIds) {
-        def newSampleIndices = []
-        def indexIdSet = []
-        def toDelete = []
-        sampleId.eachWithIndex { id, idx ->
-            def sample = Sample.get(Long.parseLong(id))
+    void addIndex(List sampleIds, List indecies, String indexType) {
+        sampleIds.eachWithIndex { sampleIdStr, idx ->
+            def sampleId = Long.parseLong(sampleIdStr)
+            def sample = Sample.get(sampleId)
             if (!sample) {
                 throw new ProtocolInstanceBagException(message: "Sample not found!")
             }
-            toDelete.addAll(SampleSequenceIndices.findAllBySample(sample))
-            if (indexIds[idx] != "") {
-                def indexStrings = indexIds[idx].split(",")*.trim()
-                indexStrings.each{ 
-                    def indexId = Long.parseLong(it)
-                    if (indexId in indexIdSet) {
-                        throw new ProtocolInstanceBagException(message: "Index ${indexId} has been used for more than twice!")
-                    }
-                    def index = SequenceIndex.findByIndexIdAndStatus(indexId, DictionaryStatus.Y)
-                    if (!index) {
-                        throw new ProtocolInstanceBagException(message: "Index ${indexId} not found!")
-                    }          
-                    indexIdSet.push(indexId)
-                    def oldIndex = toDelete.find{it.index == index && it.sample == sample}
-                    if (oldIndex) {
-                        toDelete.remove(oldIndex)
-                    } else {
-                        newSampleIndices.push(new SampleSequenceIndices(sample: sample, index: index))
-                    }
-                }       
+            SampleSequenceIndices.executeUpdate("delete from SampleSequenceIndices where sample.id = :sampleId", [sampleId: sampleId])
+            try {
+                if (indexType == "ID") {
+                    sampleService.splitIdAndAddIndexToSample(sample, indecies[idx])
+                } else {
+                    sampleService.splitAndAddIndexToSample(sample, indecies[idx])
+                }
+            } catch (SampleException e) {
+                 throw new ProtocolInstanceBagException(message: e.message)
             }
-        }
-        toDelete.each {
-            it.delete()
-        }
-        newSampleIndices.each {
-            it.save()
         }
     }
     
@@ -253,7 +262,7 @@ class ProtocolInstanceBagService {
             }
         }
         if (protocol.addIndex) {
-            if (samples.any {it.sequenceIndices.empty}) {
+            if (samples.any { it.sequenceIndicesString == null || it.sequenceIndicesString == "" }) {
                 return false
             }
         }
@@ -461,13 +470,14 @@ class ProtocolInstanceBagService {
                 // remove all the items from the instances
                 ProtocolInstanceItems.executeUpdate('delete ProtocolInstanceItems where protocolInstance.id = :instanceId', [instanceId: it.id])
                 // delete the instances in the bag
-                it.delete(flush: true)
+                it.delete()
             }            
             // remove all the samples from the bag
-            def samples = bag.tracedSamples
-            samples.each{
-                it.removeFromBags(bag).save(flush: true)
+            def samples = bag.tracedSamples.toList()
+            for (sample in samples) {
+                sample.removeFromBags(bag)
             }
+            
             // remove the bag itself
             bag.delete()
         } else {

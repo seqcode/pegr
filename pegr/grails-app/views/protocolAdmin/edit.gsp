@@ -28,7 +28,7 @@
 			<g:form action="edit" method="POST" useToken="true">
                 <g:hiddenField name="id" value="${protocol?.id}" />
 				<fieldset class="form fields">
-					<g:render template="form"/>
+					<g:render template="/protocol/form"/>
 				</fieldset>
 				<fieldset class="buttons">
 					<g:submitButton class="save" name="save" value="save" />

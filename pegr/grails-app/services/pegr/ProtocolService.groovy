@@ -1,6 +1,7 @@
 package pegr
 
 import grails.transaction.Transactional
+import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 class ProtocolException extends RuntimeException {
     String message
@@ -63,4 +64,18 @@ class ProtocolService {
         return new File(folder, "protocol${protocolId}.pdf") 
     }
     
+    void uploadFile(MultipartHttpServletRequest mpr, Long protocolId, String fileField) {
+        def mpf = mpr.getFile(fileField);
+        String fileName = mpf.getOriginalFilename();
+        String fileType = mpf.getContentType();
+
+        if(!mpf?.empty && mpf.size < 100 * 1024 * 1024 && fileType == "application/pdf") {                
+            File folder = getProtocolFolder(); 
+            if (!folder.exists()) { 
+                folder.mkdirs(); 
+            } 
+            File fileDest = getProtocolFile(protocolId) 
+            mpf.transferTo(fileDest)
+        }
+    }
 }

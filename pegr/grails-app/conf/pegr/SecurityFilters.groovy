@@ -1,12 +1,22 @@
 package pegr
+import groovy.sql.Sql
 
+/**
+ * The class of security filters defines the user's authorization to 
+ * the actions in controllers.
+ */
 class SecurityFilters {
 
+    def dataSource
     def springSecurityService
+    def projectService
+    def sampleService
     
     def filters = {
         
-        // allow admin or anyone who has a role in this project to view 
+        /**
+         * allow admin or anyone who has a role in this project to view 
+         */
         projectShow(controller:'project', action:'show') {
             before = {
                 def currUser = springSecurityService.currentUser
@@ -36,23 +46,29 @@ class SecurityFilters {
             }    
         }
         
-        projectEdit(controller:'project', action:'edit|addUserAjax|removeUserAjax|editUserRoleAjax|removeSample|searchSample|addExistingSample|addNewSamples') {
+        projectEdit(controller:'project', action:'edit|addUserAjax|removeUserAjax|editUserRoleAjax') {
             before = {
-                def currUser = springSecurityService.currentUser
-                // admin is allowed
-                if (currUser.isAdmin()) {
-                    return true
-                }
-                // project owner is allowed
-                def projectId = params.long('projectId')
-                if (ProjectUser.where {project.id == projectId && user == currUser && projectRole == ProjectRole.OWNER}.get(max: 1)) {
-                    return true                    
+                def project = Project.get(params.long('projectId'))
+                if (projectService.projectEditAuth(project)) {
+                    return true                  
                 } else {
                     render(view: '/login/denied')
                     return false
                 }
             }
-        }     
+        }
+        
+        projectSampleEdit(controller:'project', action:'removeSample|searchSample|addExistingSample|addNewSamples') {
+            before = {
+                def project = Project.get(params.long('projectId'))
+                if (projectService.sampleEditAuth(project)) {
+                    return true                  
+                } else {
+                    render(view: '/login/denied')
+                    return false
+                }
+            }
+        }
                 
         AntibodyEdit(controller: 'antibody', action: 'edit|update|delete|editItem|updateItem|addBarcode') {
             before = {
@@ -96,7 +112,9 @@ class SecurityFilters {
             }
         }
 
-        // before the bag is completed
+        /**
+         * before the bag is completed
+         */
         ProtocolInstanceBagEdit(controller: "protocolInstanceBag", action: "searchItemForBag|previewItemAndBag|addItemToBag|addSubBagToBag|removeItemFromBag|updateBagAjax") {
             before = {
                 def bagId = params.long('bagId')
@@ -110,7 +128,9 @@ class SecurityFilters {
             }    
         }
         
-        // before the bag is completed and only admin/instance user is allowed 
+        /**
+         * before the bag is completed and only admin/instance user is allowed 
+         */
         ProtocolInstanceEdit(controller: "protocolInstanceBag", action: "searchItemForInstance|searchItemForTypeInstance|previewItemInInstance|addPoolToInstance|addItemToInstance|saveItemInInstance|removeItemFromInstance|addIndex|searchAntibody|previewAntibody|addAntibodyToSample|removeAntibody|addChild|removeChild|completeInstance") {
             before = {
                 def instanceId = params.long('instanceId') 
@@ -132,7 +152,7 @@ class SecurityFilters {
             }
         }
         
-        SequenceRunEdit(controller: "sequenceRun", action: "editInfo|update|searchPool|addPool|removePool|removeExperiment|updateGenomes|run") {
+        SequenceRunEdit(controller: "sequenceRun", action: "editRead|updateRead|editInfo|update|searchPool|addPool|removePool|addSamplesById|removeExperiment|edit|updateSamples|run") {
             before = {
                 def runId = params.long('runId')
                 def run =  SequenceRun.get(runId)
@@ -150,5 +170,165 @@ class SecurityFilters {
                 return true
             }
         }
+
+        /**
+         * If the replicate belongs to a project, allow admin or anyone who has
+         * a role in that project to view the replicate set; else allow anyone
+         * to view.
+         */
+        replicateShow(controller:'replicate', action:'show') {
+            before = {
+                def currUser = springSecurityService.currentUser
+                if (currUser.isAdmin()) {
+                    return true
+                }
+                def replicateId = params.long('id')
+                def project = ReplicateSet.get(replicateId)?.project
+                if (!project) {
+                    return true
+                }
+                if (ProjectUser.where {project == project && user == currUser}.get(max: 1)) {
+                    return true                    
+                } else {
+                    render(view: '/login/denied')
+                    return false
+                }
+            }
+        }
+
+        /** 
+         * If the replicate belongs to a project, the right to add or remove 
+         * samples is the same as the right to edit that project, that is the
+         * user is an admin or is an owner of the project; else, only the admin
+         * is allowed to add/remove samples.  
+         */
+        replicateSample(controller:'replicate', action:'addSamples|removeSample') {
+            before = {
+                def replicateId = params.long('setId')
+                def project = ReplicateSet.get(replicateId)?.project
+                if (projectService.sampleEditAuth(project)) {
+                    return true
+                } else {
+                    render(view: '/login/denied')
+                    return false
+                }
+            }
+        }  
+        
+        /** 
+         * If the replicate belongs to a project, the right to delete the replicate set is the same 
+         * as the right to edit that project, that is 
+         * the user is an admin or is an owner of the project; else, only the 
+         * admin is allowed to delete the set.  
+         */
+        replicateDelete(controller:'replicate', action:'delete') {
+            before = {
+                def replicateId = params.long('id')
+                def project = ReplicateSet.get(replicateId)?.project
+                if (projectService.sampleEditAuth(project)) {
+                    return true
+                } else {
+                    render(view: '/login/denied')
+                    return false
+                }
+            }
+        }
+        
+        /** 
+         * If the replicate belongs to a project, the right to create a
+         * replicate set inside the project is the same as the right to edit 
+         * that project, that is the user is an admin or is an owner of the
+         * project; else, only the admin is allowed to create a replicate set.  
+         */
+        replicateCreate(controller:'replicate', action:'saveAjax') {
+            before = {
+                def project = Project.get(params.long('projectId'))
+                if (projectService.sampleEditAuth(project)) {
+                    return true
+                } else {
+                    render(view: '/login/denied')
+                    return false
+                }
+            }
+        }
+        
+        /**
+         * ADMIN and MEMBERS are allowed to see all samples; 
+         * Others are only allowed to see their projects' samples;
+         */        
+        sampleShow(controller:'sample', action:'show') {
+            before = {
+                def user = springSecurityService.currentUser
+                if (user.isAdmin() || user.authorities.any { it.authority == "ROLE_MEMBER" }) {
+                    return true
+                } else {
+                    def sampleId = params.long('id')
+                    def sql = new Sql(dataSource)
+                    def count = sql.rows("SELECT count(*) as cnt FROM project_user pu JOIN project_samples ps ON pu.project_id = ps.project_id WHERE pu.user_id = ${user.id} and ps.sample_id = ${sampleId}") 
+                    if (count[0].cnt > 0) {
+                        return true
+                    } else {
+                        render(view: '/login/denied')
+                        return false
+                    }                    
+                }               
+            }    
+        }
+        
+        /**
+         * ADMIN and Project Owner/Participants are allowed to edit the sample
+         */
+        sampleEdit(controller:'sample', action:'edit') {
+            before = {
+                def sample = Sample.get(params.long('sampleId'))
+                if (sampleService.editAuth(sample)) {
+                    return true
+                } else {
+                    render(view: '/login/denied')
+                    return false
+                }
+            }
+        }
+        
+        /**
+         * Only the protocol's user or ADMIN can edit or delete the protocol.
+         */
+        protocolEdit(controller: 'protocol', action: 'edit|delete') {
+            before = {
+                def user = springSecurityService.currentUser
+                if (user.isAdmin()) {
+                    return true
+                } else {
+                    def protocol = Protocol.get(params.long('id'))
+                    if (protocol.user == user) {
+                        return true
+                    } else {
+                        render(view: '/login/denied')
+                        return false
+                    }
+                }
+            }
+        }
+        
+        /**
+         * Only the protocol's user or ADMIN can upload or delete the protocol's file.
+         */
+        protocolEdit(controller: 'protocol', action: 'upload|deleteFile') {
+            before = {
+                def user = springSecurityService.currentUser
+                if (user.isAdmin()) {
+                    return true
+                } else {
+                    def protocol = Protocol.get(params.long('protocolId'))
+                    if (protocol.user == user) {
+                        return true
+                    } else {
+                        render(view: '/login/denied')
+                        return false
+                    }
+                }
+            }
+        }
     }
 }
+

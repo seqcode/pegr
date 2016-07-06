@@ -7,6 +7,9 @@
     <label>Type</label>
     <select id="type" name="type.id">
         <option value="${item?.type?.id}" selected>${item?.type?.name}</option>
+        <g:each in="${itemTypeOptions}">
+            <option value="${it.id}">${it.name}</option>
+        </g:each>
     </select>
 </div>
 

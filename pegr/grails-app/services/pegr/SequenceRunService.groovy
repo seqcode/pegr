@@ -6,9 +6,14 @@ class SequenceRunException extends RuntimeException {
     String message
 }
 
+class DuplicatedSampleException extends RuntimeException {
+    
+}
+
 class SequenceRunService {
     def springSecurityService
     def walleService
+    def utilityService
     
     @Transactional
     void save(SequenceRun run) {
@@ -33,19 +38,27 @@ class SequenceRunService {
         }       
         run.poolItem = Item.get(poolItemId)
         run.save()
-        def messages = []
         def samples = fetchSamplesInPool(poolItemId)
+        def positions = run.experiments?.getAt(0)?.readPositions
         samples.each {
-            if (SequencingExperiment.findBySampleAndSequenceRun(it, run)) {
-                messages.push("Sample already included in this run!")
-            } else {
-                def experiment = new SequencingExperiment(sample: it, sequenceRun: run) 
-                if (!experiment.save(flush: true)) {
-                    message.push("Error including this sample to the sequence run!")
-                } 
+            addSampleToRun(it, run, positions)
+        }
+    }
+    
+    @Transactional
+    def addSampleToRun(Sample sample, SequenceRun run, String positions) {
+        if (!SequencingExperiment.findBySampleAndSequenceRun(sample, run)) {
+            def experiment = new SequencingExperiment(sample: sample, sequenceRun: run, readPositions: positions) 
+            experiment.save(failOnError: true)
+            if (sample.requestedGenomes && sample.requestedGenomes != "") {
+                sample.requestedGenomes.split(",")*.trim().unique().each{ genomeName ->
+                    def genome = Genome.findByName(genomeName)
+                    if (genome) {                            
+                        new SequenceAlignment(genome: genome, sequencingExperiment: experiment).save()
+                    }
+                }
             }
         }
-        return messages
     }
     
     @Transactional
@@ -74,6 +87,34 @@ class SequenceRunService {
     }
     
     @Transactional
+    def addSamplesById(Long runId, String sampleIds) {
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            throw new SequenceRunException(message: "Sequence run not found!")
+        }  
+        def positions = run.experiments?.getAt(0)?.readPositions
+        if (sampleIds == null || sampleIds == "") {
+            throw new SequenceRunException(message: "No sample ID!")
+        }
+        Set ids 
+        try {
+            ids = utilityService.parseSetOfNumbers(sampleIds)
+        } catch (UtilityException e) {
+            throw new SequenceRunException(message: e.message)
+        }
+        Set unknownSampleIds = []
+        ids.each { id ->
+            def sample = Sample.get(id)
+            if (!sample) {
+                unknownSampleIds << id
+            } else {
+                addSampleToRun(sample, run, positions)
+            }
+        }
+        return unknownSampleIds
+    }
+    
+    @Transactional
     void removeExperiment(Long experimentId) {
         def experiment = SequencingExperiment.get(experimentId)
         if (experiment) {
@@ -87,7 +128,7 @@ class SequenceRunService {
     }
     
     @Transactional
-    void updateGenome(String experimentIdStr, List genomeIds) {
+    void updateSample(String experimentIdStr, List genomeIds, Long readTypeId) {
         Long experimentId = Long.parseLong(experimentIdStr) 
         def experiment = SequencingExperiment.get(experimentId) 
         if (!experiment) {
@@ -113,6 +154,23 @@ class SequenceRunService {
             it.delete()
         }
         toAdd.each{
+            it.save()
+        }
+        def readType = ReadType.get(readTypeId)
+        if (readType && experiment.readType != readType) {
+            experiment.readType = readType
+            experiment.save()
+        }
+    }
+    
+    @Transactional
+    void updateRead(Long runId, String readPositions) {
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            throw new SequenceRunException(message: "Sequence Run not found!")
+        }
+        run.experiments.each {
+            it.readPositions = readPositions
             it.save()
         }
     }

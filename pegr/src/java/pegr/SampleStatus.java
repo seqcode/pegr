@@ -2,7 +2,7 @@ package pegr;
 
 public enum SampleStatus {
 	CREATED,
-	PROCESSING,
+	PREP,
 	READY,
     SEQUENCING,
     COMPLETED,

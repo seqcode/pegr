@@ -10,7 +10,7 @@
     <div>
         <h3>${project?.name}</h3>
         <p>Description: ${project?.description}</p>
-        <p>The number of Samples: </p>
+        <p>The number of Samples: ${sampleCount}</p>
         <div id="project-users">
             <g:render template="userTable"/>
         </div>

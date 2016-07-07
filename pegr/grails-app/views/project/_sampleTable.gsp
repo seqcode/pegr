@@ -3,7 +3,7 @@
         <thead>
             <tr>
                 <th>Sample ID</th>
-                <th>Strain</th>
+                <th>Celltype/Strain</th>
                 <th>Antibody</th>
                 <th>Target</th>
                 <th>Assay</th>

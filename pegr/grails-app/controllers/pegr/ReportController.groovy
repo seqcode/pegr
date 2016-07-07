@@ -29,7 +29,8 @@ class ReportController {
             redirect(action: "index")
         }
     }
-    
+
+    /** How to retrieve the array for SampleID? */
     def showSamples(Long id) {
         def currentProject = Project.get(id)
         if (currentProject) {

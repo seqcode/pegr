@@ -33,7 +33,7 @@ class SecurityFilters {
             }
         }
         
-        reportShowProject(controller:'report', action:'show') {
+        reportShowProject(controller:'report', action:'showProject|showSamples') {
             before = {
                 def currUser = springSecurityService.currentUser
                 if (currUser.isAdmin()) {

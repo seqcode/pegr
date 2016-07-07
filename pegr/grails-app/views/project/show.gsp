@@ -18,7 +18,7 @@
             <g:render template="userTable"/>
         </div>
         
-		<h3>Samples</h3>
+		<h3>Samples <button class="edit" onClick='location.href="/pegr/report/show/${project?.id}"'>Report</button></h3>
         <ul class="nav nav-tabs">
             <li class="active"><a data-toggle="tab" href="#sample">Sample Information</a></li>
             <li><a data-toggle="tab" href="#alignment">Alignment</a></li>

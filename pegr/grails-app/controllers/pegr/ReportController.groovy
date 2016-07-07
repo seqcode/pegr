@@ -7,7 +7,6 @@ class ReportController {
     def sampleService
 
     def index() { 
-        render "Hello World"
     }
     
     def show(Long id) {

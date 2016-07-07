@@ -7,7 +7,7 @@
                 <th>Genome</th>
                 <th>Read Count</th>
                 <th>Index Mismatch</th>
-                <th>Adapter Count</th>
+                <th>Adapter Dimer Count</th>
                 <th>Mapped Read Count</th>
                 <th>Uniquely Mapped Count</th>
                 <th>Deduplicated Count</th>
@@ -24,7 +24,7 @@
                     <td>${alignment.genome}</td>
                     <td><g:formatNumber number="${alignment.sequencingExperiment?.totalReads}" format="###,###,###" /></td>
                     <td>${alignment.sequencingExperiment?.indexMismatch}</td>
-                    <td><g:formatNumber number="${alignment.sequencingExperiment?.adapterCount}" format="###,###,###" /></td>
+                    <td><g:formatNumber number="${alignment.sequencingExperiment?.adapterDimerCount}" format="###,###,###" /></td>
                     <td><g:formatNumber number="${alignment.mappedReads}" format="###,###,###" /></td>
                     <td><g:formatNumber number="${alignment.uniquelyMappedReads}" format="###,###,###" /></td>
                     <td><g:formatNumber number="${alignment.dedupUniquelyMappedReads}" format="###,###,###"

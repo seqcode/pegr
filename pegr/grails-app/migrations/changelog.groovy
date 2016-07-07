@@ -2849,4 +2849,6 @@ databaseChangeLog = {
 	include file: 'addHistoryId.groovy'
 
 	include file: 'mergeReplicates.groovy'
+
+	include file: 'addSummaryReport.groovy'
 }

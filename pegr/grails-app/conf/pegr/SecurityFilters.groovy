@@ -15,16 +15,12 @@ class SecurityFilters {
     def filters = {
         
         /**
-         * allow admin or anyone who has a role in this project to view 
+         * allow ADMIN, MEMBER or anyone who has a role in this project to view 
          */
         projectShow(controller:'project', action:'show') {
             before = {
-                def currUser = springSecurityService.currentUser
-                if (currUser.isAdmin()) {
-                    return true
-                }
                 def projectId = params.long('id')
-                if (ProjectUser.where {project.id == projectId && user == currUser}.get(max: 1)) {
+                if (projectService.projectViewAuth(projectId)) {
                     return true                    
                 } else {
                     render(view: '/login/denied')
@@ -33,33 +29,20 @@ class SecurityFilters {
             }
         }
         
-        reportShowProject(controller:'report', action:'showProject|showSamples') {
+        /*
+         * The authorization to view a project's summary report is the same as 
+         * that of viewing a project
+         */
+        reportShowProject(controller:'report', action:'showProject') {
             before = {
-                def currUser = springSecurityService.currentUser
-                if (currUser.isAdmin()) {
-                    return true
-                }
                 def projectId = params.long('id')
-                if (ProjectUser.where {project.id == projectId && user == currUser}.get(max: 1)) {
+                if (projectService.projectViewAuth(projectId)) {
                     return true                    
                 } else {
                     render(view: '/login/denied')
                     return false
                 }
             }
-        }
-        
-        projectAllAndCreate(controller: 'project', action: 'create|all') {
-            before = {
-                def currUser = springSecurityService.currentUser
-                // only admin is allowed
-                if (currUser.isAdmin()) {
-                    return true
-                } else {
-                    render(view: '/login/denied')
-                    return false
-                }
-            }    
         }
         
         projectEdit(controller:'project', action:'edit|addUserAjax|removeUserAjax|editUserRoleAjax') {
@@ -275,7 +258,7 @@ class SecurityFilters {
         sampleShow(controller:'sample', action:'show') {
             before = {
                 def user = springSecurityService.currentUser
-                if (user.isAdmin() || user.authorities.any { it.authority == "ROLE_MEMBER" }) {
+                if (user.isAdmin() || user.isMember()) {
                     return true
                 } else {
                     def sampleId = params.long('id')

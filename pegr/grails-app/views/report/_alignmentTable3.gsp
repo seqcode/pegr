@@ -17,7 +17,7 @@
                     <td><g:link controller="sample" action="show" id="${alignment.sequencingExperiment?.sample?.id}">${alignment.sequencingExperiment?.sample?.id}</g:link></td>    
                     <td><g:link controller="sequenceRun" action="show" id="${alignment.sequencingExperiment?.sequenceRun?.id}">${alignment.sequencingExperiment?.sequenceRun?.id} (Old ${alignment.sequencingExperiment?.sequenceRun?.runNum}) </g:link></td>
                     <td>${alignment.genome}</td>
-                    <td><g:formatNumber number="${alignment.sequencingExperiment?.adapterCount}" format="###,###,###" /></td>
+                    <td><g:formatNumber number="${alignment.sequencingExperiment?.adapterDimerCount}" format="###,###,###" /></td>
                     <td></td>
                     <td></td>
                     <td>${alignment.genomeCoverage}</td>

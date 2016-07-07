@@ -33,6 +33,22 @@ class SecurityFilters {
             }
         }
         
+        reportShowProject(controller:'report', action:'show') {
+            before = {
+                def currUser = springSecurityService.currentUser
+                if (currUser.isAdmin()) {
+                    return true
+                }
+                def projectId = params.long('id')
+                if (ProjectUser.where {project.id == projectId && user == currUser}.get(max: 1)) {
+                    return true                    
+                } else {
+                    render(view: '/login/denied')
+                    return false
+                }
+            }
+        }
+        
         projectAllAndCreate(controller: 'project', action: 'create|all') {
             before = {
                 def currUser = springSecurityService.currentUser

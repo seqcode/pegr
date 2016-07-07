@@ -1,55 +1,73 @@
 <html>
 <head>
-    <title>My Projects</title> 
+    <title>My Reports</title> 
     <meta name="layout" content="main"/>
 </head>
 <body>
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
-	<div>
-		<h3>Project: ${project?.name} <g:if test="${projectEditAuth}"><g:link action="edit" params="[projectId:project?.id]" class="edit">Edit</g:link></g:if></h3>
-		<p>Created: ${project?.dateCreated}, updated: ${project?.lastUpdated}</p>
-		<p>Description: ${project?.description}</p>
-        <p>Funding: ${project?.funding}</p>
-        
-        <h3>Users <g:if test="${projectEditAuth}"><button class="edit" data-toggle="modal" data-target="#addUser">Add</button></g:if></h3>
+    <div>
+        <h3>${project?.name}</h3>
+        <p>Description: ${project?.description}</p>
+        <p>The number of Samples: </p>
         <div id="project-users">
             <g:render template="userTable"/>
         </div>
-        
-		<h3>Samples <button class="edit" onClick='location.href="/pegr/report/showProject/${project?.id}"'>Report</button></h3>
+        <h3>Samples</h3>
         <ul class="nav nav-tabs">
-            <li class="active"><a data-toggle="tab" href="#sample">Sample Information</a></li>
-            <li><a data-toggle="tab" href="#alignment">Alignment</a></li>
+            <li class="active"><a data-toggle="tab" href="#sample">Description</a></li>
+            <li><a data-toggle="tab" href="#epitope">Epitope Tags & FastQC</a></li>
         </ul>
 
         <div class="tab-content">
             <div id="sample" class="tab-pane fade in active">
-                <g:render template="/project/sampleTable" model="['sampleList':samples, 'project':project]" />
+                <g:render template="/report/sampleTable" model="['sampleList':samples, 'project':project]" />
             </div>
-            <div id="alignment" class="tab-pane fade">
-                <g:render template="/project/alignmentTable" model="['alignmentList':alignments]" />
+            <div id="epitope" class="tab-pane fade">
+                <g:render template="/report/epitopeTable" model="['sampleList':samples]" />
             </div>
         </div>
+        <h3>Mapping Statistics</h3>
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#alignment"> Number of Tags</a></li>
+            <li><a data-toggle="tab" href="#alignment2"> Percentage of Tags</a></li>
+            <li><a data-toggle="tab" href="#alignment3"> Additional Information</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div id="alignment" class="tab-pane in active">
+                <g:render template="/report/alignmentTable" model="['alignmentList':alignments]" />
+            </div>
+            <div id="alignment2" class="tab-pane fade">
+                <g:render template="/report/alignmentTable2" model="['alignmentList':alignments]" />
+            </div>
+            <div id="alignment3" class="tab-pane fade">
+                <g:render template="/report/alignmentTable3" model="['alignmentList':alignments]" />
+            </div>
+        </div>
+        <h3>Downstream Analysis</h3>
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#peak">Peak Statistics</a></li>
+        </ul>
+        
+
+        <div class="tab-content">
+            <div id="peak" class="tab-pane fade in active">
+                <g:render template="/report/peakTable" model="['sampleList':samples, 'project':project]" />
+            </div>
+        </div>
+        <h4> - MEME Motifs</h4>
+        <br><br>
+        <h4> - Tag PileUp</h4>
+        <br><br>
         <div class="pagination">
             <g:paginate id="${project.id}" total="${sampleCount ?: 0}" max="50"/>
         </div>   
-        <g:if test="${sampleEditAuth}">
-            <div>
-                <button data-toggle="modal" data-target="#selectAssay" class="btn btn-info">Create New Samples</button>
-                <g:link action="searchSample" params="[projectId: project?.id]" class="btn btn-info">Add Existing Sample</g:link>
-            </div>
-        </g:if>
-        
-        <h3>Replicates <g:if test="${sampleEditAuth}"><button data-toggle="modal" data-target="#addReplicate" class="edit">Add</button></g:if></h3>
-        <div id="replicates">
-            <g:render template="/replicate/list" model="['replicates':replicates]"></g:render>
-        </div>
     </div>
-    <br/>         
+    </br>          
     
-    <g:if test="${sampleEditAuth}">
+    <g:if test="${authorized}">
         <div id="selectAssay" class="modal fade" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -65,7 +83,7 @@
                             </div>
                             <g:submitButton class="btn btn-primary" name="submit" value="OK"/>
                             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        </g:form>         
+                        </g:form>                    
                     </div>
                 </div>
             </div>
@@ -123,37 +141,15 @@
                 </div>
             </div>
         </div>
-        
-        <div id="addReplicate" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Add Replicate Set</h3>
-                    </div>
-                    <div class="modal-body">
-                        <form role="form" method="post" class="fields">
-                            <div>
-                                <label>Type</label>
-                                <g:select id="replicateType" name="type" from="${pegr.ReplicateType.values()}" keys="${pegr.ReplicateType.values()*.name()}"></g:select>
-                            </div>
-                            <g:render template="/sample/inputSampleIds"></g:render>
-                            <g:hiddenField name="projectId" value="${project.id}"></g:hiddenField>
-                            <g:submitToRemote type="button" class="btn btn-primary" name="save" value="Save" data-dismiss="modal"
-                                              url="[controller: 'replicate', action: 'saveAjax']"
-                                              update="[success: 'replicates']"
-                                              onComplete="closeModal()"/>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
     </g:if>
     
-	<script>
+    <script>
         $(function(){
             $(".confirm").confirm();
             $("#nav-projects").addClass("active");
+            if (!${authorized}) {
+                $(".edit").hide();
+            }
             $("#userId").select2();
         });
 
@@ -173,6 +169,10 @@
         function showEditRole(userId) {
             $(".modal-body #hiddenUserId").val(userId);
         }
+
+        function closeModal() {
+            $(".modal").modal('hide');
+        }
         
         $(function(){
           var hash = window.location.hash;
@@ -185,6 +185,6 @@
             $('html,body').scrollTop(scrollmem);
           });
         });
-	</script>
+    </script>
 </body>
 </html>

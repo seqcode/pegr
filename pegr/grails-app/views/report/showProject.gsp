@@ -14,9 +14,6 @@
         <div id="project-users">
             <g:render template="userTable"/>
         </div>
-        <h3>Experiment Images</h3>
-       
-        <br><br> 
         <h3>Samples</h3>
         <ul class="nav nav-tabs">
             <li class="active"><a data-toggle="tab" href="#sample">Description</a></li>

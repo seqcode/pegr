@@ -144,6 +144,7 @@ grails.plugin.springsecurity.interceptUrlMap = [
 	'/*Admin/**':       ['ROLE_ADMIN'],
     '/project/all/**':          ['ROLE_MEMBER', 'ROLE_ADMIN'],
     '/project/create/**':       ['ROLE_MEMBER', 'ROLE_ADMIN'],
+    '/report/show/**':   ['ROLE_MEMBER', 'ROLE_ADMIN'],
     '/report/showSamples/**':   ['ROLE_MEMBER', 'ROLE_ADMIN'],
     '/protocolInstanceBag/renderFile/**':['permitAll'],
     '/protocolInstanceBag/reopenBag/**':['ROLE_ADMIN'],
@@ -166,17 +167,6 @@ grails.plugin.springsecurity.auth.loginFormUrl = "/login/form"
 grails.plugin.springsecurity.logout.afterLogoutUrl = "/login/form"
 grails.plugin.springsecurity.failureHandler.defaultFailureUrl = "/login/form"
 grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
-
-grails {
-   mail {
-     host = "ucs.psu.edu"
-     port = 587
-     username = "dus73@psu.edu"
-     password = ""
-     props = ["mail.smtp.starttls.enable":"true",				   
-              "mail.smtp.port":"587"]
-   }
-}
 
 environments {
     development {

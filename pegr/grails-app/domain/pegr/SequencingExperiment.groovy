@@ -7,7 +7,6 @@ class SequencingExperiment {
     String readPositions
 	String note
 	ReadType readType 
-    SummaryReport summaryReport
     
     String fastqFile
     String fastqcReport
@@ -40,6 +39,5 @@ class SequencingExperiment {
         totalReads nullable: true
         indexMismatch nullable: true
         adapterDimerCount nullable: true
-        summaryReport nullable: true
 	}
 }

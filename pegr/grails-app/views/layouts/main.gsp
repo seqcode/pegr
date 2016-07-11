@@ -31,6 +31,7 @@
                         <li><g:link controller="sequenceRun">Sequencing</g:link></li>
                     </ul>
                 </li>
+                <li id="nav-reports"><g:link controller="report">Reports</g:link></li>
               </sec:ifAnyGranted>
 	       	<sec:ifAllGranted roles="ROLE_ADMIN"><li id="nav-admin"><g:link controller="admin">Admin</g:link></li></sec:ifAllGranted>
 	      </ul>

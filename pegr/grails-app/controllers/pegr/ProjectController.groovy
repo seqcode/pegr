@@ -96,7 +96,7 @@ class ProjectController {
             def experiments = samples.collect{it.sequencingExperiments}.flatten()
             def alignments = experiments.collect{it.alignments}.flatten()
             def replicates = replicateService.getReplicates(currentProject)
-            [project: currentProject, projectUsers: projectUsers, samples: samples, experiments: experiments, alignments: alignments, sampleCount: currentProject.samples.size(), replicates: replicates, projectEditAuth: projectEditAuth, sampleEditAuth: sampleEditAuth]
+            [project: currentProject, projectUsers: projectUsers, samples: samples, experiments: experiments, alignments: alignments, replicates: replicates, projectEditAuth: projectEditAuth, sampleEditAuth: sampleEditAuth]
         } else {
             flash.message = "Project not found!"
             redirect(action: "index")

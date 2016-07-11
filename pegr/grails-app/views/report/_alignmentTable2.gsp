@@ -5,10 +5,10 @@
                 <th>Sample ID</th>
                 <th>Sequence Run</th>
                 <th>Genome</th>
-                <th>Read Count</th>
-                <th>Mapped Read Count</th>
-                <th>Uniquely Mapped Count</th>
-                <th>Deduplicated Count</th>
+                <th class="text-right">Read Count</th>
+                <th class="text-right">Mapped Read Count</th>
+                <th class="text-right">Uniquely Mapped Count</th>
+                <th class="text-right">Deduplicated Count</th>
             </tr>
         </thead>
         <tbody>
@@ -17,10 +17,10 @@
                     <td><g:link controller="sample" action="show" id="${alignment.sequencingExperiment?.sample?.id}">${alignment.sequencingExperiment?.sample?.id}</g:link></td>    
                     <td><g:link controller="sequenceRun" action="show" id="${alignment.sequencingExperiment?.sequenceRun?.id}">${alignment.sequencingExperiment?.sequenceRun?.id} (Old ${alignment.sequencingExperiment?.sequenceRun?.runNum}) </g:link></td>
                     <td>${alignment.genome}</td>
-                    <td>100%</td>
-                    <td><g:formatNumber number="${alignment.mappedReads/alignment.sequencingExperiment?.totalReads*100}" format="##.#" />%</td>
-                    <td><g:formatNumber number="${alignment.uniquelyMappedReads/alignment.sequencingExperiment?.totalReads*100}" format="##.#" />%</td>
-                    <td><g:formatNumber number="${alignment.dedupUniquelyMappedReads/alignment.sequencingExperiment?.totalReads*100}" format="##.#" />%</td>
+                    <td class="text-right">100%</td>
+                    <td class="text-right"><g:formatNumber number="${alignment.mappedReads?.div(alignment.sequencingExperiment?.totalReads)}" format="##.#%" /></td>
+                    <td class="text-right"><g:formatNumber number="${alignment.uniquelyMappedReads?.div(alignment.sequencingExperiment?.totalReads)}" format="##.#%" /></td>
+                    <td class="text-right"><g:formatNumber number="${alignment.dedupUniquelyMappedReads?.div(alignment.sequencingExperiment?.totalReads)}" format="##.#%" /></td>
                 </tr>
             </g:each>              
             <tr>

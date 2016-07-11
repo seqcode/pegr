@@ -11,4 +11,9 @@ class SummaryReport {
     static mapping = {
         version false
     }
+    
+    String toString() {
+        def name = "${run.id}_${project.name}"
+        return name
+    }
 }

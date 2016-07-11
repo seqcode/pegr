@@ -74,7 +74,7 @@ class AlignmentStatsService {
         return pipeline
     }
     
-    def copyProperties(source, target, historyId) {
+    def copyProperties(source, target) {
         def updatedProperties = []
         def readKey = source.containsKey("read") ? "read${source.read}" : "read"
         source.each { key, value ->
@@ -84,7 +84,7 @@ class AlignmentStatsService {
                     if ( key in ["fastqFile", "fastqcReport"] ) {
                         def dic = [:] 
                         if ( target[key] ) {
-                            // If the target field has already been filled, check the prior historyId.   
+                            // If the target field has already been filled, parse the value.   
                             def jsonSlurper = new JsonSlurper()
                             try {
                                 dic = jsonSlurper.parseText(target[key])
@@ -105,4 +105,5 @@ class AlignmentStatsService {
         }
         return updatedProperties
     }
+
 }

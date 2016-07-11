@@ -20,7 +20,7 @@
                     <td>${sample.antibody}</td>
                     <td>${sample.cellSource} </td>
                     <td>${sample.cellSource?.strain?.geneticModification}</td>
-                    <td>${sample.cellSource.growthMedia}</td>
+                    <td>${sample.cellSource?.growthMedia}</td>
                     <td><g:each in="${sample?.cellSource?.treatments}" var="c">${c}</g:each></td>
                     <td>${sample.assay}</td>
                 </tr>

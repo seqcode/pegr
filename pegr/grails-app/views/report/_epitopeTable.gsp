@@ -13,12 +13,12 @@
             </tr>
         </thead>
         <tbody>
-            <g:each in="${sampleList}" var="sample">
+            <g:each in="${experiments}" var="experiment">
                 <tr>
-                    <td><g:link controller="sample" action="show" id="${sample.id}">${sample.id}</g:link></td>    
-                    <td>${sample.target?.nTermTag}</td>
-                    <td>${sample.target}</td>
-                    <td>${sample.target?.cTermTag}</td>
+                    <td><g:link controller="sample" action="show" id="${experiment.sample?.id}">${experiment.sample?.id}</g:link></td>    
+                    <td>${experiment.sample?.target?.nTermTag}</td>
+                    <td>${experiment.sample?.target}</td>
+                    <td>${experiment.sample?.target?.cTermTag}</td>
                     <td></td>
                     <td></td>
                     <td></td>

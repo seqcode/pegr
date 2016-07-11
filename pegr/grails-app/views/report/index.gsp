@@ -7,20 +7,32 @@
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
-    <sec:ifAllGranted roles="ROLE_ADMIN">
-    <div>
-        <g:link action='index'  class="btn btn-info active">My Projects</g:link>
-        <g:link action='all'  class="btn btn-info" >All Projects</g:link>
-        <g:link action='create'  class="btn btn-info" ><span class="glyphicon glyphicon-plus"></span>Add Project</g:link>
-    </sec:ifAllGranted>
-    <ul class="list-group" id="allProjects">
-        <g:render template="overview" collection="${projects}" var="project"/>
-    </ul>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <g:sortableColumn property="run.id" title="Sequnece Run"></g:sortableColumn>
+                <g:sortableColumn property="project.id" title="Project"></g:sortableColumn>
+                <th>Summary Report</th>
+            </tr>
+        </thead>
+        <tbody>
+            <g:each in="${reports}" var="report">
+                <tr>
+                    <td><g:link controller="sequenceRun" action="show" id="${report.run.id}">Run#${report.run.id}</g:link></td>
+                    <td><g:link controller="project" action="show" id="${report.project.id}">${report.project.name}</g:link></td>
+                    <td><g:link action="show" id="${report.id}">${report}</g:link></td>
+                </tr>
+            </g:each>              
+            <tr>
+                <td colspan="4"></td>
+            </tr>
+        </tbody>
+      </table>
     <div class="pagination">
-        <g:paginate next="Next" prev="Prev" controller="project" action="index" max="15" total="${totalCount ?: 0}" />
+        <g:paginate next="Next" prev="Prev" controller="report" action="index" max="25" total="${totalCount ?: 0}" />
     </div>
      <script>
-        $("#nav-projects").addClass("active");
+        $("#nav-reports").addClass("active");
      </script>
 </body>
 </html>

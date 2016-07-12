@@ -1,4 +1,5 @@
 package pegr
+import groovy.json.*
 
 class SequenceAlignment {
 	SequencingExperiment sequencingExperiment
@@ -19,6 +20,7 @@ class SequenceAlignment {
 	Float avgInsertSize
     Float stdDevInsertSize
     Float genomeCoverage
+    SummaryReport summaryReport
     
     static constraints = {
 		readDbId nullable: true
@@ -36,6 +38,7 @@ class SequenceAlignment {
         avgInsertSize nullable: true
         stdDevInsertSize nullable: true
         genomeCoverage nullable: true
+        summaryReport nullable: true
     }
     
     static mapping = {

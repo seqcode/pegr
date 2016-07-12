@@ -10,7 +10,7 @@ class SampleController {
     def itemService
     def utilityService
     
-    def index(Integer max) {
+    def all(Integer max) {
         params.max = Math.min(max ?: 15, 100)
         if (!params.sort) {
             params.sort = "id"

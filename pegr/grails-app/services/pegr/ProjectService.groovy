@@ -75,6 +75,20 @@ class ProjectService {
         return unknownSampleIds
     }
     
+    /**
+     * ADMIN, MEMBER and project users are allow to view the project
+     */
+    def projectViewAuth(Long projectId) {
+        def authorized = false
+        def currUser = springSecurityService.currentUser
+        if (currUser.isAdmin() 
+            || currUser.isMember()
+            || (ProjectUser.where {project.id == projectId && user == currUser}.get(max: 1))) {
+            authorized = true
+        }
+        return authorized
+    }
+    
     def projectEditAuth(Project project) {
         def authorized = false
         def currUser = springSecurityService.currentUser

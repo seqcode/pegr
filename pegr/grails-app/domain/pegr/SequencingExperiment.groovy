@@ -12,7 +12,7 @@ class SequencingExperiment {
     String fastqcReport
     Long totalReads
     Integer indexMismatch
-    Long adapterCount
+    Long adapterDimerCount
 	
     List getAlignments() {
         return SequenceAlignment.where{sequencingExperiment == this}.list()
@@ -38,6 +38,6 @@ class SequencingExperiment {
         fastqcReport nullable: true, blank: true, maxSize: 1000
         totalReads nullable: true
         indexMismatch nullable: true
-        adapterCount nullable: true
+        adapterDimerCount nullable: true
 	}
 }

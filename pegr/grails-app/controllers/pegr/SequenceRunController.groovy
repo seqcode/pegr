@@ -39,7 +39,8 @@ class SequenceRunController {
                 def jsonSlurper = new JsonSlurper()
                 read = jsonSlurper.parseText(run.experiments[0].readPositions)           
             }
-            [run: run, read: read]
+            def reports = SummaryReport.findAllByRun(run)
+            [run: run, read: read, reports: reports]
         } else {
             flash.message = "Sequence run not found!"
             redirect(action: "index")
@@ -315,4 +316,5 @@ class SequenceRunController {
 
         redirect(action: "index")
     }
+    
 }

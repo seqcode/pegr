@@ -35,7 +35,6 @@ class AlignmentStatsService {
         }
         // save the data
         def statisticsStr = data.statistics ? JsonOutput.toJson(data.statistics) : null
-        log.error data.datasets
         def datasetsStr = data.datasets ? JsonOutput.toJson(data.datasets) : null
         def analysis = new Analysis(alignment: alignment,
                                     tool: data.toolId,
@@ -53,13 +52,13 @@ class AlignmentStatsService {
 
         // store named fields
         if (data.statistics) {
-            def updatedInAlignment = copyProperties(data.statistics, alignment, data.historyId)
+            def updatedInAlignment = copyProperties(data.statistics, alignment)
             if (updatedInAlignment.size() > 0) {
                 if (!alignment.save()) {
                     log.error "Error saving ${updatedInAlignment} in Alignment!"
                 }
             } 
-            def updatedInExperiment = copyProperties(data.statistics, experiment, data.historyId)
+            def updatedInExperiment = copyProperties(data.statistics, experiment)
             if (updatedInExperiment.size() > 0) {
                 if (!experiment.save()) {
                     log.error "Error saving ${updatedInExperiment} in Experiment!"
@@ -75,36 +74,24 @@ class AlignmentStatsService {
         return pipeline
     }
     
-    def copyProperties(source, target, historyId) {
+    def copyProperties(source, target) {
         def updatedProperties = []
+        def readKey = source.containsKey("read") ? "read${source.read}" : "read"
         source.each { key, value ->
-            if (target.hasProperty(key) && value != null) {
+            if (key != "read" && target.hasProperty(key) && value != null) {
                 try {
                     // Special handling of fastqFile and fastqcReport: there could be two files for each sample.
                     if ( key in ["fastqFile", "fastqcReport"] ) {
-                        def dic = null
+                        def dic = [:] 
                         if ( target[key] ) {
-                            // If the target field has already been filled, check the prior historyId.   
+                            // If the target field has already been filled, parse the value.   
                             def jsonSlurper = new JsonSlurper()
                             try {
                                 dic = jsonSlurper.parseText(target[key])
-                                if (dic.historyId == historyId) {
-                                    // if the historyId is the same, add the new file; else overide.
-                                    if (!(value in dic.files)) {
-                                        while (dic.files.size() > 1) {
-                                            dic.files.pop()
-                                        }
-                                        dic.files.push(value)
-                                    }
-                                } else {
-                                    dic = null
-                                }
                             } catch (Exception e) {
                             }                          
-                        } 
-                        if (!dic) {
-                            dic = [historyId: historyId, files: [value]]
-                        }   
+                        }
+                        dic[readKey] = value
                         target[key] = JsonOutput.toJson(dic)
                     } else {
                         target[key] = value
@@ -118,4 +105,5 @@ class AlignmentStatsService {
         }
         return updatedProperties
     }
+
 }

@@ -62,6 +62,7 @@ select s.id, r.run_num, i.invoice_num from sample s join invoice i on s.invoice_
 
 // update user set affiliation_id = 81 where username = "bfp2"; // check affiliation_id! "labadmin"
 
+/*
 insert into read_type (version, short_name, name) values (0, "PE","Paired End");
 insert into read_type (version, short_name, name) values (0, "SR","Single Read");
 
@@ -81,3 +82,5 @@ update sequencing_experiment set read_positions = '{"rd1":["1","40"],"index1":["
 
 update user set enabled = false;
 update user set enabled = true where id in (1,3, 173);
+*/
+

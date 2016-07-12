@@ -139,21 +139,23 @@ grails.plugin.springsecurity.interceptUrlMap = [
     '/user/register':   ['permitAll'],
     '/login/**':        ['permitAll'],
 	'/logout/**':       ['permitAll'],
-    '/api/**':     ['permitAll'],
+    '/api/**':          ['permitAll'],
 	'/admin/**':        ['ROLE_ADMIN'],
 	'/*Admin/**':       ['ROLE_ADMIN'],
-    '/project/all/**':  ['ROLE_ADMIN'],
-    '/project/create/**':['ROLE_ADMIN'],
+    '/project/all/**':          ['ROLE_MEMBER', 'ROLE_ADMIN'],
+    '/project/create/**':       ['ROLE_MEMBER', 'ROLE_ADMIN'],
+    '/report/all/**':           ['ROLE_MEMBER', 'ROLE_ADMIN'],
+    '/report/showSamples/**':   ['ROLE_MEMBER', 'ROLE_ADMIN'],
     '/protocolInstanceBag/renderFile/**':['permitAll'],
     '/protocolInstanceBag/reopenBag/**':['ROLE_ADMIN'],
     '/protocolInstanceBag/deleteBag/**':['ROLE_ADMIN'],
-    '/protocolInstanceBag/**': ['ROLE_MEMBER', 'ROLE_ADMIN'],
-    '/item/**':         ['ROLE_MEMBER', 'ROLE_ADMIN'],
-    '/antibody/**':     ['ROLE_MEMBER', 'ROLE_ADMIN'],
-    '/protocol/**':         ['ROLE_MEMBER', 'ROLE_ADMIN'],
-    '/sample/saveBarcode/**': ['ROLE_MEMBER', 'ROLE_ADMIN'],
-    '/sample/index/**':       ['ROLE_MEMBER', 'ROLE_ADMIN'],
-    '/sample/search/**':      ['ROLE_MEMBER', 'ROLE_ADMIN'],
+    '/protocolInstanceBag/**':  ['ROLE_MEMBER', 'ROLE_ADMIN'],
+    '/item/**':                 ['ROLE_MEMBER', 'ROLE_ADMIN'],
+    '/antibody/**':             ['ROLE_MEMBER', 'ROLE_ADMIN'],
+    '/protocol/**':             ['ROLE_MEMBER', 'ROLE_ADMIN'],
+    '/sample/saveBarcode/**':   ['ROLE_MEMBER', 'ROLE_ADMIN'],
+    '/sample/all/**':           ['ROLE_MEMBER', 'ROLE_ADMIN'],
+    '/sample/search/**':        ['ROLE_MEMBER', 'ROLE_ADMIN'],
     '/sequenceRun/upload/**':     ['ROLE_ADMIN'],
     '/sequenceRun/convertCsv/**': ['ROLE_ADMIN'],
     '/sequenceRun/create/**':     ['ROLE_ADMIN'],
@@ -165,17 +167,6 @@ grails.plugin.springsecurity.auth.loginFormUrl = "/login/form"
 grails.plugin.springsecurity.logout.afterLogoutUrl = "/login/form"
 grails.plugin.springsecurity.failureHandler.defaultFailureUrl = "/login/form"
 grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
-
-grails {
-   mail {
-     host = "ucs.psu.edu"
-     port = 587
-     username = "dus73@psu.edu"
-     password = ""
-     props = ["mail.smtp.starttls.enable":"true",				   
-              "mail.smtp.port":"587"]
-   }
-}
 
 environments {
     development {

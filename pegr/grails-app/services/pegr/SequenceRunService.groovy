@@ -186,11 +186,44 @@ class SequenceRunService {
              throw new SequenceRunException(message: "Sequence run has already been submitted!")
         }
         
-        walleService.addToQueue(runId)
+        // create summary reports
+        createSummaryReports(run)
         
         // start the run by creating a job on remote server
         run.status = RunStatus.QUEUE
         run.save()
+                
+        walleService.addToQueue(runId)
+    }
+    
+    /*
+     * Create summary reports for each project linked to the samples inside the 
+     * sequence run. And link the alignments to the corresponding summary reports. 
+     */
+    @Transactional
+    def createSummaryReports(SequenceRun run) {        
+        def reports = []
+        run.experiments.each { experiment ->
+            def projects = experiment.sample?.projects
+            if (projects && projects.size() > 0) {
+                def project = projects.first()
+                def report = reports.find {it.project == project}
+                if (!report) {
+                    report = SummaryReport.findByRunAndProject(run, project)
+                    if (!report) {
+                        report = new SummaryReport(run: run, project: project)
+                        report.save()
+                    }
+                    reports << report
+                }
+                experiment.alignments.each { alignment ->
+                    alignment.summaryReport = report
+                    alignment.save()
+                } 
+            } else {
+                throw new SequenceRunException(message: "Sample ${experiment.sample?.id} is not linked to a project yet!")
+            }
+        }        
     }
     
     def getCalendarTimeString(Date time) {

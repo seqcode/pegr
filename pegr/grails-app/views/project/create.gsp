@@ -18,6 +18,7 @@
     <g:form action='create' method="post" role="form" useToken="true">
         <g:render template='info' bean='${project}'/>
         <g:submitButton name='save' value='Save' class="btn btn-primary"/>
+        <g:link class="btn btn-default">Cancel</g:link>
     </g:form>
     <script>
         $("#nav-projects").addClass("active");

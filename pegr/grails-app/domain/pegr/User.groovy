@@ -51,6 +51,10 @@ class User implements Serializable {
     boolean isAdmin() {
         return this.authorities.any { it.authority == "ROLE_ADMIN" }
     }
+    
+    boolean isMember() {
+        return this.authorities.any { it.authority == "ROLE_MEMBER" }
+    }
 
 	static transients = ['springSecurityService']
 

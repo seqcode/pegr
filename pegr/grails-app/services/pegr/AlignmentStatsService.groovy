@@ -52,13 +52,13 @@ class AlignmentStatsService {
 
         // store named fields
         if (data.statistics) {
-            def updatedInAlignment = copyProperties(data.statistics, alignment, data.historyId)
+            def updatedInAlignment = copyProperties(data.statistics, alignment)
             if (updatedInAlignment.size() > 0) {
                 if (!alignment.save()) {
                     log.error "Error saving ${updatedInAlignment} in Alignment!"
                 }
             } 
-            def updatedInExperiment = copyProperties(data.statistics, experiment, data.historyId)
+            def updatedInExperiment = copyProperties(data.statistics, experiment)
             if (updatedInExperiment.size() > 0) {
                 if (!experiment.save()) {
                     log.error "Error saving ${updatedInExperiment} in Experiment!"

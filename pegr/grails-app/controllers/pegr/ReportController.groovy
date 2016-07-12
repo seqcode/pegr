@@ -52,8 +52,3 @@ class ReportController {
         
     }
 }
-
-class DownstreamAnalysisCommand {
-    String peakCallingParams
-    Long numberOfPeaks
-}

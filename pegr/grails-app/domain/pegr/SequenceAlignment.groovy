@@ -22,30 +22,6 @@ class SequenceAlignment {
     Float genomeCoverage
     SummaryReport summaryReport
     
-    def getAnalysis() {
-        def result = new DownstreamAnalysisCommand()
-        def analysis = Analysis.findByAlignment(this)
-        def jsonSlurper = new JsonSlurper()
-        analysis.each {
-            def statistics = jsonSlurper.parseText(it.statistics)
-            copyProperties(statistics, result)
-        }
-        return result
-    }
-    
-    def copyProperties(source, target) {
-        source.each { key, value ->
-            if (target.hasProperty(key) && value != null) {
-                try {
-                    target[key] = value
-                } catch(org.codehaus.groovy.runtime.typehandling.GroovyCastException e) {
-                    log.error e
-                    throw new AlignmentStatsException(message: e.message)
-                }                
-            }
-        }
-    }
-    
     static constraints = {
 		readDbId nullable: true
         aligner nullable: true

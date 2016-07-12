@@ -18,20 +18,11 @@
             <g:render template="userTable"/>
         </div>
         
-		<h3>Samples <button class="edit" onClick='location.href="/pegr/report/showProject/${project?.id}"'>Report</button></h3>
-        <ul class="nav nav-tabs">
-            <li class="active"><a data-toggle="tab" href="#sample">Sample Information</a></li>
-            <li><a data-toggle="tab" href="#alignment">Alignment</a></li>
-        </ul>
-
-        <div class="tab-content">
-            <div id="sample" class="tab-pane fade in active">
-                <g:render template="/project/sampleTable" model="['sampleList':samples, 'project':project]" />
-            </div>
-            <div id="alignment" class="tab-pane fade">
-                <g:render template="/project/alignmentTable" model="['alignmentList':alignments]" />
-            </div>
+        <h3>Samples</h3>
+        <div id="sample" class="tab-pane fade in active">
+            <g:render template="/project/sampleTable" model="['sampleList':samples, 'project':project]" />
         </div>
+
         <div class="pagination">
             <g:paginate id="${project.id}" total="${sampleCount ?: 0}" max="50"/>
         </div>   
@@ -40,12 +31,19 @@
                 <button data-toggle="modal" data-target="#selectAssay" class="btn btn-info">Create New Samples</button>
                 <g:link action="searchSample" params="[projectId: project?.id]" class="btn btn-info">Add Existing Sample</g:link>
             </div>
-        </g:if>
-        
+        </g:if>            
+            
         <h3>Replicates <g:if test="${sampleEditAuth}"><button data-toggle="modal" data-target="#addReplicate" class="edit">Add</button></g:if></h3>
         <div id="replicates">
             <g:render template="/replicate/list" model="['replicates':replicates]"></g:render>
         </div>
+                
+        <h3>Summary Reports</h3>
+        <ul>
+            <g:each in="${reports}">
+                <g:link controller="report" action="show" id="${it.id}">${it}</g:link> 
+            </g:each>
+        </ul>
     </div>
     <br/>         
     

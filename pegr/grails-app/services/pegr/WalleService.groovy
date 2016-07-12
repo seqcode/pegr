@@ -98,7 +98,6 @@ class WalleService {
         updatePriorRunFolder(newFolder)
         log.info "WallE service has sent the info of run ${run.id} to Wall E."
     }
-
     
     def getQueuedRunIds() {
         def runIds = []

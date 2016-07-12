@@ -93,10 +93,9 @@ class ProjectController {
             def projectEditAuth = projectService.projectEditAuth(currentProject)
             def sampleEditAuth = projectService.sampleEditAuth(currentProject)
             def samples = ProjectSamples.where {project==currentProject}.list(params).collect{it.sample}
-            def experiments = samples.collect{it.sequencingExperiments}.flatten()
-            def alignments = experiments.collect{it.alignments}.flatten()
+            def reports = SummaryReport.findByProject(currentProject)
             def replicates = replicateService.getReplicates(currentProject)
-            [project: currentProject, projectUsers: projectUsers, samples: samples, experiments: experiments, alignments: alignments, replicates: replicates, projectEditAuth: projectEditAuth, sampleEditAuth: sampleEditAuth]
+            [project: currentProject, projectUsers: projectUsers, samples: samples, reports: reports, replicates: replicates, projectEditAuth: projectEditAuth, sampleEditAuth: sampleEditAuth]
         } else {
             flash.message = "Project not found!"
             redirect(action: "index")

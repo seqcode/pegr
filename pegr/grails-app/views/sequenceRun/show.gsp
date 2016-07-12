@@ -93,6 +93,12 @@
             </tbody>
         </table>
     </g:if>
+    <h3>Summary Reports</h3>
+    <ul>
+        <g:each in="${reports}">
+            <li><g:link controller="report" action="show" id="${it.id}">${it}</g:link></li>
+        </g:each>
+    </ul>
     <div class="row well text-center">
         <g:if test="${run.status == pegr.RunStatus.PREP}">
             <g:link action="previewRun" params="[runId: run.id]" class="btn btn-success">Submit</g:link>

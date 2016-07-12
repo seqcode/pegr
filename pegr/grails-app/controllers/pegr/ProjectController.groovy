@@ -93,7 +93,7 @@ class ProjectController {
             def projectEditAuth = projectService.projectEditAuth(currentProject)
             def sampleEditAuth = projectService.sampleEditAuth(currentProject)
             def samples = ProjectSamples.where {project==currentProject}.list(params).collect{it.sample}
-            def reports = SummaryReport.findByProject(currentProject)
+            def reports = SummaryReport.findAllByProject(currentProject)
             def replicates = replicateService.getReplicates(currentProject)
             [project: currentProject, projectUsers: projectUsers, samples: samples, reports: reports, replicates: replicates, projectEditAuth: projectEditAuth, sampleEditAuth: sampleEditAuth]
         } else {

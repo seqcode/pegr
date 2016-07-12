@@ -6,7 +6,7 @@ class ReportController {
     def projectService
     def sampleService
 
-    def index(Integer max) {
+    def all(Integer max) {
         params.max = Math.min(max ?: 25, 100)
         def reports = SummaryReport.list(params)
         def totalCount = SummaryReport.count()

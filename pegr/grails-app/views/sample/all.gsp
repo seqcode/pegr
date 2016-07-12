@@ -15,7 +15,7 @@
         <g:render template="table" model="['sampleList':sampleList]"></g:render>
     </g:form>
     <div class="pagination">
-        <g:paginate next="Next" prev="Prev" controller="sample" action="index" max="15" total="${sampleCount ?: 0}" />
+        <g:paginate next="Next" prev="Prev" controller="sample" action="all" max="15" total="${sampleCount ?: 0}" />
     </div>
 
     <script>

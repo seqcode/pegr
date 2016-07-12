@@ -2851,4 +2851,6 @@ databaseChangeLog = {
 	include file: 'mergeReplicates.groovy'
 
 	include file: 'addSummaryReport.groovy'
+
+	include file: 'changeTreatmentNoteType.groovy'
 }

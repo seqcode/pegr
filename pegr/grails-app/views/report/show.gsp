@@ -10,7 +10,7 @@
     <div>
         <h2>Summary Report</h2>
         <g:if test="${project}">
-            <h3>Project: ${project?.name}</h3>
+            <h3>Project: <g:link controller="project" action="show" id="${project.id}">${project?.name}</g:link></h3>
             <p>Description: ${project?.description}</p>
             <p>The number of Samples: ${samples?.size()}</p>
             <div id="project-users">

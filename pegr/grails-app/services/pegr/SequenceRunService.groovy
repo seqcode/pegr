@@ -186,14 +186,14 @@ class SequenceRunService {
              throw new SequenceRunException(message: "Sequence run has already been submitted!")
         }
         
-        walleService.addToQueue(runId)
+        // create summary reports
+        createSummaryReports(run)
         
         // start the run by creating a job on remote server
         run.status = RunStatus.QUEUE
         run.save()
-
-        // create summary reports
-        createSummaryReports(run)
+                
+        walleService.addToQueue(runId)
     }
     
     /*
@@ -209,14 +209,19 @@ class SequenceRunService {
                 def project = projects.first()
                 def report = reports.find {it.project == project}
                 if (!report) {
-                    report = new SummaryReport(run: run, project: project)
-                    report.save()
+                    report = SummaryReport.findByRunAndProject(run, project)
+                    if (!report) {
+                        report = new SummaryReport(run: run, project: project)
+                        report.save()
+                    }
                     reports << report
                 }
-                experiment.alignments.each {
-                    it.summaryReport = report
-                    it.save()
+                experiment.alignments.each { alignment ->
+                    alignment.summaryReport = report
+                    alignment.save()
                 } 
+            } else {
+                throw new SequenceRunException(message: "Sample ${experiment.sample?.id} is not linked to a project yet!")
             }
         }        
     }

@@ -18,7 +18,7 @@
 	    <div class="collapse navbar-collapse" id="myNavbar">
 	      <ul class="nav navbar-nav">
               <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MEMBER">
-  	             <li id="nav-metadata"><g:link controller="sample">Metadata</g:link></li>
+  	             <li id="nav-metadata"><g:link controller="sample" action="all">Metadata</g:link></li>
               </sec:ifAnyGranted>
 	          <li id="nav-projects"><g:link controller="project">My Projects</g:link></li>
               <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MEMBER">
@@ -31,7 +31,7 @@
                         <li><g:link controller="sequenceRun">Sequencing</g:link></li>
                     </ul>
                 </li>
-                <li id="nav-reports"><g:link controller="report">Reports</g:link></li>
+                <li id="nav-reports"><g:link controller="report" action="all">Reports</g:link></li>
               </sec:ifAnyGranted>
 	       	<sec:ifAllGranted roles="ROLE_ADMIN"><li id="nav-admin"><g:link controller="admin">Admin</g:link></li></sec:ifAllGranted>
 	      </ul>

@@ -45,6 +45,23 @@ class SecurityFilters {
             }
         }
         
+        /*
+         * The authorization to view a summary report is the same as 
+         * that of viewing the project that the report belongs to.
+         */
+        reportShow(controller:'report', action:'show') {
+            before = {
+                def reportId = params.long('id')
+                def projectId = SummaryReport.get(reportId)?.project?.id
+                if (projectService.projectViewAuth(projectId)) {
+                    return true                    
+                } else {
+                    render(view: '/login/denied')
+                    return false
+                }
+            }
+        }
+        
         projectEdit(controller:'project', action:'edit|addUserAjax|removeUserAjax|editUserRoleAjax') {
             before = {
                 def project = Project.get(params.long('projectId'))

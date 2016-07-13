@@ -6,6 +6,7 @@ class ProtocolInstanceBagController {
     def springSecurityService
     def protocolInstanceBagService
     def protocolService
+    def barcodeService
     
     def index() {
         redirect(action: "processingBags", params: params )
@@ -230,31 +231,41 @@ class ProtocolInstanceBagController {
     
     def previewItemInInstance(Long typeId, String barcode, Long instanceId) {
         def itemType = ItemType.get(typeId)
-        def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
-        if (itemType.category == ItemTypeCategory.SAMPLE_POOL) {
-            def instance = ProtocolInstance.get(instanceId)
-            if (instance) {
-                if (instance.protocol.startPoolType == itemType && item) {
-                    // start pool must be pre-existing    
-                    render(view: "previewPoolInInstance", model: [instanceId: instanceId, item:item])
-                } else if (instance.protocol.endPoolType == itemType && !item) {
-                    // end pool must be new
-                    item = new Item(type: itemType, barcode: barcode)
-                    render(view: "createItemInInstance", model: [instanceId: instanceId, item:item])    
-                } else {
-                    flash.message = "Start pool must be pre-existing and end pool must be new!"
-                    redirect(action: "showInstance", id: instanceId)
-                }
-            } else {
-                flash.message = "Protocol instance not found!"
-                redirect(action: "processingBags")
+        if (params.generate) {
+            try {
+                barcode = barcodeService.generateBarcode()
+                render(view: "generateBarcode", model: [itemType: itemType, barcode: barcode, instanceId: instanceId])
+            } catch (BarcodeException e) {
+                flash.message = e.message
+                redirect(action: "showInstance", id: instanceId)
             }
         } else {
-            if (item) {
-                render(view:"previewItemInInstance", model: [item: item, instanceId: instanceId])
-            }else {
-                item = new Item(type: itemType, barcode: barcode)
-                render(view: "createItemInInstance", model: [instanceId: instanceId, item:item])
+            def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
+            if (itemType.category == ItemTypeCategory.SAMPLE_POOL) {
+                def instance = ProtocolInstance.get(instanceId)
+                if (instance) {
+                    if (instance.protocol.startPoolType == itemType && item) {
+                        // start pool must be pre-existing    
+                        render(view: "previewPoolInInstance", model: [instanceId: instanceId, item:item])
+                    } else if (instance.protocol.endPoolType == itemType && !item) {
+                        // end pool must be new
+                        item = new Item(type: itemType, barcode: barcode)
+                        render(view: "createItemInInstance", model: [instanceId: instanceId, item:item])    
+                    } else {
+                        flash.message = "Start pool must be pre-existing and end pool must be new!"
+                        redirect(action: "showInstance", id: instanceId)
+                    }
+                } else {
+                    flash.message = "Protocol instance not found!"
+                    redirect(action: "processingBags")
+                }
+            } else {
+                if (item) {
+                    render(view:"previewItemInInstance", model: [item: item, instanceId: instanceId])
+                }else {
+                    item = new Item(type: itemType, barcode: barcode)
+                    render(view: "createItemInInstance", model: [instanceId: instanceId, item:item])
+                }
             }
         }
     }

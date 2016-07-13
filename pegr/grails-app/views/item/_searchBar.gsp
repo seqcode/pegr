@@ -5,8 +5,9 @@
     </div>        
     <div class="form-group">
         <label for="barcode">Barcode</label>
-         <g:textField id="barcode" name="barcode" />
+        <g:textField id="barcode" name="barcode" />
         <button type="button" onclick="getScan();"><span class="glyphicon glyphicon-qrcode"></span></button>
     </div>
     <g:submitButton class="btn btn-primary btn-sm" name="search" value="Search/Create"/>
+    <g:submitButton class="btn btn-primary btn-sm" name="generate" value="Generate Barcode"/>
 </g:form> 

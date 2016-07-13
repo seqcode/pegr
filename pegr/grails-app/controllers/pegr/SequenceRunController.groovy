@@ -241,29 +241,34 @@ class SequenceRunController {
     }
     
     def previewRun(Long runId) {
-        def previousRun = walleService.getPreviousRun()
-        def newFolders = walleService.getNewRunFolders()
-        def queuedRunIds = walleService.getQueuedRunIds()
-        def queuedRuns = []
-        queuedRunIds.eachWithIndex { id, n ->
-             def run = SequenceRun.get(Long.parseLong(id))
-            queuedRuns.push([id: id, 
-                             runNum: run?.runNum, 
-                             directoryName: n < newFolders.size() ? newFolders[n] : null])
+        try {
+            def previousRun = walleService.getPreviousRun()
+            def newFolders = walleService.getNewRunFolders()
+            def queuedRunIds = walleService.getQueuedRunIds()
+            def queuedRuns = []
+            queuedRunIds.eachWithIndex { id, n ->
+                 def run = SequenceRun.get(Long.parseLong(id))
+                queuedRuns.push([id: id, 
+                                 runNum: run?.runNum, 
+                                 directoryName: n < newFolders.size() ? newFolders[n] : null])
 
+            }
+            def currentRun = [id: runId,
+                              runNum: SequenceRun.get(runId)?.runNum,
+                              directoryName: queuedRunIds.size() < newFolders.size() ? newFolders[queuedRunIds.size()] : null]
+            def startTime
+            use(TimeCategory) {
+                def now = new Date() 
+                startTime = now.clearTime() + 10.hours + 1.week
+            }
+            [previousRun: previousRun,
+             queuedRuns: queuedRuns,
+             currentRun: currentRun,
+             meetingTime: startTime]
+        } catch (Exception e) {
+            flash.message = "Error connecting to Wall E!"
+            redirect(action: "show", id: runId)
         }
-        def currentRun = [id: runId,
-                          runNum: SequenceRun.get(runId)?.runNum,
-                          directoryName: queuedRunIds.size() < newFolders.size() ? newFolders[queuedRunIds.size()] : null]
-        def startTime
-        use(TimeCategory) {
-            def now = new Date() 
-            startTime = now.clearTime() + 10.hours + 1.week
-        }
-        [previousRun: previousRun,
-         queuedRuns: queuedRuns,
-         currentRun: currentRun,
-         meetingTime: startTime]
     }
     
     def run(Long runId) {
@@ -272,7 +277,7 @@ class SequenceRunController {
             redirect(action: "show", id: runId)
         } catch(SequenceRunException e) {
             flash.message = e.message
-            redirect(action: "edit", params: [runId: runId])
+            redirect(action: "show", id: runId)
         }
     }
     

@@ -37,9 +37,9 @@ class ProtocolInstanceBagController {
         [protocolGroups: protocolGroups, user: user]
     }
     
-    def savePrtclInstBag() {        
+    def savePrtclInstBag(Long protocolGroupId, String bagName) {        
         try {
-            def prtclInstBag = (params.protocolInput == "defined") ? protocolInstanceBagService.savePrtclInstBagByGroup(Long.parseLong(params.protocolGroupId), params.bagName, params.startTime) : protocolInstanceBagService.savePrtclInstBagByProtocols(params.list('protocols'), params.bagName, params.startTime)
+            def prtclInstBag = (params.protocolInput == "defined") ? protocolInstanceBagService.savePrtclInstBagByGroup(protocolGroupId, bagName, params.startTime) : protocolInstanceBagService.savePrtclInstBagByProtocols(params.list('protocols'), bagName, params.startTime)
             redirect(action: "showBag", id: prtclInstBag.id)
         }catch( ProtocolInstanceBagException e) {
             flash.message = e.message
@@ -52,7 +52,10 @@ class ProtocolInstanceBagController {
         def protocolInstances = ProtocolInstance.where { bag.id == id}.list(sort: "bagIdx", order: "asc")
         def count = protocolInstances.count{it.status == ProtocolStatus.COMPLETED}
         def completed = (bag.status == ProtocolStatus.COMPLETED)
-        def toBeCompleted = (bag.status != ProtocolStatus.COMPLETED && protocolInstances.last().status == ProtocolStatus.COMPLETED)
+        def toBeCompleted
+        if (protocolInstances.size() > 0) {
+            toBeCompleted = (bag.status != ProtocolStatus.COMPLETED && protocolInstances.last().status == ProtocolStatus.COMPLETED)
+        }
         if (bag) {
             [bag:bag, count: count, protocolInstances: protocolInstances, completed: completed, toBeCompleted: toBeCompleted]
         }else {

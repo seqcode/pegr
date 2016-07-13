@@ -32,7 +32,7 @@
                         <label for="name">Name	<span class="required-indicator">*</span></label>
                         <g:textField name="name" required="" value="${protocolGroupInstance?.name}"/>
                     </div>
-					<g:render template="form"/>
+					<g:render template="form" model="[protocolGroup: protocolGroupInstance]"/>
 				</fieldset>
 				<fieldset class="buttons">
 					<g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />

@@ -2,7 +2,6 @@
 
 <h4>Protocols <a href="#" class="edit" onclick="window.open('${g.createLink(controller: 'protocol', action:'create')}', 'Create Protocol', 'width=800, height=600')">New</a> </h4>
 <div class="row" id="select-protocols">
-    <g:hiddenField name="protocolGroupId" value="${protocolGroup?.id}"></g:hiddenField>
     <div class="col-sm-5">
        <g:select name="from[]" id="search" class="form-control" multiple="multiple" from="${pegr.Protocol.list()}" optionKey="id" ></g:select>
     </div>

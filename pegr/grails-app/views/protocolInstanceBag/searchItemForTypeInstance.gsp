@@ -29,10 +29,12 @@
             <button type="button" onclick="getScan();"><span class="glyphicon glyphicon-qrcode"></span> Scan</button>
         </div>
         <g:submitButton class="btn btn-primary" name="search" value="Search Or Create"/>
+        <g:submitButton class="btn btn-primary" name="generate" value="Generate Barcode"/>
     </g:form>                    
 
     <script>
         $("#nav-bench").addClass("active");
+        $("select").select2();
      </script>
 </div>
 </body>

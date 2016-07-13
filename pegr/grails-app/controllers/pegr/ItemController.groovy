@@ -8,6 +8,7 @@ class ItemController {
     def private final allowedTypes = ['image/png':'png', 'image/jpeg':'jpg', 'image/jpg':'jpg', 'image/gif':'gif']
     
     def itemService
+    def barcodeService
     
     def index(){
         redirect(action: "list", params: [typeId: 1])
@@ -21,6 +22,7 @@ class ItemController {
         def itemType = ItemType.get(typeId)
         switch (itemType.category) {
             case ItemTypeCategory.ANTIBODY:
+                flash.message = flash.message
                 redirect(controller: "antibody", action: "list", params: params)
                 break
             default:
@@ -55,39 +57,49 @@ class ItemController {
     }
   
     def preview(Long typeId, String barcode) {
-        if (barcode?.trim()){
-            def itemType = typeId ? ItemType.get(typeId):null
-            if (itemType) { 
-                def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
-                if (item) {
-                    switch (itemType.category) {
-                        case ItemTypeCategory.ANTIBODY:
-                            def antibody = Antibody.findByItem(item)
-                            redirect(controller: "antibody", action: "show", id: antibody?.id)
-                            break
-                        default:
-                            redirect(action: "show", id: item.id)
-                    }
-                }else {
-                    item = new Item(type: itemType, barcode: barcode)
-                    switch (itemType.category) {
-                        case ItemTypeCategory.ANTIBODY:
-                            render(view: "/antibody/create", model: [item:item])
-                            break
-                        case ItemTypeCategory.TRACED_SAMPLE:
-                            render(view: "/cellSource/create", model: [item: item])
-                            break
-                        default:
-                            render(view: "create", model: [item: item])
-                    }
-                }
-            }else {
-                flash.message = "Item type not found!"
+        def itemType = typeId ? ItemType.get(typeId):null
+        if (params.generate) {
+            try {
+                barcode = barcodeService.generateBarcode()
+                render(view: "/item/generateBarcode", model: [itemType: itemType, barcode: barcode])
+            } catch (BarcodeException e) {
+                flash.message = e.message
                 redirect(action: "list", params: [typeId: typeId])
             }
-        }else {
-            flash.message = "Barcode cannot be empty!"
-            redirect(action: "list", params: [typeId: typeId])
+        } else {
+            if (barcode?.trim()){
+                if (itemType) { 
+                    def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
+                    if (item) {
+                        switch (itemType.category) {
+                            case ItemTypeCategory.ANTIBODY:
+                                def antibody = Antibody.findByItem(item)
+                                redirect(controller: "antibody", action: "show", id: antibody?.id)
+                                break
+                            default:
+                                redirect(action: "show", id: item.id)
+                        }
+                    }else {
+                        item = new Item(type: itemType, barcode: barcode)
+                        switch (itemType.category) {
+                            case ItemTypeCategory.ANTIBODY:
+                                render(view: "/antibody/create", model: [item:item])
+                                break
+                            case ItemTypeCategory.TRACED_SAMPLE:
+                                render(view: "/cellSource/create", model: [item: item])
+                                break
+                            default:
+                                render(view: "create", model: [item: item])
+                        }
+                    }
+                }else {
+                    flash.message = "Item type not found!"
+                    redirect(action: "list", params: [typeId: typeId])
+                }
+            }else {
+                flash.message = "Barcode cannot be empty!"
+                redirect(action: "list", params: [typeId: typeId])
+            }
         }
     }
     
@@ -192,6 +204,10 @@ class ItemController {
             response.outputStream << imageInByte
             response.outputStream.flush()
         }
+    }
+    
+    def displayBarcode(String barcode, Integer width, Integer height, String formatStr) {
+        barcodeService.renderImage(response, barcode, width, height, formatStr)
     }
     
     def deleteImage(String img, Long itemId) {

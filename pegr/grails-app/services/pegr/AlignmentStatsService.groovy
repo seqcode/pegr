@@ -29,15 +29,16 @@ class AlignmentStatsService {
         if (!genome) {
             throw new AlignmentStatsException(message: "Genome ${data.genome} not found!")
         }           
-        def alignment = SequenceAlignment.findBySequencingExperimentAndGenome(experiment, genome)
-        if (!alignment) {
-            throw new AlignmentStatsException(message: "Sequence Alignment for Run ${data.run}, Sample ${data.sample} and Genome ${data.genome} not found!")
+        def theAlignment = Analysis.where { historyId == data.historyId && alignment.sequencingExperiment == experiment && alignment.genome == genome}.get(max:1)?.alignment
+        if (!theAlignment) {
+            theAlignment = new SequenceAlignment(sequencingExperiment: experiment, genome: genome, isPreferred: true)
+            theAlignment.save()
         }
         // save the data
         def statisticsStr = data.statistics ? JsonOutput.toJson(data.statistics) : null
         def parameterStr = data.parameters ? JsonOutput.toJson(data.parameters) : null
         def datasetsStr = data.datasets ? JsonOutput.toJson(data.datasets) : null
-        def analysis = new Analysis(alignment: alignment,
+        def analysis = new Analysis(alignment: theAlignment,
                                     tool: data.toolId,
                                     pipeline: pipeline,
                                     category: data.toolCategory,
@@ -53,9 +54,10 @@ class AlignmentStatsService {
 
         // store named fields
         if (data.statistics) {
-            def updatedInAlignment = copyProperties(data.statistics, alignment)
+            def updatedInAlignment = copyProperties(data.statistics, theAlignment)
             if (updatedInAlignment.size() > 0) {
-                if (!alignment.save()) {
+                theAlignment.date = new Date()
+                if (!theAlignment.save()) {
                     log.error "Error saving ${updatedInAlignment} in Alignment!"
                 }
             } 

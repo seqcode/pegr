@@ -90,7 +90,7 @@ class WalleService {
         run.status = RunStatus.RUN
         run.save()
         // generate run info and parameter files
-        def fileAndFolder = generateAndSendRunFiles(run, newRunRemotePath)
+        def fileAndFolder = generateRunFiles(run, newRunRemotePath)
         // move files to the remote server
         moveFilesToRemote(fileAndFolder.runInfoLocalFile, fileAndFolder.configLocalFolder, newRunRemotePath)
         // update queue
@@ -136,7 +136,7 @@ class WalleService {
         return newPaths
     }
     
-    def generateAndSendRunFiles(SequenceRun run, String newRunRemotePath) {
+    def generateRunFiles(SequenceRun run, String newRunRemotePath) {
         // make the directory
         File localFolder = new File(LOCAL_FOLDER); 
         if (!localFolder.exists()) { 
@@ -163,9 +163,13 @@ class WalleService {
             it.println newRunRemotePath
             run.experiments.each { experiment -> 
                 def xmlNames = []
-                experiment.alignments.eachWithIndex { alignment, idx ->
-                    def xmlName = generateXmlFile(alignment, run.id, experiment.sample.id, idx, configLocalFolder)
-                    xmlNames.push(xmlName)
+                def genomesStr = experiment.sample.requestedGenomes
+                if (genomesStr) {
+                    def genomes = genomesStr.split(",")
+                    genomes.eachWithIndex { genome, idx ->
+                        def xmlName = generateXmlFile(genome, run.id, experiment.sample.id, idx, configLocalFolder)
+                        xmlNames.push(xmlName)
+                    }
                 }
                 def indicesString = experiment.sample?.sequenceIndicesString
                 def xmlNamesString= xmlNames.join(",")
@@ -195,10 +199,10 @@ class WalleService {
         }
     }
     
-    String generateXmlFile(SequenceAlignment alignment, Long runId, Long sampleId, int idx, File folder) {
+    String generateXmlFile(String genome, Long runId, Long sampleId, int idx, File folder) {
         def filename = "${sampleId}_${idx}.xml"
         def file = new File(folder, filename)
-        def alignmentParams = new WorkFlow(dbkey: alignment.genome.name)
+        def alignmentParams = new WorkFlow(dbkey: genome)
         def converter = alignmentParams as XML
         converter.render(new java.io.FileWriter(file))
         return filename

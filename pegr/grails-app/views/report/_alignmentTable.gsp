@@ -12,10 +12,10 @@
             </tr>
         </thead>
         <tbody>
-            <g:each in="${alignmentList}" var="alignment">
+            <g:each in="${sampleList}" var="sample">
                 <tr>
-                    <td><g:link controller="sample" action="show" id="${alignment.sequencingExperiment?.sample?.id}">${alignment.sequencingExperiment?.sample?.id}</g:link></td>    
-                    <td><g:link controller="sequenceRun" action="show" id="${alignment.sequencingExperiment?.sequenceRun?.id}">${alignment.sequencingExperiment?.sequenceRun?.id} (Old ${alignment.sequencingExperiment?.sequenceRun?.runNum}) </g:link></td>
+                    <td><g:link controller="sample" action="show" id="${sample?.id}">${sample?.id}</g:link></td>    
+                    <td><g:link controller="sequenceRun" action="show" id="${experiment?.runId}">${experiment?.runId} (Old ${experiment?.oldRunNum}) </g:link></td>
                     <td>${alignment.genome}</td>
                     <td class="text-right"><g:formatNumber number="${alignment.sequencingExperiment?.totalReads}" format="###,###,###" /></td>
                     <td class="text-right"><g:formatNumber number="${alignment.mappedReads}" format="###,###,###" /></td>

@@ -50,14 +50,6 @@ class SequenceRunService {
         if (!SequencingExperiment.findBySampleAndSequenceRun(sample, run)) {
             def experiment = new SequencingExperiment(sample: sample, sequenceRun: run, readPositions: positions) 
             experiment.save(failOnError: true)
-            if (sample.requestedGenomes && sample.requestedGenomes != "") {
-                sample.requestedGenomes.split(",")*.trim().unique().each{ genomeName ->
-                    def genome = Genome.findByName(genomeName)
-                    if (genome) {                            
-                        new SequenceAlignment(genome: genome, sequencingExperiment: experiment).save()
-                    }
-                }
-            }
         }
     }
     
@@ -134,28 +126,10 @@ class SequenceRunService {
         if (!experiment) {
             throw new SequenceRunException(message: "Experiment not found!")
         }
-        def toDelete = experiment.alignments
-        def toAdd = []
-        genomeIds.each { genomeIdStr ->
-            def genomeId = Long.parseLong(genomeIdStr)
-            def oldAlign = toDelete.find{it.genome.id == genomeId}
-            if (oldAlign) {
-                toDelete.remove(oldAlign)
-            } else {
-                def genome = Genome.get(genomeId)
-                if (genome) {
-                    toAdd.push(new SequenceAlignment(sequencingExperiment: experiment, genome: genome))
-                } else {
-                    throw new SequenceRunException(message: "Genome #${genomeId} not found for Sample ${experiment.sample.id}!")
-                }
-            }
-        }
-        toDelete.each{
-            it.delete()
-        }
-        toAdd.each{
-            it.save()
-        }
+
+        experiment.sample.requestedGenomes = genomeIds.join(',')
+        experiment.sample.save()
+
         def readType = ReadType.get(readTypeId)
         if (readType && experiment.readType != readType) {
             experiment.readType = readType
@@ -186,44 +160,11 @@ class SequenceRunService {
              throw new SequenceRunException(message: "Sequence run has already been submitted!")
         }
         
-        // create summary reports
-        createSummaryReports(run)
-        
         // start the run by creating a job on remote server
         run.status = RunStatus.QUEUE
         run.save()
                 
         walleService.addToQueue(runId)
-    }
-    
-    /*
-     * Create summary reports for each project linked to the samples inside the 
-     * sequence run. And link the alignments to the corresponding summary reports. 
-     */
-    @Transactional
-    def createSummaryReports(SequenceRun run) {        
-        def reports = []
-        run.experiments.each { experiment ->
-            def projects = experiment.sample?.projects
-            if (projects && projects.size() > 0) {
-                def project = projects.first()
-                def report = reports.find {it.project == project}
-                if (!report) {
-                    report = SummaryReport.findByRunAndProject(run, project)
-                    if (!report) {
-                        report = new SummaryReport(run: run, project: project)
-                        report.save()
-                    }
-                    reports << report
-                }
-                experiment.alignments.each { alignment ->
-                    alignment.summaryReport = report
-                    alignment.save()
-                } 
-            } else {
-                throw new SequenceRunException(message: "Sample ${experiment.sample?.id} is not linked to a project yet!")
-            }
-        }        
     }
     
     def getCalendarTimeString(Date time) {

@@ -18,10 +18,10 @@
                     <td><g:link controller="sample" action="show" id="${sample.id}">${sample.id}</g:link></td>    
                     <td>${sample.target}</td>
                     <td>${sample.antibody}</td>
-                    <td>${sample.cellSource} </td>
-                    <td>${sample.cellSource?.strain?.geneticModification}</td>
-                    <td>${sample.cellSource?.growthMedia}</td>
-                    <td><g:each in="${sample?.cellSource?.treatments}" var="c">${c}</g:each></td>
+                    <td>${sample.strain} </td>
+                    <td>${sample.geneticModification}</td>
+                    <td>${sample.growthMedia}</td>
+                    <td>${sample.treatments}</td>
                     <td>${sample.assay}</td>
                 </tr>
             </g:each>              

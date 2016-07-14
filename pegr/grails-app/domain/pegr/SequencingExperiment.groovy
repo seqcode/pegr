@@ -18,13 +18,13 @@ class SequencingExperiment {
         return SequenceAlignment.where{sequencingExperiment == this}.list()
     }
     
-    List getGenomes() {
-        return SequenceAlignment.where{sequencingExperiment == this}.collect{it.genome}
-    }
-    
-    String getGenomesString() {
-        def genomes = SequenceAlignment.where{sequencingExperiment == this}.collect{it.genome.name}
-        return genomes.join(', ')
+    def getGenomes() {
+        def genomes = []
+        String s = sample?.requestedGenomes
+        if (s) {
+            genomes = s.split(",").toList()
+        }
+        return genomes
     }
     
     static constraints = {

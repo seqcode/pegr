@@ -42,6 +42,6 @@ class SequenceAlignment {
     }
     
     static mapping = {
-        isPreferred  defaultValue: false  
+        isPreferred  defaultValue: true  
      } 
 }

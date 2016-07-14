@@ -9,6 +9,7 @@ class SequenceRunController {
     def sequenceRunService    
     def csvConvertService    
     def walleService
+    def reportService
     
     // list incomplete runs
     def index(Integer max){
@@ -322,4 +323,17 @@ class SequenceRunController {
         redirect(action: "index")
     }
     
+    def createReports(Long runId) {
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            render(view:"/404")
+            return
+        }
+        try {
+            reportService.createSummaryReportsForRun(run)
+        } catch(ReportException e) {
+            flash.message = e.message
+        }
+        redirect(action:"show", id: runId)
+    }
 }

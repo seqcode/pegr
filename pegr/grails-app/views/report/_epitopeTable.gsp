@@ -26,7 +26,7 @@
                 </tr>
             </g:each>              
             <tr>
-                <td colspan="9"></td>
+                <td colspan="8"></td>
             </tr>
         </tbody>
       </table>

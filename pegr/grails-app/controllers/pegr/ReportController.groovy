@@ -69,31 +69,31 @@ class ExperimentDTO {
     Long id
     Long runId
     Long oldRunNum
+    Long totalReads
+    Long adapterDimerCount
     List alignments
 }
 
 class AlignmentDTO {
     Long id
     String genome
-    Integer readCount
     
-    Integer mappedReadCount
-    Integer uniquelyMappedCount
-    Integer deduplicatedCount
+    Long mappedReads
+    Long uniquelyMappedReads
+    Long dedupUniquelyMappedReads
     
-    Double mappedReadPct
-    Double uniquelyMappedPct
-    Double deduplicatedPct
-    
-    Integer adapterDimerCount
+    Float mappedReadPct
+    Float uniquelyMappedPct
+    Float deduplicatedPct
+
     Integer avgInsertSize
-    Double stdPE
-    Double genomeCoverage
+    Float stdInsertSize
+    Float genomeCoverage
     
     String peakCallingParam
-    Integer peaks
-    Integer singletons
+    Long peaks
+    Long singletons  // TODO
     String peakPairsParam
-    Integer peakPairs
-    Integer nonPairedPeaks
+    Long peakPairs
+    Long nonPairedPeaks
 }

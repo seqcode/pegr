@@ -12,7 +12,7 @@
         <g:if test="${project}">
             <h3>Project: <g:link controller="project" action="show" id="${project.id}">${project?.name}</g:link></h3>
             <p>Description: ${project?.description}</p>
-            <p>The number of Samples: ${data.size()}</p>
+            <p>The number of Samples: ${sampleDTOs.size()}</p>
             <div id="project-users">
                 <g:render template="/project/userTable" model="[projectEditAuth:false]"/>
             </div>

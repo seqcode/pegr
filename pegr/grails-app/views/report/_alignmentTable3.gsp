@@ -5,24 +5,30 @@
                 <th>Sample ID</th>
                 <th>Sequence Run</th>
                 <th>Genome</th>
-                <th>Adapter Dimer Count</th>
-                <th>Average Insertion Size (PE)</th>
-                <th>Standard Dev (PE)</th>
-                <th>Genome Coverage</th>
+                <th class="text-right">Adapter Dimer Count</th>
+                <th class="text-right">Average Insertion Size (PE)</th>
+                <th class="text-right">Standard Dev (PE)</th>
+                <th class="text-right">Genome Coverage</th>
             </tr>
         </thead>
         <tbody>
-            <g:each in="${alignmentList}" var="alignment">
+            <g:each in="${sampleList}" var="sample">
                 <tr>
-                    <td><g:link controller="sample" action="show" id="${alignment.sequencingExperiment?.sample?.id}">${alignment.sequencingExperiment?.sample?.id}</g:link></td>    
-                    <td><g:link controller="sequenceRun" action="show" id="${alignment.sequencingExperiment?.sequenceRun?.id}">${alignment.sequencingExperiment?.sequenceRun?.id} (Old ${alignment.sequencingExperiment?.sequenceRun?.runNum}) </g:link></td>
-                    <td>${alignment.genome}</td>
-                    <td><g:formatNumber number="${alignment.sequencingExperiment?.adapterDimerCount}" format="###,###,###" /></td>
-                    <td></td>
-                    <td></td>
-                    <td>${alignment.genomeCoverage}</td>
-                </tr>
-            </g:each>              
+                    <td rowspan="${Math.max(1, sample.experiments.size())}"><g:link controller="sample" action="show" id="${sample?.id}">${sample?.id}</g:link></td>
+                    <g:each in="${sample.experiments}" var="experiment" status="nExp">
+                        <g:if test="${nExp>0}"><tr></g:if>
+                        <td rowspan="${Math.max(1, experiment.alignments.size())}"><g:link controller="sequenceRun" action="show" id="${experiment?.runId}">${experiment?.runId} (Old ${experiment?.oldRunNum}) </g:link></td>    
+                        <g:each in="${experiment.alignments}" var="alignment" status="nAli">
+                            <g:if test="${nAli>0}"><tr></g:if>
+                            <td>${alignment.genome}</td>
+                            <td class="text-right"><g:formatNumber number="${experiment.adapterDimerCount}" format="###,###,###" /></td>
+                            <td class="text-right">${alignment.avgInsertSize}</td>
+                            <td class="text-right">${alignment.stdInsertSize}</td>
+                            <td class="text-right"><g:formatNumber number="${alignment.genomeCoverage}" format="##.#%" /></td>
+                            </tr>
+                        </g:each>
+                    </g:each>
+            </g:each>                      
             <tr>
                 <td colspan="9"></td>
             </tr>

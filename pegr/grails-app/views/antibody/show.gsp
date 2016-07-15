@@ -15,26 +15,33 @@
         <g:if test="${!antibody.item}"><h4>Barcode: none <g:link action="addBarcode" params="[antibodyId:antibody.id]" class="edit">Add</g:link></h4></g:if>
         <g:else>
             <h4>Barcode Information <g:link action="editItem" params="[antibodyId:antibody.id]" class="edit">Edit</g:link></h4>
-            <ul>
-                <g:if test="${antibody.item?.name}">
-                <li>Name: ${antibody.item.name}</li>
-                </g:if>
-                <g:if test="${antibody.item?.barcode}">
-                <li>Barcode: ${antibody.item.barcode }</li>
-                </g:if>	
+            <div class="row">
+                <div class="col-sm-6">
+                    <ul>
+                        <g:if test="${antibody.item?.name}">
+                        <li>Name: ${antibody.item.name}</li>
+                        </g:if>
+                        <g:if test="${antibody.item?.barcode}">
+                        <li>Barcode: ${antibody.item.barcode }</li>
+                        </g:if>	
 
-                <g:if test="${antibody.item?.location}">
-                <li>Location: ${antibody.item.location}</li>
-                </g:if>	
+                        <g:if test="${antibody.item?.location}">
+                        <li>Location: ${antibody.item.location}</li>
+                        </g:if>	
 
-                <g:if test="${antibody.item?.user}">
-                <li>User: ${antibody.item.user}</li>
-                </g:if>
-                
-                <g:if test="${antibody.item?.notes}">
-                <li>Notes: ${antibody.item.notes}</li>
-                </g:if>    
-            </ul>
+                        <g:if test="${antibody.item?.user}">
+                        <li>User: ${antibody.item.user}</li>
+                        </g:if>
+
+                        <g:if test="${antibody.item?.notes}">
+                        <li>Notes: ${antibody.item.notes}</li>
+                        </g:if>    
+                    </ul>
+                </div>
+                <div class="col-sm-6">
+                    <g:render template="/item/barcodeImage" model="[barcode:antibody?.item?.barcode]"></g:render>
+                </div>
+            </div>
         </g:else>
         <h4>Antibody Information <g:link controller="antibody" action="edit" params="[antibodyId:antibody.id]" class="edit">Edit</g:link></h4>
         <g:render template="/antibody/details" model="[object: antibody]"></g:render>

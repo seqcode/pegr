@@ -19,8 +19,17 @@ class BarcodeService {
         String SUFFIX = "R"
         try {
             def maxIds = Item.executeQuery("select max(id) from Item")
-            Long maxId = maxIds[0] + 1
-            def barcode = PREFIX + maxId.toString() + SUFFIX
+            Long id = maxIds[0] + 1
+            def barcode = PREFIX + id.toString() + SUFFIX
+            while(Item.findByBarcode(barcode)) {
+                def type = ItemType.first()
+                def item = new Item(type: type)
+                item.save()
+                item.delete()
+                id++
+                barcode = PREFIX + id.toString() + SUFFIX
+            }
+            
             return barcode
         } catch(Exception e) {
             log.error e

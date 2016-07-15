@@ -97,7 +97,7 @@
         $("#nav-bench").addClass("active");
         $(".confirm").confirm();
         $(".confirm-deleteBag").confirm({text: "All protocol instances in this bag will be deleted! Are you sure you want to delete this bag?"});
-        
+        $(".confirm-start").confirm({text: "Are you the one to perform this protocol?"});
         function closeModal() {
             $(".modal").modal('hide');
         }

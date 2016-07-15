@@ -71,7 +71,7 @@
                             <g:select name="readType${it.id}" from="${pegr.ReadType.list()}" optionKey="id" value="${it.readType?.id?:1}"></g:select>
                         </td>
                         <td>                            
-                            <g:select multiple="multiple" name="genomes${it.id}" from="${pegr.Genome.list()}" optionKey="id" value="${it.genomes}" class="select2"></g:select>
+                            <g:select multiple="multiple" name="genomes${it.id}" from="${pegr.Genome.list()}" optionKey="name" value="${it.genomes}" class="select2"></g:select>
                         </td>                        
                         <td>
                             <g:link action="removeExperiment" params="[experimentId:it.id, runId:run.id]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link>

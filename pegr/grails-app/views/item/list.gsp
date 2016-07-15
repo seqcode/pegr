@@ -47,7 +47,8 @@
     <g:render template="filter"></g:render>
 </div>
 <script>
-$("#nav-bench").addClass("active");
+    $("#nav-bench").addClass("active");
+    $("select").select2();
 </script>
 </body>
 </html>

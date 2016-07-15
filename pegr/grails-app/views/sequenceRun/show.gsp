@@ -37,7 +37,7 @@
                     <td>${it.sample?.antibody}</td>
                     <td>${it.sample?.sequenceIndicesString}</td>
                     <td>${it.readType?.name}</td>
-                    <td>${it.genomesString}</td>
+                    <td>${it.sample?.requestedGenomes}</td>
                     <td>
                         <g:each in="${it.sample?.projects}">
                             <g:link controller="project" action="show" id="${it.id}">${it.name}</g:link>; 
@@ -93,6 +93,12 @@
             </tbody>
         </table>
     </g:if>
+    <h3>Summary Reports <g:link action="createReports" params="[runId: run.id]" class="edit">Generate</g:link></h3>
+    <ul>
+        <g:each in="${reports}">
+            <li><g:link controller="report" action="show" id="${it.id}">${it}</g:link></li>
+        </g:each>
+    </ul>
     <div class="row well text-center">
         <g:if test="${run.status == pegr.RunStatus.PREP}">
             <g:link action="previewRun" params="[runId: run.id]" class="btn btn-success">Submit</g:link>

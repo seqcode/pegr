@@ -50,14 +50,6 @@ class SequenceRunService {
         if (!SequencingExperiment.findBySampleAndSequenceRun(sample, run)) {
             def experiment = new SequencingExperiment(sample: sample, sequenceRun: run, readPositions: positions) 
             experiment.save(failOnError: true)
-            if (sample.requestedGenomes && sample.requestedGenomes != "") {
-                sample.requestedGenomes.split(",")*.trim().unique().each{ genomeName ->
-                    def genome = Genome.findByName(genomeName)
-                    if (genome) {                            
-                        new SequenceAlignment(genome: genome, sequencingExperiment: experiment).save()
-                    }
-                }
-            }
         }
     }
     
@@ -134,28 +126,10 @@ class SequenceRunService {
         if (!experiment) {
             throw new SequenceRunException(message: "Experiment not found!")
         }
-        def toDelete = experiment.alignments
-        def toAdd = []
-        genomeIds.each { genomeIdStr ->
-            def genomeId = Long.parseLong(genomeIdStr)
-            def oldAlign = toDelete.find{it.genome.id == genomeId}
-            if (oldAlign) {
-                toDelete.remove(oldAlign)
-            } else {
-                def genome = Genome.get(genomeId)
-                if (genome) {
-                    toAdd.push(new SequenceAlignment(sequencingExperiment: experiment, genome: genome))
-                } else {
-                    throw new SequenceRunException(message: "Genome #${genomeId} not found for Sample ${experiment.sample.id}!")
-                }
-            }
-        }
-        toDelete.each{
-            it.delete()
-        }
-        toAdd.each{
-            it.save()
-        }
+
+        experiment.sample.requestedGenomes = genomeIds.join(',')
+        experiment.sample.save()
+
         def readType = ReadType.get(readTypeId)
         if (readType && experiment.readType != readType) {
             experiment.readType = readType
@@ -186,11 +160,11 @@ class SequenceRunService {
              throw new SequenceRunException(message: "Sequence run has already been submitted!")
         }
         
-        walleService.addToQueue(runId)
-        
         // start the run by creating a job on remote server
         run.status = RunStatus.QUEUE
         run.save()
+                
+        walleService.addToQueue(runId)
     }
     
     def getCalendarTimeString(Date time) {

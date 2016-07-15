@@ -16,30 +16,37 @@
             <h3><g:link controller="sample" action="show" id="${sample.id}">Sample ${sample.id}</g:link></h3>
     </g:if>
     <h4>Barcode Information <g:link action="edit" params="[itemId:item?.id]" class="edit">Edit</g:link></h4>
-    <ul>
-        <g:if test="${item?.name}">
-        <li>Name: ${item.name}</li>
-        </g:if>
-        <g:if test="${item?.type}">
-        <li>Type: ${item.type}</li>
-        </g:if>
+    <div class="row">
+        <div class="col-sm-6">
+            <ul>
+                <g:if test="${item?.name}">
+                <li>Name: ${item.name}</li>
+                </g:if>
+                <g:if test="${item?.type}">
+                <li>Type: ${item.type}</li>
+                </g:if>
 
-        <g:if test="${item?.barcode}">
-        <li>Barcode: ${item.barcode }</li>
-        </g:if>	
+                <g:if test="${item?.barcode}">
+                <li>Barcode: ${item.barcode }</li>
+                </g:if>	
 
-        <g:if test="${item?.location}">
-        <li>Location: ${item.location}</li>
-        </g:if>	
+                <g:if test="${item?.location}">
+                <li>Location: ${item.location}</li>
+                </g:if>	
 
-        <g:if test="${item?.user}">
-        <li>User: ${item.user}</li>
-        </g:if>
-        
-        <g:if test="${item?.notes}">
-        <li>Notes: ${item.notes}</li>
-        </g:if>    
-    </ul>
+                <g:if test="${item?.user}">
+                <li>User: ${item.user}</li>
+                </g:if>
+
+                <g:if test="${item?.notes}">
+                <li>Notes: ${item.notes}</li>
+                </g:if>    
+            </ul>
+        </div>
+        <div class="col-sm-6">
+            <g:render template="/item/barcodeImage" model="[barcode:item.barcode]"></g:render>
+        </div>
+    </div>
     <g:if test="${traces?.size()}">
         <h4>Sample Traces</h4>
         <ul>

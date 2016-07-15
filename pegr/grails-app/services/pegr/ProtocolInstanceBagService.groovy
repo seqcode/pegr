@@ -17,6 +17,9 @@ class ProtocolInstanceBagService {
         if(protocolGroup == null) {
             throw new ProtocolInstanceBagException(message: "protocol Group not found!")
         }
+        if (!name || name == "") {
+            throw new ProtocolInstanceBagException(message: "Name cannot be empty!")
+        }
         def prtclInstBag = new ProtocolInstanceBag(name: name,
                                                   status: ProtocolStatus.PROCESSING,
                                                   protocolGroup: protocolGroup,
@@ -36,6 +39,9 @@ class ProtocolInstanceBagService {
     
     @Transactional
     ProtocolInstanceBag savePrtclInstBagByProtocols(List protocols, String name, Date startTime) {
+        if (!protocols || protocols.size() == 0) {
+            throw new ProtocolInstanceBagException(message: "Please select at least one protocol!")
+        }
         def prtclInstBag = new ProtocolInstanceBag(name: name,
                                                   status: ProtocolStatus.PROCESSING,
                                                   startTime: startTime)

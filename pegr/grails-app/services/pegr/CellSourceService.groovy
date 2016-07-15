@@ -258,9 +258,14 @@ class CellSourceService {
 	    if(treatmentStr == null) {
 	        return null
 	    }
-	    def treatment = CellSourceTreatment.findByName(treatmentStr)
+        def name = treatmentStr
+        def description = treatmentStr
+        if(treatmentStr.size() > 250) {
+            name = treatmentStr.take(250)
+        }
+	    def treatment = CellSourceTreatment.findByName(name)
 	    if(!treatment) {
-	        treatment = new CellSourceTreatment(name: treatmentStr).save(failOnError: true)
+	        treatment = new CellSourceTreatment(name: name, note: description).save(failOnError: true)
 	    }
 	    if(treatment && cellSource) {
             if (!CellSourceTreatments.findByCellSourceAndTreatment(cellSource, treatment)) {

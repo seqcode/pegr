@@ -11,7 +11,7 @@
     <h4>Add Item </h4>
     <p>Item not found! Do you want to add it as a new item?</p>
     <button class="btn btn-primary" onClick="$('form').show()">Yes</button>
-    <g:link class="btn btn-default" action="searchItemForInstance" id="${instanceId}">No</g:link>
+    <g:link class="btn btn-default" action="searchItemForInstance" params="[instanceId:instanceId]">No</g:link>
 
     <g:form action="saveItemInInstance" class="fields" role="form" method="post">
         <g:hiddenField name="instanceId" value="${instanceId}"/>

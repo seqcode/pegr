@@ -9,6 +9,7 @@ class SequenceRunController {
     def sequenceRunService    
     def csvConvertService    
     def walleService
+    def reportService
     
     // list incomplete runs
     def index(Integer max){
@@ -39,7 +40,8 @@ class SequenceRunController {
                 def jsonSlurper = new JsonSlurper()
                 read = jsonSlurper.parseText(run.experiments[0].readPositions)           
             }
-            [run: run, read: read]
+            def reports = SummaryReport.findAllByRun(run)
+            [run: run, read: read, reports: reports]
         } else {
             flash.message = "Sequence run not found!"
             redirect(action: "index")
@@ -240,29 +242,34 @@ class SequenceRunController {
     }
     
     def previewRun(Long runId) {
-        def previousRun = walleService.getPreviousRun()
-        def newFolders = walleService.getNewRunFolders()
-        def queuedRunIds = walleService.getQueuedRunIds()
-        def queuedRuns = []
-        queuedRunIds.eachWithIndex { id, n ->
-             def run = SequenceRun.get(Long.parseLong(id))
-            queuedRuns.push([id: id, 
-                             runNum: run?.runNum, 
-                             directoryName: n < newFolders.size() ? newFolders[n] : null])
+        try {
+            def previousRun = walleService.getPreviousRun()
+            def newFolders = walleService.getNewRunFolders()
+            def queuedRunIds = walleService.getQueuedRunIds()
+            def queuedRuns = []
+            queuedRunIds.eachWithIndex { id, n ->
+                 def run = SequenceRun.get(Long.parseLong(id))
+                queuedRuns.push([id: id, 
+                                 runNum: run?.runNum, 
+                                 directoryName: n < newFolders.size() ? newFolders[n] : null])
 
+            }
+            def currentRun = [id: runId,
+                              runNum: SequenceRun.get(runId)?.runNum,
+                              directoryName: queuedRunIds.size() < newFolders.size() ? newFolders[queuedRunIds.size()] : null]
+            def startTime
+            use(TimeCategory) {
+                def now = new Date() 
+                startTime = now.clearTime() + 10.hours + 1.week
+            }
+            [previousRun: previousRun,
+             queuedRuns: queuedRuns,
+             currentRun: currentRun,
+             meetingTime: startTime]
+        } catch (Exception e) {
+            flash.message = "Error connecting to Wall E!"
+            redirect(action: "show", id: runId)
         }
-        def currentRun = [id: runId,
-                          runNum: SequenceRun.get(runId)?.runNum,
-                          directoryName: queuedRunIds.size() < newFolders.size() ? newFolders[queuedRunIds.size()] : null]
-        def startTime
-        use(TimeCategory) {
-            def now = new Date() 
-            startTime = now.clearTime() + 10.hours + 1.week
-        }
-        [previousRun: previousRun,
-         queuedRuns: queuedRuns,
-         currentRun: currentRun,
-         meetingTime: startTime]
     }
     
     def run(Long runId) {
@@ -271,7 +278,7 @@ class SequenceRunController {
             redirect(action: "show", id: runId)
         } catch(SequenceRunException e) {
             flash.message = e.message
-            redirect(action: "edit", params: [runId: runId])
+            redirect(action: "show", id: runId)
         }
     }
     
@@ -314,5 +321,19 @@ class SequenceRunController {
         }
 
         redirect(action: "index")
+    }
+    
+    def createReports(Long runId) {
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            render(view:"/404")
+            return
+        }
+        try {
+            reportService.createSummaryReportsForRun(run)
+        } catch(ReportException e) {
+            flash.message = e.message
+        }
+        redirect(action:"show", id: runId)
     }
 }

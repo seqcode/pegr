@@ -7,9 +7,17 @@ class ProtocolGroupException extends RuntimeException {
 }
 
 class ProtocolGroupService {
+    def springSecurityService
     
     @Transactional
     def save(ProtocolGroup protocolGroup) {
+        if (!protocolGroup.name || protocolGroup.name == "") {
+            throw new ProtocolGroupException(message: "Name cannot be empty!")
+        }
+        if (!protocolGroup.protocols || protocolGroup.protocols.size() == 0) {
+            throw new ProtocolGroupException(message: "Please select at least one protocol!")
+        }
+        protocolGroup.user = springSecurityService.currentUser
         if (!protocolGroup.save(flush:true)) {
             throw new ProtocolGroupException(message: "Error saving the protocol group!")
         } 

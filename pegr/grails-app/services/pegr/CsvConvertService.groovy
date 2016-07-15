@@ -127,7 +127,8 @@ class CsvConvertService {
 
         def seqExp = getSeqExperiment(sample, results.sequenceRun, data.rd1Start, data.rd1End, data.indexStart, data.indexEnd, data.rd2Start, data.rd2End)
 
-        [data.genomeBuild1, data.genomeBuild2, data.genomeBuild3].each{ getSeqAlign(it, seqExp, species) }
+        def genomeBuilds = [data.genomeBuild1, data.genomeBuild2, data.genomeBuild3]
+        saveRequestedGenome(genomeBuilds, sample, species) 
 
     }
     
@@ -566,11 +567,12 @@ class CsvConvertService {
 	    return seqExp
 	}
 	        
-	def getSeqAlign(String genomeBuild, SequencingExperiment seqExp, Species species) {
-	    def genome = getGenome(genomeBuild, species)
-	    if (seqExp && genome) {
-	        new SequenceAlignment(sequencingExperiment: seqExp, genome: genome).save( failOnError: true)
-	    }
+	def saveRequestedGenome(List genomeBuilds, Sample sample, Species species) {
+        genomeBuilds.removeAll {it == null}
+        genomeBuilds.each { genomeBuild ->
+            getGenome(genomeBuild, species)
+        }
+	    sample.requestedGenomes = genomeBuilds.join(",")
 	}
 	
 	def getGenome(String genomeStr, Species species) {

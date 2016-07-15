@@ -12,19 +12,19 @@ class SequencingExperiment {
     String fastqcReport
     Long totalReads
     Integer indexMismatch
-    Long adapterCount
+    Long adapterDimerCount
 	
     List getAlignments() {
         return SequenceAlignment.where{sequencingExperiment == this}.list()
     }
     
-    List getGenomes() {
-        return SequenceAlignment.where{sequencingExperiment == this}.collect{it.genome}
-    }
-    
-    String getGenomesString() {
-        def genomes = SequenceAlignment.where{sequencingExperiment == this}.collect{it.genome.name}
-        return genomes.join(', ')
+    def getGenomes() {
+        def genomes = []
+        String s = sample?.requestedGenomes
+        if (s) {
+            genomes = s.split(",").toList()
+        }
+        return genomes
     }
     
     static constraints = {
@@ -38,6 +38,6 @@ class SequencingExperiment {
         fastqcReport nullable: true, blank: true, maxSize: 1000
         totalReads nullable: true
         indexMismatch nullable: true
-        adapterCount nullable: true
+        adapterDimerCount nullable: true
 	}
 }

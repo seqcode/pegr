@@ -18,10 +18,12 @@
         <g:hiddenField name="instanceId" value="${instanceId}"/>
         <g:render template="/item/search" model="['currentCategory':pegr.ItemTypeCategory.OTHER]"></g:render>
         <g:submitButton class="btn btn-primary" name="search" value="Search Or Create"/>
+        <g:submitButton class="btn btn-primary" name="generate" value="Generate Barcode"/>
     </g:form>                    
 
     <script>
         $("#nav-bench").addClass("active");
+        $("select").select2();
      </script>
 </div>
 </body>

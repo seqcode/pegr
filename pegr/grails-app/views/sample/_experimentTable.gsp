@@ -11,7 +11,7 @@
             <tr>
                 <td>${experiment.totalReads}</td>
                 <td>${experiment.indexMismatch}</td>
-                <td>${experiment.adapterCount}</td>
+                <td>${experiment.adapterDimerCount}</td>
             </tr>
         </tbody>
       </table>

@@ -1,5 +1,7 @@
 package pegr
 
+import groovy.json.*
+    
 class UtilityException extends RuntimeException {
     String message
 }
@@ -105,5 +107,39 @@ class UtilityService {
             }            
         }
         return s
+    }
+    
+    /*
+     * Divide one Long by another Long
+     * @param a numerator
+     * @param b denominator
+     * @return the value of a/b if a and b are not null and b is not 0; otherwise, return null.
+     */
+    def divide(Long a, Long b) {
+        def result
+        if (a!= null && b != null && b!=0) {
+            result = a / b
+        }
+        return result
+    }
+    
+    def queryJson(String jsonStr, List keys) {
+        def jsonSlurper = new JsonSlurper()
+        def jsonMap
+        try {
+            jsonMap = jsonSlurper.parseText(jsonStr)
+        } catch(Exception e) {   
+        }
+        def result = [:]
+        if (jsonMap) {
+            keys.each { key ->
+                result[key] = jsonMap.containsKey(key) ? jsonMap[key] : null
+            }
+        } else {
+            keys.each { key ->
+                result[key] = null
+            }
+        }        
+        return result
     }
 }

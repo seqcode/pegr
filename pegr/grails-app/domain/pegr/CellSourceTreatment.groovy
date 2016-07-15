@@ -14,4 +14,8 @@ class CellSourceTreatment {
         note nullable: true, blank: true
         status nullable: true
 	}
+    
+    static mapping = {
+		note sqlType: 'text'
+    }
 }

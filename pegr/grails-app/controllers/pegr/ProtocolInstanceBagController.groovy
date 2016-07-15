@@ -6,6 +6,7 @@ class ProtocolInstanceBagController {
     def springSecurityService
     def protocolInstanceBagService
     def protocolService
+    def barcodeService
     
     def index() {
         redirect(action: "processingBags", params: params )
@@ -37,9 +38,9 @@ class ProtocolInstanceBagController {
         [protocolGroups: protocolGroups, user: user]
     }
     
-    def savePrtclInstBag() {        
+    def savePrtclInstBag(Long protocolGroupId, String bagName) {        
         try {
-            def prtclInstBag = (params.protocolInput == "defined") ? protocolInstanceBagService.savePrtclInstBagByGroup(Long.parseLong(params.protocolGroupId), params.bagName, params.startTime) : protocolInstanceBagService.savePrtclInstBagByProtocols(params.list('protocols'), params.bagName, params.startTime)
+            def prtclInstBag = (params.protocolInput == "defined") ? protocolInstanceBagService.savePrtclInstBagByGroup(protocolGroupId, bagName, params.startTime) : protocolInstanceBagService.savePrtclInstBagByProtocols(params.list('protocols'), bagName, params.startTime)
             redirect(action: "showBag", id: prtclInstBag.id)
         }catch( ProtocolInstanceBagException e) {
             flash.message = e.message
@@ -52,7 +53,10 @@ class ProtocolInstanceBagController {
         def protocolInstances = ProtocolInstance.where { bag.id == id}.list(sort: "bagIdx", order: "asc")
         def count = protocolInstances.count{it.status == ProtocolStatus.COMPLETED}
         def completed = (bag.status == ProtocolStatus.COMPLETED)
-        def toBeCompleted = (bag.status != ProtocolStatus.COMPLETED && protocolInstances.last().status == ProtocolStatus.COMPLETED)
+        def toBeCompleted
+        if (protocolInstances.size() > 0) {
+            toBeCompleted = (bag.status != ProtocolStatus.COMPLETED && protocolInstances.last().status == ProtocolStatus.COMPLETED)
+        }
         if (bag) {
             [bag:bag, count: count, protocolInstances: protocolInstances, completed: completed, toBeCompleted: toBeCompleted]
         }else {
@@ -227,31 +231,41 @@ class ProtocolInstanceBagController {
     
     def previewItemInInstance(Long typeId, String barcode, Long instanceId) {
         def itemType = ItemType.get(typeId)
-        def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
-        if (itemType.category == ItemTypeCategory.SAMPLE_POOL) {
-            def instance = ProtocolInstance.get(instanceId)
-            if (instance) {
-                if (instance.protocol.startPoolType == itemType && item) {
-                    // start pool must be pre-existing    
-                    render(view: "previewPoolInInstance", model: [instanceId: instanceId, item:item])
-                } else if (instance.protocol.endPoolType == itemType && !item) {
-                    // end pool must be new
-                    item = new Item(type: itemType, barcode: barcode)
-                    render(view: "createItemInInstance", model: [instanceId: instanceId, item:item])    
-                } else {
-                    flash.message = "Start pool must be pre-existing and end pool must be new!"
-                    redirect(action: "showInstance", id: instanceId)
-                }
-            } else {
-                flash.message = "Protocol instance not found!"
-                redirect(action: "processingBags")
+        if (params.generate) {
+            try {
+                barcode = barcodeService.generateBarcode()
+                render(view: "generateBarcode", model: [itemType: itemType, barcode: barcode, instanceId: instanceId])
+            } catch (BarcodeException e) {
+                flash.message = e.message
+                redirect(action: "showInstance", id: instanceId)
             }
         } else {
-            if (item) {
-                render(view:"previewItemInInstance", model: [item: item, instanceId: instanceId])
-            }else {
-                item = new Item(type: itemType, barcode: barcode)
-                render(view: "createItemInInstance", model: [instanceId: instanceId, item:item])
+            def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
+            if (itemType && itemType.category == ItemTypeCategory.SAMPLE_POOL) {
+                def instance = ProtocolInstance.get(instanceId)
+                if (instance) {
+                    if (instance.protocol.startPoolType == itemType && item) {
+                        // start pool must be pre-existing    
+                        render(view: "previewPoolInInstance", model: [instanceId: instanceId, item:item])
+                    } else if (instance.protocol.endPoolType == itemType && !item) {
+                        // end pool must be new
+                        item = new Item(type: itemType, barcode: barcode)
+                        render(view: "createItemInInstance", model: [instanceId: instanceId, item:item])    
+                    } else {
+                        flash.message = "Start pool must be pre-existing and end pool must be new!"
+                        redirect(action: "showInstance", id: instanceId)
+                    }
+                } else {
+                    flash.message = "Protocol instance not found!"
+                    redirect(action: "processingBags")
+                }
+            } else {
+                if (item) {
+                    render(view:"previewItemInInstance", model: [item: item, instanceId: instanceId])
+                }else {
+                    item = new Item(type: itemType, barcode: barcode)
+                    render(view: "createItemInInstance", model: [instanceId: instanceId, item:item])
+                }
             }
         }
     }

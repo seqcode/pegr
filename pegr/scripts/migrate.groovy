@@ -25,6 +25,7 @@ def dataMigrate = new CsvConvertService()
 dataMigrate.getAllBioReplicate()
 */
 
+/*
 // migrate antibody notes
 def jsonSlurper = new JsonSlurper()
 Sample.list().each{ sample ->
@@ -75,5 +76,9 @@ Antibody.list().each { antibody ->
         }
     }
 }
+*/
 
+def run = SequenceRun.get(219)
+def walleService = new WalleService()
+walleService.generateRunFiles(run, "abc")
 

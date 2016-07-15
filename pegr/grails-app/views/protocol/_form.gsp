@@ -52,3 +52,7 @@
 <sec:ifAllGranted roles="ROLE_ADMIN">
     <h4>Protocol approved? <g:select name="status" from="${pegr.DictionaryStatus.values()}" value="${protocol?.status}"/></h4>
 </sec:ifAllGranted>
+
+<script>
+    $("#sharedItem").select2();
+</script>

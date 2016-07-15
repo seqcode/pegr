@@ -13,7 +13,7 @@
         <form role="form" method="post" action="savePrtclInstBag" class="fields">
             <div>
                 <label>Name</label>
-                <g:textField name="bagName"></g:textField>
+                <input name="bagName" required>
             </div>
             <div>
                 <label>Start Time</label>

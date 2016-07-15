@@ -10,6 +10,19 @@ class ProtocolGroupAdminController {
 	public static AdminCategory category = AdminCategory.PROTOCOLS
     def protocolGroupService
     
+    def save() {
+        // update with new input
+        def protocolGroup = new ProtocolGroup(params)
+        try {
+            protocolGroupService.save(protocolGroup)
+            flash.message = "Protocol Group ${protocolGroup.name} has been updated!"
+            redirect(id: protocolGroup.id, action: 'show')
+        } catch(ProtocolGroupException e) {
+            flash.message = e.message
+            redirect(action: 'create', params:[protocolGroupInstance: protocolGroup])
+        }
+    }
+    
     def update() {
         withForm {
             def protocolGroup = ProtocolGroup.get(params.id)

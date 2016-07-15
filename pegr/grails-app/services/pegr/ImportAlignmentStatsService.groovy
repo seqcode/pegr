@@ -40,7 +40,7 @@ class ImportAlignmentStatsService {
                     // experiment
                     experiment.indexMismatch = data.indexMismatch
                     experiment.totalReads = data.totalReads
-                    experiment.adapterCount = data.adapterCount 
+                    experiment.adapterDimerCount = data.adapterDimerCount 
                     experiment.save(flush: true)
                     
                     // alignment
@@ -222,7 +222,7 @@ class ImportAlignmentStatsService {
             UNIQ_ID            : data[11],  
             VERSION            : data[12],  
             spikeInCount       : getInteger(data[13]),  
-            adapterCount       : getInteger(data[14]),  
+            adapterDimerCount       : getInteger(data[14]),  
             NON_UNIQ_COUNT     : data[15],  
             DUP_READ_COUNT     : data[16],  
             dedupUniquelyMappedReads     : getInteger(data[17]),  

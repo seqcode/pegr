@@ -7,7 +7,16 @@ import groovy.json.*
 class StatsAPIController {
     def alignmentStatsService
     
-    // to test the API: curl -i -X POST -H "Content-Type: application/json" -d '{"run":2,"sample":2,"genome":"sacCer3_cegr"}' localhost:8080/pegr/api/stats?apiKey=
+    /*
+     * Accept API calls, authenticate by the API Key, save the raw data into Analysis, 
+     * and parse data prior to and including the Alignment. To test the API: curl -i -X POST -H 
+     * "Content-Type: application/json" -d '{"run":2,"sample":2,"genome":"sacCer3_cegr"}' 
+     * <hostname>:<port>/<application-name>/api/stats?apiKey=
+     * @param data Input data in the format of JSON dictionary
+     * @param apiKey API Key used to authenticate the user
+     * @return response in the format of JSON dictionary, including a response_code and a message. 
+     * @return status code
+     */
     def save(StatsRegistrationCommand data, String apiKey) {
 
         if (!data || data.properties.every {key, value -> value == null}) {
@@ -42,6 +51,9 @@ class ResponseMessage {
     String message
 }
 
+/* 
+ * Class that defines the underlying structure of input JSON data
+ */
 class StatsRegistrationCommand {
     Long run
     Long sample
@@ -50,7 +62,7 @@ class StatsRegistrationCommand {
     String workflowId
     String historyId
     String toolCategory
-    String parameters
+    Map parameters
     Map statistics
     List datasets
 }

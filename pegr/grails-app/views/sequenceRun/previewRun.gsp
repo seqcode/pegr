@@ -57,7 +57,7 @@
     <g:form action="run">
         <g:hiddenField name="runId" value="${currentRun.id}"></g:hiddenField>
         <g:submitButton class="btn btn-primary" name="submit" value="Submit"></g:submitButton>
-        <g:link action="edit" params="[runId: currentRun.id]" class="btn btn-default">Cancel</g:link>
+        <g:link action="show" id="${currentRun.id}" class="btn btn-default">Cancel</g:link>
     </g:form>
 
     <script>

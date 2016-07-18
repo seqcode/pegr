@@ -207,7 +207,9 @@ class ItemController {
     }
     
     def displayBarcode(String barcode, Integer width, Integer height, String formatStr) {
-        barcodeService.renderImage(response, barcode, width, height, formatStr)
+        if (barcode && barcode != "") {
+            barcodeService.renderImage(response, barcode, width, height, formatStr)
+        }
     }
     
     def deleteImage(String img, Long itemId) {
@@ -237,5 +239,10 @@ class ItemController {
             flash.message = e.message
             redirect(action: 'show', id: itemId)
         }
+    }
+    
+    def generateBarcodeAjax() {
+        def barcode = barcodeService.generateBarcode()
+        render barcode
     }
 }

@@ -16,7 +16,7 @@
         </select>
     </div>
     <div>
-        <button class="btn" onclick="refreshBarcode()">Refresh</button>
+        <button class="btn btn-default" onclick="refreshBarcode()">Refresh</button>
     </div>
 </div>
 <script>

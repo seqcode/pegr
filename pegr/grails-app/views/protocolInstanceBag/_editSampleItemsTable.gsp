@@ -17,7 +17,7 @@
                 <th><a href="#" onclick="window.open('${g.createLink(controller:'project',action:'sampleSubmissionHelp', fragment:'sequence-index')}', 'Help: Sample Submission', 'width=600,height=400' )">Index <span class="glyphicon glyphicon-question-sign"></span></a> 
                         <label class="radio-inline"><input type="radio" name="indexType" value="ID">ID</label>
                         <label class="radio-inline"><input type="radio" name="indexType" value="Sequence" checked>Sequence</label></th>
-            </g:if>        
+            </g:if>    
         </thead>
         <tbody>            
             <g:each in="${samples}" var="sample" status="n">
@@ -28,6 +28,7 @@
                             <g:if test="${children[n]}">
                                 <g:link controller="item" action="show" id="${children[n].id}" target="_blank">${children[n].name}</g:link>
                                 <g:link action="removeChild" params="[sampleId: sample.id, instanceId: instanceId]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link>
+                                <g:link action="addChild" params="[sampleId: sample.id, instanceId: instanceId, childTypeId: childType.id, split: true]" class="edit">Split</g:link>
                             </g:if>
                             <g:else>
                                 <g:link action="addChild" params="[sampleId:sample.id, instanceId:instanceId, childTypeId:childType.id]"><span class="glyphicon glyphicon-plus"></span></g:link>

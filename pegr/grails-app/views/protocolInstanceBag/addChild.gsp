@@ -17,6 +17,7 @@
             <g:form action="addChild" class="fields" role="form" method="POST" useToken="true">
                 <g:hiddenField name="instanceId" value="${instanceId}"/>
                 <g:hiddenField name="sampleId" value="${sample.id}"/>
+                <g:hiddenField name="split" value="${split}"/>
                 <div class=" ${hasErrors(bean: item, field: 'barcode', 'error')} ">
                     <label>Barcode</label>
                     <g:field name="barcode" value="${item?.barcode}" id="barcode"/>

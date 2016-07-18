@@ -418,6 +418,36 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
+    void splitChildren(Item item, Long sampleId, Long instanceId) {
+        def instance = ProtocolInstance.get(instanceId)
+        if (!instance?.bag) {
+            throw new ProtocolInstanceBagException(message: "Protocol Instance Bag not found!")
+        }
+        def sample = Sample.get(sampleId)
+        if (!sample) {
+            throw new ProtocolInstanceBagException(message: "Sample not found!")
+        }
+        if (!sample.item?.parent) {
+            throw new ProtocolInstanceBagException(message: "Parent not found!")
+        }
+        item.parent = sample.item.parent
+        item.user = springSecurityService.currentUser
+        if (item.save()){
+            def newSample = new Sample(cellSource: sample.cellSource, 
+                                       antibody: sample.antibody, 
+                                       item: item,
+                                        status: SampleStatus.PREP)
+            newSample.item = item
+            newSample.addToBags(instance.bag)
+            if (!newSample.save()) {
+                throw new ProtocolInstanceBagException(message: "Error creating the new sample!")
+            }
+        }else {
+            throw new ProtocolInstanceBagException(message: "Invalid inputs!")
+        }
+    }
+    
+    @Transactional
     void removeChild(Long sampleId) {
         def sample = Sample.get(sampleId)
         if (!sample) {

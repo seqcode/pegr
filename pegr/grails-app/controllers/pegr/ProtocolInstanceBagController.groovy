@@ -401,7 +401,11 @@ class ProtocolInstanceBagController {
             withForm {
                 def item = new Item(params)
                 try {
-                    protocolInstanceBagService.addChild(item, sampleId)
+                    if (params.split) {
+                        protocolInstanceBagService.splitChildren(item, sampleId, instanceId)
+                    } else {
+                        protocolInstanceBagService.addChild(item, sampleId)
+                    }
                 }catch(ProtocolInstanceBagException e){
                     flash.message = e.message 
                 }                
@@ -413,7 +417,7 @@ class ProtocolInstanceBagController {
             if (!sample) {
                 redirect(action: "showInstance", id: instanceId)
             }
-            [sample: sample, instanceId: instanceId, childType: childType]
+            [sample: sample, instanceId: instanceId, childType: childType, split: params.split]
         }
     }
     

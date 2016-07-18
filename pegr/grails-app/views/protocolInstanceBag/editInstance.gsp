@@ -5,7 +5,7 @@
 <title>Work bench</title>
 </head>
 <body>
-    <div>
+    <div class="container-fluid">
         <a href="#" onclick="window.open('${g.createLink(action:'help')}', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><u>Help</u></a>
         <g:link action="showBag" id="${protocolInstance?.bag?.id}"><span class="glyphicon glyphicon-home"></span> Home</g:link>
         <g:if test="${flash.message}">

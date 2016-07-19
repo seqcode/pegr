@@ -18,6 +18,11 @@ function getHash(){
     }
 }
 
+function refreshHash() {
+    $("#barcode").val("");
+    location.hash = "";
+}
+
 function closeModal() {
     $(".modal").modal('hide');
 }

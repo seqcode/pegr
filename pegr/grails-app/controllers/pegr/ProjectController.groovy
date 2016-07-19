@@ -186,14 +186,6 @@ class ProjectController {
         }
     }
     
-    def projectRoleHelp() {
-        render(view: "projectRoleHelp")
-    }
-    
-    def sampleSubmissionHelp() {
-        def allIndices = SequenceIndex.findAllByStatus(DictionaryStatus.Y).groupBy({ it -> it.indexVersion })
-        render(view: "sampleSubmissionHelp", model: [allIndices: allIndices])
-    }
 }
 
 

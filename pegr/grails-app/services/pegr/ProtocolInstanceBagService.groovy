@@ -114,9 +114,9 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    def removeItemFromBag(Long itemId, Long bagId) {
+    def removeSampleFromBag(Long sampleId, Long bagId) {
         try {
-            def sample = Sample.where{item.id == itemId}.find()
+            def sample = Sample.get(sampleId)
             def bag = ProtocolInstanceBag.get(bagId)
             sample.removeFromBags(bag).save(flush: true)
         }catch(Exception e) {
@@ -454,8 +454,15 @@ class ProtocolInstanceBagService {
             throw new ProtocolInstanceBagException(message: "Sample not found!")
         }
         def item = sample.item
-        sample.item = item.parent
-        sample.save(flush: true)
+        def childrenCount = Item.executeQuery("select count(*) from Item where parent.id = ?", [item.parent.id])
+        if (childrenCount == 1) {
+            // if there is only one child
+            sample.item = item.parent
+            sample.save(flush: true)
+        } else {
+            // if there are more than one child
+            sample.delete()
+        }
         itemService.delete(item.id)
     }
     

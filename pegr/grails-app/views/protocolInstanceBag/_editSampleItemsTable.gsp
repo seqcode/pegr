@@ -14,7 +14,7 @@
                 <th>Antibody</th>
             </g:if>
             <g:if test="${protocolInstance.protocol.addIndex}">
-                <th><a href="#" onclick="window.open('${g.createLink(controller:'project',action:'sampleSubmissionHelp', fragment:'sequence-index')}', 'Help: Sample Submission', 'width=600,height=400' )">Index <span class="glyphicon glyphicon-question-sign"></span></a> 
+                <th><a href="#" onclick="window.open('/pegr/help#sequence-index', 'Help: Sample Submission', 'width=600,height=400' )">Index <span class="glyphicon glyphicon-question-sign"></span></a> 
                         <label class="radio-inline"><input type="radio" name="indexType" value="ID">ID</label>
                         <label class="radio-inline"><input type="radio" name="indexType" value="Sequence" checked>Sequence</label></th>
             </g:if>    

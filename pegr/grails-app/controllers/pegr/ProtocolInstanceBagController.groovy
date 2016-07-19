@@ -137,9 +137,9 @@ class ProtocolInstanceBagController {
         }
     }
     
-    def removeItemFromBag(Long itemId, Long bagId) {
+    def removeSampleFromBag(Long sampleId, Long bagId) {
         try {
-            protocolInstanceBagService.removeItemFromBag(itemId, bagId)
+            protocolInstanceBagService.removeSampleFromBag(sampleId, bagId)
         } catch(ProtocolInstanceBagException e) {
             flash.message = e.message
         }
@@ -437,10 +437,6 @@ class ProtocolInstanceBagController {
         } else {
             render(view: "/404")
         }
-    }
-    
-    def help() {
-        render(view: "help")
     }
 
 }

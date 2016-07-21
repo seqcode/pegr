@@ -244,7 +244,8 @@ class SequenceRunController {
     def previewRun(Long runId) {
         try {
             def previousRun = walleService.getPreviousRun()
-            def newFolders = walleService.getNewRunFolders()
+            def remoteFiles = walleService.getRemoteFiles()
+            def newFolders = walleService.getNewRunFolders(remoteFiles)
             def queuedRunIds = walleService.getQueuedRunIds()
             def queuedRuns = []
             queuedRunIds.eachWithIndex { id, n ->
@@ -267,6 +268,7 @@ class SequenceRunController {
              currentRun: currentRun,
              meetingTime: startTime]
         } catch (Exception e) {
+            log.error e
             flash.message = "Error connecting to Wall E!"
             redirect(action: "show", id: runId)
         }

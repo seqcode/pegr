@@ -71,12 +71,13 @@ class WalleService {
         Long runId = Long.parseLong(runIds[0])
         def run = SequenceRun.get(runId)
         // return if the prior run has not been processed by the remote server
-        if (findPriorInfoOnRemote()) {
+        def remoteFiles = getRemoteFiles()
+        if (findPriorInfoOnRemote(remoteFiles)) {
             log.warn "The last run has not been processed yet!"
             return
         }
         // get new folder name on the remote server
-        def newRunFolders = getNewRunFolders()
+        def newRunFolders = getNewRunFolders(remoteFiles)
         // return if no new folder has been created on the remote server
         if (newRunFolders.size() == 0) {
             return
@@ -108,26 +109,27 @@ class WalleService {
         return runIds
     }
     
-    def findPriorInfoOnRemote() {
-        def walle = getWalle()
+    def findPriorInfoOnRemote(String[] remoteFiles) {
         def runInfoPath = new File(walle.root, RUN_INFO_FILE_NAME).getPath()
-        def command = 'ls ' + runInfoPath 
-        def rsh = new RemoteSSH(walle.host, walle.username, walle.password, '', command, '', walle.port)
-        def result = rsh.Result(sshConfig).toString().split('<br>') 
-        return result.find{ it == runInfoPath}
+        return remoteFiles.find{ it == runInfoPath}
     }
     
-    def getNewRunFolders() {
+    def getRemoteFiles() {
         def walle = getWalle()
-        String priorRunFolder = Chores.findByName(PRIOR_RUN_FOLDER)?.value
-        // get all the folder names 
         def command = 'ls ' + walle.root + ' | sort'
         def rsh = new RemoteSSH(walle.host, walle.username, walle.password, '', command, '', walle.port)
         def s = rsh.Result(sshConfig).toString().split('<br>')
+        return s
+    }
+    
+    def getNewRunFolders(String[] remoteFiles) {
+        String priorRunFolder = Chores.findByName(PRIOR_RUN_FOLDER)?.value
+        // get all the folder names 
+        
         def newPaths = []
 
-        s.each{
-            if (!it.contains("exit") && !it.contains(command) && !it.contains(RUN_INFO_FILE_NAME)) {
+        remoteFiles.each{
+            if (!it.contains("exit") && !it.contains('ls ') && !it.contains(RUN_INFO_FILE_NAME)) {
                 if (priorRunFolder == null || it > priorRunFolder) {
                     newPaths.push(it)
                 }

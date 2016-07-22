@@ -97,14 +97,14 @@ environments {
 }
 
 // log4j configuration
-log4j.main = {
+log4j = {
     // Example of changing the log pattern for the default console appender:
     //
     appenders {
-    //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
+        console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
 		
 		// limit the size of file 'stacktrace.log'
-		rollingFile name:'stacktrace', file:'stacktrace.log', maxFileSize:'5MB', maxBackupIndex:2
+		rollingFile name:'stacktrace', file:'stacktrace.log', layout: pattern(conversionPattern: '%d{dd-MM-yyyy HH:mm:ss,SSS} %5p %c{1} - %m%n'), maxFileSize:'5MB', maxBackupIndex:2
     }
 
     error  'org.codehaus.groovy.grails.web.servlet',        // controllers
@@ -119,6 +119,10 @@ log4j.main = {
            'org.hibernate',
            'net.sf.ehcache.hibernate'
     info   'grails.app'
+    root {
+        warn 'stdout', 'stacktrace'
+        additivity = true
+    }
 }
 
 grails.war.resources = { stagingDir ->

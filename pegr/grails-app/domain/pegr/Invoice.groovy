@@ -9,6 +9,6 @@ class Invoice {
     static constraints = {
 		serviceId nullable: true, blank: true
         invoiceNum nullable: true, blank: true
-        date nullable: true, blank: true
+        date nullable: true
     }
 }

@@ -11,6 +11,7 @@ class WalleService {
 
     def grailsApplication
     def sshConfig
+    def utilityService
 
     final String RUNS_IN_QUEUE = "RunsInQueue"
     final String PRIOR_RUN_FOLDER = "PriorRunFolder"
@@ -21,10 +22,10 @@ class WalleService {
     
     Map getWalle() {
         def walle = [
-            host : grailsApplication.config.walle.host,
-            port : grailsApplication.config.walle.port.toInteger(),
             username : grailsApplication.config.walle.username,
-            password : grailsApplication.config.walle.password,
+            keyfile : grailsApplication.config.walle.keyfile,
+            host : grailsApplication.config.walle.host,
+            port : grailsApplication.config.walle.port,
             root : grailsApplication.config.walle.root
         ]
         return walle
@@ -97,7 +98,7 @@ class WalleService {
         // update queue
         removeRunFromQueue()  
         updatePriorRunFolder(newFolder)
-        log.info "WallE service has sent the info of run ${run.id} to Wall E."
+        log.warn "WallE service has sent the info of run ${run.id} to Wall E."
     }
     
     def getQueuedRunIds() {
@@ -116,9 +117,12 @@ class WalleService {
     
     def getRemoteFiles() {
         def walle = getWalle()
-        def command = 'ls ' + walle.root + ' | sort'
-        def rsh = new RemoteSSH(walle.host, walle.username, walle.password, '', command, '', walle.port)
-        def s = rsh.Result(sshConfig).toString().split('<br>')
+        // set timeout to 2 min
+        def timeout = 1000 * 60 * 2; 
+        def command = "ssh -i ${walle.keyfile} ${walle.username}@${walle.host} ls ${walle.root} | sort"
+        log.error command
+        def s = utilityService.executeCommand(command, timeout)
+        log.error s
         return s
     }
     

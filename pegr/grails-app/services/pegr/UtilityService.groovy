@@ -142,4 +142,20 @@ class UtilityService {
         }        
         return result
     }
+    
+    def executeCommand(String command, Long timeout) {
+        def output = null
+        def proc = command.execute()
+        proc.waitForOrKill(timeout)
+        if(!proc.exitValue()){
+            // error handling
+            log.error "Error executing the command: ${command}. ${proc.exitValue}: ${proc.err?.text}."
+        }else{
+            output = []
+            proc.eachLine {
+                output << it
+            }
+        }        
+        return output
+    }
 }

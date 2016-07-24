@@ -171,12 +171,3 @@ grails.plugin.springsecurity.auth.loginFormUrl = "/login/form"
 grails.plugin.springsecurity.logout.afterLogoutUrl = "/login/form"
 grails.plugin.springsecurity.failureHandler.defaultFailureUrl = "/login/form"
 grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
-
-environments {
-    development {
-        grails.mail.disabled=false
-    }
-    test {
-        grails.mail.disabled=false
-    }
-}

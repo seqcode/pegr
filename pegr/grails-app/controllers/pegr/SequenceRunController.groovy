@@ -10,6 +10,7 @@ class SequenceRunController {
     def csvConvertService    
     def walleService
     def reportService
+    def utilityService
     
     // list incomplete runs
     def index(Integer max){
@@ -267,9 +268,12 @@ class SequenceRunController {
              queuedRuns: queuedRuns,
              currentRun: currentRun,
              meetingTime: startTime]
+        } catch (WalleException e) {
+            flash.message = e.message
+            redirect(action: "show", id: runId)
         } catch (Exception e) {
             log.error e
-            flash.message = "Error connecting to Wall E!"
+            flash.message = "Error querying the information!"
             redirect(action: "show", id: runId)
         }
     }
@@ -289,13 +293,13 @@ class SequenceRunController {
     }
     
     def convertCsv() {
-        def folderName = "files/csv/"
+        def filesroot = utilityService.getFilesRoot()
         try {
             MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  
             def mpf = mpr.getFile("file");
             String filename = mpf.getOriginalFilename();
             if(!mpf?.empty && filename[-4..-1] == ".csv") {  
-                File folder = new File(folderName); 
+                File folder = new File(filesroot, 'csv'); 
                 if (!folder.exists()) { 
                     folder.mkdirs(); 
                 } 
@@ -303,7 +307,7 @@ class SequenceRunController {
                 mpf.transferTo(fileDest)
                 def user = springSecurityService.currentUser
                 def basicCheck = true
-                def messages = csvConvertService.migrate(folderName + filename, 
+                def messages = csvConvertService.migrate(fileDest.getPath(), 
                                           RunStatus.PREP, 
                                           params.int("startLine"), 
                                           params.int("endLine"),

@@ -9,6 +9,7 @@ class ProtocolException extends RuntimeException {
 
 class ProtocolService {
     def springSecurityService
+    def utilityService
     
     @Transactional
     void save(Protocol protocol, Map protocolItemTypeIds) {
@@ -56,7 +57,8 @@ class ProtocolService {
     }
     
     def getProtocolFolder() {
-        return new File("files/protocols"); 
+        def filesroot = utilityService.getFilesRoot()
+        return new File(filesroot, "protocols"); 
     }
     
     def getProtocolFile(Long protocolId) {

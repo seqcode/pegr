@@ -7,6 +7,7 @@ class UtilityException extends RuntimeException {
 }
 
 class UtilityService {
+    def grailsApplication
    /** 
     * Helper method for Select2. It converts a collection of strings to a collection 
     * of maps with both id and text to be the string.
@@ -109,7 +110,7 @@ class UtilityService {
         return s
     }
     
-    /*
+    /**
      * Divide one Long by another Long
      * @param a numerator
      * @param b denominator
@@ -143,19 +144,41 @@ class UtilityService {
         return result
     }
     
+    /**
+     * Execute command and return the consumed string of output. If
+     * the process does not finish within given time, kill the process.
+     * If the process's exist value is not zero (including the timeout
+     * situation), throw an exception.
+     * @param command a string of command to be executed
+     * @param timeout the max time in milli second allowed to execute.
+     * If exceeded, an error will be thorwn.
+     * @return a consumed string of output 
+     */
     def executeCommand(String command, Long timeout) {
-        def output = null
+        def output = new StringBuilder()
+        def err = new StringBuilder()
         def proc = command.execute()
+        proc.consumeProcessOutput(output, err)
         proc.waitForOrKill(timeout)
-        if(!proc.exitValue()){
+        
+        if (proc.exitValue()){
             // error handling
-            log.error "Error executing the command: ${command}. ${proc.exitValue}: ${proc.err?.text}."
-        }else{
-            output = []
-            proc.eachLine {
-                output << it
-            }
+            log.error "Error executing the command: ${command}. Code ${proc.exitValue()}: ${err}."
+            throw new UtilityException(message: "Error executing the command!")
         }        
-        return output
+        return output.toString()
+    }
+    
+    /**
+     * Get the root folder to hold files
+     * @return the root folder to hold files
+     */
+    def getFilesRoot() {
+        def filesrootStr = grailsApplication.config.filesroot
+        File filesroot = new File(filesrootStr);
+        if (!filesroot.exists()) {
+            filesroot.mkdirs();
+        }
+        return filesroot
     }
 }

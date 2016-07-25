@@ -18,7 +18,7 @@
     </style>
 </head>
 <body>
-    <a href="#" onclick="window.open('${g.createLink(action:'sampleSubmissionHelp')}', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><u>Help</u></a>
+    <a href="#" onclick="window.open('/pegr/help#sample-submission', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><u>Help</u></a>
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>

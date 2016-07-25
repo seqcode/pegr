@@ -9,7 +9,7 @@
         <g:if test="${flash.message}">
             <div class="message" role="status">${flash.message}</div>
         </g:if>
-        <a href="#" onclick="window.open('${g.createLink(action:'help')}', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><u>Help</u></a>
+        <a href="#" onclick="window.open('/pegr/help#bag', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><u>Help</u></a>
         <form role="form" method="post" action="savePrtclInstBag" class="fields">
             <div>
                 <label>Name</label>

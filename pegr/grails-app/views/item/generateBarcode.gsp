@@ -31,15 +31,6 @@
     <script>
         $("#nav-bench").addClass("active");
         $("select").select2();
-        
-        function refreshBarcode() {
-            var width = $("#width").val();
-            var height = $("#height").val();
-            var format = $("#format").val();
-            var s = '${createLink(controller:"item", action:"displayBarcode", params:[barcode:barcode])}';
-            s += "&width=" + width + "&height=" + height + "&formatStr=" + format;
-            $("img").attr("src", s);
-        }
-     </script>
+    </script>
 </body>
 </html>

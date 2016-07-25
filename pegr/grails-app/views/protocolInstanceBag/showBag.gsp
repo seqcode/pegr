@@ -5,7 +5,7 @@
 </head>
 <body>                
     <div class="container-fluid">
-        <a href="#" onclick="window.open('${g.createLink(action:'help')}', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><u>Help</u></a>
+        <a href="#" onclick="window.open('/pegr/help#bag', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><u>Help</u></a>
         <ul class="nav nav-tabs">
             <li><g:link action="index"><span class="glyphicon glyphicon-home"></span> List</g:link></li>
             <g:if test="${completed}">
@@ -70,7 +70,7 @@
                                 </g:if>
                         </h4>
                     </div>                    
-                    <g:render template="/protocolInstanceBag/baggedItems" model="['items':bag.tracedSamples*.item, 'completed':completed]"></g:render>
+                    <g:render template="/protocolInstanceBag/baggedItems" model="['samples':bag.tracedSamples, 'completed':completed]"></g:render>
                 </div>
             </div>
         </div>

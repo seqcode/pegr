@@ -7,6 +7,7 @@
         <label for="barcode">Barcode</label>
         <g:textField id="barcode" name="barcode" />
         <button type="button" onclick="getScan();"><span class="glyphicon glyphicon-qrcode"></span></button>
+        <a href="#" onclick="refreshHash();"><span class="glyphicon glyphicon-refresh"></span></a>
     </div>
     <g:submitButton class="btn btn-primary btn-sm" name="search" value="Search/Create"/>
     <g:submitButton class="btn btn-primary btn-sm" name="generate" value="Generate Barcode"/>

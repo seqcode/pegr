@@ -114,9 +114,9 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    def removeItemFromBag(Long itemId, Long bagId) {
+    def removeSampleFromBag(Long sampleId, Long bagId) {
         try {
-            def sample = Sample.where{item.id == itemId}.find()
+            def sample = Sample.get(sampleId)
             def bag = ProtocolInstanceBag.get(bagId)
             sample.removeFromBags(bag).save(flush: true)
         }catch(Exception e) {
@@ -418,14 +418,51 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
+    void splitChildren(Item item, Long sampleId, Long instanceId) {
+        def instance = ProtocolInstance.get(instanceId)
+        if (!instance?.bag) {
+            throw new ProtocolInstanceBagException(message: "Protocol Instance Bag not found!")
+        }
+        def sample = Sample.get(sampleId)
+        if (!sample) {
+            throw new ProtocolInstanceBagException(message: "Sample not found!")
+        }
+        if (!sample.item?.parent) {
+            throw new ProtocolInstanceBagException(message: "Parent not found!")
+        }
+        item.parent = sample.item.parent
+        item.user = springSecurityService.currentUser
+        if (item.save()){
+            def newSample = new Sample(cellSource: sample.cellSource, 
+                                       antibody: sample.antibody, 
+                                       item: item,
+                                        status: SampleStatus.PREP)
+            newSample.item = item
+            newSample.addToBags(instance.bag)
+            if (!newSample.save()) {
+                throw new ProtocolInstanceBagException(message: "Error creating the new sample!")
+            }
+        }else {
+            throw new ProtocolInstanceBagException(message: "Invalid inputs!")
+        }
+    }
+    
+    @Transactional
     void removeChild(Long sampleId) {
         def sample = Sample.get(sampleId)
         if (!sample) {
             throw new ProtocolInstanceBagException(message: "Sample not found!")
         }
         def item = sample.item
-        sample.item = item.parent
-        sample.save(flush: true)
+        def childrenCount = Item.executeQuery("select count(*) from Item where parent.id = ?", [item.parent.id])
+        if (childrenCount == 1) {
+            // if there is only one child
+            sample.item = item.parent
+            sample.save(flush: true)
+        } else {
+            // if there are more than one child
+            sample.delete()
+        }
         itemService.delete(item.id)
     }
     

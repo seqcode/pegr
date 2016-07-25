@@ -7,7 +7,7 @@
             <tr>
                 <th>Name</th>
                 <th>Affiliation</th> 
-                <th><a href="#" onclick="window.open('${g.createLink(action: 'projectRoleHelp')}', 'Help: Project Role', 'width=600,height=400' )">Role <span class="glyphicon glyphicon-question-sign"></span></a></th>
+                <th><a href="#" onclick="window.open('/pegr/help#project-role', 'Help: Project Role', 'width=600,height=400' )">Role <span class="glyphicon glyphicon-question-sign"></span></a></th>
                 <th></th>
             </tr>
         </thead>

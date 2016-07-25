@@ -102,12 +102,7 @@ class ProtocolInstanceBagController {
             def subBag = null
             if (sample && !sample.bags.empty){
                 subBag = sample.bags.last()
-                if (subBag.status == ProtocolStatus.COMPLETED) {
-                    render(view:"previewItemAndBag", model: [item: item, subBag: subBag, bagId: bagId])
-                } else {
-                    flash.message = "The previous protocol for this sample is not completed yet!"
-                    redirect(action: "searchItemForBag", params:[bagId: bagId])
-                }
+                render(view:"previewItemAndBag", model: [item: item, subBag: subBag, bagId: bagId])
             } else {
                 render(view:"previewItemAndBag", model: [item: item, bagId: bagId])
             }

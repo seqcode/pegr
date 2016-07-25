@@ -37,14 +37,14 @@
             <thead>
                 <tr>
                     <th></th>
-                    <th colspan="19" id="sample-group" class="sample">Sample</th>
-                    <th colspan="12" id="antibody-group" class="antibody">Antibody</th>
-                    <th colspan="4" id="target-group" class="target">Target</th>
-                    <th colspan="4" id="other-group" class="other"></th>
+                    <th colspan="19" class="sample">Sample</th>
+                    <th colspan="12" class="antibody">Antibody</th>
+                    <th colspan="4" class="target">Target</th>
+                    <th colspan="4" class="other">Other</th>
                 </tr>
                 <tr>
                     <th></th>
-                    <th>Genus</th>
+                    <th id="sample-group">Genus</th>
                     <th>Species</th>
                     <th>Parent Strain</th>
                     <th>Strain</th>
@@ -68,7 +68,7 @@
                     <th>Company</th>
                     <th>Catalog</th>
                     <th>Lot #</th>
-                    <th>Host</th>
+                    <th id="antibody-group">Host</th>
                     <th>Immunogene</th>
                     <th>Mono/Poly</th>
                     <th>Ig Type</th>
@@ -80,11 +80,11 @@
                     <th>Target Type</th>
                     <th>Target</th>
                     <th>C-Term</th>
-                    <th>N-Term</th>
+                    <th id="target-group">N-Term</th>
                     <th>Sample Provider</th>
                     <th>Sample Provider Lab</th>
                     <th>Biological Source ID</th>
-                    <th>Send Data to</th>
+                    <th id="other-group">Send Data to</th>
                 </tr>
             </thead>
             <tbody>

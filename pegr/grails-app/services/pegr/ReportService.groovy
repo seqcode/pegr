@@ -100,10 +100,13 @@ class ReportService {
                                           growthMedia: sample.cellSource?.growthMedia?.name,
                                           treatments: sample.cellSource?.treatments,
                                           assay: sample.assay?.name,
-                                          experiments: []
+                                          experiments: [],
+                                          alignmentCount: 0
                                          )
                 sampleDTOs << sampleDTO
-            }
+            } 
+            sampleDTO.alignmentCount++
+            
             def experiment = alignment.sequencingExperiment
             def experimentDTO = sampleDTO.experiments.find { it.id == experiment.id }
             if (!experimentDTO) {
@@ -128,17 +131,17 @@ class ReportService {
     
     def getPeakCallingParam(def filter, def exclusion, def sigma) {
         def result = ""
-        result += (sigma == null) ? "S-" : "S${sigma}"
-        result += (exclusion == null) ? "e-" : "e${exclusion}"
-        result += (filter == null) ? "F-" : "F${filter}"
+        result += getParam("S", sigma)
+        result += getParam("e", exclusion)
+        result += getParam("F", filter)
         return result
     }
     
     def getPeakPairsParam(def upDistance, def downDistance, def binSize) {
         def result = ""
-        result += (upDistance == null) ? "u-" : "u${upDistance}"
-        result += (downDistance == null) ? "d-" : "d${downDistance}"
-        result += (binSize == null) ? "b-" : "b${binSize}"
+        result += getParam("u", upDistance)
+        result += getParam("d", downDistance)
+        result += getParam("b", binSize)
         return result
     }
     
@@ -147,6 +150,16 @@ class ReportService {
         if (peaks != null && peakPairs != null) {
             result = peaks - 2 * peakPairs
         }
+        return result
+    }
+    
+    def getParam(String shortName, String value) {
+        def result = shortName
+        if (value) {
+            result += value.replace("\"", "")
+        } else {
+            result += "-"
+        }        
         return result
     }
 }

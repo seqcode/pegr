@@ -64,7 +64,7 @@ class ProtocolInstanceBagService {
         def item = Item.get(itemId)
         def sample = Sample.findByItem(item)
         if (sample in bag.tracedSamples) {
-            throw new ProtocolInstanceBagException(message: "This sample is already in the bag!")
+            throw new ProtocolInstanceBagException(message: "This sample is already in the bag! You can split the child sample inside the corresponding protocol instance.")
         }
         // create a new sample if the item is not a traced sample
         if (!sample) {

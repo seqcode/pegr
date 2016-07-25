@@ -63,6 +63,7 @@ class SampleDTO {
     String treatments
     String assay
     List experiments
+    Integer alignmentCount
 }
 
 class ExperimentDTO {

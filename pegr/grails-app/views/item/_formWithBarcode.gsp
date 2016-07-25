@@ -17,6 +17,7 @@
     <label>Barcode</label>
     <g:textField id="barcode" name="barcode" value="${item?.barcode}"/>
 <button type="button" onclick="getScan();"><span class="glyphicon glyphicon-qrcode"></span> Scan</button>
+    <a href="#" onclick="refreshHash();"><span class="glyphicon glyphicon-refresh"></span></a>
 </div>
 
 <div class=" ${hasErrors(bean: item, field: 'location', 'error')} ">

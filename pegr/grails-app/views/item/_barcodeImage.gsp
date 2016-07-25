@@ -16,6 +16,16 @@
         </select>
     </div>
     <div>
-        <button class="btn" onclick="refreshBarcode()">Refresh</button>
+        <button class="btn btn-default" onclick="refreshBarcode()">Refresh</button>
     </div>
 </div>
+<script>
+    function refreshBarcode() {
+        var width = $("#width").val();
+        var height = $("#height").val();
+        var format = $("#format").val();
+        var s = '${createLink(controller:"item", action:"displayBarcode", params:[barcode:barcode])}';
+        s += "&width=" + width + "&height=" + height + "&formatStr=" + format;
+        $("img").attr("src", s);
+    }
+</script>

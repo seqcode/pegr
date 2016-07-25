@@ -137,9 +137,9 @@ class ProtocolInstanceBagController {
         }
     }
     
-    def removeItemFromBag(Long itemId, Long bagId) {
+    def removeSampleFromBag(Long sampleId, Long bagId) {
         try {
-            protocolInstanceBagService.removeItemFromBag(itemId, bagId)
+            protocolInstanceBagService.removeSampleFromBag(sampleId, bagId)
         } catch(ProtocolInstanceBagException e) {
             flash.message = e.message
         }
@@ -401,7 +401,11 @@ class ProtocolInstanceBagController {
             withForm {
                 def item = new Item(params)
                 try {
-                    protocolInstanceBagService.addChild(item, sampleId)
+                    if (params.split) {
+                        protocolInstanceBagService.splitChildren(item, sampleId, instanceId)
+                    } else {
+                        protocolInstanceBagService.addChild(item, sampleId)
+                    }
                 }catch(ProtocolInstanceBagException e){
                     flash.message = e.message 
                 }                
@@ -413,7 +417,7 @@ class ProtocolInstanceBagController {
             if (!sample) {
                 redirect(action: "showInstance", id: instanceId)
             }
-            [sample: sample, instanceId: instanceId, childType: childType]
+            [sample: sample, instanceId: instanceId, childType: childType, split: params.split]
         }
     }
     
@@ -433,10 +437,6 @@ class ProtocolInstanceBagController {
         } else {
             render(view: "/404")
         }
-    }
-    
-    def help() {
-        render(view: "help")
     }
 
 }

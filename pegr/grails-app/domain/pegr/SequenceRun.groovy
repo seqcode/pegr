@@ -23,7 +23,7 @@ class SequenceRun {
 		fcId nullable: true, blank: true
 		directoryName nullable: true, blank: true
         user nullable: true
-        lane nullable: true, blank: true
+        lane nullable: true
         date nullable: true
         runStats nullable: true
         poolItem nullable: true

@@ -9,7 +9,7 @@ class ItemException extends RuntimeException {
 
 class ItemService {
 
-    def grailsApplication
+    def utilityService
     def springSecurityService
 
     @Transactional
@@ -69,6 +69,7 @@ class ItemService {
     }
 
     def getImageFolder(Long itemId){
-        File folder = new File("files/items/${itemId}"); 
+        def filesroot = utilityService.getFilesRoot()
+        File folder = new File(filesroot, "items/${itemId}"); 
     }
 }

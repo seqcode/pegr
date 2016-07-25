@@ -36,6 +36,10 @@ ul {
   background-color: #3973ad;
 }
 
+#myNavbar .dropdown-menu li {
+    padding: 5px 0;
+}
+
 .nav .open > a:focus {
   background-color: #3f7fc0;
 }

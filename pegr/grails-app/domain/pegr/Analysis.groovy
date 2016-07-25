@@ -11,6 +11,7 @@ class Analysis {
     String statistics
     String datasets
     String note
+    String stepId
     
     static constraints = {
         category nullable: true, blank: true
@@ -21,6 +22,7 @@ class Analysis {
         statistics nullable: true, blank: true
         datasets nullable: true, blank: true
         note nullable: true, blank: true
+        stepId nullable: true, blank: true
     }
     
     static mapping = {

@@ -15,14 +15,7 @@ class ReportService {
      * sequence run. And link the preferred alignments to the corresponding summary reports. 
      */
     @Transactional
-    def createSummaryReportsForRun(SequenceRun run) {    
-        // clean old reports
-        def alignments = SequenceAlignment.where { summaryReport.run == run}. list()
-        alignments.each {
-            it.summaryReport = null
-            it.save()
-        }
-        SummaryReport.executeUpdate("delete from SummaryReport where run.id = ?", [run.id])
+    def createSummaryReportsForRun(SequenceRun run) {
         // create reports
         def reports = []
         run.experiments.each { experiment ->
@@ -40,8 +33,7 @@ class ReportService {
                 }
                 experiment.alignments.each { alignment ->
                     if (alignment.isPreferred) {
-                        alignment.summaryReport = report
-                        alignment.save()
+                        new ReportAlignments(report: repot, alignment: alignment).save()
                     }
                 } 
             } else {
@@ -51,7 +43,7 @@ class ReportService {
     }
     
     def fetchData(Long reportId) {
-        def alignments = SequenceAlignment.where { summaryReport.id == reportId }.list()
+        def alignments = ReportAlignments.where { report.id == reportId }.collect { it.alignment }.list()
         def sampleDTOs = []
         alignments.each { alignment ->
             def alignmentDTO = new AlignmentDTO(id: alignment.id,

@@ -25,6 +25,7 @@ class Sample {
     Assay assay
     String requestedGenomes
     SampleAudit audit
+    GrowthMedia growthMedia
     
     static hasMany = [bags: ProtocolInstanceBag]
     
@@ -80,6 +81,7 @@ class Sample {
         assay nullable: true
         requestedGenomes nullable: true, blank: true
         audit nullable: true
+        growthMedia nullable: true
     }
     
     static mapping = {

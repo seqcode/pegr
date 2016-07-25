@@ -2,6 +2,7 @@ package pegr
 
 class Protocol {
 	String name
+    String shortName
 	String protocolVersion
 	String description
     User user
@@ -43,6 +44,7 @@ class Protocol {
     
     static constraints = {
 		name unique: 'protocolVersion'
+        shortName nullable: true, blank: true
 		protocolVersion nullable: true, blank: true, maxSize: 10
 		description nullable: true, blank: true
         user nullable: true

@@ -33,7 +33,7 @@ class ReportService {
                 }
                 experiment.alignments.each { alignment ->
                     if (alignment.isPreferred) {
-                        new ReportAlignments(report: repot, alignment: alignment).save()
+                        new ReportAlignments(report: report, alignment: alignment).save()
                     }
                 } 
             } else {
@@ -43,7 +43,7 @@ class ReportService {
     }
     
     def fetchData(Long reportId) {
-        def alignments = ReportAlignments.where { report.id == reportId }.collect { it.alignment }.list()
+        def alignments = ReportAlignments.where { report.id == reportId }.collect { it.alignment }
         def sampleDTOs = []
         alignments.each { alignment ->
             def alignmentDTO = new AlignmentDTO(id: alignment.id,
@@ -63,8 +63,9 @@ class ReportService {
                 switch (analysis.category) {
                     // TODO: change the category name
                     case "testSeven": // GeneTrack
-                        def stats = utilityService.queryJson(analysis.statistics, ["numberOfPeaks"])
+                        def stats = utilityService.queryJson(analysis.statistics, ["numberOfPeaks", "singletons"])
                         alignmentDTO.peaks = stats.numberOfPeaks
+                        alignmentDTO.singletons = stats.singletons
                         def params = utilityService.queryJson(analysis.parameters, ["filter", "sigma", "exclusion"])
                         alignmentDTO.peakCallingParam = getPeakCallingParam(params.filter, params.exclusion, params.sigma)
                         break
@@ -74,6 +75,9 @@ class ReportService {
                         def params = utilityService.queryJson(analysis.parameters, ["up_distance", "down_distance", "binsize"])
                         alignmentDTO.peakPairsParam = getPeakPairsParam(params.up_distance, params.down_distance, params.binsize)
                         break
+                    case "testNine": // meme
+                        def datasets = utilityService.queryJson(analysis.datasets, ["txt"])
+                        alignmentDTO.memeFile = datasets.txt
                 }
             }
             
@@ -89,8 +93,8 @@ class ReportService {
                                           antibody: sample.antibody?.catalogNumber,
                                           strain: sample.cellSource?.strain?.name,
                                           geneticModification: sample.cellSource?.strain?.geneticModification,
-                                          growthMedia: sample.cellSource?.growthMedia?.name,
-                                          treatments: sample.cellSource?.treatments,
+                                          growthMedia: sample.growthMedia?.name,
+                                          treatments: sample.treatments.join(", "),
                                           assay: sample.assay?.name,
                                           experiments: [],
                                           alignmentCount: 0
@@ -120,6 +124,63 @@ class ReportService {
         }
         return sampleDTOs
     }
+    
+    // 
+    def fetchMemeMotifAjax(String url) {
+        def data = new URL(url).getText()
+        def inBlock = false
+        def count = 0
+        def len, nsites, evalue
+        def pwn
+        data.eachLine {
+            if (inBlock) {
+                if (it.startsWith("----------------")) {
+                    results.push([db: 0, 
+                            id: count, 
+                            alt: "MEME", 
+                            len: len, 
+                            nsites: nsites, 
+                            evalue: evalue, 
+                            pwn: pwn])
+                    inBlock = false
+                } else {
+                    def numbers = it.tokenize()
+                    def a = []
+                    numbers.each { n ->
+                        a.push(utilityService.getFloat(n))
+                    }
+                    pwn.push(a)
+                }
+            } else {
+                if (it.startsWith("letter-probability matrix")) {
+                    // digest the statistics
+                    len = findInMotif(it, "w")
+                    nsites = findInMotif(it, "nsites")
+                    evalue = findInMotif(it, "evalue")
+                    pwn = []
+                    count++
+                    inBlock = true
+                }
+            }
+
+        }
+        return results
+    }
+    
+    def findInMotif(String s, String name) {
+        def nameStart = s.indexOf(name+"= ")
+        if (nameStart < 0) {
+            return null
+        }        
+        def valueStart = nameStart + name.length() + 2
+        if (valueStart >= s.length()) {
+            return null
+        }
+        def valueEnd = s.indexOf(" ", valueStart)
+        def value = s[valueStart..valueEnd]
+        return value
+    }
+    
     
     def getPeakCallingParam(def filter, def exclusion, def sigma) {
         def result = ""

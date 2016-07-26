@@ -93,8 +93,9 @@ class AlignmentDTO {
     
     String peakCallingParam
     Long peaks
-    Long singletons  // TODO
+    Long singletons
     String peakPairsParam
     Long peakPairs
     Long nonPairedPeaks
+    String memeFile
 }

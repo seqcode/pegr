@@ -59,6 +59,10 @@ class Sample {
         return ProjectSamples.where{sample == this}.collect{it.project}
     }
     
+    List getTreatments() {
+        return SampleTreatments.where{ sample == this }.collect{ it.treatment }
+    }
+    
     static constraints = {
 		cellSource nullable: true
 		antibody nullable: true

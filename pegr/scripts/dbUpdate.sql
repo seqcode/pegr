@@ -90,4 +90,5 @@ insert into sample_treatments (sample_id, treatment_id) select s.id, treatment_i
 // fill growth media in sample
 update sample s inner join cell_source c on s.cell_source_id = c.id set s.growth_media_id = c.growth_media_id 
 
-
+// delte reports
+delete from summary_report

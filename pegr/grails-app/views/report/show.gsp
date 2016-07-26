@@ -2,6 +2,8 @@
 <head>
     <title>My Reports</title> 
     <meta name="layout" content="main"/>
+    <asset:javascript src="meme.js"/>
+    <asset:stylesheet href="meme.css"/>
 </head>
 <body>
     <g:if test="${flash.message}">
@@ -62,6 +64,7 @@
         <ul>
             <li>
                 <h4>MEME Motifs</h4>
+                <g:render template="/report/meme" model="['sampleList':sampleDTOs]"></g:render>
             </li>
             <li>
                 <h4>Tag PileUp</h4>

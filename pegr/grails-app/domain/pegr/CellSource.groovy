@@ -19,10 +19,6 @@ class CellSource {
 	String toString() {
 		strain
 	}
-    
-    List getTreatments() {
-        return CellSourceTreatments.where{cellSource == this}.collect{it.treatment}
-    }
 	
     static constraints = {
 		inventory nullable: true

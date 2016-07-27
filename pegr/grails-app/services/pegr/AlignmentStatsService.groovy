@@ -14,7 +14,7 @@ class AlignmentStatsService {
         def pipeline = getPipeline(apiUser)
         
         // check required fields
-        def requiredFields = ["run", "sample", "genome", "toolId", "workflowId", "historyId", "toolCategory"]
+        def requiredFields = ["run", "sample", "genome", "toolId", "workflowId", "historyId", "toolCategory", "workflowStepId"]
         requiredFields.each { field ->
             if (!data.properties[field]) {
                 throw new AlignmentStatsException(message: "Missing ${field}!")
@@ -44,7 +44,8 @@ class AlignmentStatsService {
                                     category: data.toolCategory,
                                     workflowId: data.workflowId,
                                     historyId: data.historyId,
-                                    stepId: data.stepId,
+                                    stepId: data.workflowStepId,
+                                    user: data.userEmail,
                                     parameters: parameterStr,
                                     statistics: statisticsStr,
                                     datasets: datasetsStr)
@@ -73,8 +74,8 @@ class AlignmentStatsService {
         return        
     }
     
-    def getPipeline(String user) {
-        def pipeline = Pipeline.where {name == user}.order('pipelineVersion', 'desc').get(max: 1)
+    def getPipeline(String apiUser) {
+        def pipeline = Pipeline.where {name == apiUser}.order('pipelineVersion', 'desc').get(max: 1)
         return pipeline
     }
     

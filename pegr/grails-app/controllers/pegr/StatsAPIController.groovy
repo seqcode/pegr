@@ -23,10 +23,10 @@ class StatsAPIController {
             def response = new ResponseMessage(response_code: 500, message: "Error parsing the JSON data!")
             render text: response as JSON, contentType: "text/json", status: 500 
         } else {
-            def user = ApiUser.findByApiKey(apiKey)
-            if (user) {
+            def apiUser = ApiUser.findByApiKey(apiKey)
+            if (apiUser) {
                 try {
-                    alignmentStatsService.save(data, user.name)
+                    alignmentStatsService.save(data, apiUser.name)
                     def message = "Success!"
                     def response = new ResponseMessage(response_code: 200, message: message)
                     render text: response as JSON, contentType: "text/json", status: 200 
@@ -61,7 +61,8 @@ class StatsRegistrationCommand {
     String toolId
     String workflowId
     String historyId
-    String stepId
+    String workflowStepId
+    String userEmail
     String toolCategory
     Map parameters
     List statistics

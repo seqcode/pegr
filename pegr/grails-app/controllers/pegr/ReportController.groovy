@@ -48,6 +48,11 @@ class ReportController {
         }
         
     }
+    
+    def meme(String url) {
+        def results = reportService.fetchMemeMotif(url)
+        [motifs: results]
+    }
 }
 
 

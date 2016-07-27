@@ -126,7 +126,10 @@ class ReportService {
     }
     
     // 
-    def fetchMemeMotifAjax(String url) {
+    def fetchMemeMotif(String url) {
+        if (url == null || url == "") {
+            return null
+        }
         def data = new URL(url).getText()
         def inBlock = false
         def count = 0

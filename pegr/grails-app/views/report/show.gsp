@@ -64,7 +64,13 @@
         <ul>
             <li>
                 <h4>MEME Motifs</h4>
-                <g:render template="/report/meme" model="['sampleList':sampleDTOs]"></g:render>
+                <g:each in="${sampleDTOs}" var="sample">
+                    <g:each in="${sample.experiments}" var="experiment">
+                        <g:each in="${experiment.alignments}" var="alignment">
+                            <iframe src="/pegr/report/meme?url=${alignment.memeFile}" width=800 height=200 scrolling=no frameBorder=0></iframe>
+                        </g:each>
+                    </g:each>
+                </g:each>
             </li>
             <li>
                 <h4>Tag PileUp</h4>

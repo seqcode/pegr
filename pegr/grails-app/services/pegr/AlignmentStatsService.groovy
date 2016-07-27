@@ -55,14 +55,14 @@ class AlignmentStatsService {
         // store named fields
         if (data.statistics) {
             def updatedInAlignment = copyProperties(data.statistics, theAlignment)
-            if (updatedInAlignment.size() > 0) {
+            if (updatedInAlignment > 0) {
                 theAlignment.date = new Date()
                 if (!theAlignment.save()) {
                     log.error "Error saving ${updatedInAlignment} in Alignment!"
                 }
             } 
             def updatedInExperiment = copyProperties(data.statistics, experiment)
-            if (updatedInExperiment.size() > 0) {
+            if (updatedInExperiment > 0) {
                 if (!experiment.save()) {
                     log.error "Error saving ${updatedInExperiment} in Experiment!"
                 }
@@ -78,7 +78,19 @@ class AlignmentStatsService {
     }
     
     def copyProperties(source, target) {
-        def updatedProperties = []
+        def updatedProperties = 0
+        if (source instanceof List) {
+            source.each {
+                updatedProperties += copyMap(it, target)
+            }
+        } else {
+            updatedProperties = copyMap(source, target)
+        }
+        return updatedProperties
+    }
+    
+    def copyMap(source, target) {
+        def updatedProperties = 0
         def readKey = source.containsKey("read") ? "read${source.read}" : "read"
         source.each { key, value ->
             if (key != "read" && target.hasProperty(key) && value != null) {
@@ -103,7 +115,7 @@ class AlignmentStatsService {
                     log.error e
                     throw new AlignmentStatsException(message: e.message)
                 }                
-                updatedProperties.push(key)
+                updatedProperties++
             }
         }
         return updatedProperties

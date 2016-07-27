@@ -63,7 +63,7 @@ class StatsRegistrationCommand {
     String historyId
     String toolCategory
     Map parameters
-    Map statistics
+    List statistics
     List datasets
 }
 

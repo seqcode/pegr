@@ -7,6 +7,7 @@ class Analysis {
     Pipeline pipeline
     String workflowId
     String historyId
+    String stepId
     String parameters
     String statistics
     String datasets
@@ -20,6 +21,7 @@ class Analysis {
         parameters nullable: true, blank: true
         statistics nullable: true, blank: true
         datasets nullable: true, blank: true
+        stepId nullable: true, blank: true
         note nullable: true, blank: true
     }
     

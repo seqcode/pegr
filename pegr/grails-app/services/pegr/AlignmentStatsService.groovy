@@ -44,6 +44,7 @@ class AlignmentStatsService {
                                     category: data.toolCategory,
                                     workflowId: data.workflowId,
                                     historyId: data.historyId,
+                                    stepId: data.stepId,
                                     parameters: parameterStr,
                                     statistics: statisticsStr,
                                     datasets: datasetsStr)

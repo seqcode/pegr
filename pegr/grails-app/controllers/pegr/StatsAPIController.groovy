@@ -61,6 +61,7 @@ class StatsRegistrationCommand {
     String toolId
     String workflowId
     String historyId
+    String stepId
     String toolCategory
     Map parameters
     List statistics

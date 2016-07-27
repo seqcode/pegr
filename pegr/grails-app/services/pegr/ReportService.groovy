@@ -9,6 +9,7 @@ class ReportException extends RuntimeException {
 class ReportService {
 
     def utilityService
+    def alignmentStatsService
     
     /*
      * Create summary reports for each project linked to the samples inside the 
@@ -76,8 +77,7 @@ class ReportService {
                         alignmentDTO.peakPairsParam = getPeakPairsParam(params.up_distance, params.down_distance, params.binsize)
                         break
                     case "testNine": // meme
-                        def datasets = utilityService.queryJson(analysis.datasets, ["txt"])
-                        alignmentDTO.memeFile = datasets.txt
+                        alignmentDTO.memeFile = alignmentStatsService.queryDatasetsUri(analysis.datasets, "txt")
                 }
             }
             
@@ -134,7 +134,8 @@ class ReportService {
         def inBlock = false
         def count = 0
         def len, nsites, evalue
-        def pwn
+        def pwm
+        def results = []
         data.eachLine {
             if (inBlock) {
                 if (it.startsWith("----------------")) {
@@ -144,7 +145,7 @@ class ReportService {
                             len: len, 
                             nsites: nsites, 
                             evalue: evalue, 
-                            pwn: pwn])
+                            pwm: pwm])
                     inBlock = false
                 } else {
                     def numbers = it.tokenize()
@@ -152,15 +153,15 @@ class ReportService {
                     numbers.each { n ->
                         a.push(utilityService.getFloat(n))
                     }
-                    pwn.push(a)
+                    pwm.push(a)
                 }
             } else {
                 if (it.startsWith("letter-probability matrix")) {
                     // digest the statistics
-                    len = findInMotif(it, "w")
-                    nsites = findInMotif(it, "nsites")
-                    evalue = findInMotif(it, "evalue")
-                    pwn = []
+                    len = utilityService.getLong(findInMotif(it, "w"))
+                    nsites = utilityService.getLong(findInMotif(it, "nsites"))
+                    evalue = findInMotif(it, "E")
+                    pwm = []
                     count++
                     inBlock = true
                 }
@@ -180,7 +181,7 @@ class ReportService {
             return null
         }
         def valueEnd = s.indexOf(" ", valueStart)
-        def value = s[valueStart..valueEnd]
+        def value = s[valueStart..valueEnd-1]
         return value
     }
     

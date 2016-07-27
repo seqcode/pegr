@@ -123,4 +123,17 @@ class AlignmentStatsService {
         return updatedProperties
     }
 
+    def queryDatasetsUri(String datasets, String type) {
+        def jsonList
+        try {
+            def jsonSlurper = new JsonSlurper()
+            jsonList = jsonSlurper.parseText(datasets)
+        } catch(Exception e) {   
+        }
+        if (jsonList) {
+            def data = jsonList.find { d -> d.type == type }
+            return data?.uri
+        }
+        return null
+    } 
 }

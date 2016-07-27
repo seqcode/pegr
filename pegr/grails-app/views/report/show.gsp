@@ -63,17 +63,18 @@
         </div>
         <ul>
             <li>
-                <h4>MEME Motifs</h4>
+                <h3>MEME Motifs</h3>
                 <g:each in="${sampleDTOs}" var="sample">
                     <g:each in="${sample.experiments}" var="experiment">
                         <g:each in="${experiment.alignments}" var="alignment">
+                            <h4>Sample ${sample.id} Run ${experiment.runId} Genome ${alignment.genome}</h4>
                             <iframe src="/pegr/report/meme?url=${alignment.memeFile}" width=800 height=200 scrolling=no frameBorder=0></iframe>
                         </g:each>
                     </g:each>
                 </g:each>
             </li>
             <li>
-                <h4>Tag PileUp</h4>
+                <h3>Tag PileUp</h3>
             </li>
         </ul>  
     </div>

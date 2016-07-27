@@ -1,4 +1,5 @@
 package pegr
+import grails.converters.*
 
 class ReportController {
     
@@ -50,7 +51,8 @@ class ReportController {
     }
     
     def meme(String url) {
-        def results = reportService.fetchMemeMotif(url)
+        def results = reportService.fetchMemeMotif(url) as JSON
+        log.error results
         [motifs: results]
     }
 }

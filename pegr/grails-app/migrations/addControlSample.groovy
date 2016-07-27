@@ -48,12 +48,6 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "dus73 (generated)", id: "1469476064537-4") {
-		addColumn(tableName: "analysis") {
-			column(name: "step_id", type: "varchar(255)")
-		}
-	}
-
 	changeSet(author: "dus73 (generated)", id: "1469476064537-5") {
 		addColumn(tableName: "protocol") {
 			column(name: "short_name", type: "varchar(255)")

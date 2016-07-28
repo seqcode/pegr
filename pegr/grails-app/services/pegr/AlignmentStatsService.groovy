@@ -8,13 +8,14 @@ class AlignmentStatsException extends RuntimeException {
 }
 
 class AlignmentStatsService {
+    def utilityService
     
     @Transactional
     def save(StatsRegistrationCommand data, String apiUser) {
         def pipeline = getPipeline(apiUser)
         
         // check required fields
-        def requiredFields = ["run", "sample", "genome", "toolId", "workflowId", "historyId", "toolCategory"]
+        def requiredFields = ["run", "sample", "genome", "toolId", "workflowId", "historyId", "toolCategory", "workflowStepId"]
         requiredFields.each { field ->
             if (!data.properties[field]) {
                 throw new AlignmentStatsException(message: "Missing ${field}!")
@@ -44,6 +45,8 @@ class AlignmentStatsService {
                                     category: data.toolCategory,
                                     workflowId: data.workflowId,
                                     historyId: data.historyId,
+                                    stepId: data.workflowStepId,
+                                    user: data.userEmail,
                                     parameters: parameterStr,
                                     statistics: statisticsStr,
                                     datasets: datasetsStr)
@@ -55,14 +58,14 @@ class AlignmentStatsService {
         // store named fields
         if (data.statistics) {
             def updatedInAlignment = copyProperties(data.statistics, theAlignment)
-            if (updatedInAlignment.size() > 0) {
+            if (updatedInAlignment > 0) {
                 theAlignment.date = new Date()
                 if (!theAlignment.save()) {
                     log.error "Error saving ${updatedInAlignment} in Alignment!"
                 }
             } 
             def updatedInExperiment = copyProperties(data.statistics, experiment)
-            if (updatedInExperiment.size() > 0) {
+            if (updatedInExperiment > 0) {
                 if (!experiment.save()) {
                     log.error "Error saving ${updatedInExperiment} in Experiment!"
                 }
@@ -72,41 +75,57 @@ class AlignmentStatsService {
         return        
     }
     
-    def getPipeline(String user) {
-        def pipeline = Pipeline.where {name == user}.order('pipelineVersion', 'desc').get(max: 1)
+    def getPipeline(String apiUser) {
+        def pipeline = Pipeline.where {name == apiUser}.order('pipelineVersion', 'desc').get(max: 1)
         return pipeline
     }
     
     def copyProperties(source, target) {
-        def updatedProperties = []
+        def updatedProperties = 0
+        if (source instanceof List) {
+            source.each {
+                updatedProperties += copyMap(it, target)
+            }
+        } else {
+            updatedProperties = copyMap(source, target)
+        }
+        return updatedProperties
+    }
+    
+    def copyMap(source, target) {
+        def updatedProperties = 0
         def readKey = source.containsKey("read") ? "read${source.read}" : "read"
         source.each { key, value ->
             if (key != "read" && target.hasProperty(key) && value != null) {
                 try {
-                    // Special handling of fastqFile and fastqcReport: there could be two files for each sample.
-                    if ( key in ["fastqFile", "fastqcReport"] ) {
-                        def dic = [:] 
-                        if ( target[key] ) {
-                            // If the target field has already been filled, parse the value.   
-                            def jsonSlurper = new JsonSlurper()
-                            try {
-                                dic = jsonSlurper.parseText(target[key])
-                            } catch (Exception e) {
-                            }                          
-                        }
-                        dic[readKey] = value
-                        target[key] = JsonOutput.toJson(dic)
-                    } else {
-                        target[key] = value
-                    }
+                    target[key] = value    
                 } catch(org.codehaus.groovy.runtime.typehandling.GroovyCastException e) {
                     log.error e
                     throw new AlignmentStatsException(message: e.message)
                 }                
-                updatedProperties.push(key)
+                updatedProperties++
             }
         }
         return updatedProperties
     }
 
+    def queryDatasetsUri(String datasets, String type) {
+        def jsonList
+        try {
+            def jsonSlurper = new JsonSlurper()
+            jsonList = jsonSlurper.parseText(datasets)
+        } catch(Exception e) {   
+        }
+        if (jsonList) {
+            def data = jsonList.find { d -> d.type == type }
+            return data?.uri
+        }
+        return null
+    } 
+    
+    def queryDatasetsUriWithRead(String datasets, String statistics, String type) {
+        def stats = utilityService.queryJson(statistics, ["read"])
+        def data = queryDatasetsUri(datasets, type)
+        return [read: "read${stats.read}", data: data]
+    }
 }

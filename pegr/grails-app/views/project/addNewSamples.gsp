@@ -37,14 +37,14 @@
             <thead>
                 <tr>
                     <th></th>
-                    <th colspan="19" id="sample-group" class="sample">Sample</th>
-                    <th colspan="12" id="antibody-group" class="antibody">Antibody</th>
-                    <th colspan="4" id="target-group" class="target">Target</th>
-                    <th colspan="4" id="other-group" class="other"></th>
+                    <th colspan="19" class="sample">Sample</th>
+                    <th colspan="12" class="antibody">Antibody</th>
+                    <th colspan="4" class="target">Target</th>
+                    <th colspan="4" class="other">Other</th>
                 </tr>
                 <tr>
                     <th></th>
-                    <th>Genus</th>
+                    <th id="sample-group">Genus</th>
                     <th>Species</th>
                     <th>Parent Strain</th>
                     <th>Strain</th>
@@ -68,7 +68,7 @@
                     <th>Company</th>
                     <th>Catalog</th>
                     <th>Lot #</th>
-                    <th>Host</th>
+                    <th id="antibody-group">Host</th>
                     <th>Immunogene</th>
                     <th>Mono/Poly</th>
                     <th>Ig Type</th>
@@ -80,11 +80,11 @@
                     <th>Target Type</th>
                     <th>Target</th>
                     <th>C-Term</th>
-                    <th>N-Term</th>
+                    <th id="target-group">N-Term</th>
                     <th>Sample Provider</th>
                     <th>Sample Provider Lab</th>
                     <th>Biological Source ID</th>
-                    <th>Send Data to</th>
+                    <th id="other-group">Send Data to</th>
                 </tr>
             </thead>
             <tbody>
@@ -136,7 +136,7 @@
                         </select>
                     </td>
                     <td>
-                        <select multiple="multiple" class="treatments tag-select2 textcontrol" name="samples[0].treatments" style="width: 300px">
+                        <select multiple="multiple" class="treatments tag-select2" name="samples[0].treatments" style="width: 300px">
                             <option></option>
                         </select>
                     </td>
@@ -269,7 +269,7 @@
             });
         }})
 
-        $.ajax({url: "/pegr/cellSource/fetchTreatmentsAjax", success: function(result) {
+        $.ajax({url: "/pegr/sample/fetchTreatmentsAjax", success: function(result) {
             $("#tr"+count+" .treatments").select2({
                 data: result,
                 tags: true,
@@ -379,7 +379,7 @@
             placeholder: tagPlaceholder
         });
         
-        $.ajax({url: "/pegr/cellSource/fetchGrowthMediaAjax?speciesId="+speciesId, success: function(medias){
+        $.ajax({url: "/pegr/sample/fetchGrowthMediaAjax?speciesId="+speciesId, success: function(medias){
             $growthMedia.select2({
                 data: medias,
                 tags: true,

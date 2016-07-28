@@ -1,5 +1,6 @@
 package pegr
 import groovy.json.*
+import grails.converters.*
     
 class SampleController {
     
@@ -90,11 +91,11 @@ class SampleController {
         }
     }
     
-    def updateProtocol(Long sampleId, Long assayId, String resin, Integer pcr, Long userId, String endTime) {
+    def updateProtocol(Long sampleId, Long assayId, String resin, Integer pcr, Long userId, String endTime, String growthMedia, String treatments) {
         def sample = Sample.get(sampleId)
         if (sample) {
             try {
-                sampleService.updateProtocol(sample, assayId, resin, pcr, userId, endTime)
+                sampleService.updateProtocol(sample, assayId, resin, pcr, userId, endTime, growthMedia, treatments)
                 redirect(action: "edit", params: [sampleId: sampleId])
             } catch(SampleException e) {
                 flash.message = e.message
@@ -231,16 +232,14 @@ class SampleController {
                 age: cellSource.age,
                 sex: cellSource.sex?.name,
                 histology: cellSource.histology?.name,
-                growthMedia: cellSource.growthMedia?.name,
                 providerId: cellSource.providerUser?.id,
                 providerLabId: cellSource.providerLab?.id,
                 bioSourceId: cellSource.biologicalSourceId
             )
             item = cellSource.item
-            treatments = cellSource.treatments
         }
         def itemTypeOptions = ItemType.where {category==ItemTypeCategory.TRACED_SAMPLE}.list()
-        [cellSource: cmd, item: item, treatments: treatments, sampleId: sampleId, cellSourceId: cellSourceId, itemTypeOptions: itemTypeOptions]
+        [cellSource: cmd, item: item, sampleId: sampleId, cellSourceId: cellSourceId, itemTypeOptions: itemTypeOptions]
     }
     
     def updateCellSource(Long sampleId, Long cellSourceId, CellSourceCommand cmd, Item item) {
@@ -395,4 +394,14 @@ class SampleController {
         return
     }
     
+    def fetchGrowthMediaAjax(Long speciesId) {
+        def selectedSpecies = Species.get(speciesId)
+        def growthMedias = GrowthMedia.where { (species == null) || (species == selectedSpecies) }.collect{it.name}
+        render utilityService.stringToSelect2Data(growthMedias) as JSON
+    }
+    
+    def fetchTreatmentsAjax() {
+        def treatments = CellSourceTreatment.executeQuery("select t.name from CellSourceTreatment t")
+        render utilityService.stringToSelect2Data(treatments) as JSON
+    }
 }

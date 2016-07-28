@@ -13,7 +13,7 @@
         <form role="form" method="post" action="savePrtclInstBag" class="fields">
             <div>
                 <label>Name</label>
-                <input name="bagName" required>
+                <input name="bagName" value="${name}" required>
             </div>
             <div>
                 <label>Start Time</label>

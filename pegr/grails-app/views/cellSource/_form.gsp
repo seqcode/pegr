@@ -62,24 +62,6 @@
 </div>
 
 <div>
-    <label>Growth Media</label>
-    <select name="growthMedia" class="growth-media tag-select2 textcontrol" style="width: 150px" required>
-        <option value="${cellSource?.growthMedia}" selected>${cellSource?.growthMedia}</option>
-    </select>
-</div>
-
-<div>
-    <label>Treatments</label>
-    <span id="treatments">
-    <select multiple="multiple" class="treatments tag-select2" name="treatments" style="width: 300px">
-        <g:each in="${treatments}">
-            <option value="${it}" selected>${it}</option>
-        </g:each>        
-    </select>
-    </span>
-</div>
-
-<div>
     <label>Provider User </label>
     <g:select name="providerId" from="${pegr.User.list()}" optionKey="id" value="${cellSource?.providerId}" noSelection="['null': '']" class="no-tag-select2"/>
 </div>
@@ -133,14 +115,6 @@
                 placeholder: tagPlaceholder
             });
         }})
-
-        $.ajax({url: "/pegr/cellSource/fetchTreatmentsAjax", success: function(result) {
-            $(".treatments").select2({
-                data: result,
-                tags: true,
-                placeholder: tagPlaceholder
-            });
-        }});
     }
     
     // ajax calls in cascade selections
@@ -181,21 +155,6 @@
         }});
         $parentStrain.prop("disabled", false);
         
-        var $growthMedia = $(".growth-media");
-        $growthMedia.html('').select2({
-            data: [{id: '', text: ''}],
-            tags: true,
-            placeholder: tagPlaceholder
-        });
-        
-        $.ajax({url: "/pegr/cellSource/fetchGrowthMediaAjax?speciesId="+speciesId, success: function(medias){
-            $growthMedia.select2({
-                data: medias,
-                tags: true,
-                placeholder: tagPlaceholder
-            });
-        }});
-        $growthMedia.prop("disabled", false);
         
         var $genomes = $(".genomes");
         $genomes.html('').select2({

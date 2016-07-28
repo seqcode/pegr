@@ -22,6 +22,7 @@
             <label for="barcode">Barcode</label>
              <g:textField id="barcode" name="barcode" />
             <button type="button" onclick="getScan();"><span class="glyphicon glyphicon-qrcode"></span></button>
+            <a href="#" onclick="refreshHash();"><span class="glyphicon glyphicon-refresh"></span></a>
         </div>
         <div class="form-group">
             <label for="location">Location</label>

@@ -126,22 +126,33 @@ class UtilityService {
     
     def queryJson(String jsonStr, List keys) {
         def jsonSlurper = new JsonSlurper()
-        def jsonMap
+        def json
         try {
-            jsonMap = jsonSlurper.parseText(jsonStr)
+            json = jsonSlurper.parseText(jsonStr)
         } catch(Exception e) {   
         }
         def result = [:]
-        if (jsonMap) {
-            keys.each { key ->
-                result[key] = jsonMap.containsKey(key) ? jsonMap[key] : null
-            }
-        } else {
-            keys.each { key ->
-                result[key] = null
-            }
-        }        
+        keys.each { key ->
+            result[key] = null
+        }
+        if (json) {
+            if (json instanceof List) {
+                json.each { jsonMap ->
+                    queryJson(jsonMap, keys, result)
+                }
+            } else {
+                queryJson(json, keys, result)
+            }            
+        }       
         return result
+    }
+    
+    def queryJson(Map jsonMap, List keys, Map result) {
+        keys.each { key ->
+            if (jsonMap.containsKey(key)) {
+                result[key] = jsonMap[key]
+            }                        
+        }
     }
     
     /**

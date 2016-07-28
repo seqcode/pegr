@@ -2853,4 +2853,8 @@ databaseChangeLog = {
 	include file: 'addSummaryReport.groovy'
 
 	include file: 'changeTreatmentNoteType.groovy'
+
+    include file: 'addStepIdAndUser.groovy'
+
+	include file: 'addControlSample.groovy'
 }

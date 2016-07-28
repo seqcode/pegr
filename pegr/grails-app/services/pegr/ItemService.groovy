@@ -14,6 +14,9 @@ class ItemService {
 
     @Transactional
     def save(Item item){
+        if (!item.type || !item.barcode || item.barcode == "") {
+            throw new ItemException(message: "Item type and barcode are required!")
+        }
         if (Item.where{type.id == item.type.id && barcode == item.barcode && id != item.id}.get(max:1)){
             throw new ItemException(message: "This barcode has already been used!")
         } 

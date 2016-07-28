@@ -84,6 +84,7 @@ update user set enabled = false;
 update user set enabled = true where id in (1,3, 173);
 */
 
+/*
 // fill sample_treatments table
 insert into sample_treatments (sample_id, treatment_id) select s.id, treatment_id from cell_source c inner join cell_source_treatments ct on c.id = ct.cell_source_id inner join sample s on s.cell_source_id = c.id 
 
@@ -92,3 +93,4 @@ update sample s inner join cell_source c on s.cell_source_id = c.id set s.growth
 
 // delte reports
 delete from summary_report
+*/

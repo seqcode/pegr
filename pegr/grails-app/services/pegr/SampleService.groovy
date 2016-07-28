@@ -160,6 +160,7 @@ class SampleService {
         sample.prtclInstSummary.endTime = Date.parse("E MMM dd H:m:s z yyyy", endTime)
         def note = ['Resin':resin, 'PCR Cycle': pcr]
         sample.prtclInstSummary.note = JsonOutput.toJson(note)
+        sample.prtclInstSummary.save()
         sample.growthMedia = getGrowthMedia(growthMedia, sample.cellSource?.strain?.species)
         sample.save()
         

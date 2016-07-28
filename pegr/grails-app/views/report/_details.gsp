@@ -53,7 +53,4 @@
             </g:each>
         </g:each>
     </li>
-    <li>
-        <h4>Tag PileUp</h4>
-    </li>
 </ul> 

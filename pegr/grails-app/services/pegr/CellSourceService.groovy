@@ -37,7 +37,9 @@ class CellSourceService {
     @Transactional
     def update(CellSourceCommand cmd, Item item){
         def cellSource = update(cmd)
-
+        if (!item.type && !item.barcode) {
+            return
+        }
         if (cellSource.item) {
             try {
                 cellSource.item.properties = item

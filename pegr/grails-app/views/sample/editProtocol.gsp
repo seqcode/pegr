@@ -42,11 +42,11 @@
             </div>
             <div>
                 <label>Technician</label>
-                <g:select name="userId" from="${pegr.User.list()}" optionKey="id" value="${sample?.prtclInstSummary.user.id}" noSelection="['':'']" class="no-tag-select2"></g:select>
+                <g:select name="userId" from="${pegr.User.list()}" optionKey="id" value="${sample?.prtclInstSummary?.user?.id}" noSelection="['':'']" class="no-tag-select2"></g:select>
             </div>
             <div>
                 <label>Date</label>
-                <g:datePicker precision="day" name="endTime" value="${sample?.prtclInstSummary.endTime}"/>
+                <g:datePicker precision="day" name="endTime" value="${sample?.prtclInstSummary?.endTime}"/>
             </div>
             <div>
                 <g:submitButton name="save" value="Save" class="btn btn-primary"></g:submitButton>

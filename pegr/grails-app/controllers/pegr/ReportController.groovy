@@ -83,8 +83,6 @@ class ExperimentDTO {
     Long totalReads
     Long adapterDimerCount
     List alignments
-    String fastqc1
-    String fastqc2
 }
 
 class AlignmentDTO {
@@ -110,4 +108,5 @@ class AlignmentDTO {
     Long peakPairs
     Long nonPairedPeaks
     String memeFile
+    Map fastqc
 }

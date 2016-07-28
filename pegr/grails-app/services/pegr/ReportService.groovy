@@ -54,7 +54,8 @@ class ReportService {
                                                 dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
                                                 avgInsertSize: alignment.avgInsertSize,
                                                 stdInsertSize: alignment.stdDevInsertSize,
-                                                genomeCoverage: alignment.genomeCoverage
+                                                genomeCoverage: alignment.genomeCoverage,
+                                                fastqc: [:]
                             )
 
             def statistics
@@ -78,6 +79,11 @@ class ReportService {
                         break
                     case "testNine": // meme
                         alignmentDTO.memeFile = alignmentStatsService.queryDatasetsUri(analysis.datasets, "txt")
+                        break
+                    case "testSix": // fastqc report
+                        def fastqcFile = alignmentStatsService.queryDatasetsUriWithRead(analysis.datasets, analysis.statistics, "html")
+                        alignmentDTO.fastqc[fastqcFile.read] = fastqcFile.data
+                        break
                 }
             }
             
@@ -94,7 +100,7 @@ class ReportService {
                                           strain: sample.cellSource?.strain?.name,
                                           geneticModification: sample.cellSource?.strain?.geneticModification,
                                           growthMedia: sample.growthMedia?.name,
-                                          treatments: sample.treatments.join(", "),
+                                          treatments: sample.treatments*.name.join(", "),
                                           assay: sample.assay?.name,
                                           experiments: [],
                                           alignmentCount: 0

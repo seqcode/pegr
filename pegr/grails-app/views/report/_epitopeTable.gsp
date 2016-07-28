@@ -15,15 +15,33 @@
         <tbody>
             <g:each in="${sampleList}" var="sample">
                 <tr>
-                    <td><g:link controller="sample" action="show" id="${sample?.id}">${sample?.id}</g:link></td>    
-                    <td>${sample?.nTermTag}</td>
-                    <td>${sample?.target}</td>
-                    <td>${sample?.cTermTag}</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>READ1 | READ2</td>
-                </tr>
+                    <td rowspan="${Math.max(1, sample.experiments.size())}"><g:link controller="sample" action="show" id="${sample?.id}">${sample?.id}</g:link></td>
+                    <td rowspan="${Math.max(1, sample.experiments.size())}">${sample?.nTermTag}</td>
+                    <td rowspan="${Math.max(1, sample.experiments.size())}">${sample?.target}</td>
+                    <td rowspan="${Math.max(1, sample.experiments.size())}">${sample?.cTermTag}</td>
+                    <td rowspan="${Math.max(1, sample.experiments.size())}"></td>
+                    <td rowspan="${Math.max(1, sample.experiments.size())}"></td>
+                    <td rowspan="${Math.max(1, sample.experiments.size())}"></td>
+                    <g:each in="${sample.experiments}" var="experiment" status="nExp">
+                        <g:if test="${nExp>0}"><tr></g:if>
+                        <td>
+                            Run${experiment.runId}:
+                            <g:if test="${experiment.alignments.first()?.fastqc.read1}">
+                                <a href="${experiment.alignments.first()?.fastqc.read1}">READ1</a>
+                            </g:if>
+                            <g:else>
+                                NONE&nbsp;
+                            </g:else>
+                             | 
+                            <g:if test="${experiment.alignments.first()?.fastqc.read2}">
+                                <a href="${experiment.alignments.first()?.fastqc.read2}">READ2</a>
+                            </g:if>
+                            <g:else>
+                                NONE&nbsp;
+                            </g:else>
+                        </td>
+                        </tr>
+                    </g:each>
             </g:each>              
             <tr>
                 <td colspan="8"></td>

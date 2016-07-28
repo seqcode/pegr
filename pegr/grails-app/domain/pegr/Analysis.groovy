@@ -24,6 +24,7 @@ class Analysis {
         datasets nullable: true, blank: true
         stepId nullable: true, blank: true
         user nullable: true, blank: true
+        note nullable: true, blank: true
     }
     
     static mapping = {

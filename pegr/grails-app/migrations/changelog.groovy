@@ -2854,5 +2854,7 @@ databaseChangeLog = {
 
 	include file: 'changeTreatmentNoteType.groovy'
 
-	include file: 'addStepIdAndUser.groovy'
+    include file: 'addStepIdAndUser.groovy'
+
+	include file: 'addControlSample.groovy'
 }

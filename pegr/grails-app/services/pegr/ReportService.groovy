@@ -9,20 +9,14 @@ class ReportException extends RuntimeException {
 class ReportService {
 
     def utilityService
+    def alignmentStatsService
     
     /*
      * Create summary reports for each project linked to the samples inside the 
      * sequence run. And link the preferred alignments to the corresponding summary reports. 
      */
     @Transactional
-    def createSummaryReportsForRun(SequenceRun run) {    
-        // clean old reports
-        def alignments = SequenceAlignment.where { summaryReport.run == run}. list()
-        alignments.each {
-            it.summaryReport = null
-            it.save()
-        }
-        SummaryReport.executeUpdate("delete from SummaryReport where run.id = ?", [run.id])
+    def createSummaryReportsForRun(SequenceRun run) {
         // create reports
         def reports = []
         run.experiments.each { experiment ->
@@ -40,8 +34,7 @@ class ReportService {
                 }
                 experiment.alignments.each { alignment ->
                     if (alignment.isPreferred) {
-                        alignment.summaryReport = report
-                        alignment.save()
+                        new ReportAlignments(report: report, alignment: alignment).save()
                     }
                 } 
             } else {
@@ -51,7 +44,7 @@ class ReportService {
     }
     
     def fetchData(Long reportId) {
-        def alignments = SequenceAlignment.where { summaryReport.id == reportId }.list()
+        def alignments = ReportAlignments.where { report.id == reportId }.collect { it.alignment }
         def sampleDTOs = []
         alignments.each { alignment ->
             def alignmentDTO = new AlignmentDTO(id: alignment.id,
@@ -61,7 +54,8 @@ class ReportService {
                                                 dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
                                                 avgInsertSize: alignment.avgInsertSize,
                                                 stdInsertSize: alignment.stdDevInsertSize,
-                                                genomeCoverage: alignment.genomeCoverage
+                                                genomeCoverage: alignment.genomeCoverage,
+                                                fastqc: [:]
                             )
 
             def statistics
@@ -71,8 +65,9 @@ class ReportService {
                 switch (analysis.category) {
                     // TODO: change the category name
                     case "testSeven": // GeneTrack
-                        def stats = utilityService.queryJson(analysis.statistics, ["numberOfPeaks"])
+                        def stats = utilityService.queryJson(analysis.statistics, ["numberOfPeaks", "singletons"])
                         alignmentDTO.peaks = stats.numberOfPeaks
+                        alignmentDTO.singletons = stats.singletons
                         def params = utilityService.queryJson(analysis.parameters, ["filter", "sigma", "exclusion"])
                         alignmentDTO.peakCallingParam = getPeakCallingParam(params.filter, params.exclusion, params.sigma)
                         break
@@ -81,6 +76,13 @@ class ReportService {
                         alignmentDTO.peakPairs = stats.peakPairWis
                         def params = utilityService.queryJson(analysis.parameters, ["up_distance", "down_distance", "binsize"])
                         alignmentDTO.peakPairsParam = getPeakPairsParam(params.up_distance, params.down_distance, params.binsize)
+                        break
+                    case "testNine": // meme
+                        alignmentDTO.memeFile = alignmentStatsService.queryDatasetsUri(analysis.datasets, "txt")
+                        break
+                    case "testSix": // fastqc report
+                        def fastqcFile = alignmentStatsService.queryDatasetsUriWithRead(analysis.datasets, analysis.statistics, "html")
+                        alignmentDTO.fastqc[fastqcFile.read] = fastqcFile.data
                         break
                 }
             }
@@ -97,13 +99,16 @@ class ReportService {
                                           antibody: sample.antibody?.catalogNumber,
                                           strain: sample.cellSource?.strain?.name,
                                           geneticModification: sample.cellSource?.strain?.geneticModification,
-                                          growthMedia: sample.cellSource?.growthMedia?.name,
-                                          treatments: sample.cellSource?.treatments,
+                                          growthMedia: sample.growthMedia?.name,
+                                          treatments: sample.treatments*.name.join(", "),
                                           assay: sample.assay?.name,
-                                          experiments: []
+                                          experiments: [],
+                                          alignmentCount: 0
                                          )
                 sampleDTOs << sampleDTO
-            }
+            } 
+            sampleDTO.alignmentCount++
+            
             def experiment = alignment.sequencingExperiment
             def experimentDTO = sampleDTO.experiments.find { it.id == experiment.id }
             if (!experimentDTO) {
@@ -126,19 +131,80 @@ class ReportService {
         return sampleDTOs
     }
     
+    // 
+    def fetchMemeMotif(String url) {
+        if (url == null || url == "") {
+            return null
+        }
+        def data = new URL(url).getText()
+        def inBlock = false
+        def count = 0
+        def len, nsites, evalue
+        def pwm
+        def results = []
+        data.eachLine {
+            if (inBlock) {
+                if (it.startsWith("----------------")) {
+                    results.push([db: 0, 
+                            id: count, 
+                            alt: "MEME", 
+                            len: len, 
+                            nsites: nsites, 
+                            evalue: evalue, 
+                            pwm: pwm])
+                    inBlock = false
+                } else {
+                    def numbers = it.tokenize()
+                    def a = []
+                    numbers.each { n ->
+                        a.push(utilityService.getFloat(n))
+                    }
+                    pwm.push(a)
+                }
+            } else {
+                if (it.startsWith("letter-probability matrix")) {
+                    // digest the statistics
+                    len = utilityService.getLong(findInMotif(it, "w"))
+                    nsites = utilityService.getLong(findInMotif(it, "nsites"))
+                    evalue = findInMotif(it, "E")
+                    pwm = []
+                    count++
+                    inBlock = true
+                }
+            }
+
+        }
+        return results
+    }
+    
+    def findInMotif(String s, String name) {
+        def nameStart = s.indexOf(name+"= ")
+        if (nameStart < 0) {
+            return null
+        }        
+        def valueStart = nameStart + name.length() + 2
+        if (valueStart >= s.length()) {
+            return null
+        }
+        def valueEnd = s.indexOf(" ", valueStart)
+        def value = s[valueStart..valueEnd-1]
+        return value
+    }
+    
+    
     def getPeakCallingParam(def filter, def exclusion, def sigma) {
         def result = ""
-        result += (sigma == null) ? "S-" : "S${sigma}"
-        result += (exclusion == null) ? "e-" : "e${exclusion}"
-        result += (filter == null) ? "F-" : "F${filter}"
+        result += getParam("S", sigma)
+        result += getParam("e", exclusion)
+        result += getParam("F", filter)
         return result
     }
     
     def getPeakPairsParam(def upDistance, def downDistance, def binSize) {
         def result = ""
-        result += (upDistance == null) ? "u-" : "u${upDistance}"
-        result += (downDistance == null) ? "d-" : "d${downDistance}"
-        result += (binSize == null) ? "b-" : "b${binSize}"
+        result += getParam("u", upDistance)
+        result += getParam("d", downDistance)
+        result += getParam("b", binSize)
         return result
     }
     
@@ -147,6 +213,16 @@ class ReportService {
         if (peaks != null && peakPairs != null) {
             result = peaks - 2 * peakPairs
         }
+        return result
+    }
+    
+    def getParam(String shortName, String value) {
+        def result = shortName
+        if (value) {
+            result += value.replace("\"", "")
+        } else {
+            result += "-"
+        }        
         return result
     }
 }

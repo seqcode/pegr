@@ -22,6 +22,7 @@
                     <label>Barcode</label>
                     <g:field name="barcode" value="${item?.barcode}" id="barcode"/>
                     <button type="button" onclick="getScan();"><span class="glyphicon glyphicon-qrcode"></span> Scan</button>
+                    <a href="#" onclick="refreshHash();"><span class="glyphicon glyphicon-refresh"></span></a>
                     <a href="#" onclick="generateBarcode()" class="btn btn-default">Generate</a>
                 </div>            
                 <div class=" ${hasErrors(bean: item, field: 'name', 'error')} ">

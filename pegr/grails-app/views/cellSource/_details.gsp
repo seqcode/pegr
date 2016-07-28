@@ -22,14 +22,6 @@
 	<li>Histology: ${cellSource.histology}	</li>
 	</g:if>
     
-    <g:if test="${cellSource?.growthMedia}">
-	<li>Growth Media: ${cellSource.growthMedia}	</li>
-	</g:if>
-        
-    <li>Cell Source Treatments:
-        ${cellSource.treatments.join("; ")}
-    </li>
-	
     <li>Provider: 
 	<g:if test="${cellSource?.providerUser}">
 	    ${cellSource.providerUser}

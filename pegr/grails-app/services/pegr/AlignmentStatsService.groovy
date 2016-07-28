@@ -8,6 +8,7 @@ class AlignmentStatsException extends RuntimeException {
 }
 
 class AlignmentStatsService {
+    def utilityService
     
     @Transactional
     def save(StatsRegistrationCommand data, String apiUser) {
@@ -97,22 +98,7 @@ class AlignmentStatsService {
         source.each { key, value ->
             if (key != "read" && target.hasProperty(key) && value != null) {
                 try {
-                    // Special handling of fastqFile and fastqcReport: there could be two files for each sample.
-                    if ( key in ["fastqFile", "fastqcReport"] ) {
-                        def dic = [:] 
-                        if ( target[key] ) {
-                            // If the target field has already been filled, parse the value.   
-                            def jsonSlurper = new JsonSlurper()
-                            try {
-                                dic = jsonSlurper.parseText(target[key])
-                            } catch (Exception e) {
-                            }                          
-                        }
-                        dic[readKey] = value
-                        target[key] = JsonOutput.toJson(dic)
-                    } else {
-                        target[key] = value
-                    }
+                    target[key] = value    
                 } catch(org.codehaus.groovy.runtime.typehandling.GroovyCastException e) {
                     log.error e
                     throw new AlignmentStatsException(message: e.message)
@@ -123,4 +109,23 @@ class AlignmentStatsService {
         return updatedProperties
     }
 
+    def queryDatasetsUri(String datasets, String type) {
+        def jsonList
+        try {
+            def jsonSlurper = new JsonSlurper()
+            jsonList = jsonSlurper.parseText(datasets)
+        } catch(Exception e) {   
+        }
+        if (jsonList) {
+            def data = jsonList.find { d -> d.type == type }
+            return data?.uri
+        }
+        return null
+    } 
+    
+    def queryDatasetsUriWithRead(String datasets, String statistics, String type) {
+        def stats = utilityService.queryJson(statistics, ["read"])
+        def data = queryDatasetsUri(datasets, type)
+        return [read: "read${stats.read}", data: data]
+    }
 }

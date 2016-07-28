@@ -45,12 +45,11 @@ class CellSourceController {
             age: cellSource.age,
             sex: cellSource.sex?.name,
             histology: cellSource.histology?.name,
-            growthMedia: cellSource.growthMedia?.name,
             providerId: cellSource.providerUser?.id,
             providerLabId: cellSource.providerLab?.id,
             bioSourceId: cellSource.biologicalSourceId
         )
-        [cellSource: cmd, treatments: cellSource.treatments]
+        [cellSource: cmd]
     }
     
     def update(CellSourceCommand cmd) {
@@ -109,17 +108,6 @@ class CellSourceController {
         def mutations = Strain.executeQuery("select distinct s.geneticModification from Strain s where s.name = ? and s.genotype = ?", [strainName, genotype])
         render utilityService.stringToSelect2Data(mutations) as JSON
     }
-    
-    def fetchGrowthMediaAjax(Long speciesId) {
-        def selectedSpecies = Species.get(speciesId)
-        def growthMedias = GrowthMedia.where { (species == null) || (species == selectedSpecies) }.collect{it.name}
-        render utilityService.stringToSelect2Data(growthMedias) as JSON
-    }
-    
-    def fetchTreatmentsAjax() {
-        def treatments = CellSourceTreatment.executeQuery("select t.name from CellSourceTreatment t")
-        render utilityService.stringToSelect2Data(treatments) as JSON
-    }
 
 }
 
@@ -137,8 +125,6 @@ class CellSourceCommand {
     String age
     String sex
     String histology
-    String growthMedia
-    String treatments
     Long providerId
     Long providerLabId
     String bioSourceId

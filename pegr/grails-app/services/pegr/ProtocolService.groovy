@@ -50,6 +50,10 @@ class ProtocolService {
         try {
             ProtocolItemTypes.executeUpdate("delete ProtocolItemTypes t where t.protocol.id = :protocolId", [protocolId: id])
             Protocol.executeUpdate("delete Protocol t where t.id = :protocolId", [protocolId: id])
+            def file = getProtocolFile(id)
+            if (file?.exists()) {
+                file.delete()
+            }
         }catch(Exception e) {
             log.error "Error: ${e.message}", e
             throw new ProtocolException(message: "Error deleting the protocol!")

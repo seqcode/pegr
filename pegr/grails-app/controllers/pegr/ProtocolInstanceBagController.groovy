@@ -35,7 +35,9 @@ class ProtocolInstanceBagController {
     def create() {
         def user = springSecurityService.currentUser
         def protocolGroups = ProtocolGroup.list()
-        [protocolGroups: protocolGroups, user: user]
+        def date = new Date().format("yyMMdd")
+        def name = "${date}_${user.username}_"
+        [protocolGroups: protocolGroups, user: user, name: name]
     }
     
     def savePrtclInstBag(Long protocolGroupId, String bagName) {        
@@ -102,12 +104,7 @@ class ProtocolInstanceBagController {
             def subBag = null
             if (sample && !sample.bags.empty){
                 subBag = sample.bags.last()
-                if (subBag.status == ProtocolStatus.COMPLETED) {
-                    render(view:"previewItemAndBag", model: [item: item, subBag: subBag, bagId: bagId])
-                } else {
-                    flash.message = "The previous protocol for this sample is not completed yet!"
-                    redirect(action: "searchItemForBag", params:[bagId: bagId])
-                }
+                render(view:"previewItemAndBag", model: [item: item, subBag: subBag, bagId: bagId])
             } else {
                 render(view:"previewItemAndBag", model: [item: item, bagId: bagId])
             }

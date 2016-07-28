@@ -1,4 +1,5 @@
 package pegr
+import grails.converters.*
 
 class ReportController {
     
@@ -20,8 +21,12 @@ class ReportController {
         }
         def currentProject = report.project
         def projectUsers = ProjectUser.where { project == currentProject}.list()
+        [project: currentProject, projectUsers: projectUsers, reportId: id]
+    }
+    
+    def fetchDataAjax(Long id) {
         def data = reportService.fetchData(id)
-        [project: currentProject, projectUsers: projectUsers, sampleDTOs: data]
+        render(template: 'details', model: [ sampleDTOs: data])        
     }
     
     def showProject(Long id) {
@@ -48,6 +53,11 @@ class ReportController {
         }
         
     }
+    
+    def meme(String url) {
+        def results = reportService.fetchMemeMotif(url) as JSON
+        [motifs: results]
+    }
 }
 
 
@@ -63,6 +73,7 @@ class SampleDTO {
     String treatments
     String assay
     List experiments
+    Integer alignmentCount
 }
 
 class ExperimentDTO {
@@ -92,8 +103,10 @@ class AlignmentDTO {
     
     String peakCallingParam
     Long peaks
-    Long singletons  // TODO
+    Long singletons
     String peakPairsParam
     Long peakPairs
     Long nonPairedPeaks
+    String memeFile
+    Map fastqc
 }

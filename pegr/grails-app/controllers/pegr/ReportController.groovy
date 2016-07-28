@@ -21,8 +21,12 @@ class ReportController {
         }
         def currentProject = report.project
         def projectUsers = ProjectUser.where { project == currentProject}.list()
+        [project: currentProject, projectUsers: projectUsers, reportId: id]
+    }
+    
+    def fetchDataAjax(Long id) {
         def data = reportService.fetchData(id)
-        [project: currentProject, projectUsers: projectUsers, sampleDTOs: data]
+        render(template: 'details', model: [ sampleDTOs: data])        
     }
     
     def showProject(Long id) {
@@ -52,7 +56,6 @@ class ReportController {
     
     def meme(String url) {
         def results = reportService.fetchMemeMotif(url) as JSON
-        log.error results
         [motifs: results]
     }
 }
@@ -80,6 +83,8 @@ class ExperimentDTO {
     Long totalReads
     Long adapterDimerCount
     List alignments
+    String fastqc1
+    String fastqc2
 }
 
 class AlignmentDTO {

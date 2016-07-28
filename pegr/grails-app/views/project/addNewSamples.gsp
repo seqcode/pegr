@@ -136,7 +136,7 @@
                         </select>
                     </td>
                     <td>
-                        <select multiple="multiple" class="treatments tag-select2 textcontrol" name="samples[0].treatments" style="width: 300px">
+                        <select multiple="multiple" class="treatments tag-select2" name="samples[0].treatments" style="width: 300px">
                             <option></option>
                         </select>
                     </td>
@@ -269,7 +269,7 @@
             });
         }})
 
-        $.ajax({url: "/pegr/cellSource/fetchTreatmentsAjax", success: function(result) {
+        $.ajax({url: "/pegr/sample/fetchTreatmentsAjax", success: function(result) {
             $("#tr"+count+" .treatments").select2({
                 data: result,
                 tags: true,
@@ -379,7 +379,7 @@
             placeholder: tagPlaceholder
         });
         
-        $.ajax({url: "/pegr/cellSource/fetchGrowthMediaAjax?speciesId="+speciesId, success: function(medias){
+        $.ajax({url: "/pegr/sample/fetchGrowthMediaAjax?speciesId="+speciesId, success: function(medias){
             $growthMedia.select2({
                 data: medias,
                 tags: true,

@@ -35,7 +35,9 @@ class ProtocolInstanceBagController {
     def create() {
         def user = springSecurityService.currentUser
         def protocolGroups = ProtocolGroup.list()
-        [protocolGroups: protocolGroups, user: user]
+        def date = new Date().format("yyMMdd")
+        def name = "${date}_${user.username}_"
+        [protocolGroups: protocolGroups, user: user, name: name]
     }
     
     def savePrtclInstBag(Long protocolGroupId, String bagName) {        

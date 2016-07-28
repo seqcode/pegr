@@ -54,10 +54,6 @@
             <li>Histology:${sample.cellSource.histology}	</li>
             </g:if>
 
-            <g:if test="${sample.cellSource?.growthMedia}">
-            <li>Growth Media: ${sample.cellSource.growthMedia}	</li>
-            </g:if>
-
             <li>Provider: 
             <g:if test="${sample.cellSource?.providerUser}">
                ${sample.cellSource.providerUser}
@@ -70,12 +66,6 @@
             <g:if test="${sample.cellSource?.biologicalSourceId}">
             <li>Biological Source ID: ${sample.cellSource.biologicalSourceId}</li>
             </g:if>
-
-            <li>Treatments:
-                <g:each in="${sample?.cellSource?.treatments}" var="c">
-                    ${c}
-                </g:each>	
-            </li>
 
             <g:if test="${sample?.spikeInCellSource}">
             Spike In Cell Source: ${sample?.spikeInCellSource?.encodeAsHTML()}
@@ -183,6 +173,15 @@
         <h4>Protocol <g:if test="${sampleEditAuth}"><g:link action="editProtocol" params="[sampleId: sample.id]" class="edit">Edit</g:link></g:if></h4>   
         <ul>
             <li>Assay: ${sample.assay}</li>
+            
+            <li>Growth Media: ${sample.growthMedia}	</li>
+            
+            <li>Treatments:
+                <g:each in="${sample?.treatments}" var="c">
+                    ${c}
+                </g:each>	
+            </li>
+
             <g:if test="${sample?.prtclInstSummary}">
                 <g:if test="${notes['Resin']}">
                 <li>Resin: ${notes['Resin']}</li>

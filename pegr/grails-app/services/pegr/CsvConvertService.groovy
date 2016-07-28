@@ -92,14 +92,11 @@ class CsvConvertService {
         def strain = strainAndTissue.strain
         def tissue = strainAndTissue.tissue
 
-        def growthMedia = cellSourceService.getGrowthMedia(data.growthMedia, species)
+        def growthMedia = sampleService.getGrowthMedia(data.growthMedia, species)
 
         def inventory = getInventory(data.dateReceived, data.receivingUser, data.inOrExternal, data.inventoryNotes)
         def prepUser = getUser(data.samplePrepUser)
-        def cellSource = getCellSource(prepUser, growthMedia, strain, cellProvider, inventory, tissue)
-
-        cellSourceService.addTreatment(cellSource, data.perturbation1)
-        cellSourceService.addTreatment(cellSource, data.perturbation2)
+        def cellSource = getCellSource(prepUser, strain, cellProvider, inventory, tissue)
         
         def assay = getAssay(data.assay)
 
@@ -118,8 +115,11 @@ class CsvConvertService {
 
         def abNotes = JsonOutput.toJson(abnoteMap)
         
-        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes, assay)
+        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes, assay, growthMedia)
 
+        sampleService.addTreatment(sample, data.perturbation1)
+        sampleService.addTreatment(sample, data.perturbation2)
+        
         addIndexToSample(sample, data.indexStr, data.indexIdStr, basicCheck)
         sampleService.addSampleToProject(project, sample)
 
@@ -400,15 +400,15 @@ class CsvConvertService {
         return prtcl
     }
 	
-    def getCellSource(User prepUser, GrowthMedia growthMedia, Strain strain, User provider, Inventory inventory, Tissue tissue) {
+    def getCellSource(User prepUser, Strain strain, User provider, Inventory inventory, Tissue tissue) {
 	    if (!strain) {
 	        return null
 	    }
-	    def cellSource = new CellSource(providerUser: provider, strain: strain, growthMedia: growthMedia, prepUser: prepUser, inventory: inventory, tissue: tissue).save( failOnError: true)
+	    def cellSource = new CellSource(providerUser: provider, strain: strain, prepUser: prepUser, inventory: inventory, tissue: tissue).save( failOnError: true)
 	    return cellSource
 	}
     
-	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId, String abNotes, Assay assay) {
+	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId, String abNotes, Assay assay, GrowthMedia growthMedia) {
 	    def note = [:]
 	    if (sampleNotes) {
 	        note['note'] = sampleNotes
@@ -438,7 +438,7 @@ class CsvConvertService {
             }
         }
         
-	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes, assay: assay).save( failOnError: true)
+	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes, assay: assay, growthMedia: growthMedia).save( failOnError: true)
 	    return sample
 	}
 	

@@ -20,7 +20,6 @@ class CellSourceService {
                 tissue = getTissue(cmd.tissue)
                 sex = getSex(cmd.sex)
                 histology = getHistology(cmd.histology)
-                growthMedia = getGrowthMedia(cmd.growthMedia, species)
                 age = utilityService.cleanString(cmd.age)
                 biologicalSourceId = utilityService.cleanString(cmd.bioSourceId)
                 providerUser = User.get(cmd.providerId)
@@ -30,25 +29,6 @@ class CellSourceService {
             // save cell source
             if (!cellSource.save(flush: true)) {
                 throw new CellSourceException(message: "Invalid inputs for cell source!")
-            }
-            // save cell source's treatments
-            def toDelete = CellSourceTreatments.where{cellSource == cellSource}.list()
-            if (cmd.treatments) {
-                cmd.treatments.split(",").each { treatmentName ->
-                    def oldTreatment = toDelete.find{it.treatment.name == treatmentName}
-                    if (oldTreatment) {
-                        toDelete.remove(oldTreatment)
-                    } else {
-                        def treatment = CellSourceTreatment.findByName(treatmentName)
-                        if (!treatment) {
-                            treatment = new CellSourceTreatment(name: treatmentName).save(failOnError: true)
-                        }
-                        new CellSourceTreatments(cellSource: cellSource, treatment: treatment).save()
-                    }
-                }
-            }
-            toDelete.each {
-                it.delete()
             }
         }
         return cellSource
@@ -206,24 +186,6 @@ class CellSourceService {
 	    }
 	    return species
 	}
-	
-    @Transactional
-	def getGrowthMedia(String _mediaStr, Species species) {
-        def mediaStr = utilityService.cleanString(_mediaStr)
-	    if(mediaStr == null) {
-	        return null
-	    }
-	    def media = GrowthMedia.findByName(mediaStr)
-	    if(!media) {
-	        media = new GrowthMedia(name: mediaStr, species: species).save( failOnError: true)
-	    } else {
-	        if(media.species != species) {
-	            media.species = null
-				media.save( failOnError: true)
-	        }
-	    }
-	    return media
-	}
     
     @Transactional
 	def getCellSource(def data) {
@@ -236,42 +198,14 @@ class CellSourceService {
         def tissue = getTissue(data.tissue)
         def sex = getSex(data.sex)
         def histology = getHistology(data.histology)
-        def growthMedia = getGrowthMedia(data.growthMedia, species)                
+             
         def age = utilityService.cleanString(data.age)
         def bioSourceId = utilityService.cleanString(data.bioSourceId)
         
         // save cell source
-	    def cellSource = new CellSource(providerUser: provider, providerLab: providerLab, biologicalSourceId: bioSourceId, strain: strain, growthMedia: growthMedia, tissue: tissue, age: age, sex: sex, histology: histology).save( failOnError: true)
-        
-        // add treatments to cell source
-        if (data.treatments) {
-            data.treatments.split(",").each { treatmentStr ->
-                addTreatment(cellSource, treatmentStr)
-            }
-        }
+	    def cellSource = new CellSource(providerUser: provider, providerLab: providerLab, biologicalSourceId: bioSourceId, strain: strain, tissue: tissue, age: age, sex: sex, histology: histology).save( failOnError: true)
 
 	    return cellSource
-	}
-	
-	def addTreatment(CellSource cellSource, String _treatmentStr) {
-        def treatmentStr = utilityService.cleanString(_treatmentStr)
-	    if(treatmentStr == null) {
-	        return null
-	    }
-        def name = treatmentStr
-        def description = treatmentStr
-        if(treatmentStr.size() > 250) {
-            name = treatmentStr.take(250)
-        }
-	    def treatment = CellSourceTreatment.findByName(name)
-	    if(!treatment) {
-	        treatment = new CellSourceTreatment(name: name, note: description).save(failOnError: true)
-	    }
-	    if(treatment && cellSource) {
-            if (!CellSourceTreatments.findByCellSourceAndTreatment(cellSource, treatment)) {
-                new CellSourceTreatments(cellSource: cellSource, treatment: treatment).save( failOnError: true)
-            }			
-		} 
 	}
 
 }

@@ -81,8 +81,17 @@ class SampleService {
             }
 
             def abNotes = JsonOutput.toJson(abnoteMap)
-            def sample = getSample(cellSource, antibody, target, data.cellNum, data.chrom, data.volume, data.requestedTags, data.sampleNotes, sendTo, abNotes, data.genomes, assay)
             
+            def growthMedia = getGrowthMedia(data.growthMedia, cellSource.strain?.species)
+            
+            def sample = getSample(cellSource, antibody, target, data.cellNum, data.chrom, data.volume, data.requestedTags, data.sampleNotes, sendTo, abNotes, data.genomes, assay, growthMedia)
+                    
+            // add treatments to sample
+            if (data.treatments) {
+                data.treatments.split(",").each { treatmentStr ->
+                    addTreatment(sample, treatmentStr)
+                }
+            }
             // add index
             try {
                 if (data.indexType == "ID") {
@@ -98,6 +107,27 @@ class SampleService {
         }
         return message
     }
+    
+    def addTreatment(Sample sample, String _treatmentStr) {
+        def treatmentStr = utilityService.cleanString(_treatmentStr)
+	    if(treatmentStr == null) {
+	        return null
+	    }
+        def name = treatmentStr
+        def description = treatmentStr
+        if(treatmentStr.size() > 250) {
+            name = treatmentStr.take(250)
+        }
+	    def treatment = CellSourceTreatment.findByName(name)
+	    if(!treatment) {
+	        treatment = new CellSourceTreatment(name: name, note: description).save(failOnError: true)
+	    }
+	    if(treatment && sample) {
+            if (!SampleTreatments.findBySampleAndTreatment(sample, treatment)) {
+                new SampleTreatments(sample: sample, treatment: treatment).save( failOnError: true)
+            }			
+		} 
+	}
     
     @Transactional
     def updateOther(Sample sample, String indexType, String indices) {
@@ -121,7 +151,7 @@ class SampleService {
     }
     
     @Transactional
-    def updateProtocol(Sample sample, Long assayId, String resin, Integer pcr, Long userId, String endTime) {
+    def updateProtocol(Sample sample, Long assayId, String resin, Integer pcr, Long userId, String endTime, String growthMedia, String treatments) {
         sample.assay = Assay.get(assayId)
         if (!sample.prtclInstSummary) {
             sample.prtclInstSummary = new ProtocolInstanceSummary()
@@ -130,7 +160,28 @@ class SampleService {
         sample.prtclInstSummary.endTime = Date.parse("E MMM dd H:m:s z yyyy", endTime)
         def note = ['Resin':resin, 'PCR Cycle': pcr]
         sample.prtclInstSummary.note = JsonOutput.toJson(note)
+        sample.growthMedia = getGrowthMedia(growthMedia, sample.cellSource?.strain?.species)
         sample.save()
+        
+        // save cell source's treatments
+        def toDelete = SampleTreatments.where{ sample == sample}.list()
+        if (treatments) {
+            treatments.split(",").each { treatmentName ->
+                def oldTreatment = toDelete.find{it.treatment.name == treatmentName}
+                if (oldTreatment) {
+                    toDelete.remove(oldTreatment)
+                } else {
+                    def treatment = CellSourceTreatment.findByName(treatmentName)
+                    if (!treatment) {
+                        treatment = new CellSourceTreatment(name: treatmentName).save(failOnError: true)
+                    }
+                    new SampleTreatments(sample: sample, treatment: treatment).save()
+                }
+            }
+        }
+        toDelete.each {
+            it.delete()
+        }
     } 
     
     @Transactional
@@ -153,9 +204,9 @@ class SampleService {
     
     
     @Transactional
-    def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, User dataTo, String abNotes, String requestedGenomes, Assay assay) {
+    def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, User dataTo, String abNotes, String requestedGenomes, Assay assay, GrowthMedia growthMedia) {
         def now = new Date()
-	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: utilityService.getFloat(requestedTagNum), chromosomeAmount: utilityService.getFloat(chromAmount), cellNumber: utilityService.getFloat(cellNum), volume: utilityService.getFloat(volume), note: sampleNotes, status: SampleStatus.CREATED, date: now, sendDataTo: dataTo, antibodyNotes: abNotes, requestedGenomes: requestedGenomes, assay: assay).save(failOnError: true)
+	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: utilityService.getFloat(requestedTagNum), chromosomeAmount: utilityService.getFloat(chromAmount), cellNumber: utilityService.getFloat(cellNum), volume: utilityService.getFloat(volume), note: sampleNotes, status: SampleStatus.CREATED, date: now, sendDataTo: dataTo, antibodyNotes: abNotes, requestedGenomes: requestedGenomes, assay: assay, growthMedia: growthMedia).save(failOnError: true)
 	    return sample
 	}
     
@@ -217,6 +268,24 @@ class SampleService {
         sample.item = item
         sample.save()
     }
+    
+    @Transactional
+	def getGrowthMedia(String _mediaStr, Species species) {
+        def mediaStr = utilityService.cleanString(_mediaStr)
+	    if(mediaStr == null) {
+	        return null
+	    }
+	    def media = GrowthMedia.findByName(mediaStr)
+	    if(!media) {
+	        media = new GrowthMedia(name: mediaStr, species: species).save( failOnError: true)
+	    } else {
+	        if(media.species != species) {
+	            media.species = null
+				media.save( failOnError: true)
+	        }
+	    }
+	    return media
+	}
     
     /**
      * Authorization to edit the given sample: Admin or 

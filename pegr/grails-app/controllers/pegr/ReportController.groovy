@@ -24,8 +24,8 @@ class ReportController {
         [project: currentProject, projectUsers: projectUsers, reportId: id]
     }
     
-    def fetchDataAjax(Long id) {
-        def data = reportService.fetchData(id)
+    def fetchDataForReportAjax(Long id) {
+        def data = reportService.fetchDataForReport(id)
         render(template: 'details', model: [ sampleDTOs: data])        
     }
     
@@ -42,7 +42,7 @@ class ReportController {
             redirect(action: "index")
         }
     }
-
+    
     def showSamples() {
         def samples = []
         params.sampleIds.each{

@@ -10,6 +10,7 @@ class SampleController {
     def cellSourceService
     def itemService
     def utilityService
+    def reportService
     
     def all(Integer max) {
         params.max = Math.min(max ?: 15, 100)
@@ -404,5 +405,10 @@ class SampleController {
     def fetchTreatmentsAjax() {
         def treatments = CellSourceTreatment.executeQuery("select t.name from CellSourceTreatment t")
         render utilityService.stringToSelect2Data(treatments) as JSON
+    }
+    
+    def fetchDataForSampleAjax(Long id) {
+        def data = reportService.fetchDataForSample(id)
+        render(template: '/sample/bioinformatics', model: [ sampleDTOs: data])    
     }
 }

@@ -43,8 +43,18 @@ class ReportService {
         }        
     }
     
-    def fetchData(Long reportId) {
+    def fetchDataForSample(Long sampleId) {
+        def experiments = SequencingExperiment.where { sample.id == sampleId }
+        def alignments = experiments*.alignments.flatten()
+        return fetchData(alignments)
+    }
+    
+    def fetchDataForReport(Long reportId) {
         def alignments = ReportAlignments.where { report.id == reportId }.collect { it.alignment }
+        return fetchData(alignments)
+    }
+    
+    def fetchData(List alignments){
         def sampleDTOs = []
         alignments.each { alignment ->
             def alignmentDTO = new AlignmentDTO(id: alignment.id,

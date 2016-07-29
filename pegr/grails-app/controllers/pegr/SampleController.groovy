@@ -370,7 +370,11 @@ class SampleController {
             }
             order("id", "desc")
         }
-        [sampleList: samples]
+        def checkedCount = 0;
+        if (session.checkedSample) {
+            checkedCount = session.checkedSample.size()
+        }
+        [sampleList: samples, checkedCount: checkedCount]
     }
     
     def fetchDataForSamplesAjax(String sampleIds) {
@@ -386,12 +390,15 @@ class SampleController {
         return
     }
     
-    def addCheckedSampleAjax() {
-        
+    def addCheckedSampleAjax(Long id) {
+        if (!session.checkedSample) {
+            session.checkedSample = []
+        }
+        session.checkedSample << id
     }
     
-    def removeCheckedSampleAjax() {
-        
+    def removeCheckedSampleAjax(Long id) {
+        session.checkedSample.remove(id)
     }
     
     def fetchGrowthMediaAjax(Long speciesId) {

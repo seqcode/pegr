@@ -49,9 +49,19 @@ class ReportService {
         return fetchData(alignments)
     }
     
-    def fetchDataForReport(Long reportId) {
-        def alignments = ReportAlignments.where { report.id == reportId }.collect { it.alignment }
-        return fetchData(alignments)
+    def fetchDataForSamples(String sampleIds) {
+        def sampleList = []
+        if (sampleIds) {
+            def ids = sampleIds.split(",")        
+
+            ids.each { 
+                def id = utilityService.getLong(it)
+                if (id) {
+                    sampleList << fetchDataForSample(id)?.first()
+                }
+            }
+        }
+        return sampleList
     }
     
     def fetchData(List alignments){
@@ -235,4 +245,5 @@ class ReportService {
         }        
         return result
     }
+
 }

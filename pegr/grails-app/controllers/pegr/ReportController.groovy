@@ -43,17 +43,6 @@ class ReportController {
         }
     }
     
-    def showSamples() {
-        def samples = []
-        params.sampleIds.each{
-            def sample = Sample.get(Long.parseLong(it))
-            if (sample) {
-                samples.push(sample)
-            }
-        }
-        
-    }
-    
     def meme(String url) {
         def results = reportService.fetchMemeMotif(url) as JSON
         [motifs: results]

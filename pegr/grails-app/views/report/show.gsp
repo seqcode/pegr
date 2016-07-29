@@ -41,7 +41,7 @@
             $("#nav-reports").addClass("active");
             $.ajax({url: "/pegr/report/fetchDataForReportAjax/${reportId}", success: function(result) {
                 $("#details").html(result)
-            }})
+            }});
         });
     </script>
 </body>

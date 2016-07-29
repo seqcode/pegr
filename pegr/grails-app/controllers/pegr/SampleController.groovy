@@ -319,22 +319,6 @@ class SampleController {
     
     def showChecked(){
         
-        def ids
-        if (session.checkedSample){
-            session.checkedSample.append(params.checkedSample)
-        }else{
-            ids = params.checkedSample
-        }
-        
-        def sampleList = []
-        ids.each{
-            def sample = Sample.get(Long.parseLong(it))
-            if (sample) {
-                sampleList.push(sample)
-            }
-        }
-        session.checkedSample = null
-        [sampleList: sampleList, ids: ids]
     }
     
     def searchForm() {
@@ -389,11 +373,25 @@ class SampleController {
         [sampleList: samples]
     }
     
+    def fetchDataForSamplesAjax(String sampleIds) {
+        log.error sampleIds
+        def data = reportService.fetchDataForSamples(sampleIds)
+        render(template: 'details', model: [ sampleDTOs: data])        
+    }
+    
     def clearCheckedSampleAjax(){
         if (session.checkedSample) {
             session.checkedSample = null
         }
         return
+    }
+    
+    def addCheckedSampleAjax() {
+        
+    }
+    
+    def removeCheckedSampleAjax() {
+        
     }
     
     def fetchGrowthMediaAjax(Long speciesId) {

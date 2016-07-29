@@ -91,10 +91,11 @@ class SampleController {
         }
     }
     
-    def updateProtocol(Long sampleId, Long assayId, String resin, Integer pcr, Long userId, String endTime, String growthMedia, String treatments) {
+    def updateProtocol(Long sampleId, Long assayId, String resin, Integer pcr, Long userId, String endTime, String growthMedia) {
         def sample = Sample.get(sampleId)
         if (sample) {
             try {
+                def treatments = params.list("treatments")
                 sampleService.updateProtocol(sample, assayId, resin, pcr, userId, endTime, growthMedia, treatments)
                 redirect(action: "edit", params: [sampleId: sampleId])
             } catch(SampleException e) {

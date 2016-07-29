@@ -7,7 +7,6 @@ class CellSource {
 	String biologicalSourceId
 	Strain strain
 	String note	
-    GrowthMedia growthMedia
     String age
     Sex sex
     Tissue tissue
@@ -26,7 +25,6 @@ class CellSource {
 		providerLab nullable: true
 		biologicalSourceId nullable: true, blank: true
 		note nullable: true, blank: true
-        growthMedia nullable: true
         age nullable: true, blank: true
         sex nullable: true
         tissue nullable: true

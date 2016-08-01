@@ -18,7 +18,7 @@
     <div>
         <g:link action="all"><span class="glyphicon glyphicon-home"></span> Home</g:link>
     </div>
-    <div id="#details">
+    <div id="details">
         <div class="text-center">
             <i class="fa fa-spinner fa-spin"></i>
         </div>
@@ -27,10 +27,7 @@
     <script>
         $(function(){
             $("#nav-metadata").addClass("active");       
-            var sampleIds = getCookie('checkedSamples');
-            $("checkedSamples").text(sampleIds);
-            var url = "/pegr/report/fetchDataForSamplesAjax?sampleIds=" + sampleIds;
-            $.ajax({url: url, success: function(result) {
+            $.ajax({url: "/pegr/sample/fetchDataForCheckedSamplesAjax", success: function(result) {
                 $("#details").html(result);
             }});
         });

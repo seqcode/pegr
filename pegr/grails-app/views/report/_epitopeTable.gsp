@@ -26,14 +26,14 @@
                         <g:if test="${nExp>0}"><tr></g:if>
                         <td>
                             Run${experiment.runId}:
-                            <g:if test="${experiment.alignments.last()?.fastqc.read1}">
+                            <g:if test="${experiment.alignments.size() && experiment.alignments.last()?.fastqc.read1}">
                                 <a href="${experiment.alignments.last()?.fastqc.read1}">READ1</a>
                             </g:if>
                             <g:else>
                                 NONE&nbsp;
                             </g:else>
                              | 
-                            <g:if test="${experiment.alignments.last()?.fastqc.read2}">
+                            <g:if test="${experiment.alignments.size() && experiment.alignments.last()?.fastqc.read2}">
                                 <a href="${experiment.alignments.last()?.fastqc.read2}">READ2</a>
                             </g:if>
                             <g:else>

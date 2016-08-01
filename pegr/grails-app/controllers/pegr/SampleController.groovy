@@ -377,28 +377,34 @@ class SampleController {
         [sampleList: samples, checkedCount: checkedCount]
     }
     
-    def fetchDataForSamplesAjax(String sampleIds) {
-        log.error sampleIds
+    def fetchDataForCheckedSamplesAjax() {
+        def sampleIds = session.checkedSample
         def data = reportService.fetchDataForSamples(sampleIds)
-        render(template: 'details', model: [ sampleDTOs: data])        
+        render(template: '/report/details', model: [ sampleDTOs: data])        
     }
     
     def clearCheckedSampleAjax(){
         if (session.checkedSample) {
             session.checkedSample = null
         }
-        return
+        render true
     }
     
     def addCheckedSampleAjax(Long id) {
         if (!session.checkedSample) {
             session.checkedSample = []
         }
-        session.checkedSample << id
+        if (!(id in session.checkedSample)) {
+            session.checkedSample << id
+        }
+        render session.checkedSample.size()
     }
     
     def removeCheckedSampleAjax(Long id) {
-        session.checkedSample.remove(id)
+        if (id in session.checkedSample) {
+            session.checkedSample.remove(id)
+        }
+        render session.checkedSample.size()
     }
     
     def fetchGrowthMediaAjax(Long speciesId) {

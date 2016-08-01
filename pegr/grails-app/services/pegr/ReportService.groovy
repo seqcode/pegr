@@ -55,6 +55,7 @@ class ReportService {
                     def alignmentDTO = getAlignmentDTO(alignment)
                     updateAlignmentPct(alignmentDTO, expDTO)
                     expDTO.alignments << alignmentDTO
+                    sampleDTO.alignmentCount++
                 }
                 sampleDTO.experiments << expDTO
             }

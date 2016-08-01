@@ -12,7 +12,7 @@
             <div class="message" role="status">${flash.message}</div>
         </g:if>
         <div>
-            <g:link action="index"><span class="glyphicon glyphicon-home"></span> Sample List</g:link>
+            <g:link action="all"><span class="glyphicon glyphicon-home"></span> Sample List</g:link>
         </div>     
         <h3>
             Sample ${sample.id} <g:if test="${sample.sourceId}">(${sample.source}#${sample.sourceId})</g:if>

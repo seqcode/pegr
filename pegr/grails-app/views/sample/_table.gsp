@@ -3,12 +3,12 @@
         <thead>
             <tr>
                 <th></th>
-                <g:sortableColumn property="id" defaultOrder="desc" title="ID"></g:sortableColumn>
-                <g:sortableColumn property="cellSource" title="Strain"></g:sortableColumn>
-                <g:sortableColumn property="antibody" title="Antibody"></g:sortableColumn>
-                <g:sortableColumn property="target" title="Target"></g:sortableColumn>
-                <g:sortableColumn property="prtclInstSummary" title="Assay"></g:sortableColumn>
-                <g:sortableColumn property="date" defaultOrder="desc" title="Date"></g:sortableColumn>
+                <g:sortableColumn property="id" defaultOrder="desc" title="ID" params="${searchParams}"></g:sortableColumn>
+                <g:sortableColumn property="cellSource" title="Strain" params="${searchParams}"></g:sortableColumn>
+                <g:sortableColumn property="antibody" title="Antibody" params="${searchParams}"></g:sortableColumn>
+                <g:sortableColumn property="target" title="Target" params="${searchParams}"></g:sortableColumn>
+                <g:sortableColumn property="prtclInstSummary" title="Assay" params="${searchParams}"></g:sortableColumn>
+                <g:sortableColumn property="date" defaultOrder="desc" title="Date" params="${searchParams}"></g:sortableColumn>
             </tr>
         </thead>
         <tbody>

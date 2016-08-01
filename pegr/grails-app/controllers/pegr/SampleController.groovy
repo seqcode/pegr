@@ -325,7 +325,13 @@ class SampleController {
         
     }
     
-    def search() {       
+    def search(Integer max) {       
+        params.max = Math.min(max ?: 15, 100)
+        if (!params.sort) {
+            params.sort = "id"
+            params.order = "desc"
+        }        
+        
         def sampleProps = Sample.metaClass.properties*.name
         def c = Sample.createCriteria()
         params.max = 15
@@ -368,13 +374,12 @@ class SampleController {
                 }
                 eq("status", SampleStatus.COMPLETED)
             }
-            order("id", "desc")
         }
         def checkedCount = 0;
         if (session.checkedSample) {
             checkedCount = session.checkedSample.size()
         }
-        [sampleList: samples, checkedCount: checkedCount]
+        [sampleList: samples, checkedCount: checkedCount, searchParams: params]
     }
     
     def fetchDataForCheckedSamplesAjax() {

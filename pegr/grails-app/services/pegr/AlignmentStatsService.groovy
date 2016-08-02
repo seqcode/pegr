@@ -97,18 +97,21 @@ class AlignmentStatsService {
         def readKey = source.containsKey("read") ? "read${source.read}" : "read"
         source.each { key, value ->
             if (key != "read" && target.hasProperty(key) && value != null) {
-                try {
-                    target[key] = value    
-                } catch(org.codehaus.groovy.runtime.typehandling.GroovyCastException e) {
-                    log.error e
-                    throw new AlignmentStatsException(message: e.message)
-                }                
-                updatedProperties++
+                // skip read 2's adapter dimer count
+                if (!(key == "adapterDimerCount" && readKey == "read2")) {
+                    try {
+                        target[key] = value    
+                    } catch(org.codehaus.groovy.runtime.typehandling.GroovyCastException e) {
+                        log.error e
+                        throw new AlignmentStatsException(message: e.message)
+                    }                
+                    updatedProperties++
+                }
             }
         }
         return updatedProperties
     }
-
+    
     def queryDatasetsUri(String datasets, String type) {
         def jsonList
         try {

@@ -97,5 +97,8 @@ class AlignmentDTO {
     Long peakPairs
     Long nonPairedPeaks
     String memeFile
+    String memeFig
     Map fastqc
+    String peHistogram
+    List fourColor
 }

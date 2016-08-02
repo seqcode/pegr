@@ -147,7 +147,8 @@ class ReportService {
                                             avgInsertSize: alignment.avgInsertSize,
                                             stdInsertSize: alignment.stdDevInsertSize,
                                             genomeCoverage: alignment.genomeCoverage,
-                                            fastqc: [:]
+                                            fastqc: [:],
+                                            fourColor: []
                         )
 
         def statistics
@@ -156,7 +157,7 @@ class ReportService {
         analysisList.each { analysis ->
             switch (analysis.category) {
                 // TODO: change the category name
-                case "testSeven": // GeneTrack
+                case "testFifteen": // GeneTrack
                     def stats = utilityService.queryJson(analysis.statistics, ["numberOfPeaks", "singletons"])
                     alignmentDTO.peaks = stats.numberOfPeaks
                     alignmentDTO.singletons = stats.singletons
@@ -171,10 +172,17 @@ class ReportService {
                     break
                 case "testNine": // meme
                     alignmentDTO.memeFile = alignmentStatsService.queryDatasetsUri(analysis.datasets, "txt")
+                    alignmentDTO.memeFig = alignmentStatsService.queryDatasetsUri(analysis.datasets, "html")
                     break
                 case "testSix": // fastqc report
                     def fastqcFile = alignmentStatsService.queryDatasetsUriWithRead(analysis.datasets, analysis.statistics, "html")
                     alignmentDTO.fastqc[fastqcFile.read] = fastqcFile.data
+                    break
+                case "testEleven": //pe histogram
+                    alignmentDTO.peHistogram = alignmentStatsService.queryDatasetsUri(analysis.datasets, "png")
+                    break
+                case "testFive": // four color plot
+                    alignmentDTO.fourColor << alignmentStatsService.queryDatasetsUri(analysis.datasets, "png")
                     break
             }
         }

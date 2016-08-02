@@ -22,7 +22,8 @@
                             <g:if test="${nAli>0}"><tr></g:if>
                             <td>${alignment.genome}</td>
                             <td class="text-right"><g:formatNumber number="${experiment.adapterDimerCount}" format="###,###,###" /></td>
-                            <td class="text-right">${alignment.avgInsertSize}</td>
+                            <td class="text-right">${alignment.avgInsertSize}
+                                <g:if test="${alignment.peHistogram}"><a href="${alignment.peHistogram}" target="_blank"><span class="glyphicon glyphicon-picture"></span></a></g:if></td>
                             <td class="text-right">${alignment.stdInsertSize}</td>
                             <td class="text-right"><g:formatNumber number="${alignment.genomeCoverage}" format="##.#%" /></td>
                             </tr>

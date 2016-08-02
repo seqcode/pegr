@@ -223,7 +223,7 @@ class SampleService {
             indices.split("-")*.trim().each {
                 def index = SequenceIndex.findBySequenceAndStatus(it, DictionaryStatus.Y)
                 if (!index) {
-                    throw new SampleException(message: "Incorrect index ${it}!")
+                    index = new SequenceIndex(indexId: 0, sequence: it, indexVersion: "UNKNOWN").save(failOnError: true)
                 }
                 new SampleSequenceIndices(sample: sample, index: index, setId: setId, indexInSet: indexInSet).save(failOnError: true)
                 indexInSet++

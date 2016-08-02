@@ -156,32 +156,31 @@ class ReportService {
         def analysisList = Analysis.findAllByAlignment(alignment)
         analysisList.each { analysis ->
             switch (analysis.category) {
-                // TODO: change the category name
-                case "testFifteen": // GeneTrack
+                case "output_bedtoolsIntersect": // GeneTrack
                     def stats = utilityService.queryJson(analysis.statistics, ["numberOfPeaks", "singletons"])
                     alignmentDTO.peaks = stats.numberOfPeaks
                     alignmentDTO.singletons = stats.singletons
                     def params = utilityService.queryJson(analysis.parameters, ["filter", "sigma", "exclusion"])
                     alignmentDTO.peakCallingParam = getPeakCallingParam(params.filter, params.exclusion, params.sigma)
                     break
-                case "testThree": // cwpair
+                case "output_cwpair2": // cwpair
                     def stats = utilityService.queryJson(analysis.statistics, ["peakPairWis"])
                     alignmentDTO.peakPairs = stats.peakPairWis
                     def params = utilityService.queryJson(analysis.parameters, ["up_distance", "down_distance", "binsize"])
                     alignmentDTO.peakPairsParam = getPeakPairsParam(params.up_distance, params.down_distance, params.binsize)
                     break
-                case "testNine": // meme
+                case "output_meme": // meme
                     alignmentDTO.memeFile = alignmentStatsService.queryDatasetsUri(analysis.datasets, "txt")
                     alignmentDTO.memeFig = alignmentStatsService.queryDatasetsUri(analysis.datasets, "html")
                     break
-                case "testSix": // fastqc report
+                case "output_fastqc": // fastqc report
                     def fastqcFile = alignmentStatsService.queryDatasetsUriWithRead(analysis.datasets, analysis.statistics, "html")
                     alignmentDTO.fastqc[fastqcFile.read] = fastqcFile.data
                     break
-                case "testEleven": //pe histogram
+                case "output_peHistogram": //pe histogram
                     alignmentDTO.peHistogram = alignmentStatsService.queryDatasetsUri(analysis.datasets, "png")
                     break
-                case "testFive": // four color plot
+                case "output_fourColorPlot": // four color plot
                     alignmentDTO.fourColor << alignmentStatsService.queryDatasetsUri(analysis.datasets, "png")
                     break
             }

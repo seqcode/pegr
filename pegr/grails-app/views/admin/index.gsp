@@ -4,6 +4,7 @@
 	<meta name="layout" content="admin"/>
 </head>
 <body>
+    <div class="row text-right"><g:link action="mergeForm" class="btn btn-default" target="_blank">Merge</g:link></div>
 	<div class="panel-group">
 	<g:each in="${controllerGroups}">
 		<div class="panel panel-info">

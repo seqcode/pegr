@@ -197,32 +197,36 @@ class UtilityService {
     
     @Transactional
     def mergeRowsInDb(String tableName, Long fromId, Long toId) {
-        def sql = new Sql(dataSource)
+        try {
+            def sql = new Sql(dataSource)
         
-        // fetch the tables that have a foreign key to the requested table
-        def cmd = "select kcu.table_name, kcu.column_name from information_schema.referential_constraints rc inner join information_schema.key_column_usage kcu on rc.constraint_name = kcu.constraint_name where kcu.constraint_schema = 'pegr' AND kcu.REFERENCED_TABLE_NAME = ?"
-        def affectedTables = sql.rows(cmd, [tableName]) 
+            // fetch the tables that have a foreign key to the requested table
+            def cmd = "select kcu.table_name, kcu.column_name from information_schema.referential_constraints rc inner join information_schema.key_column_usage kcu on rc.constraint_name = kcu.constraint_name and rc.constraint_schema = kcu.constraint_schema where kcu.constraint_schema = 'pegr' AND kcu.REFERENCED_TABLE_NAME = ?"
+            def affectedTables = sql.rows(cmd, [tableName]) 
 
-        affectedTables.each { table ->
-            // check unique constraints
-            cmd = "select 1 from information_schema.key_column_usage kcu inner join information_schema.TABLE_CONSTRAINTS tc on kcu.constraint_name = tc.constraint_name and kcu.table_name = tc.table_name and kcu.table_schema = tc.table_schema where kcu.constraint_schema = 'pegr' and kcu.table_name = ? and kcu.column_name= ? and tc.constraint_type='UNIQUE' and kcu.constraint_schema = 'pegr'"
-            def count = sql.rows(cmd, [table.table_name, table.column_name])
-            if (count && count.size() > 0 ) {
-                // if there is UNIQUE constraint that prevent changing reference key, remove this row
-                cmd = "delete from " + table.table_name + " where " + table.column_name + "= ?"
-                log.error cmd
-                sql.execute(cmd, [fromId])
-            } else {
-                // change reference key from the fromId to the toId   
-                cmd = "update " + table.table_name + " set " + table.column_name + "= ? where " + table.column_name + " = ?"
-                log.error cmd
-                sql.execute(cmd, [toId, fromId]) 
-            }             
+            affectedTables.each { table ->
+                // check unique constraints
+                cmd = "select 1 from information_schema.key_column_usage kcu inner join information_schema.TABLE_CONSTRAINTS tc on kcu.constraint_name = tc.constraint_name and kcu.table_name = tc.table_name and kcu.table_schema = tc.table_schema where kcu.constraint_schema = 'pegr' and kcu.table_name = ? and kcu.column_name= ? and tc.constraint_type='UNIQUE' and kcu.constraint_schema = 'pegr'"
+                def count = sql.rows(cmd, [table.table_name, table.column_name])
+                if (count && count.size() > 0 ) {
+                    // if there is UNIQUE constraint that prevent changing reference key, remove this row
+                    cmd = "delete from " + table.table_name + " where " + table.column_name + "= ?"
+                    log.error cmd
+                    sql.execute(cmd, [fromId])
+                } else {
+                    // change reference key from the fromId to the toId   
+                    cmd = "update " + table.table_name + " set " + table.column_name + "= ? where " + table.column_name + " = ?"
+                    log.error cmd
+                    sql.execute(cmd, [toId, fromId]) 
+                }             
+            }
+            // delete the merge-from row
+            cmd = "delete from " + tableName + " where id = ?"
+            sql.execute(cmd, [fromId])
+            sql.close()
+        } catch (Exception e) {
+            log.error e
+            throw new UtilityException(message: "Error merging ${tableName} from ID-${fromId} to ID-${toId}!")
         }
-        // delete the merge-from row
-        cmd = "delete from " + tableName + " where id = ?"
-        sql.execute(cmd, [fromId])
-		sql.close()
-        
     }
 }

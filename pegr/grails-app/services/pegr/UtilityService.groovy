@@ -1,12 +1,14 @@
 package pegr
-
+import grails.transaction.Transactional
 import groovy.json.*
+import groovy.sql.Sql
     
 class UtilityException extends RuntimeException {
     String message
 }
 
 class UtilityService {
+    def dataSource
     def grailsApplication
    /** 
     * Helper method for Select2. It converts a collection of strings to a collection 
@@ -191,5 +193,36 @@ class UtilityService {
             filesroot.mkdirs();
         }
         return filesroot
+    }
+    
+    @Transactional
+    def mergeRowsInDb(String tableName, Long fromId, Long toId) {
+        def sql = new Sql(dataSource)
+        
+        // fetch the tables that have a foreign key to the requested table
+        def cmd = "select kcu.table_name, kcu.column_name from information_schema.referential_constraints rc inner join information_schema.key_column_usage kcu on rc.constraint_name = kcu.constraint_name where kcu.constraint_schema = 'pegr' AND kcu.REFERENCED_TABLE_NAME = ?"
+        def affectedTables = sql.rows(cmd, [tableName]) 
+
+        affectedTables.each { table ->
+            // check unique constraints
+            cmd = "select 1 from information_schema.key_column_usage kcu inner join information_schema.TABLE_CONSTRAINTS tc on kcu.constraint_name = tc.constraint_name and kcu.table_name = tc.table_name and kcu.table_schema = tc.table_schema where kcu.constraint_schema = 'pegr' and kcu.table_name = ? and kcu.column_name= ? and tc.constraint_type='UNIQUE' and kcu.constraint_schema = 'pegr'"
+            def count = sql.rows(cmd, [table.table_name, table.column_name])
+            if (count && count.size() > 0 ) {
+                // if there is UNIQUE constraint that prevent changing reference key, remove this row
+                cmd = "delete from " + table.table_name + " where " + table.column_name + "= ?"
+                log.error cmd
+                sql.execute(cmd, [fromId])
+            } else {
+                // change reference key from the fromId to the toId   
+                cmd = "update " + table.table_name + " set " + table.column_name + "= ? where " + table.column_name + " = ?"
+                log.error cmd
+                sql.execute(cmd, [toId, fromId]) 
+            }             
+        }
+        // delete the merge-from row
+        cmd = "delete from " + tableName + " where id = ?"
+        sql.execute(cmd, [fromId])
+		sql.close()
+        
     }
 }

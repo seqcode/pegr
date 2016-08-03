@@ -2,6 +2,7 @@ package pegr.admin
 import pegr.AdminCategory
 
 class AdminController {
+    def utilityService
 
     def index() {    
 		
@@ -20,4 +21,9 @@ class AdminController {
         }
         [controllerGroups: controllerGroups]
 	}
+    
+    def merge(String table, Long fromId, Long toId) {
+        utilityService.mergeRowsInDb(table, fromId, toId)
+    }
 }
+

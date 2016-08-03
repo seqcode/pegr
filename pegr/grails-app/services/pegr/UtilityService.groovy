@@ -149,6 +149,16 @@ class UtilityService {
         return result
     }
     
+    def queryJson(String jsonStr, String key) {
+        def keys = [key]
+        def results = queryJson(jsonStr, keys)
+        if (results && results.containsKey(key)) {
+            return results[key]
+        } else {
+            return null
+        }
+    }
+    
     def queryJson(Map jsonMap, List keys, Map result) {
         keys.each { key ->
             if (jsonMap.containsKey(key)) {

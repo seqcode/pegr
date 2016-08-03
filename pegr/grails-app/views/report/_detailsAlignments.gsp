@@ -33,7 +33,9 @@
             <g:each in="${sample.experiments}" var="experiment">
                 <g:each in="${experiment.alignments}" var="alignment">
                     <h5>Sample ${sample.id} Run ${experiment.runId} Genome ${alignment.genome}
-                        <a href="${alignment.memeFig}" target="_blank"><span class="glyphicon glyphicon-picture"></span>Meme</a>
+                        <g:if test="${alignment.memeFig}">
+                            <a href="${alignment.memeFig}" target="_blank"><span class="glyphicon glyphicon-picture"></span>Meme</a>
+                        </g:if>
                         <g:each in="${alignment.fourColor}" var="fourColor">
                             <a href="${fourColor}" target="_blank"><span class="glyphicon glyphicon-picture"></span>4Color</a>
                         </g:each>

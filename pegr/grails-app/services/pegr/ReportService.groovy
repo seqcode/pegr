@@ -164,8 +164,7 @@ class ReportService {
                     alignmentDTO.peakCallingParam = getPeakCallingParam(params.filter, params.exclusion, params.sigma)
                     break
                 case "output_cwpair2": // cwpair
-                    def stats = utilityService.queryJson(analysis.statistics, ["peakPairWis"])
-                    alignmentDTO.peakPairs = stats.peakPairWis
+                    alignmentDTO.peakPairs = utilityService.queryJson(analysis.statistics, "peakPairWis")
                     def params = utilityService.queryJson(analysis.parameters, ["up_distance", "down_distance", "binsize"])
                     alignmentDTO.peakPairsParam = getPeakPairsParam(params.up_distance, params.down_distance, params.binsize)
                     break
@@ -181,7 +180,7 @@ class ReportService {
                     alignmentDTO.peHistogram = alignmentStatsService.queryDatasetsUri(analysis.datasets, "png")
                     break
                 case "output_fourColorPlot": // four color plot
-                    alignmentDTO.fourColor << alignmentStatsService.queryDatasetsUri(analysis.datasets, "png")
+                    alignmentDTO.fourColor = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "png")
                     break
             }
         }

@@ -139,18 +139,10 @@ class CsvConvertService {
         if (indexStr == null || indexStr == "unk"){
             return
         }
-        if (basicCheck) {
-            try {
-                sampleService.splitAndAddIndexToSample(sample, indexStr)
-            } catch (SampleException e) {
-                throw new CsvConvertException(message: e.message)
-            }
-        } else {
-            def index = SequenceIndex.findByIndexIdAndSequence(indexIdStr, indexStr)
-            if (!index) {
-                index = new SequenceIndex(indexId: indexIdStr, sequence: indexStr, indexVersion: "UNKNOWN").save(failOnError: true)
-            }
-            new SampleSequenceIndices(sample: sample, index: index).save(failOnError: true)
+        try {
+            sampleService.splitAndAddIndexToSample(sample, indexStr)
+        } catch (SampleException e) {
+            throw new CsvConvertException(message: e.message)
         }
     }
 	

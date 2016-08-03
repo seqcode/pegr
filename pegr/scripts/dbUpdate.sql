@@ -94,3 +94,5 @@ update sample s inner join cell_source c on s.cell_source_id = c.id set s.growth
 // delte reports
 delete from summary_report
 */
+
+// alter table sequence_run auto_increment = 215;

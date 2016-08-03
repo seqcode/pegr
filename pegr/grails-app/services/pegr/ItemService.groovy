@@ -57,7 +57,6 @@ class ItemService {
             if (item.type.category == ItemTypeCategory.TRACED_SAMPLE) {
                 def cellSource = CellSource.findByItem(item)
                 if (cellSource) {
-                    CellSourceTreatments.executeUpdate("delete CellSourceTreatments where cellSource.id = :cellSourceId", [cellSourceId: cellSource.id])
                     cellSource.delete(flush: true)
                 }
             }            

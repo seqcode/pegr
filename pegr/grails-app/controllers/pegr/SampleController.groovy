@@ -10,6 +10,7 @@ class SampleController {
     def cellSourceService
     def itemService
     def utilityService
+    def reportService
     
     def all(Integer max) {
         params.max = Math.min(max ?: 15, 100)
@@ -91,10 +92,11 @@ class SampleController {
         }
     }
     
-    def updateProtocol(Long sampleId, Long assayId, String resin, Integer pcr, Long userId, String endTime, String growthMedia, String treatments) {
+    def updateProtocol(Long sampleId, Long assayId, String resin, Integer pcr, Long userId, String endTime, String growthMedia) {
         def sample = Sample.get(sampleId)
         if (sample) {
             try {
+                def treatments = params.list("treatments")
                 sampleService.updateProtocol(sample, assayId, resin, pcr, userId, endTime, growthMedia, treatments)
                 redirect(action: "edit", params: [sampleId: sampleId])
             } catch(SampleException e) {
@@ -317,29 +319,19 @@ class SampleController {
     
     def showChecked(){
         
-        def ids
-        if (session.checkedSample){
-            session.checkedSample.append(params.checkedSample)
-        }else{
-            ids = params.checkedSample
-        }
-        
-        def sampleList = []
-        ids.each{
-            def sample = Sample.get(Long.parseLong(it))
-            if (sample) {
-                sampleList.push(sample)
-            }
-        }
-        session.checkedSample = null
-        [sampleList: sampleList, ids: ids]
     }
     
     def searchForm() {
         
     }
     
-    def search() {       
+    def search(Integer max) {       
+        params.max = Math.min(max ?: 15, 100)
+        if (!params.sort) {
+            params.sort = "id"
+            params.order = "desc"
+        }        
+        
         def sampleProps = Sample.metaClass.properties*.name
         def c = Sample.createCriteria()
         params.max = 15
@@ -382,16 +374,42 @@ class SampleController {
                 }
                 eq("status", SampleStatus.COMPLETED)
             }
-            order("id", "desc")
         }
-        [sampleList: samples]
+        def checkedCount = 0;
+        if (session.checkedSample) {
+            checkedCount = session.checkedSample.size()
+        }
+        [sampleList: samples, checkedCount: checkedCount, searchParams: params]
+    }
+    
+    def fetchDataForCheckedSamplesAjax() {
+        def sampleIds = session.checkedSample
+        def data = reportService.fetchDataForSamples(sampleIds)
+        render(template: '/report/details', model: [ sampleDTOs: data])        
     }
     
     def clearCheckedSampleAjax(){
         if (session.checkedSample) {
             session.checkedSample = null
         }
-        return
+        render true
+    }
+    
+    def addCheckedSampleAjax(Long id) {
+        if (!session.checkedSample) {
+            session.checkedSample = []
+        }
+        if (!(id in session.checkedSample)) {
+            session.checkedSample << id
+        }
+        render session.checkedSample.size()
+    }
+    
+    def removeCheckedSampleAjax(Long id) {
+        if (id in session.checkedSample) {
+            session.checkedSample.remove(id)
+        }
+        render session.checkedSample.size()
     }
     
     def fetchGrowthMediaAjax(Long speciesId) {
@@ -403,5 +421,10 @@ class SampleController {
     def fetchTreatmentsAjax() {
         def treatments = CellSourceTreatment.executeQuery("select t.name from CellSourceTreatment t")
         render utilityService.stringToSelect2Data(treatments) as JSON
+    }
+    
+    def fetchDataForSampleAjax(Long id) {
+        def data = reportService.fetchDataForSample(id)
+        render(template: '/sample/bioinformatics', model: [ sampleDTOs: data])    
     }
 }

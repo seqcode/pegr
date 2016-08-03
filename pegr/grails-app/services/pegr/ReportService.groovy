@@ -43,68 +43,50 @@ class ReportService {
         }        
     }
     
-    def fetchData(Long reportId) {
-        def alignments = ReportAlignments.where { report.id == reportId }.collect { it.alignment }
+    
+    def fetchDataForSample(Long sampleId) {
         def sampleDTOs = []
-        alignments.each { alignment ->
-            def alignmentDTO = new AlignmentDTO(id: alignment.id,
-                                                genome: alignment.genome,
-                                                mappedReads: alignment.mappedReads,
-                                                uniquelyMappedReads: alignment.uniquelyMappedReads,
-                                                dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
-                                                avgInsertSize: alignment.avgInsertSize,
-                                                stdInsertSize: alignment.stdDevInsertSize,
-                                                genomeCoverage: alignment.genomeCoverage,
-                                                fastqc: [:]
-                            )
-
-            def statistics
-            def parameter
-            def analysisList = Analysis.findAllByAlignment(alignment)
-            analysisList.each { analysis ->
-                switch (analysis.category) {
-                    // TODO: change the category name
-                    case "testSeven": // GeneTrack
-                        def stats = utilityService.queryJson(analysis.statistics, ["numberOfPeaks", "singletons"])
-                        alignmentDTO.peaks = stats.numberOfPeaks
-                        alignmentDTO.singletons = stats.singletons
-                        def params = utilityService.queryJson(analysis.parameters, ["filter", "sigma", "exclusion"])
-                        alignmentDTO.peakCallingParam = getPeakCallingParam(params.filter, params.exclusion, params.sigma)
-                        break
-                    case "testThree": // cwpair
-                        def stats = utilityService.queryJson(analysis.statistics, ["peakPairWis"])
-                        alignmentDTO.peakPairs = stats.peakPairWis
-                        def params = utilityService.queryJson(analysis.parameters, ["up_distance", "down_distance", "binsize"])
-                        alignmentDTO.peakPairsParam = getPeakPairsParam(params.up_distance, params.down_distance, params.binsize)
-                        break
-                    case "testNine": // meme
-                        alignmentDTO.memeFile = alignmentStatsService.queryDatasetsUri(analysis.datasets, "txt")
-                        break
-                    case "testSix": // fastqc report
-                        def fastqcFile = alignmentStatsService.queryDatasetsUriWithRead(analysis.datasets, analysis.statistics, "html")
-                        alignmentDTO.fastqc[fastqcFile.read] = fastqcFile.data
-                        break
+        def sample = Sample.get(sampleId)
+        if (sample) {
+            def sampleDTO = getSampleDTO(sample)
+            sample.sequencingExperiments.each { experiment ->
+                def expDTO = getExperimentDTO(experiment)
+                experiment.alignments.each { alignment ->
+                    def alignmentDTO = getAlignmentDTO(alignment)
+                    updateAlignmentPct(alignmentDTO, expDTO)
+                    expDTO.alignments << alignmentDTO
+                    sampleDTO.alignmentCount++
+                }
+                sampleDTO.experiments << expDTO
+            }
+            sampleDTOs << sampleDTO
+        }
+        return sampleDTOs
+    }
+    
+    def fetchDataForSamples(List sampleIds) {
+        def sampleList = []
+        if (sampleIds) {
+            sampleIds.each { id ->
+                def data = fetchDataForSample(id)
+                if (data && data.size()) {
+                    sampleList << data.first()
                 }
             }
-            
-            alignmentDTO.nonPairedPeaks = getNonPairedPeaks(alignmentDTO.peaks, alignmentDTO.peakPairs)
-            
+        }
+        return sampleList
+    }
+    
+    def fetchDataForReport(Long reportId) {
+        def alignments = ReportAlignments.where { report.id == reportId }.collect { it.alignment }
+
+        def sampleDTOs = []
+        alignments.each { alignment ->
+            def alignmentDTO = getAlignmentDTO(alignment)
             def sample = alignment.sequencingExperiment.sample
             def sampleDTO = sampleDTOs.find{ it.id == sample.id}
             if (!sampleDTO) {
-                sampleDTO = new SampleDTO(id: sample.id,
-                                          target: sample.target?.name,
-                                          nTermTag: sample.target?.nTermTag,
-                                          cTermTag: sample.target?.cTermTag,
-                                          antibody: sample.antibody?.catalogNumber,
-                                          strain: sample.cellSource?.strain?.name,
-                                          geneticModification: sample.cellSource?.strain?.geneticModification,
-                                          growthMedia: sample.growthMedia?.name,
-                                          treatments: sample.treatments*.name.join(", "),
-                                          assay: sample.assay?.name,
-                                          experiments: [],
-                                          alignmentCount: 0
-                                         )
+                sampleDTO = getSampleDTO(sample)
                 sampleDTOs << sampleDTO
             } 
             sampleDTO.alignmentCount++
@@ -112,23 +94,99 @@ class ReportService {
             def experiment = alignment.sequencingExperiment
             def experimentDTO = sampleDTO.experiments.find { it.id == experiment.id }
             if (!experimentDTO) {
-                experimentDTO = new ExperimentDTO(id: experiment.id,
-                                                  runId: experiment.sequenceRun?.id,
-                                                  oldRunNum: experiment.sequenceRun?.runNum,
-                                                  totalReads: experiment.totalReads,
-                                                  adapterDimerCount: experiment.adapterDimerCount,
-                                                  alignments: []
-                                                 )
+                experimentDTO = getExperimentDTO(experiment)
                 sampleDTO.experiments << experimentDTO
             }
             
-            alignmentDTO.mappedReadPct = utilityService.divide(alignmentDTO.mappedReads, experimentDTO.totalReads)
-            alignmentDTO.uniquelyMappedPct = utilityService.divide(alignmentDTO.uniquelyMappedReads, experimentDTO.totalReads)
-            alignmentDTO.deduplicatedPct = utilityService.divide(alignmentDTO.dedupUniquelyMappedReads, experimentDTO.totalReads)
+            updateAlignmentPct(alignmentDTO, experimentDTO)
             
             experimentDTO.alignments << alignmentDTO
         }
         return sampleDTOs
+    }
+    
+    def updateAlignmentPct(AlignmentDTO alignmentDTO, ExperimentDTO experimentDTO) {
+        alignmentDTO.mappedReadPct = utilityService.divide(alignmentDTO.mappedReads, experimentDTO.totalReads)
+        alignmentDTO.uniquelyMappedPct = utilityService.divide(alignmentDTO.uniquelyMappedReads, experimentDTO.totalReads)
+        alignmentDTO.deduplicatedPct = utilityService.divide(alignmentDTO.dedupUniquelyMappedReads, experimentDTO.totalReads)
+    }
+    
+    
+    def getSampleDTO(Sample sample) {
+        return new SampleDTO(id: sample.id,
+          target: sample.target?.name,
+          nTermTag: sample.target?.nTermTag,
+          cTermTag: sample.target?.cTermTag,
+          antibody: sample.antibody?.catalogNumber,
+          strain: sample.cellSource?.strain?.name,
+          geneticModification: sample.cellSource?.strain?.geneticModification,
+          growthMedia: sample.growthMedia?.name,
+          treatments: sample.treatments*.name.join(", "),
+          assay: sample.assay?.name,
+          experiments: [],
+          alignmentCount: 0
+         )
+    }
+    
+    def getExperimentDTO(SequencingExperiment experiment) {
+        return new ExperimentDTO(id: experiment.id,
+                              runId: experiment.sequenceRun?.id,
+                              oldRunNum: experiment.sequenceRun?.runNum,
+                              totalReads: experiment.totalReads,
+                              adapterDimerCount: experiment.adapterDimerCount,
+                              alignments: []
+                             )
+    }
+    
+    def getAlignmentDTO(SequenceAlignment alignment) {
+        def alignmentDTO = new AlignmentDTO(id: alignment.id,
+                                            genome: alignment.genome,
+                                            mappedReads: alignment.mappedReads,
+                                            uniquelyMappedReads: alignment.uniquelyMappedReads,
+                                            dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
+                                            avgInsertSize: alignment.avgInsertSize,
+                                            stdInsertSize: alignment.stdDevInsertSize,
+                                            genomeCoverage: alignment.genomeCoverage,
+                                            fastqc: [:],
+                                            fourColor: []
+                        )
+
+        def statistics
+        def parameter
+        def analysisList = Analysis.findAllByAlignment(alignment)
+        analysisList.each { analysis ->
+            switch (analysis.category) {
+                case "output_bedtoolsIntersect": // GeneTrack
+                    def stats = utilityService.queryJson(analysis.statistics, ["numberOfPeaks", "singletons"])
+                    alignmentDTO.peaks = stats.numberOfPeaks
+                    alignmentDTO.singletons = stats.singletons
+                    def params = utilityService.queryJson(analysis.parameters, ["filter", "sigma", "exclusion"])
+                    alignmentDTO.peakCallingParam = getPeakCallingParam(params.filter, params.exclusion, params.sigma)
+                    break
+                case "output_cwpair2": // cwpair
+                    alignmentDTO.peakPairs = utilityService.queryJson(analysis.statistics, "peakPairWis")
+                    def params = utilityService.queryJson(analysis.parameters, ["up_distance", "down_distance", "binsize"])
+                    alignmentDTO.peakPairsParam = getPeakPairsParam(params.up_distance, params.down_distance, params.binsize)
+                    break
+                case "output_meme": // meme
+                    alignmentDTO.memeFile = alignmentStatsService.queryDatasetsUri(analysis.datasets, "txt")
+                    alignmentDTO.memeFig = alignmentStatsService.queryDatasetsUri(analysis.datasets, "html")
+                    break
+                case "output_fastqc": // fastqc report
+                    def fastqcFile = alignmentStatsService.queryDatasetsUriWithRead(analysis.datasets, analysis.statistics, "html")
+                    alignmentDTO.fastqc[fastqcFile.read] = fastqcFile.data
+                    break
+                case "output_peHistogram": //pe histogram
+                    alignmentDTO.peHistogram = alignmentStatsService.queryDatasetsUri(analysis.datasets, "png")
+                    break
+                case "output_fourColorPlot": // four color plot
+                    alignmentDTO.fourColor = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "png")
+                    break
+            }
+        }
+
+        alignmentDTO.nonPairedPeaks = getNonPairedPeaks(alignmentDTO.peaks, alignmentDTO.peakPairs)
+        return alignmentDTO
     }
     
     // 
@@ -225,4 +283,5 @@ class ReportService {
         }        
         return result
     }
+
 }

@@ -32,14 +32,28 @@ class AlignmentStatsService {
         }           
         def theAlignment = Analysis.where { historyId == data.historyId && alignment.sequencingExperiment == experiment && alignment.genome == genome}.get(max:1)?.alignment
         if (!theAlignment) {
-            theAlignment = new SequenceAlignment(sequencingExperiment: experiment, genome: genome, isPreferred: true)
+            theAlignment = new SequenceAlignment(sequencingExperiment: experiment, 
+                                                 genome: genome, 
+                                                 isPreferred: true, 
+                                                 date: new Date())
             theAlignment.save()
-        }
+        } 
+
         // save the data
         def statisticsStr = data.statistics ? JsonOutput.toJson(data.statistics) : null
         def parameterStr = data.parameters ? JsonOutput.toJson(data.parameters) : null
         def datasetsStr = data.datasets ? JsonOutput.toJson(data.datasets) : null
-        def analysis = new Analysis(alignment: theAlignment,
+        
+        def analysis = findOldAnalysis(data, theAlignment)
+        if (analysis) {
+            analysis.with {
+                user = data.userEmail
+                parameters = parameterStr
+                statistics = statisticsStr
+                datasets = datasetsStr
+            }
+        } else {
+            analysis = new Analysis(alignment: theAlignment,
                                     tool: data.toolId,
                                     pipeline: pipeline,
                                     category: data.toolCategory,
@@ -50,6 +64,8 @@ class AlignmentStatsService {
                                     parameters: parameterStr,
                                     statistics: statisticsStr,
                                     datasets: datasetsStr)
+        }
+            
         if (!analysis.save()) {
             log.error analysis.errors
             throw new AlignmentStatsException(message: "Error saving the analysis ${analysis}!")
@@ -75,6 +91,31 @@ class AlignmentStatsService {
         return        
     }
     
+    def findOldAnalysis(StatsRegistrationCommand data, SequenceAlignment alignment) {
+        def oldAnalysis = null
+        switch (data.toolCategory) {
+            case "output_tagPileup":
+                // special handling of multip Tag Pileup calls
+                def MOTIF_ID = "input2X__identifier__"
+                def newMotifId = (data.parameters && data.parameters.containsKey(MOTIF_ID)) ? data.parameters[MOTIF_ID] : null 
+                if (newMotifId) {
+                    def oldAnalysisList = Analysis.findAllByHistoryIdAndStepIdAndAlignment(data.historyId, data.workflowStepId, alignment)
+                    for (int i = 0; i< oldAnalysisList.size(); ++i) {
+                        def oldMotifId = utilityService.queryJson(oldAnalysisList[i].parameters, MOTIF_ID)
+                        if (oldMotifId && oldMotifId == newMotifId) {
+                            oldAnalysis = oldAnalysisList[i]
+                            break
+                        }
+                    }
+                }
+                break
+            default:
+                oldAnalysis = Analysis.findByHistoryIdAndStepIdAndAlignment(data.historyId, data.workflowStepId, alignment)
+                break
+        }
+        return oldAnalysis
+    }
+    
     def getPipeline(String apiUser) {
         def pipeline = Pipeline.where {name == apiUser}.order('pipelineVersion', 'desc').get(max: 1)
         return pipeline
@@ -97,19 +138,31 @@ class AlignmentStatsService {
         def readKey = source.containsKey("read") ? "read${source.read}" : "read"
         source.each { key, value ->
             if (key != "read" && target.hasProperty(key) && value != null) {
-                try {
-                    target[key] = value    
-                } catch(org.codehaus.groovy.runtime.typehandling.GroovyCastException e) {
-                    log.error e
-                    throw new AlignmentStatsException(message: e.message)
-                }                
-                updatedProperties++
+                // skip read 2's adapter dimer count
+                if (!(key == "adapterDimerCount" && readKey == "read2")) {
+                    try {
+                        target[key] = value    
+                    } catch(org.codehaus.groovy.runtime.typehandling.GroovyCastException e) {
+                        log.error e
+                        throw new AlignmentStatsException(message: e.message)
+                    }                
+                    updatedProperties++
+                }
             }
         }
         return updatedProperties
     }
-
+    
     def queryDatasetsUri(String datasets, String type) {
+        def result = queryDatasetsUriList(datasets, type)
+        if (result && result.size() > 0) {
+            return result[0]
+        } else {
+            return null
+        }
+    } 
+    
+    def queryDatasetsUriList(String datasets, String type) {
         def jsonList
         try {
             def jsonSlurper = new JsonSlurper()
@@ -117,15 +170,15 @@ class AlignmentStatsService {
         } catch(Exception e) {   
         }
         if (jsonList) {
-            def data = jsonList.find { d -> d.type == type }
-            return data?.uri
+            def data = jsonList.findAll { d -> d.type == type }.collect { it.uri }
+            return data.toList()
         }
-        return null
+        return []
     } 
     
     def queryDatasetsUriWithRead(String datasets, String statistics, String type) {
-        def stats = utilityService.queryJson(statistics, ["read"])
+        def readNum = utilityService.queryJson(statistics, "read")
         def data = queryDatasetsUri(datasets, type)
-        return [read: "read${stats.read}", data: data]
+        return [read: "read${readNum}", data: data]
     }
 }

@@ -2857,4 +2857,6 @@ databaseChangeLog = {
     include file: 'addStepIdAndUser.groovy'
 
 	include file: 'addControlSample.groovy'
+
+	include file: 'removeCellSourceTreatments.groovy'
 }

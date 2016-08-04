@@ -156,12 +156,14 @@ class ReportService {
         def analysisList = Analysis.findAllByAlignment(alignment)
         analysisList.each { analysis ->
             switch (analysis.category) {
+                case "output_genetrack": // GeneTrack
+                    def params = utilityService.queryJson(analysis.parameters, ["filter", "sigma", "exclusion"])
+                    alignmentDTO.peakCallingParam = getPeakCallingParam(params.filter, params.exclusion, params.sigma)
+                    break
                 case "output_bedtoolsIntersect": // GeneTrack
                     def stats = utilityService.queryJson(analysis.statistics, ["numberOfPeaks", "singletons"])
                     alignmentDTO.peaks = stats.numberOfPeaks
                     alignmentDTO.singletons = stats.singletons
-                    def params = utilityService.queryJson(analysis.parameters, ["filter", "sigma", "exclusion"])
-                    alignmentDTO.peakCallingParam = getPeakCallingParam(params.filter, params.exclusion, params.sigma)
                     break
                 case "output_cwpair2": // cwpair
                     alignmentDTO.peakPairs = utilityService.queryJson(analysis.statistics, "peakPairWis")

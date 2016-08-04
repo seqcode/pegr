@@ -25,14 +25,28 @@ class AdminController {
 	}
     
     def mergeForm(String table) {
-        def tables = ['user'] 
+        def tables = ['user', 
+                      'ab_host', 
+                      'cell_source_treatment',
+                      'growth_media',
+                      'histology',
+                      'ig_type',
+                      'sex',
+                      'species',
+                      'strain',
+                      'target',
+                      'target_type',
+                      'tissue',
+                      'assay',
+                      'protocol',
+                     ] 
         [tables: tables, table: table]
     }
     
     def merge(String table, Long fromId, Long toId) {
         try {
             utilityService.mergeRowsInDb(table, fromId, toId)
-            flash.message = "Success merging ${table} from ID-" + fromId + " to ID-" + toId + "!"
+            flash.message = "Success merging ${table} from ID#" + fromId + " to ID#" + toId + "!"
         } catch (UtilityException e) {
             flash.message = e.message
         }

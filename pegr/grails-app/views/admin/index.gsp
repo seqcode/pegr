@@ -11,7 +11,7 @@
 </head>
 <body>
     <div class="container-fluid text-right" id="merge">
-        <a href="#" onclick="window.open('/pegr/admin/mergeForm', 'PEGR Admin', 'width=600,height=400')" class="edit"><u>Merge</u></a>  
+        <button onclick="window.open('/pegr/admin/mergeForm', 'PEGR Admin', 'width=600,height=400')" class="edit">Merge</button>  
     </div>
 	<div class="panel-group">
 	<g:each in="${controllerGroups}">

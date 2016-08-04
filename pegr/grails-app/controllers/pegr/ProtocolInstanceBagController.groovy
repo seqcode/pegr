@@ -103,20 +103,18 @@ class ProtocolInstanceBagController {
             def sample = Sample.findByItem(item)
             def subBag = null
             if (sample && !sample.bags.empty){
-                subBag = sample.bags.last()
-                render(view:"previewItemAndBag", model: [item: item, subBag: subBag, bagId: bagId])
-            } else {
-                render(view:"previewItemAndBag", model: [item: item, bagId: bagId])
+                subBag = sample.bags.last()            
             }
+            render(view:"previewItemAndBag", model: [item: item, sample: sample, subBag: subBag, bagId: bagId])
         } else {
             flash.message = "No item found!"
             redirect(action: "searchItemForBag", params: [bagId: bagId])
         }
     }
     
-    def addItemToBag(Long itemId, Long bagId) {
+    def addItemToBag(Long itemId, Long bagId, Boolean split) {
         try {
-            protocolInstanceBagService.addItemToBag(itemId, bagId)
+            protocolInstanceBagService.addItemToBag(itemId, bagId, split)
             redirect(action: "showBag", id: bagId)
         }catch(ProtocolInstanceBagException e){
             flash.message = e.message

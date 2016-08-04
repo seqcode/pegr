@@ -14,9 +14,13 @@
         <p>This item is associated with bag <g:link controller="ProtocolInstanceBag" action="showBag" id="${subBag.id}" target="_blank">${subBag.name}</g:link></p>
     </g:if>
     <g:link action="addItemToBag" params="[itemId: item.id,
-                               bagId: bagId]" class="btn btn-primary">Add Item Only</g:link>
+                               bagId: bagId, split: false]" class="btn btn-primary">Import Item</g:link>
+    <g:if test="${sample}">
+        <g:link action="addItemToBag" params="[itemId: item.id,
+                               bagId: bagId, split: true]" class="btn btn-primary">Split and Add Item</g:link>
+    </g:if>
     <g:if test="${subBag}">
-        <g:link action="addSubBagToBag" params="[subBagId: subBag.id, bagId: bagId]" class="btn btn-primary">Add Entire Bag</g:link>
+        <g:link action="addSubBagToBag" params="[subBagId: subBag.id, bagId: bagId]" class="btn btn-primary">Import Entire Bag</g:link>
     </g:if>
     <g:link action="searchItemForBag" params="[bagId:bagId]" class="btn btn-primary">Cancel</g:link>
     <script>

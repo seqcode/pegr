@@ -59,15 +59,12 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    void addItemToBag(Long itemId, Long bagId){
+    void addItemToBag(Long itemId, Long bagId, Boolean split){
         def bag = ProtocolInstanceBag.get(bagId)
         def item = Item.get(itemId)
         def sample = Sample.findByItem(item)
-        if (sample in bag.tracedSamples) {
-            throw new ProtocolInstanceBagException(message: "This sample is already in the bag! You can split the child sample inside the corresponding protocol instance.")
-        }
-        // create a new sample if the item is not a traced sample
-        if (!sample) {
+        // create a new sample if the item is not a traced sample or split is true
+        if (!sample || split == true) {
             // find the cell source
             def csItem = item
             def cellSource = CellSource.findByItem(item)
@@ -83,14 +80,6 @@ class ProtocolInstanceBagService {
         }
         try {
             sample.status = SampleStatus.PREP
-
-            // iterate the protocols and add assay to sample if assay is defined
-            ProtocolInstance.findByBag(bag).each {
-                if (it.protocol?.assay) {
-                    sample.assay = it.protocol?.assay
-                }
-            }
-            
             sample.addToBags(bag).save()
         } catch(Exception e) {
             log.error "Error: ${e.message}", e

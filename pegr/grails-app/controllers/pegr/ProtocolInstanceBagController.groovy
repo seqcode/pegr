@@ -55,12 +55,14 @@ class ProtocolInstanceBagController {
         def protocolInstances = ProtocolInstance.where { bag.id == id}.list(sort: "bagIdx", order: "asc")
         def count = protocolInstances.count{it.status == ProtocolStatus.COMPLETED}
         def completed = (bag.status == ProtocolStatus.COMPLETED)
-        def toBeCompleted
+        def toBeCompleted, notStarted
         if (protocolInstances.size() > 0) {
             toBeCompleted = (bag.status != ProtocolStatus.COMPLETED && protocolInstances.last().status == ProtocolStatus.COMPLETED)
+            notStarted = (protocolInstances[0].status == ProtocolStatus.INACTIVE)
         }
+
         if (bag) {
-            [bag:bag, count: count, protocolInstances: protocolInstances, completed: completed, toBeCompleted: toBeCompleted]
+            [bag:bag, count: count, protocolInstances: protocolInstances, notStarted: notStarted, completed: completed, toBeCompleted: toBeCompleted]
         }else {
             render status: 404
         }
@@ -122,9 +124,9 @@ class ProtocolInstanceBagController {
         }
     }
     
-    def addSubBagToBag(Long subBagId, Long bagId, Boolean split) {
+    def addSubBagToBag(Long subBagId, Long bagId) {
         try {
-            protocolInstanceBagService.addSubBagToBag(subBagId, bagId, split)
+            protocolInstanceBagService.addSubBagToBag(subBagId, bagId)
             redirect(action: "showBag", id: bagId)
         } catch(ProtocolInstanceBagException e) {
             flash.message = e.message

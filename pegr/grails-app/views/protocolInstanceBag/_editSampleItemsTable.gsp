@@ -54,8 +54,9 @@
             </g:each>
         </tbody>
     </table>
+    <g:if test="${protocolInstance?.protocol?.addIndex}">
     <div class="row">
         <g:submitButton name="save" class="btn btn-primary pull-right" value="Save Index"></g:submitButton>
     </div>
-    
+    </g:if>
 </g:form>

@@ -93,13 +93,12 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    void addSubBagToBag(Long subBagId, Long bagId, Boolean split){
+    void addSubBagToBag(Long subBagId, Long bagId){
         try {
             def subBag = ProtocolInstanceBag.get(subBagId)
             def bag = ProtocolInstanceBag.get(bagId)
             subBag.tracedSamples.each { sample ->
-                sampleToAdd = (split == true) ? new Sample(item: sample.item, cellSource: sample.cellSource, status: SampleStatus.PREP) : sample                
-                sampleToAdd.addToBags(bag).save()
+                sample.addToBags(bag).save()
             }
         }catch(Exception e) {
             log.error "Error: ${e.message}", e
@@ -138,7 +137,7 @@ class ProtocolInstanceBagService {
             if (!sample.item) {
                 throw new ProtocolInstanceBagException(message: "sample ${sample.id} does not have an item!")
             }
-            new ProtocolInstanceItems(protocolInstance: instance, item: sample.item, function: ProtocolItemFunction.END).save()
+            new ProtocolInstanceItems(protocolInstance: instance, item: sample.item, function: ProtocolItemFunction.CHILD).save()
         }
     }
     
@@ -147,7 +146,7 @@ class ProtocolInstanceBagService {
         try {
             def item = Item.get(itemId)
             def instance = ProtocolInstance.get(instanceId)
-            def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance)
+            def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance, function: ProtocolItemFunction.SHARED)
             instanceItem.save(flush: true)
         }catch(Exception e) {
             log.error "Error: ${e.message}", e
@@ -170,14 +169,18 @@ class ProtocolInstanceBagService {
         if (item.save(flush: true)) { 
             // add the item to the instance
             def instance = ProtocolInstance.get(instanceId)
-            def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance)
-            instanceItem.save(flush: true)
-            // add all the samples in the bag to the pool
             if (item.type.category == ItemTypeCategory.SAMPLE_POOL) {
+                def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance, function: ProtocolItemFunction.END_POOL)
+                instanceItem.save(flush: true)
+                // add all the samples in the bag to the pool
                 instance.bag.tracedSamples.each {
                     new PoolSamples(pool: item, sample: it).save()
                 }
+            } else {
+                def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance, function: ProtocolItemFunction.SHARED)
+                instanceItem.save(flush: true)
             }
+            
         } else { 
             throw new ProtocolInstanceBagException(message: "Error saving this item!")
         }
@@ -200,6 +203,13 @@ class ProtocolInstanceBagService {
                 PoolSamples.executeUpdate("delete from PoolSamples where pool.id = :itemId", [itemId: itemId])
                 // delete the pool itself
                 item.delete()
+            } else if (instance.protocol.startPoolType == item.type) {                
+                PoolSamples.each {
+                    // remove the link between samples and bag
+                    it.sample.removeFromBags(instance.bag)
+                }
+                // remove the link between traced samples and protocol instance
+                ProtocolInstanceItems.executeUpdate("delete from ProtocolInstanceItems where protocolInstance.id = :instanceId", [instanceId: instanceId])
             }
         }catch(Exception e) { 
             log.error "Error: ${e.message}", e
@@ -302,11 +312,11 @@ class ProtocolInstanceBagService {
             def itemsInType = result.sharedItemList.find{it.type == item.type}
             if (itemsInType) {
                 itemsInType.items.add(item)
-            }else if (item.type == protocol.startPoolType) {
+            } else if (item.type == protocol.startPoolType) {
                 result.startPool[0].items.add(item)
             } else if (item.type == protocol.endPoolType) {
                 result.endPool[0].items.add(item)
-            }else {
+            } else if (item.type.category == ItemTypeCategory.OTHER ){
                 result.sharedItemList.add([type: item.type, items: [item]])
             }
         }  
@@ -317,7 +327,7 @@ class ProtocolInstanceBagService {
     Map getParentsAndChildrenForInstance(ProtocolInstance instance, ItemType startState, ItemType endState) {
         def parents = []
         def children = null
-        def items = ProtocolInstanceItems.findAllByFunctionAndProtocolInstance(ProtocolItemFunction.END, instance).sort {it.id}
+        def items = ProtocolInstanceItems.findAllByFunctionAndProtocolInstance(ProtocolItemFunction.CHILD, instance).sort {it.id}.collect { it.item }
         if (startState && endState && startState != endState) {
             children = []
             items.eachWithIndex { item, idx ->
@@ -378,6 +388,10 @@ class ProtocolInstanceBagService {
         if (!sample.item) {
             throw new ProtocolInstanceBagException(message: "Parent not found!")
         }
+        def instance = ProtocolInstance.get(instanceId)
+        if (!instance) {
+            throw new ProtocolInstanceBagException(message: "Protocol instance not found!")
+        }
         item.parent = sample.item
         item.user = springSecurityService.currentUser
         if (item.save(flush: true)){
@@ -408,7 +422,7 @@ class ProtocolInstanceBagService {
         item.user = springSecurityService.currentUser
         if (item.save()){
             // add the item to the protocol instance
-            new ProtocolInstanceItems(protocolInstance: instance, item: item, function: ProtocolItemFunction.END).save()
+            new ProtocolInstanceItems(protocolInstance: instance, item: item, function: ProtocolItemFunction.CHILD).save()
             def newSample = new Sample(cellSource: sample.cellSource, 
                                        antibody: sample.antibody, 
                                        item: item,
@@ -453,9 +467,10 @@ class ProtocolInstanceBagService {
         if (!instanceId) {
             ProtocolInstanceBagException(message: "Protocol instance not found!")
         }        
-        new ProtocolInstanceItems(item: item, protocolInstance: instance).save()
+        new ProtocolInstanceItems(item: item, protocolInstance: instance, function: ProtocolItemFunction.START_POOL).save()
         item.samplesInPool.each {
             it.addToBags(instance.bag)
+            new ProtocolInstanceItems(item: it.item, protocolInstance: instance, function: ProtocolItemFunction.CHILD).save()
         }
     }
     

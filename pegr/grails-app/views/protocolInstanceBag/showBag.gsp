@@ -65,12 +65,12 @@
                     <div class="panel-heading">
                         <h4 class="panel-title">
                             <a data-toggle="collapse" href="#items">Traced Samples</a>
-                                <g:if test="${!completed}">
+                                <g:if test="${notStarted}">
                                     <g:link action="searchItemForBag" params="[bagId: bag?.id]" class="pull-right"><span class="glyphicon glyphicon-plus"></span> Add</g:link>
                                 </g:if>
                         </h4>
                     </div>                    
-                    <g:render template="/protocolInstanceBag/baggedItems" model="['samples':bag.tracedSamples, 'completed':completed]"></g:render>
+                    <g:render template="/protocolInstanceBag/baggedItems" model="['samples':bag.tracedSamples, 'completed':completed, 'notStarted':notStarted]"></g:render>
                 </div>
             </div>
         </div>
@@ -98,6 +98,10 @@
         $(".confirm").confirm();
         $(".confirm-deleteBag").confirm({text: "All protocol instances in this bag will be deleted! Are you sure you want to delete this bag?"});
         $(".confirm-start").confirm({text: "Are you the one to perform this protocol?"});
+        function closeModal() {
+            $(".modal").modal('hide');
+        }
+        $(".confirm-start-first").confirm({text: "Have you added all samples to the bag? Are you the one to perform this protocol?"});
         function closeModal() {
             $(".modal").modal('hide');
         }

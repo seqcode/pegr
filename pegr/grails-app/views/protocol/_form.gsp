@@ -42,10 +42,10 @@
 
 <h4>Sample Pool</h4>
 <div>
-    <label for="startPool"><abbr title="A pre-existing pool that has been generated in the previous protocol.">Start Pool</abbr></label>
+    <label for="startPool"><abbr title="A pre-existing pool that has been generated in the previous protocol.">Import Pool</abbr></label>
     <g:select name="startPoolTypeId" from="${pegr.ItemType.where{category==pegr.ItemTypeCategory.SAMPLE_POOL}.list(sort:'name')}" optionKey="id" value="${startPoolTypeId}" noSelection="['null':'N/A']"/>
     
-    <label for="endPool"><abbr title="A new pool that will be generated at the end of this protocol.">End Pool</abbr></label>
+    <label for="endPool"><abbr title="A new pool that will be generated at the end of this protocol.">Create Pool</abbr></label>
     <g:select name="endPoolTypeId" from="${pegr.ItemType.where{category==pegr.ItemTypeCategory.SAMPLE_POOL}.list(sort:'name')}" optionKey="id" value="${endPoolTypeId}" noSelection="['null':'N/A']"/>
 </div>
 

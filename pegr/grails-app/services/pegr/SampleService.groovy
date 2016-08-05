@@ -29,8 +29,11 @@ class SampleService {
 
         }
         def protocols = []
-        sample.bags.each{ linkedbag ->
-            protocols.push([bag:linkedbag, protocolList:ProtocolInstance.where{bag.id == linkedbag.id}.list(sort: "bagIdx", order: "asc")])
+        def item = sample.item
+        while (item) {
+            def instances = ProtocolInstanceItems.findAllByItem(item).sort{ -it.id }.collect { it.protocolInstance}
+            protocols.push([item: item, protocolList: instances])
+            item = item.parent
         }
         def replicates = replicateService.getReplicates(sample)
         return [sample: sample, notes: notes, protocols: protocols, replicates: replicates] 

@@ -2859,4 +2859,6 @@ databaseChangeLog = {
 	include file: 'addControlSample.groovy'
 
 	include file: 'removeCellSourceTreatments.groovy'
+
+	include file: 'addProtocolItemFunction.groovy'
 }

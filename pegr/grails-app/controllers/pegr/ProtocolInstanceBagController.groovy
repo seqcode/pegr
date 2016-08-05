@@ -122,9 +122,9 @@ class ProtocolInstanceBagController {
         }
     }
     
-    def addSubBagToBag(Long subBagId, Long bagId) {
+    def addSubBagToBag(Long subBagId, Long bagId, Boolean split) {
         try {
-            protocolInstanceBagService.addSubBagToBag(subBagId, bagId)
+            protocolInstanceBagService.addSubBagToBag(subBagId, bagId, split)
             redirect(action: "showBag", id: bagId)
         } catch(ProtocolInstanceBagException e) {
             flash.message = e.message
@@ -135,15 +135,6 @@ class ProtocolInstanceBagController {
     def removeSampleFromBag(Long sampleId, Long bagId) {
         try {
             protocolInstanceBagService.removeSampleFromBag(sampleId, bagId)
-        } catch(ProtocolInstanceBagException e) {
-            flash.message = e.message
-        }
-        redirect(action: "showBag", id: bagId)
-    }
-    
-    def removeBagFromBag(Long subBagId, Long bagId) {        
-        try {
-            protocolInstanceBagService.removeBagFromBag(subBagId)
         } catch(ProtocolInstanceBagException e) {
             flash.message = e.message
         }
@@ -169,7 +160,9 @@ class ProtocolInstanceBagController {
             }
             // get shared item list
             def sharedItemAndPoolList = protocolInstanceBagService.getSharedItemAndPoolList(id, protocol)
+            
             // prepare the individual sample table template
+            // set addChild to be true if end item type is different from the start item type
             def addChild = (protocol.startItemType 
                         && protocol.endItemType 
                         && protocol.startItemType != protocol.endItemType)
@@ -181,9 +174,8 @@ class ProtocolInstanceBagController {
             def completed = (protocolInstance.bag.status == ProtocolStatus.COMPLETED)
             try{
                 def toBeCompleted = false
-                def results
+                def results = protocolInstanceBagService.getParentsAndChildrenForInstance(protocolInstance, protocol.startItemType, protocol.endItemType)
                 if (completed) {
-                    results = protocolInstanceBagService.getParentsAndChildrenForCompletedInstance(samples, protocol.startItemType, protocol.endItemType)
                     render(view: "showInstance", model: [protocolInstance: protocolInstance, 
                                                  sharedItemAndPoolList: sharedItemAndPoolList,
                                                  samples: samples,
@@ -191,8 +183,7 @@ class ProtocolInstanceBagController {
                                                  children: results.children,
                                                  childType: protocol.endItemType,
                                                  file: file])
-                } else {
-                    results = protocolInstanceBagService.getParentsAndChildrenForProcessingInstance(samples, protocol.startItemType, protocol.endItemType)                
+                } else {              
                     toBeCompleted = protocolInstanceBagService.readyToBeCompleted(sharedItemAndPoolList, results, samples, protocol)
                     if (protocol.endItemType && !samples) {
                         request.message = "Please add traced samples on the Home page!"
@@ -399,7 +390,7 @@ class ProtocolInstanceBagController {
                     if (params.split) {
                         protocolInstanceBagService.splitChildren(item, sampleId, instanceId)
                     } else {
-                        protocolInstanceBagService.addChild(item, sampleId)
+                        protocolInstanceBagService.addChild(item, sampleId, instanceId)
                     }
                 }catch(ProtocolInstanceBagException e){
                     flash.message = e.message 

@@ -63,24 +63,29 @@ class ProtocolInstanceBagService {
         def bag = ProtocolInstanceBag.get(bagId)
         def item = Item.get(itemId)
         def sample = Sample.findByItem(item)
-        // create a new sample if the item is not a traced sample or split is true
-        if (!sample || split == true) {
-            // find the cell source
-            def csItem = item
-            def cellSource = CellSource.findByItem(item)
-            while(csItem && !cellSource) {
-                csItem = csItem.parent
-                cellSource = CellSource.findByItem(csItem)
-            }
-            if (cellSource) {
-                sample = new Sample(item: item, cellSource: cellSource)
-            } else {
-                throw new ProtocolInstanceBagException(message: "No cell source found for this item!")
-            }            
-        }
+        def sampleToAdd
         try {
-            sample.status = SampleStatus.PREP
-            sample.addToBags(bag).save()
+            // create a new sample if the item is not a traced sample or split is true
+            if (!sample) {
+                // find the cell source
+                def csItem = item
+                def cellSource = CellSource.findByItem(item)
+                while(csItem && !cellSource) {
+                    csItem = csItem.parent
+                    cellSource = CellSource.findByItem(csItem)
+                }
+                if (cellSource) {
+                    sampleToAdd = new Sample(item: item, cellSource: cellSource)
+                } else {
+                    throw new ProtocolInstanceBagException(message: "No cell source found for this item!")
+                }            
+            } else if (split == true) {
+                sampleToAdd = new Sample(item: item, cellSource: sample.cellSource)
+            } else {
+                sampleToAdd = sample
+            }
+            sampleToAdd.status = SampleStatus.PREP
+            sampleToAdd.addToBags(bag).save()
         } catch(Exception e) {
             log.error "Error: ${e.message}", e
             throw new ProtocolInstanceBagException(message: "Error adding this item!")
@@ -88,13 +93,13 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    void addSubBagToBag(Long subBagId, Long bagId){
+    void addSubBagToBag(Long subBagId, Long bagId, Boolean split){
         try {
             def subBag = ProtocolInstanceBag.get(subBagId)
             def bag = ProtocolInstanceBag.get(bagId)
-            
-            subBag.tracedSamples.each {
-                it.addToBags(bag).save()
+            subBag.tracedSamples.each { sample ->
+                sampleToAdd = (split == true) ? new Sample(item: sample.item, cellSource: sample.cellSource, status: SampleStatus.PREP) : sample                
+                sampleToAdd.addToBags(bag).save()
             }
         }catch(Exception e) {
             log.error "Error: ${e.message}", e
@@ -117,15 +122,23 @@ class ProtocolInstanceBagService {
     
     @Transactional
     void startInstance(Long id) {
-        try {
-            def instance = ProtocolInstance.get(id)
-            instance.user = springSecurityService.currentUser
-            instance.status = ProtocolStatus.PROCESSING
-            instance.startTime = new Date()
-            instance.save(flush: true)
-        }catch(Exception e) {
-            log.error "Error: ${e.message}", e
-            throw new ProtocolInstanceBagException()
+        def instance = ProtocolInstance.get(id)
+        if (!instance) {
+            throw new ProtocolInstanceBagException(message: "Protocol instance ${id} not found!")
+        }
+        instance.user = springSecurityService.currentUser
+        instance.status = ProtocolStatus.PROCESSING
+        instance.startTime = new Date()
+        if (!instance.save(flush: true)) {
+            throw new ProtocolInstanceBagException(message: "Error updating the status of instance ${id}!")
+        }
+        // link traced samples to instance
+        def samples = instance.bag.tracedSamples.toList().sort {it.id}
+        samples.each { sample ->
+            if (!sample.item) {
+                throw new ProtocolInstanceBagException(message: "sample ${sample.id} does not have an item!")
+            }
+            new ProtocolInstanceItems(protocolInstance: instance, item: sample.item, function: ProtocolItemFunction.END).save()
         }
     }
     
@@ -300,52 +313,21 @@ class ProtocolInstanceBagService {
         return result
     }
     
-    Map getParentsAndChildrenForCompletedInstance(List samples, ItemType startState, ItemType endState) {
-        def parents = []
-        def children = null
-        if (startState && endState && startState != endState) {
-            children = []
-            samples.eachWithIndex { sample, idx ->
-                def item = sample.item
-                while(item && item.type != endState) {
-                    item = item.parent
-                }
-                if (item && item.parent?.type == startState) {
-                    parents[idx] = item.parent
-                    children[idx] = item
-                } else {
-                    throw new ProtocolInstanceBagException(message: "Status of the parent does not match the protocol!")
-                }
-            }
-        } else if (startState || endState) {
-            def currentType = startState?: endState
-            samples.eachWithIndex { sample, idx ->
-                def item = sample.item
-                while(item && item.type != currentType) {
-                    item = item.parent
-                }
-                if (item) {
-                    parents[idx] = item
-                } 
-            }
-        } 
-        return [parents: parents, children: children]
-    }
     
-    Map getParentsAndChildrenForProcessingInstance(List samples, ItemType startState, ItemType endState) {
+    Map getParentsAndChildrenForInstance(ProtocolInstance instance, ItemType startState, ItemType endState) {
         def parents = []
         def children = null
+        def items = ProtocolInstanceItems.findAllByFunctionAndProtocolInstance(ProtocolItemFunction.END, instance).sort {it.id}
         if (startState && endState && startState != endState) {
             children = []
-            samples.eachWithIndex { sample, idx ->
-                def currentType = sample.item?.type
-                if( currentType == startState) {
-                    parents[idx] = sample.item
+            items.eachWithIndex { item, idx ->
+                if( item.type == startState) {
+                    parents[idx] = item
                     children[idx] = null
-                } else if(currentType == endState) {
-                    children[idx] = sample.item
-                    if (sample.item.parent.type == startState) {
-                        parents[idx] = sample.item.parent
+                } else if(item.type == endState) {
+                    children[idx] = item
+                    if (item.parent.type == startState) {
+                        parents[idx] = item.parent
                     } else {
                         throw new ProtocolInstanceBagException(message: "Status of the parent does not match the protocol!")
                     }
@@ -355,9 +337,9 @@ class ProtocolInstanceBagService {
             }
         } else if (startState || endState) {
             def requiredType = startState?: endState
-            samples.eachWithIndex { sample, idx ->
-                if(sample.item?.type == requiredType) {
-                    parents[idx] = sample.item
+            items.eachWithIndex { item, idx ->
+                if(item?.type == requiredType) {
+                    parents[idx] = item
                 } else {
                     throw new ProtocolInstanceBagException(message: "Status of the traced sample does not match the protocol!")
                 }
@@ -388,7 +370,7 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    void addChild(Item item, Long sampleId) {
+    void addChild(Item item, Long sampleId, Long instanceId) {
         def sample = Sample.get(sampleId)
         if (!sample) {
             throw new ProtocolInstanceBagException(message: "Sample not found!")
@@ -401,6 +383,9 @@ class ProtocolInstanceBagService {
         if (item.save(flush: true)){
             sample.item = item
             sample.save()
+            def instanceItem = ProtocolInstanceItems.findByProtocolInstanceAndItem(instance, item.parent)
+            instanceItem.item = item
+            instanceItem.save()
         } else {
             throw new ProtocolInstanceBagException(message: "Invalid inputs! Barcode might already exist for this type!")
         }
@@ -422,11 +407,14 @@ class ProtocolInstanceBagService {
         item.parent = sample.item.parent
         item.user = springSecurityService.currentUser
         if (item.save()){
+            // add the item to the protocol instance
+            new ProtocolInstanceItems(protocolInstance: instance, item: item, function: ProtocolItemFunction.END).save()
             def newSample = new Sample(cellSource: sample.cellSource, 
                                        antibody: sample.antibody, 
                                        item: item,
                                         status: SampleStatus.PREP)
             newSample.item = item
+            // add the sample to the bag
             newSample.addToBags(instance.bag)
             if (!newSample.save()) {
                 throw new ProtocolInstanceBagException(message: "Error creating the new sample!")

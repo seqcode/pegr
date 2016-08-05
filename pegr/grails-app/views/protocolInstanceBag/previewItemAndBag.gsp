@@ -20,7 +20,8 @@
                                bagId: bagId, split: true]" class="btn btn-primary">Split and Add Item</g:link>
     </g:if>
     <g:if test="${subBag}">
-        <g:link action="addSubBagToBag" params="[subBagId: subBag.id, bagId: bagId]" class="btn btn-primary">Import Entire Bag</g:link>
+        <g:link action="addSubBagToBag" params="[subBagId: subBag.id, bagId: bagId, split: false]" class="btn btn-primary">Import Entire Bag</g:link>
+        <g:link action="addSubBagToBag" params="[subBagId: subBag.id, bagId: bagId, split: true]" class="btn btn-primary">Split And Add Entire Bag</g:link>
     </g:if>
     <g:link action="searchItemForBag" params="[bagId:bagId]" class="btn btn-primary">Cancel</g:link>
     <script>

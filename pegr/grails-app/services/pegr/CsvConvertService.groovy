@@ -140,7 +140,31 @@ class CsvConvertService {
             return
         }
         try {
-            sampleService.splitAndAddIndexToSample(sample, indexStr)
+            if (indexStr.indexOf("-") == -1 && indexStr.indexOf(",") == -1) {
+                def index = SequenceIndex.findBySequenceAndIndexId(indexStr, indexIdStr)
+                if (!index) {
+                    index = new SequenceIndex(indexId: indexIdStr, sequence: indexStr, indexVersion: "UNKNOWN").save(failOnError: true)
+                }
+                new SampleSequenceIndices(sample: sample, index: index, setId: 1, indexInSet: 1).save(failOnError: true)
+            } else {                
+                def indexList = indexStr.split(",")*.trim()
+                def setId = 1
+                indexList.each { indices ->
+                    def indexInSet = 1
+                    indices.split("-")*.trim().each {
+                        def index = SequenceIndex.findBySequenceAndStatus(it, DictionaryStatus.Y)
+                        if (!index) {
+                            index = SequenceIndex.findBySequenceAndIndexId(it, 0)
+                        }
+                        if (!index) {
+                            index = new SequenceIndex(indexId: 0, sequence: it, indexVersion: "UNKNOWN").save(failOnError: true)
+                        }
+                        new SampleSequenceIndices(sample: sample, index: index, setId: setId, indexInSet: indexInSet).save(failOnError: true)
+                        indexInSet++
+                    }
+                    setId++
+                }
+            }            
         } catch (SampleException e) {
             throw new CsvConvertException(message: e.message)
         }

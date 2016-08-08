@@ -143,6 +143,7 @@ class CsvConvertService {
             if (indexStr.indexOf("-") == -1 && indexStr.indexOf(",") == -1) {
                 def index = SequenceIndex.findBySequenceAndIndexId(indexStr, indexIdStr)
                 if (!index) {
+                    indexIdStr = indexIdStr ?: "0"
                     index = new SequenceIndex(indexId: indexIdStr, sequence: indexStr, indexVersion: "UNKNOWN").save(failOnError: true)
                 }
                 new SampleSequenceIndices(sample: sample, index: index, setId: 1, indexInSet: 1).save(failOnError: true)
@@ -440,7 +441,7 @@ class CsvConvertService {
 	    }
 	    def date = getDate(dateStr)
         def source = "PughLab"
-        if (invoice.invoiceNum && invoice.invoiceNum.size() >= 4 && invoice.invoiceNum[1..3] ==~ /\d+/ ) {
+        if (invoice?.invoiceNum && invoice.invoiceNum.size() >= 4 && invoice.invoiceNum[1..3] ==~ /\d+/ ) {
             switch (invoice.invoiceNum[0].toLowerCase()) {
                 case "p":
                     source = "Peconic"

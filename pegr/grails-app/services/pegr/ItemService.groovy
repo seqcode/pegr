@@ -74,4 +74,15 @@ class ItemService {
         def filesroot = utilityService.getFilesRoot()
         File folder = new File(filesroot, "items/${itemId}"); 
     }
+    
+    def findCellSource(Item item) {
+        // find the cell source
+        def csItem = item
+        def cellSource = CellSource.findByItem(item)
+        while(csItem && !cellSource) {
+            csItem = csItem.parent
+            cellSource = CellSource.findByItem(csItem)
+        }
+        return cellSource
+    }
 }

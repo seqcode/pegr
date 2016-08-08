@@ -114,9 +114,19 @@ class ProtocolInstanceBagController {
         }
     }
     
-    def addItemToBag(Long itemId, Long bagId, Boolean split) {
+    def addItemToBag(Long itemId, Long bagId) {
         try {
-            protocolInstanceBagService.addItemToBag(itemId, bagId, split)
+            protocolInstanceBagService.addItemToBag(itemId, bagId)
+            redirect(action: "showBag", id: bagId)
+        }catch(ProtocolInstanceBagException e){
+            flash.message = e.message
+            redirect(action: "searchItemForBag", params: [bagId: bagId])
+        }
+    }
+    
+    def splitAndAddItemToBag(Long itemId, Long bagId, Item item) {
+        try {
+            protocolInstanceBagService.splitAndAddItemToBag(itemId, bagId, item)
             redirect(action: "showBag", id: bagId)
         }catch(ProtocolInstanceBagException e){
             flash.message = e.message
@@ -410,7 +420,11 @@ class ProtocolInstanceBagController {
     }
     
     def removeChild(Long sampleId, Long instanceId) {
-        protocolInstanceBagService.removeChild(sampleId)
+        try {
+            protocolInstanceBagService.removeChild(sampleId, instanceId)
+        } catch (ProtocolInstanceBagException e) {
+            flash.message = e.message
+        }
         redirect(action: "showInstance", id: instanceId)
     }
     

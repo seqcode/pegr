@@ -55,14 +55,18 @@ class ProtocolInstanceBagController {
         def protocolInstances = ProtocolInstance.where { bag.id == id}.list(sort: "bagIdx", order: "asc")
         def count = protocolInstances.count{it.status == ProtocolStatus.COMPLETED}
         def completed = (bag.status == ProtocolStatus.COMPLETED)
-        def toBeCompleted, notStarted
+        def toBeCompleted, notStarted, tracedSamples
         if (protocolInstances.size() > 0) {
             toBeCompleted = (bag.status != ProtocolStatus.COMPLETED && protocolInstances.last().status == ProtocolStatus.COMPLETED)
             notStarted = (protocolInstances[0].status == ProtocolStatus.INACTIVE)
+            def instance = protocolInstances.find { it.status == ProtocolStatus.PROCESSING }
+            if (!instance) {
+                instance = (protocolInstances[0].status == ProtocolStatus.INACTIVE) ? protocolInstances.first() : protocolInstances.last()
+            } 
+            tracedSamples = ProtocolInstanceItems.findAllByProtocolInstance(instance).collect { it.item }
         }
-
         if (bag) {
-            [bag:bag, count: count, protocolInstances: protocolInstances, notStarted: notStarted, completed: completed, toBeCompleted: toBeCompleted]
+            [bag:bag, count: count, protocolInstances: protocolInstances, notStarted: notStarted, completed: completed, toBeCompleted: toBeCompleted, tracedSamples: tracedSamples]
         }else {
             render status: 404
         }
@@ -102,12 +106,9 @@ class ProtocolInstanceBagController {
         def itemType = ItemType.get(typeId)
         def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
         if (item) {        
-            def sample = Sample.findByItem(item)
-            def subBag = null
-            if (sample && !sample.bags.empty){
-                subBag = sample.bags.last()            
-            }
-            render(view:"previewItemAndBag", model: [item: item, sample: sample, subBag: subBag, bagId: bagId])
+            def itemId = item.id
+            def priorInstance = ProtocolInstanceItems.where {item.id == itemId}.get(sort:"id", order: 'desc', max: 1)
+            render(view:"previewItemAndBag", model: [item: item, priorInstance: priorInstance, bagId: bagId])
         } else {
             flash.message = "No item found!"
             redirect(action: "searchItemForBag", params: [bagId: bagId])
@@ -134,19 +135,19 @@ class ProtocolInstanceBagController {
         }
     }
     
-    def addSubBagToBag(Long subBagId, Long bagId) {
+    def addSubBagToBag(Long instanceId, Long bagId) {
         try {
-            protocolInstanceBagService.addSubBagToBag(subBagId, bagId)
-            redirect(action: "showBag", id: bagId)
+            protocolInstanceBagService.addSubBagToBag(instanceId, bagId)
+            flash.message = "success adding the traced samples!"
         } catch(ProtocolInstanceBagException e) {
             flash.message = e.message
-            redirect(action: "searchItemForBag", params: [bagId: bagId])
         }
+        redirect(action: "showBag", id: bagId)
     }
     
-    def removeSampleFromBag(Long sampleId, Long bagId) {
+    def removeSampleFromBag(Long itemId, Long bagId) {
         try {
-            protocolInstanceBagService.removeSampleFromBag(sampleId, bagId)
+            protocolInstanceBagService.removeSampleFromBag(itemId, bagId)
         } catch(ProtocolInstanceBagException e) {
             flash.message = e.message
         }
@@ -178,11 +179,6 @@ class ProtocolInstanceBagController {
             def addChild = (protocol.startItemType 
                         && protocol.endItemType 
                         && protocol.startItemType != protocol.endItemType)
-            def samples = null
-            if (addChild || protocol.addAntibody || protocol.addIndex) {
-                // get samples in the bag
-                samples = protocolInstance.bag.tracedSamples.toList().sort {it.id}
-            }
             def completed = (protocolInstance.bag.status == ProtocolStatus.COMPLETED)
             try{
                 def toBeCompleted = false
@@ -190,19 +186,16 @@ class ProtocolInstanceBagController {
                 if (completed) {
                     render(view: "showInstance", model: [protocolInstance: protocolInstance, 
                                                  sharedItemAndPoolList: sharedItemAndPoolList,
-                                                 samples: samples,
+                                                 samples: results.samples,
                                                  parents: results.parents,
                                                  children: results.children,
                                                  childType: protocol.endItemType,
                                                  file: file])
                 } else {              
-                    toBeCompleted = protocolInstanceBagService.readyToBeCompleted(sharedItemAndPoolList, results, samples, protocol)
-                    if (protocol.endItemType && !samples) {
-                        request.message = "Please add traced samples on the Home page!"
-                    }
+                    toBeCompleted = protocolInstanceBagService.readyToBeCompleted(sharedItemAndPoolList, results, protocol)
                     render(view: "editInstance", model: [protocolInstance: protocolInstance, 
                                                  sharedItemAndPoolList: sharedItemAndPoolList,
-                                                 samples: samples,
+                                                 samples: results.samples,
                                                  parents: results.parents,
                                                  children: results.children,
                                                  childType: protocol.endItemType,

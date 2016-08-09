@@ -32,7 +32,9 @@ class SampleService {
         def item = sample.item
         while (item) {
             def instances = ProtocolInstanceItems.findAllByItem(item).sort{ -it.id }.collect { it.protocolInstance}
-            protocols.push([item: item, protocolList: instances])
+            if (instances.size()>0) {
+                protocols.push([item: item, protocolList: instances])
+            }            
             item = item.parent
         }
         def replicates = replicateService.getReplicates(sample)

@@ -60,21 +60,27 @@ class ProtocolInstanceBagService {
     
     @Transactional
     void addItemToBag(Long itemId, Long bagId){
-        def bag = ProtocolInstanceBag.get(bagId)
-        if (!bag) {
-            throw new ProtocolInstanceBagException(message: "Protocol instance bag not found!")
+        // find the first protocol instance instance of the bag
+        def instance = ProtocolInstance.where { bag.id == bagId && bagIdx == 0 }.get(max: 1)
+        if (!instance) {
+            throw new ProtocolInstanceBagException(message: "Protocol instance not found!")
         }
+        // find the item
         def item = Item.get(itemId)
         if (!item) {
             throw new ProtocolInstanceBagException(message: "Item not found!")
         }
+        // check if the traced sample is already in the bag
+        if (ProtocolInstanceItems.findByProtocolInstanceAndItem(instance, item)) {
+            throw new ProtocolInstanceBagException(message: "The sample is already inside the bag! You may choose to split and add the sample now or split it later inside the protocol instance.")
+        }
+        // add the traced sample to the first protocol instance of the bag
+        new ProtocolInstanceItems(item: item,
+                                 protocolInstance: instance,
+                                 function: ProtoclItemFunction.CHILD).save()
         def sample = Sample.findByItem(item)
-        if (sample) {
-            if ( bag in sample.bags) {
-                throw new ProtocolInstanceBagException(message: "The sample is already inside the bag!")
-            }
-        } else {
-            // create a new sample if the item is not a traced sample or split is true
+        // create a new sample if the item is not yet attached to a sample
+        if (!sample) {            
             def cellSource = itemService.findCellSource(item)
             if (cellSource) {
                 sample = new Sample(item: item, cellSource: cellSource)
@@ -82,61 +88,77 @@ class ProtocolInstanceBagService {
                 throw new ProtocolInstanceBagException(message: "No cell source found for this item!")
             }            
         } 
-        sample.status = SampleStatus.PREP
-        try {            
-            sample.addToBags(bag).save()
-        } catch(Exception e) {
-            log.error "Error: ${e.message}", e
-            throw new ProtocolInstanceBagException(message: "Error adding this item!")
-        }
+        // update the sample's status
+        sample.status = SampleStatus.PREP 
+        sample.save()
     }
     
     @Transactional
     void splitAndAddItemToBag(Long itemId, Long bagId, Item item) {
-        def bag = ProtocolInstanceBag.get(bagId)
-        if (!bag) {
-            throw new ProtocolInstanceBagException(message: "Protocol instance bag not found!")
+        // find the first protocol instance instance of the bag
+        def instance = ProtocolInstance.where { bag.id == bagId && bagIdx == 0 }.get(max: 1)
+        if (!instance) {
+            throw new ProtocolInstanceBagException(message: "Protocol instance not found!")
         }
+        // set the parent 
         def parent = Item.get(itemId)
         if (!parent) {
             throw new ProtocolInstanceBagException(message: "Parent item not found!")
         }
         item.parent = parent
+        // save the child
         try {
             itemService.save(item)
         } catch (ItemException e) {
             throw new ProtocolInstanceBagException(message: e.message)
         }
+        // add the child to the first protocol instance of the bag
+         new ProtocolInstanceItems(item: item,
+                                 protocolInstance: instance,
+                                 function: ProtoclItemFunction.CHILD).save()
+        // create a new sample
         def cellSource = itemService.findCellSource(parent)
-        def sample = new Sample(item: item, cellSource: cellSource, status: SampleStatus.PREP)
-        sample.addToBags(bag).save()        
+        new Sample(item: item, cellSource: cellSource, status: SampleStatus.PREP).save()     
     }
     
     @Transactional
-    void addSubBagToBag(Long subBagId, Long bagId){
+    def addSubBagToBag(Long priorInstanceId, Long bagId){
+        def duplicateItems = []
+        // find the first protocol instance instance of the bag
+        def instance = ProtocolInstance.where { bag.id == bagId && bagIdx == 0 }.get(max: 1)
+        if (!instance) {
+            throw new ProtocolInstanceBagException(message: "Protocol instance not found!")
+        }
         try {
-            def subBag = ProtocolInstanceBag.get(subBagId)
-            def bag = ProtocolInstanceBag.get(bagId)
-            subBag.tracedSamples.each { sample ->
-                sample.addToBags(bag).save()
+            def items = ProtocolInstanceItems.where {protocolInstance.id == priorInstanceId && function == ProtocolItemFunction.CHILD}.list()
+            items.each { tracedSample ->
+                // check if the traced sample is already in the bag
+                if (ProtocolInstanceItems.findByProtocolInstanceAndItem(instance, item)) {
+                    duplicateItems.push(tracedSample.name)
+                } else {
+                    // add the item to the first protocol instance of the bag
+                    new ProtocolInstanceItems(protocolInstance: instance,
+                                          item: tracedSample,
+                                         function: ProtocolItemFunction.CHILD).save()
+                }                
             }
         }catch(Exception e) {
             log.error "Error: ${e.message}", e
-            throw new ProtocolInstanceBagException(message: "Error adding this bag!")
+            throw new ProtocolInstanceBagException(message: "Error adding the traced samples!")
+        }
+        if (duplicateItems.size() > 0) {
+            throw new ProtocolInstanceBagException(message: "Traced sample(s) ${duplicateItems} are already included in the bag. You may choose to split and add them now or split them later inside the protocol instance.") 
         }
     }
     
     @Transactional
-    def removeSampleFromBag(Long sampleId, Long bagId) {
+    def removeSampleFromBag(Long itemId, Long bagId) {
         try {
-            def sample = Sample.get(sampleId)
-            def bag = ProtocolInstanceBag.get(bagId)
-            sample.removeFromBags(bag).save(flush: true)
+            ProtocolInstanceItems.executeUpdate("delete from ProtocolInstanceItems where protocolInstance.bag.id=:bagId and item.id=:itemId", [bagId: bagId, itemId: itemId])
         }catch(Exception e) {
             log.error "Error: ${e.message}", e
             throw new ProtocolInstanceBagException(message: "Error removing this item!")
-        }
-        
+        }        
     }
     
     @Transactional
@@ -152,12 +174,12 @@ class ProtocolInstanceBagService {
             throw new ProtocolInstanceBagException(message: "Error updating the status of instance ${id}!")
         }
         // link traced samples to instance
-        def samples = instance.bag.tracedSamples.toList().sort {it.id}
-        samples.each { sample ->
-            if (!sample.item) {
-                throw new ProtocolInstanceBagException(message: "sample ${sample.id} does not have an item!")
+        if (instance.bagIdx > 0) {
+            def priorInstance = ProtocolInstance.findByBagAndBagIdx(instance.bag, instance.bagIdx - 1)
+            def items = ProtocolInstanceItems.findAllByProtocolInstanceAndFunction(priorInstance, ProtocolItemFunction.CHILD)
+            items.each {
+                new ProtocolInstanceItems(protocolInstance: instance, item: item, function: ProtocolItemFunction.CHILD).save()
             }
-            new ProtocolInstanceItems(protocolInstance: instance, item: sample.item, function: ProtocolItemFunction.CHILD).save()
         }
     }
     
@@ -223,13 +245,9 @@ class ProtocolInstanceBagService {
                 PoolSamples.executeUpdate("delete from PoolSamples where pool.id = :itemId", [itemId: itemId])
                 // delete the pool itself
                 item.delete()
-            } else if (instance.protocol.startPoolType == item.type) {                
-                PoolSamples.each {
-                    // remove the link between samples and bag
-                    it.sample.removeFromBags(instance.bag)
-                }
+            } else if (instance.protocol.startPoolType == item.type) {
                 // remove the link between traced samples and protocol instance
-                ProtocolInstanceItems.executeUpdate("delete from ProtocolInstanceItems where protocolInstance.id = :instanceId", [instanceId: instanceId])
+                ProtocolInstanceItems.executeUpdate("delete from ProtocolInstanceItems where function = :function and protocolInstance.id = :instanceId", [function: ProtocolItemFunction.CHILD, instanceId: instanceId])
             }
         }catch(Exception e) { 
             log.error "Error: ${e.message}", e
@@ -290,7 +308,7 @@ class ProtocolInstanceBagService {
         }
     }
     
-    Boolean readyToBeCompleted(Map sharedItemAndPoolList, Map parentsAndChildren, List samples, Protocol protocol) {
+    Boolean readyToBeCompleted(Map sharedItemAndPoolList, Map parentsAndChildren, Protocol protocol) {
         if (sharedItemAndPoolList.any { k, v -> v.any { it.items.empty }}) {
                 return false            
         } 
@@ -300,12 +318,12 @@ class ProtocolInstanceBagService {
             }
         }
         if (protocol.addIndex) {
-            if (samples.any { it.sequenceIndicesString == null || it.sequenceIndicesString == "" }) {
+            if (parentsAndChildren.samples.any { it.sequenceIndicesString == null || it.sequenceIndicesString == "" }) {
                 return false
             }
         }
         if (protocol.addAntibody) {
-            if (samples.any {it.antibody == null}) {
+            if (parentsAndChildren.samples.any {it.antibody == null}) {
                 return false
             }
         }
@@ -345,9 +363,13 @@ class ProtocolInstanceBagService {
     
     
     Map getParentsAndChildrenForInstance(ProtocolInstance instance, ItemType startState, ItemType endState) {
+        def samples = []
         def parents = []
         def children = null
         def items = ProtocolInstanceItems.findAllByFunctionAndProtocolInstance(ProtocolItemFunction.CHILD, instance).sort {it.id}.collect { it.item }
+        items.each { item ->
+            samples << Sample.findByItem(item)
+        }
         if (startState && endState && startState != endState) {
             children = []
             items.eachWithIndex { item, idx ->
@@ -375,7 +397,7 @@ class ProtocolInstanceBagService {
                 }
             }
         }
-        return [parents: parents, children: children]
+        return [parents: parents, children: children, samples: samples]
     }
     
     @Transactional
@@ -443,13 +465,8 @@ class ProtocolInstanceBagService {
         if (item.save()){
             // add the item to the protocol instance
             new ProtocolInstanceItems(protocolInstance: instance, item: item, function: ProtocolItemFunction.CHILD).save()
-            def newSample = new Sample(cellSource: sample.cellSource, 
-                                       antibody: sample.antibody, 
-                                       item: item,
-                                        status: SampleStatus.PREP)
+            def newSample = new Sample(sample)
             newSample.item = item
-            // add the sample to the bag
-            newSample.addToBags(instance.bag)
             if (!newSample.save()) {
                 throw new ProtocolInstanceBagException(message: "Error creating the new sample!")
             }
@@ -480,8 +497,7 @@ class ProtocolInstanceBagService {
         if (!instanceItem) {
             throw new ProtocolInstanceBagException(message: "Item in the protocol instance not found!")
         }
-        //def children = ProtocolInstanceItems.where { protocolInstance.id == instanceId && item.parent != null}.collect { it.item }
-        //def childrenCount = children.findAll { it.parent == parent }.size()
+
         def childrenCount = ProtocolInstanceItems.where { protocolInstance.id == instanceId && item.parent != null && item.parent == parent && item.type == instance.protocol.endItemType }.count()
         if (childrenCount == 1) {
             // if there is only one child
@@ -513,7 +529,6 @@ class ProtocolInstanceBagService {
         }        
         new ProtocolInstanceItems(item: item, protocolInstance: instance, function: ProtocolItemFunction.START_POOL).save()
         item.samplesInPool.each {
-            it.addToBags(instance.bag)
             new ProtocolInstanceItems(item: it.item, protocolInstance: instance, function: ProtocolItemFunction.CHILD).save()
         }
     }
@@ -551,12 +566,6 @@ class ProtocolInstanceBagService {
                 // delete the instances in the bag
                 it.delete()
             }            
-            // remove all the samples from the bag
-            def samples = bag.tracedSamples.toList()
-            for (sample in samples) {
-                sample.removeFromBags(bag)
-            }
-            
             // remove the bag itself
             bag.delete()
         } else {

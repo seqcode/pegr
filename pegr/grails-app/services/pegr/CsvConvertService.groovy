@@ -572,8 +572,8 @@ class CsvConvertService {
             if (indexStartList.size() == 1) {
                 map['index'] = [indexStart, indexEnd]
             } else {
-                map['index1'] = [indexStartList[0], indexEndList[0]]
-                map['index2'] = [indexStartList[1], indexEndList[1]]
+                map['index1'] = [indexStartList[0], indexStartList[1]]
+                map['index2'] = [indexEndList[0], indexEndList[1]]
             }
 		}
 		if(rd2Start || rd2End) {

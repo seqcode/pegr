@@ -342,30 +342,5 @@ class SequenceRunController {
         }
         redirect(action:"show", id: runId)
     }
-    
-    def migrateData() {
-        def basicCheck = true
-        
-        def datasets = [[file: '/Users/dus73/queueFiles/csv/samples.csv', start: 4696, end: 6203],
-                        [file: '/Users/dus73/queueFiles/csv/Peconic_Database.csv', start: 4, end: 51],
-                    [file: '/Users/dus73/queueFiles/csv/samples.csv', start: 6204, end: 7503],
-                    [file: '/Users/dus73/queueFiles/csv/Peconic_Database.csv', start: 52, end: 278],
-                    [file: '/Users/dus73/queueFiles/csv/samples.csv', start: 7504, end: 7855],
-                    [file: '/Users/dus73/queueFiles/csv/Peconic_Database.csv', start: 279, end: 349]]
-        
-        (520..632).each { run ->
-            datasets.push([file: "/Users/dus73/queueFiles/csv/Queue_sample_${run}.csv", start: 4, end: 100])
-        }
-                
-        datasets.each { data ->            
-            log.error "${data.file} ${data.start} ${data.end}"
-            def messages = csvConvertService.migrate(data.file, 
-                                                      RunStatus.PREP, 
-                                                      data.start, 
-                                                      data.end,
-                                                      basicCheck
-                                                     )
-            log.error messages
-        }
-    }
+
 }

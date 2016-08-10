@@ -2,8 +2,17 @@
 <html>
 <head>
 	<meta name="layout" content="admin"/>
+    <style>
+        #merge {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+    </style>
 </head>
 <body>
+    <div class="container-fluid text-right" id="merge">
+        <button onclick="window.open('/pegr/admin/mergeForm', 'PEGR Admin', 'width=600,height=400')" class="edit">Merge</button>  
+    </div>
 	<div class="panel-group">
 	<g:each in="${controllerGroups}">
 		<div class="panel panel-info">

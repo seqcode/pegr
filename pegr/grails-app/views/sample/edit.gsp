@@ -12,7 +12,7 @@
             <div class="message" role="status">${flash.message}</div>
         </g:if>
         <div>
-            <g:link action="index"><span class="glyphicon glyphicon-home"></span> Sample List</g:link>
+            <g:link action="all"><span class="glyphicon glyphicon-home"></span> Sample List</g:link>
         </div>     
         <h3>
             Sample ${sample.id} <g:if test="${sample.sourceId}">(${sample.source}#${sample.sourceId})</g:if>
@@ -25,24 +25,7 @@
         </g:if>
         <g:render template="/sample/details" model="['sample': sample, 'sampleEditAuth':true]"></g:render>
         <div id="seq">
-            <h4>Sequencing Experiments</h4>
-            <ol>
-                <g:each in="${sample.sequencingExperiments}" var="experiment">
-                    <li>
-                        <h5><g:link controller="sequenceRun" action="show" id="${experiment.sequenceRun.id}">Sequence Run ${experiment.sequenceRun.id}(Old No.${experiment.sequenceRun.runNum})</g:link></h5>
-                        <g:render template="/sample/experimentTable" model="['experiment':experiment]"></g:render>
-                        <h5>Alignments</h5>
-                        <ul>
-                            <g:each in="${experiment.alignments}" var="alignment">
-                                <li>
-                                    <g:render template="alignmentTable" model="['alignment':alignment]"></g:render>
-                                </li>
-                            </g:each>
-                        </ul>
-                    </li>
-                </g:each>
 
-            </ol>
         </div>
         <h4>Replicates</h4>
         <div id="replicates">

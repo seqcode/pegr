@@ -39,9 +39,9 @@
     <script>
         $(function(){
             $("#nav-reports").addClass("active");
-            $.ajax({url: "/pegr/report/fetchDataAjax/${reportId}", success: function(result) {
+            $.ajax({url: "/pegr/report/fetchDataForReportAjax/${reportId}", success: function(result) {
                 $("#details").html(result)
-            }})
+            }});
         });
     </script>
 </body>

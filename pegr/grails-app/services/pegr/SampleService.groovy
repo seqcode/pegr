@@ -151,7 +151,7 @@ class SampleService {
     }
     
     @Transactional
-    def updateProtocol(Sample sample, Long assayId, String resin, Integer pcr, Long userId, String endTime, String growthMedia, String treatments) {
+    def updateProtocol(Sample sample, Long assayId, String resin, Integer pcr, Long userId, String endTime, String growthMedia, List treatments) {
         sample.assay = Assay.get(assayId)
         if (!sample.prtclInstSummary) {
             sample.prtclInstSummary = new ProtocolInstanceSummary()
@@ -167,7 +167,7 @@ class SampleService {
         // save cell source's treatments
         def toDelete = SampleTreatments.where{ sample == sample}.list()
         if (treatments) {
-            treatments.split(",").each { treatmentName ->
+            treatments.each { treatmentName ->
                 def oldTreatment = toDelete.find{it.treatment.name == treatmentName}
                 if (oldTreatment) {
                     toDelete.remove(oldTreatment)
@@ -223,7 +223,7 @@ class SampleService {
             indices.split("-")*.trim().each {
                 def index = SequenceIndex.findBySequenceAndStatus(it, DictionaryStatus.Y)
                 if (!index) {
-                    throw new SampleException(message: "Incorrect index ${it}!")
+                     throw new SampleException(message: "Incorrect index ${it}!")
                 }
                 new SampleSequenceIndices(sample: sample, index: index, setId: setId, indexInSet: indexInSet).save(failOnError: true)
                 indexInSet++

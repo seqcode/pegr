@@ -139,18 +139,35 @@ class CsvConvertService {
         if (indexStr == null || indexStr == "unk"){
             return
         }
-        if (basicCheck) {
-            try {
-                sampleService.splitAndAddIndexToSample(sample, indexStr)
-            } catch (SampleException e) {
-                throw new CsvConvertException(message: e.message)
-            }
-        } else {
-            def index = SequenceIndex.findByIndexIdAndSequence(indexIdStr, indexStr)
-            if (!index) {
-                index = new SequenceIndex(indexId: indexIdStr, sequence: indexStr, indexVersion: "UNKNOWN").save(failOnError: true)
-            }
-            new SampleSequenceIndices(sample: sample, index: index).save(failOnError: true)
+        try {
+            if (indexStr.indexOf("-") == -1 && indexStr.indexOf(",") == -1) {
+                def index = SequenceIndex.findBySequenceAndIndexId(indexStr, indexIdStr)
+                if (!index) {
+                    indexIdStr = indexIdStr ?: "0"
+                    index = new SequenceIndex(indexId: indexIdStr, sequence: indexStr, indexVersion: "UNKNOWN").save(failOnError: true)
+                }
+                new SampleSequenceIndices(sample: sample, index: index, setId: 1, indexInSet: 1).save(failOnError: true)
+            } else {                
+                def indexList = indexStr.split(",")*.trim()
+                def setId = 1
+                indexList.each { indices ->
+                    def indexInSet = 1
+                    indices.split("-")*.trim().each {
+                        def index = SequenceIndex.findBySequenceAndStatus(it, DictionaryStatus.Y)
+                        if (!index) {
+                            index = SequenceIndex.findBySequenceAndIndexId(it, 0)
+                        }
+                        if (!index) {
+                            index = new SequenceIndex(indexId: 0, sequence: it, indexVersion: "UNKNOWN").save(failOnError: true)
+                        }
+                        new SampleSequenceIndices(sample: sample, index: index, setId: setId, indexInSet: indexInSet).save(failOnError: true)
+                        indexInSet++
+                    }
+                    setId++
+                }
+            }            
+        } catch (SampleException e) {
+            throw new CsvConvertException(message: e.message)
         }
     }
 	
@@ -424,7 +441,7 @@ class CsvConvertService {
 	    }
 	    def date = getDate(dateStr)
         def source = "PughLab"
-        if (invoice.invoiceNum && invoice.invoiceNum.size() >= 4 && invoice.invoiceNum[1..3] ==~ /\d+/ ) {
+        if (invoice?.invoiceNum && invoice.invoiceNum.size() >= 4 && invoice.invoiceNum[1..3] ==~ /\d+/ ) {
             switch (invoice.invoiceNum[0].toLowerCase()) {
                 case "p":
                     source = "Peconic"
@@ -555,8 +572,8 @@ class CsvConvertService {
             if (indexStartList.size() == 1) {
                 map['index'] = [indexStart, indexEnd]
             } else {
-                map['index1'] = [indexStartList[0], indexEndList[0]]
-                map['index2'] = [indexStartList[1], indexEndList[1]]
+                map['index1'] = [indexStartList[0], indexStartList[1]]
+                map['index2'] = [indexEndList[0], indexEndList[1]]
             }
 		}
 		if(rd2Start || rd2End) {

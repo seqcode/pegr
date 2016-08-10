@@ -11,7 +11,7 @@ class Genome {
 	}
 	
     static constraints = {
-		name unqiue: true, matches: '^[0-9A-Za-z -]+$'
+		name unqiue: true
         species nullable: true
         status nullable: true
     }

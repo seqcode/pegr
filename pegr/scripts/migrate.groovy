@@ -78,7 +78,14 @@ Antibody.list().each { antibody ->
 }
 */
 
-def run = SequenceRun.get(219)
+class UtilityTemp {
+    def getFilesRoot() {
+        return "/Users/danyingshao/tmp/runInfo"
+    }
+}
+
+def run = SequenceRun.get(215)
 def walleService = new WalleService()
+walleService.utilityService = new UtilityTemp()
 walleService.generateRunFiles(run, "abc")
 

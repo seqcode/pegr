@@ -1,10 +1,10 @@
 package pegr
 
 def walleService = new WalleService()
-final String remoteRoot = "/gpfs/cyberstar/pughhpc/storage/illumina/illuminaNextSeq/NSQData_PughLab/"
-final String localRoot = "/Users/danyingshao/tmp/runInfo"
+final String remoteRoot = "/home/nextseq/NSQData_PughLab/"
+final String localRoot = "/Users/dus73/temp/runInfo"
 
-(215..103).each {
+(215..209).each {
     def run = SequenceRun.get(it)
     def remotePath = new File(remoteRoot, run.directoryName).getPath()
     // make the local folder to temporarily store run infos and 

@@ -32,7 +32,7 @@
         <g:each in="${sampleDTOs}" var="sample">
             <g:each in="${sample.experiments}" var="experiment">
                 <g:each in="${experiment.alignments}" var="alignment">
-                    <h5>Sample ${sample.id} Run ${experiment.runId} Genome ${alignment.genome}
+                    <h5>Sample ${sample.id} Run ${experiment.runId} Genome ${alignment.genome} Target ${sample.target}
                         <g:if test="${alignment.memeFig}">
                             <a href="${alignment.memeFig}" target="_blank"><span class="glyphicon glyphicon-picture"></span>Meme</a>
                         </g:if>

@@ -47,6 +47,11 @@ class ReportController {
         def results = reportService.fetchMemeMotif(url) as JSON
         [motifs: results]
     }
+    
+    def composite(String url) {
+        def compositeData = reportService.fetchComposite(url)
+        [compositeData: compositeData]
+    }
 }
 
 
@@ -101,4 +106,5 @@ class AlignmentDTO {
     Map fastqc
     String peHistogram
     List fourColor
+    Map composite
 }

@@ -148,7 +148,8 @@ class ReportService {
                                             stdInsertSize: alignment.stdDevInsertSize,
                                             genomeCoverage: alignment.genomeCoverage,
                                             fastqc: [:],
-                                            fourColor: []
+                                            fourColor: [],
+                                            composite: [:]
                         )
 
         def statistics
@@ -183,6 +184,13 @@ class ReportService {
                     break
                 case "output_fourColorPlot": // four color plot
                     alignmentDTO.fourColor = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "png")
+                    break
+                case "output_tagPileup": //composite 
+                    def motif = utilityService.queryJson(analysis.parameters, "input2X__identifier__")
+                    def tabulars = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "tabular")
+                    if (tabulars && tabulars.size() > 0) {
+                        alignmentDTO.composite[motif] = tabulars.last()
+                    }
                     break
             }
         }
@@ -251,6 +259,34 @@ class ReportService {
         return value
     }
     
+    def fetchComposite(String url) {
+        if (url == null || url == "") {
+            return null
+        }
+        def data = new URL(url).getText()
+       
+        def results = []
+        data.eachLine { line, lineNum ->
+            def numbers = line.tokenize()
+            if (lineNum == 0) {
+                numbers.each { n ->
+                    results.push([n])
+                } 
+            } else {
+                numbers.eachWithIndex { n, c ->
+                    if (c > 0) {
+                        results[c-1][lineNum] = n
+                    }
+                }
+            }
+        }
+        String s = ""
+        results.each {
+            def a = it.join(",")
+            s += ",[${a}]"
+        }
+        return s
+    }
     
     def getPeakCallingParam(def filter, def exclusion, def sigma) {
         def result = ""

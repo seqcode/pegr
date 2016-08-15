@@ -8,11 +8,11 @@
 		<title><g:message code="default.list.label" args="[entityName]" /></title>
 	</head>
 	<body>
-		<ul class="nav nav-tabs">
-            <li><g:link action="index">My Protocols</g:link></li>
-            <li><g:link action="labProtocols">Lab Protocols</g:link></li>
-            <li class="active"><g:link action="labProtocolGroups">Lab Protocol Groups</g:link></li>
-		</ul>
+        <div>
+            <g:link action="labProtocols" class="btn btn-info">Lab Protocols</g:link>
+            <g:link action="labProtocolGroups" class="btn btn-info">Lab Protocol Groups</g:link>
+            <g:link action="index" class="btn btn-info">My Protocols</g:link>
+        </div> 
 		<div id="list-protocol">
 			<h3>Lab Protocol Groups</h3>
             

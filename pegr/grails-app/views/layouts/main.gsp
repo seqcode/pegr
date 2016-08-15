@@ -6,49 +6,41 @@
 </head>
 <body  onhashchange="${pageProperty(name:'body.onhashchange')}">	
 	<nav class="navbar">
-	  <div class="container-fluid">
-	    <div class="navbar-header">
-	      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>                        
-	      </button>
-	      <a class="navbar-brand" href="#">PEGR</a>
-	    </div>
-	    <div class="collapse navbar-collapse" id="myNavbar">
-	      <ul class="nav navbar-nav">
-              <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MEMBER">
-  	             <li id="nav-metadata"><g:link controller="sample" action="all">Metadata</g:link></li>
-              </sec:ifAnyGranted>
-	          <li id="nav-projects"><g:link controller="project">My Projects</g:link></li>
-              <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MEMBER">
-                <li id="nav-bench" class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Work Bench</a>
+        <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>                        
+              </button>
+              <a class="navbar-brand" href="#">PEGR</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                    <li><a href="#">Home</a></li>
+                    <li id="nav-projects"><g:link controller="project">My Projects</g:link></li>
+                    <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MEMBER">
+                        <li id="nav-inventory"><g:link controller="item">Inventory</g:link></li>
+                        <li id="nav-protocols"><g:link controller="protocol">Protocols</g:link></li>
+                        <li id="nav-experiments"><g:link controller="protocolInstanceBag" action="processingBags">Experiments</g:link></li>
+                        <li id="nav-bioinformatics"><g:link controller="bioinformatics">Bioinfomatics</g:link></li>
+                        <li id="nav-analysis"><g:link controller="report" action="all">Analysis</g:link></li>
+                    </sec:ifAnyGranted>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle"  data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-user"></span>${sec.username()}<span class="caret"></span>
+                    </a>
                     <ul class="dropdown-menu">
-                        <li><g:link controller="item">Items</g:link></li>
-                        <li><g:link controller="protocol">Protocols</g:link></li>
-                        <li><g:link controller="ProtocolInstanceBag" action="processingBags" >Sample Prep</g:link></li>
-                        <li><g:link controller="sequenceRun">Sequencing</g:link></li>
+                        <li><g:link controller="user" action="profile"><span class="glyphicon glyphicon-user"></span> Profile</g:link></li>
+                      <li><g:remoteLink class="logout" controller="logout" method="post" asynchronous="false" onSuccess="location.reload()"><span class="glyphicon glyphicon-log-out"></span> Logout</g:remoteLink></li>
                     </ul>
-                </li>
-                <li id="nav-reports"><g:link controller="report" action="all">Reports</g:link></li>
-              </sec:ifAnyGranted>
-	       	<sec:ifAllGranted roles="ROLE_ADMIN"><li id="nav-admin"><g:link controller="admin">Admin</g:link></li></sec:ifAllGranted>
-	      </ul>
-	    <ul class="nav navbar-nav navbar-right">
-		  <li class="dropdown">
-		    <a href="#" class="dropdown-toggle"  data-toggle="dropdown">
-		    	<span class="glyphicon glyphicon-user"></span>${sec.username()}<span class="caret"></span>
-		    </a>
-		    <ul class="dropdown-menu">
-                <li><g:link controller="user" action="profile"><span class="glyphicon glyphicon-user"></span> Profile</g:link></li>
-		      <li><g:remoteLink class="logout" controller="logout" method="post" asynchronous="false" onSuccess="location.reload()"><span class="glyphicon glyphicon-log-out"></span> Logout</g:remoteLink></li>
-		    </ul>
-		  </li>
-	      </ul>
-	    </div>
+                    </li>
+                </ul>
+            </div>
 	  </div>
-	</nav>
+    </nav>
 	<div class="container-fluid text-left" id="main-content">
 	<g:layoutBody/>
 	</div>	

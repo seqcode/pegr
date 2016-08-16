@@ -12,6 +12,7 @@ class Analysis {
     String parameters
     String statistics
     String datasets
+    Date date
     String note
     
     static constraints = {
@@ -24,6 +25,7 @@ class Analysis {
         datasets nullable: true, blank: true
         stepId nullable: true, blank: true
         user nullable: true, blank: true
+        date nullable: true
         note nullable: true, blank: true
     }
     

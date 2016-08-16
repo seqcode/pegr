@@ -30,13 +30,23 @@ class AlignmentStatsService {
         if (!genome) {
             throw new AlignmentStatsException(message: "Genome ${data.genome} not found!")
         }           
-        def theAlignment = Analysis.where { historyId == data.historyId && alignment.sequencingExperiment == experiment && alignment.genome == genome}.get(max:1)?.alignment
+        def theAlignment = SequenceAlignment.findByPipelineAndHistoryId(pipeline, data.historyId) 
         if (!theAlignment) {
             theAlignment = new SequenceAlignment(sequencingExperiment: experiment, 
                                                  genome: genome, 
+                                                 pipeline: pipeline,
+                                                 workflowId: data.workflowId,
+                                                 historyId: data.historyId,
                                                  isPreferred: true, 
                                                  date: new Date())
-            theAlignment.save()
+            try {
+                theAlignment.save(flush:true, failOnError: true)
+            } catch (Exception e) {
+                theAlignment = SequenceAlignment.findByPipelineAndHistoryId(pipeline, data.historyId)
+                if (!theAlignment) {
+                    throw new AlignmentStatsException("Error creating a new sequence alignment!")
+                }
+            }
         } 
 
         // save the data
@@ -51,19 +61,19 @@ class AlignmentStatsService {
                 parameters = parameterStr
                 statistics = statisticsStr
                 datasets = datasetsStr
+                date = new Date()
             }
         } else {
             analysis = new Analysis(alignment: theAlignment,
-                                    tool: data.toolId,
-                                    pipeline: pipeline,
+                                    tool: data.toolId,                                    
                                     category: data.toolCategory,
-                                    workflowId: data.workflowId,
-                                    historyId: data.historyId,
                                     stepId: data.workflowStepId,
                                     user: data.userEmail,
                                     parameters: parameterStr,
                                     statistics: statisticsStr,
-                                    datasets: datasetsStr)
+                                    datasets: datasetsStr,
+                                    date: new Date()
+                                   )
         }
             
         if (!analysis.save()) {
@@ -99,7 +109,7 @@ class AlignmentStatsService {
                 def MOTIF_ID = "input2X__identifier__"
                 def newMotifId = (data.parameters && data.parameters.containsKey(MOTIF_ID)) ? data.parameters[MOTIF_ID] : null 
                 if (newMotifId) {
-                    def oldAnalysisList = Analysis.findAllByHistoryIdAndStepIdAndAlignment(data.historyId, data.workflowStepId, alignment)
+                    def oldAnalysisList = Analysis.findAllByStepIdAndAlignment(data.workflowStepId, alignment)
                     for (int i = 0; i< oldAnalysisList.size(); ++i) {
                         def oldMotifId = utilityService.queryJson(oldAnalysisList[i].parameters, MOTIF_ID)
                         if (oldMotifId && oldMotifId == newMotifId) {
@@ -110,7 +120,7 @@ class AlignmentStatsService {
                 }
                 break
             default:
-                oldAnalysis = Analysis.findByHistoryIdAndStepIdAndAlignment(data.historyId, data.workflowStepId, alignment)
+                oldAnalysis = Analysis.findByStepIdAndAlignment(data.workflowStepId, alignment)
                 break
         }
         return oldAnalysis

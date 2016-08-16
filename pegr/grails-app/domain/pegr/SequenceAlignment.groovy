@@ -4,6 +4,9 @@ import groovy.json.*
 class SequenceAlignment {
 	SequencingExperiment sequencingExperiment
 	Genome genome
+    Pipeline pipeline
+    String workflowId
+    String historyId
 	Integer readDbId
     Aligner aligner
 	AlignType alignType
@@ -22,6 +25,10 @@ class SequenceAlignment {
     Float genomeCoverage
     
     static constraints = {
+        workflowId nullable: true, blank: true
+        pipeline nullable: true
+        historyId nullable: true
+        
 		readDbId nullable: true
         aligner nullable: true
         alignType nullable: true

@@ -30,7 +30,7 @@ class AlignmentStatsService {
         if (!genome) {
             throw new AlignmentStatsException(message: "Genome ${data.genome} not found!")
         }           
-        def theAlignment = SequenceAlignment.findByPipelineAndHistoryId(pipeline, data.historyId) 
+        def theAlignment = SequenceAlignment.findBySequencingExperimentAndGenomeAndPipelineAndHistoryId(experiment, genome, pipeline, data.historyId) 
         if (!theAlignment) {
             theAlignment = new SequenceAlignment(sequencingExperiment: experiment, 
                                                  genome: genome, 
@@ -42,7 +42,7 @@ class AlignmentStatsService {
             try {
                 theAlignment.save(flush:true, failOnError: true)
             } catch (Exception e) {
-                theAlignment = SequenceAlignment.findByPipelineAndHistoryId(pipeline, data.historyId)
+                theAlignment = SequenceAlignment.findBySequencingExperimentAndGenomeAndPipelineAndHistoryId(experiment, genome, pipeline, data.historyId) 
                 if (!theAlignment) {
                     throw new AlignmentStatsException("Error creating a new sequence alignment!")
                 }

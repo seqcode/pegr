@@ -26,8 +26,7 @@ class SequenceAlignment {
     
     static constraints = {
         workflowId nullable: true, blank: true
-        pipeline nullable: true
-        historyId nullable: true
+        historyId unique: ["sequencingExperiment", "genome", "pipeline"]
         
 		readDbId nullable: true
         aligner nullable: true

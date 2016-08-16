@@ -39,6 +39,9 @@
                         <g:each in="${alignment.fourColor}" var="fourColor">
                             <a href="${fourColor}" target="_blank"><span class="glyphicon glyphicon-picture"></span>4Color</a>
                         </g:each>
+                        <g:each in="${alignment.composite}" var="composite">
+                            <g:link action="composite" params="[url: composite]" target="_blank"><span class="glyphicon glyphicon-picture"></span>Composite</g:link>
+                        </g:each>
                     </h5>
                     <div>
                         <iframe src="/pegr/report/meme?url=${alignment.memeFile}" width=800 height=200 scrolling=no frameBorder=0></iframe>    

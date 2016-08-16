@@ -106,5 +106,5 @@ class AlignmentDTO {
     Map fastqc
     String peHistogram
     List fourColor
-    Map composite
+    List composite
 }

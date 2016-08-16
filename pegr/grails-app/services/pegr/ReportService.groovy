@@ -149,7 +149,7 @@ class ReportService {
                                             genomeCoverage: alignment.genomeCoverage,
                                             fastqc: [:],
                                             fourColor: [],
-                                            composite: [:]
+                                            composite: []
                         )
 
         def statistics
@@ -187,9 +187,14 @@ class ReportService {
                     break
                 case "output_tagPileup": //composite 
                     def motif = utilityService.queryJson(analysis.parameters, "input2X__identifier__")
+                    def motifId = motif?.find( /\d+/ )?.toInteger()
                     def tabulars = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "tabular")
                     if (tabulars && tabulars.size() > 0) {
-                        alignmentDTO.composite[motif] = tabulars.last()
+                        if (motifId && motifId > 0){
+                            alignmentDTO.composite[motifId] = tabulars.last()
+                        } else {
+                             alignmentDTO.composite[0] = tabulars.last()
+                        }                        
                     }
                     break
             }

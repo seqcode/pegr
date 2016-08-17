@@ -29,6 +29,7 @@ class ItemService {
         }
     }
 
+    // TODO
     @Transactional
     def delete(Long id) {
         def item = Item.get(id)
@@ -85,4 +86,16 @@ class ItemService {
         }
         return cellSource
     }
+    
+    // TODO
+    def clone(Item parent, Item child) {
+        child.parent = parent
+        save(child)
+    }
+    
+    def createSample(Item item) {
+        def cellSource = itemService.findCellSource(parent)
+        new Sample(item: item, cellSource: cellSource, status: SampleStatus.PREP).save()  
+    }
+
 }

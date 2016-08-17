@@ -293,6 +293,19 @@ class SampleService {
 	    return media
 	}
     
+    // TODO
+    def copyIndexToItem(Sample sample) {
+        
+    }
+    
+    def clone(Sample parent) {
+        
+    }
+    
+    def delete(Sample sample) {
+        
+    }
+    
     /**
      * Authorization to edit the given sample: Admin or 
      * the owner or participant in the project which the sample belong to

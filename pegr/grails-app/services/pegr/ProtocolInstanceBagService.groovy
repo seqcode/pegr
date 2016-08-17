@@ -105,10 +105,10 @@ class ProtocolInstanceBagService {
         if (!parent) {
             throw new ProtocolInstanceBagException(message: "Parent item not found!")
         }
-        item.parent = parent
-        // save the child
+        
+        // save the child and clone the antibody/index
         try {
-            itemService.save(item)
+            itemService.clone(parent, item)
         } catch (ItemException e) {
             throw new ProtocolInstanceBagException(message: e.message)
         }
@@ -117,8 +117,8 @@ class ProtocolInstanceBagService {
                                  protocolInstance: instance,
                                  function: ProtoclItemFunction.CHILD).save()
         // create a new sample
-        def cellSource = itemService.findCellSource(parent)
-        new Sample(item: item, cellSource: cellSource, status: SampleStatus.PREP).save()     
+        itemService.createSample(item)
+        
     }
     
     @Transactional
@@ -302,6 +302,7 @@ class ProtocolInstanceBagService {
                 } else {
                     sampleService.splitAndAddIndexToSample(sample, indecies[idx])
                 }
+                sampleService.copyIndexToItem(sample)
             } catch (SampleException e) {
                  throw new ProtocolInstanceBagException(message: e.message)
             }
@@ -407,6 +408,9 @@ class ProtocolInstanceBagService {
         if (sample && antibody) {
             sample.antibody = antibody
             sample.save()
+            if (sample.item) {
+                new ItemAntibody(item: sample.item, antibody: antibody).save()    
+            }
         } else {
             throw new ProtocolInstanceBagException(message: "Sample or antibody not found!")
         }
@@ -416,6 +420,9 @@ class ProtocolInstanceBagService {
     void removeAntibodyFromSample(Long sampleId) {
         def sample = Sample.get(sampleId) 
         if (sample) {
+            if (sample.item && sample.antibody) {
+                ItemAntibody.findByItemAndAntibody(sample.item, sample.antibody)?.delete()
+            }
             sample.antibody = null
             sample.save()
         } 
@@ -434,15 +441,15 @@ class ProtocolInstanceBagService {
         if (!instance) {
             throw new ProtocolInstanceBagException(message: "Protocol instance not found!")
         }
-        item.parent = sample.item
-        item.user = springSecurityService.currentUser
-        if (item.save(flush: true)){
+
+        try {
+            itemService.clone(sample.item, item)
             sample.item = item
             sample.save()
             def instanceItem = ProtocolInstanceItems.findByProtocolInstanceAndItem(instance, item.parent)
             instanceItem.item = item
             instanceItem.save()
-        } else {
+        } catch (Exception e) {
             throw new ProtocolInstanceBagException(message: "Invalid inputs! Barcode might already exist for this type!")
         }
     }
@@ -460,17 +467,14 @@ class ProtocolInstanceBagService {
         if (!sample.item?.parent) {
             throw new ProtocolInstanceBagException(message: "Parent not found!")
         }
-        item.parent = sample.item.parent
-        item.user = springSecurityService.currentUser
-        if (item.save()){
+        try {
+            itemService.clone(sample.item.parent, item)
             // add the item to the protocol instance
             new ProtocolInstanceItems(protocolInstance: instance, item: item, function: ProtocolItemFunction.CHILD).save()
-            def newSample = new Sample(sample)
+            def newSample = sampleService.clone(sample)
             newSample.item = item
-            if (!newSample.save()) {
-                throw new ProtocolInstanceBagException(message: "Error creating the new sample!")
-            }
-        }else {
+            newSample.save()
+        } catch(Exception e) {
             throw new ProtocolInstanceBagException(message: "Invalid inputs!")
         }
     }
@@ -507,7 +511,7 @@ class ProtocolInstanceBagService {
             instanceItem.save()            
         } else {
             // if there are more than one child
-            sample.delete()
+            sampleService.delete(sample)
             instanceItem.delete()
         }
         try {

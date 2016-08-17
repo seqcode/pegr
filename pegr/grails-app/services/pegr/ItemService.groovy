@@ -29,7 +29,6 @@ class ItemService {
         }
     }
 
-    // TODO
     @Transactional
     def delete(Long id) {
         def item = Item.get(id)
@@ -47,6 +46,15 @@ class ItemService {
                 if (sample) {
                     throw new ItemException(message: "This traced sample cannot be deleted because it has been attached to a sample!")
                 }
+                // delete cell source
+                def cellSource = CellSource.findByItem(item)
+                if (cellSource) {
+                    cellSource.delete(flush: true)
+                }
+                // delete index
+                ItemSequenceIndices.executeUpdate("delete from ItemSequenceIndices where item.id=:itemId", [itemId: id])
+                // delete antibody
+                ItemAntibody.executeUpdate("delete from ItemAntibody where item.id=:itemId", [itemId: id])
                 break
             default: 
                 def instance = ProtocolInstanceItems.findByItem(item)
@@ -54,13 +62,7 @@ class ItemService {
                     throw new ItemException(message: "Item cannot be deleted because it has been used in protocols!")
                 }
         }        
-        try {
-            if (item.type.category == ItemTypeCategory.TRACED_SAMPLE) {
-                def cellSource = CellSource.findByItem(item)
-                if (cellSource) {
-                    cellSource.delete(flush: true)
-                }
-            }            
+        try {          
             item.delete(flush: true)
             if (folder?.exists()) {
                 folder.deleteDir()    
@@ -76,26 +78,45 @@ class ItemService {
         File folder = new File(filesroot, "items/${itemId}"); 
     }
     
-    def findCellSource(Item item) {
-        // find the cell source
-        def csItem = item
-        def cellSource = CellSource.findByItem(item)
-        while(csItem && !cellSource) {
-            csItem = csItem.parent
-            cellSource = CellSource.findByItem(csItem)
-        }
-        return cellSource
-    }
-    
-    // TODO
-    def clone(Item parent, Item child) {
-        child.parent = parent
-        save(child)
-    }
-    
     def createSample(Item item) {
-        def cellSource = itemService.findCellSource(parent)
-        new Sample(item: item, cellSource: cellSource, status: SampleStatus.PREP).save()  
+        def theItem = item
+        def cellSource
+        def antibody
+        def itemIndices
+        while(theItem) {            
+            if (theItem.parent) {
+                if (!antibody) {
+                    antibody = ItemAntibody.findByItem(item)?.antibody
+                }
+                if (!itemIndices || itemIndices.size() == 0) {
+                    itemIndices = ItemSequenceIndices.findAllByItem(item)
+                }                
+            } else {
+                cellSource = CellSource.findByItem(item)
+            }
+            theItem = theItem.parent
+        }
+        // create sample, and attach item, cell source and antibody
+        def sample = new Sample(item: item, cellSource: cellSource, antibody: antibody, status: SampleStatus.PREP)
+        sample.save()
+        // attach the index
+        itemIndices.each { itemIndex ->
+            new SampleSequenceIndices(sample: sample, index: itemIndex.index, indexInSet: itemIndex.indexInSet, setId: itemIndex.setId).save()       
+        }
+    }
+    
+    def fetchOffspringSamples(Item item) {
+        List samples = []
+        if (!item) {
+            return samples
+        }
+        def sample = Sample.findByItem(item)
+        if (sample) {
+            samples << sample
+            return samples
+        }
+        fetchOffspringSamples()
+        Item.findAllByParent()
     }
 
 }

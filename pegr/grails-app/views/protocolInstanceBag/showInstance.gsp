@@ -32,10 +32,8 @@
         <g:if test="${sharedItemAndPoolList.endPool}">
             <h4>End Pool</h4>
             <g:render template="sharedItemsTable" model="['itemList':sharedItemAndPoolList.endPool,'instanceId':protocolInstance.id, 'extra':false,'edit':false]"></g:render>
-        </g:if>
-        <g:if test="${samples}">            
-            <g:render template="showSampleItemsTable" model="['parents':parents,'children':children, 'samples':samples, 'instanceId':protocolInstance.id, 'edit':false]"></g:render>         
-        </g:if> 
+        </g:if>          
+        <g:render template="showSampleItemsTable" model="['parents':parents,'children':children, 'instanceId':protocolInstance.id, 'edit':false]"></g:render>         
     </div>
     <script>
         $("#nav-bench").addClass("active"); 

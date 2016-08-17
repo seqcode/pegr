@@ -186,7 +186,6 @@ class ProtocolInstanceBagController {
                 if (completed) {
                     render(view: "showInstance", model: [protocolInstance: protocolInstance, 
                                                  sharedItemAndPoolList: sharedItemAndPoolList,
-                                                 samples: results.samples,
                                                  parents: results.parents,
                                                  children: results.children,
                                                  childType: protocol.endItemType,
@@ -195,7 +194,6 @@ class ProtocolInstanceBagController {
                     toBeCompleted = protocolInstanceBagService.readyToBeCompleted(sharedItemAndPoolList, results, protocol)
                     render(view: "editInstance", model: [protocolInstance: protocolInstance, 
                                                  sharedItemAndPoolList: sharedItemAndPoolList,
-                                                 samples: results.samples,
                                                  parents: results.parents,
                                                  children: results.children,
                                                  childType: protocol.endItemType,
@@ -382,20 +380,20 @@ class ProtocolInstanceBagController {
         redirect(action: "showInstance", id: instanceId)
     }
     
-    def removeAntibodyFromSample(Long sampleId, Long instanceId) {
-        protocolInstanceBagService.removeAntibodyFromSample(sampleId)
+    def removeAntibodyFromTracedSample(Long itemId, Long instanceId) {
+        protocolInstanceBagService.removeAntibodyFromTracedSample(itemId)
         redirect(action: "showInstance", id: instanceId)
     }
     
-    def addChild(Long sampleId, Long instanceId) {
+    def addChild(Long parentItemId, Long instanceId) {
         if (request.method == "POST") {
             withForm {
                 def item = new Item(params)
                 try {
                     if (params.split) {
-                        protocolInstanceBagService.splitChildren(item, sampleId, instanceId)
+                        protocolInstanceBagService.splitChildren(item, parentItemId, instanceId)
                     } else {
-                        protocolInstanceBagService.addChild(item, sampleId, instanceId)
+                        protocolInstanceBagService.addChild(item, parentItemId, instanceId)
                     }
                 }catch(ProtocolInstanceBagException e){
                     flash.message = e.message 
@@ -404,17 +402,17 @@ class ProtocolInstanceBagController {
             }
         } else{
             def childType = ItemType.get(params.long('childTypeId'))
-            def sample = Sample.get(sampleId)
-            if (!sample) {
+            def parentItem = Item.get(parentItemId)
+            if (!parentItem) {
                 redirect(action: "showInstance", id: instanceId)
             }
-            [sample: sample, instanceId: instanceId, childType: childType, split: params.split]
+            [parentItem: parentItem, instanceId: instanceId, childType: childType, split: params.split]
         }
     }
     
-    def removeChild(Long sampleId, Long instanceId) {
+    def removeChild(Long childItemId, Long instanceId) {
         try {
-            protocolInstanceBagService.removeChild(sampleId, instanceId)
+            protocolInstanceBagService.removeChild(childItemId, instanceId)
         } catch (ProtocolInstanceBagException e) {
             flash.message = e.message
         }

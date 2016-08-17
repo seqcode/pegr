@@ -293,17 +293,18 @@ class SampleService {
 	    return media
 	}
     
-    // TODO
     def copyIndexToItem(Sample sample) {
-        
-    }
-    
-    def clone(Sample parent) {
-        
+        def item = sample.item
+        if (item) {
+            SampleSequenceIndices.findAllBySample(sample).each { sampleIndex ->
+                new ItemSequenceIndices(item: item, index: sampleIndex.index, indexInSet: sampleIndex.indexInSet, setId: sampleIndex.setId).save()
+            }
+        }        
     }
     
     def delete(Sample sample) {
-        
+        SampleSequenceIndices.executeUpdate("delete from SampleSequenceIndices where sample.id=:sampleId", [sampleId: sample.id])
+        sample.delete()
     }
     
     /**

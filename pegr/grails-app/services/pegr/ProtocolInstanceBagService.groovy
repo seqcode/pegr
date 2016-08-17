@@ -80,13 +80,8 @@ class ProtocolInstanceBagService {
                                  function: ProtoclItemFunction.CHILD).save()
         def sample = Sample.findByItem(item)
         // create a new sample if the item is not yet attached to a sample
-        if (!sample) {            
-            def cellSource = itemService.findCellSource(item)
-            if (cellSource) {
-                sample = new Sample(item: item, cellSource: cellSource)
-            } else {
-                throw new ProtocolInstanceBagException(message: "No cell source found for this item!")
-            }            
+        if (!sample) {  
+            sample = itemService.createSample(item)
         } 
         // update the sample's status
         sample.status = SampleStatus.PREP 
@@ -108,7 +103,8 @@ class ProtocolInstanceBagService {
         
         // save the child and clone the antibody/index
         try {
-            itemService.clone(parent, item)
+            item.parent = parent
+            itemService.save(item)
         } catch (ItemException e) {
             throw new ProtocolInstanceBagException(message: e.message)
         }
@@ -364,13 +360,9 @@ class ProtocolInstanceBagService {
     
     
     Map getParentsAndChildrenForInstance(ProtocolInstance instance, ItemType startState, ItemType endState) {
-        def samples = []
         def parents = []
         def children = null
         def items = ProtocolInstanceItems.findAllByFunctionAndProtocolInstance(ProtocolItemFunction.CHILD, instance).sort {it.id}.collect { it.item }
-        items.each { item ->
-            samples << Sample.findByItem(item)
-        }
         if (startState && endState && startState != endState) {
             children = []
             items.eachWithIndex { item, idx ->
@@ -398,9 +390,10 @@ class ProtocolInstanceBagService {
                 }
             }
         }
-        return [parents: parents, children: children, samples: samples]
+        return [parents: parents, children: children]
     }
     
+    // TODO antibody should be added to the child, same with index.
     @Transactional
     void addAntibodyToSample(Long sampleId, Long antibodyId) {
         def sample = Sample.get(sampleId)
@@ -417,33 +410,41 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    void removeAntibodyFromSample(Long sampleId) {
-        def sample = Sample.get(sampleId) 
-        if (sample) {
-            if (sample.item && sample.antibody) {
-                ItemAntibody.findByItemAndAntibody(sample.item, sample.antibody)?.delete()
-            }
-            sample.antibody = null
-            sample.save()
-        } 
+    void removeAntibodyFromTracedSample(Long itemId) {
+        def item = Item.get(itemId)
+        if (!item) {
+            throw new ProtocolInstanceBagException(message: "")
+        }
+        ItemAntibody.findByItem(item)?.delete()
+        if (item) {
+            def sample = Sample.findByItem(item) 
+            if (sample && sample.) {
+                
+                sample.antibody = null
+                sample.save()
+            } 
+        }
     }
     
     @Transactional
-    void addChild(Item item, Long sampleId, Long instanceId) {
-        def sample = Sample.get(sampleId)
+    void addChild(Item item, Long parentItemId, Long instanceId) {
+        def parent = Item.get(parentItemId)
+        if (!parent) {
+            throw new ProtocolInstanceBagException(message: "Parent not found!")
+        }
+        def sample = Sample.findByItem(parent)
         if (!sample) {
             throw new ProtocolInstanceBagException(message: "Sample not found!")
         }
-        if (!sample.item) {
-            throw new ProtocolInstanceBagException(message: "Parent not found!")
-        }
+        
         def instance = ProtocolInstance.get(instanceId)
         if (!instance) {
             throw new ProtocolInstanceBagException(message: "Protocol instance not found!")
         }
 
         try {
-            itemService.clone(sample.item, item)
+            item.parent = parent
+            itemService.save(item)
             sample.item = item
             sample.save()
             def instanceItem = ProtocolInstanceItems.findByProtocolInstanceAndItem(instance, item.parent)
@@ -455,40 +456,37 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    void splitChildren(Item item, Long sampleId, Long instanceId) {
+    void splitChildren(Item item, Long parentItemId, Long instanceId) {
         def instance = ProtocolInstance.get(instanceId)
         if (!instance?.bag) {
             throw new ProtocolInstanceBagException(message: "Protocol Instance Bag not found!")
         }
-        def sample = Sample.get(sampleId)
-        if (!sample) {
-            throw new ProtocolInstanceBagException(message: "Sample not found!")
-        }
-        if (!sample.item?.parent) {
+        def parent = Item.get(parentItemId)
+        if (!parent) {
             throw new ProtocolInstanceBagException(message: "Parent not found!")
         }
         try {
-            itemService.clone(sample.item.parent, item)
+            item.parent = parent
+            itemService.save(item)
             // add the item to the protocol instance
             new ProtocolInstanceItems(protocolInstance: instance, item: item, function: ProtocolItemFunction.CHILD).save()
-            def newSample = sampleService.clone(sample)
-            newSample.item = item
-            newSample.save()
+            itemService.createSample(item)
         } catch(Exception e) {
             throw new ProtocolInstanceBagException(message: "Invalid inputs!")
         }
     }
     
     @Transactional
-    void removeChild(Long sampleId, instanceId) {
-        def sample = Sample.get(sampleId)
-        if (!sample) {
-            throw new ProtocolInstanceBagException(message: "Sample not found!")
-        }
-        def child = sample.item
+    void removeChild(Long childItemId, instanceId) {
+        def child = Item.get(childItemId)
         if (child == null) {
             throw new ProtocolInstanceBagException(message: "Child item not found!")
         }
+        def sample = Sample.findByItem(item)
+        if (!sample) {
+            throw new ProtocolInstanceBagException(message: "Sample not found!")
+        }
+
         def parent = child.parent
         if (parent == null) {
             throw new ProtocolInstanceBagException(message: "Parent item not found!")

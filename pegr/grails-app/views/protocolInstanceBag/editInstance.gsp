@@ -31,10 +31,8 @@
         <g:if test="${sharedItemAndPoolList.endPool}">
             <h4>End Pool</h4>
             <g:render template="sharedItemsTable" model="['itemList':sharedItemAndPoolList.endPool,'instanceId':protocolInstance.id, 'extra':false,'edit':true]"></g:render>
-        </g:if>
-        <g:if test="${samples}">            
-            <g:render template="editSampleItemsTable" model="['parents':parents,'children':children, 'samples':samples, 'instanceId':protocolInstance.id]"></g:render>         
-        </g:if>    
+        </g:if>          
+        <g:render template="editSampleItemsTable" model="['parents':parents,'children':children, 'instanceId':protocolInstance.id]"></g:render>             
         <g:if test="${toBeCompleted}">
         <div class="row well text-center">
         <g:link action="completeInstance" params="[instanceId: protocolInstance?.id, bagId: protocolInstance?.bag?.id]" class="btn btn-success">Complete <span class="glyphicon glyphicon-ok"></span> </g:link>

@@ -16,9 +16,9 @@
         </g:if>        
     </thead>
     <tbody>            
-        <g:each in="${samples}" var="sample" status="n">
+        <g:each in="${parents}" var="parent" status="n">
             <tr>
-                <td><g:link controller="item" action="show" id="${parents[n]?.id}" target="_blank">${parents[n]?.name}</g:link></td>
+                <td><g:link controller="item" action="show" id="${parent.id}" target="_blank">${parent.name}</g:link></td>
                 <g:if test="${children}">
                     <td>
                         <g:if test="${children[n]}">
@@ -28,13 +28,13 @@
                 </g:if>
                 <g:if test="${protocolInstance?.protocol?.addAntibody}">
                     <td>
-                        <g:if test="${sample?.antibody}">
-                            <g:link controller="antibody" action="show" id="${sample?.antibody?.id}" target="_blank">${sample?.antibody}</g:link>
+                        <g:if test="${childre[n]?.antibody}">
+                            <g:link controller="antibody" action="show" id="${children[n]?.antibody?.id}" target="_blank">${children[n]?.antibody}</g:link>
                         </g:if>
                     </td> 
                 </g:if>
                 <g:if test="${protocolInstance?.protocol?.addIndex}">
-                    <td>${sample.sequenceIndicesString}</td>
+                    <td>${children[n].sequenceIndicesString}</td>
                 </g:if>
             </tr>
         </g:each>

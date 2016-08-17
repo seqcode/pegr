@@ -1,10 +1,9 @@
 <html>
 <head>
-  <title>Cell Source</title> 
-  <meta name="layout" content="main"/>
+  <title>PEGR - Work Records</title> 
 </head>
 <body>
-    <h4>Protocol Instance Bags</h4>
+    <h4>Work Records</h4>
     <a href="#" onclick="window.open('/pegr/help#bag', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><u>Help</u></a>
     <ul class="nav nav-tabs">
         <li class="active"><a href="#">Processing</a></li>
@@ -26,8 +25,5 @@
     <div class="pagination">
         <g:paginate next="Next" prev="Prev" total="${bags.totalCount ?: 0}" />
     </div>
-     <script>
-        $("#nav-bench").addClass("active");
-     </script>
 </body>
 </html>

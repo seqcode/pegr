@@ -1,12 +1,17 @@
 <html>
 <head>
   <title>My Projects</title> 
-  <meta name="layout" content="main"/>
+  <meta name="layout" content="analysis"/>
 </head>
 <body>
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
+    <br>
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#">Automated</a></li>
+        <li><g:link controller="sample" action="searchForm">Search</g:link></a></li>
+    </ul>
     <table class="table table-striped">
         <thead>
             <tr>

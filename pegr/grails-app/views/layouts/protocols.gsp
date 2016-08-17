@@ -16,7 +16,7 @@
 </div>
     
  <script>
-	$("#nav-bench").addClass("active");
+	$("#nav-protocols").addClass("active");
  </script>
 </body>
 </html>

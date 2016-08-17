@@ -226,20 +226,26 @@ class WalleService {
         return newPaths
     }
     
+    def generateRunFiles(SequenceRun run, String newRunRemotePath) {
+        def filesroot = utilityService.getFilesRoot()
+        File localFolder = new File(filesroot, LOCAL_FOLDER)
+        generateRunFilesInFolder(run, newRunRemotePath, localFolder)
+    }
+    
+    
     /**
      * Generate run info and config files in local folder.
      * @param run sequence run whose information will be sent to remote.
      * @param newRunRemotePath the new folder's path on remote server
+     * @param localFolder the local folder to temporarily store the run infos
      * @return a map of (1) runInfoLocalFile: local run info file path,
      * (2) configLocalFolder: local config folder path.
      */
-    def generateRunFiles(SequenceRun run, String newRunRemotePath) {
+    def generateRunFilesInFolder(SequenceRun run, String newRunRemotePath, File localFolder) {
         // make the local folder to temporarily store run infos and 
-        // configs if the folder does not exit.
-        def filesroot = utilityService.getFilesRoot()
-        File localFolder = new File(filesroot, LOCAL_FOLDER); 
+        // configs if the folder does not exit.        
         if (!localFolder.exists()) { 
-            localFolder.mkdirs(); 
+            localFolder.mkdirs() 
         } 
         
         // delete old run info if it exists and create a new run info file.

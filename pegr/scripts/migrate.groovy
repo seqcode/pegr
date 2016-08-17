@@ -78,7 +78,4 @@ Antibody.list().each { antibody ->
 }
 */
 
-def run = SequenceRun.get(219)
-def walleService = new WalleService()
-walleService.generateRunFiles(run, "abc")
 

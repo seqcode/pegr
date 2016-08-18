@@ -127,19 +127,38 @@ class SecurityFilters {
                 }
             }
         }
-
+   
+        /**
+         * before processing the bag
+         */
+        ProtocolInstanceBagEdit(controller: "protocolInstanceBag", action: "searchItemForBag|previewItemAndBag|addItemToBag|addSubBagToBag|removeSampleFromBag") {
+            before = {
+                def bagId = params.long('bagId')
+                def bag = ProtocolInstanceBag.get(bagId)
+                def instances = ProtocolInstance.where { bag.id == bagId }.list(sort: "bagIdx", order: "asc")
+                if ( instances.size() > 0 && instances[0].status == ProtocolStatus.INACTIVE) {
+                    return true
+                } else {
+                    def message = "We have started processing the protocol instance bag and no changes are allowed. Please contact lab admin if you have further questions."
+                    render(view: '/login/denied', model: [message: message])
+                    return false
+                }
+            }    
+        }
+        
         /**
          * before the bag is completed
          */
-        ProtocolInstanceBagEdit(controller: "protocolInstanceBag", action: "searchItemForBag|previewItemAndBag|addItemToBag|addSubBagToBag|removeItemFromBag|updateBagAjax") {
+        ProtocolInstanceBagEdit(controller: "protocolInstanceBag", action: "updateBagAjax") {
             before = {
                 def bagId = params.long('bagId')
                 def bag = ProtocolInstanceBag.get(bagId)
                 if (bag.status != ProtocolStatus.COMPLETED) {
                     return true
                 } else {
-                    flash.message = "The protocol instance bag is completed and no changes are allowed. Please contact lab admin if you have further questions."
-                    redirect(action: "showBag", id: bagId)
+                    def message = "The protocol instance bag is completed and no changes are allowed. Please contact lab admin if you have further questions."
+                    render(view: '/login/denied', model: [message: message])
+                    return false
                 }
             }    
         }
@@ -160,8 +179,9 @@ class SecurityFilters {
                 }                
                 if (instance?.bag) {
                     if (instance.bag.status == ProtocolStatus.COMPLETED) {
-                        flash.message = "The protocol instance bag is completed and no changes are allowed. Please contact lab admin if you have further questions."
-                        redirect(action: "showBag", id: instance.bag.id)
+                        def message = "The protocol instance bag is completed and no changes are allowed. Please contact lab admin if you have further questions."
+                        render(view: '/login/denied', model: [message: message])
+                    return false
                     }
                 } 
                 return true
@@ -180,8 +200,9 @@ class SecurityFilters {
                     }
                 }
                 if (run?.status == RunStatus.COMPLETED) {
-                    flash.message = "This sequence run is completed and no changes are allowed. Please contact lab admin if you have further questions."
-                    redirect(action: "show", id: runId)
+                    def message = "This sequence run is completed and no changes are allowed. Please contact lab admin if you have further questions."
+                    render(view: '/login/denied', model: [message: message])
+                    return false
                 }
                 return true
             }

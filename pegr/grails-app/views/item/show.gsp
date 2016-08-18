@@ -12,9 +12,7 @@
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
-        <g:if test="${sample}">
-            <h3><g:link controller="sample" action="show" id="${sample.id}">Sample ${sample.id}</g:link></h3>
-    </g:if>
+        
     <h4>Barcode Information <g:link action="edit" params="[itemId:item?.id]" class="edit">Edit</g:link></h4>
     <div class="row">
         <div class="col-sm-6">

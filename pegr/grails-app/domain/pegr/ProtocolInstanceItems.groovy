@@ -4,10 +4,7 @@ class ProtocolInstanceItems {
 
     ProtocolInstance protocolInstance
     Item item
-    
-    static constraints = {
-        protocolInstance unique: 'item'
-    }
+    ProtocolItemFunction function
     
     static mapping = {
         version false

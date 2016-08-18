@@ -8,10 +8,6 @@ class ProtocolInstanceBag {
 	Date endTime
 	ProtocolStatus status
     
-    static hasMany = [tracedSamples: Sample]
-    
-    static belongsTo = [Sample]
-    
     String toString() {
         name
     }

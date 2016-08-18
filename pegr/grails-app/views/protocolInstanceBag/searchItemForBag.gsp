@@ -10,7 +10,7 @@
 <div class="container-fluid">
     <g:link action="showBag" id="${bagId}"><span class="glyphicon glyphicon-menu-left"></span> Back</g:link>
 
-    <h4>Add Traced Item </h4>
+    <h4>Add Traced Sample </h4>
         <div class="message">If you want to add a sample pool, please add the pool inside the protocol instance where the sample pool is required as a start pool.</div>
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
@@ -21,7 +21,8 @@
         <g:submitButton class="btn btn-primary" name="search" value="Search Or Create"/>
     </g:form>                    
     <script>
-        $("#nav-bench").addClass("active");
+        $("#nav-experiments").addClass("active");
+        $("select").select2();
      </script>
 </div>
 </body>

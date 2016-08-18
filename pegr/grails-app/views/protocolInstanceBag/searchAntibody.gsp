@@ -16,7 +16,7 @@
     </g:if>
     <g:form class="fields" role="form" action="previewAntibody" >
         <g:hiddenField name="instanceId" value="${instanceId}"/>
-        <g:hiddenField name="sampleId" value="${sampleId}"/>
+        <g:hiddenField name="itemId" value="${itemId}"/>
         <div class=" ${hasErrors(bean: item, field: 'type', 'error')} ">
             <label>Type</label>
             <select id="type" name="type.id">
@@ -33,7 +33,7 @@
     </g:form>                    
 
     <script>
-        $("#nav-bench").addClass("active");
+        $("#nav-experiments").addClass("active");
      </script>
 </div>
 </body>

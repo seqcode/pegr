@@ -2863,4 +2863,6 @@ databaseChangeLog = {
 	include file: 'addHistoryIdToAlignment.groovy'
 
 	include file: 'removeHistoryIdFromAnalysis.groovy'
+
+	include file: 'changeInstanceItem.groovy'
 }

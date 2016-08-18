@@ -20,42 +20,47 @@
             </g:if>    
         </thead>
         <tbody>            
-            <g:each in="${samples}" var="sample" status="n">
+            <g:each in="${parents}" var="parent" status="n">
                 <tr>
-                    <td><g:link controller="item" action="show" id="${parents[n].id}" target="_blank">${parents[n].name}</g:link></td>
+                    <td><g:link controller="item" action="show" id="${parent.id}" target="_blank">${parent.name}</g:link></td>
                     <g:if test="${children}">
                         <td>
                             <g:if test="${children[n]}">
                                 <g:link controller="item" action="show" id="${children[n].id}" target="_blank">${children[n].name}</g:link>
-                                <g:link action="removeChild" params="[sampleId: sample.id, instanceId: instanceId]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link>
-                                <g:link action="addChild" params="[sampleId: sample.id, instanceId: instanceId, childTypeId: childType.id, split: true]" class="edit">Split</g:link>
+                                <g:link action="removeChild" params="[childItemId: children[n].id, instanceId: instanceId]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link>
+                                <g:link action="addChild" params="[parentItemId: parent.id, instanceId: instanceId, childTypeId: childType.id, split: true]" class="edit">Split</g:link>
                             </g:if>
                             <g:else>
-                                <g:link action="addChild" params="[sampleId:sample.id, instanceId:instanceId, childTypeId:childType.id]"><span class="glyphicon glyphicon-plus"></span></g:link>
+                                <g:link action="addChild" params="[parentItemId: parent.id, instanceId:instanceId, childTypeId:childType.id]"><span class="glyphicon glyphicon-plus"></span></g:link>
                             </g:else>
                         </td> 
                     </g:if>
                     <g:if test="${protocolInstance?.protocol?.addAntibody}">
                         <td>
-                            <g:if test="${sample.antibody}">
-                                <g:link controller="antibody" action="show" id="${sample.antibody.id}" target="_blank">${sample.antibody}</g:link>
-                                <g:link action="removeAntibodyFromSample" params="[sampleId: sample.id, instanceId: instanceId]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link>
+                            <g:if test="${children[n]?.antibody}">
+                                <g:link controller="antibody" action="show" id="${children[n].antibody.id}" target="_blank">${children[n].antibody}</g:link>
+                                <g:link action="removeAntibodyFromTracedSample" params="[itemId: children[n].id, instanceId: instanceId]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link>
                             </g:if>
-                            <g:else>
-                                <g:link action="searchAntibody" params="[sampleId:sample.id, instanceId:instanceId]"><span class="glyphicon glyphicon-plus"></span></g:link>
-                            </g:else>
+                            <g:elseif test="${children[n]}">
+                                <g:link action="searchAntibody" params="[itemId:children[n].id, instanceId:instanceId]"><span class="glyphicon glyphicon-plus"></span></g:link>
+                            </g:elseif>
                         </td> 
                     </g:if>
-                    <g:hiddenField name="sampleId" value="${sample.id}"/>
                     <g:if test="${protocolInstance?.protocol?.addIndex}">
-                        <td><g:textField name="indexId" value="${sample.sequenceIndicesString}" size="50"/></td>
+                        <td>
+                            <g:if test="${children[n]}">
+                                <g:hiddenField name="itemId" value="${children[n].id}"/>
+                                <g:textField name="indexId" value="${children[n].sequenceIndicesString}" size="50"/>
+                            </g:if>
+                        </td>
                     </g:if>
                 </tr>
             </g:each>
         </tbody>
     </table>
+    <g:if test="${protocolInstance?.protocol?.addIndex}">
     <div class="row">
         <g:submitButton name="save" class="btn btn-primary pull-right" value="Save Index"></g:submitButton>
     </div>
-    
+    </g:if>
 </g:form>

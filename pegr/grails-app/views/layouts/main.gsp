@@ -25,6 +25,7 @@
                         <li id="nav-experiments"><g:link controller="protocolInstanceBag" action="processingBags">Experiments</g:link></li>
                         <li id="nav-bioinformatics"><g:link controller="bioinformatics">Bioinfomatics</g:link></li>
                         <li id="nav-analysis"><g:link controller="report" action="all">Analysis</g:link></li>
+                        <li id="nav-admin"><g:link controller="admin" action="index">Admin</g:link></li>
                     </sec:ifAnyGranted>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">

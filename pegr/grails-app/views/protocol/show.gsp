@@ -49,8 +49,8 @@
 
 			<h4>Sample Pool</h4>
             <ul>
-                <li>Start Pool: ${protocol?.startPoolType}</li>
-                <li>End Pool: ${protocol?.endPoolType}</li>
+                <li>Import Pool: ${protocol?.startPoolType}</li>
+                <li>Create Pool: ${protocol?.endPoolType}</li>
             </ul>
             <h4>Protocol File</h4>
             <g:if test="${file}">

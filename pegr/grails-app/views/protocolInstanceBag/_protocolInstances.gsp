@@ -10,9 +10,15 @@
 	<g:elseif test="${count == completedCount}">
         <g:if test="${it.status == pegr.ProtocolStatus.INACTIVE}">
             <li class="list-group-item"> 
-                <h4 class="list-group-item-heading">${it.protocol.name} <g:link  action="startInstance" id="${it.id}" class="label label-success confirm-start">Start</g:link></h4>
+                <h4 class="list-group-item-heading">${it.protocol.name} 
+                    <g:if test="${count == 0}">
+                        <g:link  action="startInstance" id="${it.id}" class="label label-success confirm-start-first">Start</g:link>
+                    </g:if>
+                    <g:else>
+                        <g:link  action="startInstance" id="${it.id}" class="label label-success confirm-start">Start</g:link>
+                    </g:else>
+                </h4>
             </li>
-
         </g:if>
         <g:else>
             <li class="list-group-item">

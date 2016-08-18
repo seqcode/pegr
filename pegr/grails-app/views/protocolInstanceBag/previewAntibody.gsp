@@ -8,11 +8,11 @@
     <h3>Add Antibody</h3>
     <g:render template="/antibody/details" bean="${antibody}" var="object"></g:render>
 
-    <g:link action="addAntibodyToSample" params="[antibodyId: antibody.id, sampleId: sampleId, instanceId: instanceId]" class="btn btn-primary">Add</g:link>
+    <g:link action="addAntibodyToSample" params="[antibodyId: antibody.id, itemId: itemId, instanceId: instanceId]" class="btn btn-primary">Add</g:link>
 
-    <g:link action="searchAntibody" params="[antibodyId: antibody.id, instanceId: instanceId]" class="btn btn-primary">Cancel</g:link>
+    <g:link action="searchAntibody" params="[itemId: itemId, instanceId: instanceId]" class="btn btn-primary">Cancel</g:link>
     <script>
-        $("#nav-bench").addClass("active");
+        $("#nav-experiments").addClass("active");
      </script>
 </div>
 </body>

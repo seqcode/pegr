@@ -153,13 +153,15 @@
                         The "Bag" is defined by a set of samples and a list of protocols to be performed on these samples.
                         <asset:image src="bag.png" height="400px"/>
                     </li>
-                    <li>
-                        <h4>Import Bag into a New Bag</h4>
+                    <li id="addSampleToBag">
+                        <h4>Import bag</h4>
                         <p>Scan any sample in the previouly finished bag. You will be asked whether you want to add only that particular sample or the entire bag. If you choose to import the entire bag, all samples in that bag will be added to the new bag.</p>
                     </li>
                     <li>
                         <h4>Split the sample</h4>
                         <asset:image src="split-sample.png" height="400px"/>
+                        <h5>Import vs. Split and Add</h5>
+                        <p>If the traced sample is linked to other bags, you can choose to either "Import" or "Split and Add". "Import" means that you will continue working on the sample(s). For example, the traced sample has been through the protocols in the latest bag, and will continue being processed in this bag. "Split and Add" means that you will create a new sample off the scaned traced sample. You may choose this option when you find out that the traced sample has been associated with another bag. </p>
                     </li>
                     <li>
                         <h4>Sample Pool</h4>

@@ -193,31 +193,33 @@
                 <li>Date: <g:formatDate format="yyyy-MM-dd" date="${sample?.prtclInstSummary?.endTime}"/></li>
             </g:if>
         </ul>
-        <div class="subnumber">
-            <ol>
-                <g:each in="${protocols}" var="bag">
-                    <li>
+        
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Details</button>
+            <ul class="dropdown-menu" class="list-group" style="padding:0">
+                <g:each in="${protocols}">
+                    <li class="list-group-item">
                         <g:if test="${sampleEditAuth}">
-                            <g:link controller="protocolInstanceBag" action="showBag" id="${bag.bag?.id}">${bag.bag?.name}</g:link>
-                            <ol>
-                                <g:each in="${bag.protocolList}">
-                                    <li><g:link controller="protocolInstanceBag" action="showInstance" id="${it.id}">${it.protocol}</g:link>
-                                    <g:link controller="protocolInstanceBag" action="renderFile" params="[protocolId: it.protocol?.id]" target="_blank"><span class="glyphicon glyphicon-file"></span></g:link></li>
+                            <h5><g:link controller="item" action="show" id="${it.item?.id}" style="color: #3f7fc0;; padding:0;">${it.item?.type?.name}</g:link></h5>
+                            <ul>
+                                <g:each in="${it.protocolList}">
+                                    <li><g:link controller="protocolInstanceBag" action="showInstance" id="${it.id}" style="color: #3f7fc0;">${it.protocol}</g:link>
+                                    <g:link controller="protocolInstanceBag" action="renderFile" params="[protocolId: it.protocol?.id]" target="_blank" style="color: #3f7fc0;"><span class="glyphicon glyphicon-file"></span></g:link></li>
                                 </g:each>
-                            </ol>
+                            </ul>
                         </g:if>
                         <g:else>
-                            ${bag.bag?.name}
-                            <ol>
-                                <g:each in="${bag.protocolList}">
-                                    <li>${it.protocol} 
+                            <h5>${it.item?.type?.name}</h5>                          
+                            <ul>
+                                <g:each in="${it.protocolList}">
+                                    <li>${it.protocol}
                                         <g:link controller="protocolInstanceBag" action="renderFile" params="[protocolId: it.protocol?.id]" target="_blank"><span class="glyphicon glyphicon-file"></span></g:link></li>
                                 </g:each>
-                            </ol>
+                            </ul>
                         </g:else>
                     </li>
                 </g:each>
-            </ol>
+            </ul>
         </div>
     </div>     
 

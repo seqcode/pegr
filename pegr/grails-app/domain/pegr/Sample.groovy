@@ -19,15 +19,12 @@ class Sample {
     Invoice invoice
 	ProtocolInstanceSummary prtclInstSummary
     Item item
-    List bags
     String source
     String sourceId
     Assay assay
     String requestedGenomes
     SampleAudit audit
     GrowthMedia growthMedia
-    
-    static hasMany = [bags: ProtocolInstanceBag]
     
     List getRuns() {
         return SequencingExperiment.where{sample == this}.collect{it.sequenceRun}

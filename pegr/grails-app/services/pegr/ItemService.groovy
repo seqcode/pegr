@@ -103,6 +103,7 @@ class ItemService {
         itemIndices.each { itemIndex ->
             new SampleSequenceIndices(sample: sample, index: itemIndex.index, indexInSet: itemIndex.indexInSet, setId: itemIndex.setId).save()       
         }
+        return sample
     }
 
 }

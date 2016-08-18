@@ -12,14 +12,14 @@
     <a href="#" onclick="window.open('/pegr/help#addSampleToBag', 'Help: Work Bench', 'width=600,height=400' )" class="pull-right"><u>Help</u></a>
     <h4>Add Traced Sample</h4>
     <g:render template="/item/details" bean="${item}" var="item"></g:render>
-    <g:if test="${subBag}">
+    <g:if test="${priorInstance}">
         <p>This item is associated with protocol instance <g:link controller="ProtocolInstanceBag" action="showInstance" id="${priorInstance.id}" target="_blank">${priorInstance}</g:link></p>
     </g:if>
     
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#split">Split and Add Sample</a></li>
         <li><a data-toggle="tab" href="#import-sample">Import Sample</a></li>
-        <g:if test="${subBag}"><li><a data-toggle="tab" href="#import-bag">Import Entire Bag</a></li>
+        <g:if test="${priorInstance}"><li><a data-toggle="tab" href="#import-bag">Import Entire Bag</a></li>
         </g:if>
     </ul>
 
@@ -38,7 +38,7 @@
             <g:link action="addItemToBag" params="[itemId: item.id,
                            bagId: bagId]" class="btn btn-primary">Import Sample</g:link>
         </div>
-        <g:if test="${subBag}">
+        <g:if test="${priorInstance}">
         <div id="import-bag" class="tab-pane fade">
             <p>You will continue working on all the samples in the above protocol instance.</p>
             <g:link action="addSubBagToBag" params="[instanceId: priorInstance.id, bagId: bagId]" class="btn btn-primary">Import Entire Bag</g:link>

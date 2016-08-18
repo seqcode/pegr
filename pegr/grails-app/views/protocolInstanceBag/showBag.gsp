@@ -70,7 +70,7 @@
                                 </g:if>
                         </h4>
                     </div>                    
-                    <g:render template="/protocolInstanceBag/baggedItems" model="['samples':tracedSamples, 'completed':completed, 'notStarted':notStarted]"></g:render>
+                    <g:render template="/protocolInstanceBag/baggedItems" model="['items':tracedSamples, 'completed':completed, 'notStarted':notStarted]"></g:render>
                 </div>
             </div>
         </div>

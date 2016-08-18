@@ -77,15 +77,16 @@ class ProtocolInstanceBagService {
         // add the traced sample to the first protocol instance of the bag
         new ProtocolInstanceItems(item: item,
                                  protocolInstance: instance,
-                                 function: ProtoclItemFunction.CHILD).save()
+                                 function: ProtocolItemFunction.CHILD).save()
         def sample = Sample.findByItem(item)
         // create a new sample if the item is not yet attached to a sample
         if (!sample) {  
-            sample = itemService.createSample(item)
-        } 
-        // update the sample's status
-        sample.status = SampleStatus.PREP 
-        sample.save()
+            itemService.createSample(item)
+        } else {
+            // update the sample's status
+            sample.status = SampleStatus.PREP 
+            sample.save()
+        }
     }
     
     @Transactional
@@ -126,10 +127,10 @@ class ProtocolInstanceBagService {
             throw new ProtocolInstanceBagException(message: "Protocol instance not found!")
         }
         try {
-            def items = ProtocolInstanceItems.where {protocolInstance.id == priorInstanceId && function == ProtocolItemFunction.CHILD}.list()
+            def items = ProtocolInstanceItems.where {protocolInstance.id == priorInstanceId && function == ProtocolItemFunction.CHILD}.collect{ it.item }
             items.each { tracedSample ->
                 // check if the traced sample is already in the bag
-                if (ProtocolInstanceItems.findByProtocolInstanceAndItem(instance, item)) {
+                if (ProtocolInstanceItems.findByProtocolInstanceAndItem(instance, tracedSample)) {
                     duplicateItems.push(tracedSample.name)
                 } else {
                     // add the item to the first protocol instance of the bag
@@ -150,7 +151,10 @@ class ProtocolInstanceBagService {
     @Transactional
     def removeSampleFromBag(Long itemId, Long bagId) {
         try {
-            ProtocolInstanceItems.executeUpdate("delete from ProtocolInstanceItems where protocolInstance.bag.id=:bagId and item.id=:itemId", [bagId: bagId, itemId: itemId])
+            def instances = ProtocolInstance.where {bag.id == bagId}.list()
+            instances.each {
+                ProtocolInstanceItems.executeUpdate("delete from ProtocolInstanceItems where protocolInstance.id=:instanceId and item.id=:itemId", [instanceId: it.id, itemId: itemId])
+            }
         }catch(Exception e) {
             log.error "Error: ${e.message}", e
             throw new ProtocolInstanceBagException(message: "Error removing this item!")

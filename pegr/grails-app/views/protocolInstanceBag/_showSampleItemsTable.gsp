@@ -28,13 +28,13 @@
                 </g:if>
                 <g:if test="${protocolInstance?.protocol?.addAntibody}">
                     <td>
-                        <g:if test="${childre[n]?.antibody}">
+                        <g:if test="${children[n]?.antibody}">
                             <g:link controller="antibody" action="show" id="${children[n]?.antibody?.id}" target="_blank">${children[n]?.antibody}</g:link>
                         </g:if>
                     </td> 
                 </g:if>
                 <g:if test="${protocolInstance?.protocol?.addIndex}">
-                    <td>${children[n].sequenceIndicesString}</td>
+                    <td>${children[n]?.sequenceIndicesString}</td>
                 </g:if>
             </tr>
         </g:each>

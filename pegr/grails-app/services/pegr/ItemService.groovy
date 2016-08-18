@@ -104,19 +104,5 @@ class ItemService {
             new SampleSequenceIndices(sample: sample, index: itemIndex.index, indexInSet: itemIndex.indexInSet, setId: itemIndex.setId).save()       
         }
     }
-    
-    def fetchOffspringSamples(Item item) {
-        List samples = []
-        if (!item) {
-            return samples
-        }
-        def sample = Sample.findByItem(item)
-        if (sample) {
-            samples << sample
-            return samples
-        }
-        fetchOffspringSamples()
-        Item.findAllByParent()
-    }
 
 }

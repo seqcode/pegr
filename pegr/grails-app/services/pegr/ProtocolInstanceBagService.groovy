@@ -111,7 +111,7 @@ class ProtocolInstanceBagService {
         // add the child to the first protocol instance of the bag
          new ProtocolInstanceItems(item: item,
                                  protocolInstance: instance,
-                                 function: ProtoclItemFunction.CHILD).save()
+                                 function: ProtocolItemFunction.CHILD).save()
         // create a new sample
         itemService.createSample(item)
         
@@ -172,9 +172,9 @@ class ProtocolInstanceBagService {
         // link traced samples to instance
         if (instance.bagIdx > 0) {
             def priorInstance = ProtocolInstance.findByBagAndBagIdx(instance.bag, instance.bagIdx - 1)
-            def items = ProtocolInstanceItems.findAllByProtocolInstanceAndFunction(priorInstance, ProtocolItemFunction.CHILD)
-            items.each {
-                new ProtocolInstanceItems(protocolInstance: instance, item: item, function: ProtocolItemFunction.CHILD).save()
+            def items = ProtocolInstanceItems.findAllByProtocolInstanceAndFunction(priorInstance, ProtocolItemFunction.CHILD)*.item
+            items.each { item ->
+                new ProtocolInstanceItems(protocolInstance: instance, item: item, function: ProtocolItemFunction.CHILD).save(faileOnError: true)
             }
         }
     }
@@ -211,8 +211,9 @@ class ProtocolInstanceBagService {
                 def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance, function: ProtocolItemFunction.END_POOL)
                 instanceItem.save(flush: true)
                 // add all the samples in the bag to the pool
-                instance.bag.tracedSamples.each {
-                    new PoolSamples(pool: item, sample: it).save()
+                ProtocolInstanceItems.findAllByProtocolInstanceAndFunction(instance, ProtocolItemFunction.CHILD).each { 
+                    def sample = Sample.findByItem(it.item)
+                    new PoolSamples(pool: item, sample: sample).save()
                 }
             } else {
                 def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance, function: ProtocolItemFunction.SHARED)
@@ -284,14 +285,14 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    void addIndex(List sampleIds, List indecies, String indexType) {
-        sampleIds.eachWithIndex { sampleIdStr, idx ->
-            def sampleId = Long.parseLong(sampleIdStr)
-            def sample = Sample.get(sampleId)
+    void addIndex(List itemIds, List indecies, String indexType) {
+        itemIds.eachWithIndex { itemIdStr, idx ->
+            def itemId = Long.parseLong(itemIdStr)
+            def sample = Sample.where { item.id == itemId }.find()
             if (!sample) {
                 throw new ProtocolInstanceBagException(message: "Sample not found!")
             }
-            SampleSequenceIndices.executeUpdate("delete from SampleSequenceIndices where sample.id = :sampleId", [sampleId: sampleId])
+            SampleSequenceIndices.executeUpdate("delete from SampleSequenceIndices where sample.id = :sampleId", [sampleId: sample.id])
             try {
                 if (indexType == "ID") {
                     sampleService.splitIdAndAddIndexToSample(sample, indecies[idx])
@@ -315,12 +316,12 @@ class ProtocolInstanceBagService {
             }
         }
         if (protocol.addIndex) {
-            if (parentsAndChildren.samples.any { it.sequenceIndicesString == null || it.sequenceIndicesString == "" }) {
+            if (parentsAndChildren.children.any { it.sequenceIndicesString == null || it.sequenceIndicesString == "" }) {
                 return false
             }
         }
         if (protocol.addAntibody) {
-            if (parentsAndChildren.samples.any {it.antibody == null}) {
+            if (parentsAndChildren.children.any {it.antibody == null}) {
                 return false
             }
         }
@@ -393,37 +394,38 @@ class ProtocolInstanceBagService {
         return [parents: parents, children: children]
     }
     
-    // TODO antibody should be added to the child, same with index.
     @Transactional
-    void addAntibodyToSample(Long sampleId, Long antibodyId) {
-        def sample = Sample.get(sampleId)
-        def antibody = Antibody.get(antibodyId)
-        if (sample && antibody) {
-            sample.antibody = antibody
-            sample.save()
-            if (sample.item) {
-                new ItemAntibody(item: sample.item, antibody: antibody).save()    
-            }
-        } else {
-            throw new ProtocolInstanceBagException(message: "Sample or antibody not found!")
+    void addAntibodyToSample(Long itemId, Long antibodyId) {
+        def item = Item.get(itemId)
+        if (!item) {
+             throw new ProtocolInstanceBagException(message: "Traced sample not found!")
         }
+        def sample = Sample.findByItem(item)
+        if (!sample) {
+            throw new ProtocolInstanceBagException(message: "Sample not found!")
+        }
+        def antibody = Antibody.get(antibodyId)
+        if (!antibody) {
+            throw new ProtocolInstanceBagException(message: "Antibody not found!")
+        }
+        sample.antibody = antibody
+        sample.save()
+        new ItemAntibody(item: item, antibody: antibody).save()    
     }
     
     @Transactional
     void removeAntibodyFromTracedSample(Long itemId) {
         def item = Item.get(itemId)
         if (!item) {
-            throw new ProtocolInstanceBagException(message: "")
+            throw new ProtocolInstanceBagException(message: "Traced sample not found!")
         }
         ItemAntibody.findByItem(item)?.delete()
-        if (item) {
-            def sample = Sample.findByItem(item) 
-            if (sample && sample.) {
-                
-                sample.antibody = null
-                sample.save()
-            } 
+        def sample = Sample.findByItem(item) 
+        if (!sample) {
+            throw new ProtocolInstanceBagException(message: "Sample not found!")
         }
+        sample.antibody = null
+        sample.save()
     }
     
     @Transactional
@@ -482,7 +484,7 @@ class ProtocolInstanceBagService {
         if (child == null) {
             throw new ProtocolInstanceBagException(message: "Child item not found!")
         }
-        def sample = Sample.findByItem(item)
+        def sample = Sample.findByItem(child)
         if (!sample) {
             throw new ProtocolInstanceBagException(message: "Sample not found!")
         }

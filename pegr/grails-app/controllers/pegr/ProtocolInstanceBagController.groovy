@@ -59,11 +59,16 @@ class ProtocolInstanceBagController {
         if (protocolInstances.size() > 0) {
             toBeCompleted = (bag.status != ProtocolStatus.COMPLETED && protocolInstances.last().status == ProtocolStatus.COMPLETED)
             notStarted = (protocolInstances[0].status == ProtocolStatus.INACTIVE)
-            def instance = protocolInstances.find { it.status == ProtocolStatus.PROCESSING }
-            if (!instance) {
-                instance = (protocolInstances[0].status == ProtocolStatus.INACTIVE) ? protocolInstances.first() : protocolInstances.last()
-            } 
-            tracedSamples = ProtocolInstanceItems.findAllByProtocolInstance(instance).collect { it.item }
+            def n = protocolInstances.findIndexOf { it.status == ProtocolStatus.INACTIVE }
+            def instance
+            if (n == -1) {
+                instance = protocolInstances.last()
+            } else if ( n==0 ) {
+                instance = protocolInstances.first()
+            } else {
+                instance = protocolInstances[n-1]
+            }
+            tracedSamples = ProtocolInstanceItems.findAllByProtocolInstanceAndFunction(instance, ProtocolItemFunction.CHILD).collect { it.item }
         }
         if (bag) {
             [bag:bag, count: count, protocolInstances: protocolInstances, notStarted: notStarted, completed: completed, toBeCompleted: toBeCompleted, tracedSamples: tracedSamples]
@@ -190,8 +195,10 @@ class ProtocolInstanceBagController {
                                                  children: results.children,
                                                  childType: protocol.endItemType,
                                                  file: file])
-                } else {              
-                    toBeCompleted = protocolInstanceBagService.readyToBeCompleted(sharedItemAndPoolList, results, protocol)
+                } else {           
+                    if (protocolInstance.status != ProtocolStatus.COMPLETED) {
+                        toBeCompleted = protocolInstanceBagService.readyToBeCompleted(sharedItemAndPoolList, results, protocol)
+                    }                    
                     render(view: "editInstance", model: [protocolInstance: protocolInstance, 
                                                  sharedItemAndPoolList: sharedItemAndPoolList,
                                                  parents: results.parents,
@@ -336,10 +343,10 @@ class ProtocolInstanceBagController {
     }
     
     def addIndex(Long instanceId, String indexType) {
-        def sampleId = params.list('sampleId')
+        def itemId = params.list('itemId')
         def indexIds = params.list('indexId')
         try {
-            protocolInstanceBagService.addIndex(sampleId, indexIds, indexType)
+            protocolInstanceBagService.addIndex(itemId, indexIds, indexType)
             flash.message = "Index saved!"            
         } catch (ProtocolInstanceBagException e) {
             flash.message = e.message  
@@ -350,27 +357,27 @@ class ProtocolInstanceBagController {
         redirect(action: "showInstance", id: instanceId)
     }
     
-    def searchAntibody(Long sampleId, Long instanceId) {
+    def searchAntibody(Long itemId, Long instanceId) {
         def antibodyTypeId = ItemType.findByName('Antibody')
-        [instanceId: instanceId, sampleId: sampleId, antibodyTypeId: antibodyTypeId]
+        [instanceId: instanceId, itemId: itemId, antibodyTypeId: antibodyTypeId]
     }
     
-    def previewAntibody(Long sampleId, Long instanceId, String barcode) {
+    def previewAntibody(Long itemId, Long instanceId, String barcode) {
         def item = Item.where{type.name == "Antibody" && barcode == barcode}.get(max: 1)
         if (item) {
             def antibody = Antibody.findByItem(item)
             if (antibody) {
-                render(view: "previewAntibody", model: [antibody: antibody, instanceId: instanceId, sampleId: sampleId] )
+                render(view: "previewAntibody", model: [antibody: antibody, instanceId: instanceId, itemId: itemId] )
             } 
         } else {
             flash.message = "Antibody not found!"
-            redirect(action: "searchAntibody", params: [instanceId: instanceId, sampleId: sampleId])
+            redirect(action: "searchAntibody", params: [instanceId: instanceId, itemId: itemId])
         }
     }
     
-    def addAntibodyToSample(Long sampleId, Long instanceId, Long antibodyId) {
+    def addAntibodyToSample(Long itemId, Long instanceId, Long antibodyId) {
         try{
-            protocolInstanceBagService.addAntibodyToSample(sampleId, antibodyId)
+            protocolInstanceBagService.addAntibodyToSample(itemId, antibodyId)
         } catch(ProtocolInstanceBagException e) {
             flash.message = e.message
         } catch(Exception e) {

@@ -49,7 +49,7 @@
     <script>
         $(function() {
             $("#split-form").hide();
-            $("#nav-bench").addClass("active");
+            $("#nav-experiments").addClass("active");
         });        
      </script>
 </div>

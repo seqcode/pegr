@@ -295,6 +295,7 @@ class SampleService {
     
     def copyIndexToItem(Sample sample) {
         def item = sample.item
+        ItemSequenceIndices.executeUpdate("delete from ItemSequenceIndices where item.id =:itemId", [itemId: item.id])
         if (item) {
             SampleSequenceIndices.findAllBySample(sample).each { sampleIndex ->
                 new ItemSequenceIndices(item: item, index: sampleIndex.index, indexInSet: sampleIndex.indexInSet, setId: sampleIndex.setId).save()

@@ -14,7 +14,7 @@
                                instanceId: instanceId]" class="btn btn-primary">Add</g:link>
     <g:link action="searchItemForInstance" id="${instanceId}" class="btn btn-primary">Cancel</g:link>
     <script>
-        $("#nav-bench").addClass("active");
+        $("#nav-experiments").addClass("active");
      </script>
 </div>
 </body>

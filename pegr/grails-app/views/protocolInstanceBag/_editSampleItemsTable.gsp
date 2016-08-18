@@ -41,14 +41,18 @@
                                 <g:link controller="antibody" action="show" id="${children[n].antibody.id}" target="_blank">${children[n].antibody}</g:link>
                                 <g:link action="removeAntibodyFromTracedSample" params="[itemId: children[n].id, instanceId: instanceId]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link>
                             </g:if>
-                            <g:else>
-                                <g:link action="searchAntibody" params="[sampleId:sample.id, instanceId:instanceId]"><span class="glyphicon glyphicon-plus"></span></g:link>
-                            </g:else>
+                            <g:elseif test="${children[n]}">
+                                <g:link action="searchAntibody" params="[itemId:children[n].id, instanceId:instanceId]"><span class="glyphicon glyphicon-plus"></span></g:link>
+                            </g:elseif>
                         </td> 
                     </g:if>
-                    <g:hiddenField name="sampleId" value="${sample.id}"/>
                     <g:if test="${protocolInstance?.protocol?.addIndex}">
-                        <td><g:textField name="indexId" value="${sample.sequenceIndicesString}" size="50"/></td>
+                        <td>
+                            <g:if test="${children[n]}">
+                                <g:hiddenField name="itemId" value="${children[n].id}"/>
+                                <g:textField name="indexId" value="${children[n].sequenceIndicesString}" size="50"/>
+                            </g:if>
+                        </td>
                     </g:if>
                 </tr>
             </g:each>

@@ -8,20 +8,20 @@
 </head>
 <body  onhashchange="getHash()">
 <div>
-    <h4>Add Child for <g:link controller="item" action="show" id="${sample?.item?.id}" target="_blank">${sample?.item?.name}</g:link></h4>
+    <h4>Add Child for <g:link controller="item" action="show" id="${parentItem?.id}" target="_blank">${parentItem?.name}</g:link></h4>
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
     <g:form action="addChild" class="fields" role="form" method="POST" useToken="true">
         <g:hiddenField name="instanceId" value="${instanceId}"/>
-        <g:hiddenField name="sampleId" value="${sample.id}"/>
+        <g:hiddenField name="parentItemId" value="${parentItem.id}"/>
         <g:hiddenField name="split" value="${split}"/>
         <g:render template="childForm"></g:render>
         <g:submitButton class="btn btn-primary" name="save" value="Save"/>
         <g:link action="showInstance" id="${instanceId}" class="btn btn-default">Cancel</g:link>
     </g:form>
     <script>
-        $("#nav-bench").addClass("active");
+        $("#nav-experiments").addClass("active");
      </script>
 </div>
 </body>

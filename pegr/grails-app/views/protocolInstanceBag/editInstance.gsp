@@ -25,22 +25,28 @@
         <h4>Shared Items</h4>
         <g:render template="sharedItemsTable" model="['itemList':sharedItemAndPoolList.sharedItemList,'instanceId':protocolInstance.id, 'extra':true,'edit':true]"></g:render>
         <g:if test="${sharedItemAndPoolList.startPool}">
-            <h4>Start Pool</h4>
+            <h4>Import Pools</h4>
             <g:render template="sharedItemsTable" model="['itemList':sharedItemAndPoolList.startPool,'instanceId':protocolInstance.id, 'extra':false,'edit':true]"></g:render>
         </g:if>
         <g:if test="${sharedItemAndPoolList.endPool}">
-            <h4>End Pool</h4>
+            <h4>Created New Pool</h4>
             <g:render template="sharedItemsTable" model="['itemList':sharedItemAndPoolList.endPool,'instanceId':protocolInstance.id, 'extra':false,'edit':true]"></g:render>
         </g:if>          
-        <g:render template="editSampleItemsTable" model="['parents':parents,'children':children, 'instanceId':protocolInstance.id]"></g:render>             
-        <g:if test="${toBeCompleted}">
+        <g:render template="editSampleItemsTable" model="['parents':parents,'children':children, 'instanceId':protocolInstance.id]"></g:render>
         <div class="row well text-center">
-        <g:link action="completeInstance" params="[instanceId: protocolInstance?.id, bagId: protocolInstance?.bag?.id]" class="btn btn-success">Complete <span class="glyphicon glyphicon-ok"></span> </g:link>
+            <g:if test="${toBeCompleted}">
+                <g:link action="completeInstance" params="[instanceId: protocolInstance?.id, bagId: protocolInstance?.bag?.id]" class="btn btn-success">Complete <span class="glyphicon glyphicon-ok"></span> </g:link>
+            </g:if>
+            <g:elseif test="${protocolInstance.status == pegr.ProtocolStatus.COMPLETED}">
+                <button class="btn btn-default disabled">Completed</button>
+            </g:elseif>
+            <g:else>
+                <button class="btn btn-default disabled">Processing</button>
+            </g:else>
         </div>
-        </g:if>
     </div>
     <script>
-        $("#nav-bench").addClass("active"); 
+        $("#nav-experiments").addClass("active"); 
         $(".confirm").confirm();
     </script>
 </body>

@@ -1,7 +1,6 @@
 <html>
 <head>
   <title>Cell Source</title> 
-  <meta name="layout" content="main"/>
 </head>
 <body>
     <h4>Protocol Instance Bags</h4>
@@ -19,9 +18,5 @@
     <div class="pagination">
         <g:paginate next="Next" prev="Prev" total="${bags.totalCount ?: 0}" />
     </div>
-    
-     <script>
-        $("#nav-bench").addClass("active");
-     </script>
 </body>
 </html>

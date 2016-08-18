@@ -29,8 +29,13 @@ class SampleService {
 
         }
         def protocols = []
-        sample.bags.each{ linkedbag ->
-            protocols.push([bag:linkedbag, protocolList:ProtocolInstance.where{bag.id == linkedbag.id}.list(sort: "bagIdx", order: "asc")])
+        def item = sample.item
+        while (item) {
+            def instances = ProtocolInstanceItems.findAllByItem(item).sort{ -it.id }.collect { it.protocolInstance}
+            if (instances.size()>0) {
+                protocols.push([item: item, protocolList: instances])
+            }            
+            item = item.parent
         }
         def replicates = replicateService.getReplicates(sample)
         return [sample: sample, notes: notes, protocols: protocols, replicates: replicates] 
@@ -287,6 +292,21 @@ class SampleService {
 	    }
 	    return media
 	}
+    
+    def copyIndexToItem(Sample sample) {
+        def item = sample.item
+        ItemSequenceIndices.executeUpdate("delete from ItemSequenceIndices where item.id =:itemId", [itemId: item.id])
+        if (item) {
+            SampleSequenceIndices.findAllBySample(sample).each { sampleIndex ->
+                new ItemSequenceIndices(item: item, index: sampleIndex.index, indexInSet: sampleIndex.indexInSet, setId: sampleIndex.setId).save()
+            }
+        }        
+    }
+    
+    def delete(Sample sample) {
+        SampleSequenceIndices.executeUpdate("delete from SampleSequenceIndices where sample.id=:sampleId", [sampleId: sample.id])
+        sample.delete()
+    }
     
     /**
      * Authorization to edit the given sample: Admin or 

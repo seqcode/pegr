@@ -20,7 +20,7 @@
     </g:form>
 
     <script>
-        $("#nav-bench").addClass("active");
+        $("#nav-experiments").addClass("active");
         $("form").hide();
      </script>
 </div>

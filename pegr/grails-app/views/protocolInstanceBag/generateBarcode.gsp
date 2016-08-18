@@ -50,7 +50,7 @@
         </div>
     </div>
     <script>
-        $("#nav-bench").addClass("active");
+        $("#nav-experiments").addClass("active");
         $("select").select2();
         
         function refreshBarcode() {

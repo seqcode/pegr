@@ -41,7 +41,7 @@
         <br>
     </div>
     <script>
-        $("#nav-bench").addClass("active");
+        $("#nav-experiments").addClass("active");
         $('#custom-protocols').hide();
         
         function showDefinedProtocol() {

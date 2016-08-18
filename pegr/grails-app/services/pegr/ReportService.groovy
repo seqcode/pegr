@@ -191,10 +191,8 @@ class ReportService {
                     def tabulars = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "tabular")
                     if (tabulars && tabulars.size() > 0) {
                         if (motifId && motifId > 0){
-                            alignmentDTO.composite[motifId] = tabulars.last()
-                        } else {
-                             alignmentDTO.composite[0] = tabulars.last()
-                        }                        
+                            alignmentDTO.composite[motifId-1] = tabulars.last()
+                        }                      
                     }
                     break
             }

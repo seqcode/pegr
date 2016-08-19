@@ -48,6 +48,11 @@ class ReportController {
         [motifs: results]
     }
     
+    def fetchMemeDataAjax(String url) {
+        def results = reportService.fetchMemeMotif(url) as JSON
+        render results
+    }
+    
     def composite(String url) {
         def compositeData = reportService.fetchComposite(url)
         [compositeData: compositeData]

@@ -34,18 +34,29 @@
                 <g:each in="${experiment.alignments}" var="alignment">
                     <h5>Sample <u>${sample.id}</u> &nbsp; Run <u>${experiment.runId}</u> &nbsp; Genome <u>${alignment.genome}</u> &nbsp; Target <u>${sample.target}</u> 
                     </h5>
-                    <table id="figs${sample.id}" class="table table-bordered" onload="draw_meme()">
+                    <table class="table table-bordered meme-table">                        
                         <thead>
                             <tr>
-                                <th><a href="${alignment.memeFig}" target="_blank">Meme <span class="glyphicon glyphicon-picture"></span></a></th>
-                                <th>Four-Color</th>
-                                <th>Composite</th>
+                                <th rowspan="2">ID</th>
+                                <th colspan="4" class="text-center"><a href="${alignment.memeFig}" target="_blank">Meme <span class="glyphicon glyphicon-picture"></span></a><span class="meme-url" hidden="hidden">${alignment.memeFile}</span></th>
+                                <th rowspan="2">Four-Color</th>
+                                <th rowspan="2">Composite</th>
+                            </tr>
+                            <tr>
+                                <th>Logo</th>
+                                <th>E-value</th>
+                                <th>Sites</th>
+                                <th>Width</th>
                             </tr>
                         </thead>
                         <tbody>
                             <g:each in="${alignment.fourColor}" var="fourColor" status="n">
                                 <tr>
-                                    <td class="meme${n}"></td>
+                                    <td class="meme-id"></td>
+                                    <td class="meme-fig"></td>
+                                    <td class="meme-evalue"></td>
+                                    <td class="meme-sites"></td>
+                                    <td class="meme-width"></td>
                                     <td><a href="${fourColor}" target="_blank"><span class="glyphicon glyphicon-picture"></span></a></td>
                                     <td><g:link action="composite" params="[url: alignment.composite[n]]" target="_blank"><span class="glyphicon glyphicon-picture"></span></g:link></td>
                                 </tr>
@@ -58,10 +69,32 @@
     </li>
 </ul>
 <script>
-    //$(".meme0").html("ABC");
-    
-    function draw_meme() {
-        $(".meme0").html("ABC");
-    }
-    
+    $(function() {
+        $(".meme-table").each( function() {
+            var memeTable = $(this);
+            var memeUrl = $(this).find(".meme-url").text();
+            $.ajax({ 
+                url: "/pegr/report/fetchMemeDataAjax?url=" + memeUrl,
+                success: 
+                    function(result) {
+                        memeTable.find(".meme-id").each(function(index, memeId) {
+                            $(memeId).html(result[index].id);
+                        });
+                        memeTable.find(".meme-fig").each(function(index, memeFig) {
+                            make_motif(memeFig, result[index]);
+                        });
+                        memeTable.find(".meme-evalue").each(function(index, memeEvalue) {
+                            $(memeEvalue).html(result[index].evalue);
+                        });
+                        memeTable.find(".meme-sites").each(function(index, memeSites) {
+                            $(memeSites).html(result[index].nsites);
+                        });
+                        memeTable.find(".meme-width").each(function(index, memeWidth) {
+                            $(memeWidth).html(result[index].len);
+                        });
+                    }
+            });  
+            
+        });        
+    });    
 </script>

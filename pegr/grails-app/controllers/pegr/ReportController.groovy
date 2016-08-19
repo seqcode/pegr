@@ -43,11 +43,6 @@ class ReportController {
         }
     }
     
-    def meme(String url) {
-        def results = reportService.fetchMemeMotif(url) as JSON
-        [motifs: results]
-    }
-    
     def fetchMemeDataAjax(String url) {
         def results = reportService.fetchMemeMotif(url) as JSON
         render results

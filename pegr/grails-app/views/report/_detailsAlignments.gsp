@@ -32,41 +32,36 @@
         <g:each in="${sampleDTOs}" var="sample">
             <g:each in="${sample.experiments}" var="experiment">
                 <g:each in="${experiment.alignments}" var="alignment">
-                    <h5>Sample <u>${sample.id}</u> &nbsp; Run <u>${experiment.runId}</u> &nbsp; Genome <u>${alignment.genome}</u> &nbsp; Target <u>${sample.target}</u>
-                        <g:if test="${alignment.memeFig}">
-                            <a href="${alignment.memeFig}" target="_blank"><span class="glyphicon glyphicon-picture"></span>Meme</a>
-                        </g:if>   
+                    <h5>Sample <u>${sample.id}</u> &nbsp; Run <u>${experiment.runId}</u> &nbsp; Genome <u>${alignment.genome}</u> &nbsp; Target <u>${sample.target}</u> 
                     </h5>
-                    <table class="table table-bordered">
+                    <table id="figs${sample.id}" class="table table-bordered" onload="draw_meme()">
                         <thead>
                             <tr>
-                                <th>MEME</th>
+                                <th><a href="${alignment.memeFig}" target="_blank">Meme <span class="glyphicon glyphicon-picture"></span></a></th>
                                 <th>Four-Color</th>
                                 <th>Composite</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <g:each in="${}" status="n">
+                            <g:each in="${alignment.fourColor}" var="fourColor" status="n">
                                 <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td class="meme${n}"></td>
+                                    <td><a href="${fourColor}" target="_blank"><span class="glyphicon glyphicon-picture"></span></a></td>
+                                    <td><g:link action="composite" params="[url: alignment.composite[n]]" target="_blank"><span class="glyphicon glyphicon-picture"></span></g:link></td>
                                 </tr>
                             </g:each>
                         </tbody>
-                    </table>
-                    
-                    <div>
-                        <iframe src="/pegr/report/meme?url=${alignment.memeFile}" width=800 height=200 scrolling=no frameBorder=0></iframe>   
-                        <g:each in="${alignment.fourColor}" var="fourColor">
-                            <a href="${fourColor}" target="_blank"><span class="glyphicon glyphicon-picture"></span>4Color</a>
-                        </g:each>
-                        <g:each in="${alignment.composite}" var="composite">
-                            <g:link action="composite" params="[url: composite]" target="_blank"><span class="glyphicon glyphicon-picture"></span>Composite</g:link>
-                        </g:each>
-                    </div>
+                    </table>                        
                 </g:each>
             </g:each>
         </g:each>
     </li>
 </ul>
+<script>
+    //$(".meme0").html("ABC");
+    
+    function draw_meme() {
+        $(".meme0").html("ABC");
+    }
+    
+</script>

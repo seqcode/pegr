@@ -197,7 +197,12 @@ class ReportService {
                     break
             }
         }
-
+        // in case not all composite figures have been received
+        def compositeCount = alignmentDTO.composite.size()
+        def fourColorCount = alignmentDTO.fourColor.size()
+        if ( compositeCount < fourColorCount ) {
+            alignmentDTO.composite[fourColorCount - 1] = null
+        }
         alignmentDTO.nonPairedPeaks = getNonPairedPeaks(alignmentDTO.peaks, alignmentDTO.peakPairs)
         return alignmentDTO
     }

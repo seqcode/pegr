@@ -288,11 +288,12 @@ class ReportService {
                 }
             }
         }
-        String s = ""
+        String s = '[["Position", "Forward","Reverse"]'
         results.each {
             def a = it.join(",")
             s += ",[${a}]"
         }
+        s += "]"
         return s
     }
     

@@ -49,8 +49,12 @@ class ReportController {
     }
     
     def composite(String url) {
-        def compositeData = reportService.fetchComposite(url)
-        [compositeData: compositeData]
+        [url: url]
+    }
+    
+    def fetchCompositeDataAjax(String url) {
+        def result = reportService.fetchComposite(url)
+        render result
     }
 }
 

@@ -52,13 +52,13 @@
                         <tbody>
                             <g:each in="${alignment.fourColor}" var="fourColor" status="n">
                                 <tr>
-                                    <td class="meme-id"></td>
+                                    <td class="meme-id" style="width:20px"></td>
                                     <td class="meme-fig"></td>
-                                    <td class="meme-evalue"></td>
-                                    <td class="meme-sites"></td>
-                                    <td class="meme-width"></td>
-                                    <td><a href="${fourColor}" target="_blank"><span class="glyphicon glyphicon-picture"></span></a></td>
-                                    <td><g:link action="composite" params="[url: alignment.composite[n]]" target="_blank"><span class="glyphicon glyphicon-picture"></span></g:link></td>
+                                    <td class="meme-evalue" style="width:100px"></td>
+                                    <td class="meme-sites" style="width:100px"></td>
+                                    <td class="meme-width" style="width:100px"></td>
+                                    <td style="width:100px"><a href="${fourColor}" target="_blank"><span class="glyphicon glyphicon-picture" style="font-size: 2em"></span></a></td>
+                                    <td class="composite" style="width:210px"><span class="composite-url" hidden="hidden">${alignment.composite[n]}</span><g:link action="composite" params="[url: alignment.composite[n]]" target="_blank"><div class="composite-fig"></div></g:link></td>
                                 </tr>
                             </g:each>
                         </tbody>
@@ -70,7 +70,27 @@
 </ul>
 <script>
     $(function() {
-        $(".meme-table").each( function() {
+        google.charts.load('current', {'packages':['corechart']});
+        // composite chart
+        $(".composite").each(function(){
+            var compositeUrl = $(this).find(".composite-url").text();
+            var container = $(this).find(".composite-fig")[0];
+            google.charts.setOnLoadCallback(function(){
+                $.ajax({
+                      url: "/pegr/report/fetchCompositeDataAjax?url=" + compositeUrl,
+                      dataType: "json"
+                }).done(function(jsonData){
+                    // Create our data table out of JSON data loaded from server.
+                    var data = new google.visualization.arrayToDataTable(jsonData);
+
+                    // Instantiate and draw our chart, passing in some options.
+                    var chart = new google.visualization.LineChart(container);
+                    chart.draw(data, {width: 200, height: 100, legend: {position: 'none'}});    
+                });                
+            });
+        });
+    
+        $(".meme-table").each(function(){
             var memeTable = $(this);
             var memeUrl = $(this).find(".meme-url").text();
             $.ajax({ 
@@ -94,7 +114,6 @@
                         });
                     }
             });  
-            
         });        
     });    
 </script>

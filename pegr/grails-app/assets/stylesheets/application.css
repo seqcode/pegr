@@ -10,8 +10,6 @@
 *= require_self
 *= require bootstrap
 *= require pegr
-*= require diagrams
 *= require scaffold
-*= require jquery.cleditor
 *= require select2
 */

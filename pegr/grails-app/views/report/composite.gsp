@@ -4,30 +4,33 @@
         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script type="text/javascript">
             google.charts.load('current', {'packages':['corechart']});
-            google.charts.setOnLoadCallback(drawChart);
-            
-            function drawChart(results) {                
-                var data = google.visualization.arrayToDataTable([['Position', 'Forward', 'Reverse']
-                        ${compositeData}
-                    ]);
+             google.charts.setOnLoadCallback(function(){
+                $.ajax({
+                      url: "/pegr/report/fetchCompositeDataAjax?url=${url}",
+                      dataType: "json"
+                }).done(function(jsonData){
+                    // Create our data table out of JSON data loaded from server.
+                    var data = new google.visualization.arrayToDataTable(jsonData);
 
-                var options = {
-                    title: '',
-                    hAxis: { title: 'Distance from MEME motif (bp)', 
-                           titleTextStyle: {fontSize:25,italic:false},
-                           gridlines: { color: '#DDDDDD', count:11 }
-                    },
-                    vAxis: { title: 'Tag frequency', 
-                           titleTextStyle: {fontSize:25,italic:false},
-                           gridlines: { color: '#DDDDDD', count:10 }
-                    },
-                    curveType: 'function',
-                    legend: { position: 'right' }
-                };
-                var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-
-                chart.draw(data, options);
-            }            
+                    var options = {
+                        title: '',
+                        hAxis: { title: 'Distance from MEME motif (bp)', 
+                               titleTextStyle: {fontSize:25,italic:false},
+                               gridlines: { color: '#DDDDDD', count:11 },
+                        },
+                        vAxis: { title: 'Tag frequency', 
+                               titleTextStyle: {fontSize:25,italic:false},
+                               gridlines: { color: '#DDDDDD', count:10 },
+                                format: '#.##'
+                        },
+                        curveType: 'function',
+                        legend: { position: 'right' }
+                    };
+                    // Instantiate and draw our chart, passing in some options.
+                    var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+                    chart.draw(data, options);    
+                });                
+            });          
         </script>
     </head>
     <body>

@@ -18,31 +18,35 @@ class StatsAPIController {
      * @return status code
      */
     def save(StatsRegistrationCommand data, String apiKey) {
-
+        def message = "Success!"
+        def code = 200
         if (!data || data.properties.every {key, value -> value == null}) {
-            def response = new ResponseMessage(response_code: 500, message: "Error parsing the JSON data!")
-            render text: response as JSON, contentType: "text/json", status: 500 
+            code = 500
+            message = "Error parsing the JSON data!"
         } else {
             def apiUser = ApiUser.findByApiKey(apiKey)
             if (apiUser) {
                 try {
-                    alignmentStatsService.save(data, apiUser.name)
-                    def message = "Success!"
-                    def response = new ResponseMessage(response_code: 200, message: message)
-                    render text: response as JSON, contentType: "text/json", status: 200 
+                    alignmentStatsService.save(data, apiUser.name)                    
                 } catch(AlignmentStatsException e) {
-                    def response = new ResponseMessage(response_code: 500, message: "Error: ${e.message}")
-                    render text: response as JSON, contentType: "text/json", status: 500 
-                } catch(Exception e) {
-                    log.error "Error: ${e.message}", e
-                    def response = new ResponseMessage(response_code: 500, message: "Error!")
-                    render text: response as JSON, contentType: "text/json", status: 500 
+                    code = 500
+                    message = "Error: ${e.message}"
+                } catch(Exception e0) {
+                    try {
+                        alignmentStatsService.save(data, apiUser.name)
+                    } catch(Exception e) {
+                        log.error "Error: ${e.message}", e
+                        code = 500
+                        message = "Error!"
+                    }                    
                 }
             } else {
-                def response = new ResponseMessage(response_code: 401, message: "Not authorized!")
-                render text: response as JSON, contentType: "text/json", status: 401 
+                code = 401
+                message = "Not authorized!" 
             }
         }
+        def response = new ResponseMessage(response_code: code, message: message)
+        render text: response as JSON, contentType: "text/json", status: code 
     }    
 }
 

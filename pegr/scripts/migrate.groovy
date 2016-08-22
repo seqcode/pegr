@@ -78,4 +78,8 @@ Antibody.list().each { antibody ->
 }
 */
 
+def peStepIds = Analysis.where {alignment.id == 1}.collect {it.stepId}.unique()
+def srStepIds = Analysis.where {alignment.id == 74}.collect {it.stepId}.unique()
+def s = [PE: peStepIds, SR: srStepIds]
+new Chores(name: "PipelineSteps", value: JsonOutput.toJson(s)).save()
 

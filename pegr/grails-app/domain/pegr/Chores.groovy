@@ -7,4 +7,8 @@ class Chores {
 		name unique: true
         value nullable: true, blank: true
     }
+    
+    static mapping = {
+		value sqlType: 'text'
+    }
 }

@@ -5,6 +5,40 @@ class ReportController {
     
     def springSecurityService
     def reportService
+    
+    /*
+     * list the analysis status of all the runs
+     * @param max max number of runs listed in a page
+     * @param requestedStatus requested status of sequence run
+     */
+    def analysisStatus(Integer max, String requestedStatus) {
+        if (requestedStatus == null || requestedStatus == "") {
+            requestedStatus = RunStatus.RUN
+        }
+        params.max = Math.min(max ?: 15, 100)
+        if (!params.sort) {
+            params.sort = "date"
+            params.order = "desc"
+        }
+        def runs = SequenceRun.where { status == requestedStatus }.list(params)
+        [runs: runs, status: requestedStatus, totalCount: runs.totalCount]
+    }
+    
+    def runStatus(Long runId) {
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            flash.message = "Run not found!"
+            redirect(action: "analysisStatus")
+        } else {
+            try {
+                def runStatus = reportService.fetchRunStatus(run)
+                [runStatus: runStatus, run: run]
+            } catch (ReportException e) {
+                flash.message = e.message
+                redirect(action: "analysisStatus")
+            }       
+        }
+    }
 
     def all(Integer max) {
         params.max = Math.min(max ?: 25, 100)
@@ -43,14 +77,18 @@ class ReportController {
         }
     }
     
-    def meme(String url) {
+    def fetchMemeDataAjax(String url) {
         def results = reportService.fetchMemeMotif(url) as JSON
-        [motifs: results]
+        render results
     }
     
     def composite(String url) {
-        def compositeData = reportService.fetchComposite(url)
-        [compositeData: compositeData]
+        [url: url]
+    }
+    
+    def fetchCompositeDataAjax(String url) {
+        def result = reportService.fetchComposite(url)
+        render result
     }
 }
 
@@ -107,4 +145,20 @@ class AlignmentDTO {
     String peHistogram
     List fourColor
     List composite
+}
+
+class RunStatusDTO {
+    List steps
+    List sampleStatusList
+}
+
+class SampleStatusDTO {
+    Long sampleId
+    List alignmentStatusList
+}
+
+class AlignmentStatusDTO {
+    String historyId
+    String genome
+    List status
 }

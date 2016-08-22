@@ -15,7 +15,7 @@
                         <option value="duo">Duo-Index</option>
                     </select>
                 </div>
-
+                
                 <table class="table table-striped">
                     <thead>
                         <tr>

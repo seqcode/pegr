@@ -41,14 +41,17 @@ class ReportService {
             
             experiment.alignments.each { alignment ->
                 def alignmentStatusDTO = new AlignmentStatusDTO( 
+                    alignmentId: alignment.id,
                     historyId: alignment.historyId,
                     genome: alignment.genome.name,
                     status: [])
                 def analysis = Analysis.findAllByAlignment(alignment)
                 steps[readType].eachWithIndex { step, index ->
-                    if (analysis.find {it.stepId == step}) {
+                    if (analysis.find {it.stepId == step[0]}) {
                         alignmentStatusDTO.status[index] = true
-                    }                   
+                    } else {
+                        alignmentStatusDTO.status[index] = false
+                    }                  
                 }
                 sampleStatus.alignmentStatusList << alignmentStatusDTO
             }
@@ -62,6 +65,20 @@ class ReportService {
             }
         }
         return results
+    }
+    
+    @Transactional
+    def deleteAlignment(Long alignmentId) {
+        try {
+            ReportAlignments.executeUpdate("delete from ReportAlignments where alignment.id =:alignmentId", [alignmentId: alignmentId])
+
+            Analysis.executeUpdate("delete from Analysis where alignment.id =:alignmentId", [alignmentId: alignmentId])
+            
+            SequenceAlignment.executeUpdate("delete from SequenceAlignment where id =:alignmentId", [alignmentId: alignmentId])
+        } catch (Exception e) {
+            log.error e
+            throw new ReportException(message: "Error deleting the alignment!")
+        } 
     }
     
     /*

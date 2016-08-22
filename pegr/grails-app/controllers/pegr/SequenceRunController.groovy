@@ -41,6 +41,7 @@ class SequenceRunController {
                 def jsonSlurper = new JsonSlurper()
                 read = jsonSlurper.parseText(run.experiments[0].readPositions)           
             }
+            read.readType = run.experiments[0].readType
             def reports = SummaryReport.findAllByRun(run)
             [run: run, read: read, reports: reports]
         } else {
@@ -228,9 +229,8 @@ class SequenceRunController {
         def expIds = params.list('experimentId')
         expIds.each{
             def genomeIds = params.list("genomes${it}")
-            def readTypeId = params.long("readType${it}")
             try {
-                sequenceRunService.updateSample(it, genomeIds, readTypeId)
+                sequenceRunService.updateSample(it, genomeIds)
             } catch (SequenceRunException e) {
                 messages += "<p>e.message</p>"
             } 

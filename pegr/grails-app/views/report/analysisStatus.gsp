@@ -42,7 +42,7 @@
         <g:paginate next="Next" prev="Prev" controller="report" action="analysisStatus" params='[requestedStatus:"${status}"]' max="25" total="${totalCount ?: 0}" />
     </div>
     <script>
-        $("#status").addClass("active");
+        $(".nav-status").addClass("active");
         $("#${status}").addClass("active");
     </script>
 </body>

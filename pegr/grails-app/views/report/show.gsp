@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>My Reports</title> 
-    <meta name="layout" content="main"/>
+    <meta name="layout" content="analysis"/>
     <asset:javascript src="meme.js"/>
     <asset:stylesheet href="meme.css"/>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -44,6 +44,7 @@
                 $("#details").html(result)
             }});
         });
+        $(".nav-reports").addClass("active");
     </script>
 </body>
 </html>

@@ -5,24 +5,18 @@
   <title>PEGR - Analysis <g:layoutTitle/></title>
   <g:layoutHead/>
 </head>
-<body>
-<div class="container-fluid text-center">    
-    <div class="row content">
-        <div class="col-sm-12 text-left">
-            <div class="sub-nav">
-                <a href="#" class="btn btn-info">Run Status</a>
-                <g:link controller="Report" action="all" class="btn btn-info">Reports</g:link>
-                <a href="#" class="btn btn-info">Datasets</a>
-                <a href="http://galaxy-cegr.psu.edu:8080/" class="btn btn-info">Analyze</a>
-            </div>
-            <g:layoutBody/>
-        </div>
+<body>   
+    <div class="sub-nav">
+        <g:link controller="Report" action="analysisStatus" params="[requestedStatus: 'RUN']" class="btn btn-info active">Run Status</g:link>
+        <g:link controller="Report" action="all" class="btn btn-info">Reports</g:link>
+        <a href="#" class="btn btn-info">Datasets</a>
+        <a href="http://galaxy-cegr.psu.edu:8080/" class="btn btn-info">Analyze</a>
     </div>
-</div>
+    <g:layoutBody/>
     
- <script>
-	$("#nav-analysis").addClass("active");
- </script>
+     <script>
+        $("#nav-analysis").addClass("active");
+     </script>
 </body>
 </html>
 </g:applyLayout>

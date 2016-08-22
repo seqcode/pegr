@@ -2865,4 +2865,6 @@ databaseChangeLog = {
 	include file: 'removeHistoryIdFromAnalysis.groovy'
 
 	include file: 'changeInstanceItem.groovy'
+
+	include file: 'changeChores.groovy'
 }

@@ -1,5 +1,5 @@
 package pegr
-
+import groovy.json.*
 import grails.transaction.Transactional
 
 class ReportException extends RuntimeException {
@@ -10,6 +10,59 @@ class ReportService {
 
     def utilityService
     def alignmentStatsService
+    
+    //TODO: single-read vs paired-end pipelines
+    // TODO: steps vs catgory
+    def fetchRunStatus(SequenceRun run) {
+        def steps
+
+        try {
+            def stepsStr = Chores.findByName("PipelineSteps")*.value
+            def jsonSlurper = new JsonSlurper()
+            steps = jsonSlurper.parseText(stepsStr)
+        } catch (Exception e) {
+            throw new ReportException(message: "Pipeline steps are not properly defined!")
+        }
+
+        def results = [:] 
+
+        run.experiments.each { experiment ->
+            // read type
+            if (!experiment.readType) {
+                throw new ReportException(message: "Read type is not defined for sample ${experiment.sample.id}!")
+            }
+            def readType = experiment.readType.shortName
+            if (!steps.containsKey(readType)) {
+                throw new ReportException(message: "Pipeline steps are not defined for read type ${readType}!")
+            }
+
+            def sampleStatus = new SampleStatusDTO(sampleId: experiment.sample.id,
+                                        alignmentStatusList: [])
+            
+            experiment.alignments.each { alignment ->
+                def alignmentStatusDTO = new AlignmentStatusDTO( 
+                    historyId: alignment.historyId,
+                    genome: alignment.genome.name,
+                    status: [])
+                def analysis = Analysis.findAllByAlignment(alignment)
+                steps[readType].eachWithIndex { step, index ->
+                    if (analysis.find {it.stepId == step}) {
+                        alignmentStatusDTO.status[index] = true
+                    }                   
+                }
+                sampleStatus.alignmentStatusList << alignmentStatusDTO
+            }
+            
+            if (results.containsKey(readType)) {
+                results[readType].sampleStatusList << sampleStatus
+            } else {
+                
+                results[readType] = new RunStatusDTO(steps: steps[readType],
+                                                    sampleStatusList: [sampleStatus])
+            }
+        }
+        return results
+    }
     
     /*
      * Create summary reports for each project linked to the samples inside the 
@@ -191,15 +244,18 @@ class ReportService {
                     def tabulars = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "tabular")
                     if (tabulars && tabulars.size() > 0) {
                         if (motifId && motifId > 0){
-                            alignmentDTO.composite[motifId] = tabulars.last()
-                        } else {
-                             alignmentDTO.composite[0] = tabulars.last()
-                        }                        
+                            alignmentDTO.composite[motifId-1] = tabulars.last()
+                        }                      
                     }
                     break
             }
         }
-
+        // in case not all composite figures have been received
+        def compositeCount = alignmentDTO.composite.size()
+        def fourColorCount = alignmentDTO.fourColor.size()
+        if ( compositeCount < fourColorCount ) {
+            alignmentDTO.composite[fourColorCount - 1] = null
+        }
         alignmentDTO.nonPairedPeaks = getNonPairedPeaks(alignmentDTO.peaks, alignmentDTO.peakPairs)
         return alignmentDTO
     }
@@ -285,11 +341,12 @@ class ReportService {
                 }
             }
         }
-        String s = ""
+        String s = '[["Position", "Forward","Reverse"]'
         results.each {
             def a = it.join(",")
             s += ",[${a}]"
         }
+        s += "]"
         return s
     }
     

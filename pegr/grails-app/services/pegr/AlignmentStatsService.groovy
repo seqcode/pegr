@@ -39,14 +39,7 @@ class AlignmentStatsService {
                                                  historyId: data.historyId,
                                                  isPreferred: true, 
                                                  date: new Date())
-            try {
-                theAlignment.save(flush:true, failOnError: true)
-            } catch (Exception e) {
-                theAlignment = SequenceAlignment.findBySequencingExperimentAndGenomeAndPipelineAndHistoryId(experiment, genome, pipeline, data.historyId) 
-                if (!theAlignment) {
-                    throw new AlignmentStatsException("Error creating a new sequence alignment!")
-                }
-            }
+            theAlignment.save(flush:true, failOnError: true)
         } 
 
         // save the data
@@ -76,25 +69,18 @@ class AlignmentStatsService {
                                    )
         }
             
-        if (!analysis.save()) {
-            log.error analysis.errors
-            throw new AlignmentStatsException(message: "Error saving the analysis ${analysis}!")
-        }
+        analysis.save(failOnError: true)
 
         // store named fields
         if (data.statistics) {
             def updatedInAlignment = copyProperties(data.statistics, theAlignment)
             if (updatedInAlignment > 0) {
                 theAlignment.date = new Date()
-                if (!theAlignment.save()) {
-                    log.error "Error saving ${updatedInAlignment} in Alignment!"
-                }
+                theAlignment.save(failOnError: true)
             } 
             def updatedInExperiment = copyProperties(data.statistics, experiment)
             if (updatedInExperiment > 0) {
-                if (!experiment.save()) {
-                    log.error "Error saving ${updatedInExperiment} in Experiment!"
-                }
+                experiment.save(failOnError: true)
             } 
         }
 

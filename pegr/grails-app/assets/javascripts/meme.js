@@ -1,55 +1,3 @@
-<html>
-  <head>
-    <title>MEME</title>
-    <asset:stylesheet href="meme.css"/>
-    <script>
-        var site_url = "";
-
-function $(el) {
-  return document.getElementById(el);
-}
-
-/*
- * update_scroll_pad
- *
- * Creates padding at the bottom of the page to allow
- * scrolling of anything into view.
- */
-function update_scroll_pad() {
-  var page, pad;
-  page = (document.compatMode === "CSS1Compat") ? document.documentElement : document.body;
-  pad = $("scrollpad");
-  if (pad === null) {
-    pad = document.createElement("div");
-    pad.id = 'scrollpad';
-    document.getElementsByTagName('body')[0].appendChild(pad);
-  }
-  pad.style.height = Math.abs(page.clientHeight - 100) + "px";
-}
-
-function substitute_classes(node, remove, add) {
-  "use strict";
-  var list, all, i, cls, classes;
-  list = node.className.split(/\s+/);
-  all = {};
-  for (i = 0; i < list.length; i++) {
-    if (list[i].length > 0) all[list[i]] = true;
-  }
-  for (i = 0; i < remove.length; i++) {
-    if (all.hasOwnProperty(remove[i])) {
-      delete all[remove[i]];
-    }
-  }
-  for (i = 0; i < add.length; i++) {
-    all[add[i]] = true;
-  }
-  classes = "";
-  for (cls in all) {
-    classes += cls + " ";
-  }
-  node.className = classes;
-}
-
 function toggle_class(node, cls, enabled) {
   var classes = node.className;
   var list = classes.replace(/^\s+/, '').replace(/\s+$/, '').split(/\s+/);
@@ -132,349 +80,155 @@ function find_parent_tag(node, tag_name) {
   return null;
 }
 
-/*
- * __toggle_help
- *
- * Uses the 'topic' property of the this object to
- * toggle display of a help topic.
- *
- * This function is not intended to be called directly.
- */
-function __toggle_help(e) {
-  if (!e) e = window.event;
-  if (e.type === "keydown") {
-    if (e.keyCode !== 13 && e.keyCode !== 32) {
-      return;
+  // 
+  // return true if any part of the passed element is visible in the viewport
+  //
+  function element_in_viewport(elem) {
+    var rect;
+    try {
+      rect = elem.getBoundingClientRect();
+    } catch (e) {
+      return false;
     }
-    // stop a submit or something like that
-    e.preventDefault();
+    return (
+        rect.top < (window.innerHeight || document.body.clientHeight) &&
+        rect.bottom > 0 &&
+        rect.left < (window.innerWidth || document.body.clientWidth) &&
+        rect.right > 0
+        );
   }
 
-  help_popup(this, this.getAttribute("data-topic"));
-}
+  //
+  // Functions to delay a drawing task until it is required or it would not lag the display to do so
+  //
 
-function setup_help_button(button) {
-  "use strict";
-  var topic;
-  if (button.hasAttribute("data-topic")) {
-    topic = button.getAttribute("data-topic");
-    if (document.getElementById(topic) != null) {
-      button.tabIndex = "0"; // make keyboard selectable
-      button.addEventListener("click", function() {
-        help_popup(button, topic);
-      }, false);
-      button.addEventListener("keydown", function(e) {
-        // toggle only on Enter or Spacebar, let other keys do their thing
-        if (e.keyCode !== 13 && e.keyCode !== 32) return;
-        // stop a submit or something like that
-        e.preventDefault();
-        help_popup(button, topic);
-      }, false);
-    } else {
-      button.style.visibility = "hidden";
-    }
+  // a list of items still to be drawn
+  var drawable_list = [];
+  // the delay between drawing objects that are not currently visible
+  var draw_delay = 1;
+  // the delay after a user interaction
+  var user_delay = 300;
+  // the delay after a user has stopped scrolling and is viewing the stuff drawn on the current page
+  var stop_delay = 300;
+  // the timer handle; allows resetting of the timer after user interactions
+  var draw_timer = null;
+
+  //
+  // Drawable
+  //
+  // elem - a page element which defines the position on the page that drawing is to be done
+  // task - an object with the method run which takes care of painting the object
+  //
+  var Drawable = function(elem, task) {
+    this.elem = elem;
+    this.task = task;
   }
-  button.className += " active";
-}
 
-/*
- * help_button
- *
- * Makes a help button for the passed topic.
- */
-function help_button(topic) {
-  var btn = document.createElement("div");
-  btn.className = "help";
-  btn.setAttribute("data-topic", topic);
-  setup_help_button(btn);
-  return btn;
-}
-
-/*
- * prepare_download
- *
- * Sets the attributes of a link to setup a file download using the given content.
- * If no link is provided then create one and click it.
- */
-function prepare_download(content, mimetype, filename, link) {
-  "use strict";
-  // if no link is provided then create one and click it
-  var click_link = false;
-  if (!link) {
-    link = document.createElement("a");
-    click_link = true;
+  //
+  // Drawable.is_visible
+  //
+  // Determines if the element is visible in the viewport
+  //
+  Drawable.prototype.is_visible = function() {
+    return element_in_viewport(this.elem);
   }
-  try {
-    // Use a BLOB to convert the text into a data URL.
-    // We could do this manually with a base 64 conversion.
-    // This will only be supported on modern browsers,
-    // hence the try block.
-    var blob = new Blob([content], {type: mimetype});
-    var reader = new FileReader();
-    reader.onloadend = function() {
-      // If we're lucky the browser will also support the download
-      // attribute which will let us suggest a file name to save the link.
-      // Otherwise it is likely that the filename will be unintelligible. 
-      link.setAttribute("download", filename);
-      link.href = reader.result;
-      if (click_link) {
-        // must add the link to click it
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-    }
-    reader.readAsDataURL(blob);
-  } catch (error) {
-    if (console && console.log) console.log(error);
-    // probably an old browser
-    link.href = "";
-    link.visible = false;
+
+  //
+  // Drawable.run
+  //
+  // Run the task held by the drawable
+  Drawable.prototype.run = function() {
+    if (this.task) this.task.run();
+    this.task = null;
   }
-}
 
-/*
- * add_cell
- *
- * Add a cell to the table row.
- */
-function add_cell(row, node, cls, click_action) {
-  var cell = row.insertCell(row.cells.length);
-  if (node) cell.appendChild(node);
-  if (cls && cls !== "") cell.className = cls;
-  if (click_action) cell.addEventListener("click", click_action, false);
-}
-
-/*
- * add_cell
- *
- * Add a header cell to the table row.
- */
-function add_header_cell(row, node, help_topic, cls, colspan) {
-  var th = document.createElement("th");
-  if (node) th.appendChild(node);
-  if (help_topic && help_topic !== "") th.appendChild(help_button(help_topic));
-  if (cls && cls !== "") th.className = cls;
-  if (typeof colspan == "number" && colspan > 1) th.colSpan = colspan;
-  row.appendChild(th);
-}
-
-/*
- * add_text_cell
- *
- * Add a text cell to the table row.
- */
-function add_text_cell(row, text, cls, action) {
-  var node = null;
-  if (typeof(text) != 'undefined') node = document.createTextNode(text);
-  add_cell(row, node, cls, action);
-}
-
-function add_text_header_cell(row, text, help_topic, cls, action, colspan) {
-  var node = null;
-  if (typeof(text) != 'undefined') {
-    var nbsp = (help_topic ? "\u00A0" : "");
-    var str = "" + text;
-    var parts = str.split(/\n/);
-    if (parts.length === 1) {
-      if (action) {
-        node = document.createElement("span");
-        node.appendChild(document.createTextNode(str + nbsp));
-      } else {
-        node = document.createTextNode(str + nbsp);
-      }
-    } else {
-      node = document.createElement("span");
-      for (var i = 0; i < parts.length; i++) {
-        if (i !== 0) {
-          node.appendChild(document.createElement("br"));
-        }
-        node.appendChild(document.createTextNode(parts[i]));
-      }
-    }
-    if (action) {
-      node.addEventListener("click", action, false);
-      node.style.cursor = "pointer";
-    }
-  }
-  add_header_cell(row, node, help_topic, cls, colspan);
-}
-
-function setup_help() {
-  "use strict";
-  var help_buttons, i;
-  help_buttons = document.querySelectorAll(".help:not(.active)");
-  for (i = 0; i < help_buttons.length; i++) {
-    setup_help_button(help_buttons[i]);
-  }
-}
-
-function setup_scrollpad() {
-  "use strict";
-  if (document.getElementsByTagName('body')[0].hasAttribute("data-scrollpad") && document.getElementById("scrollpad") == null) {
-    window.addEventListener("resize", update_scroll_pad, false);
-    update_scroll_pad();
-  }
-}
-
-// anon function to avoid polluting global scope
-(function() {
-  "use strict";
-  window.addEventListener("load", function load(evt) {
-    window.removeEventListener("load", load, false);
-    setup_help();
-    setup_scrollpad();
-  }, false);
-})();
-      // 
-      // return true if any part of the passed element is visible in the viewport
-      //
-      function element_in_viewport(elem) {
-        var rect;
-        try {
-          rect = elem.getBoundingClientRect();
-        } catch (e) {
-          return false;
-        }
-        return (
-            rect.top < (window.innerHeight || document.body.clientHeight) &&
-            rect.bottom > 0 &&
-            rect.left < (window.innerWidth || document.body.clientWidth) &&
-            rect.right > 0
-            );
-      }
-
-      //
-      // Functions to delay a drawing task until it is required or it would not lag the display to do so
-      //
-
-      // a list of items still to be drawn
-      var drawable_list = [];
-      // the delay between drawing objects that are not currently visible
-      var draw_delay = 1;
-      // the delay after a user interaction
-      var user_delay = 300;
-      // the delay after a user has stopped scrolling and is viewing the stuff drawn on the current page
-      var stop_delay = 300;
-      // the timer handle; allows resetting of the timer after user interactions
-      var draw_timer = null;
-
-      //
-      // Drawable
-      //
-      // elem - a page element which defines the position on the page that drawing is to be done
-      // task - an object with the method run which takes care of painting the object
-      //
-      var Drawable = function(elem, task) {
-        this.elem = elem;
-        this.task = task;
-      }
-
-      //
-      // Drawable.is_visible
-      //
-      // Determines if the element is visible in the viewport
-      //
-      Drawable.prototype.is_visible = function() {
-        return element_in_viewport(this.elem);
-      }
-
-      //
-      // Drawable.run
-      //
-      // Run the task held by the drawable
-      Drawable.prototype.run = function() {
-        if (this.task) this.task.run();
+  //
+  // Drawable.run
+  //
+  // Run the task iff visible
+  // returns true if the task ran or has already run
+  Drawable.prototype.run_visible = function() {
+    if (this.task) {
+      if (element_in_viewport(this.elem)) {
+        this.task.run();
         this.task = null;
+        return true;
       }
+      return false;
+    } else {
+      return true;
+    }
+  }
 
-      //
-      // Drawable.run
-      //
-      // Run the task iff visible
-      // returns true if the task ran or has already run
-      Drawable.prototype.run_visible = function() {
-        if (this.task) {
-          if (element_in_viewport(this.elem)) {
-            this.task.run();
-            this.task = null;
-            return true;
-          }
-          return false;
-        } else {
-          return true;
-        }
+  //
+  // draw_on_screen
+  //
+  // Checks each drawable object and draws those on screen.
+  //
+  function draw_on_screen() {
+    var found = false;
+    for (var i = 0; i < drawable_list.length; i++) {
+      if (drawable_list[i].run_visible()) {
+        drawable_list.splice(i--, 1);
+        found = true;
       }
+    }
+    return found;
+  }
 
-      //
-      // draw_on_screen
-      //
-      // Checks each drawable object and draws those on screen.
-      //
-      function draw_on_screen() {
-        var found = false;
-        for (var i = 0; i < drawable_list.length; i++) {
-          if (drawable_list[i].run_visible()) {
-            drawable_list.splice(i--, 1);
-            found = true;
-          }
-        }
-        return found;
-      }
+  //
+  // process_draw_tasks
+  //
+  // Called on a delay to process the next avaliable
+  // draw task.
+  //
+  function process_draw_tasks() {
+    var delay = draw_delay;
+    draw_timer = null;
+    if (drawable_list.length == 0) return; //no more tasks
+    if (draw_on_screen()) {
+      delay = stop_delay; //give the user a chance to scroll
+    } else {
+      //get next task
+      var drawable = drawable_list.shift();
+      drawable.task.run();
+    }
+    //allow UI updates between tasks
+    draw_timer = window.setTimeout("process_draw_tasks()", delay);
+  }
 
-      //
-      // process_draw_tasks
-      //
-      // Called on a delay to process the next avaliable
-      // draw task.
-      //
-      function process_draw_tasks() {
-        var delay = draw_delay;
-        draw_timer = null;
-        if (drawable_list.length == 0) return; //no more tasks
-        if (draw_on_screen()) {
-          delay = stop_delay; //give the user a chance to scroll
-        } else {
-          //get next task
-          var drawable = drawable_list.shift();
-          drawable.task.run();
-        }
-        //allow UI updates between tasks
-        draw_timer = window.setTimeout("process_draw_tasks()", delay);
-      }
+  //
+  // delayed_process_draw_tasks
+  //
+  // Call process_draw_tasks after a short delay.
+  // The delay serves to group multiple redundant events.       
+  // Should be set as event handler for onscroll and onresize.
+  //
+  function delayed_process_draw_tasks() {
+    //reset the timer
+    if (drawable_list.length > 0) { 
+      if (draw_timer != null) clearTimeout(draw_timer);
+      draw_timer = window.setTimeout("process_draw_tasks()", user_delay);
+    }
+  }
 
-      //
-      // delayed_process_draw_tasks
-      //
-      // Call process_draw_tasks after a short delay.
-      // The delay serves to group multiple redundant events.       
-      // Should be set as event handler for onscroll and onresize.
-      //
-      function delayed_process_draw_tasks() {
-        //reset the timer
-        if (drawable_list.length > 0) { 
-          if (draw_timer != null) clearTimeout(draw_timer);
-          draw_timer = window.setTimeout("process_draw_tasks()", user_delay);
-        }
-      }
-
-      //
-      // add_draw_task
-      //
-      // Add a drawing task to be called immediately if it is
-      // visible, or to be called on a delay to reduce stuttering
-      // effect on the web browser.
-      function add_draw_task(elem, task) {
-        drawable = new Drawable(elem, task);
-        if (drawable.is_visible()) {
-          task.run();
-        } else {
-          drawable_list.push(drawable);
-          //reset timer
-          if (draw_timer != null) clearTimeout(draw_timer);
-          draw_timer = window.setTimeout("process_draw_tasks()", user_delay);
-        }
-      }
+  //
+  // add_draw_task
+  //
+  // Add a drawing task to be called immediately if it is
+  // visible, or to be called on a delay to reduce stuttering
+  // effect on the web browser.
+  function add_draw_task(elem, task) {
+    drawable = new Drawable(elem, task);
+    if (drawable.is_visible()) {
+      task.run();
+    } else {
+      drawable_list.push(drawable);
+      //reset timer
+      if (draw_timer != null) clearTimeout(draw_timer);
+      draw_timer = window.setTimeout("process_draw_tasks()", user_delay);
+    }
+  }
 
 //======================================================================
 // start Alphabet object
@@ -3182,494 +2936,6 @@ function trim (str) {
   return str.slice(0, i + 1);
 }
 
-// PRIVATE GLOBAL (uhoh)
-var _block_colour_lookup = {};
-
-function block_colour(index) {
-  function hsl2rgb(hue, saturation, lightness) {
-    "use strict";
-    function _hue(p, q, t) {
-      "use strict";
-      if (t < 0) t += 1;
-      else if (t > 1) t -= 1;
-      if (t < (1.0 / 6.0)) {
-        return p + ((q - p) * 6.0 * t);
-      } else if (t < 0.5) {
-        return q;
-      } else if (t < (2.0 / 3.0)) {
-        return p + ((q - p) * ((2.0 / 3.0) - t) * 6.0);
-      } else {
-        return p;
-      }
-    }
-    function _pad_hex(value) {
-      var hex = Math.round(value * 255).toString(16);
-      if (hex.length < 2) hex = "0" + hex;
-      return hex;
-    }
-    var r, g, b, p, q;
-    if (saturation == 0) {
-      // achromatic (grayscale)
-      r = lightness;
-      g = lightness;
-      b = lightness;
-    } else {
-      if (lightness < 0.5) {
-        q = lightness * (1 + saturation);
-      } else {
-        q = lightness + saturation - (lightness * saturation);
-      }
-      p = (2 * lightness) - q;
-      r = _hue(p, q, hue + (1.0 / 3.0));
-      g = _hue(p, q, hue);
-      b = _hue(p, q, hue - (1.0 / 3.0));
-    }
-    return "#" + _pad_hex(r) + _pad_hex(g) + _pad_hex(b);
-  }
-  if (typeof index !== "number" || index % 1 !== 0 || index < 0) return "#000000";
-  // check for override
-  if (_block_colour_lookup[index] == null) {
-    var start = 0; //red
-    var sat = 100;
-    var light = 50;
-    var divisions = 1 << Math.ceil(Math.log(index + 1) / Math.LN2);
-    hue = start + (360 / divisions) * ((index - (divisions >> 1)) * 2 + 1);
-    // colour input fields only support values in the form #RRGGBB
-    _block_colour_lookup[index] = hsl2rgb(hue / 360, sat / 100, light / 100);
-  }
-  return _block_colour_lookup[index];
-}
-
-function set_block_colour(index, new_colour) {
-  _block_colour_lookup[index] = new_colour;
-  var blocks = document.querySelectorAll("div.block_motif[data-colour-index=\"" + index + "\"]");
-  var i;
-  for (i = 0; i < blocks.length; i++) {
-    blocks[i].style.backgroundColor = new_colour;
-  }
-  var swatches = document.querySelectorAll("div.legend_swatch[data-colour-index=\"" + index + "\"]");
-  var picker;
-  for (i = 0; i < swatches.length; i++) {
-    swatches[i].style.backgroundColor = new_colour;
-    picker = swatches[i].querySelector("input[type=\"color\"]");
-    if (picker != null) picker.value = new_colour;
-  }
-}
-
-function make_block_legend_entry(motif_name, motif_colour_index) {
-  if (typeof make_block_legend_entry.has_colour_picker !== "boolean") {
-    // test if colour picker is supported, based off Modernizer
-    // see http://stackoverflow.com/a/7787648/66387
-    make_block_legend_entry.has_colour_picker = (function() {
-      var doc_ele = document.documentElement;
-      // We first check to see if the type we give it sticks..
-      var input_ele = document.createElement('input');
-      input_ele.setAttribute('type', 'color');
-      var value_ok = input_ele.type !== 'text';
-      if (value_ok) {
-        // If the type does, we feed it a textual value, which shouldn't be valid.
-        // If the value doesn't stick, we know there's input sanitization which infers a custom UI
-        var smile = ':)';
-        input_ele.value = smile;
-        input_ele.style.cssText = 'position:absolute;visibility:hidden;';
-        // chuck into DOM and force reflow for Opera bug in 11.00
-        // github.com/Modernizr/Modernizr/issues#issue/159
-        doc_ele.appendChild(input_ele);
-        doc_ele.offsetWidth;
-        value_ok = input_ele.value != smile;
-        doc_ele.removeChild(input_ele);
-      }
-      return value_ok;
-    })();
-  }
-  var entry = document.createElement("div");
-  entry.className = "legend_entry";
-  var swatch;
-  swatch = document.createElement("div");
-  swatch.className = "legend_swatch";
-  swatch.setAttribute("data-colour-index", motif_colour_index);
-  swatch.style.backgroundColor = block_colour(motif_colour_index);
-  if (make_block_legend_entry.has_colour_picker) {
-    var picker = document.createElement("input");
-    picker.type = "color";
-    picker.value = block_colour(motif_colour_index);
-    picker.addEventListener("change", function(e) {
-      set_block_colour(motif_colour_index, picker.value);
-    }, false);
-    swatch.addEventListener("click", function(e) {
-      picker.click();
-    }, false);
-    swatch.appendChild(picker);
-  }
-  entry.appendChild(swatch);
-  var name = document.createElement("div");
-  name.className = "legend_text";
-  name.appendChild(document.createTextNode(motif_name));
-  entry.appendChild(name);
-  return entry;
-}
-
-function make_block_ruler(max_len) {
-  var container = document.createElement("div");
-  container.className = "block_container";
-  var step;
-  if (max_len < 50) {
-    step = 1;
-  } else if (max_len < 100) {
-    step = 2;
-  } else if (max_len < 200) {
-    step = 4;
-  } else if (max_len < 500) {
-    step = 10;
-  } else if (max_len < 1000) {
-    step = 20;
-  } else if (max_len < 2000) {
-    step = 40;
-  } else if (max_len < 5000) {
-    step = 100;
-  } else if (max_len < 10000) {
-    step = 200;
-  } else if (max_len < 20000) {
-    step = 400;
-  } else {
-    step = Math.floor(max_len / 20000) * 400;
-  }
-  var peroid;
-  if (max_len < 10) {
-    peroid = 1;
-  } else if (max_len < 20) {
-    peroid = 2;
-  } else {
-    peroid = 5;
-  }
-  var i, cycle, offset, tic, label;
-  for (i = 0, cycle = 0; i < max_len; i += step, cycle = (cycle + 1) % peroid) {
-    offset = "" + ((i / max_len) * 100) + "%";
-    tic = document.createElement("div");
-    tic.style.left = offset;
-    tic.className = (cycle == 0 ? "tic_major" : "tic_minor");
-    container.appendChild(tic);
-    if (cycle == 0) {
-      label = document.createElement("div");
-      label.className = "tic_label";
-      label.style.left = offset;
-      label.appendChild(document.createTextNode(i));
-      container.appendChild(label);
-    }
-  }
-  return container;
-}
-
-function _calculate_block_needle_drag_pos(e, data) {
-  var mouse;
-  e = e || window.event;
-  if (e.pageX || ev.pageY) {
-    mouse = {"x": e.pageX, "y": e.pageY};
-  } else {
-    mouse = {
-      x:e.clientX + document.body.scrollLeft - document.body.clientLeft, 
-      y:e.clientY + document.body.scrollTop  - document.body.clientTop 
-    };
-  }
-  var cont = data.container;
-  var dragable_length = cont.clientWidth - 
-    (cont.style.paddingLeft ? cont.style.paddingLeft : 0) -
-    (cont.style.paddingRight ? cont.style.paddingRight : 0);
-  //I believe that the offset parent is the body
-  //otherwise I would need to make this recursive
-  //maybe clientLeft would work, but the explanation of
-  //it is hard to understand and it apparently doesn't work
-  //in firefox 2.
-  var diff = mouse.x - cont.offsetLeft;
-  if (diff < 0) diff = 0;
-  if (diff > dragable_length) diff = dragable_length;
-  var pos = Math.round(diff / dragable_length * data.max);
-  if (pos > data.len) pos = data.len;
-  return pos;
-}
-
-function _update_block_needle_drag(e, data, done) {
-  "use strict";
-  var pos = _calculate_block_needle_drag_pos(e, data);
-  // read the needle positions
-  var left = parseInt(data.llabel.textContent, 10) - data.off - 1;
-  var right = parseInt(data.rlabel.textContent, 10) - data.off;
-  // validate needle positions
-  if (left >= data.len) left = data.len - 1;
-  if (left < 0) left = 0;
-  if (right > data.len) right = data.len;
-  if (right <= left) right = left + 1;
-  // calculate the new needle positions
-  if (data.moveboth) {
-    var size = right - left;
-    if (data.isleft) {
-      if ((pos + size) > data.len) pos = data.len - size;
-      left = pos;
-      right = pos + size;
-    } else {
-      if ((pos - size) < 0) pos = size;
-      left = pos - size;
-      right = pos;
-    }
-  } else {
-    if (data.isleft) {
-      if (pos >= right) pos = right - 1;
-      left = pos;
-    } else {
-      if (pos <= left) pos = left + 1;
-      right = pos;
-    }
-  }
-  // update the needle positions
-  data.lneedle.style.left = "" + (left / data.max * 100) + "%";
-  data.llabel.textContent = "" + (left + data.off + 1);
-  data.rneedle.style.left = "" + (right / data.max * 100) + "%";
-  data.rlabel.textContent = "" + (right + data.off);
-  data.handler(left, right, done);
-}
-
-function _make_block_needle_drag_start_handler(isleft, data) {
-  return function (e) {
-    data.isleft = isleft;
-    data.moveboth = !(e.shiftKey);
-    document.addEventListener("mousemove", data.drag_during, false);
-    document.addEventListener("mouseup", data.drag_end, false);
-  };
-}
-
-function _make_block_needle_drag_end_handler(data) {
-  return function (e) {
-    document.removeEventListener("mousemove", data.drag_during, false);
-    document.removeEventListener("mouseup", data.drag_end, false);
-    _update_block_needle_drag(e, data, true);
-  };
-}
-
-function _make_block_needle_drag_during_handler(data) {
-  return function (e) {
-    _update_block_needle_drag(e, data, false);
-  };
-}
-
-// private function used by make_block_container
-function _make_block_needle(isleft, value, data) {
-  var vbar = document.createElement('div');
-  vbar.className = "block_needle " + (isleft ? "left" : "right");
-  vbar.style.left = "" + (value / data.max * 100)+ "%";
-  var label = document.createElement('div');
-  label.className = "block_handle " + (isleft ? "left" : "right");
-  // The needles sit between the sequence positions, so the left one sits at the
-  // start and the right at the end. This is why 1 is added to the displayed
-  // value for a left handle as the user doesn't need to know about this detail
-  label.textContent = "" + (isleft ? value + data.off + 1 : value + data.off);
-  label.unselectable = "on"; // so IE and Opera don't select the text, others are done in css
-  label.title = "Drag to move the displayed range. Hold shift and drag to change " + (isleft ? "lower" : "upper") + " bound of the range.";
-  vbar.appendChild(label);
-  if (isleft) {
-    data.lneedle = vbar;
-    data.llabel = label;
-  } else {
-    data.rneedle = vbar;
-    data.rlabel = label;
-  }
-  label.addEventListener("mousedown", _make_block_needle_drag_start_handler(isleft, data), false);
-  return vbar;
-}
-
-function make_block_container(is_stranded, has_both_strands, max_len, show_len, offset, range_handler) {
-  offset = (offset != null ? offset : 0);
-  // make the container for the block diagram
-  var container = document.createElement("div");
-  container.className = "block_container";
-  container.setAttribute("data-max", max_len);
-  container.setAttribute("data-off", offset);
-  if (is_stranded) {
-    var plus = document.createElement("div");
-    plus.appendChild(document.createTextNode("+"));
-    plus.className = "block_plus_sym";
-    container.appendChild(plus);
-    if (has_both_strands) {
-      var minus = document.createElement("div");
-      minus.appendChild(document.createTextNode("-"));
-      minus.className = "block_minus_sym";
-      container.appendChild(minus);
-    }
-  }
-  var rule = document.createElement("div");
-  rule.className = "block_rule";
-  rule.style.width = ((show_len / max_len) * 100) + "%";
-  container.appendChild(rule);
-  if (range_handler != null) {
-    var range_data = {
-      "max": max_len,
-      "len": show_len,
-      "off": offset,
-      "handler": range_handler,
-      "container": container,
-      "lneedle": null, "llabel": null,
-      "rneedle": null, "rlabel": null,
-      "isleft": false, "moveboth" : false
-    };
-    range_data.drag_during = _make_block_needle_drag_during_handler(range_data);
-    range_data.drag_end = _make_block_needle_drag_end_handler(range_data);
-    container.appendChild(_make_block_needle(false, 1, range_data)); // add right first so z-index works
-    container.appendChild(_make_block_needle(true, 0, range_data));
-  }
-  return container;
-}
-
-function make_block_label(container, max_len, pos, length, message) {
-  "use strict";
-  var label = document.createElement("div");
-  label.className = "block_label";
-  label.style.left = (((pos + (length / 2)) / max_len) * 100) + "%";
-  label.appendChild(document.createTextNode(message));
-  container.appendChild(label);
-}
-
-function make_block(container, max_len,
-    site_pos, site_len, site_pvalue, site_rc, site_colour_index, site_secondary) {
-  "use strict";
-  var block_height, block, block_region1, block_region2;
-  var max_block_height = 12;
-  var max_pvalue = 1e-10;
-  // calculate the height of the block
-  block_height = (site_pvalue < max_pvalue ? max_block_height : 
-      (Math.log(site_pvalue) / Math.log(max_pvalue)) * max_block_height);
-  if (block_height < 1) block_height = 1;
-  // create a block to represent the motif
-  block = document.createElement("div");
-  block.className = "block_motif" + (site_secondary ? " scanned_site" : "") + (site_rc ? " bottom" : " top");
-  block.style.left = ((site_pos / max_len) * 100) + "%";
-  block.style.top = (!site_rc ? max_block_height - block_height : 
-      max_block_height + 1) + "px";
-  block.style.width = ((site_len / max_len) * 100) + "%";
-  block.style.height = block_height + "px";
-  block.style.backgroundColor = block_colour(site_colour_index);
-  block.setAttribute("data-colour-index", site_colour_index);
-  // add to container
-  container.appendChild(block);
-  var activator = function (e) {
-    toggle_class(block, "active", true);
-    var new_e = new e.constructor(e.type, e);
-    block.dispatchEvent(new_e);
-  };
-  var deactivator = function (e) {
-    toggle_class(block, "active", false);
-    var new_e = new e.constructor(e.type, e);
-    block.dispatchEvent(new_e);
-  }
-  // create a larger region to detect mouseover for the block
-  block_region1 = document.createElement("div");
-  block_region1.className = "block_region top" + 
-    (site_secondary ? " scanned_site" : "") + (site_rc ? "" : " main");
-  block_region1.style.left = block.style.left;
-  block_region1.style.width = block.style.width;
-  block_region1.addEventListener('mouseover', activator, false);
-  block_region1.addEventListener('mouseout', deactivator, false);
-  container.appendChild(block_region1);
-  block_region2 = document.createElement("div");
-  block_region2.className = "block_region bottom" + 
-    (site_secondary ? " scanned_site" : "") + (site_rc ? " main" : "");
-  block_region2.style.left = block.style.left;
-  block_region2.style.width = block.style.width;
-  block_region2.addEventListener('mouseover', activator, false);
-  block_region2.addEventListener('mouseout', deactivator, false);
-  container.appendChild(block_region2);
-  return block;
-}
-
-function set_block_needle_positions(containingNode, start, end) {
-  var container, lneedle, llabel, rneedle, rlabel, max, off, left, right;
-  container = (/\bblock_container\b/.test(containingNode.className) ? containingNode : containingNode.querySelector(".block_container"));
-  max = parseInt(container.getAttribute("data-max"), 10);
-  off = parseInt(container.getAttribute("data-off"), 10);
-  left = start - off;
-  right = end - off;
-  lneedle = containingNode.querySelector(".block_needle.left");
-  llabel = lneedle.querySelector(".block_handle.left");
-  rneedle = containingNode.querySelector(".block_needle.right");
-  rlabel = rneedle.querySelector(".block_handle.right");
-  // update the needle positions
-  lneedle.style.left = "" + (left / max * 100) + "%";
-  llabel.textContent = "" + (left + off + 1);
-  rneedle.style.left = "" + (right / max * 100) + "%";
-  rlabel.textContent = "" + (right + off);
-}
-
-function get_block_needle_positions(containingNode) {
-  var container, llabel, rlabel, max, off, left, right;
-  container = (/\bblock_container\b/.test(containingNode.className) ? containingNode : containingNode.querySelector(".block_container"));
-  max = parseInt(container.getAttribute("data-max"), 10);
-  off = parseInt(container.getAttribute("data-off"), 10);
-  llabel = containingNode.querySelector(".block_needle.left > .block_handle.left");
-  rlabel = containingNode.querySelector(".block_needle.right > .block_handle.right");
-  left = parseInt(llabel.textContent, 10) - off - 1;
-  right = parseInt(rlabel.textContent, 10) - off;
-  return {"start": left + off, "end": right + off};
-}
-function make_alpha_bg_table(alph, freqs) {
-  function colour_symbol(index) {
-    var span = document.createElement("span");
-    span.appendChild(document.createTextNode(alph.get_symbol(index)));
-    span.style.color = alph.get_colour(index);
-    span.className = "alpha_symbol";
-    return span;
-  }
-  var table, thead, tbody, row, th, span, i;
-  // create table
-  table = document.createElement("table");
-  table.className = "alpha_bg_table";
-  // create header
-  thead = document.createElement("thead");
-  table.appendChild(thead);
-  row = thead.insertRow(thead.rows.length);
-  if (alph.has_complement()) {
-    add_text_header_cell(row, "Name", "pop_alph_name");
-    if (freqs != null) add_text_header_cell(row, "Freq.", "pop_alph_freq");
-    if (alph.has_bg()) add_text_header_cell(row, "Bg.", "pop_alph_bg");
-    add_text_header_cell(row, "");
-    add_text_header_cell(row, "");
-    add_text_header_cell(row, "");
-    if (alph.has_bg()) add_text_header_cell(row, "Bg.", "pop_alph_bg");
-    if (freqs != null) add_text_header_cell(row, "Freq.", "pop_alph_freq");
-    add_text_header_cell(row, "Name", "pop_alph_name");
-  } else {
-    add_text_header_cell(row, "");
-    add_text_header_cell(row, "Name", "pop_alph_name");
-    if (freqs != null) add_text_header_cell(row, "Freq.", "pop_alph_freq");
-    if (alph.has_bg()) add_text_header_cell(row, "Bg.", "pop_alph_bg");
-  }
-  // add alphabet entries
-  tbody = document.createElement("tbody");
-  table.appendChild(tbody);
-  if (alph.has_complement()) {
-    for (i = 0; i < alph.get_size_core(); i++) {
-      var c = alph.get_complement(i);
-      if (i > c) continue;
-      row = tbody.insertRow(tbody.rows.length);
-      add_text_cell(row, alph.get_name(i));
-      if (freqs != null) add_text_cell(row, "" + freqs[i].toFixed(3));
-      if (alph.has_bg()) add_text_cell(row, "" + alph.get_bg_freq(i).toFixed(3));
-      add_cell(row, colour_symbol(i)); 
-      add_text_cell(row, "~");
-      add_cell(row, colour_symbol(c)); 
-      if (alph.has_bg()) add_text_cell(row, "" + alph.get_bg_freq(c).toFixed(3));
-      if (freqs != null) add_text_cell(row, "" + freqs[c].toFixed(3));
-      add_text_cell(row, alph.get_name(c));
-    }
-  } else {
-    for (i = 0; i < alph.get_size_core(); i++) {
-      row = tbody.insertRow(tbody.rows.length);
-      add_cell(row, colour_symbol(i)); 
-      add_text_cell(row, alph.get_name(i));
-      if (freqs != null) add_text_cell(row, "" + freqs[i].toFixed(3));
-      if (alph.has_bg()) add_text_cell(row, "" + alph.get_bg_freq(i).toFixed(3));
-    }
-  }
-  return table;
-}
-
 var DelayLogoTask = function(logo, canvas) {
   this.logo = logo;
   this.canvas = canvas;
@@ -3789,36 +3055,6 @@ function make_logo(alphabet, pspm, rc, offset, className) {
   return canvas;
 }
 
-function make_small_logo(alphabet, pspm, options) {
-  if (typeof options === "undefined") options = {};
-  if (options.rc) pspm = pspm.copy().reverse_complement(alphabet);
-  var logo = new Logo(alphabet, {x_axis: false, y_axis: false});
-  logo.add_pspm(pspm, (typeof options.offset === "number" ? options.offset : 0));
-  var canvas = document.createElement('canvas');
-  if (typeof options.className === "string") canvas.className = options.className;
-  if (typeof options.width === "number" && options.width > 0) {
-    canvas.height = 0;
-    canvas.width = options.width;
-    draw_logo_on_canvas(logo, canvas, false);
-  } else {
-    draw_logo_on_canvas(logo, canvas, false, 1/3);
-  }
-  return canvas;
-}
-
-function make_large_logo(alphabet, pspm, rc, offset, className) {
-  if (rc) pspm = pspm.copy().reverse_complement(alphabet);
-  var logo = new Logo(alphabet, "");
-  logo.add_pspm(pspm, offset);
-  var canvas = document.createElement('canvas');
-  canvas.height = 200;
-  canvas.width = 0;
-  canvas.className = className;
-  size_logo_on_canvas(logo, canvas, false);
-  add_draw_task(canvas, new DelayLogoTask(logo, canvas));
-  return canvas;
-}
-
 function make_sym_btn(symbol, title, action) {
   var box;
   box = document.createElement("div");
@@ -3849,152 +3085,8 @@ function make_seq(alphabet, seq) {
   return sbox;
 }
 
-//
-// make_pv_text
-//
-// Returns the string p-value, with the p italicised.
-///
-function make_pv_text() {
-  var pv_text = document.createElement("span");
-  var pv_italic_text = document.createElement("span");
-  pv_italic_text.appendChild(document.createTextNode("p"));
-  pv_italic_text.style.fontStyle = "italic";
-  pv_text.appendChild(pv_italic_text);
-  pv_text.appendChild(document.createTextNode("-value"));
-  return pv_text;
-}
 
-function append_site_entries(tbody, motif, site_index, count) {
-  "use strict";
-  var i, end;
-  var sites, site, sequences, sequence;
-  var rbody;
-  if (typeof count !== "number") {
-    count = 20;
-  }
-  sequences = data["sequence_db"]["sequences"];
-  sites = motif["sites"];
-  end = Math.min(site_index + count, sites.length);
-  for (i = site_index; i < end; i++) {
-    site = sites[i];
-    sequence = sequences[site["seq"]];
-
-    rbody = tbody.insertRow(tbody.rows.length);
-    add_text_cell(rbody, "" + (site["seq"] + 1) + ".", "site_num");
-    add_text_cell(rbody, sequence["name"], "site_name");
-    add_text_cell(rbody, site["rc"] ? "-" : "+", "site_strand");
-    add_text_cell(rbody, site["pos"] + 1, "site_start");
-    add_text_cell(rbody, site["pvalue"].toExponential(2), "site_pvalue");
-    add_text_cell(rbody, site["lflank"], "site lflank");
-    add_cell(rbody, make_seq(meme_alphabet, site["match"]), "site match");
-    add_text_cell(rbody, site["rflank"], "site rflank");
-  }
-  return i;
-}
-
-function make_site_entries() {
-  "use strict";
-  var region;
-  region = this;
-  if (region.data_site_index >= region.data_motif["sites"].length) {
-    // all sites created
-    region.removeEventListener('scroll', make_site_entries, false);
-    return;
-  }
-  // if there's still 100 pixels to scroll than don't do anything yet
-  if (region.scrollHeight - (region.scrollTop + region.offsetHeight) > 100) {
-    return;
-  }
-
-  region.data_site_index = append_site_entries(
-      find_child(region, "sites_tbl").tBodies[0], 
-      region.data_motif, region.data_site_index, 20
-    ); 
-}
-
-function make_sites(motif) {
-  "use strict";
-  function add_site_header(row, title, nopad, help_topic, tag_class) {
-    var div, divcp, th;
-    th = document.createElement("th");
-    div = document.createElement("div");
-    div.className = "sites_th_inner";
-    if (typeof title !== "object") {
-      title = document.createTextNode("" + title);
-    }
-    div.appendChild(title);
-    if (help_topic) {
-      div.appendChild(document.createTextNode("\xA0"));
-      div.appendChild(help_button(help_topic));
-    }
-    divcp = div.cloneNode(true);
-    divcp.className = "sites_th_hidden";
-    th.appendChild(div);
-    th.appendChild(divcp);
-    if (nopad) {
-      th.className = "nopad";
-    }
-    if (tag_class) {
-      th.className += " " + tag_class;
-    }
-    row.appendChild(th);
-  }
-  var outer_tbl, inner_tbl, tbl, thead, tbody, rhead;
-
-  outer_tbl = document.createElement("div");
-  outer_tbl.className = "sites_outer";
-
-  inner_tbl = document.createElement("div");
-  inner_tbl.className = "sites_inner";
-  outer_tbl.appendChild(inner_tbl);
-
-  tbl = document.createElement("table");
-  tbl.className = "sites_tbl";
-  inner_tbl.appendChild(tbl);
-
-  thead = document.createElement("thead");
-  tbl.appendChild(thead);
-  tbody = document.createElement("tbody");
-  tbl.appendChild(tbody);
-
-  rhead = thead.insertRow(thead.rows.length);
-  add_site_header(rhead, "", true);
-  add_site_header(rhead, "Name", false, "pop_seq_name");
-  add_site_header(rhead, "Strand", false, "pop_site_strand", "site_strand_title");
-  add_site_header(rhead, "Start", false, "pop_site_start");
-  add_site_header(rhead, make_pv_text(), false, "pop_site_pvalue");
-  add_site_header(rhead, "", false);
-  add_site_header(rhead, "Sites", true, "pop_site_match");
-  add_site_header(rhead, "", false);
-
-  inner_tbl.data_motif = motif;
-  inner_tbl.data_site_index = append_site_entries(tbody, motif, 0, 20);
-  if (inner_tbl.data_site_index < motif["sites"].length) {
-    inner_tbl.addEventListener('scroll', make_site_entries, false);
-  }
-  return outer_tbl;
-}
-
-function make_motif_table_entry(row, alphabet, ordinal, motif, colw) {
-  "use strict";
-  function ev_sig(evalue_str) {
-    "use strict";
-    var ev_re, match, sig, exp, num;
-    ev_re = /^(.*)e(.*)$/;
-    if (match = ev_re.exec(evalue_str)) {
-      sig = parseFloat(match[1]);
-      exp = parseInt(match[2]);
-      if (exp >= 0) {
-        return false;
-      } else if (exp <= -3) {
-        return true;
-      } else {
-        return sig * Math.pow(10, exp) <= 0.05;
-      }
-    }
-    return true;
-  }
-  function make_preview(alphabet, motif) {
+function make_preview(alphabet, motif) {
     "use strict";
     var pspm, preview, preview_rc;
     var box, btn_box, logo_box, btn_plus, btn_minus;
@@ -4045,132 +3137,6 @@ function make_motif_table_entry(row, alphabet, ordinal, motif, colw) {
       }
     }
     return box;
-  }
-  var pspm, preview, preview_rc, c;
-  row.data_motif = motif;
-  row.data_ordinal = ordinal;
-  if (!ev_sig(motif["evalue"])) {
-    row.style.opacity = 0.4;
-  }
-  add_text_cell(row, "" + ordinal + ".", "motif_ordinal");
-  add_cell(row, make_preview(alphabet, motif), "motif_logo");
-  add_text_cell(row, motif["evalue"], "motif_evalue");
-  add_text_cell(row, motif["nsites"], "motif_nsites");
-  add_text_cell(row, motif["len"], "motif_width");
-  if (colw) {
-    for (c = 0; c < row.cells.length; c++) {
-      row.cells[c].style.minWidth = colw[c] + "px";
-    }
-  }
-}
-
-function make_motifs_table(alphabet, start_ordinal, motifs, colw, stop_reason) {
-  var i, j;
-  var tbl, thead, tbody, tfoot, row, preview;
-  var motif, pspm;
-
-  tbl = document.createElement("table");
-  
-  thead = document.createElement("thead");
-  tbl.appendChild(thead);
-  tbody = document.createElement("tbody");
-  tbl.appendChild(tbody);
-  tfoot = document.createElement("tfoot");
-  tbl.appendChild(tfoot);
-
-  row = thead.insertRow(thead.rows.length);
-  add_text_header_cell(row, "", "", "motif_ordinal");
-  add_text_header_cell(row, "Logo", "", "motif_logo");
-  add_text_header_cell(row, "E-value", "", "motif_evalue");
-  add_text_header_cell(row, "Sites", "", "motif_nsites");
-  add_text_header_cell(row, "Width", "", "motif_width");
-
-  for (i = 0; i < motifs.length; i++) {
-    row = tbody.insertRow(tbody.rows.length);
-    make_motif_table_entry(row, alphabet, start_ordinal + i, motifs[i], colw);
-  }
-
-  row = tfoot.insertRow(tfoot.rows.length);
-  add_text_header_cell(row, stop_reason, "", "stop_reason", "", 6);
-
-  return tbl;
-}
-
-function action_outpop_next(e) {
-  if (!e) e = window.event;
-  if (e.type === "keydown") {
-    if (e.keyCode !== 13 && e.keyCode !== 32) {
-      return;
-    }
-    // stop a submit or something like that
-    e.preventDefault();
-  }
-  update_outpop_motif(current_motif + 1);
-}
-
-function action_outpop_prev(e) {
-  if (!e) e = window.event;
-  if (e.type === "keydown") {
-    if (e.keyCode !== 13 && e.keyCode !== 32) {
-      return;
-    }
-    // stop a submit or something like that
-    e.preventDefault();
-  }
-  update_outpop_motif(current_motif - 1);
-}
-
-function action_outpop_program() {
-  "use strict";
-  var table, tr, rows, i;
-  tr = find_parent_tag(this, "TR");
-  table = find_parent_tag(tr, "TABLE");
-  rows = table.querySelectorAll("tr");
-  for (i = 0; i < rows.length; i++) {
-    toggle_class(rows[i], "selected", rows[i] === tr);
-  }
-}
-
-function action_outpop_ssc() {
-  "use strict";
-  $("logo_err").value = $("logo_ssc").value;
-}
-
-function action_outpop_submit(e) {
-  "use strict";
-  var form, input, program, motifs;
-  // find out which program is selected
-  var radios, i;
-  radios = document.getElementsByName("program");
-  program = "fimo"; // default to fimo, since it works with all alphabet types
-  for (i = 0; i < radios.length; i++) {
-    if (radios[i].checked) program = radios[i].value;
-  }
-
-  motifs = motif_minimal_meme(current_motif);
-  form = document.createElement("form");
-  form.setAttribute("method", "post");
-  form.setAttribute("action", site_url + "/tools/" + program);
-  
-  input = document.createElement("input");
-  input.setAttribute("type", "hidden");
-  input.setAttribute("name", "motifs_embed");
-  input.setAttribute("value", motifs);
-  form.appendChild(input);
-
-  document.body.appendChild(form);
-  form.submit();
-  document.body.removeChild(form);
-}
-
-function action_outpop_download_motif(e) {
-  $("text_form").submit();
-}
-
-function action_outpop_download_logo(e) {
-  "use strict";
-  $("logo_motifs").value = motif_minimal_meme(current_motif);
-  $("logo_form").submit();
 }
 
 function action_btn_rc(e) {
@@ -4191,13 +3157,11 @@ function action_btn_rc(e) {
   if (!node) throw new Error("Expected to find row!?");
   tr = node;
   // get info
-  motif = tr.data_motif;
   box = find_parent(this, "preview_box");
   logo_box = find_child(box, "preview_logo_box");
   tab_st = find_child(box, "plus");
   tab_rc = find_child(box, "minus");
   rc = (this === tab_rc);
-  motif["rc"] = rc;
   toggle_class(logo_box, "show_rc_logo", rc);
   toggle_class(tab_st, "active", !rc);
   toggle_class(tab_rc, "active", rc);
@@ -4223,214 +3187,97 @@ function action_rc_tab(e) {
   toggle_class(logo_box, "show_rc_logo", rc);
   toggle_class(tab_st, "activeTab", !rc);
   toggle_class(tab_rc, "activeTab", rc);
-}
-
-function action_outpop_tab(e) {
-  "use strict";
-  var tab1, tab2, tab3, pnl1, pnl2, pnl3, do_btn;
-  if (!e) e = window.event;
-  if (e.type === "keydown") {
-    if (e.keyCode !== 13 && e.keyCode !== 32) {
-      return;
+}       
+        
+// @JSON_VAR data
+var data = {
+"program": "MEME",
+"version": "4.11.0",
+"release": "Thu Nov 26 17:48:49 2015 +1000",
+"stop_reason": "",
+"alphabet": {
+  "name": "DNA",
+  "like": "dna",
+  "ncore": 4,
+  "symbols": [
+    {
+      "symbol": "A",
+      "name": "Adenine",
+      "colour": "CC0000",
+      "complement": "T"
+    }, {
+      "symbol": "C",
+      "name": "Cytosine",
+      "colour": "0000CC",
+      "complement": "G"
+    }, {
+      "symbol": "G",
+      "name": "Guanine",
+      "colour": "FFB300",
+      "complement": "C"
+    }, {
+      "symbol": "T",
+      "aliases": "U",
+      "name": "Thymine",
+      "colour": "008000",
+      "complement": "A"
+    }, {
+      "symbol": "N",
+      "aliases": "X.",
+      "name": "Any base",
+      "equals": "ACGT"
+    }, {
+      "symbol": "V",
+      "name": "Not T",
+      "equals": "ACG"
+    }, {
+      "symbol": "H",
+      "name": "Not G",
+      "equals": "ACT"
+    }, {
+      "symbol": "D",
+      "name": "Not C",
+      "equals": "AGT"
+    }, {
+      "symbol": "B",
+      "name": "Not A",
+      "equals": "CGT"
+    }, {
+      "symbol": "M",
+      "name": "Amino",
+      "equals": "AC"
+    }, {
+      "symbol": "R",
+      "name": "Purine",
+      "equals": "AG"
+    }, {
+      "symbol": "W",
+      "name": "Weak",
+      "equals": "AT"
+    }, {
+      "symbol": "S",
+      "name": "Strong",
+      "equals": "CG"
+    }, {
+      "symbol": "Y",
+      "name": "Pyrimidine",
+      "equals": "CT"
+    }, {
+      "symbol": "K",
+      "name": "Keto",
+      "equals": "GT"
     }
-    // stop a submit or something like that
-    e.preventDefault();
-  }
-  tab1 = $("outpop_tab_1");
-  tab2 = $("outpop_tab_2");
-  tab3 = $("outpop_tab_3");
-  pnl1 = $("outpop_pnl_1");
-  pnl2 = $("outpop_pnl_2");
-  pnl3 = $("outpop_pnl_3");
-  do_btn = $("outpop_do");
-
-  toggle_class(tab1, "activeTab", (this === tab1));
-  toggle_class(tab2, "activeTab", (this === tab2));
-  toggle_class(tab3, "activeTab", (this === tab3));
-  pnl1.style.display = ((this === tab1) ? "block" : "none");
-  pnl2.style.display = ((this === tab2) ? "block" : "none");
-  pnl3.style.display = ((this === tab3) ? "block" : "none");
-  do_btn.value = ((this === tab1) ? "Submit" : "Download");
-  do_btn.removeEventListener("click", action_outpop_submit, false);
-  do_btn.removeEventListener("click", action_outpop_download_logo, false);
-  do_btn.removeEventListener("click", action_outpop_download_motif, false);
-  if (this === tab1) {
-    do_btn.addEventListener("click", action_outpop_submit, false);
-  } else if (this === tab2) {
-    do_btn.addEventListener("click", action_outpop_download_motif, false);
-  } else {
-    do_btn.addEventListener("click", action_outpop_download_logo, false);
-  }
-}
-
-        
-        
-        
-      // @JSON_VAR data
-      var data = {
-        "program": "MEME",
-        "version": "4.11.0",
-        "release": "Thu Nov 26 17:48:49 2015 +1000",
-        "stop_reason": "",
-        "alphabet": {
-          "name": "DNA",
-          "like": "dna",
-          "ncore": 4,
-          "symbols": [
-            {
-              "symbol": "A",
-              "name": "Adenine",
-              "colour": "CC0000",
-              "complement": "T"
-            }, {
-              "symbol": "C",
-              "name": "Cytosine",
-              "colour": "0000CC",
-              "complement": "G"
-            }, {
-              "symbol": "G",
-              "name": "Guanine",
-              "colour": "FFB300",
-              "complement": "C"
-            }, {
-              "symbol": "T",
-              "aliases": "U",
-              "name": "Thymine",
-              "colour": "008000",
-              "complement": "A"
-            }, {
-              "symbol": "N",
-              "aliases": "X.",
-              "name": "Any base",
-              "equals": "ACGT"
-            }, {
-              "symbol": "V",
-              "name": "Not T",
-              "equals": "ACG"
-            }, {
-              "symbol": "H",
-              "name": "Not G",
-              "equals": "ACT"
-            }, {
-              "symbol": "D",
-              "name": "Not C",
-              "equals": "AGT"
-            }, {
-              "symbol": "B",
-              "name": "Not A",
-              "equals": "CGT"
-            }, {
-              "symbol": "M",
-              "name": "Amino",
-              "equals": "AC"
-            }, {
-              "symbol": "R",
-              "name": "Purine",
-              "equals": "AG"
-            }, {
-              "symbol": "W",
-              "name": "Weak",
-              "equals": "AT"
-            }, {
-              "symbol": "S",
-              "name": "Strong",
-              "equals": "CG"
-            }, {
-              "symbol": "Y",
-              "name": "Pyrimidine",
-              "equals": "CT"
-            }, {
-              "symbol": "K",
-              "name": "Keto",
-              "equals": "GT"
-            }
-          ]
-        },
-        "background": {
-          "freqs": [0.277, 0.223, 0.223, 0.277]
-        },
-        "motifs":<g:applyCodec encodeAs="none">${motifs}</g:applyCodec>,
-      };
+  ]
+},
+"background": {
+  "freqs": [0.277, 0.223, 0.223, 0.277]
+},
+};
 
 var current_motif = 0;
 var meme_alphabet = new Alphabet(data.alphabet, data.background.freqs);
 
-function page_loaded() {
-  post_load_setup();
+function make_motif(container, motif) {
+    $(container).append(make_preview(meme_alphabet, motif));
+    draw_on_screen();
 }
-
-function post_load_setup() {
-  update_scroll_pad();
-  if (data["motifs"].length > 0) {
-    make_motifs();
-  } else {
-    $("motifs").innerHTML = "<p>No significant motifs found!</p>"; // clear content
-  }
-}
-
-function make_motifs() {
-  "use strict";
-  function pixel_value(str_in) {
-    "use strict";
-    var px_re, match;
-    px_re = /^(\d+)px$/;
-    if (match = px_re.exec(str_in)) {
-      return parseInt(match[1], 10);
-    }
-    return 0;
-  }
-  var container, tbl;
-  var colw, r, row, c, cell, cell_style, pad_left, pad_right;
-
-  // make the motifs table
-  container = $("motifs");
-  container.innerHTML = ""; // clear content
-
-  tbl = make_motifs_table(meme_alphabet, 1, data["motifs"], colw, data["stop_reason"]);
-  container.appendChild(tbl);
-
-  // measure table column widths
-  colw = [];
-  row = tbl.tBodies[0].rows[0];
-  for (c = 0; c < row.cells.length; c++) {
-    var padLeft, padRight;
-    cell = row.cells[c];
-    cell_style = window.getComputedStyle(cell, null);
-    pad_left = pixel_value(cell_style.getPropertyValue("padding-left"));
-    pad_right = pixel_value(cell_style.getPropertyValue("padding-right"));
-    colw[c] = cell.clientWidth - pad_left - pad_right;
-    if (typeof colw[c] !== "number" || colw[c] < 0) {
-      colw[c] = 1;
-    }
-  }
-
-  // set minimum table column widths on each row so later when we remove rows it still aligns
-  for (r = 0; r < tbl.tBodies[0].rows.length; r++) {
-    row = tbl.tBodies[0].rows[r];
-    for (c = 0; c < row.cells.length; c++) {
-      row.cells[c].style.minWidth = colw[c] + "px";
-    }
-  }
-
-  // store the table column widths so we can create rows latter with the same minimums
-  container.data_colw = colw;
-
-  // calculate the x offset for the buttons
-  row = tbl.tBodies[0].rows[0];
-
-  draw_on_screen();
-}
-
-</script>
-  </head>
-  <body onload="page_loaded()">
-    <!-- templates -->
-    <!-- Page starts here -->
-    <!-- navigation -->
-    <div id="motifs" class="box">
-      <p>Please wait... Loading...</p>
-      <p>If the page has fully loaded and this message does not disappear then an error may have occurred.</p>
-    </div>
-  </body>
-</html>
-

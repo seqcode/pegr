@@ -134,11 +134,12 @@ class SequenceRunService {
     }
     
     @Transactional
-    void updateRead(Long runId, String readPositions, ReadType readType) {
+    void updateRead(Long runId, String readPositions, String readTypeShortName) {
         def run = SequenceRun.get(runId)
         if (!run) {
             throw new SequenceRunException(message: "Sequence Run not found!")
         }
+        def readType = ReadType.findByShortName(readTypeShortName)
         run.experiments.each {
             it.readPositions = readPositions
             it.readType = readType

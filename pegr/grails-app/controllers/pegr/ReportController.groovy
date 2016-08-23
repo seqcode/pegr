@@ -172,5 +172,6 @@ class AlignmentStatusDTO {
     String alignmentId
     String historyId
     String genome
+    Date date
     List status
 }

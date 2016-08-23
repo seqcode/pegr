@@ -12,12 +12,13 @@
         <div class="pull-right"><span class="label label-success"> </span> Data received; <span class="label label-danger"> </span> No data. Hover to see the step's category.</div>
         <div>
             <table>
-                <caption>Read Type: ${it.key} </caption>
+                <caption>Workflow: ${it.key} </caption>
                 <thead>
                     <tr>
                         <th>Sample</th>
                         <th>Genome</th>
-                        <th>Galaxy</th>
+                        <th>Galaxy History</th>
+                        <th>Date</th>
                         <th colspan="${it.value.steps.size()}">Status</th>
                         <th>Delete</th>
                     </tr>
@@ -30,6 +31,7 @@
                         <g:if test="${n>0}"><tr></g:if>
                             <td>${alignment.genome}</td>                            
                             <td><a href="http://galaxy-cegr.psu.edu:8080/history?id=${alignment.historyId}" target="_blank">${alignment.historyId}</a></td>
+                            <td>${alignment.date}</td>
                             <g:each in="${alignment.status}" var="status" status="j">
                                 <td class="analysis-status">
                                     <g:if test="${status}"><span title="${it.value.steps[j][1]}" class="label label-success"> </span></g:if> 

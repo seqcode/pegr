@@ -11,8 +11,6 @@ class ReportService {
     def utilityService
     def alignmentStatsService
     
-    //TODO: single-read vs paired-end pipelines
-    // TODO: steps vs catgory
     def fetchRunStatus(SequenceRun run) {
         def steps
 
@@ -44,6 +42,7 @@ class ReportService {
                     alignmentId: alignment.id,
                     historyId: alignment.historyId,
                     genome: alignment.genome.name,
+                    date: alignment.date,
                     status: [])
                 def analysis = Analysis.findAllByAlignment(alignment)
                 steps[readType].eachWithIndex { step, index ->

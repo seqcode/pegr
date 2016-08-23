@@ -9,11 +9,10 @@
             <g:form action="updateRead" class="fields">
                 <g:hiddenField name="runId" value="${run?.id}"></g:hiddenField>
                 <div>
+                    <label>Read Type</label>
+                    <g:select name="readType" from="${pegr.ReadType.list()}" value="${read?.readType.shortName}" optionKey="shortName" id="read-type" onchange="readTypeChange()"></g:select>
                     <label>Index Type</label>
-                    <select name="indexType" value="${indexType}" id="index-type" onchange="indexTypeChange()">
-                        <option value="single">Single-Index</option>
-                        <option value="duo">Duo-Index</option>
-                    </select>
+                    <g:select name="indexType" from="${['single', 'duo']}" value="${indexType}" id="index-type" onchange="indexTypeChange()"></g:select>
                 </div>
                 
                 <table class="table table-striped">
@@ -45,7 +44,7 @@
                             <td><input name="index2Start" value="${read?.index2?.getAt(0)}"></td>
                             <td><input name="index2End" value="${read?.index2?.getAt(1)}"></td>
                         </tr>
-                        <tr>
+                        <tr id="pair-read">
                             <td>Read 2</td>
                             <td><input name="rd2Start" value="${read?.rd2?.getAt(0)}"></td>
                             <td><input name="rd2End" value="${read?.rd2?.getAt(1)}"></td>
@@ -59,7 +58,7 @@
         <script>
             $("#nav-bench").addClass("active");
             indexTypeChange();
-            
+            readTypeChange();
             function indexTypeChange() {
                 if ($("#index-type").val() == "single") {
                     $(".duo-index").hide();
@@ -67,6 +66,13 @@
                 } else {
                     $(".duo-index").show();
                     $(".single-index").hide();
+                }
+            }
+            function readTypeChange() {
+                if ($("#read-type").val() == "SR") {
+                    $("#pair-read").hide();
+                } else {
+                    $("#pair-read").show();
                 }
             }
         </script>

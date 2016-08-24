@@ -40,4 +40,8 @@ class Item {
 		notes nullable: true, blank: true
         parent nullable: true
     }
+    
+    static mapping = {
+		notes sqlType: 'text'
+    }
 }

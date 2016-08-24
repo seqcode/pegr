@@ -8,19 +8,19 @@
             <g:if test="${flash.message}">
                 <div class="message">${flash.message}</div>
             </g:if>
-            <g:form action="merge" class="fields">
+            <g:form action="merge" class="fields" useToken="true">
                 <h4>Merge</h4>
                 <div>
                     <label>Type</label>
-                    <g:select name="table" from="${tables}" value="${table}" noSelection="['':'--Choose--']"></g:select>
+                    <g:select name="table" from="${tables}" value="${table}" noSelection="['':'--Choose--']" required="required"></g:select>
                 </div>
                 <div>
                     <label>From ID</label>
-                    <input name="fromId">
+                    <input name="fromId" required>
                 </div>
                 <div>
                     <label>To ID</label>
-                    <input name="toId">
+                    <input name="toId" required>
                 </div>
                 <g:submitButton name="submit" value="Submit" class="btn btn-primary"></g:submitButton>
             </g:form>
@@ -28,6 +28,7 @@
         <script>
             $(function(){
                 $("select").select2();
+                $("form").validate();
             })
         </script>
     </body>

@@ -53,12 +53,12 @@
                             <g:each in="${alignment.fourColor}" var="fourColor" status="n">
                                 <tr>
                                     <td class="meme-id" style="width:20px"></td>
-                                    <td class="meme-fig"></td>
+                                    <td class="meme-fig"><i class="fa fa-spinner fa-spin"></i></td>
                                     <td class="meme-evalue" style="width:100px"></td>
                                     <td class="meme-sites" style="width:100px"></td>
                                     <td class="meme-width" style="width:100px"></td>
                                     <td style="width:100px"><a href="${fourColor}" target="_blank"><span class="glyphicon glyphicon-picture" style="font-size: 2em"></span></a></td>
-                                    <td class="composite" style="width:210px"><span class="composite-url" hidden="hidden">${alignment.composite[n]}</span><g:link action="composite" params="[url: alignment.composite[n]]" target="_blank"><div class="composite-fig"></div></g:link></td>
+                                    <td class="composite" style="width:210px"><i class="fa fa-spinner fa-spin"></i><span class="composite-url" hidden="hidden">${alignment.composite[n]}</span><g:link action="composite" params="[url: alignment.composite[n]]" target="_blank"><div class="composite-fig"></div></g:link></td>
                                 </tr>
                             </g:each>
                         </tbody>
@@ -73,6 +73,7 @@
         google.charts.load('current', {'packages':['corechart']});
         // composite chart
         $(".composite").each(function(){
+            var spinner = $(this).find("i");
             var compositeUrl = $(this).find(".composite-url").text();
             var container = $(this).find(".composite-fig")[0];
             google.charts.setOnLoadCallback(function(){
@@ -85,8 +86,9 @@
 
                     // Instantiate and draw our chart, passing in some options.
                     var chart = new google.visualization.LineChart(container);
-                    chart.draw(data, {width: 200, height: 100, legend: {position: 'none'}});    
-                });                
+                    chart.draw(data, {width: 200, height: 100, legend: {position: 'none'}});   
+                    $(spinner).remove();
+                })           
             });
         });
     
@@ -102,6 +104,7 @@
                         });
                         memeTable.find(".meme-fig").each(function(index, memeFig) {
                             make_motif(memeFig, result[index]);
+                            $(memeFig).find("i").remove();
                         });
                         memeTable.find(".meme-evalue").each(function(index, memeEvalue) {
                             $(memeEvalue).html(result[index].evalue);
@@ -111,6 +114,12 @@
                         });
                         memeTable.find(".meme-width").each(function(index, memeWidth) {
                             $(memeWidth).html(result[index].len);
+                        });
+                    },
+                error:
+                    function(result) {
+                        memeTable.find(".meme-fig").each(function(index, memeFig) {
+                            $(memeFig).html(result);
                         });
                     }
             });  

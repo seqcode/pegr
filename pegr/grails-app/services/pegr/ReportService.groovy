@@ -340,9 +340,13 @@ class ReportService {
         if (url == null || url == "") {
             return null
         }
-        def data = new URL(url).getText()
-       
         def results = []
+        def data
+        try {
+            data = new URL(url).getText()
+        } catch(Exception e) {
+            throw new ReportException(message: "Error fetching the data!")
+        }
         data.eachLine { line, lineNum ->
             def numbers = line.tokenize()
             if (lineNum == 0) {
@@ -352,6 +356,9 @@ class ReportService {
             } else {
                 numbers.eachWithIndex { n, c ->
                     if (c > 0) {
+                        if (results[c-1] == null) {
+                            throw new ReportException(message: "Error converting the data into array!")
+                        }
                         results[c-1][lineNum] = n
                     }
                 }

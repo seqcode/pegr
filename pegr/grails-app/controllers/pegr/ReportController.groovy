@@ -6,6 +6,20 @@ class ReportController {
     def springSecurityService
     def reportService
     
+    def createReports(Long runId) {
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            render(view:"/404")
+            return
+        }
+        try {
+            reportService.createSummaryReportsForRun(run)
+        } catch(ReportException e) {
+            flash.message = e.message
+        }
+        redirect(action:"runStatus", params: [runId: runId])
+    }
+    
     /*
      * list the analysis status of all the runs
      * @param max max number of runs listed in a page
@@ -89,8 +103,12 @@ class ReportController {
     }
     
     def fetchMemeDataAjax(String url) {
-        def results = reportService.fetchMemeMotif(url) as JSON
+        try {
+            def results = reportService.fetchMemeMotif(url) as JSON
         render results
+        } catch(ReportException e) {
+            render e.message, status: 500
+        }
     }
     
     def composite(String url) {
@@ -98,8 +116,12 @@ class ReportController {
     }
     
     def fetchCompositeDataAjax(String url) {
-        def result = reportService.fetchComposite(url)
-        render result
+        try {
+            def result = reportService.fetchComposite(url)
+            render result
+        } catch(ReportException e) {
+            render e.message, status: 500
+        }
     }
 }
 

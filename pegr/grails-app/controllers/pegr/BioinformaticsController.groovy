@@ -5,4 +5,8 @@ class BioinformaticsController {
         def genomes = Genome.list(params)
         [genomes: genomes]
     }
+    
+    def features() {
+        render "Comming soon..."
+    }
 }

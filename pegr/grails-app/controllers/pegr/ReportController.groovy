@@ -32,12 +32,23 @@ class ReportController {
         } else {
             try {
                 def runStatus = reportService.fetchRunStatus(run)
-                [runStatus: runStatus, run: run]
+                def reports = SummaryReport.findAllByRun(run)
+                [runStatus: runStatus, run: run, reports: reports]
             } catch (ReportException e) {
                 flash.message = e.message
                 redirect(action: "analysisStatus")
             }       
         }
+    }
+    
+    def deleteAlignment(Long alignmentId, Long runId) {
+        try {
+            reportService.deleteAlignment(alignmentId)
+            flash.message = "Success deleting the alignment!"
+        } catch (ReportException e) {
+            flash.message = e.message
+        }
+        redirect(action: "runStatus", params: [runId: runId])
     }
 
     def all(Integer max) {
@@ -158,7 +169,9 @@ class SampleStatusDTO {
 }
 
 class AlignmentStatusDTO {
+    String alignmentId
     String historyId
     String genome
+    Date date
     List status
 }

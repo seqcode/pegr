@@ -13,18 +13,18 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>                        
               </button>
-              <a class="navbar-brand" href="#">PEGR</a>
+              <a class="navbar-brand">PEGR</a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
-                    <li><a href="#">Home</a></li>
-                    <li id="nav-projects"><g:link controller="project">My Projects</g:link></li>
+                    <li><a href="http://sites.psu.edu/pughlab/">Lab Home</a></li>
+                    <li id="nav-projects"><g:link controller="project">Projects</g:link></li>
                     <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MEMBER">
                         <li id="nav-inventory"><g:link controller="item">Inventory</g:link></li>
                         <li id="nav-protocols"><g:link controller="protocol">Protocols</g:link></li>
                         <li id="nav-experiments"><g:link controller="protocolInstanceBag" action="processingBags">Experiments</g:link></li>
-                        <li id="nav-bioinformatics"><g:link controller="bioinformatics">Bioinfomatics</g:link></li>
                         <li id="nav-analysis"><g:link controller="report" action="analysisStatus" params="[requestedStatus:'RUN']">Analysis</g:link></li>
+                        <li id="nav-bioinformatics"><g:link controller="bioinformatics">Bioinfomatics</g:link></li>
                         <li id="nav-admin"><g:link controller="admin" action="index">Admin</g:link></li>
                     </sec:ifAnyGranted>
                 </ul>

@@ -562,6 +562,7 @@ class CsvConvertService {
 	}
 	        
 	def getSeqExperiment(Sample sample, SequenceRun seqRun, String rd1Start, String rd1End, String indexStart, String indexEnd, String rd2Start, String rd2End) {
+        def readType = ReadType.findByShortName("SR")
 		def map = [:]
 		if(rd1Start || rd1End) {
 			map['rd1'] = [rd1Start, rd1End]
@@ -578,9 +579,10 @@ class CsvConvertService {
 		}
 		if(rd2Start || rd2End) {
 			map['rd2'] = [rd2Start, rd2End]
+            readType = ReadType.findByShortName("PE")
 		}
 	    def readPositions = JsonOutput.toJson(map)
-	    def seqExp = new SequencingExperiment(sample: sample, sequenceRun: seqRun, readPositions: readPositions).save( failOnError: true)
+	    def seqExp = new SequencingExperiment(sample: sample, sequenceRun: seqRun, readPositions: readPositions, readType: readType).save( failOnError: true)
 	    return seqExp
 	}
 	        

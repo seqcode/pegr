@@ -24,7 +24,6 @@
                 <th>Strain</th>
                 <th>Antibody</th>
                 <th>Index</th>
-                <th>Read Type</th>
                 <th>Genome Build</th>
                 <th>Project</th>
             </tr>
@@ -36,7 +35,6 @@
                     <td>${it.sample?.cellSource?.strain}</td>
                     <td>${it.sample?.antibody}</td>
                     <td>${it.sample?.sequenceIndicesString}</td>
-                    <td>${it.readType?.name}</td>
                     <td>${it.sample?.requestedGenomes}</td>
                     <td>
                         <g:each in="${it.sample?.projects}">
@@ -52,6 +50,7 @@
     </table>
     <g:if test="${run?.experiments.size()}">
         <h3>Read and Index Positions <g:link action="editRead" params="[runId:run?.id]" class="edit">Edit</g:link></h3>
+        <h5>Read Type: ${read.readType.name}</h5>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -85,31 +84,26 @@
                         <td>${read?.index2?.getAt(1)}</td>
                     </tr>
                 </g:else>
-                <tr>
-                    <td>Read 2</td>
-                    <td>${read?.rd2?.getAt(0)}</td>
-                    <td>${read?.rd2?.getAt(1)}</td>
-                </tr>
+                <g:if test="${read?.rd2}">                
+                    <tr>
+                        <td>Read 2</td>
+                        <td>${read?.rd2?.getAt(0)}</td>
+                        <td>${read?.rd2?.getAt(1)}</td>
+                    </tr>
+                </g:if>
             </tbody>
         </table>
     </g:if>
-    <h3>Summary Reports <g:link action="createReports" params="[runId: run.id]" class="edit">Generate</g:link></h3>
-    <ul>
-        <g:each in="${reports}">
-            <li><g:link controller="report" action="show" id="${it.id}">${it}</g:link></li>
-        </g:each>
-    </ul>
     <div class="row well text-center">
         <g:if test="${run.status == pegr.RunStatus.PREP}">
             <g:link action="previewRun" params="[runId: run.id]" class="btn btn-success">Submit</g:link>
-
         </g:if>
         <g:else>
             <span class="btn btn-default">Submitted</span>
         </g:else>
     </div>
     <script>
-        $("#nav-bench").addClass("active");
+        $("#nav-experiments").addClass("active");
      </script>
 </div>
 </body>

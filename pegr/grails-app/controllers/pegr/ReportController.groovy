@@ -103,12 +103,8 @@ class ReportController {
     }
     
     def fetchMemeDataAjax(String url) {
-        try {
-            def results = reportService.fetchMemeMotif(url) as JSON
+        def results = reportService.fetchMemeMotif(url) as JSON
         render results
-        } catch(ReportException e) {
-            render e.message, status: 500
-        }
     }
     
     def composite(String url) {
@@ -116,12 +112,16 @@ class ReportController {
     }
     
     def fetchCompositeDataAjax(String url) {
+        def result
         try {
-            def result = reportService.fetchComposite(url)
-            render result
+            result = reportService.fetchComposite(url)
+            if (!result) {
+                result = [error: "No composite data found!"] as JSON
+            }
         } catch(ReportException e) {
-            render e.message, status: 500
-        }
+            result = [error: e.message] as JSON
+        } 
+        render result
     }
 }
 

@@ -278,46 +278,51 @@ class ReportService {
     
     // 
     def fetchMemeMotif(String url) {
-        if (url == null || url == "") {
-            return null
-        }
-        def data = new URL(url).getText()
-        def inBlock = false
-        def count = 0
-        def len, nsites, evalue
-        def pwm
         def results = []
-        data.eachLine {
-            if (inBlock) {
-                if (it.startsWith("----------------")) {
-                    results.push([db: 0, 
-                            id: count, 
-                            alt: "MEME", 
-                            len: len, 
-                            nsites: nsites, 
-                            evalue: evalue, 
-                            pwm: pwm])
-                    inBlock = false
-                } else {
-                    def numbers = it.tokenize()
-                    def a = []
-                    numbers.each { n ->
-                        a.push(utilityService.getFloat(n))
-                    }
-                    pwm.push(a)
-                }
-            } else {
-                if (it.startsWith("letter-probability matrix")) {
-                    // digest the statistics
-                    len = utilityService.getLong(findInMotif(it, "w"))
-                    nsites = utilityService.getLong(findInMotif(it, "nsites"))
-                    evalue = findInMotif(it, "E")
-                    pwm = []
-                    count++
-                    inBlock = true
-                }
-            }
+        if (url == null || url == "") {
+            return results
+        }
+        try {
+            def data = new URL(url).getText()
+            def inBlock = false
+            def count = 0
+            def len, nsites, evalue
+            def pwm
 
+            data.eachLine {
+                if (inBlock) {
+                    if (it.startsWith("----------------")) {
+                        results.push([db: 0, 
+                                id: count, 
+                                alt: "MEME", 
+                                len: len, 
+                                nsites: nsites, 
+                                evalue: evalue, 
+                                pwm: pwm])
+                        inBlock = false
+                    } else {
+                        def numbers = it.tokenize()
+                        def a = []
+                        numbers.each { n ->
+                            a.push(utilityService.getFloat(n))
+                        }
+                        pwm.push(a)
+                    }
+                } else {
+                    if (it.startsWith("letter-probability matrix")) {
+                        // digest the statistics
+                        len = utilityService.getLong(findInMotif(it, "w"))
+                        nsites = utilityService.getLong(findInMotif(it, "nsites"))
+                        evalue = findInMotif(it, "E")
+                        pwm = []
+                        count++
+                        inBlock = true
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            throw new ReportException(message: "Error fetching the MEME data!")
         }
         return results
     }

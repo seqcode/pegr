@@ -2867,4 +2867,6 @@ databaseChangeLog = {
 	include file: 'changeInstanceItem.groovy'
 
 	include file: 'changeChores.groovy'
+
+	include file: 'changeGenome.groovy'
 }

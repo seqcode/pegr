@@ -78,8 +78,17 @@ Antibody.list().each { antibody ->
 }
 */
 
-def peStepIds = Analysis.where {alignment.id == 1}.collect {it.stepId}.unique()
-def srStepIds = Analysis.where {alignment.id == 74}.collect {it.stepId}.unique()
-def s = [PE: peStepIds, SR: srStepIds]
-new Chores(name: "PipelineSteps", value: JsonOutput.toJson(s)).save()
 
+def chores = Chores.findByName("PipelineSteps")
+def jsonSlurper = new JsonSlurper()
+def readSteps = jsonSlurper.parseText(chores.value)
+def readStepCategories = [:]
+readSteps.each { key, value ->
+    readStepCategories[key] = []
+    value.each { step ->
+        def pair = [step, Analysis.findByStepId(step).category]
+        readStepCategories[key].push(pair) 
+    }    
+}
+chores.value = JsonOutput.toJson(readStepCategories)
+chores.save()

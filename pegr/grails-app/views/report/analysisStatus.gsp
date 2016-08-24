@@ -9,8 +9,6 @@
     </g:if>
     <br>
     <ul class="nav nav-tabs">
-        <li id="PREP"><g:link controller="report" action="analysisStatus" params="[requestedStatus: 'PREP']">Experiment Prep</g:link></li>
-        <li id="QUEUE"><g:link controller="report" action="analysisStatus" params="[requestedStatus: 'QUEUE']">Queue</g:link></li>
         <li id="RUN"><g:link controller="report" action="analysisStatus" params="[requestedStatus: 'RUN']">Analyzing</g:link></li>
         <li id="COMPLETED"><g:link controller="report" action="analysisStatus" params="[requestedStatus: 'COMPLETED']">Completed</g:link></li>
     </ul>
@@ -19,8 +17,8 @@
         <thead>
             <tr>
                 <g:sortableColumn property="runNum" defaultOrder="desc" title="Run #"></g:sortableColumn>
-                <g:sortableColumn property="date" defaultOrder="desc" title="Date"></g:sortableColumn>  
-                <th>Sample status</th>
+                <g:sortableColumn property="date" defaultOrder="desc" title="Sequencing Date"></g:sortableColumn>  
+                <th>Sample Status</th>
             </tr>
         </thead>
         <tbody>
@@ -28,7 +26,7 @@
                 <tr>
                     <td>${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if></td>
                     <td><g:formatDate format="yyyy-MM-dd" date="${run.date}"/></td>
-                    <td><g:link controller="report" action="runStatus" params="[runId: run.id]">Status</g:link></td>
+                    <td><g:link controller="report" action="runStatus" params="[runId: run.id]">Sample Status</g:link></td>
                 </tr>
             </g:each>              
             <tr>
@@ -42,7 +40,7 @@
         <g:paginate next="Next" prev="Prev" controller="report" action="analysisStatus" params='[requestedStatus:"${status}"]' max="25" total="${totalCount ?: 0}" />
     </div>
     <script>
-        $("#status").addClass("active");
+        $(".nav-status").addClass("active");
         $("#${status}").addClass("active");
     </script>
 </body>

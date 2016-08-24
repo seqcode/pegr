@@ -41,8 +41,9 @@ class SequenceRunController {
                 def jsonSlurper = new JsonSlurper()
                 read = jsonSlurper.parseText(run.experiments[0].readPositions)           
             }
-            def reports = SummaryReport.findAllByRun(run)
-            [run: run, read: read, reports: reports]
+            read.readType = run.experiments[0].readType
+
+            [run: run, read: read]
         } else {
             flash.message = "Sequence run not found!"
             redirect(action: "index")
@@ -66,6 +67,7 @@ class SequenceRunController {
             if (run.experiments.getAt(0)?.readPositions) {
                 def jsonSlurper = new JsonSlurper()
                 read = jsonSlurper.parseText(run.experiments[0].readPositions)
+                read.readType = run.experiments.getAt(0)?.readType
             }
             def indexType = read?.containsKey("index") ? "single" : "duo"
             [run: run, read: read, indexType: indexType]
@@ -75,7 +77,7 @@ class SequenceRunController {
         }
     }
     
-    def updateRead(Long runId, String indexType) {
+    def updateRead(Long runId, String indexType, String readType) {
         def readPositions
         def posMap
         if (indexType == "single") {
@@ -88,12 +90,14 @@ class SequenceRunController {
             posMap = [
                 rd1: [params.rd1Start, params.rd1End], 
                 index1: [params.index1Start, params.index1End], 
-                index2: [params.index2Start, params.index2End], 
-                rd2: [params.rd2Start, params.rd2End]]
+                index2: [params.index2Start, params.index2End]]
+        }
+        if (readType == "PE") {
+            posMap.rd2 = [params.rd2Start, params.rd2End]
         }
         readPositions = JsonOutput.toJson(posMap)
         try {
-            sequenceRunService.updateRead(runId, readPositions)
+            sequenceRunService.updateRead(runId, readPositions, readType)
             flash.message = "Success updating the read type and read positions!"
         } catch(SequenceRunException e) {
             flash.message = e.message
@@ -228,9 +232,8 @@ class SequenceRunController {
         def expIds = params.list('experimentId')
         expIds.each{
             def genomeIds = params.list("genomes${it}")
-            def readTypeId = params.long("readType${it}")
             try {
-                sequenceRunService.updateSample(it, genomeIds, readTypeId)
+                sequenceRunService.updateSample(it, genomeIds)
             } catch (SequenceRunException e) {
                 messages += "<p>e.message</p>"
             } 

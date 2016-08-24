@@ -37,7 +37,7 @@
         <g:paginate next="Next" prev="Prev" controller="report" action="all" max="25" total="${totalCount ?: 0}" />
     </div>
      <script>
-        $("#nav-reports").addClass("active");
+        $(".nav-reports").addClass("active");
      </script>
 </body>
 </html>

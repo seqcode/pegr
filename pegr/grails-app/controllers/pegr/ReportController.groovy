@@ -6,6 +6,20 @@ class ReportController {
     def springSecurityService
     def reportService
     
+    def createReports(Long runId) {
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            render(view:"/404")
+            return
+        }
+        try {
+            reportService.createSummaryReportsForRun(run)
+        } catch(ReportException e) {
+            flash.message = e.message
+        }
+        redirect(action:"runStatus", params: [runId: runId])
+    }
+    
     /*
      * list the analysis status of all the runs
      * @param max max number of runs listed in a page
@@ -98,7 +112,15 @@ class ReportController {
     }
     
     def fetchCompositeDataAjax(String url) {
-        def result = reportService.fetchComposite(url)
+        def result
+        try {
+            result = reportService.fetchComposite(url)
+            if (!result) {
+                result = [error: "No composite data found!"] as JSON
+            }
+        } catch(ReportException e) {
+            result = [error: e.message] as JSON
+        } 
         render result
     }
 }

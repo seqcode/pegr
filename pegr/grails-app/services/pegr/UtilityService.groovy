@@ -231,6 +231,15 @@ class UtilityService {
      */
     @Transactional
     def mergeRowsInDb(String tableName, Long fromId, Long toId) {
+        if (!tableName || tableName == "") {
+            throw new UtilityException(message: "Table not selected!")
+        }
+        if (!fromId) {
+            throw new UtilityException(message: "From ID is missing!")
+        }
+        if (!toId) {
+            throw new UtilityException(message: "To ID is missing!")
+        }                                                        
         try {
             def sql = new Sql(dataSource)
             // check if both the merge from and merge to exist

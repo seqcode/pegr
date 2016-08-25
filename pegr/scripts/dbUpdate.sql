@@ -99,6 +99,19 @@ delete from summary_report
 
 insert into pipeline (host, workflow_id, name, pipelineVersion, steps) values ("galaxy-cegr", "b266c9aed69b2935","paired", "001", '["input2","input1","ad583fa93b5fed87","96dd6dd693e9a033","71175efa22558b3b","b868e18d758bba8a","6f4fa8324bf2747b","89b5528676fe3fae","b24b58817eeee721","072cb5142f83033f","f6186cdbed51a4cb","cdb3593ee534882e","d9078eb5a65df1e4","96761ccd61321ce3","34caead642390a27","c36cbb3fa155d5b4","7c5ed654bd70e4b5","59e21c1ec43960de","cce41d830f1a2319","10a14f60d05bf206"]');
 
-insert into pipeline (host, workflow_id, name, pipelineVersion, steps) values ("galaxy-cegr", "ed30e974065fb948", "single", "001", '["input1","4907c51e3aa6e860","6cd87e7183cf8adf","0aaceadffb66386e","f277bfdf7db1fd92","c0add05666cfe9e1","afcb51f2c322d3e2","5a48aaf4773da987","551cc07dc795d77f","b1fe447033b4153f","63c2821ce20bf810","322a184133da80c8","3306623a89c4f2b1","e326ee6dfab5e747","21777a7abfcac6bb","1a8acd3a033f4266","52e892817bc83e2b"]')
+insert into pipeline (host, workflow_id, name, pipelineVersion, steps) values ("galaxy-cegr", "ed30e974065fb948", "single", "001", '["input1","4907c51e3aa6e860","6cd87e7183cf8adf","0aaceadffb66386e","f277bfdf7db1fd92","c0add05666cfe9e1","afcb51f2c322d3e2","5a48aaf4773da987","551cc07dc795d77f","b1fe447033b4153f","63c2821ce20bf810","322a184133da80c8","3306623a89c4f2b1","e326ee6dfab5e747","21777a7abfcac6bb","1a8acd3a033f4266","52e892817bc83e2b"]');
 
-insert into user (version, username, email, api_key) values (0, "galaxy-cegr", "cegr@psu.edu", "0YG9B2LPLLDPP4B1LQQ0BB1LH75L8A3P")
+insert into user (version, username, email, api_key) values (0, "galaxy-cegr", "cegr@psu.edu", "0YG9B2LPLLDPP4B1LQQ0BB1LH75L8A3P");
+
+insert into item_type_category (version, name, super_category) values (0, "Antibody", "ANTIBODY");
+insert into item_type_category (version, name, super_category) values (0, "Equipment", "OTHER");
+insert into item_type_category (version, name, super_category) values (0, "General Supply", "OTHER");
+insert into item_type_category (version, name, super_category) values (0, "Chemical", "OTHER");
+insert into item_type_category (version, name, super_category) values (0, "Enzyme", "OTHER");
+insert into item_type_category (version, name, super_category) values (0, "Cell Stock", "TRACED_SAMPLE");
+insert into item_type_category (version, name, super_category) values (0, "Biosample", "TRACED_SAMPLE");
+insert into item_type_category (version, name, super_category) values (0, "Reagent", "OTHER");
+
+update sequence_run set status = "ANALYZING" where status = "RUN";
+
+                                                                       

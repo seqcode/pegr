@@ -24,8 +24,8 @@ class Analysis {
     }
     
     static mapping = {
-        parameters sqlType: 'text'
-        statistics sqlType: 'text'
-        datasets sqlType: 'text'
+        parameters sqlType: 'longtext'
+        statistics sqlType: 'longtext'
+        datasets sqlType: 'longtext'
     }
 } 

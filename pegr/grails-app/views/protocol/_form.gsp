@@ -21,17 +21,17 @@
 
 <div>
     <label for="sharedItem">Shared Item Types (multi-select)</label>
-    <g:select name="sharedItemTypeIds" id="sharedItem" from="${pegr.ItemType.where{category==pegr.ItemTypeCategory.OTHER}.list(sort:'name')}" optionKey="id" value="${sharedItemTypeIds}" multiple="multiple" size="10"/>
+    <g:select name="sharedItemTypeIds" id="sharedItem" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.OTHER}.list(sort:'name')}" optionKey="id" value="${sharedItemTypeIds}" multiple="multiple" size="10"/>
 </div>
 
 <h4>Traced Samples</h4>
 <div>
     <label for="startItem">Start State</label>
-    <g:select name="startItemTypeId" id="startItem" from="${pegr.ItemType.where{category==pegr.ItemTypeCategory.TRACED_SAMPLE}.list(sort:'name')}" optionKey="id" value="${startItemTypeId}" noSelection="['null':'N/A']"/>
+    <g:select name="startItemTypeId" id="startItem" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.TRACED_SAMPLE}.list(sort:'name')}" optionKey="id" value="${startItemTypeId}" noSelection="['null':'N/A']"/>
 </div>
 <div>
     <label for="endItem">End State</label>
-    <g:select name="endItemTypeId" id="endItem" from="${pegr.ItemType.where{category==pegr.ItemTypeCategory.TRACED_SAMPLE}.list(sort:'name')}" optionKey="id" value="${endItemTypeId}" noSelection="['null':'N/A']"/>
+    <g:select name="endItemTypeId" id="endItem" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.TRACED_SAMPLE}.list(sort:'name')}" optionKey="id" value="${endItemTypeId}" noSelection="['null':'N/A']"/>
 </div>
 
 <div>    
@@ -43,10 +43,10 @@
 <h4>Sample Pool</h4>
 <div>
     <label for="startPool"><abbr title="A pre-existing pool that has been generated in the previous protocol.">Import Pool</abbr></label>
-    <g:select name="startPoolTypeId" from="${pegr.ItemType.where{category==pegr.ItemTypeCategory.SAMPLE_POOL}.list(sort:'name')}" optionKey="id" value="${startPoolTypeId}" noSelection="['null':'N/A']"/>
+    <g:select name="startPoolTypeId" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.SAMPLE_POOL}.list(sort:'name')}" optionKey="id" value="${startPoolTypeId}" noSelection="['null':'N/A']"/>
     
     <label for="endPool"><abbr title="A new pool that will be generated at the end of this protocol.">Create Pool</abbr></label>
-    <g:select name="endPoolTypeId" from="${pegr.ItemType.where{category==pegr.ItemTypeCategory.SAMPLE_POOL}.list(sort:'name')}" optionKey="id" value="${endPoolTypeId}" noSelection="['null':'N/A']"/>
+    <g:select name="endPoolTypeId" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.SAMPLE_POOL}.list(sort:'name')}" optionKey="id" value="${endPoolTypeId}" noSelection="['null':'N/A']"/>
 </div>
 
 <sec:ifAllGranted roles="ROLE_ADMIN">

@@ -42,6 +42,6 @@ class Item {
     }
     
     static mapping = {
-		notes sqlType: 'text'
+		notes sqlType: 'longtext'
     }
 }

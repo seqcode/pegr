@@ -9,23 +9,31 @@
     </g:if>
 	<div>
 		<h3>Project: ${project?.name} <g:if test="${projectEditAuth}"><g:link action="edit" params="[projectId:project?.id]" class="edit">Edit</g:link></g:if></h3>
+        <div>
+            <button class="dropdown-toggle glyphicon glyphicon-file" data-toggle="notepad">Notes</button>
+            <div class="dropdown-menu">
+                <textarea rows="5" id="comment"></textarea>
+                <button onclick="saveNotes()">Save</button>
+            </div>
+            
+        </div>
 		<p>Created: ${project?.dateCreated}, updated: ${project?.lastUpdated}</p>
 		<p>Description: ${project?.description}</p>
-        <p>Funding: ${project?.funding}</p>
-        
+        <p>Funding: ${project?.fundings.join(', ')}</p>
         <h3>Users <g:if test="${projectEditAuth}"><button class="edit" data-toggle="modal" data-target="#addUser">Add</button></g:if></h3>
         <div id="project-users">
             <g:render template="userTable"/>
-        </div>
-        
-        <h3>Samples</h3>
-        <div id="sample" class="tab-pane fade in active">
-            <g:render template="/project/sampleTable" model="['sampleList':samples, 'project':project]" />
-        </div>
-
-        <div class="pagination">
-            <g:paginate id="${project.id}" total="${sampleCount ?: 0}" max="50"/>
-        </div>   
+        </div> 
+        <h3>Sequencing Cohorts</h3>
+        <ul>
+            <g:each in="${cohorts}" var="cohort">
+                <h4>${cohort.run}
+                    <g:if test="${cohort.report && cohort.report.status == pegr.ReportStatus.PUBLISH}"><g:link controller="report" action="show" id="${cohort.report?.id}">Report: ${cohort.report?.name}</g:link> 
+                    </g:if>
+                </h4>
+                <g:render template="/project/sampleTable" model="['sampleList':cohort.samples, 'project':project]" />
+            </g:each>
+        </ul>
         <g:if test="${sampleEditAuth}">
             <div>
                 <button data-toggle="modal" data-target="#selectAssay" class="btn btn-info">Create New Samples</button>
@@ -37,13 +45,6 @@
         <div id="replicates">
             <g:render template="/replicate/list" model="['replicates':replicates]"></g:render>
         </div>
-                
-        <h3>Summary Reports</h3>
-        <ul>
-            <g:each in="${reports}">
-                <g:link controller="report" action="show" id="${it.id}">${it}</g:link> 
-            </g:each>
-        </ul>
     </div>
     <br/>         
     

@@ -7,7 +7,7 @@
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
-    <h3><g:link controller="sequenceRun" action="show" id="${run.id}">Run ${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if></g:link></h3>
+    <h3><g:link controller="sequenceRun" action="show" id="${run.id}">Run ${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if></g:link><small><span class="label label-default">${run.status}</span></small> </h3>
     <g:each in="${runStatus}">
         <div class="pull-right"><span class="label label-success"> </span> Data received; <span class="label label-danger"> </span> No data. Hover to see the step's category.</div>
         <div>
@@ -59,6 +59,12 @@
     <script>
         $(".confirm").confirm({text: "All data in this alignment will be deleted. Are you sure you want to delete this alignment?"});
         $(".nav-status").addClass("active");
+                
+        function completeRun() {
+            $.ajax({url: "/pegr/report/completeRunAjax/${run.id}", success: function(result) {
+                $("#runStatus").html(result)
+            }});
+        }
     </script>
 </body>
 </html>

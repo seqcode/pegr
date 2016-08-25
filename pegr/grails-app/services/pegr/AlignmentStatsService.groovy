@@ -105,7 +105,7 @@ class AlignmentStatsService {
         try {
             def jsonSlurper = new JsonSlurper()
             switch (category) {
-                case ["output_fastqRead1", "output_fastqRead2"]:
+                case ["output_fastqRead1", "output_fastqRead2"]: // fastq
                     def fastq = [:]
                     if (experiment.fastqFile) {
                         fastq = jsonSlurper.parseText(experiment.fastqFile)
@@ -118,9 +118,7 @@ class AlignmentStatsService {
                         experiment.save(faileOnError: true)
                     }                    
                     break
-                case ["output_markDuplicates", "output_samtoolFilter"]: // bam
-                    break
-                case "output_fastqc":
+                case "output_fastqc": // fastqc report
                     def fastqc = [:]
                     if (experiment.fastqcReport) {
                         fastqc = jsonSlurper.parseText(experiment.fastqcReport)
@@ -131,6 +129,13 @@ class AlignmentStatsService {
                         experiment.fastqcReport = JsonOutput.toJson(fastqc)
                         experiment.save(faileOnError: true)
                     }
+                    break
+                case "output_samtoolFilter": // bam
+                    def newBam = queryDatasetsUri(datasets, "bam")
+                    if (newBam) {
+                        alignment.bamFile = newBam
+                        alignment.save(failOnError: true)
+                    }         
                     break
                 case "output_peHistogram": //pe histogram
                     def newHistogram = queryDatasetsUri(datasets, "png")

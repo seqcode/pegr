@@ -18,6 +18,9 @@
             <tr>
                 <g:sortableColumn property="runNum" defaultOrder="desc" title="Run #"></g:sortableColumn>
                 <g:sortableColumn property="date" defaultOrder="desc" title="Sequencing Date"></g:sortableColumn>  
+                <th>Platform</th>
+                <th>Directory</th>
+                <th>Run status</th>
                 <th>Sample Status</th>
             </tr>
         </thead>
@@ -26,6 +29,9 @@
                 <tr>
                     <td>${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if></td>
                     <td><g:formatDate format="yyyy-MM-dd" date="${run.date}"/></td>
+                    <td>${run.platform}</td>
+                    <td>${run.directoryName}</td>
+                    <td>${run.status}</td>
                     <td><g:link controller="report" action="runStatus" params="[runId: run.id]">Sample Status</g:link></td>
                 </tr>
             </g:each>              
@@ -39,9 +45,11 @@
     <div class="pagination">
         <g:paginate next="Next" prev="Prev" controller="report" action="analysisStatus" params='[requestedStatus:"${status}"]' max="25" total="${totalCount ?: 0}" />
     </div>
-    <script>
-        $(".nav-status").addClass("active");
-        $("#${status}").addClass("active");
+    <script>        
+        $(function(){
+            $(".nav-status").addClass("active");
+            $("#${status}").addClass("active");
+        });
     </script>
 </body>
 </html>

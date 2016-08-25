@@ -9,6 +9,6 @@ class Chores {
     }
     
     static mapping = {
-		value sqlType: 'text'
+		value sqlType: 'longtext'
     }
 }

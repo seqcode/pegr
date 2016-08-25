@@ -9,5 +9,8 @@
 </div>
 <div class="form-group ${hasErrors(bean: project, field: 'name', 'error')}">
     <label for="name">Funding</label>
-    <g:textField name="funding" id="funding" value="${it?.funding}" class="form-control"></g:textField>
+    <g:select from="${pegr.Funding.list()}" name="funding" value="${it?.fundings}" optionKey="id" noSelection="${['null':'']}" multiple="multiple" style="width: 250px"></g:select> 
+    <script>
+        $("select").select2();
+    </script>
 </div>

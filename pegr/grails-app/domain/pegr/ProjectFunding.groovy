@@ -9,7 +9,6 @@ class ProjectFunding {
     }
     
     static mapping = {
-		id composite: ['project', 'funding']
 		version false
 	}
 }

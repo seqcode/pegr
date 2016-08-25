@@ -3,7 +3,7 @@ package pegr;
 public enum RunStatus {
     PREP,
     QUEUE,
-    RUN,
+    ANALYZING,
     COMPLETED,
     ERROR
 	;

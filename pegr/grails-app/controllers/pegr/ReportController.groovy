@@ -55,6 +55,11 @@ class ReportController {
         }
     }
     
+    def completeRunAjax(Long runId) {
+        reportService.completeRun(runId)
+        render "Completed"
+    }
+    
     def deleteAlignment(Long alignmentId, Long runId) {
         try {
             reportService.deleteAlignment(alignmentId)

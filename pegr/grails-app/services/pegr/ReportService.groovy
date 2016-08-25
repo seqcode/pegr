@@ -198,28 +198,36 @@ class ReportService {
     }
     
     def getExperimentDTO(SequencingExperiment experiment) {
+        def fastqc
+        try {
+            def jsonSlurper = new JsonSlurper()
+            fastqc = jsonSlurper.parseText(experiment.fastqcReport)
+        } catch (Exception e) {
+            
+        }
         return new ExperimentDTO(id: experiment.id,
                               runId: experiment.sequenceRun?.id,
                               oldRunNum: experiment.sequenceRun?.runNum,
                               totalReads: experiment.totalReads,
                               adapterDimerCount: experiment.adapterDimerCount,
+                              fastqc: fastqc,
                               alignments: []
                              )
     }
     
     def getAlignmentDTO(SequenceAlignment alignment) {
         def alignmentDTO = new AlignmentDTO(id: alignment.id,
-                                            genome: alignment.genome,
-                                            mappedReads: alignment.mappedReads,
-                                            uniquelyMappedReads: alignment.uniquelyMappedReads,
-                                            dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
-                                            avgInsertSize: alignment.avgInsertSize,
-                                            stdInsertSize: alignment.stdDevInsertSize,
-                                            genomeCoverage: alignment.genomeCoverage,
-                                            fastqc: [:],
-                                            fourColor: [],
-                                            composite: []
-                        )
+                genome: alignment.genome,
+                mappedReads: alignment.mappedReads,
+                uniquelyMappedReads: alignment.uniquelyMappedReads,
+                dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
+                avgInsertSize: alignment.avgInsertSize,
+                stdInsertSize: alignment.stdDevInsertSize,
+                genomeCoverage: alignment.genomeCoverage,
+                peHistogram: alignment.peHistogram,
+                fourColor: [],
+                composite: []
+            )
 
         def statistics
         def parameter
@@ -243,13 +251,6 @@ class ReportService {
                 case "output_meme": // meme
                     alignmentDTO.memeFile = alignmentStatsService.queryDatasetsUri(analysis.datasets, "txt")
                     alignmentDTO.memeFig = alignmentStatsService.queryDatasetsUri(analysis.datasets, "html")
-                    break
-                case "output_fastqc": // fastqc report
-                    def fastqcFile = alignmentStatsService.queryDatasetsUriWithRead(analysis.datasets, analysis.statistics, "html")
-                    alignmentDTO.fastqc[fastqcFile.read] = fastqcFile.data
-                    break
-                case "output_peHistogram": //pe histogram
-                    alignmentDTO.peHistogram = alignmentStatsService.queryDatasetsUri(analysis.datasets, "png")
                     break
                 case "output_fourColorPlot": // four color plot
                     alignmentDTO.fourColor = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "png")

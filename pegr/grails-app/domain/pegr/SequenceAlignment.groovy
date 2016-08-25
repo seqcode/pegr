@@ -5,7 +5,6 @@ class SequenceAlignment {
 	SequencingExperiment sequencingExperiment
 	Genome genome
     Pipeline pipeline
-    String workflowId
     String historyId
 	Integer readDbId
     Aligner aligner
@@ -25,7 +24,6 @@ class SequenceAlignment {
     Float genomeCoverage
     
     static constraints = {
-        workflowId nullable: true, blank: true
         historyId unique: ["sequencingExperiment", "genome", "pipeline"]
         
 		readDbId nullable: true

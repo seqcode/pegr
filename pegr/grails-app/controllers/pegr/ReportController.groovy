@@ -147,6 +147,7 @@ class ExperimentDTO {
     Long oldRunNum
     Long totalReads
     Long adapterDimerCount
+    Map fastqc
     List alignments
 }
 
@@ -174,7 +175,6 @@ class AlignmentDTO {
     Long nonPairedPeaks
     String memeFile
     String memeFig
-    Map fastqc
     String peHistogram
     List fourColor
     List composite

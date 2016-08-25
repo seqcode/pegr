@@ -5,7 +5,7 @@ class Analysis {
     String category
     String tool
     String stepId
-    String user
+    User user
     String parameters
     String statistics
     String datasets
@@ -18,7 +18,7 @@ class Analysis {
         statistics nullable: true, blank: true
         datasets nullable: true, blank: true
         stepId nullable: true, blank: true
-        user nullable: true, blank: true
+        user nullable: true
         date nullable: true
         note nullable: true, blank: true
     }

@@ -16,7 +16,7 @@
         <tbody>
             <g:each in="${genomes}" var="genome">
                 <tr>
-                    <td>${genome.species}</td>
+                    <td><i>${genome.species}</i></td>
                     <td>${genome.name}</td>
                     <td><a href="${genome.url}">${genome.url}</a></td>
                 </tr>

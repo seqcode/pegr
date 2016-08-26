@@ -2,6 +2,11 @@
 <head>
     <title>My Projects</title> 
     <meta name="layout" content="main"/>
+    <style>
+        .dropdown-menu {
+            background-color: white;
+        }
+    </style>
 </head>
 <body>
     <g:if test="${flash.message}">
@@ -9,13 +14,12 @@
     </g:if>
 	<div>
 		<h3>Project: ${project?.name} <g:if test="${projectEditAuth}"><g:link action="edit" params="[projectId:project?.id]" class="edit">Edit</g:link></g:if></h3>
-        <div>
-            <button class="dropdown-toggle glyphicon glyphicon-file" data-toggle="notepad">Notes</button>
+        <div class="dropdown pull-right">
+            <button class="edit dropdown-toggle" type="button" data-toggle="dropdown">Notes <span class="glyphicon glyphicon-pencil"></span></button>
             <div class="dropdown-menu">
-                <textarea rows="5" id="comment"></textarea>
-                <button onclick="saveNotes()">Save</button>
+                <textarea name="notes" id="notes">${project.notes}</textarea>
+                <button class="pull-right btn btn-default" onclick="saveNotes();">Save</button>
             </div>
-            
         </div>
 		<p>Created: ${project?.dateCreated}, updated: ${project?.lastUpdated}</p>
 		<p>Description: ${project?.description}</p>
@@ -26,8 +30,8 @@
         </div> 
         <h3>Sequencing Cohorts</h3>
         <ul>
-            <g:each in="${cohorts}" var="cohort">
-                <h4>${cohort.run}
+            <g:each in="${project.cohorts}" var="cohort">
+                <h4>${cohort}
                     <g:if test="${cohort.report && cohort.report.status == pegr.ReportStatus.PUBLISH}"><g:link controller="report" action="show" id="${cohort.report?.id}">Report: ${cohort.report?.name}</g:link> 
                     </g:if>
                 </h4>
@@ -173,17 +177,15 @@
             $(".modal-body #hiddenUserId").val(userId);
         }
         
-        $(function(){
-          var hash = window.location.hash;
-          hash && $('ul.nav a[href="' + hash + '"]').tab('show');
-
-          $('.nav-tabs a').click(function (e) {
-            $(this).tab('show');
-            var scrollmem = $('body').scrollTop() || $('html').scrollTop();
-            window.location.hash = this.hash;
-            $('html,body').scrollTop(scrollmem);
-          });
-        });
+        function saveNotes() {
+            var projectId = ${project.id};
+            var notes = $("#notes").val();
+            $.ajax({
+                type: 'POST',
+                data: {'projectId': projectId, 'notes': notes},
+                url: '/pegr/project/saveNotesAjax'
+            });
+        }
 	</script>
 </body>
 </html>

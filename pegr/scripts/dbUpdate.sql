@@ -97,21 +97,26 @@ delete from summary_report
 
 // alter table sequence_run auto_increment = 215;
 
-insert into pipeline (host, workflow_id, name, pipelineVersion, steps) values ("galaxy-cegr", "b266c9aed69b2935","paired", "001", '["input2","input1","ad583fa93b5fed87","96dd6dd693e9a033","71175efa22558b3b","b868e18d758bba8a","6f4fa8324bf2747b","89b5528676fe3fae","b24b58817eeee721","072cb5142f83033f","f6186cdbed51a4cb","cdb3593ee534882e","d9078eb5a65df1e4","96761ccd61321ce3","34caead642390a27","c36cbb3fa155d5b4","7c5ed654bd70e4b5","59e21c1ec43960de","cce41d830f1a2319","10a14f60d05bf206"]');
+insert into user (version, account_expired, account_locked, enabled, password, password_expired, username, email, api_key) values (0, false, false, false, "$2a$10$ErWZYV6RfjF0ST8YQ43ImetX6pNEUPXOw1hGA.T092tfSBgT2t2kC",false, "galaxy-cegr", "cegr@psu.edu", "0YG9B2LPLLDPP4B1LQQ0BB1LH75L8A3P");
 
-insert into pipeline (host, workflow_id, name, pipelineVersion, steps) values ("galaxy-cegr", "ed30e974065fb948", "single", "001", '["input1","4907c51e3aa6e860","6cd87e7183cf8adf","0aaceadffb66386e","f277bfdf7db1fd92","c0add05666cfe9e1","afcb51f2c322d3e2","5a48aaf4773da987","551cc07dc795d77f","b1fe447033b4153f","63c2821ce20bf810","322a184133da80c8","3306623a89c4f2b1","e326ee6dfab5e747","21777a7abfcac6bb","1a8acd3a033f4266","52e892817bc83e2b"]');
+insert into pipeline (version, user_id, workflow_id, name, pipelineVersion, steps) values (0, 350, "b266c9aed69b2935","paired", "001", '[["input2","output_fastqRead2"],["input1","output_fastqRead1"],["ad583fa93b5fed87","output_fastqc"],["96dd6dd693e9a033","output_fastqc"],["71175efa22558b3b","output_markDuplicates"],["b868e18d758bba8a","output_samtoolFilter"],["6f4fa8324bf2747b","output_peHistogram"],["89b5528676fe3fae","output_bamToScidx"],["b24b58817eeee721","output_genetrack"],["072cb5142f83033f","output_bedtoolsIntersect"],["f6186cdbed51a4cb","output_cwpair2"],["cdb3593ee534882e","output_extractGenomicDNA"],["d9078eb5a65df1e4","output_extractGenomicDNA"],["96761ccd61321ce3","output_repeatMasker"],["c36cbb3fa155d5b4","output_repeatMasker"],["34caead642390a27","output_meme"],["7c5ed654bd70e4b5","output_fimo"],["59e21c1ec43960de","output_extractGenomicDNA"],["cce41d830f1a2319","output_fourColorPlot"],["10a14f60d05bf206","output_tagPileup"]]');
 
-insert into user (version, username, email, api_key) values (0, "galaxy-cegr", "cegr@psu.edu", "0YG9B2LPLLDPP4B1LQQ0BB1LH75L8A3P");
+insert into pipeline (version, user_id, workflow_id, name, pipeline_version, steps) values (0, 350, "ed30e974065fb948", "single", "001", '[["input1","output_fastqRead1"],["4907c51e3aa6e860","output_fastqc"],["6cd87e7183cf8adf","output_markDuplicates"],["0aaceadffb66386e","output_samtoolFilter"],["f277bfdf7db1fd92","output_peHistogram"],["c0add05666cfe9e1","output_bamToScidx"],["afcb51f2c322d3e2","output_genetrack"],["5a48aaf4773da987","output_bedtoolsIntersect"],["551cc07dc795d77f","output_cwpair2"],["b1fe447033b4153f","output_extractGenomicDNA"],["63c2821ce20bf810","output_extractGenomicDNA"],["322a184133da80c8","output_repeatMasker"],["3306623a89c4f2b1","output_repeatMasker"],["e326ee6dfab5e747","output_meme"],["21777a7abfcac6bb","output_fimo"],["1a8acd3a033f4266","output_fourColorPlot"],["52e892817bc83e2b","output_tagPileup"]]');
 
-insert into item_type_category (version, name, super_category) values (0, "Antibody", "ANTIBODY");
-insert into item_type_category (version, name, super_category) values (0, "Equipment", "OTHER");
-insert into item_type_category (version, name, super_category) values (0, "General Supply", "OTHER");
+
+
+
 insert into item_type_category (version, name, super_category) values (0, "Chemical", "OTHER");
 insert into item_type_category (version, name, super_category) values (0, "Enzyme", "OTHER");
+insert into item_type_category (version, name, super_category) values (0, "Reagent", "OTHER");
+insert into item_type_category (version, name, super_category) values (0, "Equipment", "OTHER");
+insert into item_type_category (version, name, super_category) values (0, "General Supply", "OTHER");
 insert into item_type_category (version, name, super_category) values (0, "Cell Stock", "TRACED_SAMPLE");
 insert into item_type_category (version, name, super_category) values (0, "Biosample", "TRACED_SAMPLE");
-insert into item_type_category (version, name, super_category) values (0, "Reagent", "OTHER");
+insert into item_type_category (version, name, super_category) values (0, "Sample Pool", "SAMPLE_POOL");
 
 update sequence_run set status = "ANALYZING" where status = "RUN";
+
+delete from chores where name = "PipelineSteps";
 
                                                                        

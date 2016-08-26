@@ -154,7 +154,7 @@ class SequenceRunService {
             throw new SequenceRunException(message: "Sequence run not found!")
         }        
  
-        if (run.status == RunStatus.RUN) {
+        if (run.status == RunStatus.ANALYZING) {
              throw new SequenceRunException(message: "Sequence run has already been submitted!")
         }
         

@@ -21,7 +21,7 @@
 
 <div>
     <label for="sharedItem">Shared Item Types (multi-select)</label>
-    <g:select name="sharedItemTypeIds" id="sharedItem" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.OTHER}.list(sort:'name')}" optionKey="id" value="${sharedItemTypeIds}" multiple="multiple" size="10"/>
+    <g:select name="sharedItemTypeIds" id="sharedItem" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.OTHER}.list(sort:'name')}" optionKey="id" value="${sharedItemTypeIds}" multiple="multiple" size="10" style="width: 200px"/>
 </div>
 
 <h4>Traced Samples</h4>

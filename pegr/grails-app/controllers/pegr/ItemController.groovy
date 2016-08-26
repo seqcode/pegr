@@ -11,23 +11,27 @@ class ItemController {
     def barcodeService
     
     def index(){
-        redirect(action: "list", params: [typeId: 1])
+        redirect(action: "list", params: [categoryId: 1])
     }
     
-    def list(Integer max, Long typeId) {
+    def list(Integer max, Long categoryId) {
         params.max = Math.min(max ?: 15, 100)
-        if(!typeId) {
-            typeId = 1
+        if(!categoryId) {
+            categoryId = 1
         }
-        def itemType = ItemType.get(typeId)
-        switch (itemType.category.superCategory) {
+        def category = ItemTypeCategory.get(categoryId)
+        def itemTypes = ItemType.findByCategory(category)
+        switch (category.superCategory) {
             case ItemTypeSuperCategory.ANTIBODY:
                 flash.message = flash.message
                 redirect(controller: "antibody", action: "list", params: params)
                 break
             default:
-                def items = Item.where{ type.id == typeId }
-                [itemList: items.list(params), itemCount: items.count(), currentType: itemType]
+                def items = Item.where { type.category.id == categoryId }
+                [itemList: items.list(params), 
+                 itemCount: items.count(), 
+                 currentCategory: category,
+                itemTypes: itemTypes]
         }
     }
     

@@ -18,6 +18,10 @@ class SequenceRun {
         return SequencingExperiment.where{sequenceRun == this}.list()
     }
     
+    List getCohorts() {
+        return SequencingCohort.findAllByRun(this)
+    }
+    
     static constraints = {
 		note nullable: true, blank: true
 		fcId nullable: true, blank: true

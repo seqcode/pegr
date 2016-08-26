@@ -121,4 +121,14 @@ class ProjectService {
         return authorized
     }
     
+    @Transactional
+    def saveNotes(Long projectId, String notes) {
+        def project = Project.get(projectId)
+        if (project) {
+            project.notes = notes
+            project.save(failOnError: true)
+        } else {
+            throw new ProjectException(message: "Project not found!")
+        }
+    }
 }

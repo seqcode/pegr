@@ -94,7 +94,7 @@ databaseChangeLog = {
 
 	changeSet(author: "dus73 (generated)", id: "1472145065343-7") {
 		addColumn(tableName: "pipeline") {
-			column(name: "steps", type: "varchar(255)") {
+			column(name: "steps", type: "longtext") {
 				constraints(nullable: "false")
 			}
 		}

@@ -12,55 +12,52 @@ class ReportService {
     def alignmentStatsService
     
     def fetchRunStatus(SequenceRun run) {
-        def steps
-
-        try {
-            def stepsStr = Chores.findByName("PipelineSteps")*.value
-            def jsonSlurper = new JsonSlurper()
-            steps = jsonSlurper.parseText(stepsStr)
-        } catch (Exception e) {
-            throw new ReportException(message: "Pipeline steps are not properly defined!")
-        }
-
-        def results = [:] 
+        def results = [:] // key: pipeline, value: runStatusDTO
 
         run.experiments.each { experiment ->
-            // read type
-            if (!experiment.readType) {
-                throw new ReportException(message: "Read type is not defined for sample ${experiment.sample.id}!")
-            }
-            def readType = experiment.readType.shortName
-            if (!steps.containsKey(readType)) {
-                throw new ReportException(message: "Pipeline steps are not defined for read type ${readType}!")
-            }
-
-            def sampleStatus = new SampleStatusDTO(sampleId: experiment.sample.id,
-                                        alignmentStatusList: [])
-            
             experiment.alignments.each { alignment ->
+                def steps
+                if (results.containsKey(alignment.pipeline)) {
+                    steps = results[alignment.pipeline].steps
+                } else {
+                    try {
+                        def jsonSlurper = new JsonSlurper()
+                        steps = jsonSlurper.parseText(alignment.pipeline.steps)
+                        results[alignment.pipeline] = new RunStatusDTO (steps: steps,
+                                                                        sampleStatusList: [])
+                    } catch (Exception e) {
+                        throw new ReportException(message: "Pipeline steps are not properly defined!")
+                    }
+                }
+                    
+                // create a new alignment status                    
                 def alignmentStatusDTO = new AlignmentStatusDTO( 
                     alignmentId: alignment.id,
                     historyId: alignment.historyId,
                     genome: alignment.genome.name,
                     date: alignment.date,
                     status: [])
-                def analysis = Analysis.findAllByAlignment(alignment)
-                steps[readType].eachWithIndex { step, index ->
+                
+                // iterate through the analysis
+                def analysis = Analysis.findAllByAlignment(alignment)   
+                steps.eachWithIndex { step, index ->
                     if (analysis.find {it.stepId == step[0]}) {
                         alignmentStatusDTO.status[index] = true
                     } else {
                         alignmentStatusDTO.status[index] = false
                     }                  
                 }
-                sampleStatus.alignmentStatusList << alignmentStatusDTO
-            }
-            
-            if (results.containsKey(readType)) {
-                results[readType].sampleStatusList << sampleStatus
-            } else {
-                
-                results[readType] = new RunStatusDTO(steps: steps[readType],
-                                                    sampleStatusList: [sampleStatus])
+
+                // find the sample in that pipeline
+                def sampleStatus = results[alignment.pipeline].sampleStatusList.find {it.sampleId == experiment.sample.id}
+                if (!sampleStatus) {
+                    sampleStatus = new SampleStatusDTO(sampleId: experiment.sample.id,
+                                                       cohort: experiment.cohort,
+                                    alignmentStatusList: [alignmentStatusDTO])
+                    results[alignment.pipeline].sampleStatusList << sampleStatus
+                } else {    
+                    sampleStatus.alignmentStatusList << alignmentStatusDTO
+                }
             }
         }
         return results

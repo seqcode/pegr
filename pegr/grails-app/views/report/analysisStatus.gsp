@@ -9,7 +9,7 @@
     </g:if>
     <br>
     <ul class="nav nav-tabs">
-        <li id="RUN"><g:link controller="report" action="analysisStatus" params="[requestedStatus: 'RUN']">Analyzing</g:link></li>
+        <li id="RUN"><g:link controller="report" action="analysisStatus" params="[requestedStatus: 'ANALYZING']">Analyzing</g:link></li>
         <li id="COMPLETED"><g:link controller="report" action="analysisStatus" params="[requestedStatus: 'COMPLETED']">Completed</g:link></li>
     </ul>
     <div class="table-responsive">

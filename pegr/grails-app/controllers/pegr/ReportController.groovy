@@ -27,7 +27,7 @@ class ReportController {
      */
     def analysisStatus(Integer max, String requestedStatus) {
         if (requestedStatus == null || requestedStatus == "") {
-            requestedStatus = RunStatus.RUN
+            requestedStatus = RunStatus.ANALYZING
         }
         params.max = Math.min(max ?: 15, 100)
         if (!params.sort) {
@@ -46,8 +46,7 @@ class ReportController {
         } else {
             try {
                 def runStatus = reportService.fetchRunStatus(run)
-                def reports = SummaryReport.findAllByRun(run)
-                [runStatus: runStatus, run: run, reports: reports]
+                [runStatus: runStatus, run: run]
             } catch (ReportException e) {
                 flash.message = e.message
                 redirect(action: "analysisStatus")
@@ -192,6 +191,7 @@ class RunStatusDTO {
 
 class SampleStatusDTO {
     Long sampleId
+    SequencingCohort cohort
     List alignmentStatusList
 }
 

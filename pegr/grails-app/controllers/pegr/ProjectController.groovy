@@ -95,7 +95,11 @@ class ProjectController {
             def projectEditAuth = projectService.projectEditAuth(currentProject)
             def sampleEditAuth = projectService.sampleEditAuth(currentProject)
             def replicates = replicateService.getReplicates(currentProject)
-            [project: currentProject, projectUsers: projectUsers, replicates: replicates, projectEditAuth: projectEditAuth, sampleEditAuth: sampleEditAuth]
+            [project: currentProject, 
+             projectUsers: projectUsers, 
+             replicates: replicates, 
+             projectEditAuth: projectEditAuth, 
+             sampleEditAuth: sampleEditAuth]
         } else {
             flash.message = "Project not found!"
             redirect(action: "index")
@@ -184,6 +188,11 @@ class ProjectController {
             flash.message = e.message
             redirect(action: "addNewSamples", params:[projectId: command.projectId, assayId: command.assayId])
         }
+    }
+    
+    def saveNotesAjax(Long projectId, String notes) {
+        projectService.saveNotes(projectId, notes)
+        render "success"
     }
     
 }

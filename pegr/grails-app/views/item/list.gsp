@@ -11,7 +11,7 @@
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
-    <h4>${currentType?.name}</h4>
+    <h4>${currentCategory?.name}</h4>
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>

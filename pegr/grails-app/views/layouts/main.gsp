@@ -23,7 +23,7 @@
                         <li id="nav-inventory"><g:link controller="item">Inventory</g:link></li>
                         <li id="nav-protocols"><g:link controller="protocol">Protocols</g:link></li>
                         <li id="nav-experiments"><g:link controller="protocolInstanceBag" action="processingBags">Experiments</g:link></li>
-                        <li id="nav-analysis"><g:link controller="report" action="analysisStatus" params="[requestedStatus:'RUN']">Analysis</g:link></li>
+                        <li id="nav-analysis"><g:link controller="report" action="analysisStatus" params="[requestedStatus:'ANALYZING']">Analysis</g:link></li>
                         <li id="nav-bioinformatics"><g:link controller="bioinformatics">Bioinfomatics</g:link></li>
                         <li id="nav-admin"><g:link controller="admin" action="index">Admin</g:link></li>
                     </sec:ifAnyGranted>

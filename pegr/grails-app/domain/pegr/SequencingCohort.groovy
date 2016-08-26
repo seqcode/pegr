@@ -5,6 +5,10 @@ class SequencingCohort {
     SequenceRun run
     SummaryReport report
     
+    String toString() {
+        run.id + "_" + project.name
+	}
+    
     List getSamples() {
         return SequencingExperiment.findAllByCohort(this).collect { it.sample }.toList()
     }

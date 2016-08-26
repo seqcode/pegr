@@ -1,6 +1,6 @@
 <div class="form-group">
     <label for="type">Type</label>
-    <g:select id="type" name="typeId" optionKey="id" from="${pegr.ItemType.where{if (currentSuperCategory) category.superCategory==currentSuperCategory}.list()}" value="${currentType?.id}" noSelection="['': '-- choose --']" required="required"/>
+    <g:select id="type" name="typeId" optionKey="id" from="${pegr.ItemType.where{if (currentSuperCategory) category.superCategory==currentSuperCategory}.list()}" value="${currentType?.id}" noSelection="['': '-- choose --']" required="required" style="width:200px"/>
 </div>        
 <div class="form-group">
     <label for="barcode">Barcode</label>

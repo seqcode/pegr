@@ -39,12 +39,11 @@
     </div>
     <script>
         $(function(){
-            $("#nav-reports").addClass("active");
+            $(".nav-reports").addClass("active");
             $.ajax({url: "/pegr/report/fetchDataForReportAjax/${reportId}", success: function(result) {
                 $("#details").html(result)
             }});
         });
-        $(".nav-reports").addClass("active");
     </script>
 </body>
 </html>

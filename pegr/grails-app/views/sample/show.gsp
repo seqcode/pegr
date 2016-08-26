@@ -5,6 +5,10 @@
 <head>
     <meta name="layout" content="main">
     <title>Sample</title>
+    <asset:javascript src="meme.js"/>
+    <asset:stylesheet href="meme.css"/>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
 </head>
 <body>
     <div class="container-fluid">

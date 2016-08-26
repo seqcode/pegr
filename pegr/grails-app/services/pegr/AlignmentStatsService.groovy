@@ -207,29 +207,46 @@ class AlignmentStatsService {
         }
         return updatedProperties
     }
+
+    def queryDatasetsUri(List jsonList, String type) {
+        def data = jsonList?.find { d -> d.type == type }?.uri
+        return data
+    }
+    
     
     def queryDatasetsUri(String datasets, String type) {
-        def result = queryDatasetsUriList(datasets, type)
-        if (result && result.size() > 0) {
-            return result[0]
+        def jsonList = utilityService.parseJson(datasets)
+        def result = queryDatasetsUri(jsonList, type)
+    } 
+
+    def queryDatasetsUriList(List jsonList, String type) {
+        def data = jsonList ? jsonList.findAll { d -> d.type == type }.collect { it.uri }.toList() : []
+        return data
+    }
+    
+    def queryDatasetsUriList(String datasets, String type) {
+        def jsonList = utilityService.parseJson(datasets)
+        def results = queryDatasetsUriList(jsonList, type)
+        return results
+    } 
+    
+    def queryDatasetsUriWithRead(List datasets, List statistics, String type) {
+        def readNum 
+        if (statistics) {
+            statistics.each { map ->
+                if (map.containsKey("read")) {
+                    readNum = map["read"]
+                }
+            }
+        }
+
+        def data = queryDatasetsUri(datasets, type)
+        if (data) {
+            return [read: "read${readNum}", data: data]
         } else {
             return null
         }
-    } 
-    
-    def queryDatasetsUriList(String datasets, String type) {
-        def jsonList
-        try {
-            def jsonSlurper = new JsonSlurper()
-            jsonList = jsonSlurper.parseText(datasets)
-        } catch(Exception e) {   
-        }
-        if (jsonList) {
-            def data = jsonList.findAll { d -> d.type == type }.collect { it.uri }
-            return data.toList()
-        }
-        return []
-    } 
+    }
     
     def queryDatasetsUriWithRead(String datasets, String statistics, String type) {
         def readNum = utilityService.queryJson(statistics, "read")

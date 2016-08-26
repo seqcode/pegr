@@ -7,12 +7,12 @@
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
-    <h3><g:link controller="sequenceRun" action="show" id="${run.id}">Run ${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if></g:link><small><span class="label label-default">${run.status}</span></small> </h3>
+    <h3><g:link controller="sequenceRun" action="show" id="${run.id}">Run ${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if></g:link><small><span class="label label-default" id="run-status">${run.status}</span></small> </h3>
     <g:each in="${runStatus}">
         <div class="pull-right"><span class="label label-success"> </span> Data received; <span class="label label-danger"> </span> No data. Click to see the step's category.</div>
         <div>
             <table class="table">
-                <caption>Pipeline: ${it.key.name}, versin: ${it.key.pipelineVersion} (workflow ID: ${it.key.workflowId}) </caption>
+                <caption><h4>Pipeline: ${it.key.name}, versin: ${it.key.pipelineVersion} (workflow ID: ${it.key.workflowId}) <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link controller="pipelineAdmin" action="show" id="${it.key.id}" class="edit">Manage</g:link></sec:ifAnyGranted></h4></caption>
                 <thead>
                     <tr>
                         <th>Sample</th>
@@ -52,12 +52,25 @@
         </div>
     </g:each>
     
-    <h3>Sequencing Cohorts <g:link action="createReports" params="[runId: run.id]" class="edit">Generate Reports</g:link></h3>
-    <ul>
-        <g:each in="${run.cohorts}">
-            <li>${it}<g:if test="${it.report}"><g:link controller="report" action="show" id="${it.report.id}">Report: ${it.report.name} </g:link></g:if></li>
+    <h3>Reports</h3>
+    <table class="table">
+        <thead>
+            <th>Sequencing Cohort</th>
+            <th>Report</th>
+            <th>Status</th>
+            <th>User</th>
+            <th>Date</th>
+            <th></th>
+        </thead>
+        <tbody>
+        <g:each in="${run.cohorts}" var="cohort">
+            <tr id="cohort-${cohort.id}">
+                <g:render template="/report/reportRow" model="[cohort: cohort]"></g:render>
+            </tr>
         </g:each>
-    </ul>
+        </tbody>
+    </table>
+    <br>
     <script>
         $(".confirm").confirm({text: "All data in this alignment will be deleted. Are you sure you want to delete this alignment?"});
         $(".nav-status").addClass("active");
@@ -65,8 +78,29 @@
                 
         function completeRun() {
             $.ajax({url: "/pegr/report/completeRunAjax/${run.id}", success: function(result) {
-                $("#runStatus").html(result)
+                $("#runStatus").html(result);
             }});
+        }
+        
+        function createReport(cohortId) {
+            $.ajax({ url: "/pegr/report/createReportForCohortAjax?cohortId=" + cohortId, success: function(result) {
+                $("#cohort-"+cohortId).html(result);
+            }});
+            $('.confirm-remove-report').confirm({text: "Are you sure you want to delete this report?"});
+        }
+        
+        function removeReport(cohortId) {
+            $.confirm({
+                text: "Are you sure you want to delete this report?",
+                confirm: function() {
+                    $.ajax({ url: "/pegr/report/deleteReportForCohortAjax?cohortId=" + cohortId, success: function(result) {
+                        $("#cohort-"+cohortId).html(result);
+                    }});  
+                },
+                cancel: function() {
+                    // nothing to do
+                }
+            });
         }
     </script>
 </body>

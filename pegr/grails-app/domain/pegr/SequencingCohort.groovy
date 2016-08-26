@@ -13,6 +13,10 @@ class SequencingCohort {
         return SequencingExperiment.findAllByCohort(this).collect { it.sample }.toList()
     }
     
+    List getExperiments() {
+        return SequencingExperiment.findAllByCohort(this)
+    }
+    
     static constraints = {
         project unique: "run"
         report nullable: true

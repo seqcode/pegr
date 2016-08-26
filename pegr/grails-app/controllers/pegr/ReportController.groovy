@@ -6,18 +6,16 @@ class ReportController {
     def springSecurityService
     def reportService
     
-    def createReports(Long runId) {
-        def run = SequenceRun.get(runId)
-        if (!run) {
-            render(view:"/404")
-            return
-        }
-        try {
-            reportService.createSummaryReportsForRun(run)
-        } catch(ReportException e) {
-            flash.message = e.message
-        }
-        redirect(action:"runStatus", params: [runId: runId])
+    def createReportForCohortAjax(Long cohortId) {
+        def cohort = SequencingCohort.get(cohortId)
+        reportService.createReportForCohort(cohort)
+        render template: "/report/reportRow", model: [cohort: cohort]
+    }
+    
+    def deleteReportForCohortAjax(Long cohortId) {
+        def cohort = SequencingCohort.get(cohortId)
+        reportService.deleteReportForCohort(cohort)
+        render template: "/report/reportRow", model: [cohort: cohort]
     }
     
     /*
@@ -82,9 +80,10 @@ class ReportController {
             render(view: "/404")
             return
         }
-        def currentProject = report.project
+
+        def currentProject = report.cohort?.project
         def projectUsers = ProjectUser.where { project == currentProject}.list()
-        [project: currentProject, projectUsers: projectUsers, reportId: id]
+        [project: currentProject, projectUsers: projectUsers, report: report]
     }
     
     def fetchDataForReportAjax(Long id) {

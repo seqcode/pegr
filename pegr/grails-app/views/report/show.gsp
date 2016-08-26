@@ -21,7 +21,9 @@
         <div class="message" role="status">${flash.message}</div>
     </g:if>
     <div>
-        <h2>Summary Report</h2>
+        <h2>Summary Report ${report.name} <small><span class="label label-default">${report.status}</span></small></h2>
+        <i>Edit by ${report.user} on ${report.date}</i>
+        <p>${report.note}</p>
         <g:if test="${project}">
             <h3>Project: <g:link controller="project" action="show" id="${project.id}">${project?.name}</g:link></h3>
             <p>Description: ${project?.description}</p>
@@ -40,7 +42,7 @@
     <script>
         $(function(){
             $(".nav-reports").addClass("active");
-            $.ajax({url: "/pegr/report/fetchDataForReportAjax/${reportId}", success: function(result) {
+            $.ajax({url: "/pegr/report/fetchDataForReportAjax/${report.id}", success: function(result) {
                 $("#details").html(result)
             }});
         });

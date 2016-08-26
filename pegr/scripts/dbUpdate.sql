@@ -107,6 +107,7 @@ insert into pipeline (version, user_id, workflow_id, name, pipeline_version, ste
 
 select *  from pipeline;
 update sequence_alignment set pipeline_id = 2;
+delete from pipeline where name = "Galaxy";
 
 insert into item_type_category (version, name, super_category) values (0, "Chemical", "OTHER");
 insert into item_type_category (version, name, super_category) values (0, "Enzyme", "OTHER");

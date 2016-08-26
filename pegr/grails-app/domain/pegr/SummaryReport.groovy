@@ -11,4 +11,9 @@ class SummaryReport {
     static constraints = {
         note nullable: true
     }
+    
+    SequencingCohort getCohort() {
+        return SequencingCohort.findByReport(this)
+    }
+    
 }

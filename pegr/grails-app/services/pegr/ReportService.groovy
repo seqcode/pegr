@@ -10,6 +10,7 @@ class ReportService {
 
     def utilityService
     def alignmentStatsService
+    def springSecurityService
     
     def fetchRunStatus(SequenceRun run) {
         def results = [:] // key: pipeline, value: runStatusDTO
@@ -82,31 +83,37 @@ class ReportService {
      * sequence run. And link the preferred alignments to the corresponding summary reports. 
      */
     @Transactional
-    def createSummaryReportsForRun(SequenceRun run) {
-        // create reports
-        def reports = []
-        run.experiments.each { experiment ->
-            def projects = experiment.sample?.projects.sort { it.id }
-            if (projects && projects.size() > 0) {
-                def project = projects.first()
-                def report = reports.find {it.project == project}
-                if (!report) {
-                    report = SummaryReport.findByRunAndProject(run, project)
-                    if (!report) {
-                        report = new SummaryReport(run: run, project: project)
-                        report.save()
-                    }
-                    reports << report
+    def createReportForCohort(SequencingCohort cohort) {
+        if (cohort.report) {
+            throw new ReportException(message: "A report has already been created for this cohort!")
+        }
+        def now = new Date()
+        def user = springSecurityService.currentUser
+        def report = new SummaryReport(name: cohort.toString(), status: ReportStatus.DRAFT, date: now, type: ReportType.AUTOMATED, user: user)
+        if(!report.save()) {
+            throw new ReportException(message: "Error saving the report!")
+        }
+        cohort.experiments.each { experiment ->
+            experiment.alignments.each { alignment ->
+                if (alignment.isPreferred) {
+                    new ReportAlignments(report: report, alignment: alignment).save()
                 }
-                experiment.alignments.each { alignment ->
-                    if (alignment.isPreferred) {
-                        new ReportAlignments(report: report, alignment: alignment).save()
-                    }
-                } 
-            } else {
-                throw new SequenceRunException(message: "Sample ${experiment.sample?.id} is not linked to a project yet!")
-            }
-        }        
+            } 
+        }
+        cohort.report = report
+        cohort.save()
+    }
+    
+    @Transactional
+    def deleteReportForCohort(SequencingCohort cohort) {
+        def report = cohort.report
+        if (!report) {
+            throw new ReportException(message: "No report found!")
+        }
+        cohort.report = null
+        cohort.save()
+        ReportAlignments.executeUpdate("delete from ReportAlignments where report=:report", [report: report])
+        report.delete()
     }
     
     

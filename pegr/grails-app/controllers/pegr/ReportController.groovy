@@ -52,9 +52,14 @@ class ReportController {
         }
     }
     
-    def completeRunAjax(Long runId) {
-        reportService.completeRun(runId)
-        render "Completed"
+    def updateRunStatusAjax(Long runId, String status) {
+        reportService.updateRunStatus(runId, status)
+        render status 
+    }
+     
+    def updateReportStatusAjax(Long reportId, String status) {
+        reportService.updateReportStatus(reportId, status)
+        render status 
     }
     
     def deleteAlignment(Long alignmentId, Long runId) {
@@ -67,10 +72,11 @@ class ReportController {
         redirect(action: "runStatus", params: [runId: runId])
     }
 
-    def all(Integer max) {
+    def automatedReportList(Integer max) {
         params.max = Math.min(max ?: 25, 100)
-        def reports = SummaryReport.list(params)
-        def totalCount = SummaryReport.count()
+        def query = SummaryReport.where { type == ReportType.AUTOMATED }
+        def reports = query.list(params)
+        def totalCount = query.count()
         [reports: reports, totalCount: totalCount]
     }
     

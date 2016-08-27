@@ -135,7 +135,7 @@ class UtilityService {
         def jsonSlurper = new JsonSlurper()
         def json
         try {
-            json = jsonSlurper.parseText(jsonStr)
+            json = jsonSlurper.parseText(s)
         } catch(Exception e) {   
         }
         return json
@@ -149,7 +149,6 @@ class UtilityService {
      */
     def queryJson(String jsonStr, List keys) {
         def json = parseJson(jsonStr)
-
         def result = [:]
         keys.each { key ->
             result[key] = null

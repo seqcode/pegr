@@ -1,7 +1,7 @@
 <html>
 <head>
   <title>Samples</title> 
-  <meta name="layout" content="main"/>
+  <meta name="layout" content="analysis"/>
 </head>
 <body>
     <div class="container-fluid">
@@ -16,7 +16,7 @@
         </div>
     </div>
     <script>
-    $("#nav-metadata").addClass("active");
+        $(".nav-datasets").addClass("active");
     </script>
 </body>
 </html>

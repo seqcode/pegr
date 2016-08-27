@@ -7,7 +7,17 @@
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
-    <h3><g:link controller="sequenceRun" action="show" id="${run.id}">Run ${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if></g:link><small><span class="label label-default" id="run-status">${run.status}</span></small> </h3>
+    <h3>
+        <g:link controller="sequenceRun" action="show" id="${run.id}">Run ${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if></g:link>
+        <small>
+            <span id="run-status-show" class="label label-default">${run.status}</span> 
+            <span id="run-status-select" style="display:none">
+                <g:select name="runStatus" from="${pegr.RunStatus}" value="${run.status}"></g:select>
+                <button id="run-status-save" class="btn btn-primary">Save</button>
+                <button id="run-status-cancel" class="btn btn-default">Cancel</button>
+            </span>
+        </small> 
+    </h3>
     <g:each in="${runStatus}">
         <div class="pull-right"><span class="label label-success"> </span> Data received; <span class="label label-danger"> </span> No data. Click to see the step's category.</div>
         <div>
@@ -75,12 +85,28 @@
         $(".confirm").confirm({text: "All data in this alignment will be deleted. Are you sure you want to delete this alignment?"});
         $(".nav-status").addClass("active");
         $('[data-toggle="popover"]').popover(); 
-                
-        function completeRun() {
-            $.ajax({url: "/pegr/report/completeRunAjax/${run.id}", success: function(result) {
-                $("#runStatus").html(result);
-            }});
-        }
+        
+        $("#run-status-show").click(function(){
+            $("#run-status-show").hide();
+            $("#run-status-select").show();
+        });
+        
+        $("#run-status-save").click(function(){
+            var status = $("#run-status-select option:selected").text();
+            $.ajax({ url: "/pegr/report/updateRunStatusAjax?runId=${run.id}&status=" + status,
+                success: function(result) {
+                    $("#run-status-show").text(result);
+                    $("#run-status-select").val(result);
+                    $("#run-status-show").show();
+                    $("#run-status-select").hide();
+                }                
+            });
+        });
+        
+        $("#run-status-cancel").click(function(){
+            $("#run-status-show").show();
+            $("#run-status-select").hide();
+        });
         
         function createReport(cohortId) {
             $.ajax({ url: "/pegr/report/createReportForCohortAjax?cohortId=" + cohortId, success: function(result) {

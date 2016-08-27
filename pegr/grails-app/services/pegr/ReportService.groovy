@@ -416,5 +416,38 @@ class ReportService {
         }        
         return result
     }
+    
+    @Transactional
+    def updateRunStatus(Long runId, String statusStr) {
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            throw new ReportException(message: "Sequence run not found!")
+        }
 
+        try {
+            RunStatus status = statusStr as RunStatus
+            run.status = status
+            run.save()
+        } catch(Exception e) {
+            throw new ReportException(message: "Wrong run status!")
+        }
+
+    } 
+    
+    @Transactional
+    def updateReportStatus(Long reportId, String statusStr) {
+        def report = SummaryReport.get(reportId)
+        if (!report) {
+            throw new ReportException(message: "Report not found!")
+        }
+
+        try {
+            ReportStatus status = statusStr as ReportStatus
+            report.status = status
+            report.save()
+        } catch(Exception e) {
+            throw new ReportException(message: "Wrong report status!")
+        }
+
+    } 
 }

@@ -157,13 +157,14 @@ class ExperimentDTO {
     Long totalReads
     Long adapterDimerCount
     Map fastqc
+    Map fastq
     List alignments
 }
 
 class AlignmentDTO {
     Long id
     String genome
-    
+    String bam
     Long mappedReads
     Long uniquelyMappedReads
     Long dedupUniquelyMappedReads

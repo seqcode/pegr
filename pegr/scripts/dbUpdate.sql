@@ -99,6 +99,7 @@ delete from summary_report
 
 insert into user (version, account_expired, account_locked, enabled, password, password_expired, username, email, api_key) values (0, false, false, false, "$2a$10$ErWZYV6RfjF0ST8YQ43ImetX6pNEUPXOw1hGA.T092tfSBgT2t2kC",false, "galaxy-cegr", "cegr@psu.edu", "0YG9B2LPLLDPP4B1LQQ0BB1LH75L8A3P");
 
+update analysis set user_id = 350 where user_id is null;
 
 insert into pipeline (version, workflow_id, name, pipeline_version, steps) values (0, "b266c9aed69b2935","paired", "001", '[["input2","output_fastqRead2"],["input1","output_fastqRead1"],["ad583fa93b5fed87","output_fastqc"],["96dd6dd693e9a033","output_fastqc"],["71175efa22558b3b","output_markDuplicates"],["b868e18d758bba8a","output_samtoolFilter"],["6f4fa8324bf2747b","output_peHistogram"],["89b5528676fe3fae","output_bamToScidx"],["b24b58817eeee721","output_genetrack"],["072cb5142f83033f","output_bedtoolsIntersect"],["f6186cdbed51a4cb","output_cwpair2"],["cdb3593ee534882e","output_extractGenomicDNA"],["d9078eb5a65df1e4","output_extractGenomicDNA"],["96761ccd61321ce3","output_repeatMasker"],["c36cbb3fa155d5b4","output_repeatMasker"],["34caead642390a27","output_meme"],["7c5ed654bd70e4b5","output_fimo"],["59e21c1ec43960de","output_extractGenomicDNA"],["cce41d830f1a2319","output_fourColorPlot"],["10a14f60d05bf206","output_tagPileup"]]');
 

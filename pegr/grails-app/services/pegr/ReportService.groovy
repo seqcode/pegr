@@ -202,19 +202,15 @@ class ReportService {
     }
     
     def getExperimentDTO(SequencingExperiment experiment) {
-        def fastqc
-        try {
-            def jsonSlurper = new JsonSlurper()
-            fastqc = jsonSlurper.parseText(experiment.fastqcReport)
-        } catch (Exception e) {
-            
-        }
+        def fastqc = utilityService.parseJson(experiment.fastqcReport)
+        def fastq = utilityService.parseJson(experiment.fastqFile)
         return new ExperimentDTO(id: experiment.id,
                               runId: experiment.sequenceRun?.id,
                               oldRunNum: experiment.sequenceRun?.runNum,
                               totalReads: experiment.totalReads,
                               adapterDimerCount: experiment.adapterDimerCount,
                               fastqc: fastqc,
+                              fastq: fastq,
                               alignments: []
                              )
     }
@@ -222,6 +218,7 @@ class ReportService {
     def getAlignmentDTO(SequenceAlignment alignment) {
         def alignmentDTO = new AlignmentDTO(id: alignment.id,
                 genome: alignment.genome,
+                bam: alignment.bamFile,
                 mappedReads: alignment.mappedReads,
                 uniquelyMappedReads: alignment.uniquelyMappedReads,
                 dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,

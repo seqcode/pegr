@@ -21,7 +21,11 @@ class AlignmentStatsService {
         }
         
         // find the pipeline by user and workflowId
-        def pipeline = Pipeline.findByUserAndWorkflowId(apiUser, data.workflowId)
+        def pipeline = Pipeline.findByWorkflowId(data.workflowId)
+        
+        if (!pipeline) {
+            throw new AlignmentStatsException(message: "Pipeline not found for workflow ID ${data.workflowId}!")
+        }
         
         // find the sequencing experiment by runId and sampleId
         def experiment = SequencingExperiment.where {sequenceRun.id == data.run && sample.id == data.sample}.find()
@@ -56,7 +60,7 @@ class AlignmentStatsService {
         def analysis = findOldAnalysis(data, theAlignment)        
         if (analysis) {
             // throw an exception if a different user tries to overwrite the analysis
-            if (analysis.user != apieUser) {
+            if (analysis.user != apiUser) {
                 throw new AlignmentStatsException(message: "Analysis cannot be overwritten by a different user!")
             }
             analysis.with {

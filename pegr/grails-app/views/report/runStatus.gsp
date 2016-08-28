@@ -68,7 +68,6 @@
             <th>Sequencing Cohort</th>
             <th>Report</th>
             <th>Status</th>
-            <th>User</th>
             <th>Date</th>
             <th></th>
         </thead>

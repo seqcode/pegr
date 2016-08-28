@@ -4,7 +4,6 @@ class SummaryReport {
     ReportType type
     String name
     Date date
-    User user
     ReportStatus status
     String note
     

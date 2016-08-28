@@ -31,7 +31,7 @@
             </span>
             </small>
         </h2>
-        <i>Edit by ${report.user} on ${report.date}</i>
+        <i>Edit on ${report.date}</i>
         <p>${report.note}</p>
         <g:if test="${project}">
             <h3>Project: <g:link controller="project" action="show" id="${project.id}">${project?.name}</g:link></h3>

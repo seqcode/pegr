@@ -1,7 +1,6 @@
 package pegr
 
 class Pipeline {
-    User user
     String workflowId
     String name
     String pipelineVersion
@@ -9,13 +8,14 @@ class Pipeline {
     String steps
     
     static constraints = {
-        workflowId unique: "user"
-        name unique: ["user", "pipelineVersion"]
+        workflowId unique: true
+        name unique: "pipelineVersion"
         note nullable: true, blank: true
         steps nullabel: true, blank: true
     }
     
     static mapping = {
+        steps sqlType: 'longtext'
         workflowId defaultValue: "N/A"
         pipelineVersion defaultValue: "0.0.0"
     }

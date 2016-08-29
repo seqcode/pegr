@@ -1,7 +1,6 @@
 <html>
 <head>
     <title>Workbench</title> 
-    <meta name="layout" content="main"/>
 </head>
 <body>
     <div class="container-fluid">
@@ -29,7 +28,6 @@
         </div>
     </div>
     <script>
-        $("#nav-bench").addClass("active");
         $("select").select2();
     </script>
 </body>

@@ -13,11 +13,11 @@ class AntibodyController {
     def list(Integer max) {
         params.max = Math.min(max ?: 15, 100)
         def category = ItemTypeCategory.findBySuperCategory(ItemTypeSuperCategory.ANTIBODY)
-        def itemType = ItemType.where {category.superCategory == ItemTypeSuperCategory.ANTIBODY}.find()
+        def itemTypes = ItemType.list(sort: "name")
         [objectList: Antibody.list(params), 
          objectCount: Antibody.count(), 
          currentCategory: category,
-         itemTypes: [itemType]
+         itemTypes: itemTypes
         ]
     }
     

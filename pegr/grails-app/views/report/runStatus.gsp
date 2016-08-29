@@ -61,7 +61,25 @@
             </table>
         </div>
     </g:each>
-    
+    <g:if test="${noResultSamples.size() > 0}">
+        <table class="table">
+            <caption><h4>No Results</h4></caption>
+            <thead>
+                <tr>
+                    <th>Sample</th>
+                    <th>Cohort</th>
+                </tr>
+            </thead>
+            <tbody>
+            <g:each in="${noResultSamples}" var="sample">
+                <tr>
+                    <td><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}</g:link></td>
+                    <td>${sample.cohort}</td>
+                </tr>
+            </g:each>
+            </tbody>
+        </table>
+    </g:if>
     <h3>Reports</h3>
     <table class="table">
         <thead>

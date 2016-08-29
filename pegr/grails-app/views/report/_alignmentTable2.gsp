@@ -29,9 +29,6 @@
                         </g:each>                    
                     </g:each>                    
             </g:each>              
-            <tr>
-                <td colspan="7"></td>
-            </tr>
         </tbody>
       </table>
 </div>

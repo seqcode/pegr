@@ -7,7 +7,7 @@
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
-    <table class="table table-striped">
+    <table class="table table-bordered">
         <thead>
             <tr>
                 <th>Summary Report</th>
@@ -27,9 +27,6 @@
                     <td>${report.date}</td>
                 </tr>
             </g:each>              
-            <tr>
-                <td colspan="4"></td>
-            </tr>
         </tbody>
       </table>
     <div class="pagination">

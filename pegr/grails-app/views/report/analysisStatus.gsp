@@ -13,7 +13,7 @@
         <li id="COMPLETED"><g:link controller="report" action="analysisStatus" params="[requestedStatus: 'COMPLETED']">Completed</g:link></li>
     </ul>
     <div class="table-responsive">
-    <table class="table table-striped">
+    <table class="table table-bordered">
         <thead>
             <tr>
                 <g:sortableColumn property="runNum" defaultOrder="desc" title="Run #"></g:sortableColumn>
@@ -35,9 +35,6 @@
                     <td><g:link controller="report" action="runStatus" params="[runId: run.id]">Sample Status</g:link></td>
                 </tr>
             </g:each>              
-            <tr>
-                <td colspan="5"></td>
-            </tr>
         </tbody>
       </table>
     </div>

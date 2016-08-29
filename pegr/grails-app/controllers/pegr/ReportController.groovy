@@ -44,7 +44,7 @@ class ReportController {
         } else {
             try {
                 def runStatus = reportService.fetchRunStatus(run)
-                [runStatus: runStatus, run: run]
+                [runStatus: runStatus.results, noResultSamples: runStatus.noResultSamples, run: run]
             } catch (ReportException e) {
                 flash.message = e.message
                 redirect(action: "analysisStatus")

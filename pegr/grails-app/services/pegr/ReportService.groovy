@@ -14,8 +14,12 @@ class ReportService {
     
     def fetchRunStatus(SequenceRun run) {
         def results = [:] // key: pipeline, value: runStatusDTO
-
+        def noResultSamples = []
         run.experiments.each { experiment ->
+            if (experiment.alignments.size() == 0) {
+                noResultSamples << new SampleStatusDTO(sampleId: experiment.sample.id, 
+                                                       cohort: experiment.cohort)
+            }
             experiment.alignments.each { alignment ->
                 def steps
                 if (results.containsKey(alignment.pipeline)) {
@@ -61,7 +65,7 @@ class ReportService {
                 }
             }
         }
-        return results
+        return [results: results, noResultSamples: noResultSamples]
     }
     
     @Transactional
@@ -175,6 +179,7 @@ class ReportService {
             
             experimentDTO.alignments << alignmentDTO
         }
+        sampleDTOs.sort { it.id }
         return sampleDTOs
     }
     

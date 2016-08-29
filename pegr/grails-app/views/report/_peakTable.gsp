@@ -35,9 +35,6 @@
                         </g:each>
                     </g:each>
             </g:each>      
-            <tr>
-                <td colspan="10"></td>
-            </tr>
         </tbody>
       </table>
 </div>

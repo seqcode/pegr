@@ -16,7 +16,7 @@ class SequencingExperiment {
     Long adapterDimerCount
 	
     List getAlignments() {
-        return SequenceAlignment.where{sequencingExperiment == this}.list()
+        return SequenceAlignment.where{sequencingExperiment == this}.list(sort: "date")
     }
     
     def getGenomes() {

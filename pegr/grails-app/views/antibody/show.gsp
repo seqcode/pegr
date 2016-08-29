@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>Workbench</title> 
-    <meta name="layout" content="main"/>
+    <meta name="layout" content="item"/>
 </head>
 <body>
     <div class="container-fluid">
@@ -47,7 +47,6 @@
         <g:render template="/antibody/details" model="[object: antibody]"></g:render>
     </div>
     <script>
-        $("#nav-bench").addClass("active");
         $(".confirm").confirm();
      </script>
 </body>

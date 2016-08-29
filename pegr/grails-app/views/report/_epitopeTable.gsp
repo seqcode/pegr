@@ -43,9 +43,6 @@
                         </tr>
                     </g:each>
             </g:each>
-            <tr>
-                <td colspan="8"></td>
-            </tr>
         </tbody>
       </table>
 </div>

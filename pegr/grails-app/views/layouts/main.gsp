@@ -4,7 +4,7 @@
 <head>
   <g:layoutHead/>
 </head>
-<body  onhashchange="${pageProperty(name:'body.onhashchange')}">	
+<body onhashchange="${pageProperty(name:'body.onhashchange')}">	
 	<nav class="navbar">
         <div class="container-fluid">
             <div class="navbar-header">

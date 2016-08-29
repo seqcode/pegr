@@ -20,7 +20,7 @@ class ItemController {
             categoryId = 1
         }
         def category = ItemTypeCategory.get(categoryId)
-        def itemTypes = ItemType.findByCategory(category)
+        def itemTypes = ItemType.list(sort: "name")
         switch (category.superCategory) {
             case ItemTypeSuperCategory.ANTIBODY:
                 flash.message = flash.message

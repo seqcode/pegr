@@ -1,12 +1,11 @@
 <html>
 <head>
     <title>Workbench</title> 
-    <meta name="layout" content="main"/>
 </head>
 <body>
 <div class="container-fluid">
      <ul class="nav nav-tabs">
-        <li><g:link action="list" params="[typeId: item?.type?.id]">List</g:link></li>
+        <li><g:link action="list" params="[categoryId: item?.type?.category?.id]">List</g:link></li>
         <li><g:link action="delete" params="[itemId:item?.id]" class="confirm">Delete</g:link></li>   
     </ul>
     <g:if test="${flash.message}">
@@ -83,7 +82,6 @@
         </ul>
     </g:if>
     <script>
-        $("#nav-bench").addClass("active");
         $(".confirm").confirm();
      </script>
 </div>

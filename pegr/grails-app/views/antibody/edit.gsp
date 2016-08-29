@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>Workbench</title> 
-    <meta name="layout" content="main"/>
+    <meta name="layout" content="item"/>
 </head>
 <body  onhashchange="getHash()">
 <div class="container-fluid">
@@ -20,10 +20,6 @@
         <g:submitButton class="btn btn-primary" name="save" value="Save"/>
         <g:link class="btn btn-default" action="show" id="${antibody.id}">Cancel</g:link>
     </g:form>
-
-    <script>
-        $("#nav-bench").addClass("active");
-     </script>
 </div>
 </body>
 </html>

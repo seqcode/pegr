@@ -126,10 +126,25 @@ class CsvConvertService {
         getPool(sample, results.sequenceRun, data.pool, data.volToPool, data.poolDate, data.quibitReading, data.quibitDilution, data.concentration, data.poolDilution)
 
         def seqExp = getSeqExperiment(sample, results.sequenceRun, data.rd1Start, data.rd1End, data.indexStart, data.indexEnd, data.rd2Start, data.rd2End)
+        
+        addExperimentToCohort(seqExp, project)
 
         def genomeBuilds = [data.genomeBuild1, data.genomeBuild2, data.genomeBuild3]
         saveRequestedGenome(genomeBuilds, sample, species) 
 
+    }
+    
+    def addExperimentToCohort(SequencingExperiment seqExp, Project project) {
+        if (!project || !seqExp.sequenceRun) {
+            return
+        }
+        def cohort = SequencingCohort.findByProjectAndRun(project, seqExp.sequenceRun)
+        if (!cohort) {
+            cohort = new SequencingCohort(project: project, run: seqExp.sequenceRun)
+            cohort.save()
+        }
+        seqExp.cohort = cohort
+        seqExp.save()
     }
     
     def addIndexToSample(Sample sample, String indexStr, String indexIdStr, boolean basicCheck) { 

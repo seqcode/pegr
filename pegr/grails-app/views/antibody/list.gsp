@@ -13,7 +13,7 @@
     </g:if>
     <h4>Antibody</h4>
     <div class="table-responsive">
-        <table class="table table-striped">
+        <table class="table table-bordered">
             <thead>
                 <tr>
                     <g:sortableColumn property="id" title="ID"></g:sortableColumn>
@@ -36,10 +36,7 @@
                         <td>${object.clonal}</td>
                         <td>${object?.igType}</td>
                     </tr>
-                </g:each>              
-                <tr>
-                    <td colspan="4"></td>
-                </tr>
+                </g:each>
             </tbody>
           </table>
     </div>

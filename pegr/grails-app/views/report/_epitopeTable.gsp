@@ -1,5 +1,5 @@
 <div class="table-responsive">
-    <table class="table table-striped">
+    <table class="table table-bordered">
         <thead>
             <tr>
                 <th>Sample ID</th>
@@ -26,15 +26,15 @@
                         <g:if test="${nExp>0}"><tr></g:if>
                         <td>
                             Run${experiment.runId}:
-                            <g:if test="${experiment.alignments.size() && experiment.alignments.last()?.fastqc.read1}">
-                                <a href="${experiment.alignments.last()?.fastqc.read1}">READ1</a>
+                            <g:if test="${experiment.fastqc?.read1}">
+                                <a href="${experiment.fastqc?.read1}">READ1</a>
                             </g:if>
                             <g:else>
                                 NONE&nbsp;
                             </g:else>
                              | 
-                            <g:if test="${experiment.alignments.size() && experiment.alignments.last()?.fastqc.read2}">
-                                <a href="${experiment.alignments.last()?.fastqc.read2}">READ2</a>
+                            <g:if test="${experiment.fastqc?.read2}">
+                                <a href="${experiment.fastqc?.read2}">READ2</a>
                             </g:if>
                             <g:else>
                                 NONE&nbsp;
@@ -42,10 +42,7 @@
                         </td>
                         </tr>
                     </g:each>
-            </g:each>              
-            <tr>
-                <td colspan="8"></td>
-            </tr>
+            </g:each>
         </tbody>
       </table>
 </div>

@@ -237,7 +237,7 @@ class ProtocolInstanceBagController {
             }
         } else {
             def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
-            if (itemType && itemType.category == ItemTypeCategory.SAMPLE_POOL) {
+            if (itemType && itemType.category.superCategory == ItemTypeSuperCategory.SAMPLE_POOL) {
                 def instance = ProtocolInstance.get(instanceId)
                 if (instance) {
                     if (instance.protocol.startPoolType == itemType && item) {

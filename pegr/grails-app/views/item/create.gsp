@@ -1,7 +1,6 @@
 <html>
 <head>
     <title>Workbench</title> 
-    <meta name="layout" content="main"/>
 </head>
 <body>
 <div class="container-fluid">
@@ -20,10 +19,6 @@
         <g:link class="btn btn-default" action="list" params="[typeId:item.type.id]">Cancel</g:link>
         <g:render template="form" model="['item':item]"/>
     </g:form>
-
-    <script>
-        $("#nav-bench").addClass("active");
-     </script>
 </div>
 </body>
 </html>

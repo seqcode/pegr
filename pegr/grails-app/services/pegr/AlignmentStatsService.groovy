@@ -11,9 +11,7 @@ class AlignmentStatsService {
     def utilityService
     
     @Transactional
-    def save(StatsRegistrationCommand data, String apiUser) {
-        def pipeline = getPipeline(apiUser)
-        
+    def save(StatsRegistrationCommand data, User apiUser) {        
         // check required fields
         def requiredFields = ["run", "sample", "genome", "toolId", "workflowId", "historyId", "toolCategory", "workflowStepId"]
         requiredFields.each { field ->
@@ -21,36 +19,51 @@ class AlignmentStatsService {
                 throw new AlignmentStatsException(message: "Missing ${field}!")
             }
         }
-
+        
+        // find the pipeline by user and workflowId
+        def pipeline = Pipeline.findByWorkflowId(data.workflowId)
+        
+        if (!pipeline) {
+            throw new AlignmentStatsException(message: "Pipeline not found for workflow ID ${data.workflowId}!")
+        }
+        
+        // find the sequencing experiment by runId and sampleId
         def experiment = SequencingExperiment.where {sequenceRun.id == data.run && sample.id == data.sample}.find()
         if (!experiment) {
             throw new AlignmentStatsException(message: "Sample ${data.sample} is not found in Run ${data.run}!")
         }
+        
+        // find the genome
         def genome = Genome.findByName(data.genome)
         if (!genome) {
             throw new AlignmentStatsException(message: "Genome ${data.genome} not found!")
         }           
+        
+        // find the sequence alignment. if no match, create a new alignment.
         def theAlignment = SequenceAlignment.findBySequencingExperimentAndGenomeAndPipelineAndHistoryId(experiment, genome, pipeline, data.historyId) 
         if (!theAlignment) {
             theAlignment = new SequenceAlignment(sequencingExperiment: experiment, 
                                                  genome: genome, 
                                                  pipeline: pipeline,
-                                                 workflowId: data.workflowId,
                                                  historyId: data.historyId,
                                                  isPreferred: true, 
                                                  date: new Date())
             theAlignment.save(flush:true, failOnError: true)
         } 
 
-        // save the data
+        // convert statistics, parameter, datasets to string
         def statisticsStr = data.statistics ? JsonOutput.toJson(data.statistics) : null
         def parameterStr = data.parameters ? JsonOutput.toJson(data.parameters) : null
         def datasetsStr = data.datasets ? JsonOutput.toJson(data.datasets) : null
         
-        def analysis = findOldAnalysis(data, theAlignment)
+        // save analysis. If it's a re-run inside an old history, overwrite the old analysis; else create a new analysis.
+        def analysis = findOldAnalysis(data, theAlignment)        
         if (analysis) {
+            // throw an exception if a different user tries to overwrite the analysis
+            if (analysis.user != apiUser) {
+                throw new AlignmentStatsException(message: "Analysis cannot be overwritten by a different user!")
+            }
             analysis.with {
-                user = data.userEmail
                 parameters = parameterStr
                 statistics = statisticsStr
                 datasets = datasetsStr
@@ -58,10 +71,10 @@ class AlignmentStatsService {
             }
         } else {
             analysis = new Analysis(alignment: theAlignment,
-                                    tool: data.toolId,                                    
+                                    tool: data.toolId,             
                                     category: data.toolCategory,
                                     stepId: data.workflowStepId,
-                                    user: data.userEmail,
+                                    user: apiUser,
                                     parameters: parameterStr,
                                     statistics: statisticsStr,
                                     datasets: datasetsStr,
@@ -71,20 +84,75 @@ class AlignmentStatsService {
             
         analysis.save(failOnError: true)
 
-        // store named fields
-        if (data.statistics) {
-            def updatedInAlignment = copyProperties(data.statistics, theAlignment)
+        // store statistics and datasets to named fields
+        saveStatistics(theAlignment, experiment, data.statistics)        
+        saveDatasets(theAlignment, experiment, data.toolCategory, data.datasets, data.statistics)
+
+        return        
+    }
+    
+    def saveStatistics(SequenceAlignment alignment, SequencingExperiment experiment, List statistics) {
+        if (statistics) {
+            def updatedInAlignment = copyProperties(statistics, alignment)
             if (updatedInAlignment > 0) {
-                theAlignment.date = new Date()
-                theAlignment.save(failOnError: true)
+                alignment.date = new Date()
+                alignment.save(failOnError: true)
             } 
-            def updatedInExperiment = copyProperties(data.statistics, experiment)
+            def updatedInExperiment = copyProperties(statistics, experiment)
             if (updatedInExperiment > 0) {
                 experiment.save(failOnError: true)
             } 
         }
-
-        return        
+    }
+    
+    def saveDatasets(SequenceAlignment alignment, SequencingExperiment experiment, String category, List datasets, List statistics) {
+        try {
+            def jsonSlurper = new JsonSlurper()
+            switch (category) {
+                case ["output_fastqRead1", "output_fastqRead2"]: // fastq
+                    def fastq = [:]
+                    if (experiment.fastqFile) {
+                        fastq = jsonSlurper.parseText(experiment.fastqFile)
+                    }
+                    def newFastq = queryDatasetsUri(datasets, "fastqsanger")
+                    if (newFastq) {
+                        def key = "read${category[-1]}"
+                        fastq[key] = newFastq
+                        experiment.fastqFile = JsonOutput.toJson(fastq)
+                        experiment.save(faileOnError: true)
+                    }                    
+                    break
+                case "output_fastqc": // fastqc report
+                    def fastqc = [:]
+                    if (experiment.fastqcReport) {
+                        fastqc = jsonSlurper.parseText(experiment.fastqcReport)
+                    }
+                    def newFastqc = queryDatasetsUriWithRead(datasets, statistics, "html")
+                    if (newFastqc) {
+                        fastqc[newFastqc.read] = newFastqc.data
+                        experiment.fastqcReport = JsonOutput.toJson(fastqc)
+                        experiment.save(faileOnError: true)
+                    }
+                    break
+                case "output_samtoolFilter": // bam
+                    def newBam = queryDatasetsUri(datasets, "bam")
+                    if (newBam) {
+                        alignment.bamFile = newBam
+                        alignment.save(failOnError: true)
+                    }         
+                    break
+                case "output_peHistogram": //pe histogram
+                    def newHistogram = queryDatasetsUri(datasets, "png")
+                    if (newHistogram) {
+                        alignment.peHistogram = newHistogram
+                        alignment.save(failOnError: true)
+                    }                    
+                    break
+            }
+        } catch (Exception e) {
+            log.error e
+            throw new AlignmentStatsException(message: "Error saving the datasets!")
+        }
     }
     
     def findOldAnalysis(StatsRegistrationCommand data, SequenceAlignment alignment) {
@@ -110,11 +178,6 @@ class AlignmentStatsService {
                 break
         }
         return oldAnalysis
-    }
-    
-    def getPipeline(String apiUser) {
-        def pipeline = Pipeline.where {name == apiUser}.order('pipelineVersion', 'desc').get(max: 1)
-        return pipeline
     }
     
     def copyProperties(source, target) {
@@ -148,33 +211,54 @@ class AlignmentStatsService {
         }
         return updatedProperties
     }
+
+    def queryDatasetsUri(List jsonList, String type) {
+        def data = jsonList?.find { d -> d.type == type }?.uri
+        return data
+    }
+    
     
     def queryDatasetsUri(String datasets, String type) {
-        def result = queryDatasetsUriList(datasets, type)
-        if (result && result.size() > 0) {
-            return result[0]
+        def jsonList = utilityService.parseJson(datasets)
+        def result = queryDatasetsUri(jsonList, type)
+    } 
+
+    def queryDatasetsUriList(List jsonList, String type) {
+        def data = jsonList ? jsonList.findAll { d -> d.type == type }.collect { it.uri }.toList() : []
+        return data
+    }
+    
+    def queryDatasetsUriList(String datasets, String type) {
+        def jsonList = utilityService.parseJson(datasets)
+        def results = queryDatasetsUriList(jsonList, type)
+        return results
+    } 
+    
+    def queryDatasetsUriWithRead(List datasets, List statistics, String type) {
+        def readNum 
+        if (statistics) {
+            statistics.each { map ->
+                if (map.containsKey("read")) {
+                    readNum = map["read"]
+                }
+            }
+        }
+
+        def data = queryDatasetsUri(datasets, type)
+        if (data) {
+            return [read: "read${readNum}", data: data]
         } else {
             return null
         }
-    } 
-    
-    def queryDatasetsUriList(String datasets, String type) {
-        def jsonList
-        try {
-            def jsonSlurper = new JsonSlurper()
-            jsonList = jsonSlurper.parseText(datasets)
-        } catch(Exception e) {   
-        }
-        if (jsonList) {
-            def data = jsonList.findAll { d -> d.type == type }.collect { it.uri }
-            return data.toList()
-        }
-        return []
-    } 
+    }
     
     def queryDatasetsUriWithRead(String datasets, String statistics, String type) {
         def readNum = utilityService.queryJson(statistics, "read")
         def data = queryDatasetsUri(datasets, type)
-        return [read: "read${readNum}", data: data]
+        if (data) {
+            return [read: "read${readNum}", data: data]
+        } else {
+            return null
+        }
     }
 }

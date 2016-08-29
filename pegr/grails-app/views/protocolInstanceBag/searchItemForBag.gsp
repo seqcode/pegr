@@ -17,7 +17,7 @@
     </g:if>
     <g:form class="fields" role="form" action="previewItemAndBag" >
         <g:hiddenField name="bagId" value="${bagId}"/>
-        <g:render template="/item/search" model="['currentCategory':pegr.ItemTypeCategory.TRACED_SAMPLE]"></g:render>
+        <g:render template="/item/search" model="['currentSuperCategory':pegr.ItemTypeSuperCategory.TRACED_SAMPLE]"></g:render>
         <g:submitButton class="btn btn-primary" name="search" value="Search Or Create"/>
     </g:form>                    
     <script>

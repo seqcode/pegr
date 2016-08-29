@@ -1,7 +1,6 @@
 <html>
 <head>
   <title>Cell Source</title> 
-  <meta name="layout" content="main"/>
     <script type="text/javascript" >
         var changingHash=false;
     </script>
@@ -21,8 +20,5 @@
         </div>
         <g:submitButton class="btn btn-primary" name="save" value="Save"/>
     </g:form>    
-<script>
-$("#nav-bench").addClass("active");
-</script>
 </body>
 </html>

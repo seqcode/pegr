@@ -1,12 +1,11 @@
 <html>
 <head>
     <title>Workbench</title> 
-    <meta name="layout" content="main"/>
 </head>
 <body>
 <div class="container-fluid">
      <ul class="nav nav-tabs">
-        <li><g:link action="list" params="[typeId: item?.type?.id]">List</g:link></li>
+        <li><g:link action="list" params="[categoryId: item?.type?.category?.id]">List</g:link></li>
         <li><g:link action="delete" params="[itemId:item?.id]" class="confirm">Delete</g:link></li>   
     </ul>
     <g:if test="${flash.message}">
@@ -74,7 +73,7 @@
             <g:submitButton name="upload" value="Upload"/> (only jpeg, png, gif files, size limit: 5 MB)
         </div>
     </g:uploadForm>
-    <g:if test="${item?.type?.category == pegr.ItemTypeCategory.OTHER || item?.type?.category == pegr.ItemTypeCategory.SAMPLE_POOL}">
+    <g:if test="${item?.type?.category.superCategory == pegr.ItemTypeSuperCategory.OTHER || item?.type?.category.superCategory == pegr.ItemTypeSuperCategory.SAMPLE_POOL}">
         <h4>Related Protocol Instances</h4>
         <ul>
             <g:each in="${item.relatedInstances}">
@@ -83,7 +82,6 @@
         </ul>
     </g:if>
     <script>
-        $("#nav-bench").addClass("active");
         $(".confirm").confirm();
      </script>
 </div>

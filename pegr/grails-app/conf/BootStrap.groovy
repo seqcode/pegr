@@ -17,8 +17,13 @@ class BootStrap {
 
         if (!ItemType.findByName("Antibody")) {
             println "Creating ItemType for Antibody"
+            def itemTypeCategory = ItemTypeCategory.findByName("Antibody")
+            if (!itemTypeCategory) {
+                itemTypeCategory = new ItemTypeCategory(name: "Antibody", superCategory: ItemTypeSuperCategory.ANTIBODY)
+                itemTypeCategory.save()
+            }
             def itemType = new ItemType(name: "Antibody",
-                category: ItemTypeCategory.ANTIBODY)
+                category: itemTypeCategory)
             itemType.save()
         }
 

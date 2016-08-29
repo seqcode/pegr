@@ -5,15 +5,16 @@
 <head>
     <meta name="layout" content="main">
     <title>Sample</title>
+    <asset:javascript src="meme.js"/>
+    <asset:stylesheet href="meme.css"/>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
 </head>
 <body>
     <div class="container-fluid">
         <g:if test="${flash.message}">
             <div class="message" role="status">${flash.message}</div>
-        </g:if>
-        <div>
-            <g:link action="all"><span class="glyphicon glyphicon-home"></span> Sample List</g:link>
-        </div>     
+        </g:if>    
         <h3>
             Sample ${sample.id} <g:if test="${sample.sourceId}">(${sample.source}#${sample.sourceId})</g:if><g:if test="${editAuth}"><g:link controller="sample" action="showItem" params="[sampleId:sample?.id]"><span class="glyphicon glyphicon-qrcode"></span></g:link></g:if>
             <small><span class="label label-default">${sample.status}</span></small> 

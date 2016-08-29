@@ -18,11 +18,10 @@
         <g:hiddenField name="instanceId" value="${instanceId}"/>
         <div class="form-group">
             <label for="type">Type</label>
-            <select id="type" name="typeId">
+            <select id="type" name="typeId" style="width: 200px">
                 <option value="${itemType.id}">${itemType.name}</option>
             <select>
-        </div>    
-        </div>        
+        </div>           
         <div class="form-group">
             <label for="barcode">Barcode</label>
              <g:textField id="barcode" name="barcode" />

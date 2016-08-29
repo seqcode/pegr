@@ -1,8 +1,9 @@
 package pegr
 
 def historyIds = Analysis.executeQuery("select distinct historyId from Analysis")
+println "historyIds ${historyIds.size()}"
 historyIds.each { historyId ->
-    def alignmentIds = Analysis.executeQuery("select distinct alignment.id from Analysis where historyId = ?", historyId)
+    def alignmentIds = Analysis.findByHistoryId(historyId).collect{it.alignment.id}.unique()
     if (alignmentIds && alignmentIds.size() > 1) {
         def mergedAlignment
         alignmentIds.each { alignmentId ->

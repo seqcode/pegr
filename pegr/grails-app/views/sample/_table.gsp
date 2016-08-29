@@ -1,5 +1,5 @@
 <div class="table-responsive">
-    <table class="table table-striped">
+    <table class="table">
         <thead>
             <tr>
                 <th></th>
@@ -23,9 +23,6 @@
                     <td><g:formatDate format="yyyy-MM-dd" date="${sample.date}"/></td>
                 </tr>
             </g:each>              
-            <tr>
-                <td colspan="7"></td>
-            </tr>
         </tbody>
       </table>
 </div>

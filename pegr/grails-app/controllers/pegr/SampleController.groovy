@@ -162,7 +162,7 @@ class SampleController {
             )
             item = antibody.item
         }
-        def itemTypeOptions = ItemType.where {category==ItemTypeCategory.ANTIBODY}.list()
+        def itemTypeOptions = ItemType.where {category.superCategory == ItemTypeSuperCategory.ANTIBODY}.list()
         [antibody: cmd, item: item, sampleId: sampleId, antibodyId: antibodyId, itemTypeOptions: itemTypeOptions]
     }
     
@@ -183,7 +183,7 @@ class SampleController {
     }
     
     def searchAntibody(Long sampleId) {
-        def itemTypeOptions = ItemType.where {category==ItemTypeCategory.ANTIBODY}.list()
+        def itemTypeOptions = ItemType.where {category.superCategory == ItemTypeSuperCategory.ANTIBODY}.list()
         [sampleId: sampleId, itemTypeOptions: itemTypeOptions]
     }
     
@@ -240,7 +240,7 @@ class SampleController {
             )
             item = cellSource.item
         }
-        def itemTypeOptions = ItemType.where {category==ItemTypeCategory.TRACED_SAMPLE}.list()
+        def itemTypeOptions = ItemType.where {category.superCategory == ItemTypeSuperCategory.TRACED_SAMPLE}.list()
         [cellSource: cmd, item: item, sampleId: sampleId, cellSourceId: cellSourceId, itemTypeOptions: itemTypeOptions]
     }
     
@@ -260,7 +260,7 @@ class SampleController {
     }
     
     def searchCellSource(Long sampleId) {
-        def itemTypeOptions = ItemType.where {category==ItemTypeCategory.TRACED_SAMPLE}.list()
+        def itemTypeOptions = ItemType.where {category.superCategory == ItemTypeSuperCategory.TRACED_SAMPLE}.list()
         [sampleId: sampleId, itemTypeOptions: itemTypeOptions]
     }
     

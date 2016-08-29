@@ -21,15 +21,25 @@
         <div class="message" role="status">${flash.message}</div>
     </g:if>
     <div>
-        <h2>Summary Report</h2>
+        <h2>Summary Report ${report.name} 
+            <small>
+                <span id="report-status-show" class="label label-default">${report.status}</span>
+                <span id="report-status-select" style="display:none">
+                <g:select name="reportStatus" from="${pegr.ReportStatus}" value="${report.status}"></g:select>
+                <button id="report-status-save" class="btn btn-primary">Save</button>
+                <button id="report-status-cancel" class="btn btn-default">Cancel</button>
+            </span>
+            </small>
+        </h2>
+        <i>Edit on ${report.date}</i>
+        <p>${report.note}</p>
         <g:if test="${project}">
             <h3>Project: <g:link controller="project" action="show" id="${project.id}">${project?.name}</g:link></h3>
             <p>Description: ${project?.description}</p>
             <div id="project-users">
                 <g:render template="/project/userTable" model="[projectEditAuth:false]"/>
             </div>
-        </g:if>        
- 
+        </g:if>
     </div>
     </br>          
     <div id="details">
@@ -39,12 +49,35 @@
     </div>
     <script>
         $(function(){
-            $("#nav-reports").addClass("active");
-            $.ajax({url: "/pegr/report/fetchDataForReportAjax/${reportId}", success: function(result) {
+            $(".nav-reports").addClass("active");
+            $.ajax({url: "/pegr/report/fetchDataForReportAjax/${report.id}", success: function(result) {
                 $("#details").html(result)
             }});
         });
-        $(".nav-reports").addClass("active");
+        
+        $("#report-status-show").click(function(){
+            $("#report-status-show").hide();
+            $("#report-status-select").show();
+        });
+        
+        $("#report-status-save").click(function(){
+            var status = $("#report-status-select option:selected").text();
+            $.ajax({ url: "/pegr/report/updateReportStatusAjax?reportId=${report.id}&status=" + status,
+                success: function(result) {
+                    $("#report-status-show").text(result);
+                    $("#report-status-select").val(result);
+                    $("#report-status-show").show();
+                    $("#report-status-select").hide();
+                }                
+            });
+        });
+        
+        $("#report-status-cancel").click(function(){
+            $("#report-status-show").show();
+            var status =  $("#report-status-show").text();
+            $("#report-status-select").val(status);
+            $("#report-status-select").hide();
+        });
     </script>
 </body>
 </html>

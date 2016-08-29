@@ -36,8 +36,8 @@ class ItemService {
             throw new ItemException(message: "Item not found!")
         }
         File folder = getImageFolder(id)
-        switch (item.type.category) {
-            case ItemTypeCategory.TRACED_SAMPLE:
+        switch (item.type.category.superCategory) {
+            case ItemTypeSuperCategory.TRACED_SAMPLE:
                 def child = Item.findByParent(item)
                 if (child) {
                     throw new ItemException(message: "This traced sample cannot be deleted because it has children samples!")

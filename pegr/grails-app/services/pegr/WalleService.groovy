@@ -139,7 +139,7 @@ class WalleService {
         run.directoryName = newFolder
         def d = newFolder.split("_").last()
         run.fcId = d[1..-1]
-        run.status = RunStatus.RUN
+        run.status = RunStatus.ANALYZING
         run.save()
         
         // generate run info and parameter files in local folder.

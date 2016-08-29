@@ -6,18 +6,16 @@ class ReportController {
     def springSecurityService
     def reportService
     
-    def createReports(Long runId) {
-        def run = SequenceRun.get(runId)
-        if (!run) {
-            render(view:"/404")
-            return
-        }
-        try {
-            reportService.createSummaryReportsForRun(run)
-        } catch(ReportException e) {
-            flash.message = e.message
-        }
-        redirect(action:"runStatus", params: [runId: runId])
+    def createReportForCohortAjax(Long cohortId) {
+        def cohort = SequencingCohort.get(cohortId)
+        reportService.createReportForCohort(cohort)
+        render template: "/report/reportRow", model: [cohort: cohort]
+    }
+    
+    def deleteReportForCohortAjax(Long cohortId) {
+        def cohort = SequencingCohort.get(cohortId)
+        reportService.deleteReportForCohort(cohort)
+        render template: "/report/reportRow", model: [cohort: cohort]
     }
     
     /*
@@ -27,7 +25,7 @@ class ReportController {
      */
     def analysisStatus(Integer max, String requestedStatus) {
         if (requestedStatus == null || requestedStatus == "") {
-            requestedStatus = RunStatus.RUN
+            requestedStatus = RunStatus.ANALYZING
         }
         params.max = Math.min(max ?: 15, 100)
         if (!params.sort) {
@@ -46,13 +44,22 @@ class ReportController {
         } else {
             try {
                 def runStatus = reportService.fetchRunStatus(run)
-                def reports = SummaryReport.findAllByRun(run)
-                [runStatus: runStatus, run: run, reports: reports]
+                [runStatus: runStatus.results, noResultSamples: runStatus.noResultSamples, run: run]
             } catch (ReportException e) {
                 flash.message = e.message
                 redirect(action: "analysisStatus")
             }       
         }
+    }
+    
+    def updateRunStatusAjax(Long runId, String status) {
+        reportService.updateRunStatus(runId, status)
+        render status 
+    }
+     
+    def updateReportStatusAjax(Long reportId, String status) {
+        reportService.updateReportStatus(reportId, status)
+        render status 
     }
     
     def deleteAlignment(Long alignmentId, Long runId) {
@@ -65,10 +72,11 @@ class ReportController {
         redirect(action: "runStatus", params: [runId: runId])
     }
 
-    def all(Integer max) {
+    def automatedReportList(Integer max) {
         params.max = Math.min(max ?: 25, 100)
-        def reports = SummaryReport.list(params)
-        def totalCount = SummaryReport.count()
+        def query = SummaryReport.where { type == ReportType.AUTOMATED }
+        def reports = query.list(params)
+        def totalCount = query.count()
         [reports: reports, totalCount: totalCount]
     }
     
@@ -78,9 +86,10 @@ class ReportController {
             render(view: "/404")
             return
         }
-        def currentProject = report.project
+
+        def currentProject = report.cohort?.project
         def projectUsers = ProjectUser.where { project == currentProject}.list()
-        [project: currentProject, projectUsers: projectUsers, reportId: id]
+        [project: currentProject, projectUsers: projectUsers, report: report]
     }
     
     def fetchDataForReportAjax(Long id) {
@@ -147,13 +156,15 @@ class ExperimentDTO {
     Long oldRunNum
     Long totalReads
     Long adapterDimerCount
+    Map fastqc
+    Map fastq
     List alignments
 }
 
 class AlignmentDTO {
     Long id
     String genome
-    
+    String bam
     Long mappedReads
     Long uniquelyMappedReads
     Long dedupUniquelyMappedReads
@@ -174,7 +185,6 @@ class AlignmentDTO {
     Long nonPairedPeaks
     String memeFile
     String memeFig
-    Map fastqc
     String peHistogram
     List fourColor
     List composite
@@ -187,6 +197,7 @@ class RunStatusDTO {
 
 class SampleStatusDTO {
     Long sampleId
+    SequencingCohort cohort
     List alignmentStatusList
 }
 

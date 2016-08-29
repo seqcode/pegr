@@ -16,7 +16,7 @@
     </g:if>
     <g:form class="fields" role="form" action="previewItemInInstance" >
         <g:hiddenField name="instanceId" value="${instanceId}"/>
-        <g:render template="/item/search" model="['currentCategory':pegr.ItemTypeCategory.OTHER]"></g:render>
+        <g:render template="/item/search" model="['currentSuperCategory':pegr.ItemTypeSuperCategory.OTHER]"></g:render>
         <g:submitButton class="btn btn-primary" name="search" value="Search Or Create"/>
         <g:submitButton class="btn btn-primary" name="generate" value="Generate Barcode"/>
     </g:form>                    

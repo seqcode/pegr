@@ -88,6 +88,6 @@ class Sample {
     static mapping = {
         sort date:"desc"
         dynamicUpdate: true
-		note sqlType: 'text'
+		note sqlType: 'longtext'
     }
 }

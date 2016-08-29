@@ -10,22 +10,30 @@ class ProjectService {
     def utilityService
 
     @Transactional
-    void save(Project project) {
+    void save(Project project, List fundings) {
         if (!project.save(flush: true)) {   
             throw new ProjectException(message: "Invalid inputs!")
+        }
+        
+        // remove old project fundings
+        ProjectFunding.executeUpdate("delete from ProjectFunding where project.id =:projectId", [projectId: project.id])
+        
+        // save the new fundings
+        fundings.each { funding ->
+            new ProjectFunding(project: project, funding: funding).save()
         }
     }
     
     @Transactional
-    void saveWithUser(Project project, User user) {
-        if (project.save(flush: true)) {
-            // add current user as owner            
-            new ProjectUser(user: user, 
-                          project: project, 
-                          projectRole: ProjectRole.OWNER).save()            
-        } else {
-            throw new ProjectException(message: "Invalid inputs!")
-        }
+    void saveWithUser(Project project, User user, List fundings) {
+        // save the project and fundings
+        save(project, fundings)
+        
+        // add current user as owner            
+        new ProjectUser(user: user, 
+                      project: project, 
+                      projectRole: ProjectRole.OWNER).save()            
+
     }
     
     @Transactional
@@ -113,4 +121,14 @@ class ProjectService {
         return authorized
     }
     
+    @Transactional
+    def saveNotes(Long projectId, String notes) {
+        def project = Project.get(projectId)
+        if (project) {
+            project.notes = notes
+            project.save(failOnError: true)
+        } else {
+            throw new ProjectException(message: "Project not found!")
+        }
+    }
 }

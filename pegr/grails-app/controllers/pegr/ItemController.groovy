@@ -11,23 +11,27 @@ class ItemController {
     def barcodeService
     
     def index(){
-        redirect(action: "list", params: [typeId: 1])
+        redirect(action: "list", params: [categoryId: 1])
     }
     
-    def list(Integer max, Long typeId) {
+    def list(Integer max, Long categoryId) {
         params.max = Math.min(max ?: 15, 100)
-        if(!typeId) {
-            typeId = 1
+        if(!categoryId) {
+            categoryId = 1
         }
-        def itemType = ItemType.get(typeId)
-        switch (itemType.category) {
-            case ItemTypeCategory.ANTIBODY:
+        def category = ItemTypeCategory.get(categoryId)
+        def itemTypes = ItemType.list(sort: "name")
+        switch (category.superCategory) {
+            case ItemTypeSuperCategory.ANTIBODY:
                 flash.message = flash.message
                 redirect(controller: "antibody", action: "list", params: params)
                 break
             default:
-                def items = Item.where{ type.id == typeId }
-                [itemList: items.list(params), itemCount: items.count(), currentType: itemType]
+                def items = Item.where { type.category.id == categoryId }
+                [itemList: items.list(params), 
+                 itemCount: items.count(), 
+                 currentCategory: category,
+                itemTypes: itemTypes]
         }
     }
     
@@ -39,8 +43,8 @@ class ItemController {
         }
         def folder = itemService.getImageFolder(id)
         def images = folder.listFiles().findAll{getFileExtension(it.name) in allowedTypes.values()}
-        switch (item.type.category) {
-            case ItemTypeCategory.TRACED_SAMPLE:
+        switch (item.type.category.superCategory) {
+            case ItemTypeSuperCategory.TRACED_SAMPLE:
                 def traces = []
                 def tmp = item
                 while(tmp.parent) {
@@ -70,8 +74,8 @@ class ItemController {
                 if (itemType) { 
                     def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
                     if (item) {
-                        switch (itemType.category) {
-                            case ItemTypeCategory.ANTIBODY:
+                        switch (itemType.category.superCategory) {
+                            case ItemTypeSuperCategory.ANTIBODY:
                                 def antibody = Antibody.findByItem(item)
                                 redirect(controller: "antibody", action: "show", id: antibody?.id)
                                 break
@@ -80,11 +84,11 @@ class ItemController {
                         }
                     }else {
                         item = new Item(type: itemType, barcode: barcode)
-                        switch (itemType.category) {
-                            case ItemTypeCategory.ANTIBODY:
+                        switch (itemType.category.superCategory) {
+                            case ItemTypeSuperCategory.ANTIBODY:
                                 render(view: "/antibody/create", model: [item:item])
                                 break
-                            case ItemTypeCategory.TRACED_SAMPLE:
+                            case ItemTypeSuperCategory.TRACED_SAMPLE:
                                 render(view: "/cellSource/create", model: [item: item])
                                 break
                             default:

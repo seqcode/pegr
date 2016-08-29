@@ -43,7 +43,8 @@ class ProjectController {
                 def project = new Project(params)
                 def user = springSecurityService.currentUser
                 try {
-                    projectService.saveWithUser(project, user)
+                    def fundings = params.list("funding")
+                    projectService.saveWithUser(project, user, fundings)
                     flash.message = "Successfully  created project ${project.name}"
                     redirect(action:"show", id:"${project.id}")
                 } catch (ProjectException e) {
@@ -69,7 +70,8 @@ class ProjectController {
             withForm{
                 project.properties = params
                 try {
-                    projectService.save(project)
+                    def fundings = params.list("funding")
+                    projectService.save(project, fundings)
                     flash.message = "Successfully  updated information for project ${project.name}"
                     redirect(action:"show", id:projectId)
                 } catch(ProjectException e) {
@@ -92,10 +94,12 @@ class ProjectController {
             def projectUsers = ProjectUser.where { project==currentProject}.list()
             def projectEditAuth = projectService.projectEditAuth(currentProject)
             def sampleEditAuth = projectService.sampleEditAuth(currentProject)
-            def samples = ProjectSamples.where {project==currentProject}.list(params).collect{it.sample}
-            def reports = SummaryReport.findAllByProject(currentProject)
             def replicates = replicateService.getReplicates(currentProject)
-            [project: currentProject, projectUsers: projectUsers, samples: samples, reports: reports, replicates: replicates, projectEditAuth: projectEditAuth, sampleEditAuth: sampleEditAuth]
+            [project: currentProject, 
+             projectUsers: projectUsers, 
+             replicates: replicates, 
+             projectEditAuth: projectEditAuth, 
+             sampleEditAuth: sampleEditAuth]
         } else {
             flash.message = "Project not found!"
             redirect(action: "index")
@@ -184,6 +188,11 @@ class ProjectController {
             flash.message = e.message
             redirect(action: "addNewSamples", params:[projectId: command.projectId, assayId: command.assayId])
         }
+    }
+    
+    def saveNotesAjax(Long projectId, String notes) {
+        projectService.saveNotes(projectId, notes)
+        render "success"
     }
     
 }

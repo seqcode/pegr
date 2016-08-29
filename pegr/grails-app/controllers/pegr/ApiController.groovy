@@ -4,8 +4,16 @@ import static org.springframework.http.HttpMethod.*
 import grails.converters.*
 import groovy.json.*
     
-class StatsAPIController {
+class ApiController {
     def alignmentStatsService
+    def reportService
+    
+     static allowedMethods = [stats:'POST',
+                              fetchDataBySampleId:'GET',
+                              fetchDataBySourceId:'GET',
+                              fetchDataBySampleIdList:'GET',
+                              fetchDataByReportId:'GET',
+                             ]
     
     /*
      * Accept API calls, authenticate by the API Key, save the raw data into Analysis, 
@@ -17,7 +25,7 @@ class StatsAPIController {
      * @return response in the format of JSON dictionary, including a response_code and a message. 
      * @return status code
      */
-    def save(StatsRegistrationCommand data, String apiKey) {
+    def stats(StatsRegistrationCommand data, String apiKey) {
         def message = "Success!"
         def code = 200
         if (!data || data.properties.every {key, value -> value == null}) {
@@ -48,6 +56,40 @@ class StatsAPIController {
         def response = new ResponseMessage(response_code: code, message: message)
         render text: response as JSON, contentType: "text/json", status: code 
     }    
+    
+    def fetchDataBySampleId(Long sampleId, String apiKey, String userEmail) {
+        try {
+            def data = reportService.fetchDataForSample(sampleId) as JSON
+            render text: data, contentType: "text/json", status: 200
+        } catch(Exception e) {
+            def message = [message: "Error retrieving the data!"] as JSON
+            render text: message, contentType: "text/json", status: 500
+        }
+    }
+    
+    def fetchDataBySourceId(String source, Long sourceId, String apiKey, String userEmail) {
+        try {
+            def sample = Sample.findBySourceAndSourceId(source, sourceId)
+            if (!sample) {
+                throw new 
+            }
+            def data = reportService.fetchDataForSample(sampleId) as JSON
+            render text: data, contentType: "text/json", status: 200
+        } catch(Exception e) {
+            def message = [message: "Error retrieving the data!"] as JSON
+            render text: message, contentType: "text/json", status: 500
+        }
+    }
+    
+    def fetchDataByReportId(Long reportId, String apiKey, String userEmail) {
+        try {
+            reportService.fetchDataForReport(reportId) as JSON
+            render text: data, contentType: "text/json", status: 200
+        } catch(Exception e) {
+            def message = [message: "Error retrieving the data!"] as JSON
+            render text: message, contentType: "text/json", status: 500
+        }
+    }
 }
 
 class ResponseMessage {

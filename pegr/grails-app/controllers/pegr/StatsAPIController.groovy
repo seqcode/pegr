@@ -24,16 +24,16 @@ class StatsAPIController {
             code = 500
             message = "Error parsing the JSON data!"
         } else {
-            def apiUser = ApiUser.findByApiKey(apiKey)
+            def apiUser = User.findByEmailAndApiKey(data.userEmail, apiKey)
             if (apiUser) {
                 try {
-                    alignmentStatsService.save(data, apiUser.name)                    
+                    alignmentStatsService.save(data, apiUser)
                 } catch(AlignmentStatsException e) {
                     code = 500
                     message = "Error: ${e.message}"
                 } catch(Exception e0) {
                     try {
-                        alignmentStatsService.save(data, apiUser.name)
+                        alignmentStatsService.save(data, apiUser)
                     } catch(Exception e) {
                         log.error "Error: ${e.message}", e
                         code = 500

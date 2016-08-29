@@ -48,8 +48,26 @@ class SequenceRunService {
     
     @Transactional
     def addSampleToRun(Sample sample, SequenceRun run, String positions, ReadType readType) {
+        if (!sample || !run) {
+            return
+        }
         if (!SequencingExperiment.findBySampleAndSequenceRun(sample, run)) {
-            def experiment = new SequencingExperiment(sample: sample, sequenceRun: run, readPositions: positions, readType: readType) 
+            def cohort
+            // find the first project that this sample is attached to
+            def projectSample = ProjectSamples.createCriteria().list {
+                eq "sample", sample 
+                maxResults(1)
+                order("id", "asc")
+            }
+            if (projectSample) {
+                // find the cohort
+                cohort = SequencingCohort.findByProjectAndRun(projectSample.project, run)
+                if (!cohort) {
+                    cohort = new SequencingCohort(project: projectSample.project, run: run)
+                    cohort.save()
+                }
+            }        
+            def experiment = new SequencingExperiment(sample: sample, sequenceRun: run, readPositions: positions, readType: readType, cohort: cohort) 
             experiment.save(failOnError: true)
         }
     }
@@ -154,7 +172,7 @@ class SequenceRunService {
             throw new SequenceRunException(message: "Sequence run not found!")
         }        
  
-        if (run.status == RunStatus.RUN) {
+        if (run.status == RunStatus.ANALYZING) {
              throw new SequenceRunException(message: "Sequence run has already been submitted!")
         }
         

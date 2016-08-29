@@ -211,7 +211,7 @@ class ProtocolInstanceBagService {
         if (item.save(flush: true)) { 
             // add the item to the instance
             def instance = ProtocolInstance.get(instanceId)
-            if (item.type.category == ItemTypeCategory.SAMPLE_POOL) {
+            if (item.type.category.superCategory == ItemTypeSuperCategory.SAMPLE_POOL) {
                 def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance, function: ProtocolItemFunction.END_POOL)
                 instanceItem.save(flush: true)
                 // add all the samples in the bag to the pool
@@ -356,7 +356,7 @@ class ProtocolInstanceBagService {
                 result.startPool[0].items.add(item)
             } else if (item.type == protocol.endPoolType) {
                 result.endPool[0].items.add(item)
-            } else if (item.type.category == ItemTypeCategory.OTHER ){
+            } else if (item.type.category.superCategory == ItemTypeSuperCategory.OTHER ){
                 result.sharedItemList.add([type: item.type, items: [item]])
             }
         }  

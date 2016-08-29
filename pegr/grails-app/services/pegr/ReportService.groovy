@@ -10,60 +10,62 @@ class ReportService {
 
     def utilityService
     def alignmentStatsService
+    def springSecurityService
     
     def fetchRunStatus(SequenceRun run) {
-        def steps
-
-        try {
-            def stepsStr = Chores.findByName("PipelineSteps")*.value
-            def jsonSlurper = new JsonSlurper()
-            steps = jsonSlurper.parseText(stepsStr)
-        } catch (Exception e) {
-            throw new ReportException(message: "Pipeline steps are not properly defined!")
-        }
-
-        def results = [:] 
-
+        def results = [:] // key: pipeline, value: runStatusDTO
+        def noResultSamples = []
         run.experiments.each { experiment ->
-            // read type
-            if (!experiment.readType) {
-                throw new ReportException(message: "Read type is not defined for sample ${experiment.sample.id}!")
+            if (experiment.alignments.size() == 0) {
+                noResultSamples << new SampleStatusDTO(sampleId: experiment.sample.id, 
+                                                       cohort: experiment.cohort)
             }
-            def readType = experiment.readType.shortName
-            if (!steps.containsKey(readType)) {
-                throw new ReportException(message: "Pipeline steps are not defined for read type ${readType}!")
-            }
-
-            def sampleStatus = new SampleStatusDTO(sampleId: experiment.sample.id,
-                                        alignmentStatusList: [])
-            
             experiment.alignments.each { alignment ->
+                def steps
+                if (results.containsKey(alignment.pipeline)) {
+                    steps = results[alignment.pipeline].steps
+                } else {
+                    try {
+                        def jsonSlurper = new JsonSlurper()
+                        steps = jsonSlurper.parseText(alignment.pipeline.steps)
+                        results[alignment.pipeline] = new RunStatusDTO (steps: steps,
+                                                                        sampleStatusList: [])
+                    } catch (Exception e) {
+                        throw new ReportException(message: "Pipeline steps are not properly defined!")
+                    }
+                }
+                    
+                // create a new alignment status                    
                 def alignmentStatusDTO = new AlignmentStatusDTO( 
                     alignmentId: alignment.id,
                     historyId: alignment.historyId,
                     genome: alignment.genome.name,
                     date: alignment.date,
                     status: [])
-                def analysis = Analysis.findAllByAlignment(alignment)
-                steps[readType].eachWithIndex { step, index ->
+                
+                // iterate through the analysis
+                def analysis = Analysis.findAllByAlignment(alignment)   
+                steps.eachWithIndex { step, index ->
                     if (analysis.find {it.stepId == step[0]}) {
                         alignmentStatusDTO.status[index] = true
                     } else {
                         alignmentStatusDTO.status[index] = false
                     }                  
                 }
-                sampleStatus.alignmentStatusList << alignmentStatusDTO
-            }
-            
-            if (results.containsKey(readType)) {
-                results[readType].sampleStatusList << sampleStatus
-            } else {
-                
-                results[readType] = new RunStatusDTO(steps: steps[readType],
-                                                    sampleStatusList: [sampleStatus])
+
+                // find the sample in that pipeline
+                def sampleStatus = results[alignment.pipeline].sampleStatusList.find {it.sampleId == experiment.sample.id}
+                if (!sampleStatus) {
+                    sampleStatus = new SampleStatusDTO(sampleId: experiment.sample.id,
+                                                       cohort: experiment.cohort,
+                                    alignmentStatusList: [alignmentStatusDTO])
+                    results[alignment.pipeline].sampleStatusList << sampleStatus
+                } else {    
+                    sampleStatus.alignmentStatusList << alignmentStatusDTO
+                }
             }
         }
-        return results
+        return [results: results, noResultSamples: noResultSamples]
     }
     
     @Transactional
@@ -85,31 +87,37 @@ class ReportService {
      * sequence run. And link the preferred alignments to the corresponding summary reports. 
      */
     @Transactional
-    def createSummaryReportsForRun(SequenceRun run) {
-        // create reports
-        def reports = []
-        run.experiments.each { experiment ->
-            def projects = experiment.sample?.projects.sort { it.id }
-            if (projects && projects.size() > 0) {
-                def project = projects.first()
-                def report = reports.find {it.project == project}
-                if (!report) {
-                    report = SummaryReport.findByRunAndProject(run, project)
-                    if (!report) {
-                        report = new SummaryReport(run: run, project: project)
-                        report.save()
-                    }
-                    reports << report
+    def createReportForCohort(SequencingCohort cohort) {
+        if (cohort.report) {
+            throw new ReportException(message: "A report has already been created for this cohort!")
+        }
+        def now = new Date()
+        def user = springSecurityService.currentUser
+        def report = new SummaryReport(name: cohort.toString(), status: ReportStatus.DRAFT, date: now, type: ReportType.AUTOMATED, user: user)
+        if(!report.save()) {
+            throw new ReportException(message: "Error saving the report!")
+        }
+        cohort.experiments.each { experiment ->
+            experiment.alignments.each { alignment ->
+                if (alignment.isPreferred) {
+                    new ReportAlignments(report: report, alignment: alignment).save()
                 }
-                experiment.alignments.each { alignment ->
-                    if (alignment.isPreferred) {
-                        new ReportAlignments(report: report, alignment: alignment).save()
-                    }
-                } 
-            } else {
-                throw new SequenceRunException(message: "Sample ${experiment.sample?.id} is not linked to a project yet!")
-            }
-        }        
+            } 
+        }
+        cohort.report = report
+        cohort.save()
+    }
+    
+    @Transactional
+    def deleteReportForCohort(SequencingCohort cohort) {
+        def report = cohort.report
+        if (!report) {
+            throw new ReportException(message: "No report found!")
+        }
+        cohort.report = null
+        cohort.save()
+        ReportAlignments.executeUpdate("delete from ReportAlignments where report=:report", [report: report])
+        report.delete()
     }
     
     
@@ -171,6 +179,7 @@ class ReportService {
             
             experimentDTO.alignments << alignmentDTO
         }
+        sampleDTOs.sort { it.id }
         return sampleDTOs
     }
     
@@ -198,28 +207,33 @@ class ReportService {
     }
     
     def getExperimentDTO(SequencingExperiment experiment) {
+        def fastqc = utilityService.parseJson(experiment.fastqcReport)
+        def fastq = utilityService.parseJson(experiment.fastqFile)
         return new ExperimentDTO(id: experiment.id,
                               runId: experiment.sequenceRun?.id,
                               oldRunNum: experiment.sequenceRun?.runNum,
                               totalReads: experiment.totalReads,
                               adapterDimerCount: experiment.adapterDimerCount,
+                              fastqc: fastqc,
+                              fastq: fastq,
                               alignments: []
                              )
     }
     
     def getAlignmentDTO(SequenceAlignment alignment) {
         def alignmentDTO = new AlignmentDTO(id: alignment.id,
-                                            genome: alignment.genome,
-                                            mappedReads: alignment.mappedReads,
-                                            uniquelyMappedReads: alignment.uniquelyMappedReads,
-                                            dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
-                                            avgInsertSize: alignment.avgInsertSize,
-                                            stdInsertSize: alignment.stdDevInsertSize,
-                                            genomeCoverage: alignment.genomeCoverage,
-                                            fastqc: [:],
-                                            fourColor: [],
-                                            composite: []
-                        )
+                genome: alignment.genome,
+                bam: alignment.bamFile,
+                mappedReads: alignment.mappedReads,
+                uniquelyMappedReads: alignment.uniquelyMappedReads,
+                dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
+                avgInsertSize: alignment.avgInsertSize,
+                stdInsertSize: alignment.stdDevInsertSize,
+                genomeCoverage: alignment.genomeCoverage,
+                peHistogram: alignment.peHistogram,
+                fourColor: [],
+                composite: []
+            )
 
         def statistics
         def parameter
@@ -243,13 +257,6 @@ class ReportService {
                 case "output_meme": // meme
                     alignmentDTO.memeFile = alignmentStatsService.queryDatasetsUri(analysis.datasets, "txt")
                     alignmentDTO.memeFig = alignmentStatsService.queryDatasetsUri(analysis.datasets, "html")
-                    break
-                case "output_fastqc": // fastqc report
-                    def fastqcFile = alignmentStatsService.queryDatasetsUriWithRead(analysis.datasets, analysis.statistics, "html")
-                    alignmentDTO.fastqc[fastqcFile.read] = fastqcFile.data
-                    break
-                case "output_peHistogram": //pe histogram
-                    alignmentDTO.peHistogram = alignmentStatsService.queryDatasetsUri(analysis.datasets, "png")
                     break
                 case "output_fourColorPlot": // four color plot
                     alignmentDTO.fourColor = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "png")
@@ -278,46 +285,51 @@ class ReportService {
     
     // 
     def fetchMemeMotif(String url) {
-        if (url == null || url == "") {
-            return null
-        }
-        def data = new URL(url).getText()
-        def inBlock = false
-        def count = 0
-        def len, nsites, evalue
-        def pwm
         def results = []
-        data.eachLine {
-            if (inBlock) {
-                if (it.startsWith("----------------")) {
-                    results.push([db: 0, 
-                            id: count, 
-                            alt: "MEME", 
-                            len: len, 
-                            nsites: nsites, 
-                            evalue: evalue, 
-                            pwm: pwm])
-                    inBlock = false
-                } else {
-                    def numbers = it.tokenize()
-                    def a = []
-                    numbers.each { n ->
-                        a.push(utilityService.getFloat(n))
-                    }
-                    pwm.push(a)
-                }
-            } else {
-                if (it.startsWith("letter-probability matrix")) {
-                    // digest the statistics
-                    len = utilityService.getLong(findInMotif(it, "w"))
-                    nsites = utilityService.getLong(findInMotif(it, "nsites"))
-                    evalue = findInMotif(it, "E")
-                    pwm = []
-                    count++
-                    inBlock = true
-                }
-            }
+        if (url == null || url == "") {
+            return results
+        }
+        try {
+            def data = new URL(url).getText()
+            def inBlock = false
+            def count = 0
+            def len, nsites, evalue
+            def pwm
 
+            data.eachLine {
+                if (inBlock) {
+                    if (it.startsWith("----------------")) {
+                        results.push([db: 0, 
+                                id: count, 
+                                alt: "MEME", 
+                                len: len, 
+                                nsites: nsites, 
+                                evalue: evalue, 
+                                pwm: pwm])
+                        inBlock = false
+                    } else {
+                        def numbers = it.tokenize()
+                        def a = []
+                        numbers.each { n ->
+                            a.push(utilityService.getFloat(n))
+                        }
+                        pwm.push(a)
+                    }
+                } else {
+                    if (it.startsWith("letter-probability matrix")) {
+                        // digest the statistics
+                        len = utilityService.getLong(findInMotif(it, "w"))
+                        nsites = utilityService.getLong(findInMotif(it, "nsites"))
+                        evalue = findInMotif(it, "E")
+                        pwm = []
+                        count++
+                        inBlock = true
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            throw new ReportException(message: "Error fetching the MEME data!")
         }
         return results
     }
@@ -340,9 +352,13 @@ class ReportService {
         if (url == null || url == "") {
             return null
         }
-        def data = new URL(url).getText()
-       
         def results = []
+        def data
+        try {
+            data = new URL(url).getText()
+        } catch(Exception e) {
+            throw new ReportException(message: "Error fetching the data!")
+        }
         data.eachLine { line, lineNum ->
             def numbers = line.tokenize()
             if (lineNum == 0) {
@@ -352,6 +368,9 @@ class ReportService {
             } else {
                 numbers.eachWithIndex { n, c ->
                     if (c > 0) {
+                        if (results[c-1] == null) {
+                            throw new ReportException(message: "Error converting the data into array!")
+                        }
                         results[c-1][lineNum] = n
                     }
                 }
@@ -399,5 +418,38 @@ class ReportService {
         }        
         return result
     }
+    
+    @Transactional
+    def updateRunStatus(Long runId, String statusStr) {
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            throw new ReportException(message: "Sequence run not found!")
+        }
 
+        try {
+            RunStatus status = statusStr as RunStatus
+            run.status = status
+            run.save()
+        } catch(Exception e) {
+            throw new ReportException(message: "Wrong run status!")
+        }
+
+    } 
+    
+    @Transactional
+    def updateReportStatus(Long reportId, String statusStr) {
+        def report = SummaryReport.get(reportId)
+        if (!report) {
+            throw new ReportException(message: "Report not found!")
+        }
+
+        try {
+            ReportStatus status = statusStr as ReportStatus
+            report.status = status
+            report.save()
+        } catch(Exception e) {
+            throw new ReportException(message: "Wrong report status!")
+        }
+
+    } 
 }

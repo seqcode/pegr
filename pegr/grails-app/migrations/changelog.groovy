@@ -2869,4 +2869,6 @@ databaseChangeLog = {
 	include file: 'changeChores.groovy'
 
 	include file: 'changeGenome.groovy'
+
+	include file: 'addCohort.groovy'
 }

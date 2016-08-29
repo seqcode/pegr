@@ -30,35 +30,36 @@ class SecurityFilters {
         }
         
         /*
-         * The authorization to view a project's summary report is the same as 
-         * that of viewing a project
-         */
-        reportShowProject(controller:'report', action:'showProject') {
-            before = {
-                def projectId = params.long('id')
-                if (projectService.projectViewAuth(projectId)) {
-                    return true                    
-                } else {
-                    render(view: '/login/denied')
-                    return false
-                }
-            }
-        }
-        
-        /*
          * The authorization to view a summary report is the same as 
          * that of viewing the project that the report belongs to.
          */
         reportShow(controller:'report', action:'show') {
             before = {
+                def user = springSecurityService.currentUser
+                if (user.isAdmin()) {
+                    return true
+                } 
                 def reportId = params.long('id')
-                def projectId = SummaryReport.get(reportId)?.project?.id
-                if (projectService.projectViewAuth(projectId)) {
-                    return true                    
-                } else {
-                    render(view: '/login/denied')
-                    return false
-                }
+                def report = SummaryReport.get(reportId)
+                switch (report.type) {
+                    case ReportType.AUTOMATED:
+                        def projectId = report.cohort?.project?.id
+                        if (projectService.projectViewAuth(projectId)) {
+                            return true                    
+                        } else {
+                            render(view: '/login/denied')
+                            return false
+                        }
+                        break
+                    default:
+                        if (report.user == user) {
+                            return true                    
+                        } else {
+                            render(view: '/login/denied')
+                            return false
+                        }
+                        break
+                }                
             }
         }
         

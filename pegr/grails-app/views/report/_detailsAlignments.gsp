@@ -53,12 +53,12 @@
                             <g:each in="${alignment.fourColor}" var="fourColor" status="n">
                                 <tr>
                                     <td class="meme-id" style="width:20px"></td>
-                                    <td class="meme-fig"></td>
+                                    <td class="meme-fig"><i class="fa fa-spinner fa-spin"></i></td>
                                     <td class="meme-evalue" style="width:100px"></td>
                                     <td class="meme-sites" style="width:100px"></td>
                                     <td class="meme-width" style="width:100px"></td>
                                     <td style="width:100px"><a href="${fourColor}" target="_blank"><span class="glyphicon glyphicon-picture" style="font-size: 2em"></span></a></td>
-                                    <td class="composite" style="width:210px"><span class="composite-url" hidden="hidden">${alignment.composite[n]}</span><g:link action="composite" params="[url: alignment.composite[n]]" target="_blank"><div class="composite-fig"></div></g:link></td>
+                                    <td class="composite" style="width:210px"><g:link action="composite" params="[url: alignment.composite[n]]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link><i class="fa fa-spinner fa-spin"></i><span class="composite-url" hidden="hidden">${alignment.composite[n]}</span><div class="composite-fig"></div></td>
                                 </tr>
                             </g:each>
                         </tbody>
@@ -73,6 +73,8 @@
         google.charts.load('current', {'packages':['corechart']});
         // composite chart
         $(".composite").each(function(){
+            var compositeTd = $(this);
+            var spinner = $(this).find("i");
             var compositeUrl = $(this).find(".composite-url").text();
             var container = $(this).find(".composite-fig")[0];
             google.charts.setOnLoadCallback(function(){
@@ -80,13 +82,25 @@
                       url: "/pegr/report/fetchCompositeDataAjax?url=" + compositeUrl,
                       dataType: "json"
                 }).done(function(jsonData){
-                    // Create our data table out of JSON data loaded from server.
-                    var data = new google.visualization.arrayToDataTable(jsonData);
+                    if (jsonData["error"]) {
+                        $(compositeTd).empty();
+                        $(compositeTd).html(jsonData["error"]);
+                    } else {
+                        // Create our data table out of JSON data loaded from server.
+                        var data = new google.visualization.arrayToDataTable(jsonData);
 
-                    // Instantiate and draw our chart, passing in some options.
-                    var chart = new google.visualization.LineChart(container);
-                    chart.draw(data, {width: 200, height: 100, legend: {position: 'none'}});    
-                });                
+                        // Instantiate and draw our chart, passing in some options.
+                        var chart = new google.visualization.LineChart(container);
+                        var options = { width: 200, 
+                                       height: 100, 
+                                       legend: { position: 'none'}, 
+                                       vAxis: { gridlines: {count: 3 } },
+                                       hAxis: { gridlines: {count: 3 } },
+                                      };
+                        chart.draw(data, options);   
+                        $(spinner).remove();
+                    }
+                });           
             });
         });
     
@@ -98,21 +112,34 @@
                 success: 
                     function(result) {
                         memeTable.find(".meme-id").each(function(index, memeId) {
-                            $(memeId).html(result[index].id);
+                            if (index < result.length) {
+                                $(memeId).html(result[index].id);
+                            }
                         });
                         memeTable.find(".meme-fig").each(function(index, memeFig) {
-                            make_motif(memeFig, result[index]);
+                            $(memeFig).find("i").remove();
+                            if (index < result.length) {
+                                make_motif(memeFig, result[index]);
+                            } else {
+                                $(memeFig).html("No MEME data found!");
+                            }                            
                         });
                         memeTable.find(".meme-evalue").each(function(index, memeEvalue) {
-                            $(memeEvalue).html(result[index].evalue);
+                            if (index < result.length) {
+                                $(memeEvalue).html(result[index].evalue);
+                            }
                         });
                         memeTable.find(".meme-sites").each(function(index, memeSites) {
-                            $(memeSites).html(result[index].nsites);
+                            if (index < result.length) {
+                                $(memeSites).html(result[index].nsites);
+                            }
                         });
                         memeTable.find(".meme-width").each(function(index, memeWidth) {
-                            $(memeWidth).html(result[index].len);
+                            if (index < result.length) {
+                                $(memeWidth).html(result[index].len);
+                            }
                         });
-                    }
+                    },
             });  
         });        
     });    

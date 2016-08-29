@@ -1,19 +1,18 @@
 package pegr
 
 class SummaryReport {
-    Project project
-    SequenceRun run
+    ReportType type
+    String name
+    Date date
+    ReportStatus status
+    String note
     
     static constraints = {
-        project unique: "run"
+        note nullable: true
     }
     
-    static mapping = {
-        version false
+    SequencingCohort getCohort() {
+        return SequencingCohort.findByReport(this)
     }
     
-    String toString() {
-        def name = "${run.id}_${project.name}"
-        return name
-    }
 }

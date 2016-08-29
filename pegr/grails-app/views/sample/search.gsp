@@ -1,18 +1,15 @@
 <html>
 <head>
     <title>Samples</title> 
-    <meta name="layout" content="main"/>
+    <meta name="layout" content="analysis"/>
     <asset:javascript src="cookie.js"/>
 </head>
 <body>
     <div class="container-fluid">
+        <br>
         <div>
-            <g:link action="all"><span class="glyphicon glyphicon-home"></span> Home</g:link>
-            <g:link action="searchForm"><span class="glyphicon glyphicon-search"></span> Search</g:link>
-        </div>
-        <div>
-            <g:link action="showChecked" class="btn btn-info">View Checked Samples (<span id="checked-count">${checkedCount}</span>)</g:link>
-            <a href="#" onclick="clearCheckedSamples()" class="btn btn-info">Clear Checkbox</a>
+            <g:link action="showChecked" class="btn btn-default">View Checked Samples (<span id="checked-count">${checkedCount}</span>)</g:link>
+            <a href="#" onclick="clearCheckedSamples()" class="btn btn-default">Clear Checkbox</a>
         </div>
         <g:render template="table" model="['sampleList':sampleList, 'checkbox':true]"></g:render>
         <div class="pagination">
@@ -21,7 +18,7 @@
     </div>
     <script>
         $(function(){
-            $("#nav-metadata").addClass("active");
+            $(".nav-datasets").addClass("active");
         });
         
         function toggleChecked(element) {

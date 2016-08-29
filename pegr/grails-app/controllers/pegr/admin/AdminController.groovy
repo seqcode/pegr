@@ -39,16 +39,21 @@ class AdminController {
                       'tissue',
                       'assay',
                       'protocol',
+                      'genome'
                      ] 
         [tables: tables, table: table]
     }
     
     def merge(String table, Long fromId, Long toId) {
-        try {
-            utilityService.mergeRowsInDb(table, fromId, toId)
-            flash.message = "Success merging ${table} from ID#" + fromId + " to ID#" + toId + "!"
-        } catch (UtilityException e) {
-            flash.message = e.message
+        if(request.method == "POST") {
+            withForm{
+                try {
+                    utilityService.mergeRowsInDb(table, fromId, toId)
+                    flash.message = "Success merging ${table} from ID#" + fromId + " to ID#" + toId + "!"
+                } catch (UtilityException e) {
+                    flash.message = e.message
+                }
+            }
         }
         redirect(action: "mergeForm", params: [table: table])
     }

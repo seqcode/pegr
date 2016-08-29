@@ -127,18 +127,28 @@ class UtilityService {
     }
     
     /**
+     * Parse a json string. 
+     * @param s the string to parse
+     * @return pared json. Returns null if parsing failed.
+     */
+    def parseJson(String s) {
+        def jsonSlurper = new JsonSlurper()
+        def json
+        try {
+            json = jsonSlurper.parseText(s)
+        } catch(Exception e) {   
+        }
+        return json
+    }
+    
+    /**
      * Given a list of keys, query the corresponding values from a Json string.
      * @param jsonStr the Json string to query from
      * @param keys the list of given keys
      * @return a map with given keys and queried values
      */
     def queryJson(String jsonStr, List keys) {
-        def jsonSlurper = new JsonSlurper()
-        def json
-        try {
-            json = jsonSlurper.parseText(jsonStr)
-        } catch(Exception e) {   
-        }
+        def json = parseJson(jsonStr)
         def result = [:]
         keys.each { key ->
             result[key] = null
@@ -231,6 +241,15 @@ class UtilityService {
      */
     @Transactional
     def mergeRowsInDb(String tableName, Long fromId, Long toId) {
+        if (!tableName || tableName == "") {
+            throw new UtilityException(message: "Table not selected!")
+        }
+        if (!fromId) {
+            throw new UtilityException(message: "From ID is missing!")
+        }
+        if (!toId) {
+            throw new UtilityException(message: "To ID is missing!")
+        }                                                        
         try {
             def sql = new Sql(dataSource)
             // check if both the merge from and merge to exist

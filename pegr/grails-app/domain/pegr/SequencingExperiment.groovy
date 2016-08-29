@@ -2,7 +2,8 @@ package pegr
 
 class SequencingExperiment {
 	Sample sample
-	SequenceRun sequenceRun	
+	SequenceRun sequenceRun
+    SequencingCohort cohort
 	String publicDbId
     String readPositions
 	String note
@@ -15,7 +16,7 @@ class SequencingExperiment {
     Long adapterDimerCount
 	
     List getAlignments() {
-        return SequenceAlignment.where{sequencingExperiment == this}.list()
+        return SequenceAlignment.where{sequencingExperiment == this}.list(sort: "date")
     }
     
     def getGenomes() {
@@ -28,7 +29,8 @@ class SequencingExperiment {
     }
     
     static constraints = {
-        sequenceRun nullable: true        
+        sequenceRun nullable: true
+        cohort nullable: true
         readPositions nullable: true, blank: true
         readType nullable: true
 		note nullable: true, blank: true

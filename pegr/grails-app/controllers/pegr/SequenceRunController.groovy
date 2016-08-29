@@ -331,19 +331,5 @@ class SequenceRunController {
 
         redirect(action: "index")
     }
-    
-    def createReports(Long runId) {
-        def run = SequenceRun.get(runId)
-        if (!run) {
-            render(view:"/404")
-            return
-        }
-        try {
-            reportService.createSummaryReportsForRun(run)
-        } catch(ReportException e) {
-            flash.message = e.message
-        }
-        redirect(action:"show", id: runId)
-    }
 
 }

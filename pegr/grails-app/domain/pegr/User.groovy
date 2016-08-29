@@ -13,6 +13,7 @@ class User implements Serializable {
 	String phone
 	Organization affiliation
 	Address address
+    String apiKey
 	
 	boolean enabled = true
 	boolean accountExpired
@@ -66,6 +67,7 @@ class User implements Serializable {
 		phone nullable: true, maxSize: 20
 		affiliation nullable: true
 		address nullable: true
+        apiKey nullable: true
 	}
 
 	static mapping = {

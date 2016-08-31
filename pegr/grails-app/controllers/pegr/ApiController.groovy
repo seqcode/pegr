@@ -7,8 +7,9 @@ import groovy.json.*
 class ApiController {
     def alignmentStatsService
     def reportService
+    def sampleService
     
-     static allowedMethods = [stats:'POST',
+    static allowedMethods = [stats:'POST',
                               fetchSampleData:'GET'
                              ]
     
@@ -63,23 +64,27 @@ class ApiController {
         def apiUser = User.findByEmailAndApiKey(params.userEmail, apiKey)
         def message, data, code
         if (apiUser) {
-            if (!params.max) {
-                params.max = 1000
-            }
-            if (!params.sort) {
-                params.sort = "id"
-            }
-            if (!params.order) {
-                params.order = "desc"
-            }
-            def sampleIds = sampleService.search(params).collect {it.id}.toList()
-            if (sampleIds.size() == 0) {
-                code = 404
-                message = "No sample has been found!"
+            if (params.runId) {
+                data = reportService.fetchDataForRun(params.runId)     
             } else {
-                data = reportService.fetchDataForSamples(sampleIds)     
-                code = 200
-                message = "Success!"
+                if (!params.max) {
+                    params.max = 100
+                }
+                if (!params.sort) {
+                    params.sort = "id"
+                }
+                if (!params.order) {
+                    params.order = "desc"
+                }
+                def sampleIds = sampleService.search(params).collect {it.id}.toList()
+                if (sampleIds.size() == 0) {
+                    code = 404
+                    message = "No sample has been found!"
+                } else {
+                    data = reportService.fetchDataForSamples(sampleIds)     
+                    code = 200
+                    message = "Success!"
+                }
             }               
         } else {
             code = 401
@@ -111,6 +116,21 @@ class StatsRegistrationCommand {
     Map parameters
     List statistics
     List datasets
+}
+
+class QueryRegistrationCommand {
+    String userEmail // required
+    Integer max
+    String sort
+    String order
+    Long runId
+    Long id
+    String source
+    String sourceId
+    String target
+    String species
+    String strain
+    String antibody
 }
 
 

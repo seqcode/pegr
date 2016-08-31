@@ -160,6 +160,27 @@ class ReportService {
         return sampleList
     }
     
+    def fetchDataForRun(Long runId) {
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            throw new ReportException(message: "Sequence run not found!")
+        }
+        def sampleDTOs = []
+        run.experiments.each { experiment ->
+            def sampleDTO = getSampleDTO(experiment.sample)
+            def expDTO = getExperimentDTO(experiment)
+            experiment.alignments.each { alignment ->
+                def alignmentDTO = getAlignmentDTO(alignment)
+                updateAlignmentPct(alignmentDTO, expDTO)
+                expDTO.alignments << alignmentDTO
+                sampleDTO.alignmentCount++
+            }
+            sampleDTO.experiments << expDTO
+            sampleDTOs << sampleDTO            
+        }
+        return sampleDTOs
+    }
+    
     def fetchDataForReport(Long reportId) {
         def alignments = ReportAlignments.where { report.id == reportId }.collect { it.alignment }
 

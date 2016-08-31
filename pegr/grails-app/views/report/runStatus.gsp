@@ -2,6 +2,29 @@
 <head>
     <title>PEGR - Analysis Status</title> 
     <meta name="layout" content="analysis"/>
+    <style>
+        .step-header {
+            height: 140px;
+            white-space: nowrap;
+        }
+
+        .step-header > div {
+            transform: 
+                /* Magic Numbers */
+                translate(25px, 51px)
+                rotate(315deg);
+            /* 45 is really 360 - 45 */
+            -webkit-transform: rotate(-45deg);
+            -moz-transform: rotate(-45deg);
+            -ms-transform: rotate(-45deg);
+            -o-transform: rotate(-45deg);
+            width: 30px;
+        }
+        .step-header > div > span {
+            border-bottom: 1px solid #ccc;
+            padding: 5px 10px;
+        }
+    </style>
 </head>
 <body>
     <g:if test="${flash.message}">
@@ -21,44 +44,98 @@
     <g:each in="${runStatus}">
         <div class="pull-right"><span class="label label-success"> </span> Data received; <span class="label label-danger"> </span> No data. Click to see the step's category.</div>
         <div>
-            <table class="table">
-                <caption><h4>Pipeline: ${it.key.name}, versin: ${it.key.pipelineVersion} (workflow ID: ${it.key.workflowId}) <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link controller="pipelineAdmin" action="show" id="${it.key.id}" class="edit">Manage</g:link></sec:ifAnyGranted></h4></caption>
-                <thead>
-                    <tr>
-                        <th>Sample</th>
-                        <th>Cohort</th>
-                        <th>Genome</th>
-                        <th>Galaxy History</th>
-                        <th>Date</th>                        
-                        <th colspan="${it.value.steps.size()}">Status</th>
-                        <th>Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <g:each in="${it.value.sampleStatusList}" var="sample">
-                    <tr>
-                    <td rowspan="${Math.max(1, sample.alignmentStatusList.size())}"><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}</g:link></td>
-                    <td rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.cohort}</td>
-                    <g:each in="${sample.alignmentStatusList}" var="alignment" status="n">
-                        <g:if test="${n>0}"><tr></g:if>
-                            <td>${alignment.genome}</td>
-                            <td><a href="http://galaxy-cegr.psu.edu:8080/history?id=${alignment.historyId}" target="_blank">${alignment.historyId}</a></td>
-                            <td>${alignment.date}</td>
-                            <g:each in="${alignment.status}" var="status" status="j">
-                                <td class="analysis-status">
-                                    <g:if test="${status}"><span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-success"> </span></g:if> 
-                                    <g:else><span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-danger"> </span></g:else>
-                                </td>
+            <h4>Pipeline: ${it.key.name}, version: ${it.key.pipelineVersion} (workflow ID: ${it.key.workflowId}) <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link controller="pipelineAdmin" action="show" id="${it.key.id}" class="edit">Manage</g:link></sec:ifAnyGranted></h4>
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#qc-steps">Steps</a></li>
+                <li><a data-toggle="tab" href="#qc-statistics">Statistics</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="qc-steps" class="tab-pane fade in active">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Sample</th>
+                                <th>Cohort</th>
+                                <th>Genome</th>
+                                <th>Galaxy History</th>
+                                <th>Date</th> 
+                                <g:if test="${it.value.steps}">
+                                    <g:each in="${it.value.steps}" var="step">
+                                        <th class="step-header"><div><span>${step[1]}</span></div></th>
+                                    </g:each>
+                                </g:if>
+                                <th></th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <g:each in="${it.value.sampleStatusList}" var="sample">
+                            <tr>
+                            <td rowspan="${Math.max(1, sample.alignmentStatusList.size())}"><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}</g:link></td>
+                            <td rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.cohort}</td>
+                            <g:each in="${sample.alignmentStatusList}" var="alignment" status="n">
+                                <g:if test="${n>0}"><tr></g:if>
+                                    <td>${alignment.genome}</td>
+                                    <td><a href="http://galaxy-cegr.psu.edu:8080/history?id=${alignment.historyId}" target="_blank">${alignment.historyId}</a></td>
+                                    <td>${alignment.date}</td>
+                                    <g:each in="${alignment.status}" var="status" status="j">
+                                        <td class="analysis-status">
+                                            <g:if test="${status}"><span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-success"> </span></g:if> 
+                                            <g:else><span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-danger"> </span></g:else>
+                                        </td>
+                                    </g:each>
+                                    <td><g:link controller="report" action="deleteAlignment" params="[alignmentId:alignment.alignmentId, runId:run.id]" class="confirm"><span class="glyphicon glyphicon-trash"</g:link></td>
+                                </tr>
                             </g:each>
-                            <td><g:link controller="report" action="deleteAlignment" params="[alignmentId:alignment.alignmentId, runId:run.id]" class="confirm"><span class="glyphicon glyphicon-trash"</g:link></td>
-                        </tr>
-                    </g:each>
-                    <g:if test="${sample.alignmentStatusList.size()==0}">
-                        </tr>
-                    </g:if>
-                </g:each>
-                </tbody>
-            </table>
+                            <g:if test="${sample.alignmentStatusList.size()==0}">
+                                </tr>
+                            </g:if>
+                        </g:each>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="qc-statistics" class="tab-pane fade">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Sample</th>                                                                    <th>Target</th>
+                                <th>Cohort</th>
+                                <th>Genome</th>
+                                <th>Galaxy History</th>
+                                <th>Date</th> 
+                                <th class="text-right">Dedup. Uniq. Mapped Reads</th>
+                                <th class="text-right">Mapped Read</th>
+                                <th class="text-right">Adapter Dimer</th>
+                                <th class="text-right">Duplication Level</th>
+                                <th>Remark</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <g:each in="${it.value.sampleStatusList}" var="sample">
+                            <tr>
+                            <td rowspan="${Math.max(1, sample.alignmentStatusList.size())}"><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}</g:link></td>
+                            <td rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.target}</td>
+                            <td rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.cohort}</td>
+                            <g:each in="${sample.alignmentStatusList}" var="alignment" status="n">
+                                <g:if test="${n>0}"><tr></g:if>
+                                    <td>${alignment.genome}</td>
+                                    <td><a href="http://galaxy-cegr.psu.edu:8080/history?id=${alignment.historyId}" target="_blank">${alignment.historyId}</a></td>
+                                    <td>${alignment.date}</td>
+                                    <td class="text-right"><g:formatNumber number="${alignment.dedupUniquelyMappedReads}" format="###,###,###" /></td>
+                                    <td class="text-right"><g:formatNumber number="${alignment.mappedReadPct}" format="##.0%" /></td>
+                                    <td class="text-right"><g:formatNumber number="${alignment.adapterDimerPct}" format="##.0%" /></td>
+                                    <td class="text-right"><g:formatNumber number="${alignment.seqDuplicationLevel}" format="##.0%" /></td>
+                                    <td></td>
+                                </tr>
+                            </g:each>
+                            <g:if test="${sample.alignmentStatusList.size()==0}">
+                                </tr>
+                            </g:if>
+                        </g:each>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </g:each>
     <g:if test="${noResultSamples.size() > 0}">

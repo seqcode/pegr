@@ -197,6 +197,7 @@ class RunStatusDTO {
 
 class SampleStatusDTO {
     Long sampleId
+    String target
     SequencingCohort cohort
     List alignmentStatusList
 }
@@ -207,4 +208,9 @@ class AlignmentStatusDTO {
     String genome
     Date date
     List status
+    
+    Long dedupUniquelyMappedReads
+    Float mappedReadPct
+    Float adapterDimerPct
+    Float seqDuplicationLevel
 }

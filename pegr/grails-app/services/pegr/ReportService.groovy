@@ -41,7 +41,12 @@ class ReportService {
                     historyId: alignment.historyId,
                     genome: alignment.genome.name,
                     date: alignment.date,
-                    status: [])
+                    status: [],
+                    dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
+                    mappedReadPct: utilityService.divide(alignment.mappedReads, experiment.totalReads),
+                    adapterDimerPct: utilityService.divide(experiment.adapterDimerCount, experiment.totalReads),
+                    seqDuplicationLevel: alignment.seqDuplicationLevel
+                )
                 
                 // iterate through the analysis
                 def analysis = Analysis.findAllByAlignment(alignment)   
@@ -57,6 +62,7 @@ class ReportService {
                 def sampleStatus = results[alignment.pipeline].sampleStatusList.find {it.sampleId == experiment.sample.id}
                 if (!sampleStatus) {
                     sampleStatus = new SampleStatusDTO(sampleId: experiment.sample.id,
+                                                       target: experiment.sample.target?.name,
                                                        cohort: experiment.cohort,
                                     alignmentStatusList: [alignmentStatusDTO])
                     results[alignment.pipeline].sampleStatusList << sampleStatus

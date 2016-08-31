@@ -9,17 +9,12 @@ class ApiController {
     def reportService
     
      static allowedMethods = [stats:'POST',
-                              fetchDataBySampleId:'GET',
-                              fetchDataBySourceId:'GET',
-                              fetchDataBySampleIdList:'GET',
-                              fetchDataByReportId:'GET',
+                              fetchSampleData:'GET'
                              ]
     
     /*
-     * Accept API calls, authenticate by the API Key, save the raw data into Analysis, 
-     * and parse data prior to and including the Alignment. To test the API: curl -i -X POST -H 
-     * "Content-Type: application/json" -d '{"run":2,"sample":2,"genome":"sacCer3_cegr"}' 
-     * <hostname>:<port>/<application-name>/api/stats?apiKey=
+     * Accept post request, authenticate by the API Key, to save data into Analysis, 
+     * and parse data prior to and including the Alignment.
      * @param data Input data in the format of JSON dictionary
      * @param apiKey API Key used to authenticate the user
      * @return response in the format of JSON dictionary, including a response_code and a message. 
@@ -57,38 +52,41 @@ class ApiController {
         render text: response as JSON, contentType: "text/json", status: code 
     }    
     
-    def fetchDataBySampleId(Long sampleId, String apiKey, String userEmail) {
-        try {
-            def data = reportService.fetchDataForSample(sampleId) as JSON
-            render text: data, contentType: "text/json", status: 200
-        } catch(Exception e) {
-            def message = [message: "Error retrieving the data!"] as JSON
-            render text: message, contentType: "text/json", status: 500
-        }
-    }
-    
-    def fetchDataBySourceId(String source, Long sourceId, String apiKey, String userEmail) {
-        try {
-            def sample = Sample.findBySourceAndSourceId(source, sourceId)
-            if (!sample) {
-                throw new 
+    /*
+     * Accept get request, authenticate by the API Key, to query sample data.
+     * @param query in the format of JSON dictionary
+     * @param apiKey API Key used to authenticate the user
+     * @return response in the format of JSON dictionary, including a response_code and a message. 
+     * @return status code
+     */
+    def fetchSampleData(String apiKey) {
+        def apiUser = User.findByEmailAndApiKey(params.userEmail, apiKey)
+        def message, data, code
+        if (apiUser) {
+            if (!params.max) {
+                params.max = 1000
             }
-            def data = reportService.fetchDataForSample(sampleId) as JSON
-            render text: data, contentType: "text/json", status: 200
-        } catch(Exception e) {
-            def message = [message: "Error retrieving the data!"] as JSON
-            render text: message, contentType: "text/json", status: 500
-        }
-    }
-    
-    def fetchDataByReportId(Long reportId, String apiKey, String userEmail) {
-        try {
-            reportService.fetchDataForReport(reportId) as JSON
-            render text: data, contentType: "text/json", status: 200
-        } catch(Exception e) {
-            def message = [message: "Error retrieving the data!"] as JSON
-            render text: message, contentType: "text/json", status: 500
-        }
+            if (!params.sort) {
+                params.sort = "id"
+            }
+            if (!params.order) {
+                params.order = "desc"
+            }
+            def sampleIds = sampleService.search(params).collect {it.id}.toList()
+            if (sampleIds.size() == 0) {
+                code = 404
+                message = "No sample has been found!"
+            } else {
+                data = reportService.fetchDataForSamples(sampleIds)     
+                code = 200
+                message = "Success!"
+            }               
+        } else {
+            code = 401
+            message = "Not authorized!" 
+        }   
+        def results = [data: data, message: message] as JSON
+        render text: results, contentType: "text/json", status: code
     }
 }
 
@@ -114,6 +112,5 @@ class StatsRegistrationCommand {
     List statistics
     List datasets
 }
-
 
 

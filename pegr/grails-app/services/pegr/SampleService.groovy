@@ -15,6 +15,51 @@ class SampleService {
     def cellSourceService
     def replicateService
     
+    def search(def params) {
+        def c = Sample.createCriteria()
+        def samples = c.list(params) {
+            and {
+               if (params.species) {
+                    cellSource {
+                        strain {
+                            species {
+                                ilike "name", "%${params.species}%"
+                            }
+                        }
+                    }
+                }
+                if (params.strain) {
+                    cellSource {
+                        strain {
+                            ilike "name", "%${params.strain}%"
+                        }                    
+                    }
+                }
+                if (params.antibody) {
+                    antibody {
+                        ilike "catalogNumber", "%${params.antibody}%"
+                    }
+                }
+                if (params.id) {
+                    eq "id", Long.parseLong(params.id)
+                }
+                if (params.sourceId) {
+                    eq "sourceId", params.sourceId
+                }
+                if (params.source) {
+                    ilike "source", "%${params.source}%"
+                }
+                if (params.target) {
+                    target {
+                        ilike "name", "%${params.target}%"
+                    }
+                }
+                eq("status", SampleStatus.COMPLETED)
+            }
+        }
+        return samples
+    }
+    
     def getSampleDetails(Sample sample) {
         def jsonSlurper = new JsonSlurper()
         def notes = [:]

@@ -11,8 +11,9 @@ class ApiController {
     def utilityService
     
     static allowedMethods = [stats:'POST',
-                              fetchSampleData:'GET'
-                             ]
+                            fetchSampleData:'GET',
+                            fetchSequenceRunData: 'GET'
+                            ]
     
     /*
      * Accept post request, authenticate by the API Key, to save data into Analysis, 

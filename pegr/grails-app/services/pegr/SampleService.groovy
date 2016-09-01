@@ -16,45 +16,51 @@ class SampleService {
     def replicateService
     
     def search(def params) {
+        return search(params, params)
+    }
+    
+    def search(Map query, Map listParams) {
         def c = Sample.createCriteria()
-        def samples = c.list(params) {
+        def samples = c.list(listParams) {
             and {
-               if (params.species) {
+               if (query.species) {
                     cellSource {
                         strain {
                             species {
-                                ilike "name", "%${params.species}%"
+                                ilike "name", "%${query.species}%"
                             }
                         }
                     }
                 }
-                if (params.strain) {
+                if (query.strain) {
                     cellSource {
                         strain {
-                            ilike "name", "%${params.strain}%"
+                            ilike "name", "%${query.strain}%"
                         }                    
                     }
                 }
-                if (params.antibody) {
+                if (query.antibody) {
                     antibody {
-                        ilike "catalogNumber", "%${params.antibody}%"
+                        ilike "catalogNumber", "%${query.antibody}%"
                     }
                 }
-                if (params.id) {
-                    eq "id", Long.parseLong(params.id)
+                if (query.id) {
+                    eq "id", Long.parseLong(query.id)
                 }
-                if (params.sourceId) {
-                    eq "sourceId", params.sourceId
+                if (query.sourceId) {
+                    eq "sourceId", query.sourceId
                 }
-                if (params.source) {
-                    ilike "source", "%${params.source}%"
+                if (query.source) {
+                    ilike "source", "%${query.source}%"
                 }
-                if (params.target) {
+                if (query.target) {
                     target {
-                        ilike "name", "%${params.target}%"
+                        ilike "name", "%${query.target}%"
                     }
                 }
-                eq("status", SampleStatus.COMPLETED)
+                if (query.status) {
+                    eq("status", query.status)
+                }                
             }
         }
         return samples

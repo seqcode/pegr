@@ -8,6 +8,7 @@ class ApiController {
     def alignmentStatsService
     def reportService
     def sampleService
+    def utilityService
     
     static allowedMethods = [stats:'POST',
                               fetchSampleData:'GET'
@@ -60,32 +61,62 @@ class ApiController {
      * @return response in the format of JSON dictionary, including a response_code and a message. 
      * @return status code
      */
-    def fetchSampleData(String apiKey) {
-        def apiUser = User.findByEmailAndApiKey(params.userEmail, apiKey)
+    def fetchSampleData(QuerySampleRegistrationCommand cmd, String apiKey) {
+        def apiUser = User.findByEmailAndApiKey(cmd.userEmail, apiKey)
         def message, data, code
-        if (apiUser) {
-            if (params.runId) {
-                data = reportService.fetchDataForRun(params.runId)     
-            } else {
-                if (!params.max) {
-                    params.max = 100
-                }
-                if (!params.sort) {
-                    params.sort = "id"
-                }
-                if (!params.order) {
-                    params.order = "desc"
-                }
-                def sampleIds = sampleService.search(params).collect {it.id}.toList()
+        if (apiUser) {            
+            if (cmd.query) {
+                def listParams = [
+                    max: cmd.max ?: 100,
+                    sort: cmd.sort ?: "id",
+                    order: cmd.order ?: "desc"
+                ]
+
+                def sampleIds = sampleService.search(cmd.query, listParams).collect {it.id}.toList()
                 if (sampleIds.size() == 0) {
                     code = 404
                     message = "No sample has been found!"
                 } else {
-                    data = reportService.fetchDataForSamples(sampleIds)     
+                    data = reportService.fetchDataForSamples(sampleIds, cmd.preferredOnly)     
                     code = 200
                     message = "Success!"
+                }              
+            } else {
+                code = 500
+                message = "No query is specified!"
+            }
+        } else {
+            code = 401
+            message = "Not authorized!" 
+        }   
+        def results = [data: data, message: message] as JSON
+        render text: results, contentType: "text/json", status: code
+    }
+    
+    /*
+     * Accept get request, authenticate by the API Key, to query sample
+     * data in a sequence run.
+     * @param query in the format of JSON dictionary
+     * @param apiKey API Key used to authenticate the user
+     * @return response in the format of JSON dictionary, including a response_code and a message. 
+     * @return status code
+     */
+    def fetchSequenceRunData(QueryRunRegistrationCommand query, String apiKey) {
+        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        def message, data, code
+        if (apiUser) {
+            if (query.runId) {
+                try {
+                    def preferredOnly = query.preferredOnly ?: true
+                    data = reportService.fetchDataForRun(query.runId, preferredOnly)       
+                } catch (ReportException e) {
+                    code = 500
+                    message = e.message
                 }
-            }               
+            } else {
+                code = 404
+                message = "Sequence Run ID is missing!"
+            }
         } else {
             code = 401
             message = "Not authorized!" 
@@ -118,19 +149,19 @@ class StatsRegistrationCommand {
     List datasets
 }
 
-class QueryRegistrationCommand {
+class QuerySampleRegistrationCommand {
     String userEmail // required
+    Boolean preferredOnly
     Integer max
     String sort
     String order
-    Long runId
-    Long id
-    String source
-    String sourceId
-    String target
-    String species
-    String strain
-    String antibody
+    Map query // required
+}
+
+class QueryRunRegistrationCommand {
+    String userEmail // required
+    Boolean preferredOnly
+    Long runId // required
 }
 
 

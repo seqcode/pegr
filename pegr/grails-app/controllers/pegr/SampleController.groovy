@@ -331,50 +331,8 @@ class SampleController {
             params.sort = "id"
             params.order = "desc"
         }        
-        
-        def sampleProps = Sample.metaClass.properties*.name
-        def c = Sample.createCriteria()
-        params.max = 15
-        def samples = c.list(params) {
-            and {
-               if (params.species) {
-                    cellSource {
-                        strain {
-                            species {
-                                ilike "name", "%${params.species}%"
-                            }
-                        }
-                    }
-                }
-                if (params.strain) {
-                    cellSource {
-                        strain {
-                            ilike "name", "%${params.strain}%"
-                        }                    
-                    }
-                }
-                if (params.antibody) {
-                    antibody {
-                        ilike "catalogNumber", "%${params.antibody}%"
-                    }
-                }
-                if (params.id) {
-                    eq "id", Long.parseLong(params.id)
-                }
-                if (params.sourceId) {
-                    eq "sourceId", params.sourceId
-                }
-                if (params.source) {
-                    ilike "source", "%${params.source}%"
-                }
-                if (params.target) {
-                    target {
-                        ilike "name", "%${params.target}%"
-                    }
-                }
-                eq("status", SampleStatus.COMPLETED)
-            }
-        }
+        def samples = sampleService.search(params)
+
         def checkedCount = 0;
         if (session.checkedSample) {
             checkedCount = session.checkedSample.size()

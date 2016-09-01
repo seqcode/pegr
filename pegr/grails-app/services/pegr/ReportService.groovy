@@ -231,6 +231,8 @@ class ReportService {
     
     def getSampleDTO(Sample sample) {
         return new SampleDTO(id: sample.id,
+          source: sample.source,
+          sourceId: sample.sourceId,
           target: sample.target?.name,
           nTermTag: sample.target?.nTermTag,
           cTermTag: sample.target?.cTermTag,

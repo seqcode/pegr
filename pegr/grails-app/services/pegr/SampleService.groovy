@@ -19,7 +19,7 @@ class SampleService {
         return search(params, params)
     }
     
-    def search(Map query, Map listParams) {
+    def search(query, listParams) {
         def c = Sample.createCriteria()
         def samples = c.list(listParams) {
             and {
@@ -57,10 +57,7 @@ class SampleService {
                     target {
                         ilike "name", "%${query.target}%"
                     }
-                }
-                if (query.status) {
-                    eq("status", query.status)
-                }                
+                }             
             }
         }
         return samples

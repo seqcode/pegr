@@ -65,25 +65,21 @@ class ApiController {
         def apiUser = User.findByEmailAndApiKey(cmd.userEmail, apiKey)
         def message, data, code
         if (apiUser) {            
-            if (cmd.query) {
-                def listParams = [
-                    max: cmd.max ?: 100,
-                    sort: cmd.sort ?: "id",
-                    order: cmd.order ?: "desc"
-                ]
+            def listParams = [
+                max: cmd.max ?: 100,
+                sort: cmd.sort ?: "id",
+                order: cmd.order ?: "desc",
+                offset: cmd.offset
+            ]
 
-                def sampleIds = sampleService.search(cmd.query, listParams).collect {it.id}.toList()
-                if (sampleIds.size() == 0) {
-                    code = 404
-                    message = "No sample has been found!"
-                } else {
-                    data = reportService.fetchDataForSamples(sampleIds, cmd.preferredOnly)     
-                    code = 200
-                    message = "Success!"
-                }              
+            def sampleIds = sampleService.search(cmd, listParams).collect {it.id}.toList()
+            if (sampleIds.size() == 0) {
+                code = 404
+                message = "No sample has been found!"
             } else {
-                code = 500
-                message = "No query is specified!"
+                data = reportService.fetchDataForSamples(sampleIds, cmd.preferredOnly)     
+                code = 200
+                message = "Success!"
             }
         } else {
             code = 401
@@ -153,9 +149,16 @@ class QuerySampleRegistrationCommand {
     String userEmail // required
     Boolean preferredOnly
     Integer max
+    Integer offset
     String sort
     String order
-    Map query // required
+    String species
+    String strain
+    String antibody
+    Long id
+    String source
+    String sourceId
+    String target
 }
 
 class QueryRunRegistrationCommand {

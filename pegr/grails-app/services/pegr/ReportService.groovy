@@ -149,11 +149,11 @@ class ReportService {
         return sampleDTOs
     }
     
-    def fetchDataForSamples(List sampleIds) {
+    def fetchDataForSamples(List sampleIds, Boolean preferredOnly=false) {
         def sampleList = []
         if (sampleIds) {
             sampleIds.each { id ->
-                def data = fetchDataForSample(id)
+                def data = fetchDataForSample(id, preferredOnly)
                 if (data && data.size()) {
                     sampleList << data.first()
                 }

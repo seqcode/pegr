@@ -127,7 +127,7 @@ class ReportService {
     }
     
     
-    def fetchDataForSample(Long sampleId) {
+    def fetchDataForSample(Long sampleId, Boolean preferredOnly=false) {
         def sampleDTOs = []
         def sample = Sample.get(sampleId)
         if (sample) {
@@ -135,10 +135,12 @@ class ReportService {
             sample.sequencingExperiments.each { experiment ->
                 def expDTO = getExperimentDTO(experiment)
                 experiment.alignments.each { alignment ->
-                    def alignmentDTO = getAlignmentDTO(alignment)
-                    updateAlignmentPct(alignmentDTO, expDTO)
-                    expDTO.alignments << alignmentDTO
-                    sampleDTO.alignmentCount++
+                    if (!preferredOnly || alignment.isPreferred) {
+                        def alignmentDTO = getAlignmentDTO(alignment)
+                        updateAlignmentPct(alignmentDTO, expDTO)
+                        expDTO.alignments << alignmentDTO
+                        sampleDTO.alignmentCount++
+                    }
                 }
                 sampleDTO.experiments << expDTO
             }
@@ -147,17 +149,43 @@ class ReportService {
         return sampleDTOs
     }
     
-    def fetchDataForSamples(List sampleIds) {
+    def fetchDataForSamples(List sampleIds, Boolean preferredOnly=false) {
         def sampleList = []
         if (sampleIds) {
             sampleIds.each { id ->
-                def data = fetchDataForSample(id)
+                def data = fetchDataForSample(id, preferredOnly)
                 if (data && data.size()) {
                     sampleList << data.first()
                 }
             }
         }
         return sampleList
+    }
+    
+    def fetchDataForRun(Long runId, Boolean preferredOnly=false) {
+        if (!runId) {
+            throw new ReportException(message: "Sequence run ID is missing!")
+        }
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            throw new ReportException(message: "Sequence run not found!")
+        }
+        def sampleDTOs = []
+        run.experiments.each { experiment ->
+            def sampleDTO = getSampleDTO(experiment.sample)
+            def expDTO = getExperimentDTO(experiment)
+            experiment.alignments.each { alignment ->
+                if (!preferredOnly || alignment.isPreferred) {
+                    def alignmentDTO = getAlignmentDTO(alignment)
+                    updateAlignmentPct(alignmentDTO, expDTO)
+                    expDTO.alignments << alignmentDTO
+                    sampleDTO.alignmentCount++
+                }
+            }
+            sampleDTO.experiments << expDTO
+            sampleDTOs << sampleDTO            
+        }
+        return sampleDTOs
     }
     
     def fetchDataForReport(Long reportId) {

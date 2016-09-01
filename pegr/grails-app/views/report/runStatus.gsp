@@ -80,8 +80,9 @@
                                     <td>${alignment.date}</td>
                                     <g:each in="${alignment.status}" var="status" status="j">
                                         <td class="analysis-status">
-                                            <g:if test="${status}"><span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-success"> </span></g:if> 
-                                            <g:else><span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-danger"> </span></g:else>
+                                            <g:if test="${status=='OK'}"><span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-success"> </span></g:if> 
+                                            <g:elseif test="${status=='NO'}"><span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-default"> </span></g:elseif>
+                                            <g:else><span data-toggle="popover" title="${it.value.steps[j][1]}" data-content="${status}" data-placement="top" class="label label-danger"> </span></g:else>
                                         </td>
                                     </g:each>
                                     <td><g:link controller="report" action="deleteAlignment" params="[alignmentId:alignment.alignmentId, runId:run.id]" class="confirm"><span class="glyphicon glyphicon-trash"</g:link></td>

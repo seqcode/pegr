@@ -51,10 +51,15 @@ class ReportService {
                 // iterate through the analysis
                 def analysis = Analysis.findAllByAlignment(alignment)   
                 steps.eachWithIndex { step, index ->
-                    if (analysis.find {it.stepId == step[0]}) {
-                        alignmentStatusDTO.status[index] = true
+                    def stepAnalysis = analysis.find {it.stepId == step[0]}
+                    if (stepAnalysis) {
+                        if (stepAnalysis.note && stepAnalysis.note.trim() != "") {
+                            alignmentStatusDTO.status[index] = stepAnalysis.note.trim()
+                        } else {
+                            alignmentStatusDTO.status[index] = "OK"
+                        }                        
                     } else {
-                        alignmentStatusDTO.status[index] = false
+                        alignmentStatusDTO.status[index] = "NO"
                     }                  
                 }
 

@@ -56,6 +56,16 @@ class AlignmentStatsService {
         def parameterStr = data.parameters ? JsonOutput.toJson(data.parameters) : null
         def datasetsStr = data.datasets ? JsonOutput.toJson(data.datasets) : null
         
+        // get the error message
+        def err
+        if (data.toolStderr && data.toolStderr != "") {
+            if (data.toolStderr.length() > 255 ) {
+                err = data.toolStderr[0..254]
+            } else {
+                err = data.toolStderr
+            }
+        }
+
         // save analysis. If it's a re-run inside an old history, overwrite the old analysis; else create a new analysis.
         def analysis = findOldAnalysis(data, theAlignment)        
         if (analysis) {
@@ -68,6 +78,7 @@ class AlignmentStatsService {
                 statistics = statisticsStr
                 datasets = datasetsStr
                 date = new Date()
+                note = err
             }
         } else {
             analysis = new Analysis(alignment: theAlignment,
@@ -78,7 +89,8 @@ class AlignmentStatsService {
                                     parameters: parameterStr,
                                     statistics: statisticsStr,
                                     datasets: datasetsStr,
-                                    date: new Date()
+                                    date: new Date(),
+                                    note: err
                                    )
         }
             

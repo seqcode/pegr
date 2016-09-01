@@ -141,6 +141,7 @@ class StatsRegistrationCommand {
     String workflowStepId
     String userEmail
     String toolCategory
+    String toolStderr
     Map parameters
     List statistics
     List datasets

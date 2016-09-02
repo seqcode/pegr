@@ -15,6 +15,9 @@ class ApiController {
                             fetchSequenceRunData: 'GET'
                             ]
     
+    def help() {
+    }
+    
     /*
      * Accept post request, authenticate by the API Key, to save data into Analysis, 
      * and parse data prior to and including the Alignment.
@@ -67,7 +70,7 @@ class ApiController {
         def message, data, code
         if (apiUser) {            
             def listParams = [
-                max: cmd.max ?: 100,
+                max: cmd.max ?: 1000,
                 sort: cmd.sort ?: "id",
                 order: cmd.order ?: "desc",
                 offset: cmd.offset

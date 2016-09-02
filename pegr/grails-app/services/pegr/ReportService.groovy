@@ -294,6 +294,7 @@ class ReportService {
                     alignmentDTO.peakPairs = utilityService.queryJson(analysis.statistics, "peakPairWis")
                     def params = utilityService.queryJson(analysis.parameters, ["up_distance", "down_distance", "binsize"])
                     alignmentDTO.peakPairsParam = getPeakPairsParam(params.up_distance, params.down_distance, params.binsize)
+                    alignmentDTO.cwpairFile = alignmentStatsService.queryDatasetsUri(analysis.datasets, "gff")
                     break
                 case "output_meme": // meme
                     alignmentDTO.memeFile = alignmentStatsService.queryDatasetsUri(analysis.datasets, "txt")

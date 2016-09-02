@@ -15,12 +15,14 @@ class SampleService {
     def cellSourceService
     def replicateService
     
-    def search(def params) {
-        return search(params, params)
-    }
-    
-    def search(query, listParams) {
+    def search(QuerySampleRegistrationCommand query) {
         def c = Sample.createCriteria()
+        def listParams = [
+                max: query.max ?: 1000,
+                sort: query.sort ?: "id",
+                order: query.order ?: "desc",
+                offset: query.offset
+            ]
         def samples = c.list(listParams) {
             and {
                if (query.species) {
@@ -45,7 +47,7 @@ class SampleService {
                     }
                 }
                 if (query.id) {
-                    eq "id", Long.parseLong(query.id)
+                    eq "id", query.id
                 }
                 if (query.sourceId) {
                     eq "sourceId", query.sourceId

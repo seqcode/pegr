@@ -40,7 +40,7 @@ http://francline.vmhost.psu.edu:8080/pegr/api/fetchSampleData?apiKey=
         <pre>
 { message: "string",
   data: [{
-        "id": integer,
+        "id": long,
         "source": "string",
         "sourceId": "string",
         "target": "string",
@@ -54,14 +54,14 @@ http://francline.vmhost.psu.edu:8080/pegr/api/fetchSampleData?apiKey=
         "assay": "string",
         "alignmentCount": integer,
         "experiments": [{
-                "id": integer,
+                "id": long,
                 "runId": integer,
                 "oldRunNum": integer,
                 "totalReads": long,
                 "adapterDimerCount": long,
                 "fastqc": {"read1":"url", "read2":"url"},
                 "fastq": {"read1":"url", "read2":"url"},
-                "alignments": [{ "id": integer,
+                "alignments": [{ "id": long,
                     "genome": "string",
                     "bam": "url",
                     "mappedReads": long,

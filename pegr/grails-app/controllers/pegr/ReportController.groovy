@@ -137,6 +137,8 @@ class ReportController {
 
 class SampleDTO {
     Long id
+    String source
+    String sourceId
     String target
     String nTermTag
     String cTermTag

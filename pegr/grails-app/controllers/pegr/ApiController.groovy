@@ -11,8 +11,8 @@ class ApiController {
     def utilityService
     
     static allowedMethods = [stats:'POST',
-                            fetchSampleData:'GET',
-                            fetchSequenceRunData: 'GET'
+                            fetchSampleData:'POST',
+                            fetchSequenceRunData: 'POST'
                             ]
     
     def help() {
@@ -59,7 +59,7 @@ class ApiController {
     }    
     
     /*
-     * Accept get request, authenticate by the API Key, to query sample data.
+     * Accept post request, authenticate by the API Key, to query sample data.
      * @param query in the format of JSON dictionary
      * @param apiKey API Key used to authenticate the user
      * @return response in the format of JSON dictionary, including a response_code and a message. 
@@ -87,7 +87,7 @@ class ApiController {
     }
     
     /*
-     * Accept get request, authenticate by the API Key, to query sample
+     * Accept post request, authenticate by the API Key, to query sample
      * data in a sequence run.
      * @param query in the format of JSON dictionary
      * @param apiKey API Key used to authenticate the user

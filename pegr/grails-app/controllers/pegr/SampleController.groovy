@@ -325,19 +325,15 @@ class SampleController {
         
     }
     
-    def search(Integer max) {       
-        params.max = Math.min(max ?: 15, 100)
-        if (!params.sort) {
-            params.sort = "id"
-            params.order = "desc"
-        }        
-        def samples = sampleService.search(params)
+    def search(QuerySampleRegistrationCommand cmd) {       
+        cmd.max = cmd.max ?: 15
+        def samples = sampleService.search(cmd)
 
         def checkedCount = 0;
         if (session.checkedSample) {
             checkedCount = session.checkedSample.size()
         }
-        [sampleList: samples, checkedCount: checkedCount, searchParams: params]
+        [sampleList: samples, checkedCount: checkedCount, searchParams: cmd]
     }
     
     def fetchDataForCheckedSamplesAjax() {

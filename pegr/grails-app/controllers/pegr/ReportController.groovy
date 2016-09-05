@@ -183,6 +183,7 @@ class AlignmentDTO {
     Long peaks
     Long singletons
     String peakPairsParam
+    String cwpairFile
     Long peakPairs
     Long nonPairedPeaks
     String memeFile

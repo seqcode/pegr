@@ -110,6 +110,15 @@ class UserController {
             }
         }
 	}
+    
+    def generateApiKey() {
+        try {
+            userService.generateApiKey()
+        } catch (UserException e) {
+            flash.message = e.message
+        }
+        redirect(action: "profile")
+    }
 }
 
 class UserRegistrationCommand {

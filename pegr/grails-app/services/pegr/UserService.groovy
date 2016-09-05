@@ -1,6 +1,7 @@
 package pegr
 
 import grails.transaction.Transactional
+import org.apache.commons.lang.RandomStringUtils
 
 class UserException extends RuntimeException {
     String message
@@ -8,6 +9,8 @@ class UserException extends RuntimeException {
 }
 
 class UserService {
+    def springSecurityService
+    
     @Transactional
     User updateUser(UserInfoCommand uic, Long userId){
 
@@ -46,5 +49,38 @@ class UserService {
         toDelete.each {
             it.delete()
         }
+    }
+    
+    /**
+     * Generate API key for the current user
+     */
+    @Transactional
+    def generateApiKey() {
+        // get the current user
+        def user = springSecurityService.currentUser
+        if (!user) {
+            throw new UserException("Not logged in!")
+        }
+        
+        // API key configs
+        String charset = (('A'..'Z') + ('0'..'9') ).join()
+        final int length = 32
+        final int maxAttempt = 10
+        
+        // generate a random string as the API key
+        String randomString
+        for (int i=0; i< maxAttempt; ++i) {
+            randomString = RandomStringUtils.random(length, charset.toCharArray())
+            // avoid duplicate API keys
+            if (!User.findByApiKey(randomString)) {
+                user.apiKey = randomString
+                user.save()
+                break
+            }
+        }
+        if (!user.apiKey) {
+            throw new UserException(message: "Error generating the API key!")
+        }
+        
     }
 }

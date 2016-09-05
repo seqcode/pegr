@@ -55,6 +55,9 @@
         <ul>
         <g:link action='updatePassword' id="${user?.id}" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil">Change</span></g:link>
         </ul>
+        <h3>API Key</h3>
+        <g:if test="${user?.apiKey}">${user.apiKey}</g:if>
+        <g:else><g:link controller="user" action="generateApiKey" class="btn btn-primary">Generate</g:link></g:else>
     </div>
 </body>
 </html>

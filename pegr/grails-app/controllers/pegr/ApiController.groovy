@@ -11,8 +11,8 @@ class ApiController {
     def utilityService
     
     static allowedMethods = [stats:'POST',
-                            fetchSampleData:'GET',
-                            fetchSequenceRunData: 'GET'
+                            fetchSampleData:'POST',
+                            fetchSequenceRunData: 'POST'
                             ]
     
     def help() {
@@ -59,7 +59,7 @@ class ApiController {
     }    
     
     /*
-     * Accept get request, authenticate by the API Key, to query sample data.
+     * Accept post request, authenticate by the API Key, to query sample data.
      * @param query in the format of JSON dictionary
      * @param apiKey API Key used to authenticate the user
      * @return response in the format of JSON dictionary, including a response_code and a message. 
@@ -68,15 +68,8 @@ class ApiController {
     def fetchSampleData(QuerySampleRegistrationCommand cmd, String apiKey) {
         def apiUser = User.findByEmailAndApiKey(cmd.userEmail, apiKey)
         def message, data, code
-        if (apiUser) {            
-            def listParams = [
-                max: cmd.max ?: 1000,
-                sort: cmd.sort ?: "id",
-                order: cmd.order ?: "desc",
-                offset: cmd.offset
-            ]
-
-            def sampleIds = sampleService.search(cmd, listParams).collect {it.id}.toList()
+        if (apiUser) {
+            def sampleIds = sampleService.search(cmd).collect {it.id}.toList()
             if (sampleIds.size() == 0) {
                 code = 404
                 message = "No sample has been found!"
@@ -94,7 +87,7 @@ class ApiController {
     }
     
     /*
-     * Accept get request, authenticate by the API Key, to query sample
+     * Accept post request, authenticate by the API Key, to query sample
      * data in a sequence run.
      * @param query in the format of JSON dictionary
      * @param apiKey API Key used to authenticate the user
@@ -134,6 +127,7 @@ class ResponseMessage {
 /* 
  * Class that defines the underlying structure of input JSON data
  */
+@grails.validation.Validateable
 class StatsRegistrationCommand {
     Long run
     Long sample
@@ -150,6 +144,7 @@ class StatsRegistrationCommand {
     List datasets
 }
 
+@grails.validation.Validateable
 class QuerySampleRegistrationCommand {
     String userEmail // required
     Boolean preferredOnly
@@ -166,6 +161,7 @@ class QuerySampleRegistrationCommand {
     String target
 }
 
+@grails.validation.Validateable
 class QueryRunRegistrationCommand {
     String userEmail // required
     Boolean preferredOnly

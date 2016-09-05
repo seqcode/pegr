@@ -111,6 +111,7 @@ class CellSourceController {
 
 }
 
+@grails.validation.Validateable
 class CellSourceCommand {
     Long cellSourceId
     Long itemId

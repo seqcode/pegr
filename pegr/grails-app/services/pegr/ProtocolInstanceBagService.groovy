@@ -208,24 +208,24 @@ class ProtocolInstanceBagService {
 		}
         // save the item
         item.user = springSecurityService.currentUser
-        if (item.save(flush: true)) { 
-            // add the item to the instance
-            def instance = ProtocolInstance.get(instanceId)
-            if (item.type.category.superCategory == ItemTypeSuperCategory.SAMPLE_POOL) {
-                def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance, function: ProtocolItemFunction.END_POOL)
-                instanceItem.save(flush: true)
-                // add all the samples in the bag to the pool
-                ProtocolInstanceItems.findAllByProtocolInstanceAndFunction(instance, ProtocolItemFunction.CHILD).each { 
-                    def sample = Sample.findByItem(it.item)
-                    new PoolSamples(pool: item, sample: sample).save()
-                }
-            } else {
-                def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance, function: ProtocolItemFunction.SHARED)
-                instanceItem.save(flush: true)
+        try {
+            itemService.save(item)
+        } catch (ItemException e) {
+            throw new ProtocolInstanceBagException(message: e.message)
+        }
+        // add the item to the instance
+        def instance = ProtocolInstance.get(instanceId)
+        if (item.type.category.superCategory == ItemTypeSuperCategory.SAMPLE_POOL) {
+            def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance, function: ProtocolItemFunction.END_POOL)
+            instanceItem.save(flush: true)
+            // add all the samples in the bag to the pool
+            ProtocolInstanceItems.findAllByProtocolInstanceAndFunction(instance, ProtocolItemFunction.CHILD).each { 
+                def sample = Sample.findByItem(it.item)
+                new PoolSamples(pool: item, sample: sample).save()
             }
-            
-        } else { 
-            throw new ProtocolInstanceBagException(message: "Error saving this item!")
+        } else {
+            def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance, function: ProtocolItemFunction.SHARED)
+            instanceItem.save(flush: true)
         }
     }
     

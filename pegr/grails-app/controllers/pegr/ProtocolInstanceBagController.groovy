@@ -7,6 +7,7 @@ class ProtocolInstanceBagController {
     def protocolInstanceBagService
     def protocolService
     def barcodeService
+    def itemService
     
     def index() {
         redirect(action: "processingBags", params: params )
@@ -307,6 +308,7 @@ class ProtocolInstanceBagController {
 		def instanceId = Long.parseLong(params.instanceId)
         try {
             protocolInstanceBagService.saveItemInInstance(item, params.parentTypeId, params.parentBarcode, instanceId)
+            itemService.updateCustomizedFields(item, params) 
             redirect(action: "showInstance", id: instanceId)
         }catch(ProtocolInstanceBagException e) {
             flash.message = e.message

@@ -290,7 +290,7 @@ class SampleController {
             if (sample.item) {
                 redirect(controller: "item", action: "show", id: sample.item.id)
             } else {
-                def types = ItemType.where{ category == ItemTypeCategory.TRACED_SAMPLE }.list()
+                def types = ItemType.where{ category.superCategory == ItemTypeSuperCategory.TRACED_SAMPLE }.list()
                 render(view: "addBarcode", model: [sampleId: sampleId, types: types])
             }
         } else {

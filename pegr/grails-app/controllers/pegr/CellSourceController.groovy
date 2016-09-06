@@ -7,6 +7,7 @@ class CellSourceController {
     def protocolInstanceBagService
     def cellSourceService
 	def utilityService
+    def itemService
     
     def save(Item item, CellSourceCommand cmd) {
         withForm {

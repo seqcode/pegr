@@ -9,6 +9,7 @@ class Item {
 	User user
 	String notes
     Item parent
+    String customizedFields
 
     List getSamplesInPool() {
         return PoolSamples.where{pool == this}.collect{it.sample}
@@ -35,9 +36,14 @@ class Item {
     static constraints = {
         name nullable: true, blank: true
 		location nullable: true, blank: true
-		barcode unique: 'type', nullable: true, blank: true
+		barcode unique: true, nullable: true, blank: true
 		user nullable: true
 		notes nullable: true, blank: true
         parent nullable: true
+        customizedFields nullable: true
+    }
+    
+    static mapping = {
+        customizedFields sqlType: 'longtext'
     }
 }

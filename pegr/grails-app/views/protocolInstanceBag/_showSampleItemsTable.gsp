@@ -2,8 +2,8 @@
 <table class="table table-striped">
     <thead>
         <g:if test="${children}">
-            <th>Start State</th>
-            <th>End State</th>  
+            <th>Start State:<br>${protocolInstance?.protocol?.startItemType}</th>
+            <th>End State:<br>${protocolInstance?.protocol?.endItemType}</th>  
         </g:if>
         <g:else>
             <th>Sample</th>
@@ -18,11 +18,11 @@
     <tbody>            
         <g:each in="${parents}" var="parent" status="n">
             <tr>
-                <td><g:link controller="item" action="show" id="${parent.id}" target="_blank">${parent.name}</g:link></td>
+                <td><g:link controller="item" action="show" id="${parent.id}" target="_blank">${parent.name}</g:link><br>(${parent.type})</td>
                 <g:if test="${children}">
                     <td>
                         <g:if test="${children[n]}">
-                            <g:link controller="item" action="show" id="${children[n]?.id}" target="_blank">${children[n]?.name}</g:link>
+                            <g:link controller="item" action="show" id="${children[n]?.id}" target="_blank">${children[n]?.name}</g:link><br>(${children[n]?.type})
                         </g:if>
                     </td> 
                 </g:if>

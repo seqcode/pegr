@@ -4,8 +4,8 @@
     <table class="table table-striped">
         <thead>
             <g:if test="${children}">
-                <th>Start State</th>
-                <th>End State</th>  
+                <th>Start State:<br>${protocolInstance?.protocol?.startItemType}</th>
+                <th>End State:<g:if test="${!children.any { it }}"><g:link action="addAllChildren" params="[instanceId: protocolInstance.id]" class="edit">+All</g:link></g:if><br>${protocolInstance?.protocol?.endItemType}</th>  
             </g:if>
             <g:else>
                 <th>Sample</th>
@@ -22,13 +22,13 @@
         <tbody>            
             <g:each in="${parents}" var="parent" status="n">
                 <tr>
-                    <td><g:link controller="item" action="show" id="${parent.id}" target="_blank">${parent.name}</g:link></td>
+                    <td><g:link controller="item" action="show" id="${parent.id}" target="_blank">${parent.name}</g:link><br>(${parent.type})</td>
                     <g:if test="${children}">
                         <td>
                             <g:if test="${children[n]}">
                                 <g:link controller="item" action="show" id="${children[n].id}" target="_blank">${children[n].name}</g:link>
                                 <g:link action="removeChild" params="[childItemId: children[n].id, instanceId: instanceId]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link>
-                                <g:link action="addChild" params="[parentItemId: parent.id, instanceId: instanceId, childTypeId: childType.id, split: true]" class="edit">Split</g:link>
+                                <g:link action="addChild" params="[parentItemId: parent.id, instanceId: instanceId, childTypeId: childType.id, split: true]" class="edit">Split</g:link><br>(${children[n]?.type})
                             </g:if>
                             <g:else>
                                 <g:link action="addChild" params="[parentItemId: parent.id, instanceId:instanceId, childTypeId:childType.id]"><span class="glyphicon glyphicon-plus"></span></g:link>

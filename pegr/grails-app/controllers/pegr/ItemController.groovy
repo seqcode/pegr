@@ -120,6 +120,7 @@ class ItemController {
             def item = new Item(params)
             try {
                 itemService.save(item)
+                itemService.updateCustomizedFields(item, params)
                 flash.message = "New item added!"
                 redirect(action: "show", id: item.id)
             }catch(ItemException e) {
@@ -150,6 +151,7 @@ class ItemController {
             item.properties = params
             try {
                 itemService.save(item)
+                itemService.updateCustomizedFields(item, params)
                 flash.message = "Item update!"
                 redirect(action: "show", id: params.itemId)
             }catch(ItemException e) {

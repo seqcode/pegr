@@ -250,7 +250,8 @@ class SampleController {
                 cellSourceService.update(cmd, item)
             } else {
                 cellSourceService.saveInSample(sampleId, cmd, item)
-            }            
+            }   
+            itemService.updateCustomizedFields(item, params)
             flash.message = "Cell source information updated!"
             redirect(action:"edit", params:[sampleId: sampleId])
         } catch (CellSourceException e) {

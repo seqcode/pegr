@@ -1,7 +1,8 @@
 package pegr
 
 class Item {
-
+    def utilityService
+    
     String name
 	String location
 	String barcode
@@ -32,6 +33,9 @@ class Item {
         return indexList.join(",")
     }
     
+    Map getFieldMap() {
+        return utilityService.parseJson(this.customizedFields)
+    }
     
     static constraints = {
         name nullable: true, blank: true

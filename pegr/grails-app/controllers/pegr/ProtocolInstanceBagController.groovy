@@ -138,6 +138,7 @@ class ProtocolInstanceBagController {
     def splitAndAddItemToBag(Long itemId, Long bagId, Item item) {
         try {
             protocolInstanceBagService.splitAndAddItemToBag(itemId, bagId, item)
+            itemService.updateCustomizedFields(item, params)
             redirect(action: "showBag", id: bagId)
         }catch(ProtocolInstanceBagException e){
             flash.message = e.message
@@ -416,7 +417,8 @@ class ProtocolInstanceBagController {
                     } else {
                         protocolInstanceBagService.addChild(item, parentItemId, instanceId)
                     }
-                }catch(ProtocolInstanceBagException e){
+                    itemService.updateCustomizedFields(item, params)    
+                } catch(ProtocolInstanceBagException e){
                     flash.message = e.message 
                 }                
                 redirect(action: "showInstance", id: instanceId)  

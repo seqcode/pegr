@@ -9,6 +9,11 @@ class ItemType {
 	String toString() {
 		name
 	}
+    
+    List getFieldList() {
+        def fieldList = fields ? fields.tokenize(",") : []
+        return fieldList
+    }
 	
     static constraints = {
 		name unique: true

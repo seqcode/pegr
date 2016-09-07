@@ -34,6 +34,7 @@ class AntibodyController {
         withForm{
             try {
                 def antibody = antibodyService.save(item, antibodyCommand)
+                itemService.updateCustomizedFields(item, params)
                 flash.message = "New antibody added!"
                 redirect(action: "show", id: antibody.id)
             }catch(AntibodyException e) {
@@ -106,6 +107,7 @@ class AntibodyController {
         item.properties = params
         try {
             itemService.save(item)
+            itemService.updateCustomizedFields(item, params)
             flash.message = "Antibody update!"
             redirect(action: "show", id: antibodyId)
         }catch(ItemException e) {
@@ -122,6 +124,7 @@ class AntibodyController {
                     def item = new Item(params)
                     try {
                         antibodyService.save(item, antibody)
+                        itemService.updateCustomizedFields(item, params)
                         flash.message = "Barcode added!"
                         redirect(action: "show", id: antibodyId)
                     }catch(AntibodyException e) {
@@ -191,6 +194,7 @@ class AntibodyController {
     
 }
 
+@grails.validation.Validateable
 class AntibodyCommand {
     Long antibodyId
     String company

@@ -250,7 +250,8 @@ class SampleController {
                 cellSourceService.update(cmd, item)
             } else {
                 cellSourceService.saveInSample(sampleId, cmd, item)
-            }            
+            }   
+            itemService.updateCustomizedFields(item, params)
             flash.message = "Cell source information updated!"
             redirect(action:"edit", params:[sampleId: sampleId])
         } catch (CellSourceException e) {
@@ -289,7 +290,7 @@ class SampleController {
             if (sample.item) {
                 redirect(controller: "item", action: "show", id: sample.item.id)
             } else {
-                def types = ItemType.where{ category == ItemTypeCategory.TRACED_SAMPLE }.list()
+                def types = ItemType.where{ category.superCategory == ItemTypeSuperCategory.TRACED_SAMPLE }.list()
                 render(view: "addBarcode", model: [sampleId: sampleId, types: types])
             }
         } else {
@@ -325,61 +326,15 @@ class SampleController {
         
     }
     
-    def search(Integer max) {       
-        params.max = Math.min(max ?: 15, 100)
-        if (!params.sort) {
-            params.sort = "id"
-            params.order = "desc"
-        }        
-        
-        def sampleProps = Sample.metaClass.properties*.name
-        def c = Sample.createCriteria()
-        params.max = 15
-        def samples = c.list(params) {
-            and {
-               if (params.species) {
-                    cellSource {
-                        strain {
-                            species {
-                                ilike "name", "%${params.species}%"
-                            }
-                        }
-                    }
-                }
-                if (params.strain) {
-                    cellSource {
-                        strain {
-                            ilike "name", "%${params.strain}%"
-                        }                    
-                    }
-                }
-                if (params.antibody) {
-                    antibody {
-                        ilike "catalogNumber", "%${params.antibody}%"
-                    }
-                }
-                if (params.id) {
-                    eq "id", Long.parseLong(params.id)
-                }
-                if (params.sourceId) {
-                    eq "sourceId", params.sourceId
-                }
-                if (params.source) {
-                    ilike "source", "%${params.source}%"
-                }
-                if (params.target) {
-                    target {
-                        ilike "name", "%${params.target}%"
-                    }
-                }
-                eq("status", SampleStatus.COMPLETED)
-            }
-        }
+    def search(QuerySampleRegistrationCommand cmd) {       
+        cmd.max = cmd.max ?: 15
+        def samples = sampleService.search(cmd)
+
         def checkedCount = 0;
         if (session.checkedSample) {
             checkedCount = session.checkedSample.size()
         }
-        [sampleList: samples, checkedCount: checkedCount, searchParams: params]
+        [sampleList: samples, checkedCount: checkedCount, searchParams: cmd]
     }
     
     def fetchDataForCheckedSamplesAjax() {

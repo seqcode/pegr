@@ -16,7 +16,7 @@
             <div class="message" role="status">${flash.message}</div>
         </g:if>    
         <h3>
-            Sample ${sample.id} <g:if test="${sample.sourceId}">(${sample.source}#${sample.sourceId})</g:if><g:if test="${editAuth}"><g:link controller="sample" action="showItem" params="[sampleId:sample?.id]"><span class="glyphicon glyphicon-qrcode"></span></g:link></g:if>
+            Sample ${sample.id} <g:if test="${sample.sourceId}">(${sample.source}#${sample.sourceId})</g:if><g:if test="${editAuth && sample.item}"><g:link controller="sample" action="showItem" params="[sampleId:sample?.id]"><span class="glyphicon glyphicon-qrcode"></span></g:link></g:if>
             <small><span class="label label-default">${sample.status}</span></small> 
             <g:if test="${editAuth}">
                 <g:link action="edit" params="[sampleId:sample?.id]" class="edit pull-right">Edit</g:link>

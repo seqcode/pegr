@@ -7,11 +7,13 @@ class CellSourceController {
     def protocolInstanceBagService
     def cellSourceService
 	def utilityService
+    def itemService
     
     def save(Item item, CellSourceCommand cmd) {
         withForm {
             try {
                 cellSourceService.save(item, cmd)
+                itemService.updateCustomizedFields(item, params)
                 flash.message = "New traced sample added!"
                 redirect(controller: "item", action: "show", id: item.id)
             }catch(ItemException e) {
@@ -111,6 +113,7 @@ class CellSourceController {
 
 }
 
+@grails.validation.Validateable
 class CellSourceCommand {
     Long cellSourceId
     Long itemId

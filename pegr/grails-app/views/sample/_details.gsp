@@ -194,6 +194,7 @@
             </g:if>
         </ul>
         
+        <g:if test="${protocols && protocols.size()>0}">
         <div class="dropdown">
             <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Details</button>
             <ul class="dropdown-menu" class="list-group" style="padding:0">
@@ -221,6 +222,7 @@
                 </g:each>
             </ul>
         </div>
+        </g:if>
     </div>     
 
     <div id="other" class="col-sm-3">      

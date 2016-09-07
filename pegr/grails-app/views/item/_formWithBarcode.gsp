@@ -32,6 +32,18 @@
             <label>Notes</label>
             <g:textArea name="notes" value="${item?.notes}"/>
         </div>
+        
+        <g:each in="${item?.type?.fieldList}" var="name">
+            <div>
+                <label>${name}</label>
+                <g:if test="${item?.fieldMap?.containsKey(name)}">
+                    <input name="${name}" value="${item?.fieldMap[name]}">
+                </g:if>
+                <g:else>
+                    <input name="${name}">
+                </g:else>
+            </div>
+        </g:each>
     </div>
     <div class="col-sm-6" id="barcode-display">    
             <g:render template="/item/barcodeImage" model="[barcode:'']"></g:render>

@@ -10,6 +10,7 @@ class ProtocolInstanceBagService {
     def springSecurityService
     def itemService
     def sampleService
+    def barcodeService
     
     @Transactional
     ProtocolInstanceBag savePrtclInstBagByGroup(Long protocolGroupId, String name, Date startTime) {
@@ -199,8 +200,7 @@ class ProtocolInstanceBagService {
     @Transactional
     void saveItemInInstance(Item item, String parentTypeId, String parentBarcode, Long instanceId) {
 		if (parentBarcode?.trim()) {
-			def typeId = Long.parseLong(parentTypeId)
-	        def parent = Item.where{type.id == typeId && barcode == parentBarcode}.get(max: 1)
+	        def parent = Item.findByBarcode(parentBarcode)
 	        if (!parent) {
 	            throw new ProtocolInstanceBagException(message: "Parent item not found!")
 	        }
@@ -208,24 +208,24 @@ class ProtocolInstanceBagService {
 		}
         // save the item
         item.user = springSecurityService.currentUser
-        if (item.save(flush: true)) { 
-            // add the item to the instance
-            def instance = ProtocolInstance.get(instanceId)
-            if (item.type.category.superCategory == ItemTypeSuperCategory.SAMPLE_POOL) {
-                def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance, function: ProtocolItemFunction.END_POOL)
-                instanceItem.save(flush: true)
-                // add all the samples in the bag to the pool
-                ProtocolInstanceItems.findAllByProtocolInstanceAndFunction(instance, ProtocolItemFunction.CHILD).each { 
-                    def sample = Sample.findByItem(it.item)
-                    new PoolSamples(pool: item, sample: sample).save()
-                }
-            } else {
-                def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance, function: ProtocolItemFunction.SHARED)
-                instanceItem.save(flush: true)
+        try {
+            itemService.save(item)
+        } catch (ItemException e) {
+            throw new ProtocolInstanceBagException(message: e.message)
+        }
+        // add the item to the instance
+        def instance = ProtocolInstance.get(instanceId)
+        if (item.type.category.superCategory == ItemTypeSuperCategory.SAMPLE_POOL) {
+            def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance, function: ProtocolItemFunction.END_POOL)
+            instanceItem.save(flush: true)
+            // add all the samples in the bag to the pool
+            ProtocolInstanceItems.findAllByProtocolInstanceAndFunction(instance, ProtocolItemFunction.CHILD).each { 
+                def sample = Sample.findByItem(it.item)
+                new PoolSamples(pool: item, sample: sample).save()
             }
-            
-        } else { 
-            throw new ProtocolInstanceBagException(message: "Error saving this item!")
+        } else {
+            def instanceItem = new ProtocolInstanceItems(item: item, protocolInstance: instance, function: ProtocolItemFunction.SHARED)
+            instanceItem.save(flush: true)
         }
     }
     
@@ -451,13 +451,45 @@ class ProtocolInstanceBagService {
         try {
             item.parent = parent
             itemService.save(item)
-            sample.item = item
-            sample.save()
-            def instanceItem = ProtocolInstanceItems.findByProtocolInstanceAndItem(instance, item.parent)
-            instanceItem.item = item
-            instanceItem.save()
+        } catch (ItemException e) {
+            throw new ProtocolInstanceBagException(message: e.message)
+        }
+        sample.item = item
+        sample.save()
+        def instanceItem = ProtocolInstanceItems.findByProtocolInstanceAndItem(instance, item.parent)
+        instanceItem.item = item
+        instanceItem.save()
+    }
+    
+    @Transactional
+    void addAllChildren(Long instanceId) {
+        def instance = ProtocolInstance.get(instanceId)
+        if (!instance) {
+            throw new ProtocolInstanceBagException(message: "Protocol instance not found!")
+        }
+        def parents = ProtocolInstanceItems.findAllByFunctionAndProtocolInstance(ProtocolItemFunction.CHILD, instance).sort {it.id}.collect { it.item }
+        if (parents.any { it -> it.type != instance.protocol.startItemType }) {
+            throw new ProtocolInstanceBagException(message: "Some traced samples may already be in the end state!")
+        }
+        try {
+            parents.each { parent ->
+                def child = new Item(parent: parent,
+                                     name: parent.name,
+                                     type: instance.protocol.endItemType,
+                                     barcode: barcodeService.generateBarcode(),
+                                     location: parent.location,
+                                    )
+                itemService.save(child)
+                def sample = Sample.findByItem(parent)
+                sample.item = child
+                sample.save()
+                def instanceItem = ProtocolInstanceItems.findByProtocolInstanceAndItem(instance, parent)
+                instanceItem.item = child
+                instanceItem.save()
+            }
         } catch (Exception e) {
-            throw new ProtocolInstanceBagException(message: "Invalid inputs! Barcode might already exist for this type!")
+            log.error e
+            throw new ProtocolInstanceBagException(message: "Error saving the children!")
         }
     }
     

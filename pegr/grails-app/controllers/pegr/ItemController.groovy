@@ -72,16 +72,21 @@ class ItemController {
         } else {
             if (barcode?.trim()){
                 if (itemType) { 
-                    def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
+                    def item = Item.findByBarcode(barcode)
                     if (item) {
-                        switch (itemType.category.superCategory) {
-                            case ItemTypeSuperCategory.ANTIBODY:
-                                def antibody = Antibody.findByItem(item)
-                                redirect(controller: "antibody", action: "show", id: antibody?.id)
-                                break
-                            default:
-                                redirect(action: "show", id: item.id)
-                        }
+                        if (item.type == itemType) {
+                            switch (itemType.category.superCategory) {
+                                case ItemTypeSuperCategory.ANTIBODY:
+                                    def antibody = Antibody.findByItem(item)
+                                    redirect(controller: "antibody", action: "show", id: antibody?.id)
+                                    break
+                                default:
+                                    redirect(action: "show", id: item.id)
+                            }
+                        } else {
+                            flash.message = "The item with barcode ${barcode} has type ${item.type.name}, which does not match the input type ${itemType.name}!"
+                            redirect(action: "list", params: [typeId: typeId])
+                        }                        
                     }else {
                         item = new Item(type: itemType, barcode: barcode)
                         switch (itemType.category.superCategory) {
@@ -115,6 +120,7 @@ class ItemController {
             def item = new Item(params)
             try {
                 itemService.save(item)
+                itemService.updateCustomizedFields(item, params)
                 flash.message = "New item added!"
                 redirect(action: "show", id: item.id)
             }catch(ItemException e) {
@@ -145,6 +151,7 @@ class ItemController {
             item.properties = params
             try {
                 itemService.save(item)
+                itemService.updateCustomizedFields(item, params)
                 flash.message = "Item update!"
                 redirect(action: "show", id: params.itemId)
             }catch(ItemException e) {

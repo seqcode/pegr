@@ -137,6 +137,8 @@ class ReportController {
 
 class SampleDTO {
     Long id
+    String source
+    String sourceId
     String target
     String nTermTag
     String cTermTag
@@ -181,6 +183,7 @@ class AlignmentDTO {
     Long peaks
     Long singletons
     String peakPairsParam
+    String cwpairFile
     Long peakPairs
     Long nonPairedPeaks
     String memeFile
@@ -197,6 +200,7 @@ class RunStatusDTO {
 
 class SampleStatusDTO {
     Long sampleId
+    String target
     SequencingCohort cohort
     List alignmentStatusList
 }
@@ -207,4 +211,9 @@ class AlignmentStatusDTO {
     String genome
     Date date
     List status
+    
+    Long dedupUniquelyMappedReads
+    Float mappedReadPct
+    Float adapterDimerPct
+    Float seqDuplicationLevel
 }

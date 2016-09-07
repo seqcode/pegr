@@ -92,21 +92,12 @@ class UserController {
     @Transactional
 	def register(UserRegistrationCommand urc) {
         if(request.method=='POST') {
-            if (urc.hasErrors()) {
+            try {
+                userService.create(urc)
+                redirect(controller: "auth", action: "form")
+            } catch (UserException e) {
+                request.message = e.message
                 [user: urc]
-            } else {
-                def user = new User(urc.properties)
-                user.password = springSecurityService.encodePassword(urc.password)
-                try {
-                    if (user.save(flush:true)) {
-                        redirect(controller: "auth", action: "form")
-                    }else {
-                        [user: urc]
-                    }
-                } catch(Exception e) {
-                    log.error "Error: ${e.message}", e
-                    render status: 404
-                }
             }
         }
 	}

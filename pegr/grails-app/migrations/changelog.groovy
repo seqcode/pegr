@@ -2871,4 +2871,6 @@ databaseChangeLog = {
 	include file: 'changeGenome.groovy'
 
 	include file: 'addCohort.groovy'
+
+	include file: 'updateItem.groovy'
 }

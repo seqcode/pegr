@@ -1,7 +1,8 @@
 package pegr
 
 class Item {
-
+    def utilityService
+    
     String name
 	String location
 	String barcode
@@ -9,6 +10,7 @@ class Item {
 	User user
 	String notes
     Item parent
+    String customizedFields
 
     List getSamplesInPool() {
         return PoolSamples.where{pool == this}.collect{it.sample}
@@ -31,13 +33,21 @@ class Item {
         return indexList.join(",")
     }
     
+    Map getFieldMap() {
+        return utilityService.parseJson(this.customizedFields)
+    }
     
     static constraints = {
         name nullable: true, blank: true
 		location nullable: true, blank: true
-		barcode unique: 'type', nullable: true, blank: true
+		barcode unique: true, nullable: true, blank: true
 		user nullable: true
 		notes nullable: true, blank: true
         parent nullable: true
+        customizedFields nullable: true
+    }
+    
+    static mapping = {
+        customizedFields sqlType: 'longtext'
     }
 }

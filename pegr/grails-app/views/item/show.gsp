@@ -38,6 +38,9 @@
                 <g:if test="${item?.notes}">
                 <li>Notes: ${item.notes}</li>
                 </g:if>    
+                <g:each in="${item?.fieldMap}">
+                    <li>${it.key}: ${it.value}</li>
+                </g:each>
             </ul>
         </div>
         <div class="col-sm-6">

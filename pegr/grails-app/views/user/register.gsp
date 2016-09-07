@@ -5,6 +5,9 @@
 </head>
 <body>
     <div class="container-fluid" id="register-form">
+    <g:if test="${request.message}">
+        <div class="errors">${request.message}</div>
+    </g:if>
     <g:hasErrors>
         <div class="errors">
             <g:renderErrors bean="${user}" as="list"/>

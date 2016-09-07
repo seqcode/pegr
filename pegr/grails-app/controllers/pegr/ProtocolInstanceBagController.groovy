@@ -466,4 +466,13 @@ class ProtocolInstanceBagController {
         redirect(action: "showInstance", id: instanceId)
     }
 
+    def showAllTracedSampleBarcodes(Long instanceId) {
+        def instance = ProtocolInstance.get(instanceId)
+        if (!instance) {
+            render(view: "/404")
+            return
+        }
+        def results = protocolInstanceBagService.getParentsAndChildrenForInstance(instance, instance.protocol.startItemType, instance.protocol.endItemType)
+        [parents: results.parents, children: results.children, instance: instance]
+    }
 }

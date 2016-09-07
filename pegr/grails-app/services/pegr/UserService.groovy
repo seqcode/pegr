@@ -51,6 +51,21 @@ class UserService {
         }
     }
     
+    @Transactional
+    def create(UserRegistrationCommand urc) {
+        if (urc.hasErrors()) {
+            throw new UserException(message: "Input error!")
+        } else if(User.findByUsername(urc.username)) {
+            throw new UserException(message: "Username already exists!")
+        } else {
+            def user = new User(urc.properties)
+            user.password = springSecurityService.encodePassword(urc.password)
+            if (!user.save(flush:true)) {
+                throw new UserException(message: "Error creating the user!")              
+            }
+        }
+    }
+    
     /**
      * Generate API key for the current user
      */

@@ -1,4 +1,4 @@
-<h4>Traced Samples</h4>
+<h4>Traced Samples <g:link controller="protocolInstanceBag" action="showAllTracedSampleBarcodes" params="[instanceId: protocolInstance?.id]" target="_blank"><span class="glyphicon glyphicon-print"></span></g:link></h4>
 <g:form action="addIndex">
     <g:hiddenField name="instanceId" value="${instanceId}"></g:hiddenField>
     <table class="table table-striped">

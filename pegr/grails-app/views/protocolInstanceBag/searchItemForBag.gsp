@@ -11,7 +11,6 @@
     <g:link action="showBag" id="${bagId}"><span class="glyphicon glyphicon-menu-left"></span> Back</g:link>
 
     <h4>Add Traced Sample </h4>
-        <div class="message">If you want to add a sample pool, please add the pool inside the protocol instance where the sample pool is required as a start pool.</div>
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>

@@ -7,6 +7,7 @@ class ProtocolInstanceBagController {
     def protocolInstanceBagService
     def protocolService
     def barcodeService
+    def itemService
     
     def index() {
         redirect(action: "processingBags", params: params )
@@ -109,11 +110,16 @@ class ProtocolInstanceBagController {
     
     def previewItemAndBag(Long typeId, String barcode, Long bagId) {
         def itemType = ItemType.get(typeId)
-        def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
+        def item = Item.findByBarcode(barcode)
         if (item) {        
-            def itemId = item.id
-            def priorInstance = ProtocolInstanceItems.where {item.id == itemId}.get(sort:"id", order: 'desc', max: 1)
-            render(view:"previewItemAndBag", model: [item: item, priorInstance: priorInstance, bagId: bagId])
+            if (item.type == itemType) {
+                def itemId = item.id
+                def priorInstance = ProtocolInstanceItems.where {item.id == itemId}.get(sort:"id", order: 'desc', max: 1)
+                render(view:"previewItemAndBag", model: [item: item, priorInstance: priorInstance, bagId: bagId])                
+            } else {
+                flash.message = "The item with barcode ${barcode} has type ${item.type}, which does not match the input type ${itemType}!"
+                redirect(action: "searchItemForBag", params: [bagId: bagId])
+            }
         } else {
             flash.message = "No item found!"
             redirect(action: "searchItemForBag", params: [bagId: bagId])
@@ -133,6 +139,7 @@ class ProtocolInstanceBagController {
     def splitAndAddItemToBag(Long itemId, Long bagId, Item item) {
         try {
             protocolInstanceBagService.splitAndAddItemToBag(itemId, bagId, item)
+            itemService.updateCustomizedFields(item, params)
             redirect(action: "showBag", id: bagId)
         }catch(ProtocolInstanceBagException e){
             flash.message = e.message
@@ -227,6 +234,10 @@ class ProtocolInstanceBagController {
     
     def previewItemInInstance(Long typeId, String barcode, Long instanceId) {
         def itemType = ItemType.get(typeId)
+        if (!itemType) {
+            flash.message = "Item type not found!"
+            return
+        }
         if (params.generate) {
             try {
                 barcode = barcodeService.generateBarcode()
@@ -236,8 +247,13 @@ class ProtocolInstanceBagController {
                 redirect(action: "showInstance", id: instanceId)
             }
         } else {
-            def item = Item.where{type.id == typeId && barcode == barcode}.get(max:1)
-            if (itemType && itemType.category.superCategory == ItemTypeSuperCategory.SAMPLE_POOL) {
+            def item = Item.findByBarcode(barcode)
+            if (item && item.type != itemType) {
+                flash.message = "The item with barcode ${barcode} has type ${item.type}, which does not match the input type ${itemType}!"
+                redirect(action: "showInstance", id: instanceId)
+                return
+            }
+            if (itemType.category.superCategory == ItemTypeSuperCategory.SAMPLE_POOL) {
                 def instance = ProtocolInstance.get(instanceId)
                 if (instance) {
                     if (instance.protocol.startPoolType == itemType && item) {
@@ -248,7 +264,7 @@ class ProtocolInstanceBagController {
                         item = new Item(type: itemType, barcode: barcode)
                         render(view: "createItemInInstance", model: [instanceId: instanceId, item:item])    
                     } else {
-                        flash.message = "Start pool must be pre-existing and end pool must be new!"
+                        flash.message = "Imported pool must be pre-existing and created pool must be new!"
                         redirect(action: "showInstance", id: instanceId)
                     }
                 } else {
@@ -258,7 +274,7 @@ class ProtocolInstanceBagController {
             } else {
                 if (item) {
                     render(view:"previewItemInInstance", model: [item: item, instanceId: instanceId])
-                }else {
+                } else {
                     item = new Item(type: itemType, barcode: barcode)
                     render(view: "createItemInInstance", model: [instanceId: instanceId, item:item])
                 }
@@ -292,6 +308,7 @@ class ProtocolInstanceBagController {
 		def instanceId = Long.parseLong(params.instanceId)
         try {
             protocolInstanceBagService.saveItemInInstance(item, params.parentTypeId, params.parentBarcode, instanceId)
+            itemService.updateCustomizedFields(item, params) 
             redirect(action: "showInstance", id: instanceId)
         }catch(ProtocolInstanceBagException e) {
             flash.message = e.message
@@ -402,7 +419,8 @@ class ProtocolInstanceBagController {
                     } else {
                         protocolInstanceBagService.addChild(item, parentItemId, instanceId)
                     }
-                }catch(ProtocolInstanceBagException e){
+                    itemService.updateCustomizedFields(item, params)    
+                } catch(ProtocolInstanceBagException e){
                     flash.message = e.message 
                 }                
                 redirect(action: "showInstance", id: instanceId)  
@@ -438,5 +456,23 @@ class ProtocolInstanceBagController {
             render(view: "/404")
         }
     }
+    
+    def addAllChildren(Long instanceId) {
+        try {
+            protocolInstanceBagService.addAllChildren(instanceId)
+        } catch (ProtocolInstanceBagException e) {
+            flash.message = e.message
+        }
+        redirect(action: "showInstance", id: instanceId)
+    }
 
+    def showAllTracedSampleBarcodes(Long instanceId) {
+        def instance = ProtocolInstance.get(instanceId)
+        if (!instance) {
+            render(view: "/404")
+            return
+        }
+        def results = protocolInstanceBagService.getParentsAndChildrenForInstance(instance, instance.protocol.startItemType, instance.protocol.endItemType)
+        [parents: results.parents, children: results.children, instance: instance]
+    }
 }

@@ -36,6 +36,9 @@
                         <g:if test="${antibody.item?.notes}">
                         <li>Notes: ${antibody.item.notes}</li>
                         </g:if>    
+                        <g:each in="${antibody.item?.fieldMap}">
+                            <li>${it.key}: ${it.value}</li>
+                        </g:each>
                     </ul>
                 </div>
                 <div class="col-sm-6">

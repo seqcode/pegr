@@ -27,3 +27,14 @@
     <g:textArea name="notes" value="${item?.notes}"/>
 </div>
 
+<g:each in="${item?.type?.fieldList}" var="name">
+    <div>
+        <label>${name}</label>
+        <g:if test="${item?.fieldMap?.containsKey(name)}">
+            <input name="${name}" value="${item?.fieldMap[name]}">
+        </g:if>
+        <g:else>
+            <input name="${name}">
+        </g:else>
+    </div>
+</g:each>

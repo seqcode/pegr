@@ -44,7 +44,7 @@
     <g:each in="${runStatus}">
         <div class="pull-right"><span class="label label-success"> </span> Data received; <span class="label label-danger"> </span> No data. Click to see the step's category.</div>
         <div>
-            <h4>Pipeline: ${it.key.name}, version: ${it.key.pipelineVersion} (workflow ID: ${it.key.workflowId}) <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link controller="pipelineAdmin" action="show" id="${it.key.id}" class="edit">Manage</g:link></sec:ifAnyGranted></h4>
+            <h4>Pipeline: ${it.key.name}, version: ${it.key.pipelineVersion} (workflow ID: <a href="http://galaxy-cegr.psu.edu:8080/workflow/display_by_id?id=${it.key.workflowId}" target="_blank">${it.key.workflowId}</a>) <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link controller="pipelineAdmin" action="show" id="${it.key.id}" class="edit">Manage</g:link></sec:ifAnyGranted></h4>
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#qc-steps">Steps</a></li>
                 <li><a data-toggle="tab" href="#qc-statistics">Statistics</a></li>

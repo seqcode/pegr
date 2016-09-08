@@ -10,7 +10,7 @@ class StrainAdminController {
     def strainService
     
     def index(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
+        params.max = Math.min(max ?: 25, 100)
         [strainList: Strain.list(params), strainCount: Strain.count()]
     }
     

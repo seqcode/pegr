@@ -21,11 +21,11 @@
 			<table class="table">
 			<thead>
 					<tr>
-						<g:sortableColumn property="name" title="${message(code: 'strain.name.label', default: 'Name')}" />
-                        <th><g:message code="strain.species.label" default="Species" /></th>
-						<th><g:message code="strain.parent.label" default="Parent" /></th>
-					    <th><g:message code="strain.genotype.label" default="Genotype" /></th>
-						<th><g:message code="strain.sourceLab.label" default="Source Lab" /></th>
+						<g:sortableColumn property="name" title="Name" />
+                        <g:sortableColumn property="species.genusName" title="Species" />
+                        <g:sortableColumn property="parent" title="Parent" />
+                        <g:sortableColumn property="genotype" title="Genotype" />
+                        <g:sortableColumn property="sourceLab" title="Source Lab" />
 						<th>Status</th>
 					</tr>
 				</thead>
@@ -46,6 +46,11 @@
 			<div class="pagination">
 				<g:paginate total="${strainCount ?: 0}" />
 			</div>
+            <span class="pagination pull-right">
+                <g:link params="[max:25]">25</g:link>
+                <g:link params="[max:100]">100</g:link>
+                / page
+            </span>
 		</div>
 	</body>
 </html>

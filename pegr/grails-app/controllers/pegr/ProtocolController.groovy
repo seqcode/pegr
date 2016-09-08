@@ -7,19 +7,19 @@ class ProtocolController {
             
     def index(Integer max) {
         def currentUser = springSecurityService.currentUser
-        params.max = Math.min(max ?: 10, 100)
+        params.max = Math.min(max ?: 25, 100)
         def protocols = Protocol.where{ user == currentUser }.list(params)
         [protocolList: protocols]
     }
     
     def labProtocols(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
+        params.max = Math.min(max ?: 25, 100)
         def protocols = Protocol.where{ status == DictionaryStatus.Y }.list(params)
         [protocolList: protocols]
     }
     
     def labProtocolGroups(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
+        params.max = Math.min(max ?: 25, 100)
         def protocolGroups = ProtocolGroup.list(params)
         [protocolGroupList: protocolGroups]
     }

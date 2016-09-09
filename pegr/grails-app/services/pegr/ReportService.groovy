@@ -11,6 +11,7 @@ class ReportService {
     def utilityService
     def alignmentStatsService
     def springSecurityService
+    final String QC_SETTINGS = "QC_SETTINGS"
     
     def fetchRunStatus(SequenceRun run) {
         def results = [:] // key: pipeline, value: runStatusDTO
@@ -42,10 +43,13 @@ class ReportService {
                     genome: alignment.genome.name,
                     date: alignment.date,
                     status: [],
-                    dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
-                    mappedReadPct: utilityService.divide(alignment.mappedReads, experiment.totalReads),
+                    totalReads: experiment.totalReads,
+                    requestedTagNumber: experiment.sample.requestedTagNumber * 1000000,
                     adapterDimerPct: utilityService.divide(experiment.adapterDimerCount, experiment.totalReads),
-                    seqDuplicationLevel: alignment.seqDuplicationLevel
+                    mappedPct: utilityService.divide(alignment.mappedReads, experiment.totalReads),
+                    uniquelyMappedPct: utilityService.divide(alignment.uniquelyMappedReads, experiment.totalReads),
+                    deduplicatedPct: utilityService.divide(alignment.dedupUniquelyMappedReads, experiment.totalReads),
+                    duplicationLevel: getDuplicationLevel(alignment.dedupUniquelyMappedReads, alignment.mappedReads)
                 )
                 
                 // iterate through the analysis
@@ -76,7 +80,14 @@ class ReportService {
                 }
             }
         }
+
         return [results: results, noResultSamples: noResultSamples]
+    }
+    
+    def getQcSettings() {
+        // get the QC settings
+        def qcSettings = utilityService.parseJson(Chores.findByName(QC_SETTINGS)?.value)
+        return qcSettings
     }
     
     @Transactional
@@ -451,6 +462,12 @@ class ReportService {
         return result
     }
     
+    def getDuplicationLevel(Long dedup, Long mapped) {
+        def dedupPct = utilityService.divide(dedup, mapped)
+        def dupLevel = dedupPct ? 1.0 - dedupPct : null
+        return dupLevel
+    }
+    
     def getParam(String shortName, String value) {
         def result = shortName
         if (value) {
@@ -494,4 +511,31 @@ class ReportService {
         }
 
     } 
+    
+    @Transactional
+    def saveQcSettings(def params) {
+        def fields = ["key", "name", "numFormat", "min", "max", "reference_min", "reference_max"]
+        def lists = []
+        
+        fields.each { field ->
+             lists.push(params.list(field))
+        }
+        def settings = []
+        int count = lists[0].size()
+        for (int i =0; i < count; ++i) {
+            def setting = [:]
+            fields.eachWithIndex { field, n ->
+                setting[field] = lists[n][i]
+            }
+            settings << setting
+        }
+        
+        def chores = Chores.findByName(QC_SETTINGS)
+        if (!chores) {
+            chores = new Chores(name: QC_SETTINGS)
+        }
+        chores.value = JsonOutput.toJson(settings)
+        chores.save()
+    }
+    
 }

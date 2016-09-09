@@ -42,7 +42,6 @@
         </small> 
     </h3>
     <g:each in="${runStatus}">
-        <div class="pull-right"><span class="label label-success"> </span> Data received; <span class="label label-danger"> </span> No data. Click to see the step's category.</div>
         <div>
             <h4>Pipeline: ${it.key.name}, version: ${it.key.pipelineVersion} (workflow ID: <a href="http://galaxy-cegr.psu.edu:8080/workflow/display_by_id?id=${it.key.workflowId}" target="_blank">${it.key.workflowId}</a>) <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link controller="pipelineAdmin" action="show" id="${it.key.id}" class="edit">Manage</g:link></sec:ifAnyGranted></h4>
             <ul class="nav nav-tabs">
@@ -51,6 +50,12 @@
             </ul>
             <div class="tab-content">
                 <div id="qc-steps" class="tab-pane fade in active">
+                <div class="pull-right">
+                    <span class="label label-success"> </span> Data received; 
+                    <span class="label label-danger"> </span> Error message;
+                    <span class="label label-default"> </span> No data.
+                    Click to see the step's category.
+                </div>
                     <table class="table">
                         <thead>
                             <tr>
@@ -99,15 +104,22 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Sample</th>                                                                    <th>Target</th>
+                                <th>Sample</th>                                                                    
+                                <th>Target</th>
                                 <th>Cohort</th>
                                 <th>Genome</th>
                                 <th>Galaxy History</th>
-                                <th>Date</th> 
-                                <th class="text-right">Dedup. Uniq. Mapped Reads</th>
-                                <th class="text-right">Mapped Read</th>
-                                <th class="text-right">Adapter Dimer</th>
-                                <th class="text-right">Duplication Level</th>
+                                <th>Date</th>
+                                <th class="text-right">Requested Tags</th>
+                                <g:each in="${qcSettings}" var="setting">
+                                    <th class="text-right">
+                                        ${setting.name}
+                                        <g:if test="${setting.min}"><br>min:<g:formatNumber number="${setting.min}" format="${setting.numFormat}" /></g:if>
+                                        <g:if test="${setting.max}"><br>max:<g:formatNumber number="${setting.max}" format="${setting.numFormat}" /></g:if>
+                                        <g:if test="${setting.reference_min}"><br>min:${setting.reference_min}</g:if>
+                                        <g:if test="${setting.reference_max}"><br>min:${setting.reference_max}</g:if>
+                                    </th>
+                                </g:each>
                                 <th>Remark</th>
                             </tr>
                         </thead>
@@ -122,11 +134,11 @@
                                     <td>${alignment.genome}</td>
                                     <td><a href="http://galaxy-cegr.psu.edu:8080/history?id=${alignment.historyId}" target="_blank">${alignment.historyId}</a></td>
                                     <td>${alignment.date}</td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.dedupUniquelyMappedReads}" format="###,###,###" /></td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.mappedReadPct}" format="##.0%" /></td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.adapterDimerPct}" format="##.0%" /></td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.seqDuplicationLevel}" format="##.0%" /></td>
-                                    <td></td>
+                                    <td class="text-right"><g:formatNumber number="${alignment.requestedTagNumber}" format="###,###,###" /></td>
+                                    <g:each in="${qcSettings}" var="setting">
+                                    <td class="text-right"><g:formatNumber number="${alignment[setting.key]}" format="${setting.numFormat}" /></td>
+                                    </g:each>
+                                   <td></td>
                                 </tr>
                             </g:each>
                             <g:if test="${sample.alignmentStatusList.size()==0}">
@@ -176,31 +188,43 @@
         </tbody>
     </table>
     <br>
-    <script>
-        $(".confirm").confirm({text: "All data in this alignment will be deleted. Are you sure you want to delete this alignment?"});
-        $(".nav-status").addClass("active");
-        $('[data-toggle="popover"]').popover(); 
-        
-        $("#run-status-show").click(function(){
-            $("#run-status-show").hide();
-            $("#run-status-select").show();
-        });
-        
-        $("#run-status-save").click(function(){
-            var status = $("#run-status-select option:selected").text();
-            $.ajax({ url: "/pegr/report/updateRunStatusAjax?runId=${run.id}&status=" + status,
-                success: function(result) {
-                    $("#run-status-show").text(result);
-                    $("#run-status-select").val(result);
-                    $("#run-status-show").show();
-                    $("#run-status-select").hide();
-                }                
+    <script>        
+        $(function(){
+            var hash = window.location.hash;
+            hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+
+            $('.nav-tabs a').click(function (e) {
+                $(this).tab('show');
+                var scrollmem = $('body').scrollTop() || $('html').scrollTop();
+                window.location.hash = this.hash;
+                $('html,body').scrollTop(scrollmem);
             });
-        });
-        
-        $("#run-status-cancel").click(function(){
-            $("#run-status-show").show();
-            $("#run-status-select").hide();
+            
+            $(".confirm").confirm({text: "All data in this alignment will be deleted. Are you sure you want to delete this alignment?"});
+            $(".nav-status").addClass("active");
+            $('[data-toggle="popover"]').popover(); 
+
+            $("#run-status-show").click(function(){
+                $("#run-status-show").hide();
+                $("#run-status-select").show();
+            });
+
+            $("#run-status-save").click(function(){
+                var status = $("#run-status-select option:selected").text();
+                $.ajax({ url: "/pegr/report/updateRunStatusAjax?runId=${run.id}&status=" + status,
+                    success: function(result) {
+                        $("#run-status-show").text(result);
+                        $("#run-status-select").val(result);
+                        $("#run-status-show").show();
+                        $("#run-status-select").hide();
+                    }                
+                });
+            });
+
+            $("#run-status-cancel").click(function(){
+                $("#run-status-show").show();
+                $("#run-status-select").hide();
+            });
         });
         
         function createReport(cohortId) {

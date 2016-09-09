@@ -44,7 +44,11 @@ class ReportController {
         } else {
             try {
                 def runStatus = reportService.fetchRunStatus(run)
-                [runStatus: runStatus.results, noResultSamples: runStatus.noResultSamples, run: run]
+                def qcSettings = reportService.getQcSettings()
+                [runStatus: runStatus.results, 
+                 noResultSamples: runStatus.noResultSamples, 
+                 qcSettings: qcSettings,
+                 run: run]
             } catch (ReportException e) {
                 flash.message = e.message
                 redirect(action: "analysisStatus")
@@ -132,6 +136,24 @@ class ReportController {
         } 
         render result
     }
+    
+    def editQcSettings() {
+        def qcSettings = reportService.getQcSettings()
+        if (!qcSettings || qcSettings.size() == 0) {
+            qcSettings = [[:]]
+        }
+        [qcSettings: qcSettings]
+    }
+    
+    def saveQcSettings() {
+        try {
+            reportService.saveQcSettings(params)
+            redirect(action: "analysisStatus")
+        } catch (ReportException e) {
+            flash.message = e.message
+            redirect(action: "editQcSettings") 
+        }
+    }
 }
 
 
@@ -212,8 +234,11 @@ class AlignmentStatusDTO {
     Date date
     List status
     
-    Long dedupUniquelyMappedReads
-    Float mappedReadPct
+    Long totalReads
+    Long requestedTagNumber
     Float adapterDimerPct
-    Float seqDuplicationLevel
+    Float mappedPct
+    Float uniquelyMappedPct
+    Float deduplicatedPct
+    Float duplicationLevel
 }

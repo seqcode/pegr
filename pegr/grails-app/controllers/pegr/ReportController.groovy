@@ -154,6 +154,11 @@ class ReportController {
             redirect(action: "editQcSettings") 
         }
     }
+    
+    def togglePreferredAlignment(Long alignmentId) {
+        reportService.togglePreferredAlignment(alignmentId)
+        render ""
+    }
 }
 
 
@@ -235,10 +240,12 @@ class AlignmentStatusDTO {
     List status
     
     Long totalReads
-    Long requestedTagNumber
+    Long requestedTags
     Float adapterDimerPct
     Float mappedPct
     Float uniquelyMappedPct
     Float deduplicatedPct
     Float duplicationLevel
+        
+    Boolean isPreferred
 }

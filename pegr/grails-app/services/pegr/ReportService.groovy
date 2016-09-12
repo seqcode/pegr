@@ -44,12 +44,13 @@ class ReportService {
                     date: alignment.date,
                     status: [],
                     totalReads: experiment.totalReads,
-                    requestedTagNumber: experiment.sample.requestedTagNumber * 1000000,
+                    requestedTags: experiment.sample.requestedTagNumber * 1000000,
                     adapterDimerPct: utilityService.divide(experiment.adapterDimerCount, experiment.totalReads),
                     mappedPct: utilityService.divide(alignment.mappedReads, experiment.totalReads),
                     uniquelyMappedPct: utilityService.divide(alignment.uniquelyMappedReads, experiment.totalReads),
                     deduplicatedPct: utilityService.divide(alignment.dedupUniquelyMappedReads, experiment.totalReads),
-                    duplicationLevel: getDuplicationLevel(alignment.dedupUniquelyMappedReads, alignment.mappedReads)
+                    duplicationLevel: getDuplicationLevel(alignment.dedupUniquelyMappedReads, alignment.mappedReads),
+                    isPreferred: alignment.isPreferred
                 )
                 
                 // iterate through the analysis
@@ -525,7 +526,16 @@ class ReportService {
         for (int i =0; i < count; ++i) {
             def setting = [:]
             fields.eachWithIndex { field, n ->
-                setting[field] = lists[n][i]
+                if (lists[n][i] != null && lists[n][i] != "") {
+                    switch(field) {
+                        case ["min", "max"]:
+                            setting[field] = utilityService.getFloat(lists[n][i])
+                            break
+                        default:
+                            setting[field] = lists[n][i]
+                            break
+                    }                
+                }
             }
             settings << setting
         }
@@ -538,4 +548,10 @@ class ReportService {
         chores.save()
     }
     
+    @Transactional
+    def togglePreferredAlignment(Long alignmentId) {
+        def alignment = SequenceAlignment.get(alignmentId)
+        alignment.isPreferred = !alignment.isPreferred
+        alignment.save()
+    }
 }

@@ -104,7 +104,7 @@
         <div>
             <h4>Pipeline: ${it.key.name}, version: ${it.key.pipelineVersion} (workflow ID: <a href="http://galaxy-cegr.psu.edu:8080/workflow/display_by_id?id=${it.key.workflowId}" target="_blank">${it.key.workflowId}</a>) <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link controller="pipelineAdmin" action="show" id="${it.key.id}" class="edit">Manage</g:link></sec:ifAnyGranted></h4>
 
-            <div class="pull-right">
+            <div>
                 <span class="label label-success"> </span> Data received; 
                 <span class="label label-danger"> </span> Error message;
                 <span class="label label-default"> </span> No data.
@@ -112,7 +112,7 @@
                 <span class="glyphicon glyphicon-minus-sign"></span> Hide the column;
                 <span id="column-toggle"> <span class="glyphicon glyphicon-plus-sign"></span> Show all columns </span>
             </div>
-            <div id="qc-statistics">
+            <div id="qc-statistics" class="table-responsive">
                 <table class="table">
                     <thead>
                         <tr>

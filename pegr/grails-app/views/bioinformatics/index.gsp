@@ -24,3 +24,7 @@
         </tbody>
     </table>
 </div>
+
+<script>
+    $(".genome").addClass("active");
+</script>

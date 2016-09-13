@@ -76,7 +76,14 @@ class ApiController {
             } else {
                 data = reportService.fetchDataForSamples(sampleIds, cmd.preferredOnly)     
                 code = 200
-                message = "Success!"
+                message = "Success! Accepted filters:\n"
+                cmd.properties.each { prop, val ->
+                    if (!(prop in ["userEmail", "class", "metaClass"]) && val != null)
+                    message += "${prop}: ${val} \n"
+                }
+                if (cmd.id) {
+                    message += "id: ${cmd.id} \n"
+                }
             }
         } else {
             code = 401
@@ -102,6 +109,8 @@ class ApiController {
                 try {
                     def preferredOnly = query.preferredOnly ?: true
                     data = reportService.fetchDataForRun(query.runId, preferredOnly)       
+                    code = 200
+                    message = "Success fetching data from Run ${runId}!"
                 } catch (ReportException e) {
                     code = 500
                     message = e.message

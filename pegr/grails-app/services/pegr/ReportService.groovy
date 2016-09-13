@@ -8,6 +8,7 @@ class ReportException extends RuntimeException {
 
 class ReportService {
 
+    def grailsApplication
     def utilityService
     def alignmentStatsService
     def springSecurityService
@@ -553,5 +554,40 @@ class ReportService {
         def alignment = SequenceAlignment.get(alignmentId)
         alignment.isPreferred = !alignment.isPreferred
         alignment.save()
+    }
+    
+    def getUnknownIndex(SequenceRun run) {
+        final String localFolder = "Bcl2FastqUnknownIndex"
+        def localRoot = utilityService.getFilesRoot()
+        File localPath = new File(localRoot, localFolder)
+        if (!localPath.exists()) { 
+            localPath.mkdirs() 
+        } 
+        def localFile = new File(localPath, "${run.directoryName}_unknownIndex.html")
+        def filepath = localFile.getPath()
+        if (!localFile.exists()) {
+            fetchUnknownIndexFromGpfs(run, filepath)
+        }
+        return filepath
+        
+    }
+    
+    def fetchUnknownIndexFromGpfs(SequenceRun run, String localFile) {
+        final String gpfsRoot = "/gpfs/cyberstar/pughhpc/galaxy-cegr/files/prep/prep_dir/"
+        final String reportDir = "/Reports/html/"
+        final String unknownIndexFile = "/default/unknown/unknown/lane.html"
+        def username = grailsApplication.config.gpfs.username
+        // rsa private file
+        def keyfile = grailsApplication.config.gpfs.keyfile
+        // hostname
+        def host = grailsApplication.config.gpfs.host
+
+        String remotePath = gpfsRoot + run.directoryName + reportDir + run.fcId + unknownIndexFile
+        
+        def cmd = "scp -i ${keyfile} ${username}@${host}:${remotePath} ${localFile}"
+        
+        def timeout = 1000 * 60 * 1 // 1 min
+        utilityService.executeCommand(cmd, timeout)
+        
     }
 }

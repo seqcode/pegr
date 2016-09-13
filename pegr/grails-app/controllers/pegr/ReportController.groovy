@@ -159,6 +159,21 @@ class ReportController {
         reportService.togglePreferredAlignment(alignmentId)
         render ""
     }
+    
+    def unknownIndex(Long runId) {
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            render "/404"
+        } else {
+            try {
+                def file = reportService.getUnknownIndex(run)
+                def htmlContent = new File(file).text
+                render text: htmlContent, contentType:"text/html", encoding:"UTF-8"    
+            } catch (Exception e) {
+                render "/404"
+            }
+        }
+    }
 }
 
 

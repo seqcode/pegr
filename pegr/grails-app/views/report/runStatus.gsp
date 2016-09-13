@@ -100,6 +100,7 @@
             </span>
         </small> 
     </h3>
+    <g:link controller="report" action="unknownIndex" params="[runId: run.id]">Unknown index</g:link>
     <g:each in="${runStatus}">
         <div>
             <h4>Pipeline: ${it.key.name}, version: ${it.key.pipelineVersion} (workflow ID: <a href="http://galaxy-cegr.psu.edu:8080/workflow/display_by_id?id=${it.key.workflowId}" target="_blank">${it.key.workflowId}</a>) <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link controller="pipelineAdmin" action="show" id="${it.key.id}" class="edit">Manage</g:link></sec:ifAnyGranted></h4>

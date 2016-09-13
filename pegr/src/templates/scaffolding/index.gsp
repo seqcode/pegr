@@ -27,7 +27,7 @@
 						Collections.sort(props, comparator.constructors[0].newInstance([domainClass] as Object[]))
 						props.eachWithIndex { p, i ->
 							if (i < 6) {
-								if (p.isAssociation()) { %>
+								if (false) { %>
 						<th><g:message code="${domainClass.propertyName}.${p.name}.label" default="${p.naturalName}" /></th>
 					<%      } else { %>
 						<g:sortableColumn property="${p.name}" title="\${message(code: '${domainClass.propertyName}.${p.name}.label', default: '${p.naturalName}')}" />
@@ -56,6 +56,11 @@
 			<div class="pagination">
 				<g:paginate total="\${${propertyName}Count ?: 0}" />
 			</div>
+            <span class="pagination pull-right">
+                <g:link params="[max:25]">25</g:link>
+                <g:link params="[max:100]">100</g:link>
+                / page
+            </span>
 		</div>
 	</body>
 </html>

@@ -44,7 +44,11 @@ class ReportController {
         } else {
             try {
                 def runStatus = reportService.fetchRunStatus(run)
-                [runStatus: runStatus.results, noResultSamples: runStatus.noResultSamples, run: run]
+                def qcSettings = reportService.getQcSettings()
+                [runStatus: runStatus.results, 
+                 noResultSamples: runStatus.noResultSamples, 
+                 qcSettings: qcSettings,
+                 run: run]
             } catch (ReportException e) {
                 flash.message = e.message
                 redirect(action: "analysisStatus")
@@ -132,6 +136,44 @@ class ReportController {
         } 
         render result
     }
+    
+    def editQcSettings() {
+        def qcSettings = reportService.getQcSettings()
+        if (!qcSettings || qcSettings.size() == 0) {
+            qcSettings = [[:]]
+        }
+        [qcSettings: qcSettings]
+    }
+    
+    def saveQcSettings() {
+        try {
+            reportService.saveQcSettings(params)
+            redirect(action: "analysisStatus")
+        } catch (ReportException e) {
+            flash.message = e.message
+            redirect(action: "editQcSettings") 
+        }
+    }
+    
+    def togglePreferredAlignment(Long alignmentId) {
+        reportService.togglePreferredAlignment(alignmentId)
+        render ""
+    }
+    
+    def unknownIndex(Long runId) {
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            render "/404"
+        } else {
+            try {
+                def file = reportService.getUnknownIndex(run)
+                def htmlContent = new File(file).text
+                render text: htmlContent, contentType:"text/html", encoding:"UTF-8"    
+            } catch (Exception e) {
+                render "/404"
+            }
+        }
+    }
 }
 
 
@@ -212,8 +254,13 @@ class AlignmentStatusDTO {
     Date date
     List status
     
-    Long dedupUniquelyMappedReads
-    Float mappedReadPct
+    Long totalReads
+    Long requestedTags
     Float adapterDimerPct
-    Float seqDuplicationLevel
+    Float mappedPct
+    Float uniquelyMappedPct
+    Float deduplicatedPct
+    Float duplicationLevel
+        
+    Boolean isPreferred
 }

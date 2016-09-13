@@ -12,7 +12,7 @@ class ProtocolAdminController {
     def springSecurityService
     
     def index(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
+        params.max = Math.min(max ?: 25, 100)
         [protocolList: Protocol.list(params), protocolCount: Protocol.count()]
     }
     

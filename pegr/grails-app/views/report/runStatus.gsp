@@ -24,6 +24,65 @@
             border-bottom: 1px solid #ccc;
             padding: 5px 10px;
         }
+        
+        /* The switch - the box around the slider */
+        .switch {
+          position: relative;
+          display: inline-block;
+          width: 40px;
+          height: 22px;
+        }
+
+        /* Hide default HTML checkbox */
+        .switch input {display:none;}
+
+        /* The slider */
+        .slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: #ccc;
+          -webkit-transition: .2s;
+          transition: .2s;
+        }
+
+        .slider:before {
+                  position: absolute;
+          content: "";
+          height: 16px;
+          width: 16px;
+          left: 4px;
+          bottom: 3px;
+          background-color: white;
+          -webkit-transition: .2s;
+          transition: .2s;
+        }
+
+        input:checked + .slider {
+          background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+          box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+          -webkit-transform: translateX(16px);
+          -ms-transform: translateX(16px);
+          transform: translateX(16px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+          border-radius: 22px;
+        }
+
+        .slider.round:before {
+          border-radius: 50%;
+        }
     </style>
 </head>
 <body>
@@ -41,101 +100,95 @@
             </span>
         </small> 
     </h3>
+    <g:link controller="report" action="unknownIndex" params="[runId: run.id]">Unknown index</g:link>
     <g:each in="${runStatus}">
-        <div class="pull-right"><span class="label label-success"> </span> Data received; <span class="label label-danger"> </span> No data. Click to see the step's category.</div>
         <div>
-            <h4>Pipeline: ${it.key.name}, version: ${it.key.pipelineVersion} (workflow ID: ${it.key.workflowId}) <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link controller="pipelineAdmin" action="show" id="${it.key.id}" class="edit">Manage</g:link></sec:ifAnyGranted></h4>
-            <ul class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" href="#qc-steps">Steps</a></li>
-                <li><a data-toggle="tab" href="#qc-statistics">Statistics</a></li>
-            </ul>
-            <div class="tab-content">
-                <div id="qc-steps" class="tab-pane fade in active">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Sample</th>
-                                <th>Cohort</th>
-                                <th>Genome</th>
-                                <th>Galaxy History</th>
-                                <th>Date</th> 
-                                <g:if test="${it.value.steps}">
-                                    <g:each in="${it.value.steps}" var="step">
-                                        <th class="step-header"><div><span>${step[1]}</span></div></th>
-                                    </g:each>
-                                </g:if>
-                                <th></th>
-                                <th>Delete</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <g:each in="${it.value.sampleStatusList}" var="sample">
-                            <tr>
-                            <td rowspan="${Math.max(1, sample.alignmentStatusList.size())}"><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}</g:link></td>
-                            <td rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.cohort}</td>
-                            <g:each in="${sample.alignmentStatusList}" var="alignment" status="n">
-                                <g:if test="${n>0}"><tr></g:if>
-                                    <td>${alignment.genome}</td>
-                                    <td><a href="http://galaxy-cegr.psu.edu:8080/history?id=${alignment.historyId}" target="_blank">${alignment.historyId}</a></td>
-                                    <td>${alignment.date}</td>
-                                    <g:each in="${alignment.status}" var="status" status="j">
-                                        <td class="analysis-status">
-                                            <g:if test="${status=='OK'}"><span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-success"> </span></g:if> 
-                                            <g:elseif test="${status=='NO'}"><span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-default"> </span></g:elseif>
-                                            <g:else><span data-toggle="popover" title="${it.value.steps[j][1]}" data-content="${status}" data-placement="top" class="label label-danger"> </span></g:else>
-                                        </td>
-                                    </g:each>
-                                    <td><g:link controller="report" action="deleteAlignment" params="[alignmentId:alignment.alignmentId, runId:run.id]" class="confirm"><span class="glyphicon glyphicon-trash"</g:link></td>
-                                </tr>
-                            </g:each>
-                            <g:if test="${sample.alignmentStatusList.size()==0}">
-                                </tr>
+            <h4>Pipeline: ${it.key.name}, version: ${it.key.pipelineVersion} (workflow ID: <a href="http://galaxy-cegr.psu.edu:8080/workflow/display_by_id?id=${it.key.workflowId}" target="_blank">${it.key.workflowId}</a>) <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link controller="pipelineAdmin" action="show" id="${it.key.id}" class="edit">Manage</g:link></sec:ifAnyGranted></h4>
+
+            <div>
+                <span class="label label-success"> </span> Data received; 
+                <span class="label label-danger"> </span> Error message;
+                <span class="label label-default"> </span> No data.
+                Click each block to see the step's category.
+                <span class="glyphicon glyphicon-minus-sign"></span> Hide the column;
+                <span id="column-toggle"> <span class="glyphicon glyphicon-plus-sign"></span> Show all columns </span>
+            </div>
+            <div id="qc-statistics" class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="col-sample">Sample</th>                                                                    
+                            <th class="col-target">Target</th>
+                            <th class="col-cohort">Cohort</th>
+                            <th class="col-genome">Genome</th>
+                            <th class="col-history">Galaxy History</th>
+                            <th class="col-date">Date</th>
+                            <g:if test="${it.value.steps}">
+                                <g:each in="${it.value.steps}" var="step">
+                                    <th class="step-header col-step-${step[0]}"><div><span>${step[1]}</span></div></th>
+                                </g:each>
                             </g:if>
-                        </g:each>
-                        </tbody>
-                    </table>
-                </div>
-                <div id="qc-statistics" class="tab-pane fade">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Sample</th>                                                                    <th>Target</th>
-                                <th>Cohort</th>
-                                <th>Genome</th>
-                                <th>Galaxy History</th>
-                                <th>Date</th> 
-                                <th class="text-right">Dedup. Uniq. Mapped Reads</th>
-                                <th class="text-right">Mapped Read</th>
-                                <th class="text-right">Adapter Dimer</th>
-                                <th class="text-right">Duplication Level</th>
-                                <th>Remark</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <g:each in="${it.value.sampleStatusList}" var="sample">
-                            <tr>
-                            <td rowspan="${Math.max(1, sample.alignmentStatusList.size())}"><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}</g:link></td>
-                            <td rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.target}</td>
-                            <td rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.cohort}</td>
-                            <g:each in="${sample.alignmentStatusList}" var="alignment" status="n">
-                                <g:if test="${n>0}"><tr></g:if>
-                                    <td>${alignment.genome}</td>
-                                    <td><a href="http://galaxy-cegr.psu.edu:8080/history?id=${alignment.historyId}" target="_blank">${alignment.historyId}</a></td>
-                                    <td>${alignment.date}</td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.dedupUniquelyMappedReads}" format="###,###,###" /></td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.mappedReadPct}" format="##.0%" /></td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.adapterDimerPct}" format="##.0%" /></td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.seqDuplicationLevel}" format="##.0%" /></td>
-                                    <td></td>
-                                </tr>
+                            <th class="text-right col-tags">Requested Tags</th>
+                            <g:each in="${qcSettings}" var="setting">
+                                <th class="text-right col-${setting.key}">
+                                    ${setting.name}
+                                    <ul style="font-weight: normal">
+                                        <g:if test="${setting.min}"><li>min: <g:formatNumber number="${setting.min}" format="${setting.numFormat}" /></li></g:if>
+                                        <g:if test="${setting.max}"><li>max: <g:formatNumber number="${setting.max}" format="${setting.numFormat}" /></li></g:if>
+                                        <g:if test="${setting.reference_min}"><li>min: ${setting.reference_min}</li></g:if>
+                                        <g:if test="${setting.reference_max}"><li>min: ${setting.reference_max}</li></g:if>
+                                    </ul>                                        
+                                </th>
                             </g:each>
-                            <g:if test="${sample.alignmentStatusList.size()==0}">
-                                </tr>
-                            </g:if>
+                            <th class="col-prefer">Preferred</th>
+                            <th class="col-delete">Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <g:each in="${it.value.sampleStatusList}" var="sample">
+                        <tr>
+                        <td class="col-sample" rowspan="${Math.max(1, sample.alignmentStatusList.size())}"><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}</g:link></td>
+                        <td class="col-target" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.target}</td>
+                        <td class="col-cohort" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.cohort}</td>
+                        <g:each in="${sample.alignmentStatusList}" var="alignment" status="n">
+                            <g:if test="${n>0}"><tr></g:if>
+                                <td class="col-genome">${alignment.genome}</td>
+                                <td class="col-history"><a href="http://galaxy-cegr.psu.edu:8080/history?id=${alignment.historyId}" target="_blank">${alignment.historyId}</a></td>
+                                <td class="col-date">${alignment.date}</td>
+                                <g:each in="${alignment.status}" var="status" status="j">
+                                    <td class="analysis-status col-step-${it.value.steps[j][0]}">
+                                        <g:if test="${status=='OK'}"><span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-success"> </span></g:if> 
+                                        <g:elseif test="${status=='NO'}"><span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-default"> </span></g:elseif>
+                                        <g:else><span data-toggle="popover" title="${it.value.steps[j][1]}" data-content="${status}" data-placement="top" class="label label-danger"> </span></g:else>
+                                    </td>
+                                </g:each>
+
+                                <td class="text-right col-tags"><g:formatNumber number="${alignment.requestedTags}" format="###,###,###" /></td>
+                                <g:each in="${qcSettings}" var="setting">
+                                    <td class="text-right col-${setting.key} <g:if test='${
+                                               (setting.min != null && alignment[setting.key] < setting.min)
+                                               || (setting.max != null && alignment[setting.key] > setting.max)
+                                               || (setting.reference_min != null && alignment.hasProperty(setting.reference_min) && alignment[setting.key] < alignment[setting.reference_min])
+                                               || (setting.reference_max != null && alignment.hasProperty(setting.reference_max) && alignment[setting.key] > alignment[setting.reference_max])
+                                               }'>bg-danger</g:if>"> 
+                                    <g:formatNumber number="${alignment[setting.key]}" format="${setting.numFormat}" />
+                                </td>
+                                </g:each>
+                                <td class="col-prefer">
+                                    <label class="switch">
+                                        <input class="prefer" type="checkbox" onclick="togglePreferredAlignment(${alignment.alignmentId})" <g:if test="${alignment.isPreferred}">checked</g:if>>
+                                        <div class="slider round"></div>
+                                    </label>
+                                </td>
+                                <td class="col-delete"><g:link controller="report" action="deleteAlignment" params="[alignmentId:alignment.alignmentId, runId:run.id]" class="confirm"><span class="glyphicon glyphicon-trash"</g:link></td>
+                            </tr>
                         </g:each>
-                        </tbody>
-                    </table>
-                </div>
+                        <g:if test="${sample.alignmentStatusList.size()==0}">
+                            </tr>
+                        </g:if>
+                    </g:each>
+                    </tbody>
+                </table>
             </div>
         </div>
     </g:each>
@@ -176,31 +229,53 @@
         </tbody>
     </table>
     <br>
-    <script>
-        $(".confirm").confirm({text: "All data in this alignment will be deleted. Are you sure you want to delete this alignment?"});
-        $(".nav-status").addClass("active");
-        $('[data-toggle="popover"]').popover(); 
-        
-        $("#run-status-show").click(function(){
-            $("#run-status-show").hide();
-            $("#run-status-select").show();
-        });
-        
-        $("#run-status-save").click(function(){
-            var status = $("#run-status-select option:selected").text();
-            $.ajax({ url: "/pegr/report/updateRunStatusAjax?runId=${run.id}&status=" + status,
-                success: function(result) {
-                    $("#run-status-show").text(result);
-                    $("#run-status-select").val(result);
-                    $("#run-status-show").show();
-                    $("#run-status-select").hide();
+    <script>        
+        $(function(){            
+            $(".confirm").confirm({text: "All data in this alignment will be deleted. Are you sure you want to delete this alignment?"});
+            $(".nav-status").addClass("active");
+            $('[data-toggle="popover"]').popover(); 
+
+            $("#run-status-show").click(function(){
+                $("#run-status-show").hide();
+                $("#run-status-select").show();
+            });
+
+            $("#run-status-save").click(function(){
+                var status = $("#run-status-select option:selected").text();
+                $.ajax({ url: "/pegr/report/updateRunStatusAjax?runId=${run.id}&status=" + status,
+                    success: function(result) {
+                        $("#run-status-show").text(result);
+                        $("#run-status-select").val(result);
+                        $("#run-status-show").show();
+                        $("#run-status-select").hide();
+                    }                
+                });
+            });
+
+            $("#run-status-cancel").click(function(){
+                $("#run-status-show").show();
+                $("#run-status-select").hide();
+            });
+            
+            $("th").each(function(){
+                $(this).append(" <span class='glyphicon glyphicon-minus-sign small'></span>");
+            });
+            
+            $("#column-toggle").click(function() {
+                $("th").show();
+                $("td").show();
+            });
+            
+            $(".glyphicon-minus-sign").click(function() {
+                var classAttr = $(this).parent().attr("class");
+                var classes = classAttr.split(' ');
+                for (n in classes) {
+                    var classname = classes[n];
+                    if (classname.substring(0,4) == "col-") {
+                        $("." + classname).hide();
+                    }
                 }                
             });
-        });
-        
-        $("#run-status-cancel").click(function(){
-            $("#run-status-show").show();
-            $("#run-status-select").hide();
         });
         
         function createReport(cohortId) {
@@ -222,6 +297,10 @@
                     // nothing to do
                 }
             });
+        }
+        
+        function togglePreferredAlignment(alignmentId) {
+            $.ajax({ url: "/pegr/report/togglePreferredAlignment?alignmentId=" + alignmentId });            
         }
     </script>
 </body>

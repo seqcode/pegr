@@ -6,18 +6,13 @@
   <g:layoutHead/>
 </head>
 <body>
-
-<div class="container-fluid text-center">    
-  <div class="row content">
-    <div class="col-sm-12 text-left">
-    <g:layoutBody/>
+    <div class="container-fluid text-left">    
+        <g:layoutBody/>
     </div>
-  </div>
-</div>
-    
- <script>
-	$("#nav-admin").addClass("active");
- </script>
+
+    <script>
+        $("#nav-admin").addClass("active");
+    </script>
 </body>
 </html>
 </g:applyLayout>

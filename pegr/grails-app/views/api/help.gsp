@@ -1,12 +1,15 @@
 <html>
 <head>
-    <meta name="layout" content="main">
+    <meta name="layout" content="bioinformatics">
 </head>
 <body>
-    <div class="container">
+    <div class="row">
+        <div class="col-sm-9">
         <h2>PEGR API</h2>
-        <h3>Query Data from PEGR</h3>
-        <h4>Query Data by Sample properties</h4>
+        To use PEGR APIs, you need a registered email and API key at PEGR. Please set up the information in your <g:link controller="user" action="profile">Profile</g:link>.
+        <div class="chapter">
+        <h3 id="query">Query Data from PEGR</h3>
+        <h4 id="query-sample">Query Data by Sample Properties</h4>
         <div>
             <p>If you want to query data by sample properties, e.g. ID, source and source ID, species, strain, antibody, target, format your query in a JSON dictionary as follows
             <pre>
@@ -190,7 +193,7 @@ public class FetchSampleDataFromPegr {
             </pre>    
         </div>
         
-        <h4>Query Data by Sequence Run</h4>
+        <h4 id="query-run">Query Data by Sequence Run</h4>
         <div>
             <p>You can also query data from PEGR by the sequence run ID. The request JSON should be in the following format</p>
             <pre>
@@ -284,9 +287,10 @@ public class FetchSequenceRunDataFromPegr {
 }
             </pre>
         </div>
-        
-        <h3>Send Analysis Results to PEGR</h3>
-        <h4>Accept Results from the Core Pipeline</h4>
+        </div>
+    <div class="chapter">
+        <h3 id="accept">Send Analysis Results to PEGR</h3>
+        <h4 id="accept-core">Accept Results from the Core Pipeline</h4>
         <div>
             <p>PEGR accepts POST request at </p>
             <pre>
@@ -458,5 +462,32 @@ public class PostDataToPegr {
             </pre>
         </div>
     </div>
+    </div>
+        <nav class="col-sm-3">
+            <h4>Menu</h4>
+            <ul id="menu" class="nav nav-pills nav-stacked" data-spy="affix" data-offset-top="205"></ul>
+        </nav>  
+    </div>
+    <script>
+        $(function(){
+            $(".api").addClass("active");
+            
+            $(".chapter").each(function(){
+                var h3 = $(this).find("h3");
+                var title = $(h3).text();
+                var id = $(h3).attr("id");
+                var cat = "<li><h5><a href='#" + id + "'>"+ title +"</a></h5><ul>";
+                $(this).find("h4").each(function(i, sub){
+                    var subTitle = $(sub).text();
+                    var subId = $(sub).attr("id");
+                    cat += "<li><a href='#" + subId + "'>"+ subTitle +"</a></li>"; 
+                });
+                
+                cat += "</ul></li>";
+                $("#menu").append(cat);
+            })
+        })
+        
+    </script>
 </body>
 </html>

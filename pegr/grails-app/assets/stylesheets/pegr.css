@@ -99,6 +99,7 @@ footer {
 
 #main-content {
     min-height: 480px;
+    padding-bottom: 10px;
 }
 
  #login-form, #register-form {

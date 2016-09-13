@@ -8,7 +8,7 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <g:sortableColumn property="species" title="Species"></g:sortableColumn>
+                <g:sortableColumn property="species.genusName" title="Species"></g:sortableColumn>
                 <g:sortableColumn property="name" title="Genome Build"></g:sortableColumn>
                 <th>Link</th>
             </tr>
@@ -24,3 +24,7 @@
         </tbody>
     </table>
 </div>
+
+<script>
+    $(".genome").addClass("active");
+</script>

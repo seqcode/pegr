@@ -15,8 +15,8 @@
         </thead>
         <tbody>
             <tr>
-                <td>Run#${previousRun.id} <g:if test="${previousRun.runNum}">(Old No.${previousRun.runNum})</g:if></td>
-                <td>${previousRun.directoryName}</td>
+                <td>Run#${previousRun?.id} <g:if test="${previousRun?.runNum}">(Old No.${previousRun?.runNum})</g:if></td>
+                <td>${previousRun?.directoryName}</td>
             </tr>
         </tbody>
     </table>

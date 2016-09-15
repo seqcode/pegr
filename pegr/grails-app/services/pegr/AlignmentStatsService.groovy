@@ -59,8 +59,8 @@ class AlignmentStatsService {
         // get the error message
         def err
         if (data.toolStderr && data.toolStderr != "") {
-            if (data.toolStderr.length() > 255 ) {
-                err = data.toolStderr[0..254]
+            if (data.toolStderr.length() > 100 ) {
+                err = data.toolStderr[0..100]
             } else {
                 err = data.toolStderr
             }
@@ -96,11 +96,90 @@ class AlignmentStatsService {
             
         analysis.save(failOnError: true)
 
-        // store statistics and datasets to named fields
-        saveStatistics(theAlignment, experiment, data.statistics)        
-        saveDatasets(theAlignment, experiment, data.toolCategory, data.datasets, data.statistics)
-
-        return        
+        return analysis
+    }
+    
+    @Transactional
+    def processAnalysis(Long analysisId) {
+        def analysis = Analysis.get(analysisId)
+        if (!analysis) {
+            return
+        }
+        
+        def statistics = utilityService.parseJson(analysis.statistics)
+        def datasets = utilityService.parseJson(analysis.datasets)
+        
+        saveStatistics(analysis.alignment, analysis.alignment.sequencingExperiment, statistics)        
+        saveDatasets(analysis.alignment, analysis.alignment.sequencingExperiment, analysis.category, datasets, statistics)
+        processAnalysisNote(analysis, statistics, datasets)
+    }
+    
+    def processAnalysisNote(Analysis analysis, List statistics, List datasets) {
+        final String peaks = "numberOfPeaks"
+        final String peakPairs = "peakPairWis"
+        def note
+        
+        // clean up the message
+        def error = analysis.note
+        if (error) {
+            error = error.trim()
+            if (error == "") {
+                error = null
+            }            
+        }        
+        
+        if (error) {
+            // filter "Permission denied" 
+            if (error.toLowerCase().contains("permission denied")) {
+                note = [code: "Permision", message: "Permission denied.", error: error]
+            } else {
+                note = [code: "Error", error: error]
+            }
+        } else {
+            note = [code: "OK"]
+        }
+        
+        switch (analysis.category) {
+            case ["output_genetrack", "output_bedtoolsIntersect"]:
+                // check peaks
+                if (statistics.any {it-> it.containsKey(peaks) && it[peaks] == 0}) {
+                    note.code = "Zero"
+                    note.message = "No Peaks."
+                }
+                break
+            case "output_cwpair2":
+                // check peak pairs        
+                if (statistics.any {it-> it.containsKey(peakPairs) && it[peakPairs] == 0}) {
+                    note.code = "Zero"
+                    note.message = "No Peak Pairs."
+                }
+                break
+            case "output_repeatMasker":
+                // check repeat masker fasta
+                def url = queryDatasetsUri(datasets, "fasta")
+                if (url) {
+                    def data = new URL(url).getText()
+                    if(data == "") {
+                        note.code = "Zero"
+                        note.message = "No sequences."
+                    }
+                }
+                break
+            case "output_meme":
+                // check motifs
+                def memeFile = queryDatasetsUri(datasets, "txt")
+                if (memeFile) {
+                    def data = new URL(memeFile).getText()
+                    if (!data.contains("letter-probability matrix")) {
+                        note.code = "Zero"
+                        note.message = "No motifs."
+                    }
+                }
+                break
+        }
+        
+        analysis.note = JsonOutput.toJson(note)
+        analysis.save(failOnError: true)
     }
     
     def saveStatistics(SequenceAlignment alignment, SequencingExperiment experiment, List statistics) {

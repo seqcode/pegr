@@ -59,13 +59,13 @@ class ReportService {
                 steps.eachWithIndex { step, index ->
                     def stepAnalysis = analysis.find {it.stepId == step[0]}
                     if (stepAnalysis) {
-                        if (stepAnalysis.note && stepAnalysis.note.trim() != "") {
-                            alignmentStatusDTO.status[index] = stepAnalysis.note.trim()
+                        if (stepAnalysis.note) {
+                            alignmentStatusDTO.status[index] = utilityService.parseJson(stepAnalysis.note)
                         } else {
-                            alignmentStatusDTO.status[index] = "OK"
-                        }                        
+                            alignmentStatusDTO.status[index] = [code: "OK"]
+                        }
                     } else {
-                        alignmentStatusDTO.status[index] = "NO"
+                        alignmentStatusDTO.status[index] = [code: "NO"]
                     }                  
                 }
 

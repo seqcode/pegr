@@ -269,7 +269,7 @@
                 $("#run-status-select").hide();
             });
             
-            $("th").each(function(){
+            $("#qc-statistics th").each(function(){
                 $(this).append(" <span class='glyphicon glyphicon-minus-sign small'></span>");
             });
             

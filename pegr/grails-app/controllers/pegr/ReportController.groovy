@@ -8,7 +8,9 @@ class ReportController {
     
     def createReportForCohortAjax(Long cohortId) {
         def cohort = SequencingCohort.get(cohortId)
-        reportService.createReportForCohort(cohort)
+        if (cohort && !cohort.report) {
+            reportService.createReportForCohort(cohort)
+        }
         render template: "/report/reportRow", model: [cohort: cohort]
     }
     

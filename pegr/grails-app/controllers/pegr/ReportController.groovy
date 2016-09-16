@@ -103,20 +103,6 @@ class ReportController {
         render(template: 'details', model: [ sampleDTOs: data])        
     }
     
-    def showProject(Long id) {
-        def currentProject = Project.get(id)
-        if (currentProject) {
-            def projectUsers = ProjectUser.where { project==currentProject}.list()         
-            def samples = ProjectSamples.where {project==currentProject}.list().collect{it.sample}
-            def experiments = samples.collect{it.sequencingExperiments}.flatten()
-            def alignments = experiments.collect{it.alignments}.flatten()
-            render(view: "show", model: [project: currentProject, projectUsers: projectUsers, samples: samples, experiments: experiments, alignments: alignments])
-        } else {
-            flash.message = "Project not found!"
-            redirect(action: "index")
-        }
-    }
-    
     def fetchMemeDataAjax(String url) {
         def results = reportService.fetchMemeMotif(url) as JSON
         render results

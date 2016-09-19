@@ -108,7 +108,9 @@
             <div>
                 <span class="label label-success"> </span> Data received; 
                 <span class="label label-danger"> </span> Error message;
-                <span class="label label-default"> </span> No data.
+                <span class="label label-warning"> </span> Permission denied;
+                <span class="label label-info"> </span> Empty dataset (e.g. no peaks, no peak-pairs, no motifs, etc.);
+                <span class="label label-default"> </span> No data received.
                 Click each block to see the step's category.
                 <span class="glyphicon glyphicon-minus-sign"></span> Hide the column;
                 <span id="column-toggle"> <span class="glyphicon glyphicon-plus-sign"></span> Show all columns </span>
@@ -157,9 +159,21 @@
                                 <td class="col-date">${alignment.date}</td>
                                 <g:each in="${alignment.status}" var="status" status="j">
                                     <td class="analysis-status col-step-${it.value.steps[j][0]}">
-                                        <g:if test="${status=='OK'}"><span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-success"> </span></g:if> 
-                                        <g:elseif test="${status=='NO'}"><span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-default"> </span></g:elseif>
-                                        <g:else><span data-toggle="popover" title="${it.value.steps[j][1]}" data-content="${status}" data-placement="top" class="label label-danger"> </span></g:else>
+                                        <g:if test="${status?.code=='OK'}">
+                                            <span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-success"> </span>
+                                        </g:if> 
+                                        <g:elseif test="${status?.code=='NO'}">
+                                            <span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-default"> </span>
+                                        </g:elseif>
+                                        <g:elseif test="${status?.code=='Permission'}">
+                                            <span data-toggle="popover" title="${it.value.steps[j][1]}" data-content="${status.message}" data-placement="top" class="label label-warning"> </span>
+                                        </g:elseif> 
+                                        <g:elseif test="${status?.code=='Zero'}">
+                                            <span data-toggle="popover" title="${it.value.steps[j][1]}" data-content="${status.message}" data-placement="top" class="label label-info"> </span>
+                                        </g:elseif>
+                                        <g:else>
+                                            <span data-toggle="popover" title="${it.value.steps[j][1]}" data-content="${status?.error}" data-placement="top" class="label label-danger"> </span>
+                                        </g:else>
                                     </td>
                                 </g:each>
 
@@ -257,7 +271,7 @@
                 $("#run-status-select").hide();
             });
             
-            $("th").each(function(){
+            $("#qc-statistics th").each(function(){
                 $(this).append(" <span class='glyphicon glyphicon-minus-sign small'></span>");
             });
             

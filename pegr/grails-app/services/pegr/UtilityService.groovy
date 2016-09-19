@@ -7,6 +7,9 @@ class UtilityException extends RuntimeException {
     String message
 }
 
+/**
+* Shared services
+*/
 class UtilityService {
     def dataSource
     def grailsApplication
@@ -42,6 +45,8 @@ class UtilityService {
     
    /**
     * Convert String to Float.
+    * @param s string
+    * @return float
     */    
     def getFloat(String s) {
 	    def f
@@ -55,6 +60,8 @@ class UtilityService {
     
    /**
     * Convert String to Long.
+    * @param s string
+    * @return long
     */        
     def getLong(String s) {
         def n
@@ -68,6 +75,8 @@ class UtilityService {
     
    /**
     * Parse String to a set of numbers.
+    * @param s string
+    * @return a set of IDs
     */     
     def parseSetOfNumbers(String s) {
         Set ids = []
@@ -112,12 +121,12 @@ class UtilityService {
         return s
     }
     
-    /**
-     * Divide one Long by another Long
-     * @param a numerator
-     * @param b denominator
-     * @return the value of a/b if a and b are not null and b is not 0; otherwise, return null.
-     */
+   /**
+    * Divide one Long by another Long
+    * @param a numerator
+    * @param b denominator
+    * @return the value of a/b if a and b are not null and b is not 0; otherwise, return null.
+    */
     def divide(Long a, Long b) {
         def result
         if (a!= null && b != null && b!=0) {
@@ -126,11 +135,11 @@ class UtilityService {
         return result
     }
     
-    /**
-     * Parse a json string. 
-     * @param s the string to parse
-     * @return pared json. Returns null if parsing failed.
-     */
+   /**
+    * Parse a json string. 
+    * @param s the string to parse
+    * @return pared json. Returns null if parsing failed.
+    */
     def parseJson(String s) {
         def jsonSlurper = new JsonSlurper()
         def json
@@ -141,12 +150,12 @@ class UtilityService {
         return json
     }
     
-    /**
-     * Given a list of keys, query the corresponding values from a Json string.
-     * @param jsonStr the Json string to query from
-     * @param keys the list of given keys
-     * @return a map with given keys and queried values
-     */
+   /**
+    * Given a list of keys, query the corresponding values from a Json string.
+    * @param jsonStr the Json string to query from
+    * @param keys the list of given keys
+    * @return a map with given keys and queried values
+    */
     def queryJson(String jsonStr, List keys) {
         def json = parseJson(jsonStr)
         def result = [:]
@@ -165,12 +174,12 @@ class UtilityService {
         return result
     }
     
-    /** 
-     * Given a key, query its value from a Json string.
-     * @param jsonStr the Json string
-     * @param key the given key
-     * @return the value of the given key
-     */
+   /** 
+    * Given a key, query its value from a Json string.
+    * @param jsonStr the Json string
+    * @param key the given key
+    * @return the value of the given key
+    */
     def queryJson(String jsonStr, String key) {
         def keys = [key]
         def results = queryJson(jsonStr, keys)
@@ -181,12 +190,12 @@ class UtilityService {
         }
     }
     
-    /**
-     * Given a list of keys, query the corresponding values from a map.
-     * @param jsonMap the map to query from
-     * @param keys a list of given keys
-     * @param result the container for the result
-     */
+   /**
+    * Given a list of keys, query the corresponding values from a map.
+    * @param jsonMap the map to query from
+    * @param keys a list of given keys
+    * @param result the container for the result
+    */
     def queryJson(Map jsonMap, List keys, Map result) {
         keys.each { key ->
             if (jsonMap.containsKey(key)) {
@@ -195,16 +204,16 @@ class UtilityService {
         }
     }
     
-    /**
-     * Execute command and return the consumed string of output. If
-     * the process does not finish within given time, kill the process.
-     * If the process's exist value is not zero (including the timeout
-     * situation), throw an exception.
-     * @param command a string of command to be executed
-     * @param timeout the max time in milli second allowed to execute.
-     * If exceeded, an error will be thorwn.
-     * @return a consumed string of output 
-     */
+   /**
+    * Execute command and return the consumed string of output. If
+    * the process does not finish within given time, kill the process.
+    * If the process's exist value is not zero (including the timeout
+    * situation), throw an exception.
+    * @param command a string of command to be executed
+    * @param timeout the max time in milli second allowed to execute.
+    * If exceeded, an error will be thorwn.
+    * @return a consumed string of output 
+    */
     def executeCommand(String command, Long timeout) {
         def output = new StringBuilder()
         def err = new StringBuilder()
@@ -220,10 +229,10 @@ class UtilityService {
         return output.toString()
     }
     
-    /**
-     * Get the root folder to hold files
-     * @return the root folder to hold files
-     */
+   /**
+    * Get the root folder to hold files
+    * @return the root folder to hold files
+    */
     def getFilesRoot() {
         def filesrootStr = grailsApplication.config.filesroot
         File filesroot = new File(filesrootStr);
@@ -233,12 +242,12 @@ class UtilityService {
         return filesroot
     }
     
-    /**
-     * Merge rows in MySQL database
-     * @param tableName the name of the table where rows will be merged
-     * @param fromId the ID to merge from
-     * @param toId the ID to merge to
-     */
+   /**
+    * Merge rows in MySQL database
+    * @param tableName the name of the table where rows will be merged
+    * @param fromId the ID to merge from
+    * @param toId the ID to merge to
+    */
     @Transactional
     def mergeRowsInDb(String tableName, Long fromId, Long toId) {
         if (!tableName || tableName == "") {

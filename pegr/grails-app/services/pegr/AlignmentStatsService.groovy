@@ -143,7 +143,8 @@ class AlignmentStatsService {
         def note
         
         // if the note has been processed, return
-        if (utilityService.parseJson(analysis.note)) {
+        def map = utilityService.parseJson(analysis.note)
+        if (map && (map instanceof Map) && map.containsKey("code")) {
             return
         }
         
@@ -159,7 +160,7 @@ class AlignmentStatsService {
         if (error) {
             // filter "Permission denied" 
             if (error.toLowerCase().contains("permission denied")) {
-                note = [code: "Permision", message: "Permission denied.", error: error]
+                note = [code: "Permission", message: "Permission denied.", error: error]
             } else {
                 note = [code: "Error", error: error]
             }

@@ -108,7 +108,9 @@
             <div>
                 <span class="label label-success"> </span> Data received; 
                 <span class="label label-danger"> </span> Error message;
-                <span class="label label-default"> </span> No data.
+                <span class="label label-warning"> </span> Permission denied;
+                <span class="label label-info"> </span> Empty dataset (e.g. no peaks, no peak-pairs, no motifs, etc.);
+                <span class="label label-default"> </span> No data received.
                 Click each block to see the step's category.
                 <span class="glyphicon glyphicon-minus-sign"></span> Hide the column;
                 <span id="column-toggle"> <span class="glyphicon glyphicon-plus-sign"></span> Show all columns </span>

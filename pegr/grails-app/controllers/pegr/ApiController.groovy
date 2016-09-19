@@ -58,7 +58,7 @@ class ApiController {
         def response = new ResponseMessage(response_code: code, message: message)
         render text: response as JSON, contentType: "text/json", status: code 
         if (analysis) {
-             ProcessAnalysisJob.triggerNow([id: anlysis.id])    
+             ProcessAnalysisJob.triggerNow([id: analysis.id])    
         }
     }    
     

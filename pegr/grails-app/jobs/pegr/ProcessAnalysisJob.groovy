@@ -7,8 +7,12 @@ class ProcessAnalysisJob {
     
     def alignmentStatsService
     
-    def execute(context) {
+    def execute(context) {        
         def id = context.mergedJobDataMap.get('id')
-        processAnalysis(id)
+        try {
+            alignmentStatsService.processAnalysis(id)
+        } catch(Exception e) {
+            log.error e
+        }
     }
 }

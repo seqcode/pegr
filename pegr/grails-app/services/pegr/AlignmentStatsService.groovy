@@ -7,9 +7,18 @@ class AlignmentStatsException extends RuntimeException {
     String message
 }
 
+/**
+* A class to CRUD sequence alignment and analysis, and update the statistics in experiment.
+*/
 class AlignmentStatsService {
     def utilityService
     
+   /**
+    * Save the Analysis data accepted from API
+    * @param data the data accpeted from API
+    * @param apiUser the API user
+    * @return the saved analysis
+    */
     @Transactional
     def save(StatsRegistrationCommand data, User apiUser) {        
         // check required fields
@@ -59,8 +68,8 @@ class AlignmentStatsService {
         // get the error message
         def err
         if (data.toolStderr && data.toolStderr != "") {
-            if (data.toolStderr.length() > 255 ) {
-                err = data.toolStderr[0..254]
+            if (data.toolStderr.length() > 100 ) {
+                err = data.toolStderr[0..100]
             } else {
                 err = data.toolStderr
             }
@@ -96,13 +105,118 @@ class AlignmentStatsService {
             
         analysis.save(failOnError: true)
 
-        // store statistics and datasets to named fields
-        saveStatistics(theAlignment, experiment, data.statistics)        
-        saveDatasets(theAlignment, experiment, data.toolCategory, data.datasets, data.statistics)
-
-        return        
+        return analysis
     }
     
+   /**
+    * Process the analysis
+    * <p>
+    * Save the statistics in alignment and experiment
+    * <p>
+    * Transform the status note in analysis
+    * @param analysisId the analysis ID
+    */
+    @Transactional
+    def processAnalysis(Long analysisId) {
+        def analysis = Analysis.get(analysisId)
+        if (!analysis) {
+            return
+        }
+        
+        def statistics = utilityService.parseJson(analysis.statistics)
+        def datasets = utilityService.parseJson(analysis.datasets)
+        
+        saveStatistics(analysis.alignment, analysis.alignment.sequencingExperiment, statistics)        
+        saveDatasets(analysis.alignment, analysis.alignment.sequencingExperiment, analysis.category, datasets, statistics)
+        processAnalysisNote(analysis, statistics, datasets)
+    }
+   
+   /**
+    * Transform the analysis' status note
+    * @param analysis the analysis to be processed
+    * @param statistics the parsed statistics JSON 
+    * @param datasets the parsed datasets JSON
+    */
+    def processAnalysisNote(Analysis analysis, List statistics, List datasets) {
+        final String peaks = "numberOfPeaks"
+        final String peakPairs = "peakPairWis"
+        def note
+        
+        // if the note has been processed, return
+        def map = utilityService.parseJson(analysis.note)
+        if (map && (map instanceof Map) && map.containsKey("code")) {
+            return
+        }
+        
+        // clean up the message
+        def error = analysis.note
+        if (error) {
+            error = error.trim()
+            if (error == "") {
+                error = null
+            }            
+        }        
+        
+        if (error) {
+            // filter "Permission denied" 
+            if (error.toLowerCase().contains("permission denied")) {
+                note = [code: "Permission", message: "Permission denied.", error: error]
+            } else {
+                note = [code: "Error", error: error]
+            }
+        } else {
+            note = [code: "OK"]
+        }
+        
+        switch (analysis.category) {
+            case ["output_genetrack", "output_bedtoolsIntersect"]:
+                // check peaks
+                if (statistics.any {it-> it.containsKey(peaks) && it[peaks] == 0}) {
+                    note.code = "Zero"
+                    note.message = "No Peaks."
+                }
+                break
+            case "output_cwpair2":
+                // check peak pairs        
+                if (statistics.any {it-> it.containsKey(peakPairs) && it[peakPairs] == 0}) {
+                    note.code = "Zero"
+                    note.message = "No Peak Pairs."
+                }
+                break
+            case "output_repeatMasker":
+                // check repeat masker fasta
+                def url = queryDatasetsUri(datasets, "fasta")
+                if (url) {
+                    def data = new URL(url).getText()
+                    if(data == "") {
+                        note.code = "Zero"
+                        note.message = "No sequences."
+                    }
+                }
+                break
+            case "output_meme":
+                // check motifs
+                def memeFile = queryDatasetsUri(datasets, "txt")
+                if (memeFile) {
+                    def data = new URL(memeFile).getText()
+                    if (!data.contains("letter-probability matrix")) {
+                        note.code = "Zero"
+                        note.message = "No motifs."
+                    }
+                }
+                break
+        }
+        
+        analysis.note = JsonOutput.toJson(note)
+        analysis.save(failOnError: true)
+    }
+    
+   /**
+    * Save the statistics in alignment and experiment
+    * @param alignment the alignment to be updated
+    * @param experiment the experiment to be updated
+    * @param statistics the parsed statistics JSON
+    */
     def saveStatistics(SequenceAlignment alignment, SequencingExperiment experiment, List statistics) {
         if (statistics) {
             def updatedInAlignment = copyProperties(statistics, alignment)
@@ -117,6 +231,12 @@ class AlignmentStatsService {
         }
     }
     
+   /**
+    * Save the datasets in alignment and experiment
+    * @param alignment the alignment to be updated
+    * @param experiment the experiment to be updated
+    * @param statistics the parsed statistics JSON
+    */
     def saveDatasets(SequenceAlignment alignment, SequencingExperiment experiment, String category, List datasets, List statistics) {
         try {
             def jsonSlurper = new JsonSlurper()
@@ -167,6 +287,14 @@ class AlignmentStatsService {
         }
     }
     
+   /**
+    * Find the existing analysis with the same alignment and step ID
+    * <p>
+    * Special handling: tag pileup
+    * @param data data received from API
+    * @param alignment alignment
+    * @return existing analysis
+    */
     def findOldAnalysis(StatsRegistrationCommand data, SequenceAlignment alignment) {
         def oldAnalysis = null
         switch (data.toolCategory) {
@@ -192,6 +320,12 @@ class AlignmentStatsService {
         return oldAnalysis
     }
     
+   /**
+    * Copy properties from source to target
+    * @param source a list of maps or a map
+    * @param target target object
+    * return number of updated properties
+    */
     def copyProperties(source, target) {
         def updatedProperties = 0
         if (source instanceof List) {
@@ -204,6 +338,12 @@ class AlignmentStatsService {
         return updatedProperties
     }
     
+   /**
+    * Copy properties from source map to target object.
+    * @param source source map
+    * @param target target object
+    * @return number of updated properties
+    */
     def copyMap(source, target) {
         def updatedProperties = 0
         def readKey = source.containsKey("read") ? "read${source.read}" : "read"
@@ -224,29 +364,60 @@ class AlignmentStatsService {
         return updatedProperties
     }
 
+   /**
+    * Query datasets for a given type's uri
+    * @param jsonList a list of datasets
+    * @param type given type
+    * @return requested uri for the given type
+    */
     def queryDatasetsUri(List jsonList, String type) {
         def data = jsonList?.find { d -> d.type == type }?.uri
         return data
     }
     
-    
+   /**
+    * Query datasets for a given type's uri
+    * @param datasets the datasets string
+    * @param type given type
+    * @return requested uri for the given type
+    */
     def queryDatasetsUri(String datasets, String type) {
         def jsonList = utilityService.parseJson(datasets)
         def result = queryDatasetsUri(jsonList, type)
     } 
 
+   /**
+    * Query datasets for a given type's uri
+    * @param jsonList a list of datasets
+    * @param type given type
+    * @return the list of URIs for the given type
+    */
     def queryDatasetsUriList(List jsonList, String type) {
         def data = jsonList ? jsonList.findAll { d -> d.type == type }.collect { it.uri }.toList() : []
         return data
     }
     
+   /**
+    * Query datasets for a given type's uri
+    * @param datasets datasets string
+    * @param type given type
+    * @return the list of URIs for the given type
+    */
     def queryDatasetsUriList(String datasets, String type) {
         def jsonList = utilityService.parseJson(datasets)
         def results = queryDatasetsUriList(jsonList, type)
         return results
     } 
-    
+   
+   /**
+    * Query datasets for a given type's uri
+    * @param datasets a list of datasets
+    * @param statistics a list of statistics containing the read id
+    * @param type given type
+    * @return a map with read ID and the requested uri for the given type
+    */
     def queryDatasetsUriWithRead(List datasets, List statistics, String type) {
+        // find the read ID
         def readNum 
         if (statistics) {
             statistics.each { map ->
@@ -255,7 +426,7 @@ class AlignmentStatsService {
                 }
             }
         }
-
+        // query the data
         def data = queryDatasetsUri(datasets, type)
         if (data) {
             return [read: "read${readNum}", data: data]
@@ -264,6 +435,13 @@ class AlignmentStatsService {
         }
     }
     
+   /**
+    * Query datasets for a given type's uri
+    * @param datasets datasets string
+    * @param statistics a list of statistics containing the read id
+    * @param type given type
+    * @return a map with read ID and the requested uri for the given type
+    */
     def queryDatasetsUriWithRead(String datasets, String statistics, String type) {
         def readNum = utilityService.queryJson(statistics, "read")
         def data = queryDatasetsUri(datasets, type)

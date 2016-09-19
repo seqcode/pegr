@@ -116,6 +116,7 @@ target(tests: "Simple tests") {
     s ='{"run":2,"sample":2,"genome":"sacCer3_cegr","toolId":"toolxxx","workflowId":"workflowxxx","toolCategory":"Categoryxxx","parameters":"a=1,b=2","statistics":{"numberOfPeaks":10000,"peakMedian":2000,"peakMean":30000,"peakMedianStd":4000,"peakMeanStd":50000,"medianTagSingletons":6000},"datasets":[{"uri":"xxx/xxx/xxx","type":"xxx"}]}'
     results_parsed = jsonSlurper.parseText(s)
     println results_parsed.run
+    
 }
 
 setDefaultTarget(tests)

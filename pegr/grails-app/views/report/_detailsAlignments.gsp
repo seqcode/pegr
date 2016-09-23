@@ -70,40 +70,7 @@
 </ul>
 <script>
     $(function() {
-        google.charts.load('current', {'packages':['corechart']});
-        // composite chart
-        $(".composite").each(function(){
-            var compositeTd = $(this);
-            var spinner = $(this).find("i");
-            var compositeUrl = $(this).find(".composite-url").text();
-            var container = $(this).find(".composite-fig")[0];
-            google.charts.setOnLoadCallback(function(){
-                $.ajax({
-                      url: "/pegr/report/fetchCompositeDataAjax?url=" + compositeUrl,
-                      dataType: "json"
-                }).done(function(jsonData){
-                    if (jsonData["error"]) {
-                        $(compositeTd).empty();
-                        $(compositeTd).html(jsonData["error"]);
-                    } else {
-                        // Create our data table out of JSON data loaded from server.
-                        var data = new google.visualization.arrayToDataTable(jsonData);
-
-                        // Instantiate and draw our chart, passing in some options.
-                        var chart = new google.visualization.LineChart(container);
-                        var options = { width: 200, 
-                                       height: 100, 
-                                       legend: { position: 'none'}, 
-                                       vAxis: { gridlines: {count: 3 } },
-                                       hAxis: { gridlines: {count: 3 } },
-                                      };
-                        chart.draw(data, options);   
-                        $(spinner).remove();
-                    }
-                });           
-            });
-        });
-    
+        // plot meme
         $(".meme-table").each(function(){
             var memeTable = $(this);
             var memeUrl = $(this).find(".meme-url").text();
@@ -141,6 +108,44 @@
                         });
                     },
             });  
-        });        
-    });    
+        });
+        
+        // plot composites
+        google.charts.load('current', {'packages':['corechart']});
+        var t = 0;
+        $(".composite").each(function(){
+            t += 200;
+            var compositeTd = $(this);
+            var spinner = $(this).find("i");
+            var compositeUrl = $(this).find(".composite-url").text();
+            var container = $(this).find(".composite-fig")[0];
+            setTimeout(function(){
+                google.charts.setOnLoadCallback(function(){
+                    $.ajax({
+                        url: "/pegr/report/fetchCompositeDataAjax?url=" + compositeUrl,
+                        dataType: "json"
+                    }).done(function(jsonData){
+                        if (jsonData["error"]) {
+                            $(compositeTd).empty();
+                            $(compositeTd).html(jsonData["error"]);
+                        } else {
+                            // Create our data table out of JSON data loaded from server.
+                            var data = new google.visualization.arrayToDataTable(jsonData);
+
+                            // Instantiate and draw our chart, passing in some options.
+                            var chart = new google.visualization.LineChart(container);
+                            var options = { width: 200, 
+                                           height: 100, 
+                                           legend: { position: 'none'}, 
+                                           vAxis: { gridlines: {count: 3 } },
+                                           hAxis: { gridlines: {count: 3 } },
+                                          };
+                            chart.draw(data, options);   
+                            $(spinner).remove();
+                        }
+                    });
+                });
+            }, t);
+        });    
+    });
 </script>

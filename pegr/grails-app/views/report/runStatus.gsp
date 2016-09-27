@@ -83,6 +83,22 @@
         .slider.round:before {
           border-radius: 50%;
         }
+        
+        th.group-operation {
+            background-color: #f0f0f5;
+            background-image: none;
+        }
+        
+        th.group-pipeline {
+            background-color: #ffffcc;
+            background-image: none;
+        }
+        
+        th.group-qc {
+            background-color: #e6ffe6;
+            background-image: none;
+        }
+
     </style>
 </head>
 <body>
@@ -115,24 +131,30 @@
                 <span class="glyphicon glyphicon-minus-sign"></span> Hide the column;
                 <span id="column-toggle"> <span class="glyphicon glyphicon-plus-sign"></span> Show all columns </span>
             </div>
-            <div id="qc-statistics" class="table-responsive">
+            <div id="qc-statistics">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th class="col-sample">Sample</th>                                                                    
-                            <th class="col-target">Target</th>
-                            <th class="col-cohort">Cohort</th>
-                            <th class="col-genome">Genome</th>
-                            <th class="col-history">Galaxy History</th>
-                            <th class="col-date">Date</th>
+                            <th colspan="6" class="text-center group-analysis">Analysis</th>
+                            <th colspan="${it.value.steps.size()}" class="text-center group-pipeline">Pipeline</th>
+                            <th colspan="${qcSettings.size() + 1}" class="text-center group-qc">Quality Control</th>
+                            <th colspan="2" class="text-center group-operation">Operation</th>
+                        </tr>
+                        <tr>
+                            <th class="col-sample group-analysis">Sample</th>
+                            <th class="col-target group-analysis">Target</th>
+                            <th class="col-cohort group-analysis">Cohort</th>
+                            <th class="col-genome group-analysis">Genome</th>
+                            <th class="col-history group-analysis">Galaxy History</th>
+                            <th class="col-date group-analysis">Date</th>
                             <g:if test="${it.value.steps}">
                                 <g:each in="${it.value.steps}" var="step">
-                                    <th class="step-header col-step-${step[0]}"><div><span>${step[1]}</span></div></th>
+                                    <th class="step-header col-step-${step[0]}  group-pipeline"><div><span>${step[1]}</span></div></th>
                                 </g:each>
                             </g:if>
-                            <th class="text-right col-tags">Requested Tags</th>
+                            <th class="text-right col-tags group-qc">Requested Tags</th>
                             <g:each in="${qcSettings}" var="setting">
-                                <th class="text-right col-${setting.key}">
+                                <th class="text-right col-${setting.key} group-qc">
                                     ${setting.name}
                                     <ul style="font-weight: normal">
                                         <g:if test="${setting.min}"><li>min: <g:formatNumber number="${setting.min}" format="${setting.numFormat}" /></li></g:if>
@@ -142,23 +164,23 @@
                                     </ul>                                        
                                 </th>
                             </g:each>
-                            <th class="col-prefer">Preferred</th>
-                            <th class="col-delete">Delete</th>
+                            <th class="col-prefer group-operation">Preferred</th>
+                            <th class="col-delete group-operation">Delete</th>
                         </tr>
                     </thead>
                     <tbody>
                     <g:each in="${it.value.sampleStatusList}" var="sample">
                         <tr>
-                        <td class="col-sample" rowspan="${Math.max(1, sample.alignmentStatusList.size())}"><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}</g:link></td>
-                        <td class="col-target" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.target}</td>
-                        <td class="col-cohort" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.cohort}</td>
+                        <td class="col-sample group-analysis" rowspan="${Math.max(1, sample.alignmentStatusList.size())}"><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}</g:link></td>
+                        <td class="col-target group-analysis" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.target}</td>
+                        <td class="col-cohort group-analysis" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.cohort}</td>
                         <g:each in="${sample.alignmentStatusList}" var="alignment" status="n">
                             <g:if test="${n>0}"><tr></g:if>
-                                <td class="col-genome">${alignment.genome}</td>
-                                <td class="col-history"><a href="http://galaxy-cegr.psu.edu:8080/history?id=${alignment.historyId}" target="_blank">${alignment.historyId}</a></td>
-                                <td class="col-date">${alignment.date}</td>
+                                <td class="col-genome group-analysis">${alignment.genome}</td>
+                                <td class="col-history group-analysis"><a href="http://galaxy-cegr.psu.edu:8080/history?id=${alignment.historyId}" target="_blank">${alignment.historyId}</a></td>
+                                <td class="col-date group-analysis">${alignment.date}</td>
                                 <g:each in="${alignment.status}" var="status" status="j">
-                                    <td class="analysis-status col-step-${it.value.steps[j][0]}">
+                                    <td class="analysis-status col-step-${it.value.steps[j][0]} group-pipeline">
                                         <g:if test="${status?.code=='OK'}">
                                             <span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-success"> </span>
                                         </g:if> 
@@ -177,9 +199,9 @@
                                     </td>
                                 </g:each>
 
-                                <td class="text-right col-tags"><g:formatNumber number="${alignment.requestedTags}" format="###,###,###" /></td>
+                                <td class="text-right col-tags group-qc"><g:formatNumber number="${alignment.requestedTags}" format="###,###,###" /></td>
                                 <g:each in="${qcSettings}" var="setting">
-                                    <td class="text-right col-${setting.key} <g:if test='${
+                                    <td class="text-right col-${setting.key} group-qc <g:if test='${
                                                (setting.min != null && alignment[setting.key] < setting.min)
                                                || (setting.max != null && alignment[setting.key] > setting.max)
                                                || (setting.reference_min != null && alignment.hasProperty(setting.reference_min) && alignment[setting.key] < alignment[setting.reference_min])
@@ -188,13 +210,13 @@
                                     <g:formatNumber number="${alignment[setting.key]}" format="${setting.numFormat}" />
                                 </td>
                                 </g:each>
-                                <td class="col-prefer">
+                                <td class="col-prefer group-operation">
                                     <label class="switch">
                                         <input class="prefer" type="checkbox" onclick="togglePreferredAlignment(${alignment.alignmentId})" <g:if test="${alignment.isPreferred}">checked</g:if>>
                                         <div class="slider round"></div>
                                     </label>
                                 </td>
-                                <td class="col-delete"><g:link controller="report" action="deleteAlignment" params="[alignmentId:alignment.alignmentId, runId:run.id]" class="confirm"><span class="glyphicon glyphicon-trash"</g:link></td>
+                                <td class="col-delete group-operation"><g:link controller="report" action="deleteAlignment" params="[alignmentId:alignment.alignmentId, runId:run.id]" class="confirm"><span class="glyphicon glyphicon-trash"</g:link></td>
                             </tr>
                         </g:each>
                         <g:if test="${sample.alignmentStatusList.size()==0}">
@@ -285,7 +307,7 @@
                 var classes = classAttr.split(' ');
                 for (n in classes) {
                     var classname = classes[n];
-                    if (classname.substring(0,4) == "col-") {
+                    if (classname.substring(0,4) == "col-" || classname.substring(0,6) == "group-") {
                         $("." + classname).hide();
                     }
                 }                

@@ -180,6 +180,7 @@ class SampleDTO {
     String assay
     List experiments
     Integer alignmentCount
+    String note
 }
 
 class ExperimentDTO {

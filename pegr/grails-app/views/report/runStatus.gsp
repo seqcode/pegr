@@ -135,10 +135,10 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th colspan="6" class="text-center group-analysis">Analysis</th>
-                            <th colspan="${it.value.steps.size()}" class="text-center group-pipeline">Pipeline</th>
-                            <th colspan="${qcSettings.size() + 1}" class="text-center group-qc">Quality Control</th>
-                            <th colspan="2" class="text-center group-operation">Operation</th>
+                            <th colspan="6" class="text-center group group-analysis">Analysis</th>
+                            <th colspan="${it.value.steps.size()}" class="text-center group group-pipeline">Pipeline</th>
+                            <th colspan="${qcSettings.size() + 1}" class="text-center group group-qc">Quality Control</th>
+                            <th colspan="2" class="text-center group group-operation">Operation</th>
                         </tr>
                         <tr>
                             <th class="col-sample group-analysis">Sample</th>
@@ -300,17 +300,51 @@
             $("#column-toggle").click(function() {
                 $("th").show();
                 $("td").show();
+                $(".group").each(function(){
+                    var classAttr = $(this).attr("class");
+                    var classes = classAttr.split(' ');
+                    var groupClass;
+                    for (n in classes) {
+                        var classname = classes[n];
+                        if (classname.substring(0,6) == "group-") {
+                            groupClass = classname;
+                            break;
+                        }
+                    }
+                    var n = $(this).closest("table").find("tbody tr:first-child ." + groupClass).length;
+                    $(this).attr("colspan", n);
+                });
             });
-            
+
             $(".glyphicon-minus-sign").click(function() {
                 var classAttr = $(this).parent().attr("class");
                 var classes = classAttr.split(' ');
+                var category;
+                var classToHide;
+                var groupClass;
                 for (n in classes) {
                     var classname = classes[n];
-                    if (classname.substring(0,4) == "col-" || classname.substring(0,6) == "group-") {
-                        $("." + classname).hide();
+                    if (classname.substring(0,4) == "col-") {
+                        category = "col";
+                        classToHide = classname;
+                    } else if (classname.substring(0,6) == "group-") {
+                        groupClass = classname;
+                        if (category != "col") {
+                            category = "group";
+                            classToHide = classname;
+                        }
                     }
-                }                
+                }      
+                $("." + classToHide).hide();
+                if (category == "col") {
+                    var groupHeader = $(".group + ." + groupClass);
+                    var n = groupHeader.attr("colspan") - 1;
+                    if (n == 0) {
+                        groupHeader.hide();    
+                    } else {
+                        groupHeader.attr("colspan", n);
+                    }
+                }
             });
         });
         

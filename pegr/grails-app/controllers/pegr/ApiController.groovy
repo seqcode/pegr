@@ -114,7 +114,7 @@ class ApiController {
                     def preferredOnly = query.preferredOnly ?: true
                     data = reportService.fetchDataForRun(query.runId, preferredOnly)       
                     code = 200
-                    message = "Success fetching data from Run ${runId}!"
+                    message = "Success fetching data from Run ${query.runId}!"
                 } catch (ReportException e) {
                     code = 500
                     message = e.message

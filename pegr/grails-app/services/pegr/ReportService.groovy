@@ -339,7 +339,8 @@ class ReportService {
           treatments: sample.treatments*.name.join(", "),
           assay: sample.assay?.name,
           experiments: [],
-          alignmentCount: 0
+          alignmentCount: 0,
+          note: utilityService.queryJson(sample.note, "note")                             
          )
     }
     

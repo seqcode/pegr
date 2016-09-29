@@ -51,11 +51,34 @@ class ReportService {
                 
                 // iterate through the analysis and get each step's status
                 def analysis = Analysis.findAllByAlignment(alignment)   
+                def motifCount = 0
+                
                 steps.eachWithIndex { step, index ->
                     // find the step's analysis by stepId
-                    def stepAnalysis = analysis.find {it.stepId == step[0]}
+                    def stepAnalysisList = analysis.findAll {it.stepId == step[0]}
+                    
                     // get the status for this step
-                    alignmentStatusDTO.status[index] = getStepAnalysisStatus(stepAnalysis)
+                    alignmentStatusDTO.status[index] = getStepAnalysisStatus(stepAnalysisList)
+                    
+                    // compare the motif count
+                    if (alignmentStatusDTO.status[index].code == "OK") {
+                        switch (step[1]) {
+                            case "meme":
+                                motifCount = utilityService.queryJson(stepAnalysisList[0].statistics, "motifCount")
+                                break
+                            case "fimo":
+                                def fimoCount = alignmentStatsService.queryDatasetsUriList(stepAnalysisList[0].datasets, "gff").size()
+                                if (fimoCount != motifCount) {
+                                    alignmentStatusDTO.status[index] = [code: "Error", error: "Motif missing"]
+                                }
+                                break
+                            case "tagPileup":
+                                if (stepAnalysisList.size() != motifCount) {
+                                    alignmentStatusDTO.status[index] = [code: "Error", error: "Motif missing"]
+                                }                         
+                                break
+                        }
+                    }
                 }
 
                 // find the sample in that pipeline
@@ -77,24 +100,42 @@ class ReportService {
     
    /** 
     * Get the step analysis' status
-    * @param stepAnalysis
-    * @return status map
+    * @param stepAnalysisList a list of analysis for a specific step
+    * @return status map, including code, error(optional), and message(optional)
     */
-    def getStepAnalysisStatus(Analysis stepAnalysis) {
-        def result
-        if (stepAnalysis) {
-            // transform the status note
-            result = utilityService.parseJson(stepAnalysis.note)
-            // if the note has not been processed
-            if (!result) {
-                if (stepAnalysis.note) {
-                    result = [code: "Error", error: stepAnalysis.note]
-                } else {
-                    result = [code: "OK"]
+    def getStepAnalysisStatus(List stepAnalysisList) {
+        def result = [:]
+        
+        if (stepAnalysisList.size() == 0){
+            result = [code: "NO"]
+        } else {
+            result.code = "OK"
+            stepAnalysisList.each { stepAnalysis ->
+                // transform the status note
+                def note = utilityService.parseJson(stepAnalysis.note)
+                // if the note has not been processed
+                if (!note) {
+                    if (stepAnalysis.note) {
+                        note = [code: "Error", error: stepAnalysis.note]
+                    } else {
+                        note = [code: "OK"]
+                    }
+                }
+                // concatenate the note
+                if ((result.code == "OK" && note.code != "OK") 
+                    || (result.code == "Permission" && ["Zero", "Error"].contains(note.code))
+                    || (result.code == "Zero" && note.code == "Error")) {
+                    result.code = note.code
+                }
+                
+                if (note.error) {
+                    result.error = result.error ? result.error + " " + note.error : note.error
+                }
+                
+                if (note.message) {
+                    result.message = result.message ? result.message + " " + note.message : note.message
                 }
             }
-        } else {
-            result = [code: "NO"]
         }
         return result
     }

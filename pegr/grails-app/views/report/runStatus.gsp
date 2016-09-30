@@ -98,7 +98,49 @@
             background-color: #e6ffe6;
             background-image: none;
         }
-
+        
+        .popover-wrapper {
+            position: relative; 
+            overflow: visible; 
+            height: 100%;
+        }
+        
+        .popover-content {
+            border-radius: 5px;
+            bottom: 25px;
+            box-shadow: 0 0 10px black;
+            display: none;
+            font-size: 10px;
+            font-family: 'Helvetica',sans-serif;
+            left: -63px;
+            padding: 0px;
+            position: absolute;
+            width: 135px;
+            z-index: 500;
+            background-color: white;
+            text-align: center;
+        }
+        
+        .popover-content:before {
+            border-top: 7px solid white;
+            border-right: 7px solid transparent;
+            border-left: 7px solid transparent;
+            bottom: -5px;
+            content: '';
+            display: block;
+            left: 50%;
+            margin-left: -7px;
+            position: absolute;
+            z-index: 1000;
+        }
+        
+        .popover-content h6 {
+            margin: 2px;
+        }
+        
+        .popover-content p {
+            margin: 2px;
+        }
     </style>
 </head>
 <body>
@@ -181,21 +223,31 @@
                                 <td class="col-date group-analysis">${alignment.date}</td>
                                 <g:each in="${alignment.status}" var="status" status="j">
                                     <td class="analysis-status col-step-${it.value.steps[j][0]} group-pipeline">
-                                        <g:if test="${status?.code=='OK'}">
-                                            <span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-success"> </span>
-                                        </g:if> 
-                                        <g:elseif test="${status?.code=='NO'}">
-                                            <span data-toggle="popover" data-content="${it.value.steps[j][1]}" data-placement="top" class="label label-default"> </span>
-                                        </g:elseif>
-                                        <g:elseif test="${status?.code=='Permission'}">
-                                            <span data-toggle="popover" title="${it.value.steps[j][1]}" data-content="${status.message}" data-placement="top" class="label label-warning"> </span>
-                                        </g:elseif> 
-                                        <g:elseif test="${status?.code=='Zero'}">
-                                            <span data-toggle="popover" title="${it.value.steps[j][1]}" data-content="${status.message}" data-placement="top" class="label label-info"> </span>
-                                        </g:elseif>
-                                        <g:else>
-                                            <span data-toggle="popover" title="${it.value.steps[j][1]}" data-content="${status?.error}" data-placement="top" class="label label-danger"> </span>
-                                        </g:else>
+                                        <div class="popover-wrapper">
+                                        <div class="popover-toggle">
+                                            <g:if test="${status?.code=='OK'}">
+                                                <span class="label label-success"> </span>
+                                            </g:if>
+                                            <g:elseif test="${status?.code=='NO'}">
+                                                <span class="label label-default"> </span>
+                                            </g:elseif>
+                                            <g:elseif test="${status?.code=='Permission'}">
+                                                <span class="label label-warning"> </span>
+                                            </g:elseif> 
+                                            <g:elseif test="${status?.code=='Zero'}">
+                                                <span class="label label-info"> </span>
+                                            </g:elseif>
+                                            <g:else>
+                                                <span class="label label-danger"> </span>
+                                            </g:else>
+                                        </div>
+                                        
+                                        <div class="popover-content">
+                                            <h6>${it.value.steps[j][1]}</h6>
+                                            <p>${status.error}</p>
+                                            <p>${status.message}</p>
+                                        </div>
+                                        </div>
                                     </td>
                                 </g:each>
 
@@ -346,6 +398,11 @@
                     }
                 }
             });
+            $(".popover-content").hide();
+            $(".popover-toggle").click(function() {
+                var target = $(this).next();
+                $(target).toggle();
+            });
         });
         
         function createReport(cohortId) {
@@ -372,6 +429,7 @@
         function togglePreferredAlignment(alignmentId) {
             $.ajax({ url: "/pegr/report/togglePreferredAlignment?alignmentId=" + alignmentId });            
         }
+        
     </script>
 </body>
 </html>

@@ -16,6 +16,8 @@ class ReportService {
     def alignmentStatsService
     def springSecurityService
     final String QC_SETTINGS = "QC_SETTINGS"
+    final String PURGE_ALIGNMENTS_CONFIG = "PurgeAlignmentsConfig"
+    final String GALAXY_CONFIG = "GalaxyConfig"
     
    /**
     * Fetch the status of the sequence run
@@ -191,6 +193,57 @@ class ReportService {
             log.error e
             throw new ReportException(message: "Error deleting the alignment!")
         } 
+    }
+    
+   /**
+    * Delete purged alignments with dates from saved chores
+    * @param startDate
+    * @param endDate
+    */
+    @Transactional
+    def deletePurgedAlignments(Date startDate, Date endDate) {
+        // set current config in Chores
+        def chore = Chores.findByName(PURGE_ALIGNMENTS_CONFIG)
+        if (!chore) {
+            chore = new Chores(name:PURGE_ALIGNMENTS_CONFIG)
+        }
+        
+        def config = utilityService.parseJson(chore.value)
+        if (config) {
+            if (config.currentRunTime)
+            throw new ReportException(message: "A job is currently running to delete purged alignments!")
+        } else {
+            config = [:]
+        }
+        def runTime = new Date()
+        config.currentRunTime = runTime
+        config.currentStartDate = startDate
+        config.currentEndDate = endDate
+        chore.value = JsonOutput.toJson(config)
+        chore.save(flush:true)
+        
+        // get Galaxy config
+        def galaxyConfig = utilityService.parseJson(Chores.findByName(GALAXY_CONFIG)?.value)
+        if (!galaxyConfig) {
+            throw new ReportException(message: "Galaxy config is not correctly defined!")
+        }
+        
+        SequenceAlignment.where { date >= startDate && date <= endDate }.list().each { alignment ->
+            def url = galaxyConfig.url + "api/histories/" + alignment.historyId + "?key=" + galaxyConfig.key
+            def s = new URL(url).getText()
+            def result = utilityService.parseJson(s)
+            if (result?.purged) {
+                deleteAlignment(alignment.id)
+            }
+        }
+
+        // update config
+        config = [lastStartDate: startDate,
+                  lastEndDate: endDate,
+                  lastRunTime: runTime
+                 ]
+        chore.value = JsonOutput.toJson(config)
+        chore.save(flush:true)
     }
     
    /**

@@ -202,6 +202,15 @@ class ReportService {
     */
     @Transactional
     def deletePurgedAlignments(Date startDate, Date endDate) {
+        final String RUN = "RUN"
+        final String ERROR = "ERROR"
+        
+        // get Galaxy config
+        def galaxyConfig = utilityService.parseJson(Chores.findByName(GALAXY_CONFIG)?.value)
+        if (!galaxyConfig || !galaxyConfig.url || !galaxyConfig.key) {
+            throw new ReportException(message: "Galaxy config is not correctly defined!")
+        }
+        
         // set current config in Chores
         def chore = Chores.findByName(PURGE_ALIGNMENTS_CONFIG)
         if (!chore) {
@@ -210,8 +219,9 @@ class ReportService {
         
         def config = utilityService.parseJson(chore.value)
         if (config) {
-            if (config.currentRunTime)
-            throw new ReportException(message: "A job is currently running to delete purged alignments!")
+            if (config.status == RUN) {
+                throw new ReportException(message: "A job is currently running to delete purged alignments!")
+            }
         } else {
             config = [:]
         }
@@ -219,31 +229,36 @@ class ReportService {
         config.currentRunTime = runTime
         config.currentStartDate = startDate
         config.currentEndDate = endDate
+        config.status = RUN
         chore.value = JsonOutput.toJson(config)
-        chore.save(flush:true)
-        
-        // get Galaxy config
-        def galaxyConfig = utilityService.parseJson(Chores.findByName(GALAXY_CONFIG)?.value)
-        if (!galaxyConfig) {
-            throw new ReportException(message: "Galaxy config is not correctly defined!")
+        if (!chore.save(flush:true)) {
+            throw new ReportException(message: "The job status cannot be updated. Job canceled!")
         }
         
-        SequenceAlignment.where { date >= startDate && date <= endDate }.list().each { alignment ->
-            def url = galaxyConfig.url + "api/histories/" + alignment.historyId + "?key=" + galaxyConfig.key
-            def s = new URL(url).getText()
-            def result = utilityService.parseJson(s)
-            if (result?.purged) {
-                deleteAlignment(alignment.id)
+        try {
+            // find the alignments in the time interval
+            def alignments = SequenceAlignment.where { date >= startDate && date <= endDate }.list()
+            alignments.each { alignment ->
+                def url = galaxyConfig.url + "api/histories/" + alignment.historyId + "?key=" + galaxyConfig.key
+                def s = new URL(url).getText()
+                def result = utilityService.parseJson(s)
+                if (result?.purged) {
+                    deleteAlignment(alignment.id)
+                }
             }
+            config = [lastStartDate: startDate,
+                      lastEndDate: endDate,
+                      lastRunTime: runTime
+                     ]
+        } catch (Exception e) {
+            log.error e
+            config.status = ERROR
         }
-
-        // update config
-        config = [lastStartDate: startDate,
-                  lastEndDate: endDate,
-                  lastRunTime: runTime
-                 ]
+        // update config        
         chore.value = JsonOutput.toJson(config)
-        chore.save(flush:true)
+        if (!chore.save(flush:true)) {
+            throw new ReportException(message: "Job finished successfully, but the job status cannot be updated.")
+        }        
     }
     
    /**

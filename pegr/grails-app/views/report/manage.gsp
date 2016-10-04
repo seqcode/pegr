@@ -5,9 +5,6 @@
     </head>
     <body>
         <br>
-        <g:if test="${flash.message}">
-            <div class="message" role="status">${flash.message}</div>
-        </g:if>
         <ul class="nav nav-tabs">
             <li class="active"><a data-toggle="tab" href="#qc-settings">Quality Control Settings</a></li>
             <li><a data-toggle="tab" href="#purge-alignments">Delete Purged Alignments</a></li>
@@ -49,27 +46,18 @@
             <g:link controller="report" action="analysisStatus" class="btn btn-default">Cancel</g:link>
             </g:form>
         </div>
-        <div id="purge-alignments"  class="tab-pane fade">           
-            <g:if test="${purgeConfig?.lastRunTime}">
-                <p>On ${purgeConfig.lastRunTime}, purged alignments between ${purgeConfig.lastStartDate} and ${purgeConfig.lastEndConfig} were deleted.</p>
-            </g:if>            
+        <div id="purge-alignments"  class="tab-pane fade">          
             <g:form controller="report" action="deletePurgedAlignments" class="fields">
-                <div>
-                    <label>Start Date</label>
-                    <g:datePicker name="startDate" value="${purgeConfig?.lastEndDate}"></g:datePicker>
-                </div>
-                <div>
-                    <label>End Date</label>
-                    <g:datePicker name="endDate" value="${purgeConfig?.lastEndDate}"></g:datePicker>
-                </div>
-                <g:submitButton name="submit" value="Submit" class="btn btn-primary"></g:submitButton>
-                <g:link controller="report" action="analysisStatus" class="btn btn-default">Cancel</g:link>
+                <g:render template="purgeAlignments" model="[purgeConfig:purgeConfig]"></g:render>
+                <input onclick="deletePurgedAlignments(this)" type="button" class="btn btn-primary" value="Submit">
+                <i class="fa fa-spinner fa-spin"></i>
             </g:form>
         </div>
         </div>
         <script>
             $(function() {
-               $(".nav-status").addClass("active");
+                $(".nav-status").addClass("active");
+                $(".fa").hide();
             });
             
             $("#add").click(function() {
@@ -81,6 +69,20 @@
                             $orig.children().clone(true))
                 );
             });
+            
+            function deletePurgedAlignments(elem) {
+                $(elem).addClass("disabled");
+                $(".fa").show();
+                jQuery.ajax({
+                    type:'POST',
+                    data:jQuery(elem).parents('form:first').serialize(), 
+                    url:'/pegr/report/deletePurgedAlignments',
+                    success:function(data,textStatus){
+                        jQuery('#purge-alignments').html(data);
+                    },
+                });
+                return false;
+            }
         </script>
     </body>
 </html>

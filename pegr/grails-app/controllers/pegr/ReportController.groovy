@@ -149,15 +149,19 @@ class ReportController {
         }
     }
     
-    def deletePurgedAlignments(Date startDate, Date endDate) {
+    def deletePurgedAlignments() {
+        def message
         try {
+            def startDate = params.startDate
+            def endDate = params.endDate
             reportService.deletePurgedAlignments(startDate, endDate)
-            flash.message = "The job to delete purged alignments between ${startDate} and ${endDate} has started."
-            redirect(action: "analysisStatus")
+            message = "Sucess deleting purged alignments between ${startDate} and ${endDate}!"
         } catch (ReportException e) {
-            flash.message = e.message
-            redirect(action: "manage")
+            message = e.message
         }
+        def purgeConfigStr = Chores.findByName(reportService.PURGE_ALIGNMENTS_CONFIG)?.value
+        def purgeConfig = utilityService.parseJson(purgeConfigStr)
+        render(template: "purgeAlignments", model: [purgeConfig:purgeConfig, message: message])
     }
     
     def togglePreferredAlignment(Long alignmentId) {

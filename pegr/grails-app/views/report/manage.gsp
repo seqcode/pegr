@@ -2,6 +2,12 @@
     <head>
         <title>PEGR - Analysis Status</title> 
         <meta name="layout" content="analysis"/>
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+        <style>
+            .fa {
+                font-size:24px;
+            }
+        </style>
     </head>
     <body>
         <br>
@@ -47,8 +53,8 @@
             </g:form>
         </div>
         <div id="purge-alignments"  class="tab-pane fade">          
-            <g:form controller="report" action="deletePurgedAlignments" class="fields">
-                <g:render template="purgeAlignments" model="[purgeConfig:purgeConfig]"></g:render>
+            <g:form controller="report" action="deletePurgedAlignments">
+                <div id="purge-config" class="fields"><g:render template="purgeAlignments" model="[purgeConfig:purgeConfig]"></g:render></div>
                 <input onclick="deletePurgedAlignments(this)" type="button" class="btn btn-primary" value="Submit">
                 <i class="fa fa-spinner fa-spin"></i>
             </g:form>
@@ -78,7 +84,9 @@
                     data:jQuery(elem).parents('form:first').serialize(), 
                     url:'/pegr/report/deletePurgedAlignments',
                     success:function(data,textStatus){
-                        jQuery('#purge-alignments').html(data);
+                        jQuery('#purge-config').html(data);
+                        $(elem).removeClass("disabled");
+                        $(".fa").hide();
                     },
                 });
                 return false;

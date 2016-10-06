@@ -96,7 +96,7 @@ delete from summary_report
 */
 
 // alter table sequence_run auto_increment = 215;
-
+/*
 insert into user (version, account_expired, account_locked, enabled, password, password_expired, username, email, api_key) values (0, false, false, false, "$2a$10$ErWZYV6RfjF0ST8YQ43ImetX6pNEUPXOw1hGA.T092tfSBgT2t2kC",false, "galaxy-cegr", "cegr@psu.edu", "0YG9B2LPLLDPP4B1LQQ0BB1LH75L8A3P");
 
 update analysis set user_id = 350 where user_id is null;
@@ -124,4 +124,4 @@ delete from chores where name = "PipelineSteps";
 
 delete from report_alignments;
 delete from summary_report;
-                                                                       
+*/

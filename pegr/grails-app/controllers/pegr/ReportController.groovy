@@ -5,6 +5,7 @@ class ReportController {
     
     def springSecurityService
     def reportService
+    def utilityService
     
     def createReportForCohortAjax(Long cohortId) {
         def cohort = SequencingCohort.get(cohortId)
@@ -125,12 +126,17 @@ class ReportController {
         render result
     }
     
-    def editQcSettings() {
+    def manage() {
+        // get QC settings
         def qcSettings = reportService.getQcSettings()
         if (!qcSettings || qcSettings.size() == 0) {
             qcSettings = [[:]]
         }
-        [qcSettings: qcSettings]
+        
+        // get the purge alignments configs for the last time
+        def purgeConfigStr = Chores.findByName(reportService.PURGE_ALIGNMENTS_CONFIG)?.value
+        def purgeConfig = utilityService.parseJson(purgeConfigStr)
+        [qcSettings: qcSettings, purgeConfig: purgeConfig]        
     }
     
     def saveQcSettings() {
@@ -141,6 +147,21 @@ class ReportController {
             flash.message = e.message
             redirect(action: "editQcSettings") 
         }
+    }
+    
+    def deletePurgedAlignments() {
+        def message
+        try {
+            def startDate = params.startDate
+            def endDate = params.endDate
+            reportService.deletePurgedAlignments(startDate, endDate)
+            message = "Sucess deleting purged alignments between ${startDate} and ${endDate}!"
+        } catch (ReportException e) {
+            message = e.message
+        }
+        def purgeConfigStr = Chores.findByName(reportService.PURGE_ALIGNMENTS_CONFIG)?.value
+        def purgeConfig = utilityService.parseJson(purgeConfigStr)
+        render(template: "purgeAlignments", model: [purgeConfig:purgeConfig, message: message])
     }
     
     def togglePreferredAlignment(Long alignmentId) {

@@ -195,20 +195,38 @@ class AlignmentStatsService {
                 }
                 break
             case "output_meme":
-                // check motifs
-                def memeFile = queryDatasetsUri(datasets, "txt")
-                if (memeFile) {
-                    def data = new URL(memeFile).getText()
-                    if (!data.contains("letter-probability matrix")) {
-                        note.code = "Zero"
-                        note.message = "No motifs."
-                    }
+                // count the number of motifs
+                def motifCount = getMotifCountFromMeme(datasets)
+                    
+                // save the number of motifs as a statistics
+                analysis.statistics = JsonOutput.toJson([["motifCount":motifCount]])
+                    
+                // add message if no motif exists
+                if (motifCount == 0) {
+                    note.code = "Zero"
+                    note.message = "No motifs."
                 }
                 break
         }
         
         analysis.note = JsonOutput.toJson(note)
         analysis.save(failOnError: true)
+    }
+
+   /**
+    * Get the motif count from meme file
+    * @param datasets a list of maps
+    * @return motifCount
+    */
+    def getMotifCountFromMeme(List datasets) {
+        def motifCount = 0
+        def memeFile = queryDatasetsUri(datasets, "txt")
+        if (memeFile) {
+            def data = new URL(memeFile).getText()
+            // count the number of motifs
+            motifCount = (data =~ /letter-probability matrix/).count
+        }
+        return motifCount
     }
     
    /**

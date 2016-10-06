@@ -16,6 +16,8 @@ class ReportService {
     def alignmentStatsService
     def springSecurityService
     final String QC_SETTINGS = "QC_SETTINGS"
+    final String PURGE_ALIGNMENTS_CONFIG = "PurgeAlignmentsConfig"
+    final String GALAXY_CONFIG = "GalaxyConfig"
     
    /**
     * Fetch the status of the sequence run
@@ -51,11 +53,34 @@ class ReportService {
                 
                 // iterate through the analysis and get each step's status
                 def analysis = Analysis.findAllByAlignment(alignment)   
+                def motifCount = 0
+                
                 steps.eachWithIndex { step, index ->
                     // find the step's analysis by stepId
-                    def stepAnalysis = analysis.find {it.stepId == step[0]}
+                    def stepAnalysisList = analysis.findAll {it.stepId == step[0]}
+                    
                     // get the status for this step
-                    alignmentStatusDTO.status[index] = getStepAnalysisStatus(stepAnalysis)
+                    alignmentStatusDTO.status[index] = getStepAnalysisStatus(stepAnalysisList)
+                    
+                    // compare the motif count
+                    if (alignmentStatusDTO.status[index].code == "OK") {
+                        switch (step[1]) {
+                            case "meme":
+                                motifCount = utilityService.queryJson(stepAnalysisList[0].statistics, "motifCount")
+                                break
+                            case "fimo":
+                                def fimoCount = alignmentStatsService.queryDatasetsUriList(stepAnalysisList[0].datasets, "gff").size()
+                                if (fimoCount != motifCount) {
+                                    alignmentStatusDTO.status[index] = [code: "Error", error: "Motif missing"]
+                                }
+                                break
+                            case "tagPileup":
+                                if (stepAnalysisList.size() != motifCount) {
+                                    alignmentStatusDTO.status[index] = [code: "Error", error: "Motif missing"]
+                                }                         
+                                break
+                        }
+                    }
                 }
 
                 // find the sample in that pipeline
@@ -77,24 +102,42 @@ class ReportService {
     
    /** 
     * Get the step analysis' status
-    * @param stepAnalysis
-    * @return status map
+    * @param stepAnalysisList a list of analysis for a specific step
+    * @return status map, including code, error(optional), and message(optional)
     */
-    def getStepAnalysisStatus(Analysis stepAnalysis) {
-        def result
-        if (stepAnalysis) {
-            // transform the status note
-            result = utilityService.parseJson(stepAnalysis.note)
-            // if the note has not been processed
-            if (!result) {
-                if (stepAnalysis.note) {
-                    result = [code: "Error", error: stepAnalysis.note]
-                } else {
-                    result = [code: "OK"]
+    def getStepAnalysisStatus(List stepAnalysisList) {
+        def result = [:]
+        
+        if (stepAnalysisList.size() == 0){
+            result = [code: "NO"]
+        } else {
+            result.code = "OK"
+            stepAnalysisList.each { stepAnalysis ->
+                // transform the status note
+                def note = utilityService.parseJson(stepAnalysis.note)
+                // if the note has not been processed
+                if (!note) {
+                    if (stepAnalysis.note) {
+                        note = [code: "Error", error: stepAnalysis.note]
+                    } else {
+                        note = [code: "OK"]
+                    }
+                }
+                // concatenate the note
+                if ((result.code == "OK" && note.code != "OK") 
+                    || (result.code == "Permission" && ["Zero", "Error"].contains(note.code))
+                    || (result.code == "Zero" && note.code == "Error")) {
+                    result.code = note.code
+                }
+                
+                if (note.error) {
+                    result.error = result.error ? result.error + " " + note.error : note.error
+                }
+                
+                if (note.message) {
+                    result.message = result.message ? result.message + " " + note.message : note.message
                 }
             }
-        } else {
-            result = [code: "NO"]
         }
         return result
     }
@@ -150,6 +193,71 @@ class ReportService {
             log.error e
             throw new ReportException(message: "Error deleting the alignment!")
         } 
+    }
+    
+   /**
+    * Delete purged alignments with dates from saved chores
+    * @param startDate
+    * @param endDate
+    */
+    def deletePurgedAlignments(Date startDate, Date endDate) {
+        final String RUN = "RUN"
+        final String ERROR = "ERROR"
+        
+        // get Galaxy config
+        def galaxyConfig = utilityService.parseJson(Chores.findByName(GALAXY_CONFIG)?.value)
+        if (!galaxyConfig || !galaxyConfig.url || !galaxyConfig.key) {
+            throw new ReportException(message: "Galaxy config is not correctly defined!")
+        }
+        
+        // set current config in Chores
+        def chore = Chores.findByName(PURGE_ALIGNMENTS_CONFIG)
+        if (!chore) {
+            chore = new Chores(name:PURGE_ALIGNMENTS_CONFIG)
+        }
+        
+        def config = utilityService.parseJson(chore.value)
+        if (config) {
+            if (config.status == RUN) {
+                throw new ReportException(message: "A job is currently running to delete purged alignments!")
+            }
+        } else {
+            config = [:]
+        }
+        def runTime = new Date()
+        config.currentRunTime = runTime
+        config.currentStartDate = startDate
+        config.currentEndDate = endDate
+        config.status = RUN
+        chore.value = JsonOutput.toJson(config)
+        if (!chore.save(flush:true)) {
+            throw new ReportException(message: "The job status cannot be updated. Job canceled!")
+        }
+        
+        try {
+            // find the alignments in the time interval
+            def alignments = SequenceAlignment.where { date >= startDate && date <= endDate }.list()
+            alignments.each { alignment ->
+                def url = galaxyConfig.url + "api/histories/" + alignment.historyId + "?key=" + galaxyConfig.key
+                def s = new URL(url).getText()
+                def result = utilityService.parseJson(s)
+                if (result?.purged) {
+                    deleteAlignment(alignment.id)
+                }
+            }
+            config = [lastStartDate: startDate,
+                      lastEndDate: endDate,
+                      lastRunTime: runTime
+                     ]
+        } catch (Exception e) {
+            log.error e
+            config.status = ERROR
+        }
+        // update config        
+        chore.value = JsonOutput.toJson(config)
+        if (!chore.save(flush:true)) {
+            throw new ReportException(message: "Job finished successfully, but the job status cannot be updated.")
+        }        
     }
     
    /**
@@ -671,7 +779,7 @@ class ReportService {
     */
     @Transactional
     def saveQcSettings(def params) {
-        def fields = ["key", "name", "numFormat", "min", "max", "reference_min", "reference_max"]
+        def fields = ["key", "name", "numFormat", "min", "max", "reference_min", "reference_min_ratio", "reference_max", "reference_max_ratio"]
         def lists = []
         
         fields.each { field ->
@@ -684,7 +792,7 @@ class ReportService {
             fields.eachWithIndex { field, n ->
                 if (lists[n][i] != null && lists[n][i] != "") {
                     switch(field) {
-                        case ["min", "max"]:
+                        case ["min", "max", "reference_min_ratio", "reference_max_ratio"]:
                             setting[field] = utilityService.getFloat(lists[n][i])
                             break
                         default:

@@ -13,7 +13,7 @@
     <h4>Add Traced Sample</h4>
     <g:render template="/item/details" bean="${item}" var="item"></g:render>
     <g:if test="${priorInstance}">
-        <p>This item is associated with protocol instance <g:link controller="ProtocolInstanceBag" action="showInstance" id="${priorInstance.id}" target="_blank">${priorInstance}</g:link></p>
+        <p>This item is associated with protocol instance <g:link controller="ProtocolInstanceBag" action="showInstance" id="${priorInstance.id}" target="_blank">${priorInstance.protocol.name} ${priorInstance.endTime}</g:link></p>
     </g:if>
     
     <ul class="nav nav-tabs">

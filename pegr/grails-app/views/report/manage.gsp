@@ -55,8 +55,10 @@
         <div id="purge-alignments"  class="tab-pane fade">          
             <g:form controller="report" action="deletePurgedAlignments">
                 <div id="purge-config" class="fields"><g:render template="purgeAlignments" model="[purgeConfig:purgeConfig]"></g:render></div>
-                <input onclick="deletePurgedAlignments(this)" type="button" class="btn btn-primary" value="Submit">
-                <i class="fa fa-spinner fa-spin"></i>
+                <g:if test="${purgeConfig?.status != 'RUN'}">
+                    <input onclick="deletePurgedAlignments(this)" type="button" class="btn btn-primary" value="Submit">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </g:if>
             </g:form>
         </div>
         </div>
@@ -79,6 +81,7 @@
             function deletePurgedAlignments(elem) {
                 $(elem).addClass("disabled");
                 $(".fa").show();
+                $(".message").remove();
                 jQuery.ajax({
                     type:'POST',
                     data:jQuery(elem).parents('form:first').serialize(), 

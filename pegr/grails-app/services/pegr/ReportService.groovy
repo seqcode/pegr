@@ -200,7 +200,6 @@ class ReportService {
     * @param startDate
     * @param endDate
     */
-    @Transactional
     def deletePurgedAlignments(Date startDate, Date endDate) {
         final String RUN = "RUN"
         final String ERROR = "ERROR"

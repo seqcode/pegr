@@ -51,7 +51,7 @@
         <h4>Sample Traces</h4>
         <ul>
         <g:each in="${traces}">
-            <li><g:link action="show" id="${it.id}">${it.name}</g:link></li>
+            <li><g:link action="show" id="${it.id}">${it.type}: ${it.name}</g:link></li>
         </g:each>
         </ul>
     </g:if>

@@ -31,7 +31,9 @@
                         <th>min</th>
                         <th>max</th>
                         <th>reference min</th>
+                        <th>ref. min ratio</th>
                         <th>reference max</th>
+                        <th>ref. max ratio</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,11 +41,13 @@
                         <tr>
                             <td><input name="key" value="${it.key}"></input></td>
                             <td><input name="name" value="${it.name}"></input></td>
-                            <td><input name="numFormat" value="${it.numFormat}"></input></td>
-                            <td><input name="min" value="${it.min}"></input></td>
-                            <td><input name="max" value="${it.max}"></input></td>
+                            <td><input name="numFormat" value="${it.numFormat}" size="12"></input></td>
+                            <td><input name="min" value="${it.min}" size="10"></input></td>
+                            <td><input name="max" value="${it.max}" size="10"></input></td>
                             <td><input name="reference_min" value="${it.reference_min}"></input></td>
+                            <td><input name="reference_min_ratio" value="${it.reference_min_ratio}" size="10"></input></td>
                             <td><input name="reference_max" value="${it.reference_max}"></input></td>
+                            <td><input name="reference_max_ratio" value="${it.reference_max_ratio}" size="10"></input></td>
                         </tr>
                     </g:each>                
                 </tbody>

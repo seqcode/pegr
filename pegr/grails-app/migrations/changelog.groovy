@@ -2873,4 +2873,6 @@ databaseChangeLog = {
 	include file: 'addCohort.groovy'
 
 	include file: 'updateItem.groovy'
+
+	include file: 'addProjectBag.groovy'
 }

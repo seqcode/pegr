@@ -11,6 +11,7 @@ class ProtocolInstanceBagService {
     def itemService
     def sampleService
     def barcodeService
+    def utilityService
     
     @Transactional
     ProtocolInstanceBag savePrtclInstBagByGroup(Long protocolGroupId, String name, Date startTime) {
@@ -57,6 +58,26 @@ class ProtocolInstanceBagService {
             throw new ProtocolInstanceBagException(message: "Error saving this protocol instance bag!")
         }
         return prtclInstBag
+    }
+    
+   /**
+    * Link protocol instance bag to projects
+    * @param bag protocol instance bag
+    * @param projectIds a list of strings 
+    */
+    @Transactional
+    addBagToProjects(ProtocolInstanceBag bag, List projectIds) {
+        if (!bag) {
+            throw new ProtocolInstanceBagException(message: "Bag not found!")
+        }
+        projectIds.each { idStr ->
+            def id = utilityService.getLong(idStr)
+            def project = Project.get(id)
+            if (!project) {
+                throw new ProtocolInstanceBagException(message: "Project not found!")
+            }
+            new ProjectBags(bag: bag, project: project).save()
+        }
     }
     
     @Transactional

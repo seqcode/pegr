@@ -256,8 +256,8 @@
                                     <td class="text-right col-${setting.key} group-qc <g:if test='${
                                                (setting.min != null && alignment[setting.key] < setting.min)
                                                || (setting.max != null && alignment[setting.key] > setting.max)
-                                               || (setting.reference_min != null && alignment.hasProperty(setting.reference_min) && alignment[setting.key] < alignment[setting.reference_min])
-                                               || (setting.reference_max != null && alignment.hasProperty(setting.reference_max) && alignment[setting.key] > alignment[setting.reference_max])
+                                               || (setting.reference_min != null && alignment.hasProperty(setting.reference_min) && alignment[setting.key] < alignment[setting.reference_min] * setting.reference_min_ratio)
+                                               || (setting.reference_max != null && alignment.hasProperty(setting.reference_max) && alignment[setting.key] > alignment[setting.reference_max] * setting.reference_max_ratio)
                                                }'>bg-danger</g:if>"> 
                                     <g:formatNumber number="${alignment[setting.key]}" format="${setting.numFormat}" />
                                 </td>

@@ -779,7 +779,7 @@ class ReportService {
     */
     @Transactional
     def saveQcSettings(def params) {
-        def fields = ["key", "name", "numFormat", "min", "max", "reference_min", "reference_max"]
+        def fields = ["key", "name", "numFormat", "min", "max", "reference_min", "reference_min_ratio", "reference_max", "reference_max_ratio"]
         def lists = []
         
         fields.each { field ->
@@ -792,7 +792,7 @@ class ReportService {
             fields.eachWithIndex { field, n ->
                 if (lists[n][i] != null && lists[n][i] != "") {
                     switch(field) {
-                        case ["min", "max"]:
+                        case ["min", "max", "reference_min_ratio", "reference_max_ratio"]:
                             setting[field] = utilityService.getFloat(lists[n][i])
                             break
                         default:

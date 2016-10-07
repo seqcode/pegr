@@ -595,11 +595,13 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    void updateBag(Long bagId, String name) {
+    void updateBag(Long bagId, String name, List projectIds) {
         def bag = ProtocolInstanceBag.get(bagId)
         if (bag) {
             bag.name = name
             bag.save()
+            ProjectBags.executeUpdate("delete from ProjectBags where bag.id =:bagId", [bagId: bagId])
+            addBagToProjects(bag, projectIds)
         } else {
             throw new ProtocolInstanceBagException(message: "Bag not found!")
         }

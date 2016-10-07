@@ -13,18 +13,30 @@ class ProtocolInstanceBagController {
         redirect(action: "list", params: params )
     } 
     
-    def list(Integer max, Long projectId, String status) {
-        params.max = Math.min(max ?: 25, 100)
-        if (!params.sort) {
-            params.sort = "startTime"
-            params.order = "desc"
-        }
+    def list(int max, int offset, Long projectId, String status) {
+        max = Math.min(max ?: 25, 100)
+
+        def bags, totalCount
         if (projectId) {
-            bags = ProjectBags.where { project.id == projectId}.list(params)
+            def projectBags = ProjectBags.createCriteria().list(max: max, offset: offset) {
+                project {
+                    eq("id", projectId)
+                }
+                bag {
+                    order("startTime", "desc")
+                }
+            }
+            totalCount = projectBags.totalCount
+            bags = projectBags.collect { it.bag }
         } else if (status) {
-            bags = ProtocolInstanceBag.where {status == status}.list(params)
+            bags = ProtocolInstanceBag.where {status == status}.list(max: max, offset: offset, sort: "startTime", order: "desc")
+            totalCount = ProtocolInstanceBag.where {status == status}.count()
+        } else {
+            bags = ProtocolInstanceBag.list(max: max, offset: offset)
+            totalCount = ProtocolInstanceBag.count()
         }
-        [bags: bags]
+        
+        [bags: bags, totalCount: totalCount]
     }
         
     def create() {
@@ -45,6 +57,21 @@ class ProtocolInstanceBagController {
             flash.message = e.message
             redirect(action: "create")
         }        
+    }
+    
+    def edit(Long bagId) {
+        def bag = ProtocolInstanceBag.get(bagId)
+        [bag: bag]
+    }
+        
+    def update(Long bagId, String name) {
+        try {
+            def projectIds = params.list("projects")
+            protocolInstanceBagService.updateBag(bagId, name, projectIds)
+        } catch (ProtocolInstanceBagException e) {
+            flash.message = e.message
+        }
+        redirect(action: "showBag", id: bagId)
     }
     
     def showBag(Long id) {
@@ -72,11 +99,6 @@ class ProtocolInstanceBagController {
         }else {
             render status: 404
         }
-    }
-    
-    def updateBagAjax(Long bagId, String name) {
-        protocolInstanceBagService.updateBag(bagId, name)
-        render name
     }
     
     def deleteBag(Long bagId) {

@@ -29,13 +29,7 @@
                             <td><g:link action="showBag" id="${it.id}">${it.name}</g:link></td>
                             <td><g:formatDate format="yyyy-MM-dd" date="${it.startTime}"/></td>
                             <td><g:formatDate format="yyyy-MM-dd" date="${it.endTime}"/></td>
-                            <td>
-                                <g:each in="${it.projects}" var="project" status="n">
-                                    <g:if test="${n>0}">, 
-                                    </g:if>
-                                    <g:link controller="project" action="show" id="${project.id}">${project.name}</g:link>                            
-                                </g:each>
-                            </td>
+                            <td><g:render template="/project/inlineList" model="[projects: it.projects]"></g:render></td>
                             <td>${it.status}</td>
                         </tr>
                     </g:each>
@@ -52,11 +46,14 @@
                 <li><g:link params="[status:'COMPLETED']">COMPLETED</g:link></li>
             </ul>
             <h5>Project</h5>
-            <g:select name="project" optionKey="id" from="${pegr.Project.list()}"></g:select>
+            <form action="list">
+                <g:select name="projectId" optionKey="id" from="${pegr.Project.list()}" noSelection="${['null':'Select...']}"></g:select>
+                <g:submitButton name="submit" value="Search" class="btn btn-default"></g:submitButton>
+            </form>
         </div>
     </div>
     <div class="pagination">
-        <g:paginate next="Next" prev="Prev" total="${bags.totalCount ?: 0}" />
+        <g:paginate next="Next" prev="Prev" total="${totalCount}" controller="protocolInstanceBag" action="list" max="25"/>
     </div>
     <script>
         $("select").select2({width: '100%'});

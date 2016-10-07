@@ -12,29 +12,7 @@
                 <sec:ifAllGranted roles="ROLE_ADMIN"><li><g:link action="reopenBag" params="[bagId: bag?.id]" class="confirm">Reopen</g:link></li></sec:ifAllGranted>
             </g:if>
             <g:else>
-                <li><a href="#" data-toggle="modal" data-target="#editName">Edit</a></li>
-                <div id="editName" class="modal fade" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <g:form class="fields" role="form" method="post">
-                                <div class="modal-body">
-                                    <g:hiddenField name="bagId" value="${bag?.id}"></g:hiddenField>
-                                    <label>Name</label>
-                                    <g:textField name="name" value="${bag?.name}"></g:textField>
-                                </div>
-                                <div class="modal-footer">
-                                    <g:submitToRemote type="button" value="Save" 
-                                                      url="[action: 'updateBagAjax']" 
-                                                      params="[bagId: bag?.id]" 
-                                                      update="[success: 'bagName']"
-                                                      onComplete="closeModal()"
-                                                      class="btn btn-primary" data-dismiss="modal"/>
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                </div>
-                            </g:form>
-                        </div>
-                    </div>
-                </div>
+                <li><g:link action="edit" params="[bagId: bag?.id]">Edit</g:link></li>
                 <li><g:link action="deleteBag" params="[bagId: bag?.id]" class="confirm-deleteBag">Delete</g:link></li>                
             </g:else>
         </ul>
@@ -45,7 +23,8 @@
             </small> 
         </h4>
         <p>Start Time: <g:formatDate format="yyyy-MM-dd" date="${bag?.startTime}"/>
-        <g:if test="${bag?.endTime}">, End Time: <g:formatDate format="yyyy-MM-dd" date="${bag?.endTime}"/></g:if></p>   
+        <g:if test="${bag?.endTime}">, End Time: <g:formatDate format="yyyy-MM-dd" date="${bag?.endTime}"/></g:if></p>
+        <p>Project(s):<g:render template="/project/inlineList" model="[projects: bag?.projects]"></g:render></p>
         <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
         </g:if>

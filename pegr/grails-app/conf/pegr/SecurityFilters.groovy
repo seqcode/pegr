@@ -150,7 +150,7 @@ class SecurityFilters {
         /**
          * before the bag is completed
          */
-        ProtocolInstanceBagEdit(controller: "protocolInstanceBag", action: "updateBagAjax") {
+        ProtocolInstanceBagEdit(controller: "protocolInstanceBag", action: "update") {
             before = {
                 def bagId = params.long('bagId')
                 def bag = ProtocolInstanceBag.get(bagId)

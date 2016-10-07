@@ -28,7 +28,7 @@
         <div id="project-users">
             <g:render template="userTable"/>
         </div> 
-        <h3>Sequencing Cohorts</h3>
+        <h3>Sequencing Runs <g:link class="edit" controller="protocolInstanceBag" action="list" params="[project:project.id]">Experiments</g:link></h3>
         <ul>
             <g:each in="${project.cohorts}" var="cohort">
                 <h4>${cohort}

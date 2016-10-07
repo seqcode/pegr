@@ -10,26 +10,20 @@ class ProtocolInstanceBagController {
     def itemService
     
     def index() {
-        redirect(action: "processingBags", params: params )
+        redirect(action: "list", params: params )
     } 
     
-    def processingBags(Integer max) {
-        params.max = Math.min(max ?: 15, 100)
+    def list(Integer max, Long projectId, String status) {
+        params.max = Math.min(max ?: 25, 100)
         if (!params.sort) {
             params.sort = "startTime"
             params.order = "desc"
         }
-        def bags = ProtocolInstanceBag.where { status != ProtocolStatus.COMPLETED }.list(params)
-        [bags: bags]
-    }
-    
-    def completedBags(Integer max){
-        params.max = Math.min(max ?: 15, 100)
-        if (!params.sort) {
-            params.sort = "startTime"
-            params.order = "desc"
+        if (projectId) {
+            bags = ProjectBags.where { project.id == projectId}.list(params)
+        } else if (status) {
+            bags = ProtocolInstanceBag.where {status == status}.list(params)
         }
-        def bags = ProtocolInstanceBag.where { status == ProtocolStatus.COMPLETED }.list(params)
         [bags: bags]
     }
         
@@ -92,7 +86,7 @@ class ProtocolInstanceBagController {
         } catch (ProtocolInstanceBagException e) {
             flash.message = e.message
         }
-        redirect(action: "processingBags")
+        redirect(action: "list")
     }
     
     def reopenBag(Long bagId) {
@@ -102,7 +96,7 @@ class ProtocolInstanceBagController {
             redirect(action: "showBag", id: bagId)
         } catch (ProtocolInstanceBagException e) {
             flash.message = e.message
-            redirect(action: "processingBags")
+            redirect(action: "list")
         }
     }
     
@@ -271,7 +265,7 @@ class ProtocolInstanceBagController {
                     }
                 } else {
                     flash.message = "Protocol instance not found!"
-                    redirect(action: "processingBags")
+                    redirect(action: "list")
                 }
             } else {
                 if (item) {
@@ -353,7 +347,7 @@ class ProtocolInstanceBagController {
     def completeBag(Long bagId) {
         try {
             protocolInstanceBagService.completeBag(bagId)
-            redirect(action:"processingBags")
+            redirect(action:"list")
         } catch(ProtocolInstanceBagException e){
             flash.message = e.message
             redirect(action: "showBag", id: bagId)

@@ -12,6 +12,10 @@ class ProtocolInstanceBag {
         name
     }
     
+    List getProjects() {
+        return ProjectBags.findAllByBag(this).collect{it.project}.toList()
+    }
+    
     static constraints = {
         protocolGroup nullable: true
         name nullable: true, blank: true

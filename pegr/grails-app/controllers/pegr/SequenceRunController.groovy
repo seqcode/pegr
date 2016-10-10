@@ -37,12 +37,13 @@ class SequenceRunController {
         def run = SequenceRun.get(id)
         if (run) {
             def read = null
-            if (run.experiments.getAt(0)?.readPositions) {
+            if (run.experiments.size() > 0) {
                 def jsonSlurper = new JsonSlurper()
-                read = jsonSlurper.parseText(run.experiments[0].readPositions)           
+                read = utilityService.parseJson(run.experiments[0].readPositions)   
+                if (read) {
+                    read.readType = run.experiments[0].readType
+                }
             }
-            read.readType = run.experiments[0].readType
-
             [run: run, read: read]
         } else {
             flash.message = "Sequence run not found!"

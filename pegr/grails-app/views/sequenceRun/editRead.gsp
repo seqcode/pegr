@@ -10,7 +10,7 @@
                 <g:hiddenField name="runId" value="${run?.id}"></g:hiddenField>
                 <div>
                     <label>Read Type</label>
-                    <g:select name="readType" from="${pegr.ReadType.list()}" value="${read?.readType.shortName}" optionKey="shortName" id="read-type" onchange="readTypeChange()"></g:select>
+                    <g:select name="readType" from="${pegr.ReadType.list()}" value="${read?.readType?.shortName}" optionKey="shortName" id="read-type" onchange="readTypeChange()"></g:select>
                     <label>Index Type</label>
                     <g:select name="indexType" from="${['single', 'duo']}" value="${indexType}" id="index-type" onchange="indexTypeChange()"></g:select>
                 </div>

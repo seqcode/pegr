@@ -471,6 +471,7 @@ class ProtocolInstanceBagService {
 
         try {
             item.parent = parent
+            item.project = parent.project
             itemService.save(item)
         } catch (ItemException e) {
             throw new ProtocolInstanceBagException(message: e.message)
@@ -499,6 +500,7 @@ class ProtocolInstanceBagService {
                                      type: instance.protocol.endItemType,
                                      barcode: barcodeService.generateBarcode(),
                                      location: parent.location,
+                                     project: parent.project
                                     )
                 itemService.save(child)
                 def sample = Sample.findByItem(parent)
@@ -526,6 +528,7 @@ class ProtocolInstanceBagService {
         }
         try {
             item.parent = parent
+            item.project = parent.project
             itemService.save(item)
             // add the item to the protocol instance
             new ProtocolInstanceItems(protocolInstance: instance, item: item, function: ProtocolItemFunction.CHILD).save()

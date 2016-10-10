@@ -16,23 +16,17 @@
     <body>
         <h4>Create</h4>
         <g:form action="saveNewSamples" method="post">
-        <ul class="nav nav-pills">
-        <li><a href="#sample-group" class="btn btn-default sample">Sample</a></li>
-        <li><a href="#target-group" class="btn btn-default target">Target</a></li>
-        <li><a href="#other-group" class="btn btn-default other">Other</a></li>
-    </ul>
     <div class="table-responsive">
         <table class="table table-striped table-bordered" style="margin-bottom: 200px">
             <thead>
                 <tr>
                     <th></th>
-                    <th colspan="19" class="sample">Sample</th>
-                    <th colspan="4" class="target">Target</th>
-                    <th colspan="3" class="other">Other</th>
-                </tr>
-                <tr>
-                    <th></th>
-                    <th id="sample-group">Genus</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Barcode</th>
+                    <th>Location</th>
+                    <th>Notes</th>
+                    <th>Genus</th>
                     <th>Species</th>
                     <th>Parent Strain</th>
                     <th>Strain</th>
@@ -42,21 +36,6 @@
                     <th>Age</th>
                     <th>Sex</th>
                     <th>Histology</th>
-                    <th>Growth Media</th>
-                    <th>Treatments</th>                       
-                    <th>Chrom. (ug)</th>
-                    <th>Cell# (M)</th>
-                    <th>Volume (ul)</th>
-                    <th>Requested Tags (M)</th>
-                    <th>Reference Genome(s)</th>
-                    <th><a href="#" onclick="window.open('${g.createLink(action:'sampleSubmissionHelp', fragment:'sequence-index')}', 'Help: Sample Submission', 'width=600,height=400' )">Index <span class="glyphicon glyphicon-question-sign"></span></a> 
-                        <label class="radio-inline"><input type="radio" name="indexType" value="ID">ID</label>
-                        <label class="radio-inline"><input type="radio" name="indexType" value="Sequence">Sequence</label></th>
-                    <th>Notes</th>
-                    <th>Target Type</th>
-                    <th>Target</th>
-                    <th>C-Term</th>
-                    <th id="target-group">N-Term</th>
                     <th>Sample Provider</th>
                     <th>Sample Provider Lab</th>
                     <th>Biological Source ID</th>
@@ -65,6 +44,11 @@
             <tbody>
                 <tr id="tr0">
                     <td><a href="#" class="removeRow"><span class="glyphicon glyphicon-trash"></span></a></td>
+                    <td><input name="samples[0].name"></td>
+                    <td><g:select name="samples[0].itemTypeId" from="${pegr.ItemType.where{category.id == categoryId}.list()}" optionKey="id" noSelection="['':'']" class="no-tag-select2" style="width: 180px"></g:select></td>
+                    <td></td>
+                    <td><input name="samples[0].location"></td>
+                    <td><g:textField name="samples[0].sampleNotes" style="width: 300px"></g:textField></td>
                     <td>
                         <select class="genus tag-select2" name="samples[0].genus" style="width: 150px" required>
                             <option></option>
@@ -106,45 +90,6 @@
                         <g:select name="samples[0].histology" from="${pegr.Histology.list()}" optionKey="name" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
                     </td>
                     <td>
-                        <select name="samples[0].growthMedia" class="growth-media tag-select2 textcontrol" style="width: 150px" required>
-                            <option></option>
-                        </select>
-                    </td>
-                    <td>
-                        <select multiple="multiple" class="treatments tag-select2" name="samples[0].treatments" style="width: 300px">
-                            <option></option>
-                        </select>
-                    </td>
-                    <td><g:textField name="samples[0].chrom" class="isnumber"></g:textField></td>
-                    <td><g:textField name="samples[0].cellNum" class="isnumber"></g:textField></td>
-                    <td><g:textField name="samples[0].volume" class="isnumber"></g:textField></td>
-                    <td><g:textField name="samples[0].requestedTags" class="isnumber"></g:textField></td>
-                    <td>
-                        <select multiple="multiple" name="samples[0].genomes" class="genomes no-tag-select2" style="width: 150px" required>
-                            <option></option>
-                        </select>
-                    </td>
-                    <td><g:textField name="samples[0].indices" style="width:200px"></g:textField></td>
-                    <td><g:textField name="samples[0].sampleNotes" style="width: 300px"></g:textField></td>
-                    <td>
-                        <g:select name="samples[0].targetType" from="${pegr.TargetType.list()}" optionKey="name" noSelection="['': '']" class="target-type tag-select2" style="width: 150px"></g:select>
-                    </td>
-                    <td>
-                        <select name="samples[0].target" class="target tag-select2 textcontrol" style="width: 150px" required>
-                            <option></option>
-                        </select>
-                    </td>
-                    <td>
-                        <select name="samples[0].cterm" class="cterm tag-select2" style="width: 150px">
-                            <option></option>
-                        </select>
-                    </td>
-                    <td>
-                        <select name="samples[0].nterm" class="nterm tag-select2" style="width: 150px">
-                            <option></option>
-                        </select>
-                    </td>
-                    <td>
                         <select class="provider no-tag-select2" name="samples[0].providerId" style="width: 150px">
                             <option></option>
                         </select>
@@ -161,7 +106,7 @@
     <button id="add" class="pull-right">Add Row</button>
     <div>
         <g:submitButton name="save" class="btn btn-primary" value="Save"></g:submitButton>
-        <g:link controller="item" action="show" params="[categoryId:categoryId]" class="btn btn-default">Cancel</g:link>
+        <g:link controller="item" action="list" params="[categoryId:categoryId]" class="btn btn-default">Cancel</g:link>
     </div>
 </g:form>
     
@@ -171,7 +116,7 @@
     var count = 0;
     
     $(document).ready(function(){
-        $("#nav-projects").addClass("active");
+        $("#nav-inventory").addClass("active");
         initializeSelect2s(count);
         $("form").validate();
     });
@@ -204,57 +149,6 @@
                 tags: true,
                 placeholder: tagPlaceholder
             });
-        }})
-
-        $.ajax({url: "/pegr/sample/fetchTreatmentsAjax", success: function(result) {
-            $("#tr"+count+" .treatments").select2({
-                data: result,
-                tags: true,
-                placeholder: tagPlaceholder
-            });
-        }})
-
-        $.ajax({url: "/pegr/antibody/fetchCompanyAjax", success: function(result) {
-            $("#tr"+count+" .company").select2({
-                data: result,
-                tags: true,
-                placeholder: tagPlaceholder
-            });
-        }})
-
-        $.ajax({url: "/pegr/antibody/fetchCatalogAjax", success: function(result){
-            $("#tr"+count+" .catalog").select2({
-                data: result,
-                tags: true,
-                placeholder: tagPlaceholder
-            });
-        }});
-
-        $.ajax({url: "/pegr/antibody/fetchImmunogeneAjax", success: function(result){
-            $("#tr"+count+" .immunogene").select2({
-                data: result,
-                tags: true,
-                placeholder: tagPlaceholder
-            });
-        }});
-        
-            
-        $.ajax({url: "/pegr/antibody/fetchTargetAjax", success: function(result){
-            $("#tr"+count+" .target").select2({
-                data: result.targets,
-                tags: true,
-                placeholder: tagPlaceholder
-            });
-            $("#tr"+count+" .nterm").select2({
-                data: result.nterms,
-                tags: true,
-                placeholder: tagPlaceholder
-            });
-            $("#tr"+count+" .cterm").select2({
-                data: result.cterms,
-                tags: true,
-                placeholder: tagPlaceholder
-            });
         }});
     }
     
@@ -264,12 +158,6 @@
     $(".strain").prop("disabled", true);
     $(".genotype").prop("disabled", true);
     $(".mutation").prop("disabled", true);
-    $(".growth-media").prop("disabled", true);
-    $(".genomes").prop("disabled", true);
-    $(".target-type").prop("disabled", true);
-    $(".target").prop("disabled", true);
-    $(".cterm").prop("disabled", true);
-    $(".nterm").prop("disabled", true);
     
     // ajax calls in cascade selections
     $(".genus").on("change", function() {
@@ -308,34 +196,6 @@
             });
         }});
         $parentStrain.prop("disabled", false);
-        
-        var $growthMedia = $(this).closest("tr").find(".growth-media");
-        $growthMedia.html('').select2({
-            data: [{id: '', text: ''}],
-            tags: true,
-            placeholder: tagPlaceholder
-        });
-        
-        $.ajax({url: "/pegr/sample/fetchGrowthMediaAjax?speciesId="+speciesId, success: function(medias){
-            $growthMedia.select2({
-                data: medias,
-                tags: true,
-                placeholder: tagPlaceholder
-            });
-        }});
-        $growthMedia.prop("disabled", false);
-        
-        var $genomes = $(this).closest("tr").find(".genomes");
-        $genomes.html('').select2({
-            data: [{id: '', text: ''}],
-        });
-        $.ajax({url: "/pegr/cellSource/fetchGenomeAjax?speciesId="+speciesId, success: function(genomes){
-            $genomes.select2({
-                data: genomes,
-                placeholder: noTagPlaceholder
-            });
-        }});
-        $genomes.prop("disabled", false);
     });
             
     $(".parent-strain").on("change", function() {
@@ -397,38 +257,6 @@
             });
         }});
         $mutation.prop("disabled", false);
-    });
-    
-    $(".catalog").on("change", function() {
-        var catalog = $(this).val();
-        
-        var $host = $(this).closest("tr").find(".host");
-        var $immunogene = $(this).closest("tr").find(".immunogene");
-        var $clonal = $(this).closest("tr").find(".clonal");
-        var $ig = $(this).closest("tr").find(".ig");
-        var $conc = $(this).closest("tr").find(".conc");
-        var $targetType = $(this).closest("tr").find(".target-type");
-        var $target = $(this).closest("tr").find(".target");
-        var $cterm = $(this).closest("tr").find(".cterm");
-        var $nterm = $(this).closest("tr").find(".nterm");
-        
-        $.ajax({url: "/pegr/antibody/fetchAntibodyAjax?catalog="+catalog, success: function(result){
-            $host.val(result.host).trigger("change");
-            $immunogene.val(result.immunogene).trigger("change");
-            $clonal.val(result.clonal).trigger("change");
-            $ig.val(result.ig).trigger("change");
-            $conc.val(result.conc);
-            
-            $targetType.val(result.targetTypeId).trigger("change");
-            $target.val(result.target).trigger("change");
-            $cterm.val(result.cterm).trigger("change");
-            $nterm.val(result.nterm).trigger("change");
-            
-            $targetType.prop("disabled", false);
-            $target.prop("disabled", false);
-            $cterm.prop("disabled", false);
-            $nterm.prop("disabled", false);
-        }});   
     });
 
     // remove row

@@ -69,6 +69,15 @@ class CellSourceController {
         }
 
     }
+    
+    def batchCreate() {
+        def category = ItemTypeCategory.findByName("Cell Stock")
+        if (category) {
+            [categoryId: category.id]
+        } else {
+            render(view: "/404")
+        }
+    }
         
     /* ----------------------------- Ajax ----------------------*/
     def fetchUserAjax() {

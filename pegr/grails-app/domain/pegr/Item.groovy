@@ -11,6 +11,7 @@ class Item {
 	String notes
     Item parent
     String customizedFields
+    Project project
 
     List getSamplesInPool() {
         return PoolSamples.where{pool == this}.collect{it.sample}
@@ -45,6 +46,7 @@ class Item {
 		notes nullable: true, blank: true
         parent nullable: true
         customizedFields nullable: true
+        project nullable: true
     }
     
     static mapping = {

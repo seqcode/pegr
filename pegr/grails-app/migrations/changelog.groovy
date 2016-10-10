@@ -2875,4 +2875,6 @@ databaseChangeLog = {
 	include file: 'updateItem.groovy'
 
 	include file: 'addProjectBag.groovy'
+
+	include file: 'addProjectItem.groovy'
 }

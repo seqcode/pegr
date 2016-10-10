@@ -120,4 +120,17 @@ class ItemService {
         item.save()
     }
     
+    @Transactional
+    def saveProject(Long itemId, Long projectId) {
+        def item = Item.get(itemId)
+        def project = Project.get(projectId)
+        item.project = project
+        item.save()
+        
+        def sample = Sample.findByItem(item)
+        if (sample) {
+            new ProjectSamples(project: project, sample: sample).save()
+        }
+    }
+    
 }

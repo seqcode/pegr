@@ -255,4 +255,10 @@ class ItemController {
         def barcode = barcodeService.generateBarcode()
         render barcode
     }
+    
+    def saveProjectAjax(Long itemId, Long projectId) {
+        itemService.saveProject(itemId, projectId)
+        render ""
+    }
 }
+

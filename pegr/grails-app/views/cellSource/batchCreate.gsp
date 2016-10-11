@@ -3,19 +3,22 @@
         <title>PEGR-Workbench</title>
         <meta name="layout" content="main"/>
         <style>
-        .sample {
-            background-image: none;
-            background-color: #d9edf7;
-        }
-        .target {
-            background-image: none;
-            background-color: #FFD4CC;
-        }
-    </style>
+            .sample {
+                background-image: none;
+                background-color: #d9edf7;
+            }
+            .target {
+                background-image: none;
+                background-color: #FFD4CC;
+            }
+        </style>
+        <script type="text/javascript" >
+            var changingHash=false;
+        </script>
     </head>
-    <body>
-        <h4>Create</h4>
-        <g:form action="saveNewSamples" method="post">
+    <body onhashchange="getBarcode()">
+        <h4>Create <a href="#" onclick="refreshHash();" class="pull-right edit"><span class="glyphicon glyphicon-refresh"></span> Clear Barcode</a></h4>
+        <g:form controller="cellSource" action="batchSave" method="post">
     <div class="table-responsive">
         <table class="table table-striped table-bordered" style="margin-bottom: 200px">
             <thead>
@@ -44,60 +47,65 @@
             <tbody>
                 <tr id="tr0">
                     <td><a href="#" class="removeRow"><span class="glyphicon glyphicon-trash"></span></a></td>
-                    <td><input name="samples[0].name"></td>
-                    <td><g:select name="samples[0].itemTypeId" from="${pegr.ItemType.where{category.id == categoryId}.list()}" optionKey="id" noSelection="['':'']" class="no-tag-select2" style="width: 180px"></g:select></td>
-                    <td></td>
-                    <td><input name="samples[0].location"></td>
-                    <td><g:textField name="samples[0].sampleNotes" style="width: 300px"></g:textField></td>
+                    <td><input name="items[0].name"></td>
+                    <td><g:select name="items[0].type.id" from="${pegr.ItemType.where{category.id == categoryId}.list()}" optionKey="id" noSelection="['':'']" class="no-tag-select2" style="width: 180px"></g:select></td>
                     <td>
-                        <select class="genus tag-select2" name="samples[0].genus" style="width: 150px" required>
+                        <input name="items[0].barcode" size="8">
+                        <span onclick="addScan(this);" type="button">
+                            <span class="glyphicon glyphicon-qrcode"></span>
+                        </span>
+                    </td>
+                    <td><input name="items[0].location"></td>
+                    <td><g:textField name="items[0].notes" style="width: 300px"></g:textField></td>
+                    <td>
+                        <select class="genus tag-select2" name="cellSources[0].genus" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="samples[0].speciesId" class="species tag-select2" style="width: 150px" required>
+                        <select name="cellSources[0].speciesId" class="species tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="samples[0].parentStrain" class="parent-strain tag-select2" style="width: 150px" required>
+                        <select name="cellSources[0].parentStrain" class="parent-strain tag-select2" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="samples[0].strain" class="strain tag-select2 textcontrol" style="width: 150px" required>
+                        <select name="cellSources[0].strain" class="strain tag-select2 textcontrol" style="width: 150px" required>
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="samples[0].genotype" class="genotype tag-select2" style="width: 300px">
+                        <select name="cellSources[0].genotype" class="genotype tag-select2" style="width: 300px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <select name="samples[0].mutation" class="mutation tag-select2 textcontrol" style="width: 150px">
+                        <select name="cellSources[0].mutation" class="mutation tag-select2 textcontrol" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <g:select name="samples[0].tissue" from="${pegr.Tissue.list()}" optionKey="name" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
+                        <g:select name="cellSources[0].tissue" from="${pegr.Tissue.list()}" optionKey="name" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
                     </td>
-                    <td><input name="samples[0].age"></td>
+                    <td><input name="cellSources[0].age"></td>
                     <td>
-                        <g:select name="samples[0].sex" from="${pegr.Sex.list()}" optionKey="name" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
-                    </td>
-                    <td>
-                        <g:select name="samples[0].histology" from="${pegr.Histology.list()}" optionKey="name" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
+                        <g:select name="cellSources[0].sex" from="${pegr.Sex.list()}" optionKey="name" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
                     </td>
                     <td>
-                        <select class="provider no-tag-select2" name="samples[0].providerId" style="width: 150px">
+                        <g:select name="cellSources[0].histology" from="${pegr.Histology.list()}" optionKey="name" noSelection="['':'']" class="tag-select2" style="width: 150px"></g:select>
+                    </td>
+                    <td>
+                        <select class="provider no-tag-select2" name="cellSources[0].providerId" style="width: 150px">
                             <option></option>
                         </select>
                     </td>
                     <td>
-                        <g:select class="no-tag-select2" name="samples[0].providerLabId" from="${pegr.Lab.list()}" optionKey="id" noSelection="['':'']" style="width: 150px"></g:select>
+                        <g:select class="no-tag-select2" name="cellSources[0].providerLabId" from="${pegr.Lab.list()}" optionKey="id" noSelection="['':'']" style="width: 150px"></g:select>
                     </td>
-                    <td><input name="samples[0].bioSourceId"></td>
+                    <td><input name="cellSources[0].bioSourceId"></td>
                 </tr>
             </tbody>
         </table>
@@ -317,6 +325,27 @@
 
         return false;
     });
+    
+    function addScan(elmnt) {
+        // pre-scan
+        $(elmnt).parent().find("input").attr("id", "barcode");
+        // scan
+        getScan();
+    }
+    
+    function getBarcode() {
+        // post-scan
+        if(!changingHash){
+            changingHash=true;
+            var hash=window.location.hash.substr(1);
+            $('#barcode').val(unescape(hash));  
+            changingHash=false;
+            $('#barcode').removeAttr("id");
+            location.hash = "";
+        }else{
+            //Do something with barcode here
+        }
+    }
         </script>
     </body>
 </html>

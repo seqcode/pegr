@@ -78,6 +78,16 @@ class CellSourceController {
             render(view: "/404")
         }
     }
+    
+    def batchSave(CellStockBatchCommand cmd) {
+        def categoryId = ItemTypeCategory.findByName("Cell Stock")?.id
+        try {
+            cellSourceService.batchSave(cmd.items, cmd.cellSources)
+        } catch(CellSourceException e) {
+            flash.message = e.message
+        }
+        redirect(controller: "item", action: "list", params: [categoryId: categoryId])
+    }
         
     /* ----------------------------- Ajax ----------------------*/
     def fetchUserAjax() {
@@ -140,4 +150,10 @@ class CellSourceCommand {
     Long providerId
     Long providerLabId
     String bioSourceId
+}
+
+@grails.validation.Validateable
+class CellStockBatchCommand {
+    List<Item> items = [].withLazyDefault {new Item()}
+    List<CellSourceCommand> cellSources = [].withLazyDefault {new CellSourceCommand()}
 }

@@ -60,6 +60,36 @@ class AlignmentStatsService {
             theAlignment.save(flush:true, failOnError: true)
         } 
 
+        def analysis = saveAnalysis(data, theAlignment, apiUser)
+
+        return analysis
+    }
+    
+    
+    @Transactional
+    def update(StatsRegistrationCommand data, User apiUser) {
+        // check required fields
+        def requiredFields = ["toolId", "toolCategory", "workflowStepId"]
+        requiredFields.each { field ->
+            if (!data.properties[field]) {
+                throw new AlignmentStatsException(message: "Missing ${field}!")
+            }
+        }
+        def alignment
+        if (data.alignmentId) {
+            alignment = SequenceAlignment.get(alignmentId)
+        } else if (data.historyId) {
+            alignment = SequenceAlignment.findByHistoryId(historyId)
+        }
+        if (!alignment) {
+            throw new AlignmentStatsException(message: "Sequence alignment/history not found!")
+        }
+        def analysis = saveAnalysis(data, alignment, apiUser)
+
+        return analysis
+    }
+    
+    def saveAnalysis(StatsRegistrationCommand data, SequenceAlignment theAlignment, User apiUser) {
         // convert statistics, parameter, datasets to string
         def statisticsStr = data.statistics ? JsonOutput.toJson(data.statistics) : null
         def parameterStr = data.parameters ? JsonOutput.toJson(data.parameters) : null
@@ -76,7 +106,7 @@ class AlignmentStatsService {
         }
 
         // save analysis. If it's a re-run inside an old history, overwrite the old analysis; else create a new analysis.
-        def analysis = findOldAnalysis(data, theAlignment)        
+        def analysis = findOldAnalysis(data, theAlignment)
         if (analysis) {
             // throw an exception if a different user tries to overwrite the analysis
             if (analysis.user != apiUser) {
@@ -104,7 +134,6 @@ class AlignmentStatsService {
         }
             
         analysis.save(failOnError: true)
-
         return analysis
     }
     

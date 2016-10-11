@@ -111,7 +111,7 @@
         </table>
     </div>
     
-    <button id="add" class="pull-right">Add Row</button>
+    <button id="add" class="pull-right edit">Add Row</button>
     <div>
         <g:submitButton name="save" class="btn btn-primary" value="Save"></g:submitButton>
         <g:link controller="item" action="list" params="[categoryId:categoryId]" class="btn btn-default">Cancel</g:link>

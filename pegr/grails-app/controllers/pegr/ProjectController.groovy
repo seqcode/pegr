@@ -95,11 +95,21 @@ class ProjectController {
             def projectEditAuth = projectService.projectEditAuth(currentProject)
             def sampleEditAuth = projectService.sampleEditAuth(currentProject)
             def replicates = replicateService.getReplicates(currentProject)
+            def otherSamples = [] 
+            
+            def cohortSamples = currentProject.cohorts*.samples.flatten()
+            currentProject.samples.each {
+                if (!(it in cohortSamples)) {
+                    otherSamples.push(it)
+                }
+            }
             [project: currentProject, 
              projectUsers: projectUsers, 
              replicates: replicates, 
              projectEditAuth: projectEditAuth, 
-             sampleEditAuth: sampleEditAuth]
+             sampleEditAuth: sampleEditAuth,
+             otherSamples: otherSamples
+            ]
         } else {
             flash.message = "Project not found!"
             redirect(action: "index")

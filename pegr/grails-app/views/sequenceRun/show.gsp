@@ -16,10 +16,42 @@
     <h2>Sequence Run #${run.id}  <small><g:if test="${run.runNum}">(Old No.${run.runNum})</g:if> <span class="label label-default">${run.status}</span></small></h2>
     <h3>Summary <g:if test="${run?.status!=pegr.RunStatus.COMPLETED}"> <g:link action="editInfo" params="[runId:run.id]"><span class="edit">Edit</span></g:link></g:if></h3>
     <g:render template="summaryDetails"></g:render>    
-    <h3>Samples <g:if test="${run.status == pegr.RunStatus.PREP}"><g:link action="edit" params="[runId: run.id]" class="edit">Edit</g:link></g:if> </h3>
+    <h3>Samples <g:if test="${run.status == pegr.RunStatus.PREP}"><g:link action="editSamples" params="[runId: run.id]" class="edit">Edit</g:link></g:if> 
+    <g:if test="${run?.status==pegr.RunStatus.PREP}">
+        <button type="button" class="edit" data-toggle="modal" data-target="#add-samples-by-id">Add Sample</button>
+        <g:if test="${run?.poolItem == null}">
+            <g:link action="searchPool" params="['runId':run.id]" class="edit">Add Master Pool</g:link>
+        </g:if>
+        <g:else>
+            <g:link action="removePool" params="['runId':run.id]" class="edit confirm">Remove Pool</g:link>
+        </g:else>
+        <div id="add-samples-by-id" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <g:form action="addSamplesById">
+                        <div class="modal-header">
+                            <h3 class="modal-title">Add Samples to Sequence Run #${run.id}</h3>
+                        </div>
+                        <div class="modal-body">
+                            <g:hiddenField name="runId" value="${run.id}"></g:hiddenField>
+                            <small class="form-group">
+                                <g:render template="/sample/inputSampleIds"></g:render>
+                            </small>
+                        </div>
+                        <div class="modal-footer">
+                            <g:submitButton name="save" value="Save" class="btn btn-primary"></g:submitButton>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </g:form>
+                </div>
+            </div>
+        </div>
+    </g:if>
+    </h3>
     <table class="table table-striped">
         <thead>
             <tr>
+                <th class="remove-sample"></th>
                 <th>Sample ID</th>
                 <th>Strain</th>
                 <th>Antibody</th>
@@ -31,6 +63,9 @@
         <tbody>
             <g:each in="${run.experiments}">
                 <tr>
+                    <td class="remove-sample">
+                        <g:link action="removeExperiment" params="[experimentId:it.id, runId:run.id]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link>
+                    </td>
                     <td><g:link controller="sample" action="show" id="${it.sample.id}">${it.sample?.id}</g:link></td>
                     <td>${it.sample?.cellSource?.strain}</td>
                     <td>${it.sample?.antibody}</td>
@@ -100,6 +135,7 @@
     </div>
     <script>
         $("#nav-experiments").addClass("active");
+        $(".confirm").confirm();
      </script>
 </div>
 </body>

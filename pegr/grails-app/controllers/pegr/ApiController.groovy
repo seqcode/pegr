@@ -11,6 +11,7 @@ class ApiController {
     def utilityService
     
     static allowedMethods = [stats:'POST',
+                            updateStats: 'POST',
                             fetchSampleData:'POST',
                             fetchSequenceRunData: 'POST'
                             ]
@@ -78,6 +79,7 @@ class ApiController {
                     code = 500
                     message = "Error: ${e.message}"
                 } catch(Exception e0) {
+                    log.error "Error: ${e0.message}", e0
                     code = 500
                     message = "Error!"            
                 }

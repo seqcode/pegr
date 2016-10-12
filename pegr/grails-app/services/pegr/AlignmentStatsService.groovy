@@ -77,9 +77,9 @@ class AlignmentStatsService {
         }
         def alignment
         if (data.alignmentId) {
-            alignment = SequenceAlignment.get(alignmentId)
+            alignment = SequenceAlignment.get(data.alignmentId)
         } else if (data.historyId) {
-            alignment = SequenceAlignment.findByHistoryId(historyId)
+            alignment = SequenceAlignment.findByHistoryId(data.historyId)
         }
         if (!alignment) {
             throw new AlignmentStatsException(message: "Sequence alignment/history not found!")

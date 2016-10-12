@@ -210,4 +210,10 @@ class CellSourceService {
 	    return cellSource
 	}
 
+    @Transactional
+    def batchSave(List items, List cellSources) {
+        cellSources.eachWithIndex { cellSource, index ->
+            save(items[index], cellSource)
+        }
+    }    
 }

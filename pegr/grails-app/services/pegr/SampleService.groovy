@@ -354,7 +354,11 @@ class SampleService {
     }
     
     def delete(Sample sample) {
+        if (!sample) {
+            return
+        }
         SampleSequenceIndices.executeUpdate("delete from SampleSequenceIndices where sample.id=:sampleId", [sampleId: sample.id])
+        ProjectSamples.executeUpdate("delete from ProjectSamples where sample.id =:sampleId", [sampleId: sample.id])
         sample.delete()
     }
     

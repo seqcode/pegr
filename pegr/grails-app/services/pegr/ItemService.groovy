@@ -105,6 +105,11 @@ class ItemService {
         itemIndices.each { itemIndex ->
             new SampleSequenceIndices(sample: sample, index: itemIndex.index, indexInSet: itemIndex.indexInSet, setId: itemIndex.setId).save()       
         }
+        // attach project
+        if (item.project) {
+            new ProjectSamples(project: item.project, sample: sample).save()
+        }
+        
         return sample
     }
     
@@ -118,6 +123,31 @@ class ItemService {
         }
         item.customizedFields = JsonOutput.toJson(map)
         item.save()
+    }
+    
+    @Transactional
+    def saveProject(Long itemId, Long projectId) {
+        def item = Item.get(itemId)
+        def oldProjectId = item.project?.id
+        if (oldProjectId == projectId) {
+            return
+        }
+
+        def project = Project.get(projectId)
+        item.project = project
+        item.save()
+        
+        def sample = Sample.findByItem(item)
+
+        if (sample) {            
+            if (oldProjectId) {
+                ProjectSamples.executeUpdate("delete from ProjectSamples where project.id =:oldProjectId and sample.id =:sampleId", [oldProjectId: oldProjectId, sampleId: sample.id])
+            }
+            if (project) {
+                new ProjectSamples(project: project, sample: sample).save()
+            }
+        }
+
     }
     
 }

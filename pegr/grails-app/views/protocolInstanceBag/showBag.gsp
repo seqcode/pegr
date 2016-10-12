@@ -1,7 +1,18 @@
 <html>
 <head>
-  <title>Protocol Instance Bag</title> 
-  <meta name="layout" content="main"/>
+    <title>Protocol Instance Bag</title> 
+    <meta name="layout" content="main"/>
+    <style>
+        th {
+            background-image: none;
+            background-color: #fcf8e3;
+        }   
+        table {
+            border-style: solid;
+            border-width: 2px;
+            border-color: #f8edba;
+        }
+    </style>
 </head>
 <body>                
     <div class="container-fluid">
@@ -12,29 +23,7 @@
                 <sec:ifAllGranted roles="ROLE_ADMIN"><li><g:link action="reopenBag" params="[bagId: bag?.id]" class="confirm">Reopen</g:link></li></sec:ifAllGranted>
             </g:if>
             <g:else>
-                <li><a href="#" data-toggle="modal" data-target="#editName">Edit</a></li>
-                <div id="editName" class="modal fade" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <g:form class="fields" role="form" method="post">
-                                <div class="modal-body">
-                                    <g:hiddenField name="bagId" value="${bag?.id}"></g:hiddenField>
-                                    <label>Name</label>
-                                    <g:textField name="name" value="${bag?.name}"></g:textField>
-                                </div>
-                                <div class="modal-footer">
-                                    <g:submitToRemote type="button" value="Save" 
-                                                      url="[action: 'updateBagAjax']" 
-                                                      params="[bagId: bag?.id]" 
-                                                      update="[success: 'bagName']"
-                                                      onComplete="closeModal()"
-                                                      class="btn btn-primary" data-dismiss="modal"/>
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                </div>
-                            </g:form>
-                        </div>
-                    </div>
-                </div>
+                <li><g:link action="edit" params="[bagId: bag?.id]">Edit</g:link></li>
                 <li><g:link action="deleteBag" params="[bagId: bag?.id]" class="confirm-deleteBag">Delete</g:link></li>                
             </g:else>
         </ul>
@@ -45,7 +34,8 @@
             </small> 
         </h4>
         <p>Start Time: <g:formatDate format="yyyy-MM-dd" date="${bag?.startTime}"/>
-        <g:if test="${bag?.endTime}">, End Time: <g:formatDate format="yyyy-MM-dd" date="${bag?.endTime}"/></g:if></p>   
+        <g:if test="${bag?.endTime}">, End Time: <g:formatDate format="yyyy-MM-dd" date="${bag?.endTime}"/></g:if></p>
+        <p>Project(s):<g:render template="/project/inlineList" model="[projects: bag?.projects]"></g:render></p>
         <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
         </g:if>
@@ -61,17 +51,39 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="panel panel-warning">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" href="#items">Traced Samples</a>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Sample</th>
+                            <th>Project</th>
+                            <th>
                                 <g:if test="${notStarted}">
                                     <g:link action="searchItemForBag" params="[bagId: bag?.id]" class="pull-right"><span class="glyphicon glyphicon-plus"></span> Add</g:link>
                                 </g:if>
-                        </h4>
-                    </div>                    
-                    <g:render template="/protocolInstanceBag/baggedItems" model="['items':tracedSamples, 'completed':completed, 'notStarted':notStarted]"></g:render>
-                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <g:each in="${tracedSamples}">
+                            <tr>
+                                <td class="col-xs-3"><g:link controller='item' action='show' id="${it.id}" target="_blank">${it.name}</g:link></td>
+                                <td class="col-xs-6">
+                                    <span class="item-project-show">${it.project?.name ?: "None"}</span>
+                                    <input type="hidden" name="itemId" value="${it.id}">
+                                    <g:select name="project" from="${bag?.projects}" optionKey="id" value="${it.project?.id}" class="item-project-select"></g:select>
+                                    <br/>
+                                    <button class="item-project-save item-project-select edit">Save</button>
+                                    <button class="item-project-cancel item-project-select edit">Cancel</button>
+                                </td>
+                                <td class="col-xs-3">
+                                    <g:if test="${notStarted}">
+                                        <g:link class="pull-right confirm" action="removeSampleFromBag" params="[itemId: it.id, bagId: bag?.id]"><span class="glyphicon glyphicon-remove"></span></g:link>
+                                    </g:if>
+                                </td>
+                            </tr>
+                        </g:each>
+                    </tbody>
+                </table>
             </div>
         </div>
         <g:if test="${toBeCompleted}">
@@ -98,13 +110,44 @@
         $(".confirm").confirm();
         $(".confirm-deleteBag").confirm({text: "All protocol instances in this bag will be deleted! Are you sure you want to delete this bag?"});
         $(".confirm-start").confirm({text: "Are you the one to perform this protocol?"});
+        
         function closeModal() {
             $(".modal").modal('hide');
         }
+        
         $(".confirm-start-first").confirm({text: "Have you added all samples to the bag? Are you the one to perform this protocol?"});
+        
         function closeModal() {
             $(".modal").modal('hide');
         }
+        
+        $(".item-project-select").hide();
+        
+        $(".item-project-show").click(function(){
+            var parent = $(this).parent();
+            $(parent).find(".item-project-show").hide();
+            $(parent).find(".item-project-select").show();
+        });
+
+        $(".item-project-cancel").click(function(){
+            var parent = $(this).parent();
+            $(parent).find(".item-project-show").show();
+            $(parent).find(".item-project-select").hide();
+        });
+        
+        $(".item-project-save").click(function(){
+            var parent = $(this).parent();
+            var projectId = $(parent).find("option:selected").val();
+            var text = $(parent).find("option:selected").text();
+            var itemId = $(parent).find("input").val();
+            $.ajax({ url: "/pegr/item/saveProjectAjax?itemId=" + itemId + "&projectId=" + projectId,
+                success: function() {
+                    $(parent).find(".item-project-show").text(text);
+                    $(parent).find(".item-project-show").show();
+                    $(parent).find(".item-project-select").hide();
+                }                
+            });
+        }); 
      </script>
 </body>
 </html>

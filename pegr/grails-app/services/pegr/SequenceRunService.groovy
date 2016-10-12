@@ -200,7 +200,7 @@ class SequenceRunService {
         def endTimeStr = getCalendarTimeString(endTime)
         
         def organizer = "Pugh Lab Sequencing"
-        def organizerEmail = "dus73@psu.edu"
+        def organizerEmail = ""
         
         def ical = """BEGIN:VCALENDAR
 PRODID:-

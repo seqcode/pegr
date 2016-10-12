@@ -11,6 +11,7 @@ class ApiController {
     def utilityService
     
     static allowedMethods = [stats:'POST',
+                            updateStats: 'POST',
                             fetchSampleData:'POST',
                             fetchSequenceRunData: 'POST'
                             ]
@@ -60,7 +61,39 @@ class ApiController {
         if (analysis) {
              ProcessAnalysisJob.triggerNow([id: analysis.id])    
         }
-    }    
+    }   
+    
+    def updateStats(StatsRegistrationCommand data, String apiKey) {
+        def message = "Success!"
+        def code = 200
+        def analysis
+        if (!data || data.properties.every {key, value -> value == null}) {
+            code = 500
+            message = "Error parsing the JSON data!"
+        } else {
+            def apiUser = User.findByEmailAndApiKey(data.userEmail, apiKey)
+            if (apiUser) {
+                try {
+                    analysis = alignmentStatsService.update(data, apiUser)
+                } catch(AlignmentStatsException e) {
+                    code = 500
+                    message = "Error: ${e.message}"
+                } catch(Exception e0) {
+                    log.error "Error: ${e0.message}", e0
+                    code = 500
+                    message = "Error!"            
+                }
+            } else {
+                code = 401
+                message = "Not authorized!" 
+            }
+        }
+        def response = new ResponseMessage(response_code: code, message: message)
+        render text: response as JSON, contentType: "text/json", status: code 
+        if (analysis) {
+             ProcessAnalysisJob.triggerNow([id: analysis.id])    
+        }
+    }
     
     /*
      * Accept post request, authenticate by the API Key, to query sample data.
@@ -142,6 +175,7 @@ class ResponseMessage {
  */
 @grails.validation.Validateable
 class StatsRegistrationCommand {
+    Long alignmentId
     Long run
     Long sample
     String genome

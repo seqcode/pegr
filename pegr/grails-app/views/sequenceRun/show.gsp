@@ -46,7 +46,7 @@
     </table>
     <g:if test="${run?.experiments.size()}">
         <h3>Read and Index Positions <g:link action="editRead" params="[runId:run?.id]" class="edit">Edit</g:link></h3>
-        <h5>Read Type: ${read.readType.name}</h5>
+        <h5>Read Type: ${read?.readType?.name}</h5>
         <table class="table table-striped">
             <thead>
                 <tr>

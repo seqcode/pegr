@@ -19,6 +19,10 @@
                 <label>Start Time</label>
                 <g:datePicker name="startTime" default="${new Date()}"/>
             </div>
+            <div>
+                <label>Projects</label>
+                <g:select name="projects" id="projects" optionKey="id" from="${pegr.Project.list()}" multiple="multiple"></g:select>
+            </div>
             <h4>Protocols</h4>
             <div class="radio">
                 <label><input type="radio" name="protocolInput" value="defined" onclick="showDefinedProtocol()" checked> Select pre-defined protocol group</label>
@@ -43,6 +47,7 @@
     <script>
         $("#nav-experiments").addClass("active");
         $('#custom-protocols').hide();
+        $("#projects").select2();
         
         function showDefinedProtocol() {
             $('#defined-protocol-group').show();

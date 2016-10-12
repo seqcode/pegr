@@ -290,7 +290,7 @@ public class FetchSequenceRunDataFromPegr {
         </div>
     <div class="chapter">
         <h3 id="accept">Send Analysis Results to PEGR</h3>
-        <h4 id="accept-core">Accept Results from the Core Pipeline</h4>
+        <h4 id="accept-core">Send Results from Core Pipeline</h4>
         <div>
             <p>PEGR accepts POST request at </p>
             <pre>
@@ -459,6 +459,66 @@ public class PostDataToPegr {
     }
 }
 
+            </pre>
+        </div>
+        <h4 id="accept-downstream">Send Downstream Results</h4>
+        <div>
+            <p>If an alignment history already exists in PEGR and you want to send additional downstream analysis, please send a POST request to </p>
+            <pre>
+http://francline.vmhost.psu.edu:8080/pegr/api/updateStats?apiKey=
+            </pre>
+            <p>The data sent to PEGR should be in the following JSON format:</p>
+            <pre>
+{
+    // required, combined with API key to authenticate user 
+    "userEmail": "xxx@psu.edu", 
+    
+    // either "alignmentId" or "historyId" should be included
+    "alignmentId": long, 
+    "historyId": "string",
+    
+    // required
+    "toolCategory": "string", 
+    "toolId": "string", 
+    "workflowStepId": "string", 
+    
+    // optional
+    "statistics": [{
+            "read": 1 or 2, // optional
+            "statName": "statValue",
+            // other statistics
+        },
+        // other reads
+    ], 
+    
+    // optional
+    "parameters": {
+        "paramName": "paramValue", 
+        // other parameters
+    }, 
+        
+    // optional
+    "datasets": [{
+            "type": "string",
+            "id": "string",
+            "uri": "uri",
+        },
+        // other datasets
+    ],
+    
+    // optional, error message if an error occurs
+    "toolStderr": "string"
+}
+            </pre>
+            <p>After a request is posted, PEGR will return the status code and a message as below</p>
+            <pre>
+{
+    // "Success!" or error message
+    "message":"string",
+    
+    // HTTP status code, e.g. 200 for success, 401 not authorized, 500 server side error.
+    "response_code":"200"
+}
             </pre>
         </div>
     </div>

@@ -10,27 +10,33 @@ class ProtocolInstanceBagController {
     def itemService
     
     def index() {
-        redirect(action: "processingBags", params: params )
+        redirect(action: "list", params: params )
     } 
     
-    def processingBags(Integer max) {
-        params.max = Math.min(max ?: 15, 100)
-        if (!params.sort) {
-            params.sort = "startTime"
-            params.order = "desc"
+    def list(int max, int offset, Long projectId, String status) {
+        max = Math.min(max ?: 25, 100)
+
+        def bags, totalCount
+        if (projectId) {
+            def projectBags = ProjectBags.createCriteria().list(max: max, offset: offset) {
+                project {
+                    eq("id", projectId)
+                }
+                bag {
+                    order("startTime", "desc")
+                }
+            }
+            totalCount = projectBags.totalCount
+            bags = projectBags.collect { it.bag }
+        } else if (status) {
+            bags = ProtocolInstanceBag.where {status == status}.list(max: max, offset: offset, sort: "startTime", order: "desc")
+            totalCount = ProtocolInstanceBag.where {status == status}.count()
+        } else {
+            bags = ProtocolInstanceBag.list(max: max, offset: offset)
+            totalCount = ProtocolInstanceBag.count()
         }
-        def bags = ProtocolInstanceBag.where { status != ProtocolStatus.COMPLETED }.list(params)
-        [bags: bags]
-    }
-    
-    def completedBags(Integer max){
-        params.max = Math.min(max ?: 15, 100)
-        if (!params.sort) {
-            params.sort = "startTime"
-            params.order = "desc"
-        }
-        def bags = ProtocolInstanceBag.where { status == ProtocolStatus.COMPLETED }.list(params)
-        [bags: bags]
+        
+        [bags: bags, totalCount: totalCount]
     }
         
     def create() {
@@ -43,12 +49,29 @@ class ProtocolInstanceBagController {
     
     def savePrtclInstBag(Long protocolGroupId, String bagName) {        
         try {
+            def projects = params.list("projects")
             def prtclInstBag = (params.protocolInput == "defined") ? protocolInstanceBagService.savePrtclInstBagByGroup(protocolGroupId, bagName, params.startTime) : protocolInstanceBagService.savePrtclInstBagByProtocols(params.list('protocols'), bagName, params.startTime)
+            protocolInstanceBagService.addBagToProjects(prtclInstBag, projects)
             redirect(action: "showBag", id: prtclInstBag.id)
         }catch( ProtocolInstanceBagException e) {
             flash.message = e.message
             redirect(action: "create")
         }        
+    }
+    
+    def edit(Long bagId) {
+        def bag = ProtocolInstanceBag.get(bagId)
+        [bag: bag]
+    }
+        
+    def update(Long bagId, String name) {
+        try {
+            def projectIds = params.list("projects")
+            protocolInstanceBagService.updateBag(bagId, name, projectIds)
+        } catch (ProtocolInstanceBagException e) {
+            flash.message = e.message
+        }
+        redirect(action: "showBag", id: bagId)
     }
     
     def showBag(Long id) {
@@ -78,11 +101,6 @@ class ProtocolInstanceBagController {
         }
     }
     
-    def updateBagAjax(Long bagId, String name) {
-        protocolInstanceBagService.updateBag(bagId, name)
-        render name
-    }
-    
     def deleteBag(Long bagId) {
         try {
             protocolInstanceBagService.deleteBag(bagId)
@@ -90,7 +108,7 @@ class ProtocolInstanceBagController {
         } catch (ProtocolInstanceBagException e) {
             flash.message = e.message
         }
-        redirect(action: "processingBags")
+        redirect(action: "list")
     }
     
     def reopenBag(Long bagId) {
@@ -100,7 +118,7 @@ class ProtocolInstanceBagController {
             redirect(action: "showBag", id: bagId)
         } catch (ProtocolInstanceBagException e) {
             flash.message = e.message
-            redirect(action: "processingBags")
+            redirect(action: "list")
         }
     }
     
@@ -115,7 +133,7 @@ class ProtocolInstanceBagController {
             if (item.type == itemType) {
                 def itemId = item.id
                 def priorInstance = ProtocolInstanceItems.where {item.id == itemId}.get(sort:"id", order: 'desc', max: 1)
-                render(view:"previewItemAndBag", model: [item: item, priorInstance: priorInstance, bagId: bagId])                
+                render(view:"previewItemAndBag", model: [item: item, priorInstance: priorInstance?.protocolInstance, bagId: bagId])                
             } else {
                 flash.message = "The item with barcode ${barcode} has type ${item.type}, which does not match the input type ${itemType}!"
                 redirect(action: "searchItemForBag", params: [bagId: bagId])
@@ -269,7 +287,7 @@ class ProtocolInstanceBagController {
                     }
                 } else {
                     flash.message = "Protocol instance not found!"
-                    redirect(action: "processingBags")
+                    redirect(action: "list")
                 }
             } else {
                 if (item) {
@@ -351,7 +369,7 @@ class ProtocolInstanceBagController {
     def completeBag(Long bagId) {
         try {
             protocolInstanceBagService.completeBag(bagId)
-            redirect(action:"processingBags")
+            redirect(action:"list")
         } catch(ProtocolInstanceBagException e){
             flash.message = e.message
             redirect(action: "showBag", id: bagId)

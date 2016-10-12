@@ -9,7 +9,7 @@
     </g:if>
     <br>
     <sec:ifAnyGranted roles="ROLE_ADMIN">
-        <g:link controller="report" action="editQcSettings" class="edit pull-right">Settings</g:link>
+        <g:link controller="report" action="manage" class="edit pull-right">Manage</g:link>
     </sec:ifAnyGranted>
     <ul class="nav nav-tabs">
         <li id="ANALYZING"><g:link controller="report" action="analysisStatus" params="[requestedStatus: 'ANALYZING']">Analyzing</g:link></li>

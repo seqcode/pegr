@@ -96,7 +96,7 @@ delete from summary_report
 */
 
 // alter table sequence_run auto_increment = 215;
-
+/*
 insert into user (version, account_expired, account_locked, enabled, password, password_expired, username, email, api_key) values (0, false, false, false, "$2a$10$ErWZYV6RfjF0ST8YQ43ImetX6pNEUPXOw1hGA.T092tfSBgT2t2kC",false, "galaxy-cegr", "cegr@psu.edu", "0YG9B2LPLLDPP4B1LQQ0BB1LH75L8A3P");
 
 update analysis set user_id = 350 where user_id is null;
@@ -124,4 +124,18 @@ delete from chores where name = "PipelineSteps";
 
 delete from report_alignments;
 delete from summary_report;
-                                                                       
+*/
+/*
+update analysis set step_id = "a442a2977eaf6790" where step_id = "c5eb2a1ac0835c38" and alignment_id in (1140, 1141);
+update analysis set step_id = "09a7f17155ea255b" where step_id = "d08a00440ee1038a" and alignment_id in (1140, 1141);
+update analysis set step_id = "01fdf28219732417" where step_id = "661be65372e579fe" and alignment_id in (1140, 1141);
+update analysis set step_id = "9c615ca963843792" where step_id = "c7bf2716982d2bcd" and alignment_id in (1140, 1141);
+update analysis set step_id = "11cc942884974181" where step_id = "6e9effa77de6b9b3" and alignment_id in (1140, 1141);
+update analysis set step_id = "14e1cfabec0d4785" where step_id = "bb8b4d32d7e4ecda" and alignment_id in (1140, 1141);
+update analysis set step_id = "118f10dfbad199cf" where step_id = "7493d2c24f83a7df" and alignment_id in (1140, 1141);
+update analysis set step_id = "9c95c017384e3e84" where step_id = "7325edebcf1fc2f7" and alignment_id in (1140, 1141);
+update analysis set step_id = "e8d04945daa8a74d" where step_id = "7003486d5fe44985" and alignment_id in (1140, 1141);
+update analysis set step_id = "0aa12b4dd1c7377c" where step_id = "d7d628a9f9076775" and alignment_id in (1140, 1141);
+update analysis set step_id = "bedb169f660c8511" where step_id = "dc4c8daf8486f4bf" and alignment_id in (1140, 1141);
+*/
+

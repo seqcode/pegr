@@ -133,7 +133,7 @@ class ProtocolInstanceBagController {
             if (item.type == itemType) {
                 def itemId = item.id
                 def priorInstance = ProtocolInstanceItems.where {item.id == itemId}.get(sort:"id", order: 'desc', max: 1)
-                render(view:"previewItemAndBag", model: [item: item, priorInstance: priorInstance.protocolInstance, bagId: bagId])                
+                render(view:"previewItemAndBag", model: [item: item, priorInstance: priorInstance?.protocolInstance, bagId: bagId])                
             } else {
                 flash.message = "The item with barcode ${barcode} has type ${item.type}, which does not match the input type ${itemType}!"
                 redirect(action: "searchItemForBag", params: [bagId: bagId])

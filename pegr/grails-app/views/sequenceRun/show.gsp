@@ -16,7 +16,7 @@
     <h2>Sequence Run #${run.id}  <small><g:if test="${run.runNum}">(Old No.${run.runNum})</g:if> <span class="label label-default">${run.status}</span></small></h2>
     <h3>Summary <g:if test="${run?.status!=pegr.RunStatus.COMPLETED}"> <g:link action="editInfo" params="[runId:run.id]"><span class="edit">Edit</span></g:link></g:if></h3>
     <g:render template="summaryDetails"></g:render>    
-    <h3>Samples <g:if test="${run.status == pegr.RunStatus.PREP}"><g:link action="editSamples" params="[runId: run.id]" class="edit">Edit</g:link></g:if> 
+    <h3>Samples <g:if test="${run.status == pegr.RunStatus.PREP}"><g:link action="editSamples" params="[runId: run.id]" class="edit" target="_blank">Edit</g:link></g:if> 
     <g:if test="${run?.status==pegr.RunStatus.PREP}">
         <button type="button" class="edit" data-toggle="modal" data-target="#add-samples-by-id">Add Sample</button>
         <g:if test="${run?.poolItem == null}">
@@ -64,7 +64,9 @@
             <g:each in="${run.experiments}">
                 <tr>
                     <td class="remove-sample">
-                        <g:link action="removeExperiment" params="[experimentId:it.id, runId:run.id]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link>
+                        <g:if test="${run?.status==pegr.RunStatus.PREP}">
+                            <g:link action="removeExperiment" params="[experimentId:it.id, runId:run.id]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link>
+                        </g:if>
                     </td>
                     <td><g:link controller="sample" action="show" id="${it.sample.id}">${it.sample?.id}</g:link></td>
                     <td>${it.sample?.cellSource?.strain}</td>

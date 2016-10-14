@@ -290,7 +290,6 @@ public class FetchSequenceRunDataFromPegr {
         </div>
     <div class="chapter">
         <h3 id="accept">Send Analysis Results to PEGR</h3>
-        <h4 id="accept-core">Send Results from Core Pipeline</h4>
         <div>
             <p>PEGR accepts POST request at </p>
             <pre>
@@ -302,16 +301,24 @@ http://francline.vmhost.psu.edu:8080/pegr/api/stats?apiKey=
     // required, combined with API key to authenticate user 
     "userEmail": "xxx@psu.edu", 
     
-    // required, used to identify the sequence sample/experiment/alignment in PEGR 
+    // if this is from a new alignment, "historyId" is required;
+    // else either "alingmentId" or "historyId" must be included.
+    "alignmentId": long,
+    "historyId": "string", 
+    
+    // required if this is from a new alignment
+    // used to identify the sequence sample/experiment/alignment in PEGR 
     "run": long, 
     "sample": long, 
     "genome": "string",
-    
-    // required for core pipeline
     "workflowId": "string", 
-    "historyId": "string", 
+
+    // required
     "toolCategory": "string", 
     "toolId": "string", 
+    "statsToolId": "string",
+    
+    // optional
     "workflowStepId": "string", 
     
     // optional
@@ -354,7 +361,7 @@ http://francline.vmhost.psu.edu:8080/pegr/api/stats?apiKey=
             </pre>
             <p>The API can be simply called through curl</p>
             <pre>
-curl  -X POST -H "Content-Type: application/json" -d '{"run": 1, "sample": 1, "genome": "sacCer3_cegr", "workflowId": "b266c9aed69b2935", "historyId": "58d3202e3", "toolCategory": "output_tagPileup", "workflowStepId": "10a140b06", "userEmail": "xxxx@psu.edu", "statistics": [{}, {}], "parameters": {}, "toolId": "sometool", "datasets": [{"type": "tabular", "id": "e4f3485fe716bd91", "uri": "someuri"}, {"type": "tabular", "id": "55f6655ba0a1f0ca", "uri": "someuri"}]}' francline.vmhost.psu.edu:8080/pegr/api/stats?apiKey=XXXXXX
+curl  -X POST -H "Content-Type: application/json" -d '{"run": 1, "sample": 1, "genome": "sacCer3_cegr", "workflowId": "b266c9aed69b2935", "historyId": "58d3202e3", "toolCategory": "output_tagPileup", "statsToolId": "tag_pileup_frequency_output_stats", "workflowStepId": "10a140b06", "userEmail": "xxxx@psu.edu", "statistics": [{}, {}], "parameters": {}, "toolId": "sometool", "datasets": [{"type": "tabular", "id": "e4f3485fe716bd91", "uri": "someuri"}, {"type": "tabular", "id": "55f6655ba0a1f0ca", "uri": "someuri"}]}' francline.vmhost.psu.edu:8080/pegr/api/stats?apiKey=XXXXXX
             </pre>
             <p>Here is a Python example</p>
             <pre>
@@ -368,6 +375,7 @@ data = {"userEmail": "xxxx@psu.edu",
         "workflowId": "b266c9aed69b2935", 
         "historyId": "58d3202e3", 
         "toolCategory": "output_tagPileup", 
+        "statsToolId": "tag_pileup_frequency_output_stats",
         "workflowStepId": "10a140b06", 
         "statistics": [{}, {}], 
         "parameters": {}, 
@@ -414,6 +422,7 @@ public class PostDataToPegr {
             		.add("workflowId", "b266c9aed69b2935")
             		.add("historyId", "abcd1234")
             		.add("toolCategory", "output_tagPileup")
+                    .add("statsToolId", "tag_pileup_frequency_output_stats")
             		.add("workflowStepId", "abcdefg")
             		.add("toolId", "toolXXXX")
             		.add("datasets", Json.createArrayBuilder()
@@ -459,66 +468,6 @@ public class PostDataToPegr {
     }
 }
 
-            </pre>
-        </div>
-        <h4 id="accept-downstream">Send Downstream Results</h4>
-        <div>
-            <p>If an alignment history already exists in PEGR and you want to send additional downstream analysis, please send a POST request to </p>
-            <pre>
-http://francline.vmhost.psu.edu:8080/pegr/api/updateStats?apiKey=
-            </pre>
-            <p>The data sent to PEGR should be in the following JSON format:</p>
-            <pre>
-{
-    // required, combined with API key to authenticate user 
-    "userEmail": "xxx@psu.edu", 
-    
-    // either "alignmentId" or "historyId" should be included
-    "alignmentId": long, 
-    "historyId": "string",
-    
-    // required
-    "toolCategory": "string", 
-    "toolId": "string", 
-    "workflowStepId": "string", 
-    
-    // optional
-    "statistics": [{
-            "read": 1 or 2, // optional
-            "statName": "statValue",
-            // other statistics
-        },
-        // other reads
-    ], 
-    
-    // optional
-    "parameters": {
-        "paramName": "paramValue", 
-        // other parameters
-    }, 
-        
-    // optional
-    "datasets": [{
-            "type": "string",
-            "id": "string",
-            "uri": "uri",
-        },
-        // other datasets
-    ],
-    
-    // optional, error message if an error occurs
-    "toolStderr": "string"
-}
-            </pre>
-            <p>After a request is posted, PEGR will return the status code and a message as below</p>
-            <pre>
-{
-    // "Success!" or error message
-    "message":"string",
-    
-    // HTTP status code, e.g. 200 for success, 401 not authorized, 500 server side error.
-    "response_code":"200"
-}
             </pre>
         </div>
     </div>

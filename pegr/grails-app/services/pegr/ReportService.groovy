@@ -56,8 +56,8 @@ class ReportService {
                 def motifCount = 0
                 
                 steps.eachWithIndex { step, index ->
-                    // find the step's analysis by stepId
-                    def stepAnalysisList = analysis.findAll {it.stepId == step[0]}
+                    // find the step's analysis by step
+                    def stepAnalysisList = analysis.findAll {it.step == step[0]}
                     
                     // get the status for this step
                     alignmentStatusDTO.status[index] = getStepAnalysisStatus(stepAnalysisList)

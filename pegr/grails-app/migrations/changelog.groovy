@@ -2877,4 +2877,6 @@ databaseChangeLog = {
 	include file: 'addProjectBag.groovy'
 
 	include file: 'addProjectItem.groovy'
+
+	include file: 'addStep.groovy'
 }

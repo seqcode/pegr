@@ -20,16 +20,41 @@ class AlignmentStatsService {
     * @return the saved analysis
     */
     @Transactional
-    def save(StatsRegistrationCommand data, User apiUser) {        
+    def save(StatsRegistrationCommand data, User apiUser) {   
         // check required fields
-        def requiredFields = ["run", "sample", "genome", "toolId", "workflowId", "historyId", "toolCategory", "workflowStepId"]
-        requiredFields.each { field ->
-            if (!data.properties[field]) {
-                throw new AlignmentStatsException(message: "Missing ${field}!")
-            }
-        }
+        checkRequiredFields(data, ["toolCategory", "toolId", "statsToolId"])
         
-        // find the pipeline by user and workflowId
+        def alignment
+        if (data.alignmentId) {
+            alignment = SequenceAlignment.get(data.alignmentId)
+            if (!alignment) {
+                throw new AlignmentStatsException(message: "Sequence alignment not found!")
+            }
+        } else if (data.historyId) {
+            alignment = SequenceAlignment.findByHistoryId(data.historyId)
+            if (!alignment) {
+                alignment = createAlignment(data, apiUser)
+            }
+        } else {
+            throw new AlignmentStatsException(message: "Missing historyId or alignmentId!")
+        }
+
+        def analysis = saveAnalysis(data, alignment, apiUser)
+
+        return analysis
+    }
+    
+   /**
+    * Create sequence alignment
+    * @param data
+    * @param apiUser
+    * @return created sequence alignment
+    */
+    def createAlignment(StatsRegistrationCommand data, User apiUser) {
+        // check required fields
+        checkRequiredFields(data, ["run", "sample", "genome", "workflowId"])
+        
+        // find the pipeline by workflowId
         def pipeline = Pipeline.findByWorkflowId(data.workflowId)
         
         if (!pipeline) {
@@ -48,45 +73,23 @@ class AlignmentStatsService {
             throw new AlignmentStatsException(message: "Genome ${data.genome} not found!")
         }           
         
-        // find the sequence alignment. if no match, create a new alignment.
-        def theAlignment = SequenceAlignment.findBySequencingExperimentAndGenomeAndPipelineAndHistoryId(experiment, genome, pipeline, data.historyId) 
-        if (!theAlignment) {
-            theAlignment = new SequenceAlignment(sequencingExperiment: experiment, 
-                                                 genome: genome, 
-                                                 pipeline: pipeline,
-                                                 historyId: data.historyId,
-                                                 isPreferred: true, 
-                                                 date: new Date())
-            theAlignment.save(flush:true, failOnError: true)
-        } 
-
-        def analysis = saveAnalysis(data, theAlignment, apiUser)
-
-        return analysis
+        // create a new alignment.
+        def alignment = new SequenceAlignment(sequencingExperiment: experiment, 
+                                             genome: genome, 
+                                             pipeline: pipeline,
+                                             historyId: data.historyId,
+                                             isPreferred: true, 
+                                             date: new Date())
+        alignment.save(flush:true, failOnError: true)
+        return alignment 
     }
     
-    
-    @Transactional
-    def update(StatsRegistrationCommand data, User apiUser) {
-        // check required fields
-        def requiredFields = ["toolId", "toolCategory", "workflowStepId"]
+    def checkRequiredFields(def data, List requiredFields) {
         requiredFields.each { field ->
             if (!data.properties[field]) {
                 throw new AlignmentStatsException(message: "Missing ${field}!")
             }
         }
-        def alignment
-        if (data.alignmentId) {
-            alignment = SequenceAlignment.get(data.alignmentId)
-        } else if (data.historyId) {
-            alignment = SequenceAlignment.findByHistoryId(data.historyId)
-        }
-        if (!alignment) {
-            throw new AlignmentStatsException(message: "Sequence alignment/history not found!")
-        }
-        def analysis = saveAnalysis(data, alignment, apiUser)
-
-        return analysis
     }
     
     def saveAnalysis(StatsRegistrationCommand data, SequenceAlignment theAlignment, User apiUser) {
@@ -123,6 +126,7 @@ class AlignmentStatsService {
             analysis = new Analysis(alignment: theAlignment,
                                     tool: data.toolId,             
                                     category: data.toolCategory,
+                                    step: data.statsToolId,
                                     stepId: data.workflowStepId,
                                     user: apiUser,
                                     parameters: parameterStr,
@@ -335,7 +339,7 @@ class AlignmentStatsService {
     }
     
    /**
-    * Find the existing analysis with the same alignment and step ID
+    * Find the existing analysis with the same alignment and step
     * <p>
     * Special handling: tag pileup
     * @param data data received from API
@@ -350,7 +354,7 @@ class AlignmentStatsService {
                 def MOTIF_ID = "input2X__identifier__"
                 def newMotifId = (data.parameters && data.parameters.containsKey(MOTIF_ID)) ? data.parameters[MOTIF_ID] : null 
                 if (newMotifId) {
-                    def oldAnalysisList = Analysis.findAllByStepIdAndAlignment(data.workflowStepId, alignment)
+                    def oldAnalysisList = Analysis.findAllByStepAndAlignment(data.statsToolId, alignment)
                     for (int i = 0; i< oldAnalysisList.size(); ++i) {
                         def oldMotifId = utilityService.queryJson(oldAnalysisList[i].parameters, MOTIF_ID)
                         if (oldMotifId && oldMotifId == newMotifId) {
@@ -361,7 +365,7 @@ class AlignmentStatsService {
                 }
                 break
             default:
-                oldAnalysis = Analysis.findByStepIdAndAlignment(data.workflowStepId, alignment)
+                oldAnalysis = Analysis.findByStepAndAlignment(data.statsToolId, alignment)
                 break
         }
         return oldAnalysis

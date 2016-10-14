@@ -11,7 +11,6 @@ class ApiController {
     def utilityService
     
     static allowedMethods = [stats:'POST',
-                            updateStats: 'POST',
                             fetchSampleData:'POST',
                             fetchSequenceRunData: 'POST'
                             ]
@@ -19,7 +18,7 @@ class ApiController {
     def help() {
     }
     
-    /*
+    /**
      * Accept post request, authenticate by the API Key, to save data into Analysis, 
      * and parse data prior to and including the Alignment.
      * @param data Input data in the format of JSON dictionary
@@ -63,7 +62,7 @@ class ApiController {
         }
     }
     
-    /*
+    /**
      * Accept post request, authenticate by the API Key, to query sample data.
      * @param query in the format of JSON dictionary
      * @param apiKey API Key used to authenticate the user

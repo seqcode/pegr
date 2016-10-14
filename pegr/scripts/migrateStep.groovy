@@ -29,21 +29,19 @@ def map = [
     "9c615ca963843792":"bam_to_scidx_output_stats",
     "11cc942884974181":"genetrack_output_stats",
     "14e1cfabec0d4785":"bedtools_intersectbed_output_stats",
-    "118f10dfbad199cf":"cwpair2_output_stats" 
+    "118f10dfbad199cf":"cwpair2_output_stats",
+    "9c95c017384e3e84":"extract_genomic_dna_output_stats",
+    "0aa12b4dd1c7377c":"extract_genomic_dna_output_stats2",
+    "e8d04945daa8a74d":"repeatmasker_wrapper_output_stats",
+    "bedb169f660c8511":"repeatmasker_wrapper_output_stats2",
+    "7451906ed56a8bcc":"meme_meme_output_stats",
+    "c292a291ca2f0a8e":"meme_fimo_output_stats",
+    "7dd23a78dc907d9a":"extract_genomic_dna_output_stats3",
+    "3c59f1a4d3979ee8":"fasta_nucleotide_color_plot_output_stats",
+    "04d9832bb2cf7335":"tag_pileup_frequency_output_stats"
 ]
 
 Analysis.list().each { analysis ->
     analysis.step = map[analysis.stepId]
     analysis.save()
-}
-
-def utilityService = new UtilityService()
-// update settings
-Pipeline.list().each { pipeline ->
-    def steps = utilityService.parseJson(pipeline.steps)
-    steps.each { step ->
-        step[0] = map[step[0]]
-    }
-    pipeline.steps = JsonOutput.toJson(steps)
-    pipeline.save()
 }

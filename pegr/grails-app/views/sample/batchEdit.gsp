@@ -5,94 +5,70 @@
 </head>
 <body>
     <div class="container-fluid">
-    <h4>Samples</h4>
-    <g:form controller="sample" action="batchUpdate">
+        <h4>Samples</h4>
+        <p><span class="glyphicon glyphicon-minus-sign"></span> Hide the column;<span id="column-toggle"> <span class="glyphicon glyphicon-plus-sign"></span> Show all columns </span></p>
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Sample ID</th>
-                    <th>Barcode</th>
-                    <th>Strain</th>
-                    <th>Genotype</th>
-                    <th>Antibody</th>
-                    <th>Target Type</th>
-                    <th>Target</th>
-                    <th>C-Term</th>
-                    <th>N-Term</th>
-                    <th>Index</th>
-                    <th>Reference Genome(s)</th>
-                    <th>Growth Media</th>
-                    <th>Treatments</th>
-                    <th>Chrom.(ug)</th>
-                    <th>Cell#(M)</th>
-                    <th>Volume(ul)</th>
-                    <th>Requested Tags(M)</th>
-                    <th>Send data to</th>
+                    <th class="sampleId">Sample ID</th>
+                    <th class="barcode">Barcode</th>
+                    <th class="strain">Strain</th>
+                    <th class="genotype">Genotype</th>
+                    <th class="antibody">Antibody</th>
+                    <th class="target-type">Target Type</th>
+                    <th class="target">Target</th>
+                    <th class="cterm">C-Term</th>
+                    <th class="nterm">N-Term</th>
+                    <th class="index">Index</th>
+                    <th class="genomes">Reference Genome(s)</th>
+                    <th class="growthMedia">Growth Media</th>
+                    <th class="treatments">Treatments</th>
+                    <th class="chromosomeAmount">Chrom.(ug)</th>
+                    <th class="cellNumber">Cell#(M)</th>
+                    <th class="volume">Volume(ul)</th>
+                    <th class="requestedTagNumber">Requested Tags(M)</th>
+                    <th class="send">Send data to</th>
                 </tr>
             </thead>
             <tbody>
                 <g:each in="${samples}" var="sample" status="n">
                     <tr>
-                        <g:hiddenField name="samples[${n}]"></g:hiddenField>
-                        <td><g:link controller="sample" action="show" id="${sample.id}" class="sample-id">${sample.id}</g:link></td>
-                        <td>${sample.item?.barcode}</td>
-                        <td>${sample.cellSource?.strain?.name}</td>
-                        <td>${sample.cellSource?.strain?.genotype}</td>
-                        <td>${sample.antibody}</td>
-                        <td>
-                            <g:select name="samples[${n}].targetType" value="${sample.target?.targetType}" from="${pegr.TargetType.list()}" optionKey="name" noSelection="['': '']" class="target-type tag-select2" style="width: 150px"></g:select>
-                        </td>
-                        <td>
-                            <select name="samples[${n}].target" value="${sample.target?.name}" class="target tag-select2 textcontrol" style="width: 150px">
-                                <option></option>
-                            </select>
-                        </td>
-                        <td>
-                            <select name="samples[${n}].cterm" value="${sample.target?.cTermTag}" class="cterm tag-select2" style="width: 150px">
-                                <option></option>
-                            </select>
-                        </td>
-                        <td>
-                            <select name="samples[${n}].nterm" value="${sample.target?.nTermTag}" class="nterm tag-select2" style="width: 150px">
-                                <option></option>
-                            </select>
-                        </td>
-                        <td><input name="samples[${n}].index" value="${sample.sequenceIndicesString}"></td>
-                        <td>
-                            <g:select multiple="multiple" name="samples[${n}].genomes" from="${pegr.Genome.list()}" optionKey="name" value="${sample.requestedGenomes}" class="genomes no-tag-select2" style="width: 150px"></g:select>
-                        </td>
-                        <td>
-                            <select name="samples[${n}].growthMedia" class="growth-media tag-select2 textcontrol" style="width: 150px" required>
-                                <option></option>
-                            </select>
-                        </td>
-                        <td>
-                            <select multiple="multiple" class="treatments tag-select2" name="samples[${n}].treatments" style="width: 300px">
-                                <option></option>
-                            </select>
-                        </td>
-                        <td><g:textField name="samples[${n}].chrom" class="isnumber"></g:textField></td>
-                        <td><g:textField name="samples[${n}].cellNum" class="isnumber"></g:textField></td>
-                        <td><g:textField name="samples[${n}].volume" class="isnumber"></g:textField></td>
-                        <td><g:textField name="samples[${n}].requestedTags" class="isnumber"></g:textField></td>
-                        <td><g:select class="sendTo no-tag-select2" name="samples[${n}].sendToId" style="width: 150px" from="${pegr.User.list()}" optonKey="id"></g:select></td>
+                        <input type="hidden" class="sampleId" name="sampleId" value="${sample.id}">
+                        <input type="hidden" class="speciesId" name="speciesId" value="${sample.cellSource?.strain?.species?.id}">
+                        <td class="sampleId"><g:link controller="sample" action="show" id="${sample.id}" class="sample-id">${sample.id}</g:link></td>
+                        <td class="barcode">${sample.item?.barcode}</td>
+                        <td class="strain">${sample.cellSource?.strain?.name}</td>
+                        <td class="genotype">${sample.cellSource?.strain?.genotype}</td>
+                        <td class="antibody">${sample.antibody}</td>
+                        <td class="group-target target-type"><span class="value">${sample.target?.targetType}</span></td>
+                        <td class="group-target target"><span class="value">${sample.target?.name}</span></td>
+                        <td class="group-target cterm"><span class="value">${sample.target?.cTermTag}</span></td>
+                        <td class="group-target nterm"><span class="value">${sample.target?.nTermTag}</span></td>
+                        <td class="index"><span class="value">${sample.sequenceIndicesString}</span></td>
+                        <td class="genomes"><span class="value">${sample.requestedGenomes}</span></td>
+                        <td class="growthMedia"><span class="value">${sample.growthMedia}</span></td>
+                        <td class="treatments"><span class="value">${sample.treatments}</span></td>
+                        <td class="group-input chromosomeAmount"><span class="value">${sample.chromosomeAmount}</span></td>
+                        <td class="group-input cellNumber"><span class="value">${sample.cellNumber}</span></td>
+                        <td class="group-input volume"><span class="value">${sample.volume}</span><button class='btn btn-default change-cancel'>Cancel</button></td>
+                        <td class="group-input requestedTagNumber"><span class="value">${sample.requestedTagNumber}</span></td>
+                        <td class="send"><span class="value">${sample.sendDataTo}</span></td>
                     </tr>
                 </g:each>
             </tbody>
         </table>
-        <g:submitButton name="save" value="Save" class="btn btn-primary"></g:submitButton>
-        <span onclick="window.close();" class="btn btn-default">Cancel</span>
-    </g:form>
     </div>
     <script>
         var tagPlaceholder = "Select or type...";
         var noTagPlaceholder = "Select...";
-
-        $(document).ready(function(){
-            $("#nav-projects").addClass("active");
-            initializeSelect2s();
-            $("form").validate();
+        var $cancel = "<button class='btn btn-default change-cancel'>Cancel</button>";
         
+        $(document).ready(function(){
+            $("th").each(function(){
+                $(this).append(" <span class='glyphicon glyphicon-minus-sign small'></span>");
+            });
+            
+            /*           
             $(".tag-select2").select2({
                 placeholder: tagPlaceholder,
                 tags: true
@@ -127,22 +103,35 @@
                     placeholder: tagPlaceholder
                 });
             }});
+            */
+        });
+        
+        $(".glyphicon-minus-sign").click(function() {
+            var c = $(this).parent().attr("class");
+            $("."+c).hide();
+        });
 
+        $(".glyphicon-plus-sign").click(function() {
+            $("th").show();  
+            $("td").show();
+        });
 
-            $.ajax({url: "/pegr/sample/fetchGrowthMediaAjax?speciesId="+speciesId, success: function(medias){
-                $growthMedia.select2({
-                    data: medias,
-                    tags: true,
-                    placeholder: tagPlaceholder
-                });
-            }});
-
-            $.ajax({url: "/pegr/cellSource/fetchGenomeAjax?speciesId="+speciesId, success: function(genomes){
-                $genomes.select2({
-                    data: genomes,
-                    placeholder: noTagPlaceholder
-                });
-            }});
+        $("td.group-input .value").click(function() {
+            var oldValue = $(this).text();
+            var td = $(this).parent();
+            td.find(".value").hide();
+            td.append("<input>");
+            var $save = "<button class='btn btn-primary change-save'>Save</button>";
+            td.append($save);
+            td.append($cancel);
+        });
+        
+        $(".change-cancel").on("click", function() {
+            var td = $(this).parent();
+            
+            //td.find(".value").show();
+            td.find(".change-cancel").remove();
+            //td.find(".save").remove();
         });
     </script>
 </body>

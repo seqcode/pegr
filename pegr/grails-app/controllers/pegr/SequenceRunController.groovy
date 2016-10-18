@@ -51,16 +51,6 @@ class SequenceRunController {
         }
     }
     
-    def editSamples(Long runId) {
-        def run = SequenceRun.get(runId)
-        if (run) {
-            render(view: "/sample/batchEdit", model: [samples: run.experiments*.sample])
-        } else {
-            flash.message = "Sequence run not found!"
-            redirect(action: "index")
-        }
-    }
-    
     def editRead(Long runId) {
         def run = SequenceRun.get(runId)
         if (run) {

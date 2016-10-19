@@ -61,9 +61,7 @@
                     <th>Volume (ul)</th>
                     <th>Requested Tags (M)</th>
                     <th>Reference Genome(s)</th>
-                    <th><a href="#" onclick="window.open('${g.createLink(action:'sampleSubmissionHelp', fragment:'sequence-index')}', 'Help: Sample Submission', 'width=600,height=400' )">Index <span class="glyphicon glyphicon-question-sign"></span></a> 
-                        <label class="radio-inline"><input type="radio" name="indexType" value="ID">ID</label>
-                        <label class="radio-inline"><input type="radio" name="indexType" value="Sequence">Sequence</label></th>
+                    <th><a href="#" onclick="window.open('${g.createLink(action:'sampleSubmissionHelp', fragment:'sequence-index')}', 'Help: Sample Submission', 'width=600,height=400' )">Index <span class="glyphicon glyphicon-question-sign"></span></a></th>
                     <th>Notes</th> 
                     <th>Company</th>
                     <th>Catalog</th>

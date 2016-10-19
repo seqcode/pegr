@@ -56,6 +56,7 @@
                 <th>Strain</th>
                 <th>Antibody</th>
                 <th>Index</th>
+                <th>Index ID</th>
                 <th>Genome Build</th>
                 <th>Cohort</th>
             </tr>
@@ -72,6 +73,7 @@
                     <td>${it.sample?.cellSource?.strain}</td>
                     <td>${it.sample?.antibody}</td>
                     <td>${it.sample?.sequenceIndicesString}</td>
+                    <td>${it.sample?.sequenceIndicesIdString}</td>
                     <td>${it.sample?.requestedGenomes}</td>
                     <td>${it.cohort}</td>
                 </tr>

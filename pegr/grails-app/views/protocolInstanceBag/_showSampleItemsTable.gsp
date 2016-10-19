@@ -13,6 +13,7 @@
         </g:if>
         <g:if test="${protocolInstance?.protocol?.addIndex}">
             <th>Index</th>
+            <th>Index ID</th>
         </g:if>        
     </thead>
     <tbody>            
@@ -35,6 +36,7 @@
                 </g:if>
                 <g:if test="${protocolInstance?.protocol?.addIndex}">
                     <td>${children[n]?.sequenceIndicesString}</td>
+                    <td>${children[n]?.sequenceIndicesIdString}</td>
                 </g:if>
             </tr>
         </g:each>

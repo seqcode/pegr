@@ -51,16 +51,6 @@ class SequenceRunController {
         }
     }
     
-    def edit(Long runId) {
-        def run = SequenceRun.get(runId)
-        if (run) {
-            [run: run]
-        } else {
-            flash.message = "Sequence run not found!"
-            redirect(action: "index")
-        }
-    }
-    
     def editRead(Long runId) {
         def run = SequenceRun.get(runId)
         if (run) {
@@ -120,7 +110,7 @@ class SequenceRunController {
         try {
             sequenceRunService.save(run)
             flash.message = "New sequence run created!"
-            redirect(action: "edit", params: [runId: run.id])
+            redirect(action: "show", params: [id: run.id])
         }catch(SequenceRunException e) {
             request.message = e.message
             def largestRunNum = SequenceRun.createCriteria().get {
@@ -188,7 +178,7 @@ class SequenceRunController {
             flash.message = "An unexpected error has occured!"
             log.error e
         }
-        redirect(action: "edit", params: [runId: runId])
+        redirect(action: "show", params: [id: runId])
     }
     
     def removePool(Long runId) {
@@ -198,7 +188,7 @@ class SequenceRunController {
         } catch (SequenceRunException e) {
             flash.message = e.message
         }
-        redirect(action: "edit", params: [runId: runId])
+        redirect(action: "show", params: [id: runId])
     }
     
     def addSamplesById(Long runId, String sampleIds) {
@@ -215,7 +205,7 @@ class SequenceRunController {
             flash.message = "An unexpected error has occured!"
             log.error e
         }
-        redirect(action: "edit", params: [runId: runId])
+        redirect(action: "show", params: [id: runId])
     }
     
     def removeExperiment(Long experimentId, Long runId) {
@@ -225,7 +215,7 @@ class SequenceRunController {
         } catch (SequenceRunException e) {
             flash.message = e.message
         }
-        redirect(action: "edit", params: [runId: runId])
+        redirect(action: "show", params: [id: runId])
     }
     
     def updateSamples(Long runId) {

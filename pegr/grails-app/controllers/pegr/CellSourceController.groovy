@@ -89,12 +89,7 @@ class CellSourceController {
         redirect(controller: "item", action: "list", params: [categoryId: categoryId])
     }
         
-    /* ----------------------------- Ajax ----------------------*/
-    def fetchUserAjax() {
-        def users = User.list().collect{[it.id, it.toString()]}
-        render utilityService.arrayToSelect2Data(users) as JSON
-    }
-    
+    /* ----------------------------- Ajax ----------------------*/    
     def fetchGenusAjax() {
         def genusList = Species.executeQuery("select distinct s.genusName from Species s")
         render utilityService.stringToSelect2Data(genusList) as JSON

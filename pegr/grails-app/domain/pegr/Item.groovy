@@ -34,6 +34,15 @@ class Item {
         return indexList.join(",")
     }
     
+    String getSequenceIndicesIdString() {
+        def indexDict = ItemSequenceIndices.where{item == this}.groupBy({it -> it.setId})
+        def indexList = []
+        indexDict.each{ key, value ->
+            indexList.push(value.sort{it.indexInSet}*.index*.indexId.join("-"))
+        }
+        return indexList.join(",")
+    }
+    
     Map getFieldMap() {
         return utilityService.parseJson(this.customizedFields)
     }

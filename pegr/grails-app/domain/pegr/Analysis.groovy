@@ -4,6 +4,7 @@ class Analysis {
     SequenceAlignment alignment
     String category
     String tool
+    String step
     String stepId
     User user
     String parameters
@@ -17,6 +18,7 @@ class Analysis {
         parameters nullable: true, blank: true
         statistics nullable: true, blank: true
         datasets nullable: true, blank: true
+        step nullable: true, blank: true
         stepId nullable: true, blank: true
         user nullable: true
         date nullable: true

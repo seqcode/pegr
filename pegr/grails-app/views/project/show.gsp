@@ -38,6 +38,8 @@
                 <g:render template="/project/sampleTable" model="['sampleList':cohort.samples, 'project':project]" />
             </g:each>
         </ul>
+        <h4>Other Samples</h4>
+        <g:render template="/project/sampleTable" model="['sampleList':otherSamples, 'project':project]" />
         <g:if test="${sampleEditAuth}">
             <div>
                 <button data-toggle="modal" data-target="#selectAssay" class="btn btn-info">Create New Samples</button>

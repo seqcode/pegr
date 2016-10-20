@@ -232,7 +232,7 @@
             </g:if>
         </h4>
         <ul>
-            <li>Index: ${sample.sequenceIndicesString}</li>
+            <li>Index: ${sample.sequenceIndicesString} (${sample.sequenceIndicesIdString})</li>
 
             <li>Chromosome (ug): <g:if test="${sample?.chromosomeAmount}">${sample.chromosomeAmount}</g:if></li>
 

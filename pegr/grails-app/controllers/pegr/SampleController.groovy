@@ -409,4 +409,9 @@ class SampleController {
         
         [samples: samples, growthMediaMap: growthMediaMap, genomeMap: genomeMap]
     }
+    
+    def updateAjax(Long sampleId, String name, String value) {
+        sampleService.update(sampleId, name, value)
+        render ""
+    }
 }

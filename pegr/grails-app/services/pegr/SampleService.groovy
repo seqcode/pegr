@@ -353,4 +353,23 @@ class SampleService {
             }                    
         }          
     }
+    
+    @Transactional
+    def update(Long sampleId, String field, String value) {
+        def sample = Sample.get(sampleId)
+        if (!sample) {
+            throw new SampleException(message: "Sample not found!")
+        }
+        switch (field) {
+            case "sendToId" :
+                def id = utilityService.getLong(value)
+                sample.sendDataTo = User.get(id)
+                break
+            default: 
+                sample[field] = utilityService.getFloat(value)
+                break
+        }
+        
+        sample.save(failOnError: true)
+    }
 }

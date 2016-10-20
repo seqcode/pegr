@@ -1,10 +1,12 @@
 package pegr
 import grails.transaction.Transactional
+import grails.converters.*
 
 class UserController {
 
 	def springSecurityService	
 	def userService
+    def utilityService
     
 	def profile(){
         def user = springSecurityService.currentUser
@@ -109,6 +111,11 @@ class UserController {
             flash.message = e.message
         }
         redirect(action: "profile")
+    }
+    
+    def fetchUserAjax() {
+        def users = User.list().collect{[it.id, it.toString()]}
+        render utilityService.arrayToSelect2Data(users) as JSON
     }
 }
 

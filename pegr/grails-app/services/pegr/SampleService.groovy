@@ -265,12 +265,19 @@ class SampleService {
         indexList.each { indices ->
             def indexInSet = 1
             indices.split("-")*.trim().each {
-                def index = SequenceIndex.findBySequence(it)
+                def index = SequenceIndex.findBySequenceAndStatus(it, DictionaryStatus.Y)
                 if (!index) {
-                    index = SequenceIndex.findByIndexId(it)
+                    index = SequenceIndex.findByIndexIdAndStatus(it, DictionaryStatus.Y)
                 }
                 if (!index) {
-                     index = new SequenceIndex(indexId: 0, sequence: it, indexVersion: "UNKNOWN").save(failOnError: true)
+                    index = SequenceIndex.findBySequenceAndIndexId(it, "0")
+                }
+                if (!index) {
+                    if (it ==~ /[ACGT]+/) {
+                        index = new SequenceIndex(indexId: "0", sequence: it, indexVersion: "UNKNOWN").save(failOnError: true)
+                    } else {
+                        throw new SampleException(message: "Index is wrong for sample ${sample.id}")
+                    }
                 }
                 new SampleSequenceIndices(sample: sample, index: index, setId: setId, indexInSet: indexInSet).save(failOnError: true)
                 indexInSet++

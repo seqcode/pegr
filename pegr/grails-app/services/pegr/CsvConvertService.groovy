@@ -148,30 +148,8 @@ class CsvConvertService {
     }
     
     def addIndexToSample(Sample sample, String indexStr, String indexIdStr, boolean basicCheck) { 
-        if (!sample) {
-            throw new CsvConvertException(message: "Sample cannot be null when adding index!")
-        }
-        if (indexStr == null || indexStr == "unk"){
-            return
-        }
-        try {                
-            def indexList = indexStr.split(",")*.trim()
-            def setId = 1
-            indexList.each { indices ->
-                def indexInSet = 1
-                indices.split("-")*.trim().each {
-                    def index = SequenceIndex.findBySequence(it)
-                    if (!index) {
-                        index = SequenceIndex.findByIndexId(it)
-                    }
-                    if (!index) {
-                        index = new SequenceIndex(indexId: 0, sequence: it, indexVersion: "UNKNOWN").save(failOnError: true)
-                    }
-                    new SampleSequenceIndices(sample: sample, index: index, setId: setId, indexInSet: indexInSet).save(failOnError: true)
-                    indexInSet++
-                }
-                setId++
-            }            
+        try {
+            sampleService.splitAndAddIndexToSample(sample, indexStr)
         } catch (SampleException e) {
             throw new CsvConvertException(message: e.message)
         }

@@ -123,7 +123,6 @@ class SampleController {
         if (sample) {
             try {
                 sampleService.updateTarget(sample, target, type, nterm, cterm)
-                log.error sample.target.targetType
                 redirect(action: "edit", params: [sampleId: sampleId])
             } catch(SampleException e) {
                 flash.message = e.message

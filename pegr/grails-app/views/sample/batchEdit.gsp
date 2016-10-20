@@ -47,12 +47,12 @@
                         <td class="index"><span class="value">${sample.sequenceIndicesString}</span></td>
                         <td class="genomes"><span class="value">${sample.requestedGenomes}</span></td>
                         <td class="growthMedia"><span class="value">${sample.growthMedia}</span></td>
-                        <td class="treatments"><span class="value">${sample.treatments}</span></td>
-                        <td class="group-input chromosomeAmount"><span class="value">${sample.chromosomeAmount}</span></td>
-                        <td class="group-input cellNumber"><span class="value">${sample.cellNumber}</span></td>
-                        <td class="group-input volume"><span class="value">${sample.volume}</span></td>
-                        <td class="group-input requestedTagNumber"><span class="value">${sample.requestedTagNumber}</span></td>
-                        <td class="send"><input type=hidden class="key" value="${sample.sendDataTo?.id}"><span class="value">${sample.sendDataTo}</span></td>
+                        <td class="treatments"><span class="value">${sample.treatments.join(", ")?:"NONE"}</span></td>
+                        <td class="group-input chromosomeAmount"><span class="value">${sample.chromosomeAmount?:"NONE"}</span></td>
+                        <td class="group-input cellNumber"><span class="value">${sample.cellNumber?:"NONE"}</span></td>
+                        <td class="group-input volume"><span class="value">${sample.volume?:"NONE"}</span></td>
+                        <td class="group-input requestedTagNumber"><span class="value">${sample.requestedTagNumber?:"NONE"}</span></td>
+                        <td class="send"><input type=hidden class="key" value="${sample.sendDataTo?.id}"><span class="value">${sample.sendDataTo?:"NONE"}</span></td>
                     </tr>
                 </g:each>
             </tbody>
@@ -61,18 +61,20 @@
     <script>
         var tagPlaceholder = "Select or type...";
         var noTagPlaceholder = "Select...";
-        var users;
+        var users, treatments;
         
         $(document).ready(function(){
             $("th").each(function(){
                 $(this).append(" <span class='glyphicon glyphicon-minus-sign small'></span>");
             });
             
-            $.ajax({
-                url: "/pegr/user/fetchUserAjax", success: function(result) {
-                    users = result
-                }
-            });
+            $.ajax({url: "/pegr/sample/fetchTreatmentsAjax", success: function(result) {
+                treatments = result;
+            }});
+            
+            $.ajax({ url: "/pegr/user/fetchUserAjax", success: function(result) {
+                users = result;
+            }});
             
             /*           
             $(".tag-select2").select2({
@@ -84,13 +86,7 @@
                 placeholder: noTagPlaceholder
             });
 
-            $.ajax({url: "/pegr/sample/fetchTreatmentsAjax", success: function(result) {
-                $(".treatments").select2({
-                    data: result,
-                    tags: true,
-                    placeholder: tagPlaceholder
-                });
-            }});
+            
 
             $.ajax({url: "/pegr/antibody/fetchTargetAjax", success: function(result){
                 $(".target").select2({
@@ -126,6 +122,18 @@
             var td = $(this).parent();            
             toggleTd(td);
         });
+        
+        
+        $("td.treatments").on("click", ".value", function() {
+            var oldValue = $(this).text();
+            var edit = "<span class='input'><select multiple='multiple' style='width:200px'>";
+            edit += "<option selected value='" + oldValue + "'>" + oldValue + "</option>";
+            edit += "</select></span>";
+            appendEdit(this, edit);
+            $(this).parent().find("select").select2({data: treatments});
+        })
+        
+        $("td")
         
         $("td.group-input .value").click(function() {
             var oldValue = $(this).text();

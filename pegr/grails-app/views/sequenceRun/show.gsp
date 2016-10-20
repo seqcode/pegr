@@ -16,7 +16,7 @@
     <h2>Sequence Run #${run.id}  <small><g:if test="${run.runNum}">(Old No.${run.runNum})</g:if> <span class="label label-default">${run.status}</span></small></h2>
     <h3>Summary <g:if test="${run?.status!=pegr.RunStatus.COMPLETED}"> <g:link action="editInfo" params="[runId:run.id]"><span class="edit">Edit</span></g:link></g:if></h3>
     <g:render template="summaryDetails"></g:render>    
-    <h3>Samples <g:if test="${run.status == pegr.RunStatus.PREP}"><g:link action="editSamples" params="[runId: run.id]" class="edit" target="_blank">Edit</g:link></g:if> 
+    <h3>Samples <g:if test="${run.status == pegr.RunStatus.PREP}"><g:link controller="sample" action="batchEdit" params="[runId: run.id]" class="edit" target="_blank">Edit</g:link></g:if> 
     <g:if test="${run?.status==pegr.RunStatus.PREP}">
         <button type="button" class="edit" data-toggle="modal" data-target="#add-samples-by-id">Add Sample</button>
         <g:if test="${run?.poolItem == null}">
@@ -56,6 +56,7 @@
                 <th>Strain</th>
                 <th>Antibody</th>
                 <th>Index</th>
+                <th>Index ID</th>
                 <th>Genome Build</th>
                 <th>Cohort</th>
             </tr>
@@ -72,6 +73,7 @@
                     <td>${it.sample?.cellSource?.strain}</td>
                     <td>${it.sample?.antibody}</td>
                     <td>${it.sample?.sequenceIndicesString}</td>
+                    <td>${it.sample?.sequenceIndicesIdString}</td>
                     <td>${it.sample?.requestedGenomes}</td>
                     <td>${it.cohort}</td>
                 </tr>

@@ -327,14 +327,10 @@ class ProtocolInstanceBagService {
             }
             SampleSequenceIndices.executeUpdate("delete from SampleSequenceIndices where sample.id = :sampleId", [sampleId: sample.id])
             try {
-                if (indexType == "ID") {
-                    sampleService.splitIdAndAddIndexToSample(sample, indecies[idx])
-                } else {
-                    sampleService.splitAndAddIndexToSample(sample, indecies[idx])
-                }
+                sampleService.splitAndAddIndexToSample(sample, indecies[idx])
                 sampleService.copyIndexToItem(sample)
             } catch (SampleException e) {
-                 throw new ProtocolInstanceBagException(message: e.message)
+                throw new ProtocolInstanceBagException(message: e.message)
             }
         }
     }

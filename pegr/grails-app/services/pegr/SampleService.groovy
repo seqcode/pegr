@@ -149,11 +149,7 @@ class SampleService {
             }
             // add index
             try {
-                if (data.indexType == "ID") {
-                    splitIdAndAddIndexToSample(sample, data.indices)
-                } else {
-                    splitAndAddIndexToSample(sample, data.indices)
-                }
+                splitAndAddIndexToSample(sample, data.indices)
             } catch(SampleException e) {
                 message += "Index is not added correctly to sample ${sample.id}! "
             }
@@ -191,18 +187,11 @@ class SampleService {
         } catch (Exception e) {
             throw new SampleException(message: "Error saving the sample!")
         }
-        
-        if (indexType == "ID") {  
-            if (sample.sequenceIndicesIdString != indices) {
-                cleanIndices(sample)
-                splitIdAndAddIndexToSample(sample, indices)
-            }            
-        } else {
-            if (sample.sequenceIndicesString != indices) {
-                cleanIndices(sample)
-                splitAndAddIndexToSample(sample, indices)
-            }
-        }               
+         
+        if (sample.sequenceIndicesIdString != indices && sample.sequenceIndicesString != indices) {
+            cleanIndices(sample)
+            splitAndAddIndexToSample(sample, indices)
+        }                  
     }
     
     @Transactional
@@ -278,28 +267,17 @@ class SampleService {
             indices.split("-")*.trim().each {
                 def index = SequenceIndex.findBySequenceAndStatus(it, DictionaryStatus.Y)
                 if (!index) {
-                     throw new SampleException(message: "Incorrect index ${it}!")
+                    index = SequenceIndex.findByIndexIdAndStatus(it, DictionaryStatus.Y)
                 }
-                new SampleSequenceIndices(sample: sample, index: index, setId: setId, indexInSet: indexInSet).save(failOnError: true)
-                indexInSet++
-            }
-            setId++
-        }
-    }
-    
-    @Transactional
-    def splitIdAndAddIndexToSample(Sample sample, String indexStr) {
-        if (sample == null || indexStr == null) {
-            return
-        }
-        def indexList = indexStr.split(",")*.trim()
-        def setId = 1
-        indexList.each { indices ->
-            def indexInSet = 1
-            indices.split("-")*.trim().each {
-                def index = SequenceIndex.findByIndexIdAndStatus(it, DictionaryStatus.Y)
                 if (!index) {
-                    throw new SampleException(message: "Incorrect index ${it}!")
+                    index = SequenceIndex.findBySequenceAndIndexId(it, "0")
+                }
+                if (!index) {
+                    if (it ==~ /[ACGT]+/) {
+                        index = new SequenceIndex(indexId: "0", sequence: it, indexVersion: "UNKNOWN").save(failOnError: true)
+                    } else {
+                        throw new SampleException(message: "Index is wrong for sample ${sample.id}")
+                    }
                 }
                 new SampleSequenceIndices(sample: sample, index: index, setId: setId, indexInSet: indexInSet).save(failOnError: true)
                 indexInSet++
@@ -381,5 +359,24 @@ class SampleService {
                 return false
             }                    
         }          
+    }
+    
+    @Transactional
+    def update(Long sampleId, String field, String value) {
+        def sample = Sample.get(sampleId)
+        if (!sample) {
+            throw new SampleException(message: "Sample not found!")
+        }
+        switch (field) {
+            case "sendToId" :
+                def id = utilityService.getLong(value)
+                sample.sendDataTo = User.get(id)
+                break
+            default: 
+                sample[field] = utilityService.getFloat(value)
+                break
+        }
+        
+        sample.save(failOnError: true)
     }
 }

@@ -97,7 +97,7 @@
             placeholder: noTagPlaceholder
         });
 
-        $.ajax({url: "/pegr/cellSource/fetchUserAjax", success: function(result) {
+        $.ajax({url: "/pegr/user/fetchUserAjax", success: function(result) {
             $(".provider").select2({
                 data: result,
                 placeholder: noTagPlaceholder

@@ -169,7 +169,6 @@ class SampleController {
     def updateAntibody(Long sampleId, Long antibodyId, AntibodyCommand cmd, Item item) {
         try {
             if (antibodyId) {
-                log.error item
                 antibodyService.update(cmd, item)
             } else {
                 antibodyService.saveInSample(sampleId, cmd, item)
@@ -399,7 +398,7 @@ class SampleController {
     }
     
     def updateAjax(Long sampleId, String name, String value) {
-        sampleService.update(sampleId, name, value)
-        render ""
+        def result = sampleService.update(sampleId, name, value)
+        render result as JSON
     }
 }

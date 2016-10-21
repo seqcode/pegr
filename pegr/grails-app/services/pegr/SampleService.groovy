@@ -257,7 +257,7 @@ class SampleService {
     
     @Transactional
     def splitAndAddIndexToSample(Sample sample, String indexStr) {
-        if (sample == null || indexStr == null) {
+        if (sample == null || indexStr == null || indexStr == "") {
             return
         }
         def indexList = indexStr.split(",")*.trim()
@@ -363,11 +363,32 @@ class SampleService {
     
     @Transactional
     def update(Long sampleId, String field, String value) {
+        def result
         def sample = Sample.get(sampleId)
         if (!sample) {
             throw new SampleException(message: "Sample not found!")
         }
         switch (field) {
+            case "target" :
+                def data = utilityService.parseJson(value)
+                sample.target = antibodyService.getTarget(data.name, data.type, data.nterm, data.cterm)
+                sample.save(failOnError: true)
+                break
+            case "index" :
+                if (sample.sequenceIndicesIdString != value && sample.sequenceIndicesString != value) {
+                    cleanIndices(sample)
+                    splitAndAddIndexToSample(sample, value)
+                }
+                result = [sequence: sample.sequenceIndicesString, id: sample.sequenceIndicesIdString]
+                break
+            case "genomes" :
+                sample.requestedGenomes = value
+                sample.save(failOnError: true)
+                break
+            case "growthMedia" :
+                sample.growthMedia = getGrowthMedia(value, sample.cellSource?.strain?.species)
+                sample.save(failOnError: true)
+                break
             case "treatments" :
                 SampleTreatments.executeUpdate("delete from SampleTreatments where sample.id =:sampleId", [sampleId: sampleId])
                 def treatments = utilityService.parseJson(value) 
@@ -384,6 +405,7 @@ class SampleService {
                 sample[field] = utilityService.getFloat(value)
                 sample.save(failOnError: true)
                 break
-        }        
+        }
+        return result
     }
 }

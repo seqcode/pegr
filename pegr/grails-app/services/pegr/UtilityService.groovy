@@ -53,7 +53,6 @@ class UtilityService {
 	    try {
 	        f = Float.parseFloat(s)
 	    } catch(Exception e) {
-	        f = 0
 	    }
 	    return f
 	}
@@ -68,7 +67,6 @@ class UtilityService {
         try {
             n = Long.parseLong(s)
         } catch (Exception e){
-            throw new UtilityException(message: "String ${s} cannot be converted to Long!")
         }
         return n
     }

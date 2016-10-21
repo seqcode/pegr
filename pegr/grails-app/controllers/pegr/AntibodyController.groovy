@@ -186,7 +186,8 @@ class AntibodyController {
     
     def fetchTargetAjax() {
         def targets = Target.list()
-        def result = [targets: utilityService.stringToSelect2Data(targets.collect{it.name}.unique()),
+        def result = [types: utilityService.stringToSelect2Data(TargetType.list().collect{it.name}),
+                    targets: utilityService.stringToSelect2Data(targets.collect{it.name}.unique()),
                      nterms: utilityService.stringToSelect2Data(targets.collect{it.nTermTag}.unique()),
                      cterms: utilityService.stringToSelect2Data(targets.collect{it.cTermTag}.unique())]
         render result as JSON

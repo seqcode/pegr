@@ -368,15 +368,22 @@ class SampleService {
             throw new SampleException(message: "Sample not found!")
         }
         switch (field) {
+            case "treatments" :
+                SampleTreatments.executeUpdate("delete from SampleTreatments where sample.id =:sampleId", [sampleId: sampleId])
+                def treatments = utilityService.parseJson(value) 
+                treatments.each { treatment ->
+                    addTreatment(sample, treatment)
+                }
+                break
             case "sendToId" :
                 def id = utilityService.getLong(value)
                 sample.sendDataTo = User.get(id)
+                sample.save(failOnError: true)
                 break
             default: 
                 sample[field] = utilityService.getFloat(value)
+                sample.save(failOnError: true)
                 break
-        }
-        
-        sample.save(failOnError: true)
+        }        
     }
 }

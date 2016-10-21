@@ -393,20 +393,9 @@ class SampleController {
                 
             }
             samples = run.experiments*.sample
-        }
-        def growthMediaMap = [:]
-        def genomeMap = [:] 
-        samples.each { sample ->
-            def speciesId = sample.cellSource?.strain?.species?.id
-            if (speciesId && !growthMediaMap.containsKey(speciesId)) {
-          
-                genomeMap[speciesId] = Genome.executeQuery("select g.name from Genome g where g.species.id = ?", [speciesId])
-                
-                growthMediaMap[speciesId] = GrowthMedia.where { (species == null) || (species.id == speciesId) }.collect{it.name}
-            }
-        }        
+        }    
         
-        [samples: samples, growthMediaMap: growthMediaMap, genomeMap: genomeMap]
+        [samples: samples]
     }
     
     def updateAjax(Long sampleId, String name, String value) {

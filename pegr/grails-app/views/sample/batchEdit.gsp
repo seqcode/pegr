@@ -62,31 +62,17 @@
         var tagPlaceholder = "Select or type...";
         var noTagPlaceholder = "Select...";
         var users, treatments;
-        
-        $(document).ready(function(){
-            $("th").each(function(){
-                $(this).append(" <span class='glyphicon glyphicon-minus-sign small'></span>");
-            });
+        var s0 = "NONE";
             
-            $.ajax({url: "/pegr/sample/fetchTreatmentsAjax", success: function(result) {
-                treatments = result;
-            }});
-            
-            $.ajax({ url: "/pegr/user/fetchUserAjax", success: function(result) {
-                users = result;
-            }});
-            
-            /*           
-            $(".tag-select2").select2({
-                placeholder: tagPlaceholder,
-                tags: true
-            });
+        $.ajax({url: "/pegr/sample/fetchTreatmentsAjax", success: function(result) {
+            treatments = result;
+        }});
 
-            $(".no-tag-select2").select2({
-                placeholder: noTagPlaceholder
-            });
-
+        $.ajax({ url: "/pegr/user/fetchUserAjax", success: function(result) {
+            users = result;
+        }});
             
+            /*              
 
             $.ajax({url: "/pegr/antibody/fetchTargetAjax", success: function(result){
                 $(".target").select2({
@@ -106,8 +92,10 @@
                 });
             }});
             */
-        });
         
+        $("th").each(function(){
+                $(this).append(" <span class='glyphicon glyphicon-minus-sign small'></span>");
+            });
         $(".glyphicon-minus-sign").click(function() {
             var c = $(this).parent().attr("class");
             $("."+c).hide();
@@ -123,17 +111,57 @@
             toggleTd(td);
         });
         
+        $("td.growthMedia").on("click", ".value", function(){
+            var td = $(this).parent();
+            var oldValue = $(this).text();
+            var edit = "<span class='input'><select style='width:200px; display:none'><option selected value='" + oldValue + "'>" + oldValue + "</option></select></span>";
+            appendEdit(this, edit);
+            var speciesId = $(this).closest("tr").find(".speciesId").val();
+            $.ajax({
+                url: "/pegr/sample/fetchGrowthMediaAjax?speciesId="+speciesId
+            }).done(function(result){
+                td.find("select").select2({
+                    data: result,
+                    placeholder: tagPlaceholder,
+                    tags: true
+                });
+            });            
+        });
         
         $("td.treatments").on("click", ".value", function() {
             var oldValue = $(this).text();
             var edit = "<span class='input'><select multiple='multiple' style='width:200px'>";
-            edit += "<option selected value='" + oldValue + "'>" + oldValue + "</option>";
+            $.each(oldValue.split(", "), function (index, value) {
+                if (value != "NONE") {
+                    edit += "<option selected value='" + value + "'>" + value + "</option>";
+                }
+            });
             edit += "</select></span>";
             appendEdit(this, edit);
-            $(this).parent().find("select").select2({data: treatments});
-        })
+            $(this).parent().find("select").select2({
+                data: treatments,
+                placeholder: tagPlaceholder,
+                tags: true
+            });
+        });
         
-        $("td")
+        $("td.treatments").on("click", ".save", function() {
+            var td = $(this).parent();
+            var value = td.find("select").val();
+            var sampleId = td.parent().find(".sampleId").val();
+            $.ajax({
+                type: "POST",
+                url: "/pegr/sample/updateAjax",
+                data: {sampleId: sampleId, name: "treatments", value : JSON.stringify(value)}, 
+                success: function() {
+                    var s = s0;
+                    if (value) {
+                        s = value.join(", ");
+                    }
+                    td.find(".value").text(s);
+                    toggleTd(td);
+            }});
+        });
         
         $("td.group-input .value").click(function() {
             var oldValue = $(this).text();
@@ -158,7 +186,11 @@
                 url: "/pegr/sample/updateAjax",
                 data: {sampleId: sampleId, name: name, value: value}, 
                 success: function() {
-                    td.find(".value").text(value);
+                    var s = s0;
+                    if (value) {
+                        s = value;
+                    }
+                    td.find(".value").text(s);
                     toggleTd(td);
             }});
         });
@@ -166,22 +198,37 @@
         $("td.send").on("click", ".value", function(){
             var oldKey = $(this).parent().find(".key").val();
             var oldValue = $(this).text();
-            var edit = "<span class='input'><select><option value='" + oldKey + "'>" + oldValue + "</option></select></span>";
+            var edit = "<span class='input'><select>";
+            if (oldKey) {
+                edit += "<option value='" + oldKey + "'>" + oldValue + "</option>";
+            }
+            edit += "<option value='0'>NONE</option></select></span>";
             appendEdit(this, edit);
-            $(this).parent().find("select").select2({data: users});
+            $(this).parent().find("select").select2({
+                data: users
+            });
         });
         
         $("td.send").on("click", ".save", function(){
             var td = $(this).parent();
             var value = td.find("select").val();
-            var s = td.find("select :selected").text();
             var sampleId = td.parent().find(".sampleId").val();
             $.ajax({
                 type: "POST",
                 url: "/pegr/sample/updateAjax",
                 data: {sampleId: sampleId, name: "sendToId", value : value}, 
                 success: function() {
+                    var s = s0;
+                    var selectedElem = td.find("select :selected")
+                    if (selectedElem) {
+                        s = selectedElem.text();
+                    }
                     td.find(".value").text(s);
+                    if (value == "0"){
+                        td.find(".key").val(null);
+                    } else {
+                        td.find(".key").val(value);
+                    }
                     toggleTd(td);
             }});
         });
@@ -202,6 +249,7 @@
             td.find(".cancel").remove();
             td.find(".save").remove();
         }
+        
     </script>
 </body>
 </html>

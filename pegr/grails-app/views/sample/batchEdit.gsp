@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>PEGR - Experiments</title> 
-    <meta name="layout" content="base"/>
+    <meta name="layout" content="main"/>
     <style>
         .index .value {
             white-space: nowrap;

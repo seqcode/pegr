@@ -11,6 +11,7 @@ class SampleController {
     def itemService
     def utilityService
     def reportService
+    def protocolInstanceBagService
     
     def all(Integer max) {
         params.max = Math.min(max ?: 15, 100)
@@ -388,11 +389,18 @@ class SampleController {
             def run = SequenceRun.get(params.long("runId"))
             if (!run) {
                 render(view: "/404")
-                return
-                
+                return                
             }
             samples = run.experiments*.sample
-        }    
+        } else if (params.bagId) {
+            def items = protocolInstanceBagService.getTracedSamples(params.long("bagId"))
+            items.each { item ->
+                def sample = Sample.findByItem(item)
+                if (sample) {
+                    samples.push(sample)
+                }
+            }
+        }
         
         [samples: samples]
     }

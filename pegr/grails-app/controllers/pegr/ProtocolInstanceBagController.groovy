@@ -83,16 +83,7 @@ class ProtocolInstanceBagController {
         if (protocolInstances.size() > 0) {
             toBeCompleted = (bag.status != ProtocolStatus.COMPLETED && protocolInstances.last().status == ProtocolStatus.COMPLETED)
             notStarted = (protocolInstances[0].status == ProtocolStatus.INACTIVE)
-            def n = protocolInstances.findIndexOf { it.status == ProtocolStatus.INACTIVE }
-            def instance
-            if (n == -1) {
-                instance = protocolInstances.last()
-            } else if ( n==0 ) {
-                instance = protocolInstances.first()
-            } else {
-                instance = protocolInstances[n-1]
-            }
-            tracedSamples = ProtocolInstanceItems.findAllByProtocolInstanceAndFunction(instance, ProtocolItemFunction.CHILD).collect { it.item }
+            tracedSamples = protocolInstanceBagService.getTracedSamples(id)
         }
         if (bag) {
             [bag:bag, count: count, protocolInstances: protocolInstances, notStarted: notStarted, completed: completed, toBeCompleted: toBeCompleted, tracedSamples: tracedSamples]

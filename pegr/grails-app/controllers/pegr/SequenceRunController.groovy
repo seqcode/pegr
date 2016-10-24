@@ -3,6 +3,7 @@ import static org.springframework.http.HttpStatus.*
 import org.springframework.web.multipart.MultipartHttpServletRequest 
 import groovy.time.TimeCategory
 import groovy.json.*
+import grails.converters.*
 
 class SequenceRunController {
     def springSecurityService    
@@ -323,4 +324,13 @@ class SequenceRunController {
         redirect(action: "index")
     }
 
+    def fetchProjectsAjax(Long runId) {
+        def projects = SequencingCohort.where{ run.id == runId }.collect {it.project?.name}.toList()
+        render utilityService.stringToSelect2Data(projects) as JSON
+    }
+    
+    def updateExperimentCohortAjax(Long runId, Long experimentId, String projectName) {
+        sequenceRunService.updateExperimentCohort(runId, experimentId, projectName)
+        render ""
+    }
 }

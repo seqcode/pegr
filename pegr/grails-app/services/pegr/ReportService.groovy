@@ -15,7 +15,7 @@ class ReportService {
     def utilityService
     def alignmentStatsService
     def springSecurityService
-    final String QC_SETTINGS = "QC_SETTINGS"
+    final Map QC_SETTINGS = ['general': "QC_SETTINGS", 'yeast': "YEAST_QC_SETTINGS"]
     final String PURGE_ALIGNMENTS_CONFIG = "PurgeAlignmentsConfig"
     final String GALAXY_CONFIG = "GalaxyConfig"
     
@@ -173,7 +173,13 @@ class ReportService {
     */
     def getQcSettings() {
         // get the QC settings
-        def qcSettings = utilityService.parseJson(Chores.findByName(QC_SETTINGS)?.value)
+        def qcSettings = [:]
+        QC_SETTINGS.each { key, value ->
+            qcSettings[key] = utilityService.parseJson(Chores.findByName(value)?.value)
+            if (!qcSettings[key]) {
+                qcSettings[key] = [[:]]
+            }
+        }
         return qcSettings
     }
     
@@ -803,10 +809,10 @@ class ReportService {
             }
             settings << setting
         }
-        
-        def chores = Chores.findByName(QC_SETTINGS)
+        def name = QC_SETTINGS[params.type]
+        def chores = Chores.findByName(name)
         if (!chores) {
-            chores = new Chores(name: QC_SETTINGS)
+            chores = new Chores(name: name)
         }
         chores.value = JsonOutput.toJson(settings)
         chores.save()

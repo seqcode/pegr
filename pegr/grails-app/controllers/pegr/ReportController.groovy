@@ -129,9 +129,6 @@ class ReportController {
     def manage() {
         // get QC settings
         def qcSettings = reportService.getQcSettings()
-        if (!qcSettings || qcSettings.size() == 0) {
-            qcSettings = [[:]]
-        }
         
         // get the purge alignments configs for the last time
         def purgeConfigStr = Chores.findByName(reportService.PURGE_ALIGNMENTS_CONFIG)?.value

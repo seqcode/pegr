@@ -270,4 +270,13 @@ class AlignmentStatusDTO {
     Float duplicationLevel
         
     Boolean isPreferred
+    
+    Long dedupUniquelyMappedReads
+    String stamp
+    Long multiGPS
+    Long peakPairs
+    String nucleosomeEnrichment
+    String enrichedSegments
+    String polIILevel
+    String exprsLevel
 }

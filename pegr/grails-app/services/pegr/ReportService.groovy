@@ -49,10 +49,10 @@ class ReportService {
                 }
                     
                 // create a new alignment status                    
-                def alignmentStatusDTO = getAlignmentStatusDTO(alignment, experiment)
+                def analysis = Analysis.findAllByAlignment(alignment) 
+                def alignmentStatusDTO = getAlignmentStatusDTO(alignment, experiment, analysis)
                 
-                // iterate through the analysis and get each step's status
-                def analysis = Analysis.findAllByAlignment(alignment)   
+                // iterate through the analysis and get each step's status  
                 def motifCount = 0
                 
                 steps.eachWithIndex { step, index ->
@@ -148,8 +148,8 @@ class ReportService {
     * @param experiment
     * @return alignment status DTO
     */
-    def getAlignmentStatusDTO(SequenceAlignment alignment, SequencingExperiment experiment) {
-        return new AlignmentStatusDTO( 
+    def getAlignmentStatusDTO(SequenceAlignment alignment, SequencingExperiment experiment, def analysis) {
+        def dto = new AlignmentStatusDTO( 
                     alignmentId: alignment.id,
                     historyId: alignment.historyId,
                     genome: alignment.genome.name,
@@ -162,8 +162,26 @@ class ReportService {
                     uniquelyMappedPct: utilityService.divide(alignment.uniquelyMappedReads, experiment.totalReads),
                     deduplicatedPct: utilityService.divide(alignment.dedupUniquelyMappedReads, experiment.totalReads),
                     duplicationLevel: getDuplicationLevel(alignment.dedupUniquelyMappedReads, alignment.mappedReads),
-                    isPreferred: alignment.isPreferred
+                    isPreferred: alignment.isPreferred,            
+                    dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads
                 )
+        analysis.each {
+            if (it.category in ["multiGPS", "significanceTester", "stamp", "nucleosomeEnrichmentProfiler", "pointEnrichmentTester", "tableLookup", "memER"]) {
+                def statistics = utilityService.parseJson(it.statistics)
+                if (statistics) {
+                    statistics[0].each { key, value ->
+                        if (dto.hasProperty(key) && value != null) {
+                            try {
+                                dto[key] = value    
+                            } catch(org.codehaus.groovy.runtime.typehandling.GroovyCastException e) {
+                            }                
+                        }
+                    }
+                }
+
+            }
+        }
+        return dto
     }
     
     

@@ -1,66 +1,80 @@
-<h4>Yeast Encode Quality Control</h4>
-<table>
+<table id="yeast" class="table table-bordered">
     <thead>
         <tr>
             <th>Sample ID</th>
             <th>Target</th>
-            <th>Note</th>
             <g:each in="${qcSettings.yeast}" var="setting">
-                <th class="text-right col-${setting.key} group-qc">
-                    ${setting.name}
-                    <ul style="font-weight: normal">
-                        <g:if test="${setting.min}"><li>min: <g:formatNumber number="${setting.min}" format="${setting.numFormat}" /></li></g:if>
-                        <g:if test="${setting.max}"><li>max: <g:formatNumber number="${setting.max}" format="${setting.numFormat}" /></li></g:if>
-                        <g:if test="${setting.reference_min}"><li>min: ${setting.reference_min}</li></g:if>
-                        <g:if test="${setting.reference_max}"><li>min: ${setting.reference_max}</li></g:if>
-                    </ul>                                        
+                <th class="text-right ${setting.key}">
+                    ${setting.name}                                     
                 </th>
             </g:each>
-            <th>Recommendations</th>
+            <th>Recommend</th>
         </tr>
     </thead>
     <tbody>
         <g:each in="${runStatusMap.value.sampleStatusList}" var="sample">
             <tr>
-                <td class="col-sample group-analysis" rowspan="${Math.max(1, sample.alignmentStatusList.size())}"><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}</g:link></td>
-                <td class="col-target group-analysis" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.target}</td>
-                <g:each in="${qcSettings.yeast}" var="setting">
-                    <td class="text-right col-${setting.key} group-qc <g:if test='${
-                                   (setting.min != null && alignment[setting.key] < setting.min)
-                                   || (setting.max != null && alignment[setting.key] > setting.max)
-                                   || (setting.reference_min != null && alignment.hasProperty(setting.reference_min) && alignment[setting.key] < alignment[setting.reference_min] * setting.reference_min_ratio)
-                                   || (setting.reference_max != null && alignment.hasProperty(setting.reference_max) && alignment[setting.key] > alignment[setting.reference_max] * setting.reference_max_ratio)
-                                   }'>bg-danger</g:if>"> 
-                        <g:formatNumber number="${alignment[setting.key]}" format="${setting.numFormat}" />
-                    </td>
+                <td class="sample" rowspan="${Math.max(1, sample.alignmentStatusList.size())}"><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}</g:link></td>
+                <g:each in="${sample.alignmentStatusList}" var="alignment" status="n">
+                    <g:if test="${n>0}"><tr></g:if>
+                    <td class="target">${sample.target}</td>
+                    <g:each in="${qcSettings.yeast}" var="setting">
+                        <td class="text-right ${setting.key}">
+                            <g:if test="${setting.numFormat && setting.numFormat != ''}">
+                                <g:formatNumber number="${alignment[setting.key]}" format="${setting.numFormat}" />
+                            </g:if>
+                            <g:else>
+                                ${alignment[setting.key]}
+                            </g:else>
+                    </g:each>
                 </g:each>
-                <td></td>
+                <td class="recommend"></td>
             </tr>
         </g:each>
     </tbody>
 </table>
 
 <script>
-    if target.upper()=="NOTAG" or target.upper()=="NOTARGET":
-    recommend=""
-else:
-    if dedupUniqReads <0.2:
-        if mappedReadPct >0.5 and adapterDimerPct<0.15 and duplicLevel <0.7:
-            recommend="Re-sequence"
-        else:
-            if stress != None:
-                recommend="Done; stress gene"
-            elif polII <0.1 and fpkm<0.1:
-                recommend="Done; low exprs"
-            else:
-                recommend="re-ChIP"
-    else:
-        if (stamp =="Yes") or (multiGPS > 25) or (peakPairs >50) or (nucleosomeEnrichment>1.5) or (enrichedSegments):
-            recommend="Done; success"
-        elif stress != None:
-            recommend="Done; stress gene"
-        elif polIILevel <0.1 and exprsLevel<0.1:
-            recommend="Done; low exprs"
-        else:
-            recommend="Done; failed"
+    $("#yeast tbody tr").each(function(){
+        var v = {};
+        $(this).children("td").each(function(index, elem) {
+            var classes =  $(elem).attr("class").split(' ');
+            for (n in classes) {
+                if (classes[n] != "text-right") {
+                    v[classes[n]] = $(elem).text().trim();
+                }
+            }            
+        });
+        $(this).find(".recommend").text(v.target);
+        var target = v.target.toUpperCase();
+        if ( target == "NOTAG" || target == "NOTARGET") {
+            recommend = "";
+        } else {
+            if (v.dedupUniqReads < 200000) {
+                if ((v.mappedReadPct > 0.5) && (v.adapterDimerPct < 0.15) && (v.duplicLevel < 0.7)) {
+                    recommend="<span class='label label-danger'>Re-sequence<span>"; // dedup
+                } else {
+                    if (v.stress != "") {
+                        recommend="Done; stress gene"; // stress
+                    } else if((v.polIILevel < 0.1) && (v.fpkm < 0.1)) {
+                        recommend="<span class='label label-success'>Done; low exprs<span>"; // polII & fpkm
+                    } else {
+                        recommend="<span class='label label-danger'>re-ChIP</span>"; // dedup & mapped& adapter& duplic
+                    }
+                }
+            } else {
+                if ((v.stamp =="Yes") || (v.multiGPS > 25) || (v.peakPairs > 50) || (v.nucleosomeEnrichment > 1.5) || (v.enrichedSegments != "")) {
+                    recommend="<span class='label label-success'>Done; success</span>"; 
+                } else if (v.stress != "") {
+                    recommend="Done; stress gene"; //stress
+                    $(this).find(".stress").addClass("bg-danger");
+                } else if (v.polIILevel < 0.1 && v.exprsLevel < 0.1) {
+                    recommend="Done; low exprs"; // pol II exprs
+                } else {
+                    recommend="Done; failed"; // stamp, multiGPS, peakPairs, nucleo   
+                }
+            }
+        }
+        $(this).find(".recommend").html(recommend);
+    });
 </script>

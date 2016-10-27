@@ -2,6 +2,7 @@
 <head>
     <title>PEGR - Analysis Status</title> 
     <meta name="layout" content="analysis"/>
+    <asset:javascript src="meme.js"/>
     <style>
         .step-header {
             height: 140px;
@@ -215,7 +216,7 @@
     <br>
     <script>        
         $(function(){  
-        var hash = window.location.hash;
+            var hash = window.location.hash;
             hash && $('ul.nav a[href="' + hash + '"]').tab('show');
 
             $('.nav-tabs a').click(function (e) {

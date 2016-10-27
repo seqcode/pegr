@@ -297,4 +297,10 @@ class UtilityService {
             throw new UtilityException(message: "Error merging ${tableName} from ID#${fromId} to ID#${toId}!")
         }
     }
+    
+    def getGpfsConfig() {
+        return [username: grailsApplication.config.gpfs.username,
+                keyfile: grailsApplication.config.gpfs.keyfile,
+                host: grailsApplication.config.gpfs.host]
+    }
 }

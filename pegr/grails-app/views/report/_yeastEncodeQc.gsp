@@ -54,13 +54,13 @@
                     recommend="<span class='label label-danger'>Re-sequence<span>"; // dedup
                     $(this).find(".dedupUniqReads").addClass("bg-danger");
                 } else {
-                    if (v.stress != "") {
-                        recommend="<span class='label label-warning'>Done; stress gene</span>"; // stress
-                        $(this).find(".stress").addClass("bg-danger");
-                    } else if((v.polIILevel < 0.1) && (v.fpkm < 0.1)) {
-                        recommend="<span class='label label-warning'>Done; low exprs<span>"; // polII & fpkm
+                    if (v.go != "") {
+                        recommend="<span class='label label-warning'>Done; stress gene</span>"; // go
+                        $(this).find(".go").addClass("bg-danger");
+                    } else if((v.polIILevel < 0.1) && (v.exprsLevel < 0.1)) {
+                        recommend="<span class='label label-warning'>Done; low exprs<span>"; // polII & expression
                         $(this).find(".polIILevel").addClass("bg-danger");
-                        $(this).find(".fpkm").addClass("bg-danger");
+                        $(this).find(".exprsLevel").addClass("bg-danger");
                     } else {
                         recommend="<span class='label label-danger'>re-ChIP</span>"; // dedup & mapped& adapter& duplic
                         $(this).find(".dedupUniqReads").addClass("bg-danger");
@@ -72,9 +72,9 @@
             } else {
                 if ((v.stamp =="Yes") || (v.multiGPS > 25) || (v.peakPairs > 50) || (v.nucleosomeEnrichment > 1.5) || (v.enrichedSegments != "")) {
                     recommend="<span class='label label-success'>Done; success</span>"; 
-                } else if (v.stress != "") {
-                    recommend="<span class='label label-warning'>Done; stress gene</span>"; //stress
-                    $(this).find(".stress").addClass("bg-danger");
+                } else if (v.go != "") {
+                    recommend="<span class='label label-warning'>Done; stress gene</span>"; //go
+                    $(this).find(".go").addClass("bg-danger");
                 } else if (v.polIILevel < 0.1 && v.exprsLevel < 0.1) {
                     recommend="<span class='label label-warning'>Done; low exprs</span>"; // pol II exprs
                     $(this).find(".polIILevel").addClass("bg-danger");
@@ -89,5 +89,18 @@
             }
         }
         $(this).find(".recommend").html(recommend);
+    });
+    
+    $("td.memER").each(function(index, memeFig){
+        var memER = $(memeFig).text().trim();
+        if (memER != "") {
+            $.ajax({
+                url: "/pegr/report/fetchMemERDataAjax?url="+memER,
+                success: function(result) {
+                    $(memeFig).empty();
+                    make_motif(memeFig, result);
+                }
+            });
+        }
     });
 </script>

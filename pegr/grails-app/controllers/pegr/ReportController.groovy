@@ -279,4 +279,6 @@ class AlignmentStatusDTO {
     String enrichedSegments
     String polIILevel
     String exprsLevel
+    String stress
+    Float fpkm
 }

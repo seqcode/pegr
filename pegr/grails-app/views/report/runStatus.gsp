@@ -214,7 +214,17 @@
     </table>
     <br>
     <script>        
-        $(function(){            
+        $(function(){  
+        var hash = window.location.hash;
+            hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+
+            $('.nav-tabs a').click(function (e) {
+                $(this).tab('show');
+                var scrollmem = $('body').scrollTop() || $('html').scrollTop();
+                window.location.hash = this.hash;
+                $('html,body').scrollTop(scrollmem);
+            });
+            
             $(".confirm").confirm({text: "All data in this alignment will be deleted. Are you sure you want to delete this alignment?"});
             $(".nav-status").addClass("active");
             $('[data-toggle="popover"]').popover(); 
@@ -325,7 +335,6 @@
         function togglePreferredAlignment(alignmentId) {
             $.ajax({ url: "/pegr/report/togglePreferredAlignment?alignmentId=" + alignmentId });            
         }
-        
     </script>
 </body>
 </html>

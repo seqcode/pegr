@@ -41,7 +41,7 @@
                         </ul>                                        
                     </th>
                 </g:each>
-                <th class="col-prefer group-operation">Preferred</th>
+                <th class="col-prefer group-operation">Verified</th>
                 <th class="col-delete group-operation">Delete</th>
             </tr>
         </thead>

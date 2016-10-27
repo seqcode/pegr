@@ -4,9 +4,7 @@
             <th>Sample ID</th>
             <th>Target</th>
             <g:each in="${qcSettings.yeast}" var="setting">
-                <th class="text-right ${setting.key}">
-                    ${setting.name}                                     
-                </th>
+                <th class="text-right ${setting.key}" style="white-space:normal">${setting.name}</th>
             </g:each>
             <th>Recommend</th>
         </tr>
@@ -19,13 +17,14 @@
                     <g:if test="${n>0}"><tr></g:if>
                     <td class="target">${sample.target}</td>
                     <g:each in="${qcSettings.yeast}" var="setting">
-                        <td class="text-right ${setting.key}">
+                        <td class="text-right ${setting.key}" title="${setting.key}">              
                             <g:if test="${setting.numFormat && setting.numFormat != ''}">
                                 <g:formatNumber number="${alignment[setting.key]}" format="${setting.numFormat}" />
                             </g:if>
                             <g:else>
                                 ${alignment[setting.key]}
                             </g:else>
+                        </td>
                     </g:each>
                 </g:each>
                 <td class="recommend"></td>
@@ -53,25 +52,39 @@
             if (v.dedupUniqReads < 200000) {
                 if ((v.mappedReadPct > 0.5) && (v.adapterDimerPct < 0.15) && (v.duplicLevel < 0.7)) {
                     recommend="<span class='label label-danger'>Re-sequence<span>"; // dedup
+                    $(this).find(".dedupUniqReads").addClass("bg-danger");
                 } else {
                     if (v.stress != "") {
-                        recommend="Done; stress gene"; // stress
+                        recommend="<span class='label label-warning'>Done; stress gene</span>"; // stress
+                        $(this).find(".stress").addClass("bg-danger");
                     } else if((v.polIILevel < 0.1) && (v.fpkm < 0.1)) {
-                        recommend="<span class='label label-success'>Done; low exprs<span>"; // polII & fpkm
+                        recommend="<span class='label label-warning'>Done; low exprs<span>"; // polII & fpkm
+                        $(this).find(".polIILevel").addClass("bg-danger");
+                        $(this).find(".fpkm").addClass("bg-danger");
                     } else {
                         recommend="<span class='label label-danger'>re-ChIP</span>"; // dedup & mapped& adapter& duplic
+                        $(this).find(".dedupUniqReads").addClass("bg-danger");
+                        $(this).find(".mappedReadPct").addClass("bg-danger");
+                        $(this).find(".adapterDimerPct").addClass("bg-danger");
+                        $(this).find(".duplicLevel").addClass("bg-danger");
                     }
                 }
             } else {
                 if ((v.stamp =="Yes") || (v.multiGPS > 25) || (v.peakPairs > 50) || (v.nucleosomeEnrichment > 1.5) || (v.enrichedSegments != "")) {
                     recommend="<span class='label label-success'>Done; success</span>"; 
                 } else if (v.stress != "") {
-                    recommend="Done; stress gene"; //stress
+                    recommend="<span class='label label-warning'>Done; stress gene</span>"; //stress
                     $(this).find(".stress").addClass("bg-danger");
                 } else if (v.polIILevel < 0.1 && v.exprsLevel < 0.1) {
-                    recommend="Done; low exprs"; // pol II exprs
+                    recommend="<span class='label label-warning'>Done; low exprs</span>"; // pol II exprs
+                    $(this).find(".polIILevel").addClass("bg-danger");
+                    $(this).find(".exprsLevel").addClass("bg-danger");
                 } else {
-                    recommend="Done; failed"; // stamp, multiGPS, peakPairs, nucleo   
+                    recommend="<span class='label label-danger'>Done; failed</span>"; // stamp, multiGPS, peakPairs, nucleo
+                    $(this).find(".stamp").addClass("bg-danger");
+                    $(this).find(".multiGPS").addClass("bg-danger");
+                    $(this).find(".peakPairs").addClass("bg-danger");
+                    $(this).find(".nucleosomeEnrichment").addClass("bg-danger");
                 }
             }
         }

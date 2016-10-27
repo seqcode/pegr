@@ -3,6 +3,7 @@
     <title>PEGR - Analysis Status</title> 
     <meta name="layout" content="analysis"/>
     <asset:javascript src="meme.js"/>
+    <asset:stylesheet href="meme.css"/>
     <style>
         .step-header {
             height: 140px;
@@ -142,6 +143,7 @@
         .popover-content p {
             margin: 2px;
         }
+        
     </style>
 </head>
 <body>

@@ -17,10 +17,13 @@
                     <g:if test="${n>0}"><tr></g:if>
                     <td class="target">${sample.target}</td>
                     <g:each in="${qcSettings.yeast}" var="setting">
-                        <td class="text-right ${setting.key}" title="${setting.key}">              
-                            <g:if test="${setting.numFormat && setting.numFormat != ''}">
-                                <g:formatNumber number="${alignment[setting.key]}" format="${setting.numFormat}" />
+                        <td class="text-right ${setting.key}" title="${setting.key}">          
+                            <g:if test="${setting.key == 'memER'}">
+                                <span style="display:none">${alignment[setting.key]}</span>
                             </g:if>
+                            <g:elseif test="${setting.numFormat && setting.numFormat != ''}">
+                                <g:formatNumber number="${alignment[setting.key]}" format="${setting.numFormat}" />
+                            </g:elseif>
                             <g:else>
                                 ${alignment[setting.key]}
                             </g:else>
@@ -97,7 +100,6 @@
             $.ajax({
                 url: "/pegr/report/fetchMemERDataAjax?url="+memER,
                 success: function(result) {
-                    $(memeFig).empty();
                     make_motif(memeFig, result);
                 }
             });

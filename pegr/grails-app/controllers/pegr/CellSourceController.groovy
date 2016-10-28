@@ -9,6 +9,18 @@ class CellSourceController {
 	def utilityService
     def itemService
     
+    def list(Integer max) {
+        params.max = Math.min(max ?: 15, 100)
+        def cellSources = CellSource.where{ item == null}.list(params)
+        def totalCount = CellSource.where{ item == null}.count()
+        [cellSources: cellSources, totalCount: totalCount, categoryId: params.categoryId]
+    }
+    
+    def show(Integer id) {
+        def cellSource = CellSource.get(id)
+        [cellSource: cellSource]
+    }
+    
     def save(Item item, CellSourceCommand cmd) {
         withForm {
             try {

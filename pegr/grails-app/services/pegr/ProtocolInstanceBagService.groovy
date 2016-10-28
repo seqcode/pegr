@@ -13,6 +13,24 @@ class ProtocolInstanceBagService {
     def barcodeService
     def utilityService
     
+    List getTracedSamples(Long bagId) {
+        def protocolInstances = ProtocolInstance.where { bag.id == bagId}.list(sort: "bagIdx", order: "asc")
+        if (protocolInstances.size() == 0) {
+            return []
+        }
+        def n = protocolInstances.findIndexOf { it.status == ProtocolStatus.INACTIVE }
+        def instance
+        if (n == -1) {
+            instance = protocolInstances.last()
+        } else if ( n==0 ) {
+            instance = protocolInstances.first()
+        } else {
+            instance = protocolInstances[n-1]
+        }
+        def tracedSamples = ProtocolInstanceItems.findAllByProtocolInstanceAndFunction(instance, ProtocolItemFunction.CHILD).collect { it.item }
+        return tracedSamples
+    }
+    
     @Transactional
     ProtocolInstanceBag savePrtclInstBagByGroup(Long protocolGroupId, String name, Date startTime) {
         def protocolGroup = ProtocolGroup.get(protocolGroupId)

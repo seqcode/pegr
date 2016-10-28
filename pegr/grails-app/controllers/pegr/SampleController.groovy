@@ -11,6 +11,7 @@ class SampleController {
     def itemService
     def utilityService
     def reportService
+    def protocolInstanceBagService
     
     def all(Integer max) {
         params.max = Math.min(max ?: 15, 100)
@@ -123,7 +124,6 @@ class SampleController {
         if (sample) {
             try {
                 sampleService.updateTarget(sample, target, type, nterm, cterm)
-                log.error sample.target.targetType
                 redirect(action: "edit", params: [sampleId: sampleId])
             } catch(SampleException e) {
                 flash.message = e.message
@@ -170,7 +170,6 @@ class SampleController {
     def updateAntibody(Long sampleId, Long antibodyId, AntibodyCommand cmd, Item item) {
         try {
             if (antibodyId) {
-                log.error item
                 antibodyService.update(cmd, item)
             } else {
                 antibodyService.saveInSample(sampleId, cmd, item)
@@ -390,28 +389,24 @@ class SampleController {
             def run = SequenceRun.get(params.long("runId"))
             if (!run) {
                 render(view: "/404")
-                return
-                
+                return                
             }
             samples = run.experiments*.sample
-        }
-        def growthMediaMap = [:]
-        def genomeMap = [:] 
-        samples.each { sample ->
-            def speciesId = sample.cellSource?.strain?.species?.id
-            if (speciesId && !growthMediaMap.containsKey(speciesId)) {
-          
-                genomeMap[speciesId] = Genome.executeQuery("select g.name from Genome g where g.species.id = ?", [speciesId])
-                
-                growthMediaMap[speciesId] = GrowthMedia.where { (species == null) || (species.id == speciesId) }.collect{it.name}
+        } else if (params.bagId) {
+            def items = protocolInstanceBagService.getTracedSamples(params.long("bagId"))
+            items.each { item ->
+                def sample = Sample.findByItem(item)
+                if (sample) {
+                    samples.push(sample)
+                }
             }
-        }        
+        }
         
-        [samples: samples, growthMediaMap: growthMediaMap, genomeMap: genomeMap]
+        [samples: samples]
     }
     
     def updateAjax(Long sampleId, String name, String value) {
-        sampleService.update(sampleId, name, value)
-        render ""
+        def result = sampleService.update(sampleId, name, value)
+        render result as JSON
     }
 }

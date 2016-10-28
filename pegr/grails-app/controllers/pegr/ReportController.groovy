@@ -109,6 +109,11 @@ class ReportController {
         render results
     }
     
+    def fetchMemERDataAjax(String url) {
+        def results = reportService.fetchMemERMotif(url) as JSON
+        render results
+    }
+    
     def composite(String url) {
         [url: url]
     }
@@ -129,9 +134,6 @@ class ReportController {
     def manage() {
         // get QC settings
         def qcSettings = reportService.getQcSettings()
-        if (!qcSettings || qcSettings.size() == 0) {
-            qcSettings = [[:]]
-        }
         
         // get the purge alignments configs for the last time
         def purgeConfigStr = Chores.findByName(reportService.PURGE_ALIGNMENTS_CONFIG)?.value
@@ -255,22 +257,4 @@ class SampleStatusDTO {
     String target
     SequencingCohort cohort
     List alignmentStatusList
-}
-
-class AlignmentStatusDTO {
-    String alignmentId
-    String historyId
-    String genome
-    Date date
-    List status
-    
-    Long totalReads
-    Long requestedTags
-    Float adapterDimerPct
-    Float mappedPct
-    Float uniquelyMappedPct
-    Float deduplicatedPct
-    Float duplicationLevel
-        
-    Boolean isPreferred
 }

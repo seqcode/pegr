@@ -40,3 +40,33 @@ jQuery.validator.addClassRules({
         number: true
     }
 });
+
+        
+function appendEdit(elem, edit) {            
+    var td = $(elem).parent();
+    td.find(".value").hide();
+    td.append(edit);
+    var $save = "<button class='btn btn-primary save'>Save</button>";
+    var $cancel = "<button class='btn btn-default cancel'>Cancel</button>";
+    td.append($save);
+    td.append($cancel);
+}
+
+function toggleTd(td) {
+    td.find(".value").show();
+    td.find(".input").remove();
+    td.find(".cancel").remove();
+    td.find(".save").remove();
+}
+
+function createSelect(tr, classname, data) {
+    var td = tr.find(classname);
+    var elem = td.find(".value");
+    var oldValue = elem.text();
+    var edit =  "<span class='input'><select style='width:120px; display:none'><option selected value='" + oldValue + "'>" + oldValue + "</option></select></span>";
+    td.append(edit);
+    elem.hide();
+    td.find("select").select2({
+        data: data
+    });
+}

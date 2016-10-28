@@ -14,6 +14,7 @@ class SequenceRunService {
     def springSecurityService
     def walleService
     def utilityService
+    def projectService
     
     @Transactional
     void save(SequenceRun run) {
@@ -182,6 +183,33 @@ class SequenceRunService {
                 
         walleService.addToQueue(runId)
     }
+    
+    @Transactional
+    void updateExperimentCohort(Long runId, Long experimentId, String projectName) {
+        def experiment = SequencingExperiment.get(experimentId)
+        if (!experiment) {
+            throw new SequenceRunException(message: "Sequencing experiment not found!")
+        }
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            throw new SequenceRunException(message: "Sequence run not found!")
+        }
+        def project = Project.findByName(projectName)
+        if (!project) {
+            project = new Project(name: projectName)
+            def user = springSecurityService.currentUser
+            projectService.saveWithUser(project, user, [])
+        }
+        def cohort = SequencingCohort.findByProjectAndRun(project, run)
+        if (!cohort) {
+            cohort = new SequencingCohort(project: project, run: run)
+            cohort.save()
+        } 
+        experiment.cohort = cohort
+        experiment.save()
+        new ProjectSamples(sample:experiment.sample, project:project).save()
+    }
+    
     
     def getCalendarTimeString(Date time) {
         return time.format("yyyyMMdd'T'HHmmss'Z'")

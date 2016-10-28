@@ -15,7 +15,7 @@ class ReportService {
     def utilityService
     def alignmentStatsService
     def springSecurityService
-    final String QC_SETTINGS = "QC_SETTINGS"
+    final Map QC_SETTINGS = ['general': "QC_SETTINGS", 'yeast': "YEAST_QC_SETTINGS"]
     final String PURGE_ALIGNMENTS_CONFIG = "PurgeAlignmentsConfig"
     final String GALAXY_CONFIG = "GalaxyConfig"
     
@@ -49,10 +49,10 @@ class ReportService {
                 }
                     
                 // create a new alignment status                    
-                def alignmentStatusDTO = getAlignmentStatusDTO(alignment, experiment)
+                def analysis = Analysis.findAllByAlignment(alignment) 
+                def alignmentStatusDTO = getAlignmentStatusDTO(alignment, experiment, analysis)
                 
-                // iterate through the analysis and get each step's status
-                def analysis = Analysis.findAllByAlignment(alignment)   
+                // iterate through the analysis and get each step's status  
                 def motifCount = 0
                 
                 steps.eachWithIndex { step, index ->
@@ -148,8 +148,8 @@ class ReportService {
     * @param experiment
     * @return alignment status DTO
     */
-    def getAlignmentStatusDTO(SequenceAlignment alignment, SequencingExperiment experiment) {
-        return new AlignmentStatusDTO( 
+    def getAlignmentStatusDTO(SequenceAlignment alignment, SequencingExperiment experiment, def analysis) {
+        def dto = [ 
                     alignmentId: alignment.id,
                     historyId: alignment.historyId,
                     genome: alignment.genome.name,
@@ -162,8 +162,27 @@ class ReportService {
                     uniquelyMappedPct: utilityService.divide(alignment.uniquelyMappedReads, experiment.totalReads),
                     deduplicatedPct: utilityService.divide(alignment.dedupUniquelyMappedReads, experiment.totalReads),
                     duplicationLevel: getDuplicationLevel(alignment.dedupUniquelyMappedReads, alignment.mappedReads),
-                    isPreferred: alignment.isPreferred
-                )
+                    isPreferred: alignment.isPreferred,            
+                    dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads
+                ]
+        analysis.each {
+            if (it.category in ["multiGPS", "significanceTester", "stamp", "nucleosomeEnrichmentProfiler", "pointEnrichmentTester", "tableLookup", "memER"]) {
+                def statistics = utilityService.parseJson(it.statistics)
+                if (statistics) {
+                    statistics[0].each { key, value ->
+                        if (value != null) {
+                            dto[key] = value
+                        }
+                    }
+                }
+                
+                def datasets = utilityService.parseJson(it.datasets)
+                if (datasets) {
+                    dto[it.category] = datasets[0].uri
+                }
+            }
+        }
+        return dto
     }
     
     
@@ -173,7 +192,13 @@ class ReportService {
     */
     def getQcSettings() {
         // get the QC settings
-        def qcSettings = utilityService.parseJson(Chores.findByName(QC_SETTINGS)?.value)
+        def qcSettings = [:]
+        QC_SETTINGS.each { key, value ->
+            qcSettings[key] = utilityService.parseJson(Chores.findByName(value)?.value)
+            if (!qcSettings[key]) {
+                qcSettings[key] = [[:]]
+            }
+        }
         return qcSettings
     }
     
@@ -596,6 +621,39 @@ class ReportService {
     }
     
    /**
+    * Fetch MemER motifs from MemER file.
+    * @param url of the MemER file
+    * @return a list of memER motifs's information
+    */
+    def fetchMemERMotif(String url) {
+        if (url == null || url == "") {
+            throw new ReportException(message: "Missing URL!")
+        }
+        def pwm = []
+        try {
+            def config = utilityService.getGpfsConfig()
+            
+            def cmd = "ssh -i ${config.keyfile} ${config.username}@${config.host} cat ${url}"
+            def timeout = 1000 * 60 * 1 // 1 min
+            def data = utilityService.executeCommand(cmd, timeout)
+
+            data.eachLine {
+                def numbers = it.tokenize()
+                def a = []
+                numbers.eachWithIndex { n, index ->
+                    if (index > 0 && index < 5) {
+                        a.push(utilityService.getFloat(n))
+                    }
+                }
+                pwm.push(a)
+            }
+        } catch (Exception e) {
+            throw new ReportException(message: "Error fetching the memER data!")
+        }
+        return [pwm: pwm]
+    }
+    
+   /**
     * Find the value of a given name in a string of motif information.
     * @param s the string of motif information
     * @param name the value's name
@@ -803,10 +861,10 @@ class ReportService {
             }
             settings << setting
         }
-        
-        def chores = Chores.findByName(QC_SETTINGS)
+        def name = QC_SETTINGS[params.type]
+        def chores = Chores.findByName(name)
         if (!chores) {
-            chores = new Chores(name: QC_SETTINGS)
+            chores = new Chores(name: name)
         }
         chores.value = JsonOutput.toJson(settings)
         chores.save()
@@ -859,15 +917,11 @@ class ReportService {
         final String gpfsRoot = "/gpfs/cyberstar/pughhpc/galaxy-cegr/files/prep/prep_dir/"
         final String reportDir = "/Reports/html/"
         final String unknownIndexFile = "/default/unknown/unknown/lane.html"
-        def username = grailsApplication.config.gpfs.username
-        // rsa private file
-        def keyfile = grailsApplication.config.gpfs.keyfile
-        // hostname
-        def host = grailsApplication.config.gpfs.host
+        def config = utilityService.getGpfsConfig()
 
         String remotePath = gpfsRoot + run.directoryName + reportDir + run.fcId + unknownIndexFile
         
-        def cmd = "scp -i ${keyfile} ${username}@${host}:${remotePath} ${localFile}"
+        def cmd = "scp -i ${config.keyfile} ${config.username}@${config.host}:${remotePath} ${localFile}"
         
         def timeout = 1000 * 60 * 1 // 1 min
         utilityService.executeCommand(cmd, timeout)

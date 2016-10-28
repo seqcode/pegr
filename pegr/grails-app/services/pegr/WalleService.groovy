@@ -24,6 +24,7 @@ class WalleService {
     final String LOCAL_FOLDER = "runInfos"
     final String RUN_INFO_FILE_NAME = "cegr_run_info.txt"
     final String CONFIG_FOLDER_NAME = "cegr_config"
+    final String RUN_COMPLETE_FILE = "RunCompletionStatus.xml"
     // max queue length, error will be logged if it is exceeded.
     final int MAX_QUEUE_LENGTH = 24
     
@@ -135,6 +136,11 @@ class WalleService {
         def newFolder = newRunFolders.first()
         def newRunRemotePath = new File(walle.root, newFolder).getPath()
         
+        // return if the sequence run has not completed
+        if (!runCompleted(newRunRemotePath)) {
+            return
+        }
+        
         // update sequence run's directory, FCID and status
         run.directoryName = newFolder
         def d = newFolder.split("_").last()
@@ -202,6 +208,25 @@ class WalleService {
             throw new WalleException(message: "Error connecting to Walle!")
         }
         return remoteFiles
+    }
+    
+    def runCompleted(String newRunRemotePath) {
+        def walle = getWalle()
+        
+        // set timeout to 2 min
+        def timeout = 1000 * 60 * 2; 
+        def newRunCompleteFile = new File(newRunRemotePath, RUN_COMPLETE_FILE).getPath()
+        // command to list and sort all files and folder on Walle
+        def command = "ssh -i ${walle.keyfile} ${walle.username}@${walle.host} ls ${newRunCompleteFile}"
+        def result = false
+        try {
+            // execute the command
+            utilityService.executeCommand(command, timeout)
+            result = true
+        } catch (UtilityException e) {
+            // run not completed yet
+        }
+        return result
     }
     
     /**

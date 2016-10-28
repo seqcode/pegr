@@ -78,7 +78,7 @@ class AlignmentStatsService {
                                              genome: genome, 
                                              pipeline: pipeline,
                                              historyId: data.historyId,
-                                             isPreferred: true, 
+                                             isPreferred: false, 
                                              date: new Date())
         alignment.save(flush:true, failOnError: true)
         return alignment 

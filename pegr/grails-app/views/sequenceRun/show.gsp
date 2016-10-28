@@ -2,6 +2,14 @@
 <head>
     <title>Workbench</title> 
     <meta name="layout" content="main"/>
+    <style>
+        .btn {
+            padding: 0 5px;
+        }
+        .project {
+            width: 250px;    
+        }
+    </style>
 </head>
 <body>
 <div class="container-fluid">
@@ -58,12 +66,13 @@
                 <th>Index</th>
                 <th>Index ID</th>
                 <th>Genome Build</th>
-                <th>Cohort</th>
+                <th>Project</th>
             </tr>
         </thead>
         <tbody>
             <g:each in="${run.experiments}">
                 <tr>
+                    <input type="hidden" name="experimentId" value="${it.id}">
                     <td class="remove-sample">
                         <g:if test="${run?.status==pegr.RunStatus.PREP}">
                             <g:link action="removeExperiment" params="[experimentId:it.id, runId:run.id]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link>
@@ -75,7 +84,7 @@
                     <td>${it.sample?.sequenceIndicesString}</td>
                     <td>${it.sample?.sequenceIndicesIdString}</td>
                     <td>${it.sample?.requestedGenomes}</td>
-                    <td>${it.cohort}</td>
+                    <td class="project"><span class="value">${it.cohort?.project ?: "NONE"}</span></td>
                 </tr>
             </g:each>              
             <tr>
@@ -140,6 +149,52 @@
     <script>
         $("#nav-experiments").addClass("active");
         $(".confirm").confirm();
+        
+        $(".project").on('click', ".value", function() {
+            var td = $(this).parent();
+            var oldValue = $(this).text();
+            if (oldValue == "NONE") {
+                oldValue = ""
+            }
+            var edit = "<span class='input'><select style='width:200px; display:none'><option selected value='" + oldValue + "'>" + oldValue + "</option></select></span>";
+            appendEdit(this, edit);
+            $.ajax({
+                url: "/pegr/sequenceRun/fetchProjectsAjax?runId=${run.id}"
+            }).done(function(result){
+                td.find("select").select2({
+                    data: result,
+                    tags: true
+                });    
+            });
+        });
+        
+        $(".project").on("click", ".cancel", function() {
+            var td = $(this).parent();
+            toggleTd(td);
+        });
+        
+        $(".project").on("click", ".save", function(){
+            var td = $(this).parent();
+            var tr = $(this).closest("tr");
+            var experimentId = tr.find("input").val();
+            var projectName = td.find("select").val();
+            var s = projectName;
+            if (s == "") {
+                s = "NONE"
+            }
+            $.ajax({
+                type: "POST",
+                url: "/pegr/sequenceRun/updateExperimentCohortAjax",
+                data: {experimentId: experimentId, 
+                       projectName: projectName,
+                      runId: ${run?.id}},
+                success: function() {
+                    td.find(".value").text(s);
+                    toggleTd(td);
+                }
+            });
+        });
+        
      </script>
 </div>
 </body>

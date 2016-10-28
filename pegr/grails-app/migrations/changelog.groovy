@@ -2879,4 +2879,6 @@ databaseChangeLog = {
 	include file: 'addProjectItem.groovy'
 
 	include file: 'addStep.groovy'
+
+	include file: 'addCohortImages.groovy'
 }

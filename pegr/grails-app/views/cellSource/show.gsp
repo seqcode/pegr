@@ -2,44 +2,50 @@
 <head>
     <title>Inventory</title> 
     <meta name="layout" content="item"/>
+        <style>
+        .btn {
+            padding: 0 5px;
+        }
+    </style>
 </head>
 <body>
 <div class="container-fluid">
      <ul class="nav nav-tabs">
-        <li><g:link action="list" params="[categoryId: item?.type?.category?.id]">List</g:link></li>
-        <li><g:link action="delete" params="[itemId:item?.id]" class="confirm">Delete</g:link></li>   
+        <li><g:link action="list">List</g:link></li>
+        <li><g:link action="delete" params="[cellSourceId:cellSource.id]" class="confirm">Delete</g:link></li>   
     </ul>
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
-        
-    <h4>Barcode Information <g:link action="edit" params="[itemId:item?.id]" class="edit">Edit</g:link></h4>
+    <g:if test="${!cellSource.item}"><h4>Barcode: none <g:link action="editBarcode" params="[cellSourceId: cellSource.id]" class="edit">Add</g:link></h4></g:if>
+    <g:else>
+    <h4>Barcode Information <g:link action="editBarcode" params="[cellSourceId:cellSource.id]" class="edit">Edit</g:link></h4>
     <div class="row">
         <div class="col-sm-6">
             <ul>
-                <g:if test="${item?.name}">
+                <g:if test="${cellSource.item?.name}">
                 <li>Name: ${cellSource.item?.name}</li>
                 </g:if>
-                <g:if test="${item?.type}">
+                <g:if test="${cellSource.item?.type}">
                 <li>Type: ${cellSource.item?.type}</li>
                 </g:if>
 
-                <g:if test="${item?.barcode}">
+                <g:if test="${cellSource.item?.barcode}">
                 <li>Barcode: ${cellSource.item?.barcode }</li>
                 </g:if>	
 
-                <g:if test="${item?.location}">
+                <g:if test="${cellSource.item?.location}">
                 <li>Location: ${cellSource.item?.location}</li>
                 </g:if>	
 
-                <g:if test="${item?.user}">
+                <g:if test="${cellSource.item?.user}">
                 <li>User: ${cellSource.item?.user}</li>
                 </g:if>
 
-                <g:if test="${item?.notes}">
+                <g:if test="${cellSource.item?.notes}">
                 <li>Notes: ${cellSource.item?.notes}</li>
                 </g:if>    
-                <g:each in="${item?.fieldMap}">
+                <g:each in="${cellSource.item?.fieldMap}">
                     <li>${it.key}: ${it.value}</li>
                 </g:each>
             </ul>
@@ -48,6 +54,7 @@
             <g:render template="/item/barcodeImage" model="[barcode:cellSource.item?.barcode]"></g:render>
         </div>
     </div>
+    </g:else>
     <h4>Cell Source Information <g:link controller="cellSource" action="edit" params="[cellSourceId:cellSource?.id]" class="edit">Edit</g:link></h4>
     <g:render template="/cellSource/details" model="[cellSource: cellSource]"></g:render>
     <h4>Images</h4>

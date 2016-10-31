@@ -17,10 +17,20 @@ class CellSourceController {
         
         params.max = Math.min(max ?: 15, 100)
         def strainName = params.strain
-        def query = CellSource.where {if (strainName) {strain.name == strainName && item != null} else { item!= null}}
-        def cellSources = query.list(params)
-        def totalCount = query.count()
-        [cellSources: cellSources, totalCount: totalCount, categoryId: params.categoryId, itemTypes: itemTypes, strains: strains]
+        def c = CellSource.createCriteria()
+        def cellSources = c.list(params) {
+            and {
+                if (strainName) {
+                    strain {
+                        eq "name", strainName
+                    }
+                }
+                eq "status", DictionaryStatus.Y
+            }
+        }
+        def category = ItemTypeCategory.findByName(CELL_STOCK)
+
+        [cellSources: cellSources, categoryId: category.id, itemTypes: itemTypes, strains: strains]
     }
     
     def show(Integer id) {
@@ -161,6 +171,47 @@ class CellSourceController {
         }
         
         return
+    }
+    
+    def editBarcode(Long cellSourceId) {
+        def cellSource = CellSource.get(cellSourceId)
+        if (cellSource) {        
+            if (request.method == "POST") {
+                withForm {
+                    def item = new Item(params)
+                    try {
+                        cellSourceService.updateItem(cellSourceId, item)
+                        itemService.updateCustomizedFields(cellSource.item, params)
+                        flash.message = "Barcode edited!"
+                        redirect(action: "show", id: cellSourceId)
+                    }catch(CellSourceException e) {
+                        request.message = e.message
+                        render(view: "editBarcode", model: [item:item, cellSourceId: cellSourceId])
+                    }                    
+                }
+            } else {
+                def types = ItemType.where {category.name == CELL_STOCK}.list()
+                def item = cellSource.item
+                if (!item) {
+                    item = new Item(name: cellSource.strain?.name)
+                }                
+                [item:item, types: types, cellSourceId: cellSourceId]
+            }
+        } else {
+            flash.message = "Cell stock not found!"
+            redirect(action: 'list')
+        }
+    }
+    
+    def delete(Long cellSourceId) {
+        try {
+            cellSourceService.delete(cellSourceId)
+            flash.message = "Cell stock deleted!"
+            redirect(action: 'list')
+        } catch(CellSourceException e) {
+            flash.message = e.message
+            redirect(action: "show", id: cellSourceId)
+        }
     }
 }
 

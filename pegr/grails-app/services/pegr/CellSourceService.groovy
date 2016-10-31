@@ -68,6 +68,7 @@ class CellSourceService {
         }
         def cellSource = getCellSource(cmd)
         cellSource.item = item 
+        cellSource.status = DictionaryStatus.Y
         cellSource.save()
         return cellSource
     }
@@ -222,15 +223,10 @@ class CellSourceService {
         def cellSource = CellSource.get(cellSourceId)
         if (cellSource) {
             try {
-                if (item.barcode == null || item.barcode == "") {
-                    cellSource.item = null
-                    cellSource.save()
-                    item.delete()
-                } else if (cellSource.item) {
+                if (cellSource.item) {
                     cellSource.item.properties = item
                     itemService.save(cellSource.item)
                 } else {
-                    item.name = cellSource.strain.name
                     itemService.save(item)
                     cellSource.item = item
                     cellSource.save()
@@ -239,7 +235,25 @@ class CellSourceService {
                 throw new CellSourceException(message: e.message)
             }
         } else {
-            throw new CellSourceException(message: "Cell Stock not found!")
+            throw new CellSourceException(message: "Cell stock not found!")
+        }
+    }
+    
+    @Transactional
+    def delete(Long cellSourceId) {
+        def cellSource = CellSource.get(cellSourceId)
+        if (!cellSource) {
+            throw new CellSourceException(message: "Cell stock not found!")
+        }
+        
+        try {
+            cellSource.delete()
+            def item = cellSource.item
+            if (item) {
+                item.delete()
+            }
+        } catch (Exception e) {
+            throw new CellSourceException(message: "Cell stock cannot be removed!")
         }
     }
 }

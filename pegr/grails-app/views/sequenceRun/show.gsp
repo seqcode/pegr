@@ -22,10 +22,11 @@
         </g:if>
     </div>
     <h2>Sequence Run #${run.id}  <small><g:if test="${run.runNum}">(Old No.${run.runNum})</g:if> <span class="label label-default">${run.status}</span></small></h2>
-    <h3>Summary <g:if test="${run?.status!=pegr.RunStatus.COMPLETED}"> <g:link action="editInfo" params="[runId:run.id]"><span class="edit">Edit</span></g:link></g:if></h3>
+    <h3>Summary <g:if test="${editable}"> <g:link action="editInfo" params="[runId:run.id]"><span class="edit">Edit</span></g:link></g:if></h3>
     <g:render template="summaryDetails"></g:render>    
-    <h3>Samples <g:if test="${run.status == pegr.RunStatus.PREP}"><g:link controller="sample" action="batchEdit" params="[runId: run.id]" class="edit" target="_blank">Edit</g:link></g:if> 
-    <g:if test="${run?.status==pegr.RunStatus.PREP}">
+    <h3>Samples 
+    <g:if test="${editable}"> 
+        <g:link controller="sample" action="batchEdit" params="[runId: run.id]" class="edit" target="_blank">Edit</g:link>
         <button type="button" class="edit" data-toggle="modal" data-target="#add-samples-by-id">Add Sample</button>
         <g:if test="${run?.poolItem == null}">
             <g:link action="searchPool" params="['runId':run.id]" class="edit">Add Master Pool</g:link>
@@ -93,7 +94,7 @@
         </tbody>
     </table>
     <g:if test="${run?.experiments.size()}">
-        <h3>Read and Index Positions <g:link action="editRead" params="[runId:run?.id]" class="edit">Edit</g:link></h3>
+        <h3>Read and Index Positions  <g:if test="${editable}"><g:link action="editRead" params="[runId:run?.id]" class="edit">Edit</g:link></g:if></h3>
         <h5>Read Type: ${read?.readType?.name}</h5>
         <table class="table table-striped">
             <thead>

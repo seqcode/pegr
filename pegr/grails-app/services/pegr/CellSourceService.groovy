@@ -212,9 +212,11 @@ class CellSourceService {
 	}
 
     @Transactional
-    def batchSave(List items, List cellSources) {
-        cellSources.eachWithIndex { cellSource, index ->
-            save(items[index], cellSource)
+    def batchSave(List cellSources) {
+        cellSources.each { cmd ->
+            def cellSource = getCellSource(cmd)
+            cellSource.status = DictionaryStatus.Y
+            cellSource.save()
         }
     }
     

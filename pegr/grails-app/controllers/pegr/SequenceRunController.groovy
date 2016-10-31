@@ -45,7 +45,10 @@ class SequenceRunController {
                     read.readType = run.experiments[0].readType
                 }
             }
-            [run: run, read: read]
+            def currUser = springSecurityService.currentUser
+            def authorized = (run.user == currUser || currUser.isAdmin())
+            def editable = (run?.status!=pegr.RunStatus.COMPLETED) && (authorized)
+            [run: run, read: read, editable: editable]
         } else {
             flash.message = "Sequence run not found!"
             redirect(action: "index")

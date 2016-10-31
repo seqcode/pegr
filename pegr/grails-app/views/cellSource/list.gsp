@@ -13,7 +13,8 @@
     <h4>Cell Stock</h4>
     <div>
         <g:form controller="cellSource" action="list">
-            <g:select name="strain" from="${strains}"></g:select>
+            <label>Strain</label> 
+            <g:select name="strain" from="${strains}" style="width:200px"></g:select>
             <g:submitButton name="submit" value="Search" class="btn btn-primary"></g:submitButton>
         </g:form>
     </div>

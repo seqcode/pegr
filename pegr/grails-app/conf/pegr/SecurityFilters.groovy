@@ -92,7 +92,7 @@ class SecurityFilters {
                 def antibodyId = params.long('antibodyId')
                 def antibody = Antibody.get(antibodyId)
                 def currUser = springSecurityService.currentUser
-                if (currUser.isAdmin() || antibody?.item?.user == currUser) {
+                if (currUser.isAdmin() || (antibody?.item == null) || antibody?.item?.user == currUser) {
                     return true
                 } else {
                     render(view: '/login/denied')
@@ -101,12 +101,12 @@ class SecurityFilters {
             }
         }
 
-        CellSourceEdit(controller: 'cellSource', action: 'edit|update|addTreatment') {
+        CellSourceEdit(controller: 'cellSource', action: 'edit|update|editBarcode|delete') {
             before = {
                 def cellSourceId = params.long('cellSourceId')
                 def cellSource = CellSource.get(cellSourceId)
                 def currUser = springSecurityService.currentUser
-                if (currUser.isAdmin() || cellSource?.item?.user == currUser) {
+                if (currUser.isAdmin() || (cellSource?.item == null) || cellSource?.item?.user == currUser) {
                     return true
                 } else {
                     render(view: '/login/denied')

@@ -110,7 +110,7 @@ class CellSourceController {
     def batchSave(CellStockBatchCommand cmd) {
         def categoryId = ItemTypeCategory.findByName(CELL_STOCK)?.id
         try {
-            cellSourceService.batchSave(cmd.items, cmd.cellSources)
+            cellSourceService.batchSave(cmd.cellSources)
         } catch(CellSourceException e) {
             flash.message = e.message
         }
@@ -217,6 +217,5 @@ class CellSourceCommand {
 
 @grails.validation.Validateable
 class CellStockBatchCommand {
-    List<Item> items = [].withLazyDefault {new Item()}
     List<CellSourceCommand> cellSources = [].withLazyDefault {new CellSourceCommand()}
 }

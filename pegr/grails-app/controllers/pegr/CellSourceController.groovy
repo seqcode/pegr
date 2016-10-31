@@ -13,7 +13,6 @@ class CellSourceController {
     
     def list(Integer max) {
         def itemTypes = ItemType.list(sort: "name")
-        def strains = Strain.executeQuery("select distinct name from Strain where name is not null order by name")
         
         params.max = Math.min(max ?: 15, 100)
         def strainName = params.strain
@@ -30,7 +29,7 @@ class CellSourceController {
         }
         def category = ItemTypeCategory.findByName(CELL_STOCK)
 
-        [cellSources: cellSources, categoryId: category.id, itemTypes: itemTypes, strains: strains]
+        [cellSources: cellSources, categoryId: category.id, itemTypes: itemTypes]
     }
     
     def show(Integer id) {
@@ -152,25 +151,6 @@ class CellSourceController {
     def fetchMutationAjax(String strainName, String genotype) {
         def mutations = Strain.executeQuery("select distinct s.geneticModification from Strain s where s.name = ? and s.genotype = ?", [strainName, genotype])
         render utilityService.stringToSelect2Data(mutations) as JSON
-    }
-
-    def fetchItemTypesAjax() {
-        def types = ItemType.where {category.name == CELL_STOCK}.collect{it.name}
-        render utilityService.stringToSelect2Data(types) as JSON
-    }
-    
-    def updateItemAjax(Long cellSourceId, String type, String barcode, String location) {
-        try {
-            def item = new Item (type: ItemType.findByName(type), 
-                                 barcode: barcode, 
-                                 location: location)
-            cellSourceService.updateItem(cellSourceId, item)
-            render ""
-        } catch (CellSourceException e) {
-            render ([message: e.message] as JSON)
-        }
-        
-        return
     }
     
     def editBarcode(Long cellSourceId) {

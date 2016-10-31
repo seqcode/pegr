@@ -40,7 +40,6 @@ jQuery.validator.addClassRules({
         number: true
     }
 });
-
         
 function appendEdit(elem, edit) {            
     var td = $(elem).parent();

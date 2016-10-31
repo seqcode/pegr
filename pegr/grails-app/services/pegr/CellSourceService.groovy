@@ -215,5 +215,31 @@ class CellSourceService {
         cellSources.eachWithIndex { cellSource, index ->
             save(items[index], cellSource)
         }
-    }    
+    }
+    
+    @Transactional
+    def updateItem(Long cellSourceId, Item item) {        
+        def cellSource = CellSource.get(cellSourceId)
+        if (cellSource) {
+            try {
+                if (item.barcode == null || item.barcode == "") {
+                    cellSource.item = null
+                    cellSource.save()
+                    item.delete()
+                } else if (cellSource.item) {
+                    cellSource.item.properties = item
+                    itemService.save(cellSource.item)
+                } else {
+                    item.name = cellSource.strain.name
+                    itemService.save(item)
+                    cellSource.item = item
+                    cellSource.save()
+                }
+            } catch (ItemException e) {
+                throw new CellSourceException(message: e.message)
+            }
+        } else {
+            throw new CellSourceException(message: "Cell Stock not found!")
+        }
+    }
 }

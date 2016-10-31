@@ -9,11 +9,18 @@ class CellSourceController {
 	def utilityService
     def itemService
     
+    final String CELL_STOCK = "Cell Stock"
+    
     def list(Integer max) {
+        def itemTypes = ItemType.list(sort: "name")
+        def strains = Strain.executeQuery("select distinct name from Strain where name is not null order by name")
+        
         params.max = Math.min(max ?: 15, 100)
-        def cellSources = CellSource.where{ item == null}.list(params)
-        def totalCount = CellSource.where{ item == null}.count()
-        [cellSources: cellSources, totalCount: totalCount, categoryId: params.categoryId]
+        def strainName = params.strain
+        def query = CellSource.where {if (strainName) {strain.name == strainName && item != null} else { item!= null}}
+        def cellSources = query.list(params)
+        def totalCount = query.count()
+        [cellSources: cellSources, totalCount: totalCount, categoryId: params.categoryId, itemTypes: itemTypes, strains: strains]
     }
     
     def show(Integer id) {
@@ -83,7 +90,7 @@ class CellSourceController {
     }
     
     def batchCreate() {
-        def category = ItemTypeCategory.findByName("Cell Stock")
+        def category = ItemTypeCategory.findByName(CELL_STOCK)
         if (category) {
             [categoryId: category.id]
         } else {
@@ -92,7 +99,7 @@ class CellSourceController {
     }
     
     def batchSave(CellStockBatchCommand cmd) {
-        def categoryId = ItemTypeCategory.findByName("Cell Stock")?.id
+        def categoryId = ItemTypeCategory.findByName(CELL_STOCK)?.id
         try {
             cellSourceService.batchSave(cmd.items, cmd.cellSources)
         } catch(CellSourceException e) {
@@ -137,6 +144,24 @@ class CellSourceController {
         render utilityService.stringToSelect2Data(mutations) as JSON
     }
 
+    def fetchItemTypesAjax() {
+        def types = ItemType.where {category.name == CELL_STOCK}.collect{it.name}
+        render utilityService.stringToSelect2Data(types) as JSON
+    }
+    
+    def updateItemAjax(Long cellSourceId, String type, String barcode, String location) {
+        try {
+            def item = new Item (type: ItemType.findByName(type), 
+                                 barcode: barcode, 
+                                 location: location)
+            cellSourceService.updateItem(cellSourceId, item)
+            render ""
+        } catch (CellSourceException e) {
+            render ([message: e.message] as JSON)
+        }
+        
+        return
+    }
 }
 
 @grails.validation.Validateable

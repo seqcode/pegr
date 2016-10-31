@@ -34,7 +34,7 @@
                     <tr>
                         <input type="hidden" name="cellSourceId" value="${cellSource.id}" class="cellSourceId">
                         <td>${cellSource.strain?.species}</td>
-                        <th>${cellSource.strain?.parent}</th>
+                        <td>${cellSource.strain?.parent}</td>
                         <td><g:link controller="cellSource" action="show" params="[id:cellSource.id]">${cellSource.strain}</g:link></td>
                         <td class="barcode item"><span class="value">${cellSource.item?.barcode}</span></td>
                         <td class="type item"><span class="value">${cellSource.item?.type}</span></td>

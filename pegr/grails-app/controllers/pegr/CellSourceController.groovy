@@ -13,7 +13,7 @@ class CellSourceController {
     
     def list(Integer max) {
         def itemTypes = ItemType.list(sort: "name")
-        
+        def strains = Strain.executeQuery("select distinct name from Strain where name is not null order by name")
         params.max = Math.min(max ?: 15, 100)
         def strainName = params.strain
         def c = CellSource.createCriteria()
@@ -29,7 +29,7 @@ class CellSourceController {
         }
         def category = ItemTypeCategory.findByName(CELL_STOCK)
 
-        [cellSources: cellSources, categoryId: category.id, itemTypes: itemTypes]
+        [cellSources: cellSources, categoryId: category.id, itemTypes: itemTypes, strains: strains]
     }
     
     def show(Integer id) {

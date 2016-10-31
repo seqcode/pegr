@@ -21,10 +21,14 @@ class ItemController {
         }
         def category = ItemTypeCategory.get(categoryId)
         def itemTypes = ItemType.list(sort: "name")
-        switch (category.superCategory) {
-            case ItemTypeSuperCategory.ANTIBODY:
+        switch (category.name) {
+            case "Antibody":
                 flash.message = flash.message
                 redirect(controller: "antibody", action: "list", params: params)
+                break
+            case "Cell Stock":
+                flash.message = flash.message
+                redirect(controller: "cellSource", action: "list", params: params)
                 break
             default:
                 def items = Item.where { type.category.id == categoryId }
@@ -259,6 +263,11 @@ class ItemController {
     def saveProjectAjax(Long itemId, Long projectId) {
         itemService.saveProject(itemId, projectId)
         render ""
+    }
+    
+    def generateBarcodeList() {
+        def barcodeList = barcodeService.generateBarcodeList(80)
+        [barcodeList: barcodeList]
     }
 }
 

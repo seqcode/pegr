@@ -9,6 +9,34 @@ class CellSourceController {
 	def utilityService
     def itemService
     
+    final String CELL_STOCK = "Cell Stock"
+    
+    def list(Integer max) {
+        def itemTypes = ItemType.list(sort: "name")
+        def strains = Strain.executeQuery("select distinct name from Strain where name is not null order by name")
+        params.max = Math.min(max ?: 15, 100)
+        def strainName = params.strain
+        def c = CellSource.createCriteria()
+        def cellSources = c.list(params) {
+            and {
+                if (strainName) {
+                    strain {
+                        eq "name", strainName
+                    }
+                }
+                eq "status", DictionaryStatus.Y
+            }
+        }
+        def category = ItemTypeCategory.findByName(CELL_STOCK)
+
+        [cellSources: cellSources, categoryId: category.id, itemTypes: itemTypes, strains: strains]
+    }
+    
+    def show(Integer id) {
+        def cellSource = CellSource.get(id)
+        [cellSource: cellSource]
+    }
+    
     def save(Item item, CellSourceCommand cmd) {
         withForm {
             try {
@@ -71,7 +99,7 @@ class CellSourceController {
     }
     
     def batchCreate() {
-        def category = ItemTypeCategory.findByName("Cell Stock")
+        def category = ItemTypeCategory.findByName(CELL_STOCK)
         if (category) {
             [categoryId: category.id]
         } else {
@@ -80,7 +108,7 @@ class CellSourceController {
     }
     
     def batchSave(CellStockBatchCommand cmd) {
-        def categoryId = ItemTypeCategory.findByName("Cell Stock")?.id
+        def categoryId = ItemTypeCategory.findByName(CELL_STOCK)?.id
         try {
             cellSourceService.batchSave(cmd.items, cmd.cellSources)
         } catch(CellSourceException e) {
@@ -124,7 +152,47 @@ class CellSourceController {
         def mutations = Strain.executeQuery("select distinct s.geneticModification from Strain s where s.name = ? and s.genotype = ?", [strainName, genotype])
         render utilityService.stringToSelect2Data(mutations) as JSON
     }
-
+    
+    def editBarcode(Long cellSourceId) {
+        def cellSource = CellSource.get(cellSourceId)
+        if (cellSource) {        
+            if (request.method == "POST") {
+                withForm {
+                    def item = new Item(params)
+                    try {
+                        cellSourceService.updateItem(cellSourceId, item)
+                        itemService.updateCustomizedFields(cellSource.item, params)
+                        flash.message = "Barcode edited!"
+                        redirect(action: "show", id: cellSourceId)
+                    }catch(CellSourceException e) {
+                        request.message = e.message
+                        render(view: "editBarcode", model: [item:item, cellSourceId: cellSourceId])
+                    }                    
+                }
+            } else {
+                def types = ItemType.where {category.name == CELL_STOCK}.list()
+                def item = cellSource.item
+                if (!item) {
+                    item = new Item(name: cellSource.strain?.name)
+                }                
+                [item:item, types: types, cellSourceId: cellSourceId]
+            }
+        } else {
+            flash.message = "Cell stock not found!"
+            redirect(action: 'list')
+        }
+    }
+    
+    def delete(Long cellSourceId) {
+        try {
+            cellSourceService.delete(cellSourceId)
+            flash.message = "Cell stock deleted!"
+            redirect(action: 'list')
+        } catch(CellSourceException e) {
+            flash.message = e.message
+            redirect(action: "show", id: cellSourceId)
+        }
+    }
 }
 
 @grails.validation.Validateable

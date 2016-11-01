@@ -11,20 +11,20 @@
         <thead>
             <tr>
                 <th>Summary Report</th>
-                <g:sortableColumn property="cohort.run" title="Sequnece Run"></g:sortableColumn>
-                <g:sortableColumn property="cohort.project" title="Project"></g:sortableColumn> 
-                <g:sortableColumn property="status" title="Status"></g:sortableColumn> 
-                <g:sortableColumn property="date" title="Date"></g:sortableColumn> 
+                <g:sortableColumn property="run" title="Sequnece Run"></g:sortableColumn>
+                <g:sortableColumn property="project" title="Project"></g:sortableColumn> 
+                <th>Status</th>
+                <th>Date</th>
             </tr>
         </thead>
         <tbody>
-            <g:each in="${reports}" var="report">
+            <g:each in="${cohorts}" var="cohort">
                 <tr>
-                    <td><strong><g:link action="show" id="${report.id}">${report.name}</g:link></strong></td>
-                    <td><g:link controller="sequenceRun" action="show" id="${report.cohort?.run?.id}">Run#${report.cohort?.run?.id}</g:link></td>
-                    <td><g:link controller="project" action="show" id="${report?.cohort?.project?.id}">${report.cohort?.project?.name}</g:link></td>     
-                    <td>${report.status}</td>
-                    <td>${report.date}</td>
+                    <td><strong><g:link action="show" id="${cohort.report?.id}">${cohort.report?.name}</g:link></strong></td>
+                    <td><g:link controller="sequenceRun" action="show" id="${cohort?.run?.id}">Run#${cohort.run?.id}</g:link></td>
+                    <td><g:link controller="project" action="show" id="${cohort?.project?.id}">${cohort.project?.name}</g:link></td>
+                    <td>${cohort.report?.status}</td>
+                    <td>${cohort.report?.date}</td>
                 </tr>
             </g:each>              
         </tbody>

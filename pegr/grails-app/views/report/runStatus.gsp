@@ -335,9 +335,22 @@
             });
         }
         
-        function togglePreferredAlignment(alignmentId) {
-            $.ajax({ url: "/pegr/report/togglePreferredAlignment?alignmentId=" + alignmentId });            
-        }
+        $(".prefer").on("click", function() {
+            var $td = $(this).closest("td");
+            var alignmentId = $td.find(".alignmentId").text();
+            $.ajax({ url: "/pegr/report/togglePreferredAlignment?alignmentId=" + alignmentId,
+                error: function(xhr, ajaxOptions, thrownError) {
+                    var $checkbox = $td.find(".prefer");
+                    if ($checkbox.is(":checked")) {
+                        $checkbox.prop("checked", false);
+                    } else {
+                        $checkbox.prop("checked", true);
+                    }
+                    $checkbox.checked = !$checkbox.checked;
+                    alert("Error");
+                }
+            });            
+        });
     </script>
 </body>
 </html>

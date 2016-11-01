@@ -81,10 +81,10 @@ class ReportController {
 
     def automatedReportList(Integer max) {
         params.max = Math.min(max ?: 25, 100)
-        def query = SummaryReport.where { type == ReportType.AUTOMATED }
-        def reports = query.list(params)
+        def query = SequencingCohort.where {report != null}
+        def cohorts = query.list(params)
         def totalCount = query.count()
-        [reports: reports, totalCount: totalCount]
+        [cohorts: cohorts, totalCount: totalCount]
     }
     
     def show(Long id) {

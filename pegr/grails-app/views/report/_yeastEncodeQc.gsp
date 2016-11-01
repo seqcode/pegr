@@ -1,12 +1,17 @@
 <table id="yeast" class="table table-bordered">
     <thead>
         <tr>
-            <th>Sample ID</th>
-            <th>Target</th>
-            <g:each in="${qcSettings.yeast}" var="setting">
-                <th class="text-right ${setting.key}" style="white-space:normal">${setting.name}</th>
+            <th rowspan="2">Sample ID</th>
+            <th rowspan="2">Target</th>
+            <g:each in="${headers.yeast}" var="header">
+                <th class="text-right" style="white-space:normal" rowspan="${header.rowspan}" colspan="${header.colspan}">${header.name}</th>
             </g:each>
-            <th>Recommend</th>
+            <th rowspan="2">Recommend</th>
+        </tr>
+        <tr>
+            <g:each in="${subheaders.yeast}" var="subheader">
+                <th class="text-right" style="white-space:normal">${subheader}</th>
+            </g:each>
         </tr>
     </thead>
     <tbody>

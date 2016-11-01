@@ -139,9 +139,18 @@ update analysis set step_id = "0aa12b4dd1c7377c" where step_id = "d7d628a9f90767
 update analysis set step_id = "bedb169f660c8511" where step_id = "dc4c8daf8486f4bf" and alignment_id in (1140, 1141);
 */
 
-
+/*
 update pipeline set steps = '[["input_dataset_r1_output_stats","fastqRead1"],["fastqc_output_stats","fastqc"],["bwa_mem_output_stats_single","bwaMem"],["samtool_filter2_output_stats","samtoolFilter"],["bam_to_scidx_output_stats","bamToScidx"],["genetrack_output_stats","genetrack"],["bedtools_intersectbed_output_stats","bedtoolsIntersect"],["cwpair2_output_stats","cwpair2"],["extract_genomic_dna_output_stats","extractGenomicDNA"],["extract_genomic_dna_output_stats2","extractGenomicDNA"],["repeatmasker_wrapper_output_stats","repeatMasker"],["repeatmasker_wrapper_output_stats2","repeatMasker"],["meme_meme_output_stats","meme"],["meme_fimo_output_stats","fimo"],["extract_genomic_dna_output_stats3","extractGenomicDNA"],["fasta_nucleotide_color_plot_output_stats","fourColorPlot"],["tag_pileup_frequency_output_stats","tagPileup"]]' where id = 3; 
 
 
 
 update pipeline set steps = '[["input_dataset_r1_output_stats","fastqRead1"],["input_dataset_r2_output_stats","fastqRead2"],["fastqc_output_stats","fastqc"],["fastqc_output_stats2","fastqc"],["mark_duplicates_bam_output_stats","markDuplicates"],["samtool_filter2_output_stats","samtoolFilter"],["pe_histogram_output_stats","peHistogram"],["bam_to_scidx_output_stats","bamToScidx"],["genetrack_output_stats","genetrack"],["bedtools_intersectbed_output_stats","bedtoolsIntersect"],["cwpair2_output_stats","cwpair2"],["extract_genomic_dna_output_stats","extractGenomicDNA"],["extract_genomic_dna_output_stats2","extractGenomicDNA"],["repeatmasker_wrapper_output_stats","repeatMasker"],["repeatmasker_wrapper_output_stats2","repeatMasker"],["meme_meme_output_stats","meme"],["meme_fimo_output_stats","fimo"],["extract_genomic_dna_output_stats3","extractGenomicDNA"],["fasta_nucleotide_color_plot_output_stats","fourColorPlot"],["tag_pileup_frequency_output_stats","tagPileup"]]' where id = 2;
+*/
+
+insert into chores (version, name, value) values(0, "YEAST_QC_SETTINGS_META", '["group", "key", "name", "numFormat"]');
+
+insert into chores (version, name, value) values(0, "QC_SETTINGS_META", '["key", "name", "numFormat", "min", "max", "reference_min", "reference_min_ratio", "reference_max", "reference_max_ratio"]');
+
+insert into chores (version, name, value) values (0, "DYNAMIC_ANALYSIS_STEPS", '["multiGPS","significanceTester","stamp","nucleosomeEnrichmentProfiler","pointEnrichmentTester","tableLookup","memER", "tapTagID"]');
+
+update chores set value = '[{"group":"Tag Tag","key":"detectedTapTag","name":"Detected"},{"group":"Tag Tag","key":"detectedTagCount","name":"Detected Count"},{"group":"Tag Tag","key":"otherTapTag","name":"Other"},{"group":"Tag Tag","key":"otherTagCount","name":"Other Count"},{"key":"dedupUniquelyMappedReads","name":"Deduplicated","numFormat":"###,###,###"},{"key":"mappedPct","name":"Mappability","numFormat":"#0.##%"},{"key":"adapterDimerPct","name":"Adapter Dimer","numFormat":"#0.##%"},{"key":"duplicationLevel","name":"Duplication Level","numFormat":"#0.##%"},{"key":"multiGPS","name":"multiGPS"},{"key":"sigPeakPairs","name":"Significant PeakPairs","numFormat":"###,###,###"},{"key":"memER","name":"Motif Consensus"},{"key":"roc","name":"Motif ROC"},{"key":"stamp","name":"Motif Match"},{"key":"enrichedSegments","name":"Enriched Segments"},{"key":"nucleosomeEnrichment","name":"Nucleosome Enrichment"},{"key":"go","name":"Gene Ontology"},{"key":"polIILevel","name":"Pol II"},{"key":"exprsLevel","name":"Expression"}]' where id = __; // 6. YEAST_QC_SETTINGS

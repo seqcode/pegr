@@ -18,6 +18,7 @@ class ReportService {
     final Map QC_SETTINGS = ['general': "QC_SETTINGS", 'yeast': "YEAST_QC_SETTINGS"]
     final String PURGE_ALIGNMENTS_CONFIG = "PurgeAlignmentsConfig"
     final String GALAXY_CONFIG = "GalaxyConfig"
+    final String DYNAMIC_ANALYSIS_STEPS = "DYNAMIC_ANALYSIS_STEPS"
     
    /**
     * Fetch the status of the sequence run
@@ -165,20 +166,27 @@ class ReportService {
                     isPreferred: alignment.isPreferred,            
                     dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads
                 ]
-        analysis.each {
-            if (it.category in ["multiGPS", "significanceTester", "stamp", "nucleosomeEnrichmentProfiler", "pointEnrichmentTester", "tableLookup", "memER"]) {
-                def statistics = utilityService.parseJson(it.statistics)
-                if (statistics) {
-                    statistics[0].each { key, value ->
-                        if (value != null) {
-                            dto[key] = value
+        def stepsStr = Chores.findByName(DYNAMIC_ANALYSIS_STEPS)?.value
+        def steps
+        if (stepsStr) {
+            steps = utilityService.parseJson(stepsStr)
+        }
+        if (steps && steps.size() > 0) {
+            analysis.each {
+                if (it.step in steps) {
+                    def statistics = utilityService.parseJson(it.statistics)
+                    if (statistics) {
+                        statistics[0].each { key, value ->
+                            if (value != null) {
+                                dto[key] = value
+                            }
                         }
                     }
-                }
-                
-                def datasets = utilityService.parseJson(it.datasets)
-                if (datasets) {
-                    dto[it.category] = datasets[0].uri
+
+                    def datasets = utilityService.parseJson(it.datasets)
+                    if (datasets) {
+                        dto[it.step] = datasets[0].uri
+                    }
                 }
             }
         }
@@ -193,13 +201,16 @@ class ReportService {
     def getQcSettings() {
         // get the QC settings
         def qcSettings = [:]
+        def meta = [:]
         QC_SETTINGS.each { key, value ->
             qcSettings[key] = utilityService.parseJson(Chores.findByName(value)?.value)
             if (!qcSettings[key]) {
                 qcSettings[key] = [[:]]
             }
+            def metaName = value + "_META"
+            meta[key] = utilityService.parseJson(Chores.findByName(metaName)?.value)
         }
-        return qcSettings
+        return [qcSettings:qcSettings, meta:meta]
     }
     
    /**
@@ -837,7 +848,12 @@ class ReportService {
     */
     @Transactional
     def saveQcSettings(def params) {
-        def fields = ["key", "name", "numFormat", "min", "max", "reference_min", "reference_min_ratio", "reference_max", "reference_max_ratio"]
+        def meta = Chores.findByName( QC_SETTINGS[params.type] + "_META")?.value
+        if (!meta) {
+            throw new ReportException(message: "Meta fields are not defined!")
+        }
+        def fields = utilityService.parseJson(meta)
+
         def lists = []
         
         fields.each { field ->

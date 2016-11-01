@@ -12,11 +12,8 @@
                 background-color: #FFD4CC;
             }
         </style>
-        <script type="text/javascript" >
-            var changingHash=false;
-        </script>
     </head>
-    <body onhashchange="getBarcode()">
+    <body>
         <h4>Create <a href="#" onclick="refreshHash();" class="pull-right edit"><span class="glyphicon glyphicon-refresh"></span> Clear Barcode</a></h4>
         <g:form controller="cellSource" action="batchSave" method="post">
     <div class="table-responsive">
@@ -24,11 +21,6 @@
             <thead>
                 <tr>
                     <th></th>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Barcode</th>
-                    <th>Location</th>
-                    <th>Notes</th>
                     <th>Genus</th>
                     <th>Species</th>
                     <th>Parent Strain</th>
@@ -47,16 +39,6 @@
             <tbody>
                 <tr id="tr0">
                     <td><a href="#" class="removeRow"><span class="glyphicon glyphicon-trash"></span></a></td>
-                    <td><input name="items[0].name"></td>
-                    <td><g:select name="items[0].type.id" from="${pegr.ItemType.where{category.id == categoryId}.list()}" optionKey="id" noSelection="['':'']" class="no-tag-select2" style="width: 180px"></g:select></td>
-                    <td>
-                        <input name="items[0].barcode" size="8">
-                        <span onclick="addScan(this);" type="button">
-                            <span class="glyphicon glyphicon-qrcode"></span>
-                        </span>
-                    </td>
-                    <td><input name="items[0].location"></td>
-                    <td><g:textField name="items[0].notes" style="width: 300px"></g:textField></td>
                     <td>
                         <select class="genus tag-select2" name="cellSources[0].genus" style="width: 150px" required>
                             <option></option>
@@ -325,27 +307,6 @@
 
         return false;
     });
-    
-    function addScan(elmnt) {
-        // pre-scan
-        $(elmnt).parent().find("input").attr("id", "barcode");
-        // scan
-        getScan();
-    }
-    
-    function getBarcode() {
-        // post-scan
-        if(!changingHash){
-            changingHash=true;
-            var hash=window.location.hash.substr(1);
-            $('#barcode').val(unescape(hash));  
-            changingHash=false;
-            $('#barcode').removeAttr("id");
-            location.hash = "";
-        }else{
-            //Do something with barcode here
-        }
-    }
         </script>
     </body>
 </html>

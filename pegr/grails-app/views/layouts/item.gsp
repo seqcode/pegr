@@ -4,6 +4,11 @@
 <head>
   <title>PEGR - Protocols <g:layoutTitle/></title>
   <g:layoutHead/>
+    <style>
+        .btn {
+            padding: 0 5px;
+        }
+    </style>
 </head>
 <body onhashchange="${pageProperty(name:'body.onhashchange')}">
     <div class="container-fluid">    

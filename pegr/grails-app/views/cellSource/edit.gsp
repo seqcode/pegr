@@ -19,7 +19,7 @@
         <g:hiddenField name="itemId" value="${cellSource?.itemId}"></g:hiddenField>
         <g:render template="form" model="['cellSource': cellSource]"></g:render>
         <g:submitButton class="btn btn-primary" name="save" value="Save"/>
-        <g:link class="btn btn-default" controller="item" action="show" id="${cellSource?.itemId}">Cancel</g:link>
+        <g:link class="btn btn-default" controller="cellSource" action="show" id="${cellSource?.cellSourceId}">Cancel</g:link>
     </g:form>
     <script>
         $("#nav-bench").addClass("active");

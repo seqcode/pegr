@@ -2881,4 +2881,6 @@ databaseChangeLog = {
 	include file: 'addStep.groovy'
 
 	include file: 'addCohortImages.groovy'
+
+	include file: 'addCellSourceStatus.groovy'
 }

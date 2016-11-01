@@ -368,6 +368,9 @@ class SampleService {
         if (!sample) {
             throw new SampleException(message: "Sample not found!")
         }
+        if (!editAuth(sample)) {
+             throw new SampleException(message: "Not authorized!")
+        }
         switch (field) {
             case "target" :
                 def data = utilityService.parseJson(value)

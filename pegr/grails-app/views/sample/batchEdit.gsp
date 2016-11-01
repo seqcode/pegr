@@ -61,7 +61,7 @@
                         <td class="group-input cellNumber"><span class="value">${sample.cellNumber}</span></td>
                         <td class="group-input volume"><span class="value">${sample.volume}</span></td>
                         <td class="group-input requestedTagNumber"><span class="value">${sample.requestedTagNumber}</span></td>
-                        <td class="send"><input type=hidden class="key" value="${sample.sendDataTo?.id}"><span class="value">${sample.sendDataTo}</span></td>
+                        <td class="send"><input type="hidden" class="key" value="${sample.sendDataTo?.id}"><span class="value">${sample.sendDataTo}</span></td>
                     </tr>
                 </g:each>
             </tbody>
@@ -155,6 +155,9 @@
                     tr.find(".group-target .input").remove();
                     tr.find(".group-target .cancel-target").remove();
                     tr.find(".group-target .save").remove();
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(xhr.responseText);
                 }
             })
         });
@@ -185,7 +188,11 @@
                     tr.find(".index-sequence .value").text(s);
                     tr.find(".index-id .value").text(id);
                     toggleTd(td);
-            }});
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(xhr.responseText);
+                }
+            });
         });
         
         $("td.genomes").on("click", ".value", function() {
@@ -229,7 +236,11 @@
                     }  
                     td.find(".value").text(s);
                     toggleTd(td);
-            }});
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(xhr.responseText);
+                }
+            });
         });
         
         $("td.growthMedia").on("click", ".value", function(){
@@ -264,7 +275,11 @@
                     }
                     td.find(".value").text(s);
                     toggleTd(td);
-            }});
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(xhr.responseText);
+                }
+            });
         });
         
         $("td.treatments").on("click", ".value", function() {
@@ -299,7 +314,11 @@
                     }
                     td.find(".value").text(s);
                     toggleTd(td);
-            }});
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(xhr.responseText);
+                }
+            });
         });
         
         $("td.group-input .value").click(function() {
@@ -331,7 +350,11 @@
                     }
                     td.find(".value").text(s);
                     toggleTd(td);
-            }});
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(xhr.responseText);
+                }
+            });
         });
         
         $("td.send").on("click", ".value", function(){
@@ -369,7 +392,11 @@
                         td.find(".key").val(value);
                     }
                     toggleTd(td);
-            }});
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(xhr.responseText);
+                }
+            });
         });
     </script>
 </body>

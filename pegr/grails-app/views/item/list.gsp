@@ -11,11 +11,7 @@
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
-    <h4>${currentCategory?.name}
-        <g:if test="${currentCategory?.name == 'Cell Stock'}">
-            <g:link controller="cellSource" action="batchCreate" class="edit">Batch Create</g:link>
-        </g:if>
-    </h4>
+    <h4>${currentCategory?.name}</h4>
     <div class="table-responsive">
         <table class="table table-bordered">
             <thead>

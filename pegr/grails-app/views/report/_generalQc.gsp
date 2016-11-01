@@ -98,8 +98,9 @@
                     </td>
                     </g:each>
                     <td class="col-prefer group-operation">
+                        <span class="alignmentId" style="display:none">${alignment.alignmentId}</span> 
                         <label class="switch">
-                            <input class="prefer" type="checkbox" onclick="togglePreferredAlignment(${alignment.alignmentId})" <g:if test="${alignment.isPreferred}">checked</g:if>>
+                            <input class="prefer" type="checkbox" <g:if test="${alignment.isPreferred}">checked</g:if>>
                             <div class="slider round"></div>
                         </label>
                     </td>

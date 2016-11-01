@@ -111,7 +111,7 @@ class ApiController {
         if (apiUser) {
             if (query.runId) {
                 try {
-                    def preferredOnly = query.preferredOnly ?: true
+                    def preferredOnly = query.preferredOnly
                     data = reportService.fetchDataForRun(query.runId, preferredOnly)       
                     code = 200
                     message = "Success fetching data from Run ${query.runId}!"

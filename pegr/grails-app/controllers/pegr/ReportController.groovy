@@ -47,11 +47,34 @@ class ReportController {
         } else {
             try {
                 def runStatus = reportService.fetchRunStatus(run)
-                def qcSettings = reportService.getQcSettings()
+                def qcSettings = reportService.getQcSettings()?.qcSettings
+                def headers = [:]
+                def subheaders = [:]
+                def priorGroup
+                if (qcSettings.yeast) {
+                    headers["yeast"] = []
+                    subheaders["yeast"] = []
+                    qcSettings.yeast.each { setting ->
+                        if (setting.group) {
+                            subheaders.yeast.push(setting.name)
+                            if (!priorGroup || setting.group != priorGroup) {
+                                headers.yeast.push([name: setting.group, rowspan: 1, colspan: 1])
+                                priorGroup = setting.group
+                            } else {
+                                headers.yeast.last().colspan++
+                            }
+                        } else {
+                            headers.yeast.push([name: setting.name, rowspan: 2, colspan: 1])
+                        }
+                    }
+                }
                 [runStatus: runStatus.results, 
                  noResultSamples: runStatus.noResultSamples, 
                  qcSettings: qcSettings,
-                 run: run]
+                 run: run,
+                 headers: headers,
+                 subheaders: subheaders
+                ]
             } catch (ReportException e) {
                 flash.message = e.message
                 redirect(action: "analysisStatus")
@@ -81,10 +104,10 @@ class ReportController {
 
     def automatedReportList(Integer max) {
         params.max = Math.min(max ?: 25, 100)
-        def query = SummaryReport.where { type == ReportType.AUTOMATED }
-        def reports = query.list(params)
+        def query = SequencingCohort.where {report != null}
+        def cohorts = query.list(params)
         def totalCount = query.count()
-        [reports: reports, totalCount: totalCount]
+        [cohorts: cohorts, totalCount: totalCount]
     }
     
     def show(Long id) {
@@ -133,12 +156,11 @@ class ReportController {
     
     def manage() {
         // get QC settings
-        def qcSettings = reportService.getQcSettings()
-        
+        def results = reportService.getQcSettings()
         // get the purge alignments configs for the last time
         def purgeConfigStr = Chores.findByName(reportService.PURGE_ALIGNMENTS_CONFIG)?.value
         def purgeConfig = utilityService.parseJson(purgeConfigStr)
-        [qcSettings: qcSettings, purgeConfig: purgeConfig]        
+        [qcSettings: results.qcSettings, meta: results.meta, purgeConfig: purgeConfig]        
     }
     
     def saveQcSettings() {

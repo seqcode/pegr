@@ -28,30 +28,22 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th>key</th>
-                        <th>name</th>
-                        <th>format</th>
-                        <th>min</th>
-                        <th>max</th>
-                        <th>reference min</th>
-                        <th>ref. min ratio</th>
-                        <th>reference max</th>
-                        <th>ref. max ratio</th>
+                        <th></th>
+                        <th></th>
+                        <g:each in="${meta.general}" var="field">
+                            <th>${field}</th>
+                        </g:each>
                     </tr>
                 </thead>
                 <tbody>
-                    <g:each in="${qcSettings.general}">
+                    <g:each in="${qcSettings.general}" var="setting">
                         <tr>
                             <td><span class="glyphicon glyphicon-trash"></span></td>
-                            <td><input name="key" value="${it.key}"></input></td>
-                            <td><input name="name" value="${it.name}"></input></td>
-                            <td><input name="numFormat" value="${it.numFormat}" size="12"></input></td>
-                            <td><input name="min" value="${it.min}" size="10"></input></td>
-                            <td><input name="max" value="${it.max}" size="10"></input></td>
-                            <td><input name="reference_min" value="${it.reference_min}"></input></td>
-                            <td><input name="reference_min_ratio" value="${it.reference_min_ratio}" size="10"></input></td>
-                            <td><input name="reference_max" value="${it.reference_max}"></input></td>
-                            <td><input name="reference_max_ratio" value="${it.reference_max_ratio}" size="10"></input></td>
+                            <td><span class="glyphicon glyphicon-arrow-up"></span></td>
+                            <td><span class="glyphicon glyphicon-arrow-down"></span></td>
+                            <g:each in="${meta.general}" var="field">
+                                <td><input name="${field}" value="${setting[field]}"</td>
+                            </g:each>
                         </tr>
                     </g:each>                
                 </tbody>
@@ -71,30 +63,22 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th>key</th>
-                        <th>name</th>
-                        <th>format</th>
-                        <th>min</th>
-                        <th>max</th>
-                        <th>reference min</th>
-                        <th>ref. min ratio</th>
-                        <th>reference max</th>
-                        <th>ref. max ratio</th>
+                        <th></th>
+                        <th></th>
+                        <g:each in="${meta.yeast}" var="field">
+                            <th>${field}</th>
+                        </g:each>
                     </tr>
                 </thead>
                 <tbody>
-                    <g:each in="${qcSettings.yeast}">
+                    <g:each in="${qcSettings.yeast}" var="setting">
                         <tr>
                             <td><span class="glyphicon glyphicon-trash"></span></td>
-                            <td><input name="key" value="${it.key}"></input></td>
-                            <td><input name="name" value="${it.name}"></input></td>
-                            <td><input name="numFormat" value="${it.numFormat}" size="12"></input></td>
-                            <td><input name="min" value="${it.min}" size="10"></input></td>
-                            <td><input name="max" value="${it.max}" size="10"></input></td>
-                            <td><input name="reference_min" value="${it.reference_min}"></input></td>
-                            <td><input name="reference_min_ratio" value="${it.reference_min_ratio}" size="10"></input></td>
-                            <td><input name="reference_max" value="${it.reference_max}"></input></td>
-                            <td><input name="reference_max_ratio" value="${it.reference_max_ratio}" size="10"></input></td>
+                            <td><span class="glyphicon glyphicon-arrow-up"></span></td>
+                            <td><span class="glyphicon glyphicon-arrow-down"></span></td>
+                            <g:each in="${meta.yeast}" var="field">
+                                <td><input name="${field}" value="${setting[field]}"</td>
+                            </g:each>
                         </tr>
                     </g:each>                
                 </tbody>
@@ -150,6 +134,16 @@
                 });
                 return false;
             }
+            
+            $(".glyphicon-arrow-up").on("click", function(){
+                var tr = $(this).closest("tr");
+                tr.insertBefore(tr.prev());
+            });
+            
+            $(".glyphicon-arrow-down").on("click", function(){
+                var tr = $(this).closest("tr");
+                tr.insertAfter(tr.next());
+            });
         </script>
     </body>
 </html>

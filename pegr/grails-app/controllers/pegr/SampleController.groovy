@@ -406,7 +406,12 @@ class SampleController {
     }
     
     def updateAjax(Long sampleId, String name, String value) {
-        def result = sampleService.update(sampleId, name, value)
-        render result as JSON
+        try {
+            def result = sampleService.update(sampleId, name, value)
+            render result as JSON
+        } catch (SampleException e) {
+            render (status: 500, text: e.message)
+        }
+
     }
 }

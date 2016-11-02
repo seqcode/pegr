@@ -57,33 +57,33 @@
         if ( target == "NOTAG" || target == "NOTARGET") {
             recommend = "";
         } else {
-            if (v.dedupUniqReads < 200000) {
-                if ((v.mappedReadPct > 0.5) && (v.adapterDimerPct < 0.15) && (v.duplicLevel < 0.7)) {
+            if (parseFloat(v.dedupUniquelyMappedReads.replace(/,/g, "")) < 200000) {
+                if ((parseFloat(v.mappedPct) > 0.5) && (parseFloat(v.adapterDimerPct) < 0.15) && (parseFloat(v.duplicationLevel) < 0.7)) {
                     recommend="<span class='label label-danger'>Re-sequence<span>"; // dedup
-                    $(this).find(".dedupUniqReads").addClass("bg-danger");
+                    $(this).find(".dedupUniquelyMappedReads").addClass("bg-danger");
                 } else {
                     if (v.go != "") {
                         recommend="<span class='label label-warning'>Done; stress gene</span>"; // go
                         $(this).find(".go").addClass("bg-danger");
-                    } else if((v.polIILevel < 0.1) && (v.exprsLevel < 0.1)) {
+                    } else if((parseFloat(v.polIILevel) < 0.1) && (parseFloat(v.exprsLevel) < 0.1)) {
                         recommend="<span class='label label-warning'>Done; low exprs<span>"; // polII & expression
                         $(this).find(".polIILevel").addClass("bg-danger");
                         $(this).find(".exprsLevel").addClass("bg-danger");
                     } else {
                         recommend="<span class='label label-danger'>re-ChIP</span>"; // dedup & mapped& adapter& duplic
-                        $(this).find(".dedupUniqReads").addClass("bg-danger");
-                        $(this).find(".mappedReadPct").addClass("bg-danger");
+                        $(this).find(".dedupUniquelyMappedReads").addClass("bg-danger");
+                        $(this).find(".mappedPct").addClass("bg-danger");
                         $(this).find(".adapterDimerPct").addClass("bg-danger");
-                        $(this).find(".duplicLevel").addClass("bg-danger");
+                        $(this).find(".duplicationLevel").addClass("bg-danger");
                     }
                 }
             } else {
-                if ((v.stamp =="Yes") || (v.multiGPS > 25) || (v.peakPairs > 50) || (v.nucleosomeEnrichment > 1.5) || (v.enrichedSegments != "")) {
+                if ((v.stamp =="Yes") || (parseFloat(v.multiGPS) > 25) || (parseFloat(v.sigPeakPairs.replace(/,/g, "")) > 50) || (parseFloat(v.nucleosomeEnrichment) > 1.5) || (v.enrichedSegments != "")) {
                     recommend="<span class='label label-success'>Done; success</span>"; 
                 } else if (v.go != "") {
                     recommend="<span class='label label-warning'>Done; stress gene</span>"; //go
                     $(this).find(".go").addClass("bg-danger");
-                } else if (v.polIILevel < 0.1 && v.exprsLevel < 0.1) {
+                } else if (parseFloat(v.polIILevel) < 0.1 && parseFloat(v.exprsLevel) < 0.1) {
                     recommend="<span class='label label-warning'>Done; low exprs</span>"; // pol II exprs
                     $(this).find(".polIILevel").addClass("bg-danger");
                     $(this).find(".exprsLevel").addClass("bg-danger");
@@ -91,7 +91,7 @@
                     recommend="<span class='label label-danger'>Done; failed</span>"; // stamp, multiGPS, peakPairs, nucleo
                     $(this).find(".stamp").addClass("bg-danger");
                     $(this).find(".multiGPS").addClass("bg-danger");
-                    $(this).find(".peakPairs").addClass("bg-danger");
+                    $(this).find(".sigPeakPairs").addClass("bg-danger");
                     $(this).find(".nucleosomeEnrichment").addClass("bg-danger");
                 }
             }

@@ -207,6 +207,11 @@ class ReportController {
             }
         }
     }
+    
+    def yeastDecisionTree() {
+        def parameters = [:]
+        [parameters: parameters]
+    }
 }
 
 

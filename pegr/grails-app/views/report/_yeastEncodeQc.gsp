@@ -1,3 +1,4 @@
+<button class="edit pull-right" onclick="window.open('/pegr/report/yeastDecisionTree', 'Yeast Decision Tree', 'width=600,height=400')">Decision Tree</button>
 <table id="yeast" class="table table-bordered">
     <thead>
         <tr>

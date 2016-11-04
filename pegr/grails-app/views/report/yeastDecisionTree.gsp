@@ -1,6 +1,7 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <title>PEGR</title>
     <!-- load the d3.js library -->    	
     <script src="//d3js.org/d3.v4.min.js"></script>
     <style> /* set the CSS */
@@ -30,70 +31,62 @@
 <script>
 	
 var p = {"dedup": 200000,
-         "mapped": 0.5,
-         "adpater": 0.15,
-         "dup": 0.7,
+         "multiGps": 100,
+         "sigPeakPair": 200,
+         "enrich": 1.5,
          "polII": 0.1,
          "exprs": 0.1,
-         "gps": 25,
-         "peakPair": 50,
-         "enrich": 1.5,
+         "mapped": 0.5,
+         "adapter": 0.15,
+         "dup": 0.7,
          "polII2": 0.1,
-         "exprs"
+         "exprs2": 0.1,
         }
     
 var treeData =
   {
-    "name": "NO TAG/TARGET",
+    "name": "Deduplicated Reads > " + p.dedup,
+    "conditions": [{"label":"Dedup < ", "name": "dedup"}],
     "children": [
-      { "flag": "yes", "name": "no recommendation" },
-      { 
-        "flag": "no",
-        "name": "Dedup < 200000",
-		"conditions": [{"label":"Dedup < ", "name": "dedup"}],
-        "children": [
-          { 
-              "flag": "yes",
-              "name": "mapped% > 0.5 && adapterDimer% < 0.15 && duplication% < 0.7",
-              "children": [
-                  { "flag": "yes", "name": "Re-sequence", "color": ""},
-                  { "flag": "no",
-                    "name": "Gene Ontology", 
-                    "children": [
-                        {"flag": "yes", "name": "Done; stress gene"},
-                        {
-                            "flag": "no",
-                            "name": "polII < 0.1 && exprs < 0.1",
-                            "children" : [
-                                {"flag": "yes", "name": "Done; low exprs"},
-                                {"flag": "no", "name": "re-ChIP"}
-                            ]    
-                        }
-                    ]}
-              ]
-          },
-          { 
-              "flag": "no",
-              "name": "Motif Match || multiGPS > 25 || sigPeakPairs > 50 || nucleosomeEnrichment > 1.5 || enrichedSegments",
-              "children": [
-                  { "flag": "yes", "name": "Done; success"},
-                  { "flag": "no", "name": "Gene Ontology", 
-                    "children": [
-                        {"flag": "yes", "name": "Done; stress gene"},
-                        {
-                            "flag": "no",
-                            "name": "polII < 0.1 && exprs < 0.1",
-                            "children" : [
-                                {"flag": "yes", "name": "Done; low exprs"},
-                                {"flag": "no", "name": "Done; failed"}
-                            ]    
-                        }
-                    ]}
-              ]
-          }
-        ]
+        { 
+          "flag": "yes",
+          "name": "Motif Match OR multiGPS > " + p.multiGps + " OR sig.PeakPairs > " + p.sigPeakPair + " OR Nucleosome Enrichment > " + p.enrich + " OR Enriched Segments",
+          "children": [
+              { "flag": "yes", "name": "Done; success"},
+              { "flag": "no", "name": "Stress Gene", 
+                "children": [
+                    {"flag": "yes", "name": "Done; stress gene"},
+                    {
+                        "flag": "no",
+                        "name": "polII < " + p.polII + " AND Expression < " + p.exprs,
+                        "children" : [
+                            {"flag": "yes", "name": "Done; low exprs"},
+                            {"flag": "no", "name": "Done; failed"}
+                        ]    
+                    }
+                ]}
+          ]
       },
-      
+      { 
+          "flag": "no",
+          "name": "Mapped > " + p.mapped + " AND Adapter Dimer < " + p.adapter + " AND Duplication Level < " + p.dup,
+          "children": [
+              { "flag": "yes", "name": "Re-sequence", "color": ""},
+              { "flag": "no",
+                "name": "Stress Gene", 
+                "children": [
+                    {"flag": "yes", "name": "Done; stress gene"},
+                    {
+                        "flag": "no",
+                        "name": "polII < " + p.polII2 + " AND Expression < " + p.exprs2,
+                        "children" : [
+                            {"flag": "yes", "name": "Done; low exprs"},
+                            {"flag": "no", "name": "re-ChIP"}
+                        ]    
+                    }
+                ]}
+          ]
+      }      
     ]
   };
 
@@ -107,8 +100,8 @@ var colors = {"Done; stress gene": "#f0ad4e", // yellow
              }
 
 // set the dimensions and margins of the diagram
-var margin = {top: 10, right: 20, bottom: 50, left: 10},
-    width = 1400 - margin.left - margin.right,
+var margin = {top: 10, right: 10, bottom: 50, left: 10},
+    width = 1700 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
 // declares a tree layout and assigns the size
@@ -172,7 +165,7 @@ var node = svg.selectAll(".node")
       return "node" + 
         (d.children ? " node--internal" : " node--leaf"); })
     .attr("transform", function(d) { 
-      return "translate(" + d.x + "," + (d.y+ 10) + ")"; });
+      return "translate(" + (d.x + 20) + "," + (d.y+ 20) + ")"; });
 
 // adds the text to the node
 node.append("text")

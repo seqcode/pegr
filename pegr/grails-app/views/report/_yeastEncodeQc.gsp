@@ -1,3 +1,4 @@
+<button class="edit pull-right" onclick="window.open('/pegr/report/yeastDecisionTree', 'Yeast Decision Tree', 'width=600,height=400')">Decision Tree</button>
 <table id="yeast" class="table table-bordered">
     <thead>
         <tr>
@@ -57,7 +58,7 @@
         if ( target == "NOTAG" || target == "NOTARGET") {
             recommend = "";
         } else {
-            if (parseFloat(v.dedupUniquelyMappedReads.replace(/,/g, "")) < 200000) {
+            if (parseFloat(v.dedupUniquelyMappedReads.replace(/,/g, "")) <= 200000) {
                 if ((parseFloat(v.mappedPct) > 0.5) && (parseFloat(v.adapterDimerPct) < 0.15) && (parseFloat(v.duplicationLevel) < 0.7)) {
                     recommend="<span class='label label-danger'>Re-sequence<span>"; // dedup
                     $(this).find(".dedupUniquelyMappedReads").addClass("bg-danger");
@@ -78,7 +79,7 @@
                     }
                 }
             } else {
-                if ((v.stamp =="Yes") || (parseFloat(v.multiGPS) > 25) || (parseFloat(v.sigPeakPairs.replace(/,/g, "")) > 50) || (parseFloat(v.nucleosomeEnrichment) > 1.5) || (v.enrichedSegments != "")) {
+                if ((v.stamp =="Yes") || (parseFloat(v.multiGPS) > 100) || (parseFloat(v.sigPeakPairs.replace(/,/g, "")) > 200) || (parseFloat(v.nucleosomeEnrichment) > 1.5) || (v.enrichedSegments != "")) {
                     recommend="<span class='label label-success'>Done; success</span>"; 
                 } else if (v.go != "") {
                     recommend="<span class='label label-warning'>Done; stress gene</span>"; //go

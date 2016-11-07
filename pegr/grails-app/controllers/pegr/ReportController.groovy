@@ -208,9 +208,20 @@ class ReportController {
         }
     }
     
-    def yeastDecisionTree() {
-        def parameters = [:]
-        [parameters: parameters]
+    def decisionTree(String type) {
+        [type: type]
+    }
+    
+    def getDecisionTreeAjax(String type) {
+        def tree = reportService.getDecisionTree(type)
+        def map = utilityService.parseJson(tree?.value)
+        render (map as JSON)
+        return
+    }
+    
+    def saveDecisionTree(String json, String type) {
+        reportService.saveDecisionTree(json, type)
+        redirect(action: "decisionTree", params: [type: type])
     }
 }
 

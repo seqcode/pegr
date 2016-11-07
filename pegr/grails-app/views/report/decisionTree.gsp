@@ -4,6 +4,7 @@
     <title>PEGR</title>
     <!-- load the d3.js library -->    	
     <script src="//d3js.org/d3.v4.min.js"></script>
+    <asset:javascript src="jquery.js"/>
     <style> /* set the CSS */
         body {
             margin: 0;
@@ -23,82 +24,33 @@
             stroke: none;
             font: 12px sans-serif; 
         }
-        
-        
+        form {
+            margin: 10px;
+        }
+        .alert {
+            color: red;
+            margin: 10px;
+            padding: 10px;
+            border: 2px solid red;
+        }
     </style>
 </head>
 <body>
-<script>
-	
-var p = {"dedup": 200000,
-         "multiGps": 100,
-         "sigPeakPair": 200,
-         "enrich": 1.5,
-         "polII": 0.1,
-         "exprs": 0.1,
-         "mapped": 0.5,
-         "adapter": 0.15,
-         "dup": 0.7,
-         "polII2": 0.1,
-         "exprs2": 0.1,
-        }
+    <div id="tree"></div>
+    <g:if test="${flash.message}"><div class="alert">${flash.message}</div></g:if>
+    <g:form controller="report" action="saveDecisionTree">
+        <input type="hidden" name="type" value="${type}">
+        <textarea name="json" rows="100" cols="200"></textarea>
+        <g:submitButton name="save" value="Save" ></g:submitButton>
+    </g:form>
     
-var treeData =
-  {
-    "name": "Deduplicated Reads > " + p.dedup,
-    "conditions": [{"label":"Dedup < ", "name": "dedup"}],
-    "children": [
-        { 
-          "flag": "yes",
-          "name": "Motif Match OR multiGPS > " + p.multiGps + " OR sig.PeakPairs > " + p.sigPeakPair + " OR Nucleosome Enrichment > " + p.enrich + " OR Enriched Segments",
-          "children": [
-              { "flag": "yes", "name": "Done; success"},
-              { "flag": "no", "name": "Stress Gene", 
-                "children": [
-                    {"flag": "yes", "name": "Done; stress gene"},
-                    {
-                        "flag": "no",
-                        "name": "polII < " + p.polII + " AND Expression < " + p.exprs,
-                        "children" : [
-                            {"flag": "yes", "name": "Done; low exprs"},
-                            {"flag": "no", "name": "Done; failed"}
-                        ]    
-                    }
-                ]}
-          ]
-      },
-      { 
-          "flag": "no",
-          "name": "Mapped > " + p.mapped + " AND Adapter Dimer < " + p.adapter + " AND Duplication Level < " + p.dup,
-          "children": [
-              { "flag": "yes", "name": "Re-sequence", "color": ""},
-              { "flag": "no",
-                "name": "Stress Gene", 
-                "children": [
-                    {"flag": "yes", "name": "Done; stress gene"},
-                    {
-                        "flag": "no",
-                        "name": "polII < " + p.polII2 + " AND Expression < " + p.exprs2,
-                        "children" : [
-                            {"flag": "yes", "name": "Done; low exprs"},
-                            {"flag": "no", "name": "re-ChIP"}
-                        ]    
-                    }
-                ]}
-          ]
-      }      
-    ]
-  };
-
-var colors = {"Done; stress gene": "#f0ad4e", // yellow
-              "Done; low exprs": "#f0ad4e",
-              "re-ChIP": "#d9534f", //red
-              "Re-sequence": "#d9534f", //red
-              "Done; failed": "#d9534f",
-              "Done; success": "#5cb85c", // green 
-              "other": "Gray"
-             }
-
+<script>
+$.ajax({
+    url:"/pegr/report/getDecisionTreeAjax?type=${type}",
+    success: function(result) {
+var settings = result;
+$("textarea").text(JSON.stringify(settings, null, "\t"));
+        
 // set the dimensions and margins of the diagram
 var margin = {top: 10, right: 10, bottom: 50, left: 10},
     width = 1700 - margin.left - margin.right,
@@ -110,7 +62,7 @@ var treemap = d3.tree()
 //    .separation(10);
     
 //  assigns the data to a hierarchy using parent-child relationships
-var nodes = d3.hierarchy(treeData);
+var nodes = d3.hierarchy(settings.treeData);
 
 // maps the node data to the tree layout
 nodes = treemap(nodes);
@@ -118,7 +70,7 @@ nodes = treemap(nodes);
 // append the svg obgect to the body of the page
 // appends a 'group' element to 'svg'
 // moves the 'group' element to the top left margin
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#tree").append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom),
     g = svg.append("g")
@@ -172,7 +124,8 @@ node.append("text")
     .attr("dy", ".35em")
     .attr("y", 0)
     .style("text-anchor", "middle")
-    .text(function(d) { return d.data.name; }).call(getBB);
+    .text(function(d) {return d.data.conditions ? getConditionStr(d.data.conditions, d.data.logic) : d.data.name;})
+    .call(getBB);
     
 // add the background color
 node.insert("rect","text")
@@ -183,7 +136,7 @@ node.insert("rect","text")
         if (d.children) {
             col = "#f2dede"
         } else {
-            col = d.data.name in colors ?  colors[d.data.name] :  colors["other"]
+            col = d.data.name in settings.colors ?  settings.colors[d.data.name] :  settings.colors["other"]
         }
         return col;
     })
@@ -192,12 +145,23 @@ node.insert("rect","text")
         return "translate(" + dx + ", -15)";
     });
     
+}});
+    
 function getBB(selection) {
     selection.each(function(d){
         d.bbox = this.getBBox();
     });
 }
-    
+
+function getConditionStr(conditions, logic) {
+    var strings = [];
+    for (i=0; i< conditions.length; i++){
+        var c = conditions[i];
+        var name = c.name? c.name : c.p;
+        strings.push([name, c.op, c.v].join(" "));    
+    }
+    return strings.join(" " + logic + " ");
+}
 </script>
 </body>
 </html>

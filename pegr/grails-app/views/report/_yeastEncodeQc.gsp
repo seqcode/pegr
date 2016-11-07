@@ -1,4 +1,4 @@
-<button class="edit pull-right" onclick="window.open('/pegr/report/yeastDecisionTree', 'Yeast Decision Tree', 'width=600,height=400')">Decision Tree</button>
+<g:link class="edit pull-right" controller="report" action="decisionTree" params="[type:'YEAST_QC']" target="_blank">Decision Tree</g:link>
 <table id="yeast" class="table table-bordered">
     <thead>
         <tr>
@@ -43,6 +43,12 @@
 </table>
 
 <script>
+    
+$.ajax({
+    url:"/pegr/report/getDecisionTreeAjax?type=YEAST_QC",
+    success: function(result) {
+        var treeData = result.treeData;
+        var colors = result.colors;
     $("#yeast tbody tr").each(function(){
         var v = {};
         $(this).children("td").each(function(index, elem) {
@@ -58,47 +64,12 @@
         if ( target == "NOTAG" || target == "NOTARGET") {
             recommend = "";
         } else {
-            if (parseFloat(v.dedupUniquelyMappedReads.replace(/,/g, "")) <= 200000) {
-                if ((parseFloat(v.mappedPct) > 0.5) && (parseFloat(v.adapterDimerPct) < 0.15) && (parseFloat(v.duplicationLevel) < 0.7)) {
-                    recommend="<span class='label label-danger'>Re-sequence<span>"; // dedup
-                    $(this).find(".dedupUniquelyMappedReads").addClass("bg-danger");
-                } else {
-                    if (v.go != "") {
-                        recommend="<span class='label label-warning'>Done; stress gene</span>"; // go
-                        $(this).find(".go").addClass("bg-danger");
-                    } else if((parseFloat(v.polIILevel) < 0.1) && (parseFloat(v.exprsLevel) < 0.1)) {
-                        recommend="<span class='label label-warning'>Done; low exprs<span>"; // polII & expression
-                        $(this).find(".polIILevel").addClass("bg-danger");
-                        $(this).find(".exprsLevel").addClass("bg-danger");
-                    } else {
-                        recommend="<span class='label label-danger'>re-ChIP</span>"; // dedup & mapped& adapter& duplic
-                        $(this).find(".dedupUniquelyMappedReads").addClass("bg-danger");
-                        $(this).find(".mappedPct").addClass("bg-danger");
-                        $(this).find(".adapterDimerPct").addClass("bg-danger");
-                        $(this).find(".duplicationLevel").addClass("bg-danger");
-                    }
-                }
-            } else {
-                if ((v.stamp =="Yes") || (parseFloat(v.multiGPS) > 100) || (parseFloat(v.sigPeakPairs.replace(/,/g, "")) > 200) || (parseFloat(v.nucleosomeEnrichment) > 1.5) || (v.enrichedSegments != "")) {
-                    recommend="<span class='label label-success'>Done; success</span>"; 
-                } else if (v.go != "") {
-                    recommend="<span class='label label-warning'>Done; stress gene</span>"; //go
-                    $(this).find(".go").addClass("bg-danger");
-                } else if (parseFloat(v.polIILevel) < 0.1 && parseFloat(v.exprsLevel) < 0.1) {
-                    recommend="<span class='label label-warning'>Done; low exprs</span>"; // pol II exprs
-                    $(this).find(".polIILevel").addClass("bg-danger");
-                    $(this).find(".exprsLevel").addClass("bg-danger");
-                } else {
-                    recommend="<span class='label label-danger'>Done; failed</span>"; // stamp, multiGPS, peakPairs, nucleo
-                    $(this).find(".stamp").addClass("bg-danger");
-                    $(this).find(".multiGPS").addClass("bg-danger");
-                    $(this).find(".sigPeakPairs").addClass("bg-danger");
-                    $(this).find(".nucleosomeEnrichment").addClass("bg-danger");
-                }
-            }
+            recommend = getDecision(v, treeData);
         }
-        $(this).find(".recommend").html(recommend);
+        $(this).find(".recommend").html("<span style='padding:.2em .5em;fond-weight:bold;line-height:1;white-space:nowrap;display:inline;color: white; background-color:" + colors[recommend] + "'>" + recommend + "</span>");
+        
     });
+}});
     
     $("td.memER").each(function(index, memeFig){
         var memER = $(memeFig).text().trim();
@@ -111,4 +82,67 @@
             });
         }
     });
+    
+    function getDecision(v, node) {
+        if (node.name) {
+            return node.name
+        } else {
+            var result = decide(v, node);
+            var flag = result ? "yes" : "no";
+            var child
+            for  (var j =0; j < node.children.length; j++) {
+                if (node.children[j].flag == flag) {
+                    child = node.children[j];
+                    break
+                }
+            }
+            return getDecision(v, child);
+        }
+        
+    }
+    
+    function decide(v, node) {
+        var result
+        if (node.logic == "AND") {
+            result = true
+            for (i=0; i<node.conditions.length; ++i) {
+                if (!test(node.conditions[i], v)) {
+                    result = false
+                    break
+                }
+            }
+        } else if (node.logic == "OR") {
+            result = false
+            for (i=0; i<node.conditions.length; ++i) {
+                if (test(node.conditions[i], v)) {
+                    result = true
+                    break
+                }
+            }
+        } else {
+            result = test(node.conditions[0], v);
+        }
+        return result
+    }
+    
+    function test(c, v) {
+        var result = false;
+        var value = v[c.p];
+        if (c.op == ">") {
+            if (value != null) {
+                value = parseFloat(value.replace(/,/g, ""));
+                result = (value > c.v);
+            } 
+        } else if (c.op == "<") {
+            if (value != null) {
+                value = parseFloat(value.replace(/,/g, ""));
+                result = (value < c.v);
+            }
+        } else if (c.op == "=") {
+            result = (value == c.v);
+        } else {
+            result = (value != "");
+        } 
+        return result;
+    }
 </script>

@@ -19,6 +19,7 @@ class ReportService {
     final String PURGE_ALIGNMENTS_CONFIG = "PurgeAlignmentsConfig"
     final String GALAXY_CONFIG = "GalaxyConfig"
     final String DYNAMIC_ANALYSIS_STEPS = "DYNAMIC_ANALYSIS_STEPS"
+    final String DECISION_TREE = "DECISION_TREE"
     
    /**
     * Fetch the status of the sequence run
@@ -942,5 +943,24 @@ class ReportService {
         def timeout = 1000 * 60 * 1 // 1 min
         utilityService.executeCommand(cmd, timeout)
         
+    }
+    
+    def getDecisionTree(String type) {
+        def name = [DECISION_TREE, type].join("_")
+        return Chores.findByName(name)
+    }
+    
+    def saveDecisionTree(String json, String type) {
+        def chore = getDecisionTree(type)
+        if (!chore) {
+            chore = new Chores(name: [DECISION_TREE, type].join("_"))
+        }
+        def map = utilityService.parseJson(json)
+        if (map) {            
+            chore.value = JsonOutput.toJson(map)
+            chore.save()
+        } else {
+            throw new ReportException(message: "Invalid json!")
+        }
     }
 }

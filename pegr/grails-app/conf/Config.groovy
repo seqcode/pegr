@@ -156,6 +156,7 @@ grails.plugin.springsecurity.interceptUrlMap = [
     '/report/deleteReportForCohortAjax/**': ['ROLE_ADMIN'],
     '/report/updateRunStatus/**':           ['ROLE_ADMIN'],
     '/report/manage/**':            ['ROLE_ADMIN'],
+    '/report/saveDecisionTree/**':          ['ROLE_ADMIN'],
     '/report/saveQcSettings/**':            ['ROLE_ADMIN'],
     '/report/togglePreferredAlignment/**':  ['ROLE_ADMIN'],
     '/report/updateReportStatus/**':        ['ROLE_ADMIN'],

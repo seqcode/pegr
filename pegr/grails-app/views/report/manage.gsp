@@ -53,6 +53,7 @@
             </g:form>
         </div>
         <div id="yeast-qc-settings" class="tab-pane fade">            
+            <g:link controller="report" action="decisionTree" params="[type:'YEAST_QC']" class="btn btn-primary">Decision Tree</g:link>
             <button class="add pull-right edit">Add Row</button>
             <g:if test="${flash.message}">
                 <div class="message">${flash.message}</div>

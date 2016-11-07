@@ -67,12 +67,17 @@ class ProtocolService {
     
     def getProtocolFile(Long protocolId) {
         def folder = getProtocolFolder()
-        return new File(folder, "protocol${protocolId}.pdf") 
+        def protocol = Protocol.get(protocolId)
+        if (protocol?.file) {
+            return new File(folder, protocol?.file) 
+        } else {
+            return null
+        }
     }
     
+    @Transactional
     void uploadFile(MultipartHttpServletRequest mpr, Long protocolId, String fileField) {
         def mpf = mpr.getFile(fileField);
-        String fileName = mpf.getOriginalFilename();
         String fileType = mpf.getContentType();
 
         if(!mpf?.empty && mpf.size < 100 * 1024 * 1024 && fileType == "application/pdf") {                
@@ -80,8 +85,27 @@ class ProtocolService {
             if (!folder.exists()) { 
                 folder.mkdirs(); 
             } 
-            File fileDest = getProtocolFile(protocolId) 
+
+            def protocol = Protocol.get(protocolId)
+            def filename =  mpf.getOriginalFilename();
+            File fileDest =  new File(folder, filename)
+            if (fileDest.exists()) {
+                throw new ProtocolException(message: "File already exists! You may change the file name and try again.")
+            }
             mpf.transferTo(fileDest)
+            protocol.file = filename
+            protocol.save()
+        }
+    }
+    
+    @Transactional
+    void deleteFile(Long protocolId) {
+        def protocol = Protocol.get(protocolId)
+        def file = getProtocolFile(protocolId)
+        if (file) {
+            file.delete()            
+            protocol.file = null
+            protocol.save()
         }
     }
 }

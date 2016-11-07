@@ -19,7 +19,7 @@ class ProtocolAdminController {
     def show(Long id) {
         def protocol = Protocol.get(id)
         def file = protocolService.getProtocolFile(id)
-        [protocol: protocol, file: file.exists() ? file : null]
+        [protocol: protocol, file: file?.exists() ? file : null]
     }
     
     def create() {
@@ -127,6 +127,8 @@ class ProtocolAdminController {
         try {
             protocolService.uploadFile( (MultipartHttpServletRequest)request, protocolId, "file")
             flash.message = "Protocol uploaded!"
+        } catch(ProtocolException e) {
+            flash.message = e.message
         } catch(Exception e) {
             log.error "Error: ${e.message}", e
             flash.message = "Error uploading the file!"
@@ -137,8 +139,7 @@ class ProtocolAdminController {
 
     def deleteFile(Long protocolId) {
         try {
-            def file = protocolService.getProtocolFile(protocolId)
-            file.delete()
+            protocolService.deleteFile(protocolId)
             flash.message = "File deleted!"
         }catch(Exception e) {
             log.error "Error: ${e.message}", e

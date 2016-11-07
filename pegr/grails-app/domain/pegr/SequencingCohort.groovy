@@ -5,6 +5,7 @@ class SequencingCohort {
     SequenceRun run
     SummaryReport report
     String images
+    String notes
     
     String toString() {
         run.id + "_" + project.name
@@ -22,9 +23,11 @@ class SequencingCohort {
         project unique: "run"
         report nullable: true
         images nullable: true
+        notes nullable: true, blank: true
     }
     
     static mapping = {
         images sqlType: 'longtext'
+        notes sqlType: 'longText'
     }
 }

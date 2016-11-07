@@ -27,11 +27,17 @@
         form {
             margin: 10px;
         }
-        
+        .alert {
+            color: red;
+            margin: 10px;
+            padding: 10px;
+            border: 2px solid red;
+        }
     </style>
 </head>
 <body>
     <div id="tree"></div>
+    <g:if test="${flash.message}"><div class="alert">${flash.message}</div></g:if>
     <g:form controller="report" action="saveDecisionTree">
         <input type="hidden" name="type" value="${type}">
         <textarea name="json" rows="100" cols="200"></textarea>

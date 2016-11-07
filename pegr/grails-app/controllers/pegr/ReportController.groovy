@@ -220,7 +220,11 @@ class ReportController {
     }
     
     def saveDecisionTree(String json, String type) {
-        reportService.saveDecisionTree(json, type)
+        try {
+            reportService.saveDecisionTree(json, type)
+        } catch (ReportException e) {
+            flash.message = e.message
+        }
         redirect(action: "decisionTree", params: [type: type])
     }
 }

@@ -196,9 +196,7 @@ class SequenceRunService {
         }
         def project = Project.findByName(projectName)
         if (!project) {
-            project = new Project(name: projectName)
-            def user = springSecurityService.currentUser
-            projectService.saveWithUser(project, user, [])
+            throw new SequenceRunException(message: "Project not found!")
         }
         def cohort = SequencingCohort.findByProjectAndRun(project, run)
         if (!cohort) {
@@ -210,6 +208,28 @@ class SequenceRunService {
         new ProjectSamples(sample:experiment.sample, project:project).save()
     }
     
+    @Transactional
+    void addProject(Long runId, Long projectId) {
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            throw new SequenceRunException(message: "Sequence run ${runId} not found!")
+        }
+        def project = Project.get(projectId)
+        if (!project) {
+            throw new SequenceRunException(message: "Project not found!")
+        }
+        new SequencingCohort(run:run, project:project).save()
+    }
+    
+    @Transactional
+    void removeProject(Long cohortId) {
+        def cohort = SequencingCohort.get(cohortId)
+        if (!cohort) {
+            throw new SequenceRunException(message: "Sequencing cohort not found!")
+        }
+        SequencingExperiment.executeUpdate("update SequencingExperiment set cohort = null where cohort=?", [cohort])
+        cohort.delete()
+    }
     
     def getCalendarTimeString(Date time) {
         return time.format("yyyyMMdd'T'HHmmss'Z'")

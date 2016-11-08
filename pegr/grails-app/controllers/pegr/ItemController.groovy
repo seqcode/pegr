@@ -204,7 +204,7 @@ class ItemController {
     
     def displayImage(String img, Long itemId) {
         File folder = itemService.getImageFolder(itemId); 
-        File image = new File(folder.getAbsolutePath() + File.separator + img)
+        File image = new File(folder, img)
         if(!image.exists()) {
             response.status = 404
         } else {

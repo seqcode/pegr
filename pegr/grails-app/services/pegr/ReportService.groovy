@@ -950,6 +950,7 @@ class ReportService {
         return Chores.findByName(name)
     }
     
+    @Transactional
     def saveDecisionTree(String json, String type) {
         def chore = getDecisionTree(type)
         if (!chore) {
@@ -962,5 +963,15 @@ class ReportService {
         } else {
             throw new ReportException(message: "Invalid json!")
         }
+    }
+    
+    @Transactional
+    def saveNotes(Long cohortId, String notes) {
+        def cohort = SequencingCohort.get(cohortId)
+        if (!cohort) {
+            throw new ReportException(message: "Cohort not found!")
+        }
+        cohort.notes = notes
+        cohort.save()
     }
 }

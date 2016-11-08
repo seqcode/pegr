@@ -336,4 +336,24 @@ class SequenceRunController {
         sequenceRunService.updateExperimentCohort(runId, experimentId, projectName)
         render ""
     }
+    
+    def addProject(Long runId, Long projectId) {
+        try {
+            sequenceRunService.addProject(runId, projectId)
+            flash.message = "Project added."
+        } catch (SequenceRunException e) {
+            flash.message = e.message
+        }
+        redirect(action: "show", id: runId)
+    }
+    
+    def removeProject(Long cohortId, Long runId) {
+        try {
+            sequenceRunService.removeProject(cohortId)
+            flash.message = "Project removed."
+        } catch (SequenceRunException e) {
+            flash.message = e.message
+        }
+        redirect(action: "show", id: runId)
+    }
 }

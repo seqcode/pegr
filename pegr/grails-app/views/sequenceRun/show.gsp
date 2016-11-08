@@ -23,7 +23,61 @@
     </div>
     <h2>Sequence Run #${run.id}  <small><g:if test="${run.runNum}">(Old No.${run.runNum})</g:if> <span class="label label-default">${run.status}</span></small></h2>
     <h3>Summary <g:if test="${editable}"> <g:link action="editInfo" params="[runId:run.id]"><span class="edit">Edit</span></g:link></g:if></h3>
-    <g:render template="summaryDetails"></g:render>    
+    <g:render template="summaryDetails"></g:render>  
+    <h3>Projects 
+        <g:if test="${editable}">
+            <span class="edit add-project">Add</span>
+            <g:form controller="sequenceRun" action="addProject" class="add-project-form">
+                <input type="hidden" name="runId" value="${run.id}">
+                <g:select name="projectId" from="${pegr.Project.list()}" optionKey="id" noSelection="['':'']"></g:select>
+                <g:submitButton class="btn btn-primary" name="save" value="Save"></g:submitButton>
+                <span class="btn btn-default cancel-project">Cancel</span>
+            </g:form>
+        </g:if>
+    </h3>
+    <table id="project-table">
+        <thead>
+            <tr>
+                <g:if test="${editable}"><th></th></g:if>
+                <th>Project</th>
+                <th>Sonication Images</th>
+                <th>Gel Images</th>
+            <tr>
+        </thead>
+        <tbody>
+            <g:each in="${run.cohorts}" var="cohort">
+            <tr>
+                <g:if test="${editable}"><td><g:link controller="sequenceRun" action="removeProject" params="[cohortId:cohort.id, runId:run.id]"><span class="glyphicon glyphicon-trash remove-project"></span></g:link></td></g:if>
+                <td>${cohort.project.name}</td>
+                <td>
+                    <g:each in="${cohort.imageMap}">
+                        <g:link ><span class="glyphicon glyphicon-picture"></span></g:link>
+                    </g:each>
+                    <g:uploadForm controller="sequenceRun" action="uploadCohortImage">
+                        <g:hiddenField name="cohortId" value="${cohort.id}"></g:hiddenField>
+                        <input type="file" id="file" name="file"/>
+                        <g:submitButton name="upload" value="Upload"/> (only png/jpg/gif files, size limit: 5MB)
+                    </g:uploadForm>
+                </td>
+                <td>
+                    ${cohort.images}
+                <g:if test="${file}">
+                <g:link action="renderFile" params="[protocolId: protocol?.id]" target="_blank">${file.getName()}</g:link>
+                <g:link action="deleteFile" params="[protocolId: protocol?.id]" class="confirm edit">Remove</g:link> 
+            </g:if>
+                <g:uploadForm action="upload" >
+                    <div class="form-group">
+                        <g:hiddenField name="protocolId" value="${protocol?.id}"></g:hiddenField>
+                        <input type="file" id="file" name="file"/>
+                        <g:submitButton name="upload" value="Upload"/> (only pdf files)
+                    </div>
+                </g:uploadForm>
+                </td>
+            </tr>
+            </g:each>
+        </tbody>
+    </table>
+
     <h3>Samples 
     <g:if test="${editable}"> 
         <g:link controller="sample" action="batchEdit" params="[runId: run.id]" class="edit" target="_blank">Edit</g:link>
@@ -75,7 +129,7 @@
                 <tr>
                     <input type="hidden" name="experimentId" value="${it.id}">
                     <td class="remove-sample">
-                        <g:if test="${run?.status==pegr.RunStatus.PREP}">
+                        <g:if test="${editable}">
                             <g:link action="removeExperiment" params="[experimentId:it.id, runId:run.id]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link>
                         </g:if>
                     </td>
@@ -150,6 +204,16 @@
     <script>
         $("#nav-experiments").addClass("active");
         $(".confirm").confirm();
+        $("select").select2();
+        $(".add-project-form").hide();
+        
+        $(".add-project").on("click", function(){
+            $(".add-project-form").show();    
+        });
+        
+        $(".cancel-project").on("click", function(){
+            $(".add-project-form").hide()
+        });
         
         $(".project").on('click', ".value", function() {
             var td = $(this).parent();
@@ -164,7 +228,7 @@
             }).done(function(result){
                 td.find("select").select2({
                     data: result,
-                    tags: true
+                    tags: false
                 });    
             });
         });

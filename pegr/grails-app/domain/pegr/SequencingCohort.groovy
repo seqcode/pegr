@@ -1,4 +1,5 @@
 package pegr
+import groovy.json.*
 
 class SequencingCohort {
     Project project
@@ -17,6 +18,16 @@ class SequencingCohort {
     
     List getExperiments() {
         return SequencingExperiment.findAllByCohort(this)
+    }
+    
+    Map getImageMap() {
+        def jsonSlurper = new JsonSlurper()
+        def json
+        try {
+            json = jsonSlurper.parseText(this.images)
+        } catch(Exception e) {   
+        }
+        return json
     }
     
     static constraints = {

@@ -2,6 +2,7 @@ package pegr
 import grails.transaction.Transactional
 import groovy.json.*
 import groovy.sql.Sql
+import org.springframework.web.multipart.MultipartHttpServletRequest 
     
 class UtilityException extends RuntimeException {
     String message
@@ -302,5 +303,24 @@ class UtilityService {
         return [username: grailsApplication.config.gpfs.username,
                 keyfile: grailsApplication.config.gpfs.keyfile,
                 host: grailsApplication.config.gpfs.host]
+    }
+    
+    def upload(MultipartHttpServletRequest mpr, String fileField, List allowedFileTypes, Folder folder, Long maxByte) {
+        def mpf = mpr.getFile(fileField);
+        String fileType = mpf.getContentType();
+
+        if(!mpf?.empty && mpf.size < maxByte && fileType in allowedFileTypes) {  
+            def filesroot = utilityService.getFilesRoot()
+        return new File(filesroot, "protocols"); 
+            if (!folder.exists()) { 
+                folder.mkdirs(); 
+            } 
+            def filename =  mpf.getOriginalFilename();
+            File fileDest =  new File(folder, filename)
+            if (fileDest.exists()) {
+                throw new ProtocolException(message: "File already exists! You may change the file name and try again.")
+            }
+            mpf.transferTo(fileDest)
+        }
     }
 }

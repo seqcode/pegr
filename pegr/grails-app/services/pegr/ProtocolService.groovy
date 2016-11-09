@@ -77,25 +77,14 @@ class ProtocolService {
     
     @Transactional
     void uploadFile(MultipartHttpServletRequest mpr, Long protocolId, String fileField) {
-        def mpf = mpr.getFile(fileField);
-        String fileType = mpf.getContentType();
-
-        if(!mpf?.empty && mpf.size < 100 * 1024 * 1024 && fileType == "application/pdf") {                
-            File folder = getProtocolFolder(); 
-            if (!folder.exists()) { 
-                folder.mkdirs(); 
-            } 
-
-            def protocol = Protocol.get(protocolId)
-            def filename =  mpf.getOriginalFilename();
-            File fileDest =  new File(folder, filename)
-            if (fileDest.exists()) {
-                throw new ProtocolException(message: "File already exists! You may change the file name and try again.")
-            }
-            mpf.transferTo(fileDest)
-            protocol.file = filename
-            protocol.save()
-        }
+        Long maxByte = 100 * 1024 * 1024
+        List fileTypes = ["application/pdf"]
+        File folder = getProtocolFolder()
+        utilityService.upload(mpr, fileField, allowedFileTypes, folder, maxByte)
+        def protocol = Protocol.get(protocolId)
+        protocol.file = filename
+        protocol.save()
+        
     }
     
     @Transactional

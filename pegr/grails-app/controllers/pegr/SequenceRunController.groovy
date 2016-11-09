@@ -356,4 +356,32 @@ class SequenceRunController {
         }
         redirect(action: "show", id: runId)
     }
+    
+    def uploadCohortImage(Long cohortId, String type) {
+        try {
+            sequenceRunService.uploadCohortImage((MultipartHttpServletRequest)request, cohortId, type);
+            def mpf = mpr.getFile("image");
+            String fileName = mpf.getOriginalFilename();
+            String fileType = mpf.getContentType();
+
+            if(!mpf?.empty && mpf.size < 5 * 1024 * 1024 && allowedTypes.containsKey(fileType)) {       
+                File folder = 
+                def n = 1
+                File fileDest = new File(folder, n + "." + allowedTypes[fileType]) 
+                while(fileDest.exists()) {
+                    n++
+                    fileDest = new File(folder, n + "." + allowedTypes[fileType]) 
+                } 
+                mpf.transferTo(fileDest)
+                flash.message = "Image uploaded!"
+            } else {
+                flash.message = "Please check the format and the size of the image."
+            }
+        } catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            flash.message = "Error uploading the file!"
+        }
+
+        redirect(action: "show", id: cohortId)
+    }
 }

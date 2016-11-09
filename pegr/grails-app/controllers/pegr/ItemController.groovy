@@ -5,8 +5,6 @@ import static org.springframework.http.HttpStatus.*
 import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 class ItemController {
-    def private final allowedTypes = ['image/png':'png', 'image/jpeg':'jpg', 'image/jpg':'jpg', 'image/gif':'gif']
-    
     def itemService
     def barcodeService
     

@@ -35,7 +35,7 @@
             </g:form>
         </g:if>
     </h3>
-    <table id="project-table">
+    <table class="table table-bordered" id="project-table">
         <thead>
             <tr>
                 <g:if test="${editable}"><th></th></g:if>
@@ -54,8 +54,9 @@
                         <g:link ><span class="glyphicon glyphicon-picture"></span></g:link>
                     </g:each>
                     <g:uploadForm controller="sequenceRun" action="uploadCohortImage">
+                        <g:hiddenField name="type" value="sonication"></g:hiddenField>
                         <g:hiddenField name="cohortId" value="${cohort.id}"></g:hiddenField>
-                        <input type="file" id="file" name="file"/>
+                        <input type="file" name="image"/>
                         <g:submitButton name="upload" value="Upload"/> (only png/jpg/gif files, size limit: 5MB)
                     </g:uploadForm>
                 </td>
@@ -67,8 +68,9 @@
             </g:if>
                 <g:uploadForm action="upload" >
                     <div class="form-group">
-                        <g:hiddenField name="protocolId" value="${protocol?.id}"></g:hiddenField>
-                        <input type="file" id="file" name="file"/>
+                        <g:hiddenField name="cohortId" value="${protocol?.id}"></g:hiddenField>
+                        <g:hiddenField name="type" value="gel"></g:hiddenField>
+                        <input type="file" name="image"/>
                         <g:submitButton name="upload" value="Upload"/> (only pdf files)
                     </div>
                 </g:uploadForm>

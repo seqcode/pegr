@@ -140,11 +140,9 @@ class ProtocolController {
         try {
             protocolService.uploadFile( (MultipartHttpServletRequest)request, protocolId, "file")
             flash.message = "Protocol uploaded!"
-        } catch(Exception e) {
-            log.error "Error: ${e.message}", e
-            flash.message = "Error uploading the file!"
+        } catch(ProtocolException e) {
+            flash.message = e.message
         }
-
         redirect(action: "show", id: protocolId)
     }
 

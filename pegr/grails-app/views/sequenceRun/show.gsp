@@ -9,6 +9,9 @@
         .project {
             width: 250px;    
         }
+        input[type="file"] {
+            display: inline;
+        }
     </style>
 </head>
 <body>
@@ -47,39 +50,50 @@
         <tbody>
             <g:each in="${run.cohorts}" var="cohort">
             <tr>
+                <input class="cohort-id" type="hidden" name="cohortId" value="${cohort.id}">
                 <g:if test="${editable}"><td><g:link controller="sequenceRun" action="removeProject" params="[cohortId:cohort.id, runId:run.id]"><span class="glyphicon glyphicon-trash remove-project"></span></g:link></td></g:if>
                 <td>${cohort.project.name}</td>
                 <td>
-                    <g:each in="${cohort.imageMap}">
-                        <g:link ><span class="glyphicon glyphicon-picture"></span></g:link>
+                    <ul>
+                    <g:each in="${cohort.imageMap?.sonication}" var="filepath">
+                        <li>
+                            <g:link controller="sequenceRun" action="displayImage" params="[cohortId:cohort.id,filepath:filepath]" target="_blank">${filepath}</g:link>
+                            <g:if test="${editable}"><span class="glyphicon glyphicon-remove btn remove-image"></span></g:if>
+                        </li>
                     </g:each>
+                    </ul>
+                    <g:if test="${editable}">
                     <g:uploadForm controller="sequenceRun" action="uploadCohortImage">
                         <g:hiddenField name="type" value="sonication"></g:hiddenField>
                         <g:hiddenField name="cohortId" value="${cohort.id}"></g:hiddenField>
                         <input type="file" name="image"/>
-                        <g:submitButton name="upload" value="Upload"/> (only png/jpg/gif files, size limit: 5MB)
+                        <g:submitButton name="upload" value="Upload"/>
                     </g:uploadForm>
+                    </g:if>
                 </td>
                 <td>
-                    ${cohort.images}
-                <g:if test="${file}">
-                <g:link action="renderFile" params="[protocolId: protocol?.id]" target="_blank">${file.getName()}</g:link>
-                <g:link action="deleteFile" params="[protocolId: protocol?.id]" class="confirm edit">Remove</g:link> 
-            </g:if>
-                <g:uploadForm action="upload" >
-                    <div class="form-group">
-                        <g:hiddenField name="cohortId" value="${protocol?.id}"></g:hiddenField>
+                    <ul>
+                    <g:each in="${cohort.imageMap?.gel}" var="filepath">
+                        <li>
+                            <g:link controller="sequenceRun" action="displayImage" params="[cohortId:cohort.id,filepath:filepath]" target="_blank">filepath</g:link>
+                            <g:if test="${editable}"><button>x</button></g:if>
+                        </li>
+                    </g:each>
+                    </ul>
+                    <g:if test="${editable}">
+                    <g:uploadForm controller="sequenceRun" action="uploadCohortImage">
                         <g:hiddenField name="type" value="gel"></g:hiddenField>
+                        <g:hiddenField name="cohortId" value="${cohort.id}"></g:hiddenField>
                         <input type="file" name="image"/>
-                        <g:submitButton name="upload" value="Upload"/> (only pdf files)
-                    </div>
-                </g:uploadForm>
+                        <g:submitButton name="upload" value="Upload"/>
+                    </g:uploadForm>
+                    </g:if>
                 </td>
             </tr>
             </g:each>
         </tbody>
     </table>
-
+    <p> (only png/jpg/gif files, size limit: 5MB)</p>
     <h3>Samples 
     <g:if test="${editable}"> 
         <g:link controller="sample" action="batchEdit" params="[runId: run.id]" class="edit" target="_blank">Edit</g:link>
@@ -262,6 +276,18 @@
             });
         });
         
+        $(".remove-image").on("click", function(){
+            var parent = $(this).parent();
+            var filepath = parent.find("a").text();
+            var cohortId = parent.closest("tr").find(".cohort-id").val();
+            $.ajax({
+                url:"/pegr/sequenceRun/removeCohortImageAjax",
+                type: "POST",
+                data: {cohortId: cohortId, filepath: filepath},
+                success: function(){
+                    parent.remove();
+                }});
+        });
      </script>
 </div>
 </body>

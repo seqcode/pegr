@@ -1,6 +1,8 @@
 package pegr
 import grails.transaction.Transactional
 import groovy.time.TimeCategory
+import org.springframework.web.multipart.MultipartHttpServletRequest 
+import groovy.json.*
 
 class SequenceRunException extends RuntimeException {
     String message
@@ -233,6 +235,49 @@ class SequenceRunService {
     
     def getCalendarTimeString(Date time) {
         return time.format("yyyyMMdd'T'HHmmss'Z'")
+    }
+    
+    @Transactional
+    def uploadCohortImage(MultipartHttpServletRequest mpr, SequencingCohort cohort, String type, String fieldName) {
+        def maxByte = 5 * 1024 * 1024 
+        def allowedFileTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif']
+        try {
+            def filepath = utilityService.upload(mpr,fieldName, allowedFileTypes, type, maxByte) 
+            def imageMap = utilityService.parseJson(cohort.images)
+            if (!imageMap) {
+                imageMap = [:]
+            }
+            if (!imageMap[type]) {
+                imageMap[type] = []
+            }
+            imageMap[type].push(filepath)
+            cohort.images = JsonOutput.toJson(imageMap)
+            cohort.save()
+        } catch (UtilityException e) {
+            throw new SequenceRunException(message: e.message)
+        }            
+    }
+    
+    @Transactional
+    def removeCohortImage(Long cohortId, String filepath) {
+        def cohort = SequencingCohort.get(cohortId)
+        if (!cohort) {
+            throw new SequenceRunException(message: "Sequencing cohort not found!")
+        }
+        // remove file
+        def file = new File(utilityService.getFilesRoot(), filepath)
+        if (file.exists()) {
+            file.delete()
+        }
+        // update db
+        def images = utilityService.parseJson(cohort.images)
+        images.each { k,v ->
+            if (filepath in v) {
+                v.remove(filepath)
+            }
+        }
+        cohort.images = JsonOutput.toJson(images)
+        cohort.save()
     }
     
     byte[] calendarEventAsBytes(Long runId, Date meetingTime) {        

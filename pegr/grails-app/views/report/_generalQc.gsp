@@ -116,19 +116,37 @@
         </tbody>
     </table>
 <script>
+    var codes = {"OK":"OK", 
+                 "Error":"Error",
+                 "Permission":"Permission denied",
+                 "Zero":"Empty datasets"};
+    
     $(".edit-code").on("click", function(){
         var $root = $(this).closest("div");
-        var $selectCode = "<select></select>";
+        var $selectCode = "<label>Code</label><select>";
+        for (var code in codes) {
+            $selectCode += '<option value="' + code + '">'+ codes[code] + '</option>';
+        }
+        $selectCode += "</select>";
         var $inputMessage = "<input name='message'>";
         var $save = "<button class='btn btn-primary save'>Save</button>";
         var $cancel = "<button class='btn btn-default cancel'>Cancel</button>";
         $root.append($selectCode);
-        $root.find("select").select2({
-            data: ["OK", "Error", "Permission", "Zero"]
-        });
+
         $root.append($inputMessage);
         $root.append($save);
         $root.append($cancel);
+    });
+    
+    $(".popover-wrapper").on("click", ".cancel", function(){
+        var $root = $(this).closest("div");
+        $root.find("button").remove();
+        $root.find("select").remove();
+        $root.find("input").remove();
+    });
+    
+    $(".popover-wrapper").on("click", ".save", function(){
+        
     });
 </script>
 </div>

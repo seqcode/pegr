@@ -78,7 +78,9 @@
                             </div>
 
                             <div class="popover-content">
-                                <h6>${runStatusMap.value.steps[j][1]}</h6>
+                                <h6>${runStatusMap.value.steps[j][1]}
+                                    <g:if test="${status?.code!='NO'}"><span class="glyphicon glyphicon-pencil edit-code"></span></g:if>
+                                </h6>
                                 <p>${status.error}</p>
                                 <p>${status.message}</p>
                             </div>
@@ -113,4 +115,20 @@
         </g:each>
         </tbody>
     </table>
+<script>
+    $(".edit-code").on("click", function(){
+        var $root = $(this).closest("div");
+        var $selectCode = "<select></select>";
+        var $inputMessage = "<input name='message'>";
+        var $save = "<button class='btn btn-primary save'>Save</button>";
+        var $cancel = "<button class='btn btn-default cancel'>Cancel</button>";
+        $root.append($selectCode);
+        $root.find("select").select2({
+            data: ["OK", "Error", "Permission", "Zero"]
+        });
+        $root.append($inputMessage);
+        $root.append($save);
+        $root.append($cancel);
+    });
+</script>
 </div>

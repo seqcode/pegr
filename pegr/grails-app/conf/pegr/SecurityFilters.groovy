@@ -189,7 +189,7 @@ class SecurityFilters {
             }
         }
         
-        SequenceRunEdit(controller: "sequenceRun", action: "editRead|updateRead|editInfo|update|searchPool|addPool|removePool|addSamplesById|removeExperiment|editSamples|updateSamples|run|fetchProjectsAjax|updateExperimentCohortAjax") {
+        SequenceRunEdit(controller: "sequenceRun", action: "editRead|updateRead|editInfo|update|searchPool|addPool|removePool|addSamplesById|removeExperiment|editSamples|updateSamples|run|fetchProjectsAjax|updateExperimentCohortAjax|addProject|removeProject|uploadCohortImage|removeCohortImageAjax") {
             before = {
                 def runId = params.long('runId')
                 def run =  SequenceRun.get(runId)

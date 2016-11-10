@@ -66,8 +66,12 @@ $.ajax({
         } else {
             recommend = getDecision(v, treeData);
         }
-        $(this).find(".recommend").html("<span style='padding:.2em .5em;fond-weight:bold;line-height:1;white-space:nowrap;display:inline;color: white; background-color:" + colors[recommend] + "'>" + recommend + "</span>");
-        
+        $(this).find(".recommend").html("<span style='padding:.2em .5em;fond-weight:bold;line-height:1;white-space:nowrap;display:inline;color: white; background-color:" + colors[recommend.name] + "'>" + recommend.name + "</span>");
+        if (recommend.marks) {
+            for ( n in recommend.marks){
+                $(this).find("."+recommend.marks[n]).css("background-color", "#f2dede");
+            }
+        }
     });
 }});
     
@@ -85,7 +89,7 @@ $.ajax({
     
     function getDecision(v, node) {
         if (node.name) {
-            return node.name
+            return node
         } else {
             var result = decide(v, node);
             var flag = result ? "yes" : "no";

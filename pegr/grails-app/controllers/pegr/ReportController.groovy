@@ -233,6 +233,12 @@ class ReportController {
         render ""
         return
     }
+    
+    def updateAnalysisCodeAjax(Long analysisId, String code, String message) {
+        reportService.updateAnalysisCode(analysisId, code, message)
+        render ""
+        return
+    }
 }
 
 

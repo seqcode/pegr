@@ -58,22 +58,23 @@
                     <td class="col-date group-analysis">${alignment.date}</td>
                     <g:each in="${alignment.status}" var="status" status="j">
                         <td class="analysis-status col-step-${runStatusMap.value.steps[j][0]} group-pipeline">
+                            <input class="analysisId" type="hidden" name="analysisId" value="${status.analysisId}">
                             <div class="popover-wrapper">
                             <div class="popover-toggle">
                                 <g:if test="${status?.code=='OK'}">
-                                    <span class="label label-success"> </span>
+                                    <span class="code label label-success"> </span>
                                 </g:if>
                                 <g:elseif test="${status?.code=='NO'}">
-                                    <span class="label label-default"> </span>
+                                    <span class="code label label-default"> </span>
                                 </g:elseif>
                                 <g:elseif test="${status?.code=='Permission'}">
-                                    <span class="label label-warning"> </span>
+                                    <span class="code label label-warning"> </span>
                                 </g:elseif> 
                                 <g:elseif test="${status?.code=='Zero'}">
-                                    <span class="label label-info"> </span>
+                                    <span class="code label label-info"> </span>
                                 </g:elseif>
                                 <g:else>
-                                    <span class="label label-danger"> </span>
+                                    <span class="code label label-danger"> </span>
                                 </g:else>
                             </div>
 
@@ -82,7 +83,7 @@
                                     <g:if test="${status?.code!='NO'}"><span class="glyphicon glyphicon-pencil edit-code"></span></g:if>
                                 </h6>
                                 <p>${status.error}</p>
-                                <p>${status.message}</p>
+                                <p class="status-message">${status.message}</p>
                             </div>
                             </div>
                         </td>
@@ -120,33 +121,46 @@
                  "Error":"Error",
                  "Permission":"Permission denied",
                  "Zero":"Empty datasets"};
+    var codeClasses = {
+        "OK":"label-success", 
+         "Error":"label-danger",
+         "Permission":"label-warning",
+         "Zero":"label-info"
+    }
     
     $(".edit-code").on("click", function(){
-        var $root = $(this).closest("div");
+        var $root = $(this).closest(".popover-content");
         var $selectCode = "<label>Code</label><select>";
         for (var code in codes) {
             $selectCode += '<option value="' + code + '">'+ codes[code] + '</option>';
         }
         $selectCode += "</select>";
-        var $inputMessage = "<input name='message'>";
+        var message = $root.find(".status-message").text()
+        var $inputMessage = "<input class='input-message' name='message' value='"+message+"'>";
         var $save = "<button class='btn btn-primary save'>Save</button>";
         var $cancel = "<button class='btn btn-default cancel'>Cancel</button>";
-        $root.append($selectCode);
-
-        $root.append($inputMessage);
-        $root.append($save);
-        $root.append($cancel);
+        $root.append("<div class='edit-code'>" +$selectCode + $inputMessage + $save + $cancel + "</div>");
     });
     
     $(".popover-wrapper").on("click", ".cancel", function(){
-        var $root = $(this).closest("div");
-        $root.find("button").remove();
-        $root.find("select").remove();
-        $root.find("input").remove();
+        $(this).closest("div.edit-code").remove();
     });
     
     $(".popover-wrapper").on("click", ".save", function(){
-        
+        var $td = $(this).closest("td");
+        var analysisId = $td.find(".analysisId").val();
+        var code = $td.find("select").val();
+        var message = $td.find(".input-message").val();
+        $.ajax({
+            url:"/pegr/report/updateAnalysisCodeAjax",
+            type:"POST",
+            data:{analysisId: analysisId, code: code, message: message},
+            success:function(){                    
+                $td.find(".code").removeClass("label-default label-danger label-warning label-info").addClass(codeClasses[code]);
+                $td.find(".status-message").text(message);
+                $td.find(".edit-code").remove();
+            }
+        })
     });
 </script>
 </div>

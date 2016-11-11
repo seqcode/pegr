@@ -161,6 +161,7 @@ grails.plugin.springsecurity.interceptUrlMap = [
     '/report/saveQcSettings/**':            ['ROLE_ADMIN'],
     '/report/togglePreferredAlignment/**':  ['ROLE_ADMIN'],
     '/report/updateReportStatus/**':        ['ROLE_ADMIN'],
+    '/report/updateAnalysisCodeAjax/**':    ['ROLE_ADMIN'],
     '/protocolInstanceBag/renderFile/**':['permitAll'],
     '/protocolInstanceBag/reopenBag/**':['ROLE_ADMIN'],
     '/protocolInstanceBag/deleteBag/**':['ROLE_ADMIN'],

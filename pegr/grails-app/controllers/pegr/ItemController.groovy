@@ -5,10 +5,9 @@ import static org.springframework.http.HttpStatus.*
 import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 class ItemController {
-    def private final allowedTypes = ['image/png':'png', 'image/jpeg':'jpg', 'image/jpg':'jpg', 'image/gif':'gif']
-    
     def itemService
     def barcodeService
+    def utilityService
     
     def index(){
         redirect(action: "list", params: [categoryId: 1])
@@ -46,7 +45,7 @@ class ItemController {
             return
         }
         def folder = itemService.getImageFolder(id)
-        def images = folder.listFiles().findAll{getFileExtension(it.name) in allowedTypes.values()}
+        def images = folder.listFiles()
         switch (item.type.category.superCategory) {
             case ItemTypeSuperCategory.TRACED_SAMPLE:
                 def traces = []
@@ -171,40 +170,22 @@ class ItemController {
     
     def upload() {        
         try {
-            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  
-            def mpf = mpr.getFile("image");
-            String fileName = mpf.getOriginalFilename();
-            String fileType = mpf.getContentType();
-
-            if(!mpf?.empty && mpf.size < 5 * 1024 * 1024 && allowedTypes.containsKey(fileType)) {
-                
-                File folder = itemService.getImageFolder(params.long('itemId')); 
-                if (!folder.exists()) { 
-                    folder.mkdirs(); 
-                } 
-                def n = 1
-                File fileDest = new File(folder, n + "." + allowedTypes[fileType]) 
-                while(fileDest.exists()) {
-                    n++
-                    fileDest = new File(folder, n + "." + allowedTypes[fileType]) 
-                } 
-                mpf.transferTo(fileDest)
-                flash.message = "Image uploaded!"
-            } else {
-                flash.message = "Please check the format and the size of the image."
-            }
-        } catch(Exception e) {
-            log.error "Error: ${e.message}", e
-            flash.message = "Error uploading the file!"
+            def fieldName = "image"
+            def maxByte = 5 * 1024 * 1024
+            def folderName = "items" + File.separator + params.itemId
+            def allowedFileTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif']
+            utilityService.upload((MultipartHttpServletRequest)request, fieldName, allowedFileTypes, folderName, maxByte)
+            flash.message = "Image uploaded!"
+        } catch(UtilityException e) {
+            flash.message = e.message
         }
-
         redirect(action: "show", id: params.itemId)
     }
     
     
     def displayImage(String img, Long itemId) {
         File folder = itemService.getImageFolder(itemId); 
-        File image = new File(folder.getAbsolutePath() + File.separator + img)
+        File image = new File(folder, img)
         if(!image.exists()) {
             response.status = 404
         } else {

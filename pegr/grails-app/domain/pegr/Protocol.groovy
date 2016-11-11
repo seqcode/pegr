@@ -10,6 +10,7 @@ class Protocol {
     Boolean addAntibody
     Boolean addIndex
     DictionaryStatus status
+    String file
     
 	String toString() {
         String s = name
@@ -52,6 +53,7 @@ class Protocol {
         addAntibody nullable: true
         addIndex nullable: true
         status nullable: true
+        file nullable: true
 	}
 
 }

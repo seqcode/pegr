@@ -77,7 +77,7 @@ class ItemService {
 
     def getImageFolder(Long itemId){
         def filesroot = utilityService.getFilesRoot()
-        File folder = new File(filesroot, "items/${itemId}"); 
+        File folder = new File(filesroot, "items" + File.separator + itemId); 
     }
     
     def createSample(Item item) {

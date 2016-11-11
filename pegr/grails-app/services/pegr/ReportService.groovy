@@ -115,6 +115,7 @@ class ReportService {
         } else {
             result.code = "OK"
             stepAnalysisList.each { stepAnalysis ->
+                 result.analysisId = stepAnalysis.id
                 // transform the status note
                 def note = utilityService.parseJson(stepAnalysis.note)
                 // if the note has not been processed
@@ -950,6 +951,7 @@ class ReportService {
         return Chores.findByName(name)
     }
     
+    @Transactional
     def saveDecisionTree(String json, String type) {
         def chore = getDecisionTree(type)
         if (!chore) {
@@ -962,5 +964,31 @@ class ReportService {
         } else {
             throw new ReportException(message: "Invalid json!")
         }
+    }
+    
+    @Transactional
+    def saveNotes(Long cohortId, String notes) {
+        def cohort = SequencingCohort.get(cohortId)
+        if (!cohort) {
+            throw new ReportException(message: "Cohort not found!")
+        }
+        cohort.notes = notes
+        cohort.save()
+    }
+    
+    @Transactional
+    def updateAnalysisCode(Long analysisId, String code, String message) {
+        def analysis = Analysis.get(analysisId)
+        if (!analysis) {
+            throw new ReportException(message: "Analysis not found!")
+        }
+        def status = utilityService.parseJson(analysis.note)
+        if (!status) {
+            status = [:]
+        }
+        status.code = code
+        status.message = message
+        analysis.note = JsonOutput.toJson(status)
+        analysis.save()
     }
 }

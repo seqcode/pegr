@@ -227,6 +227,18 @@ class ReportController {
         }
         redirect(action: "decisionTree", params: [type: type])
     }
+    
+    def saveNotesAjax(Long cohortId, String notes) {
+        reportService.saveNotes(cohortId, notes)
+        render ""
+        return
+    }
+    
+    def updateAnalysisCodeAjax(Long analysisId, String code, String message) {
+        reportService.updateAnalysisCode(analysisId, code, message)
+        render ""
+        return
+    }
 }
 
 

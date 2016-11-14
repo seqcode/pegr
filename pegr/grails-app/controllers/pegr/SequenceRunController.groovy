@@ -1,6 +1,8 @@
 package pegr
 import static org.springframework.http.HttpStatus.*
 import org.springframework.web.multipart.MultipartHttpServletRequest 
+import javax.imageio.ImageIO
+import java.awt.image.BufferedImage
 import groovy.time.TimeCategory
 import groovy.json.*
 import grails.converters.*
@@ -335,5 +337,60 @@ class SequenceRunController {
     def updateExperimentCohortAjax(Long runId, Long experimentId, String projectName) {
         sequenceRunService.updateExperimentCohort(runId, experimentId, projectName)
         render ""
+    }
+    
+    def addProject(Long runId, Long projectId) {
+        try {
+            sequenceRunService.addProject(runId, projectId)
+            flash.message = "Project added."
+        } catch (SequenceRunException e) {
+            flash.message = e.message
+        }
+        redirect(action: "show", id: runId)
+    }
+    
+    def removeProject(Long cohortId, Long runId) {
+        try {
+            sequenceRunService.removeProject(cohortId)
+            flash.message = "Project removed."
+        } catch (SequenceRunException e) {
+            flash.message = e.message
+        }
+        redirect(action: "show", id: runId)
+    }
+    
+    def uploadCohortImage(Long cohortId, String type) {
+        def cohort = SequencingCohort.get(cohortId)
+        if (!cohort) {
+            render(view: "/404")
+            return
+        }
+        def runId = cohort.run.id
+        try {
+            def fieldName = "image"
+            sequenceRunService.uploadCohortImage((MultipartHttpServletRequest)request, cohort, type, fieldName);
+        } catch(SequenceRunException e) {
+            flash.message = e.message
+        }
+        redirect(action: "show", id: runId)
+    }
+    
+    def displayImage(Long cohortId, String filepath) {
+        File image = new File(utilityService.getFilesRoot(), filepath)
+        BufferedImage originalImage = ImageIO.read(image)
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+        def fileType = filepath.substring(filepath.lastIndexOf('.') + 1)
+        ImageIO.write(originalImage, fileType, outputStream)
+        byte[] imageInByte = outputStream.toByteArray()
+        response.setHeader("Content-Length", imageInByte.length.toString())
+        response.contentType = "image/"+fileType
+        response.outputStream << imageInByte
+        response.outputStream.flush()
+    }
+    
+    def removeCohortImageAjax(Long cohortId, String filepath) {
+        sequenceRunService.removeCohortImage(cohortId, filepath)
+        render ""
+        return
     }
 }

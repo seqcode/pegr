@@ -19,6 +19,7 @@ class ReportService {
     final String PURGE_ALIGNMENTS_CONFIG = "PurgeAlignmentsConfig"
     final String GALAXY_CONFIG = "GalaxyConfig"
     final String DYNAMIC_ANALYSIS_STEPS = "DYNAMIC_ANALYSIS_STEPS"
+    final String DECISION_TREE = "DECISION_TREE"
     
    /**
     * Fetch the status of the sequence run
@@ -114,6 +115,7 @@ class ReportService {
         } else {
             result.code = "OK"
             stepAnalysisList.each { stepAnalysis ->
+                 result.analysisId = stepAnalysis.id
                 // transform the status note
                 def note = utilityService.parseJson(stepAnalysis.note)
                 // if the note has not been processed
@@ -942,5 +944,51 @@ class ReportService {
         def timeout = 1000 * 60 * 1 // 1 min
         utilityService.executeCommand(cmd, timeout)
         
+    }
+    
+    def getDecisionTree(String type) {
+        def name = [DECISION_TREE, type].join("_")
+        return Chores.findByName(name)
+    }
+    
+    @Transactional
+    def saveDecisionTree(String json, String type) {
+        def chore = getDecisionTree(type)
+        if (!chore) {
+            chore = new Chores(name: [DECISION_TREE, type].join("_"))
+        }
+        def map = utilityService.parseJson(json)
+        if (map) {            
+            chore.value = JsonOutput.toJson(map)
+            chore.save()
+        } else {
+            throw new ReportException(message: "Invalid json!")
+        }
+    }
+    
+    @Transactional
+    def saveNotes(Long cohortId, String notes) {
+        def cohort = SequencingCohort.get(cohortId)
+        if (!cohort) {
+            throw new ReportException(message: "Cohort not found!")
+        }
+        cohort.notes = notes
+        cohort.save()
+    }
+    
+    @Transactional
+    def updateAnalysisCode(Long analysisId, String code, String message) {
+        def analysis = Analysis.get(analysisId)
+        if (!analysis) {
+            throw new ReportException(message: "Analysis not found!")
+        }
+        def status = utilityService.parseJson(analysis.note)
+        if (!status) {
+            status = [:]
+        }
+        status.code = code
+        status.message = message
+        analysis.note = JsonOutput.toJson(status)
+        analysis.save()
     }
 }

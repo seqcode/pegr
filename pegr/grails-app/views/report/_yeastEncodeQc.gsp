@@ -1,3 +1,4 @@
+<g:link class="edit pull-right" controller="report" action="decisionTree" params="[type:'YEAST_QC']" target="_blank">Decision Tree</g:link>
 <table id="yeast" class="table table-bordered">
     <thead>
         <tr>
@@ -42,6 +43,12 @@
 </table>
 
 <script>
+    
+$.ajax({
+    url:"/pegr/report/getDecisionTreeAjax?type=YEAST_QC",
+    success: function(result) {
+        var treeData = result.treeData;
+        var colors = result.colors;
     $("#yeast tbody tr").each(function(){
         var v = {};
         $(this).children("td").each(function(index, elem) {
@@ -57,47 +64,16 @@
         if ( target == "NOTAG" || target == "NOTARGET") {
             recommend = "";
         } else {
-            if (v.dedupUniqReads < 200000) {
-                if ((v.mappedReadPct > 0.5) && (v.adapterDimerPct < 0.15) && (v.duplicLevel < 0.7)) {
-                    recommend="<span class='label label-danger'>Re-sequence<span>"; // dedup
-                    $(this).find(".dedupUniqReads").addClass("bg-danger");
-                } else {
-                    if (v.go != "") {
-                        recommend="<span class='label label-warning'>Done; stress gene</span>"; // go
-                        $(this).find(".go").addClass("bg-danger");
-                    } else if((v.polIILevel < 0.1) && (v.exprsLevel < 0.1)) {
-                        recommend="<span class='label label-warning'>Done; low exprs<span>"; // polII & expression
-                        $(this).find(".polIILevel").addClass("bg-danger");
-                        $(this).find(".exprsLevel").addClass("bg-danger");
-                    } else {
-                        recommend="<span class='label label-danger'>re-ChIP</span>"; // dedup & mapped& adapter& duplic
-                        $(this).find(".dedupUniqReads").addClass("bg-danger");
-                        $(this).find(".mappedReadPct").addClass("bg-danger");
-                        $(this).find(".adapterDimerPct").addClass("bg-danger");
-                        $(this).find(".duplicLevel").addClass("bg-danger");
-                    }
-                }
-            } else {
-                if ((v.stamp =="Yes") || (v.multiGPS > 25) || (v.peakPairs > 50) || (v.nucleosomeEnrichment > 1.5) || (v.enrichedSegments != "")) {
-                    recommend="<span class='label label-success'>Done; success</span>"; 
-                } else if (v.go != "") {
-                    recommend="<span class='label label-warning'>Done; stress gene</span>"; //go
-                    $(this).find(".go").addClass("bg-danger");
-                } else if (v.polIILevel < 0.1 && v.exprsLevel < 0.1) {
-                    recommend="<span class='label label-warning'>Done; low exprs</span>"; // pol II exprs
-                    $(this).find(".polIILevel").addClass("bg-danger");
-                    $(this).find(".exprsLevel").addClass("bg-danger");
-                } else {
-                    recommend="<span class='label label-danger'>Done; failed</span>"; // stamp, multiGPS, peakPairs, nucleo
-                    $(this).find(".stamp").addClass("bg-danger");
-                    $(this).find(".multiGPS").addClass("bg-danger");
-                    $(this).find(".peakPairs").addClass("bg-danger");
-                    $(this).find(".nucleosomeEnrichment").addClass("bg-danger");
-                }
+            recommend = getDecision(v, treeData);
+        }
+        $(this).find(".recommend").html("<span style='padding:.2em .5em;fond-weight:bold;line-height:1;white-space:nowrap;display:inline;color: white; background-color:" + colors[recommend.name] + "'>" + recommend.name + "</span>");
+        if (recommend.marks) {
+            for ( n in recommend.marks){
+                $(this).find("."+recommend.marks[n]).css("background-color", "#f2dede");
             }
         }
-        $(this).find(".recommend").html(recommend);
     });
+}});
     
     $("td.memER").each(function(index, memeFig){
         var memER = $(memeFig).text().trim();
@@ -110,4 +86,67 @@
             });
         }
     });
+    
+    function getDecision(v, node) {
+        if (node.name) {
+            return node
+        } else {
+            var result = decide(v, node);
+            var flag = result ? "yes" : "no";
+            var child
+            for  (var j =0; j < node.children.length; j++) {
+                if (node.children[j].flag == flag) {
+                    child = node.children[j];
+                    break
+                }
+            }
+            return getDecision(v, child);
+        }
+        
+    }
+    
+    function decide(v, node) {
+        var result
+        if (node.logic == "AND") {
+            result = true
+            for (i=0; i<node.conditions.length; ++i) {
+                if (!test(node.conditions[i], v)) {
+                    result = false
+                    break
+                }
+            }
+        } else if (node.logic == "OR") {
+            result = false
+            for (i=0; i<node.conditions.length; ++i) {
+                if (test(node.conditions[i], v)) {
+                    result = true
+                    break
+                }
+            }
+        } else {
+            result = test(node.conditions[0], v);
+        }
+        return result
+    }
+    
+    function test(c, v) {
+        var result = false;
+        var value = v[c.p];
+        if (c.op == ">") {
+            if (value != null) {
+                value = parseFloat(value.replace(/,/g, ""));
+                result = (value > c.v);
+            } 
+        } else if (c.op == "<") {
+            if (value != null) {
+                value = parseFloat(value.replace(/,/g, ""));
+                result = (value < c.v);
+            }
+        } else if (c.op == "=") {
+            result = (value == c.v);
+        } else {
+            result = (value != "");
+        } 
+        return result;
+    }
 </script>

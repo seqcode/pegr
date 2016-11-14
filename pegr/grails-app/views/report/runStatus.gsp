@@ -5,6 +5,10 @@
     <asset:javascript src="meme.js"/>
     <asset:stylesheet href="meme.css"/>
     <style>
+        .dropdown-menu {
+            background-color: white;
+        }
+
         .step-header {
             height: 140px;
             white-space: nowrap;
@@ -202,6 +206,7 @@
     <table class="table">
         <thead>
             <th>Sequencing Cohort</th>
+            <th>Notes</th>
             <th>Report</th>
             <th>Status</th>
             <th>Date</th>
@@ -351,6 +356,25 @@
                 }
             });            
         });
+        
+        $(".save-notes").on("click", function() {       
+            var parent = $(this).parent();
+            var notes = parent.find(".notes").val();
+            var cohortId = parent.find(".cohort-id").val();
+            $.ajax({
+                type: 'POST',
+                data: {'cohortId': cohortId, 'notes': notes},
+                url: '/pegr/report/saveNotesAjax',
+                success: function(){parent.find(".orig-notes").val(notes);}
+            });
+        });
+        
+        $(".cancel-notes").on("click", function() {
+            var parent = $(this).parent();
+            var origNotes = parent.find(".orig-notes").val();
+            parent.find(".notes").val(origNotes);
+        });
+
     </script>
 </body>
 </html>

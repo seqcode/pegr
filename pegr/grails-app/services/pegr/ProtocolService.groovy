@@ -60,28 +60,36 @@ class ProtocolService {
         }
     }
     
-    def getProtocolFolder() {
-        def filesroot = utilityService.getFilesRoot()
-        return new File(filesroot, "protocols"); 
-    }
-    
     def getProtocolFile(Long protocolId) {
-        def folder = getProtocolFolder()
-        return new File(folder, "protocol${protocolId}.pdf") 
+        def folder = utilityService.getFilesRoot()
+        def protocol = Protocol.get(protocolId)
+        def file = protocol?.file ? new File(folder, protocol?.file) : null 
+        return file
     }
     
+    @Transactional
     void uploadFile(MultipartHttpServletRequest mpr, Long protocolId, String fileField) {
-        def mpf = mpr.getFile(fileField);
-        String fileName = mpf.getOriginalFilename();
-        String fileType = mpf.getContentType();
-
-        if(!mpf?.empty && mpf.size < 100 * 1024 * 1024 && fileType == "application/pdf") {                
-            File folder = getProtocolFolder(); 
-            if (!folder.exists()) { 
-                folder.mkdirs(); 
-            } 
-            File fileDest = getProtocolFile(protocolId) 
-            mpf.transferTo(fileDest)
+        Long maxByte = 100 * 1024 * 1024
+        List allowedFileTypes = ["application/pdf"]
+        String folderName = "protocols"
+        try {
+            def filepath = utilityService.upload(mpr, fileField, allowedFileTypes, folderName, maxByte)
+            def protocol = Protocol.get(protocolId)
+            protocol.file = filepath
+            protocol.save()     
+        } catch (UtilityException e) {
+            throw new ProtocolException(message: e.message)
+        }
+    }
+    
+    @Transactional
+    void deleteFile(Long protocolId) {
+        def protocol = Protocol.get(protocolId)
+        def file = getProtocolFile(protocolId)
+        if (file) {
+            file.delete()            
+            protocol.file = null
+            protocol.save()
         }
     }
 }

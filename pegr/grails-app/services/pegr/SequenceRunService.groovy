@@ -205,8 +205,15 @@ class SequenceRunService {
             cohort = new SequencingCohort(project: project, run: run)
             cohort.save()
         } 
+        def oldProject = experiment.cohort?.project
+        if (oldProject) {
+            def oldProjectSample = ProjectSamples.findByProjectAndSample(oldProject, experiment.sample)
+            if (oldProjectSample) {
+                oldProjectSample.delete(failOnError:true, flush: true)
+            }
+        } 
         experiment.cohort = cohort
-        experiment.save()
+        experiment.save(failOnError:true, flush: true)
         new ProjectSamples(sample:experiment.sample, project:project).save()
     }
     

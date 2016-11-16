@@ -3,7 +3,7 @@ import groovy.sql.Sql
 import com.opencsv.CSVParser
 import com.opencsv.CSVReader
 import groovy.json.*
-
+/*
 def minRun = 550
 def maxRun = 637
 
@@ -26,14 +26,14 @@ while ((rawdata = reader.readNext()) != null) {
     } else if (endLine > 0 && lineNo > endLine) {
         break
     }
-    reportImages[rawdata[0]]= [sonication: rawdata[1], gel: rawdata[2]]
+    reportImages[rawdata[0]]= [sonication: rawdata[1]+".png", gel: rawdata[2]+".png"]
 }
 
 def dataSource = grailsApplication.mainContext.getBean('dataSource')
 def sql = new Sql(dataSource)
 (minRun..maxRun).each { runNum ->
     def pegrRun = SequenceRun.findByRunNum(runNum)
-    def cmd = "select RUN_NAME, UNIQ_ID, SUMMARY_REPORT from pughlab.pughlabsequencingrunsampleinfo where run_name = ?"
+    def cmd = "select RUN_NAME, UNIQ_ID, SUMMARY_REPORT from pughlab.PughLabSequencingRunSampleInfo where run_name = ?"
     def sampleRows = sql.rows(cmd, [runNum.toString()])
     def reports = sampleRows.groupBy({ sample -> sample.SUMMARY_REPORT})
     reports.each { reportName, samples ->
@@ -46,6 +46,13 @@ def sql = new Sql(dataSource)
                 if (pegrExp) {
                     if (cohort) {
                         if (pegrExp.cohort != cohort) {
+                            if (pegrExp.cohort) {
+                                def oldProjectSample =  ProjectSamples.findByProjectAndSample(pegrExp.cohort.project, pegrSample)
+                                if (oldProjectSample) {
+                                    oldProjectSample.delete(failOnError: true)
+                                }
+                            }
+                            new ProjectSamples(project: cohort.project, sample: pegrSample).save(failOnError: true)
                             pegrExp.cohort = cohort
                             pegrExp.save(failOnError: true)
                         } 
@@ -66,9 +73,17 @@ def sql = new Sql(dataSource)
                                 } catch(Exception e) {
 
                                 }
+                                if (!date) {
+                                    date = pegrRun.date ?: new Date()
+                                }
                                 def user = User.findByUsername(username)
-                                project = new Project(name: reportName, dateCreatet: date, dateUpdated: date)
-                                project.save(failOnError: true)
+                                println dateStr
+                                println date
+                                project = new Project(name: reportName, dateCreated: date, lastUpdated: date)
+                                project.save(failOnError: true, flush: true)
+                                project.dateCreated = date
+                                project.lastUpdated = date
+                                project.save()
                                 if (user) {
                                     new ProjectUser(project: project, user: user, projectRole: ProjectRole.OWNER).save(failOnError: true)
                                 }
@@ -82,7 +97,7 @@ def sql = new Sql(dataSource)
                             pegrExp.cohort = cohort
                             pegrExp.save(failOnError: true)
                         }
-                        // update cohort name
+                        // update cohort images
                         if (reportImages.containsKey(reportName)) {
                             cohort.images = JsonOutput.toJson([gel: [reportImages[reportName].gel], sonication: [reportImages[reportName].sonication]])
                             cohort.save(failOnError: true)
@@ -94,4 +109,22 @@ def sql = new Sql(dataSource)
         }
     }
 }
+*/
+SequencingCohort.list().each {cohort ->
+    if (cohort.experiments.size() == 0) {
+        cohort.delete()     
+    }
+}
 
+Project.list().each {project ->
+    if (project.samples.size() == 0) {
+        ProjectUser.executeUpdate("delete from ProjectUser where project.id=:projectId", [projectId: project.id])
+        project.delete()
+    }
+}
+
+SummaryReport.list().each {report ->
+    if (!report.cohort) {
+        report.delete()
+    }
+}

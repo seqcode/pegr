@@ -70,16 +70,13 @@ class UserController {
     }
     
     @Transactional
-    def updatePassword() {
+    def updatePassword(UserRegistrationCommand urc) {
         if(request.method=='POST') {
             withForm {
-                def user = springSecurityService.currentUser.attach()
-                def urc = new UserRegistrationCommand(username: user.username, 
-                                                      password: params.password, 
-                                                passwordRepeat: params.passwordRepeat)
                 if (urc.hasErrors()) {
                     [user: urc]
                 } else {
+                    def user = springSecurityService.currentUser.attach()
                     flash.message = "Your password has been changed."
                     user.password = springSecurityService.encodePassword(urc.password)
                     if (user.validate() && user.save()) {
@@ -92,7 +89,6 @@ class UserController {
         }
     }
     
-    @Transactional
 	def register(UserRegistrationCommand urc) {
         if(request.method=='POST') {
             try {
@@ -125,6 +121,7 @@ class UserController {
     }
 }
 
+@grails.validation.Validateable
 class UserRegistrationCommand {
 	String username
 	String password
@@ -133,7 +130,7 @@ class UserRegistrationCommand {
 	static constraints = {
 		importFrom User
 
-		password size: 5..20, blank: false		
+		password(size: 5..20, blank: false)		
 		passwordRepeat nullable: false,
 		   validator: { passwd2, urc ->
 			   return passwd2 == urc.password ?: 'validation.reenterSamePassword'

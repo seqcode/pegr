@@ -7,6 +7,7 @@ class UserController {
 	def springSecurityService	
 	def userService
     def utilityService
+    def emailService
     
 	def profile(){
         def user = springSecurityService.currentUser
@@ -116,6 +117,11 @@ class UserController {
     def fetchUserAjax() {
         def users = User.list().collect{[it.id, it.toString()]}
         render utilityService.arrayToSelect2Data(users) as JSON
+    }
+    
+    def email() {
+        emailService.getLabels()
+        redirect(action: "profile")
     }
 }
 

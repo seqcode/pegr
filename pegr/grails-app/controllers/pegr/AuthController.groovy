@@ -5,4 +5,8 @@ class AuthController {
     def form(String username) {
 		[username: username]
 	}
+    
+    def denied() {
+        
+    }
 }

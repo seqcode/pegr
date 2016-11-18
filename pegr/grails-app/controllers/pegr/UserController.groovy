@@ -38,51 +38,51 @@ class UserController {
         }
     }
     
-    @Transactional
-    def editAddress(Address address){
+    def editAddress(Address newAddress){
+        def user = springSecurityService.currentUser
         if(request.method=='POST'){
             withForm {
-                if (address.validate() && address.save()) {
-                    def user = springSecurityService.currentUser?.attach()
-                    user.address = address
+                try {
+                    userService.updateAddress(user, newAddress)
                     flash.message = "Your address has been updated!"
                     redirect(action: "profile")
-                } else {
-                    request.message = "Invalid input!" 
-                    render(view:'editAddress', model:[address: address])
+                } catch(UserException e) {
+                    request.message = e.message
+                    render(view:'editAddress', model:[address: newAddress])
                 }
             }
         }else{
-            [address: address]
+            [address: user.address]
         }
     }
     
-    @Transactional
-    def deleteAddress(Address address) {
-        if (address == null) {
-            render status:404
-        }
-        def user = springSecurityService.currentUser?.attach()
-        user.address = null
-        address.delete()
-        flash.message = "Your address has been deleted!"
+    def deleteAddress() {
+        try {
+            def user = springSecurityService.currentUser
+            userService.deleteAddress(user)
+        } catch (UserException e) {
+            flash.message = "Your address has been deleted!"
+        }        
         redirect(action: "profile")
     }
     
-    @Transactional
     def updatePassword(UserRegistrationCommand urc) {
         if(request.method=='POST') {
             withForm {
+                def user = springSecurityService.currentUser.attach()
+                urc.username = user.username
+                urc.validate()
                 if (urc.hasErrors()) {
-                    [user: urc]
-                } else {
-                    def user = springSecurityService.currentUser.attach()
-                    flash.message = "Your password has been changed."
+                    render(view: "updatePassword", model: [user: urc])
+                } else {                                   
                     user.password = springSecurityService.encodePassword(urc.password)
-                    if (user.validate() && user.save()) {
+                    try {
+                        userService.save(user)
+                        flash.message = "Your password has been changed."
                         redirect(action: "profile")
-                    }else {
-                        [user: urc]
+                    } catch(UserException e) {
+                        request.message = e.message
+                        render(view: "updatePassword", model: [user: urc])
                     }
                 }        
             }   
@@ -93,6 +93,7 @@ class UserController {
         if(request.method=='POST') {
             try {
                 userService.create(urc)
+                flash.message = "You have registered with PEGR. Please login."
                 redirect(controller: "auth", action: "form")
             } catch (UserException e) {
                 request.message = e.message

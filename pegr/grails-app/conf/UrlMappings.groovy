@@ -1,6 +1,9 @@
 class UrlMappings {
 
 	static mappings = {
+        "500"(view:'/error')        
+        "404"(view:'/404')
+        "403"(view:'/auth/denied')
         
 		"/login/form"{
 			controller = "auth"
@@ -23,8 +26,6 @@ class UrlMappings {
 			action = "index"
 		}
 		
-        "500"(view:'/error')
-        
-        "404"(view:'/404')
+
 	}
 }

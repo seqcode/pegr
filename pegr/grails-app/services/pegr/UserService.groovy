@@ -98,4 +98,30 @@ class UserService {
         }
         
     }
+    
+    @Transactional
+    def save(User user) {
+        if (!user.save()) {
+            throw new UserException(message: "Error saving the user!")
+        }
+    }
+    
+    @Transactional
+    def updateAddress(User user, Address address) {
+        if (user.address) {
+            user.address.properties = address
+        } else {
+            user.address = address
+        }
+        if (!user.address.save()) {
+            throw new UserException(message: "Error saving the address!")
+        }
+    }
+    
+    @Transactional
+    def deleteAddress(User user) {
+        user.address.delete()
+        user.address = null
+        user.save()
+    }
 }

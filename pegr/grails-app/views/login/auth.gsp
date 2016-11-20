@@ -7,10 +7,7 @@
 	<div class="container-fluid" id="login-form">
 	<g:form uri="/j_spring_security_check" method="POST" role="form">
         <g:if test="${flash.message}">
-            <div class="message">${flash.message}</div>
-        </g:if>
-        <g:if test="${flash.error}">
-            <div class="error">${flash.error}</div>
+            <div class="alert alert-danger">${flash.message}</div>
         </g:if>
 		<div class="form-group">
 			<label for="j_username">Username </label> 
@@ -29,5 +26,4 @@
 		</div>
 	</g:form>
 	</div>
-
 </body>

@@ -23,7 +23,7 @@ class SecurityFilters {
                 if (projectService.projectViewAuth(projectId)) {
                     return true                    
                 } else {
-                    render(view: '/auth/denied')
+                    render(view: '/login/denied')
                     return false
                 }
             }
@@ -47,7 +47,7 @@ class SecurityFilters {
                         if (projectService.projectViewAuth(projectId)) {
                             return true                    
                         } else {
-                            render(view: '/auth/denied')
+                            render(view: '/login/denied')
                             return false
                         }
                         break
@@ -55,7 +55,7 @@ class SecurityFilters {
                         if (report.user == user) {
                             return true                    
                         } else {
-                            render(view: '/auth/denied')
+                            render(view: '/login/denied')
                             return false
                         }
                         break
@@ -69,7 +69,7 @@ class SecurityFilters {
                 if (projectService.projectEditAuth(project)) {
                     return true                  
                 } else {
-                    render(view: '/auth/denied')
+                    render(view: '/login/denied')
                     return false
                 }
             }
@@ -81,7 +81,7 @@ class SecurityFilters {
                 if (projectService.sampleEditAuth(project)) {
                     return true                  
                 } else {
-                    render(view: '/auth/denied')
+                    render(view: '/login/denied')
                     return false
                 }
             }
@@ -95,7 +95,7 @@ class SecurityFilters {
                 if (currUser.isAdmin() || (antibody?.item == null) || antibody?.item?.user == currUser) {
                     return true
                 } else {
-                    render(view: '/auth/denied')
+                    render(view: '/login/denied')
                     return false
                 }
             }
@@ -109,7 +109,7 @@ class SecurityFilters {
                 if (currUser.isAdmin() || (cellSource?.item == null) || cellSource?.item?.user == currUser) {
                     return true
                 } else {
-                    render(view: '/auth/denied')
+                    render(view: '/login/denied')
                     return false
                 }
             }
@@ -123,7 +123,7 @@ class SecurityFilters {
                 if (currUser.isAdmin() || item?.user == currUser) {
                     return true
                 } else {
-                    render(view: '/auth/denied')
+                    render(view: '/login/denied')
                     return false
                 }
             }
@@ -141,7 +141,7 @@ class SecurityFilters {
                     return true
                 } else {
                     def message = "We have started processing the protocol instance bag and no changes are allowed. Please contact lab admin if you have further questions."
-                    render(view: '/auth/denied', model: [message: message])
+                    render(view: '/login/denied', model: [message: message])
                     return false
                 }
             }    
@@ -158,7 +158,7 @@ class SecurityFilters {
                     return true
                 } else {
                     def message = "The protocol instance bag is completed and no changes are allowed. Please contact lab admin if you have further questions."
-                    render(view: '/auth/denied', model: [message: message])
+                    render(view: '/login/denied', model: [message: message])
                     return false
                 }
             }    
@@ -174,14 +174,14 @@ class SecurityFilters {
                 if (instance?.user) {
                     def currUser = springSecurityService.currentUser
                     if (!currUser.isAdmin() && instance.user != currUser) {
-                        render(view: '/auth/denied')
+                        render(view: '/login/denied')
                         return false
                     }
                 }                
                 if (instance?.bag) {
                     if (instance.bag.status == ProtocolStatus.COMPLETED) {
                         def message = "The protocol instance bag is completed and no changes are allowed. Please contact lab admin if you have further questions."
-                        render(view: '/auth/denied', model: [message: message])
+                        render(view: '/login/denied', model: [message: message])
                     return false
                     }
                 } 
@@ -196,13 +196,13 @@ class SecurityFilters {
                 if (run?.user) {
                     def currUser = springSecurityService.currentUser
                     if (!currUser.isAdmin() && run.user != currUser) {
-                        render(view: '/auth/denied')
+                        render(view: '/login/denied')
                         return false
                     }
                 }
                 if (run?.status == RunStatus.COMPLETED) {
                     def message = "This sequence run is completed and no changes are allowed. Please contact lab admin if you have further questions."
-                    render(view: '/auth/denied', model: [message: message])
+                    render(view: '/login/denied', model: [message: message])
                     return false
                 }
                 return true
@@ -228,7 +228,7 @@ class SecurityFilters {
                 if (ProjectUser.where {project == project && user == currUser}.get(max: 1)) {
                     return true                    
                 } else {
-                    render(view: '/auth/denied')
+                    render(view: '/login/denied')
                     return false
                 }
             }
@@ -247,7 +247,7 @@ class SecurityFilters {
                 if (projectService.sampleEditAuth(project)) {
                     return true
                 } else {
-                    render(view: '/auth/denied')
+                    render(view: '/login/denied')
                     return false
                 }
             }
@@ -266,7 +266,7 @@ class SecurityFilters {
                 if (projectService.sampleEditAuth(project)) {
                     return true
                 } else {
-                    render(view: '/auth/denied')
+                    render(view: '/login/denied')
                     return false
                 }
             }
@@ -284,7 +284,7 @@ class SecurityFilters {
                 if (projectService.sampleEditAuth(project)) {
                     return true
                 } else {
-                    render(view: '/auth/denied')
+                    render(view: '/login/denied')
                     return false
                 }
             }
@@ -306,7 +306,7 @@ class SecurityFilters {
                     if (count[0].cnt > 0) {
                         return true
                     } else {
-                        render(view: '/auth/denied')
+                        render(view: '/login/denied')
                         return false
                     }                    
                 }               
@@ -322,7 +322,7 @@ class SecurityFilters {
                 if (sampleService.editAuth(sample)) {
                     return true
                 } else {
-                    render(view: '/auth/denied')
+                    render(view: '/login/denied')
                     return false
                 }
             }
@@ -341,7 +341,7 @@ class SecurityFilters {
                     if (protocol.user == user) {
                         return true
                     } else {
-                        render(view: '/auth/denied')
+                        render(view: '/login/denied')
                         return false
                     }
                 }
@@ -361,7 +361,7 @@ class SecurityFilters {
                     if (protocol.user == user) {
                         return true
                     } else {
-                        render(view: '/auth/denied')
+                        render(view: '/login/denied')
                         return false
                     }
                 }

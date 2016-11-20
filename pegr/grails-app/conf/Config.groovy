@@ -182,8 +182,5 @@ grails.plugin.springsecurity.interceptUrlMap = [
     '/sequenceRun/**':  ['ROLE_MEMBER', 'ROLE_ADMIN'],
 	'/**':              ['isAuthenticated()'] // everything else requires authenticated user
 ]
-grails.plugin.springsecurity.auth.loginFormUrl = "/login/form"
-grails.plugin.springsecurity.logout.afterLogoutUrl = "/login/form"
-grails.plugin.springsecurity.failureHandler.defaultFailureUrl = "/login/form"
-grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
-grails.plugin.springsecurity.adh.errorPage="/auth/denied"
+
+

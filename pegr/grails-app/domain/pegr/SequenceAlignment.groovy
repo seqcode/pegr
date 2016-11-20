@@ -22,6 +22,7 @@ class SequenceAlignment {
 	Float avgInsertSize
     Float stdDevInsertSize
     Float genomeCoverage
+    String notes
     
     static constraints = {
         historyId unique: ["sequencingExperiment", "genome", "pipeline"]
@@ -41,6 +42,7 @@ class SequenceAlignment {
         avgInsertSize nullable: true
         stdDevInsertSize nullable: true
         genomeCoverage nullable: true
+        notes nullable: true, blank: true
     }
     
     static mapping = {

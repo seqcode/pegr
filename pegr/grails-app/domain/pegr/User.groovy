@@ -1,5 +1,10 @@
 package pegr
 
+import groovy.transform.EqualsAndHashCode
+import groovy.transform.ToString
+
+@EqualsAndHashCode(includes='username')
+@ToString(includes='username', includeNames=true, includePackage=false)
 class User implements Serializable {
 
 	private static final long serialVersionUID = 1
@@ -8,13 +13,13 @@ class User implements Serializable {
 
 	String username
 	String password
-	String fullName
+    String fullName
 	String email
 	String phone
 	Organization affiliation
 	Address address
     String apiKey
-	
+    
 	boolean enabled = true
 	boolean accountExpired
 	boolean accountLocked
@@ -26,27 +31,8 @@ class User implements Serializable {
 		this.password = password
 	}
 
-	@Override
-	int hashCode() {
-		username?.hashCode() ?: 0
-	}
-
-	@Override
-	boolean equals(other) {
-		is(other) || (other instanceof User && other.username == username)
-	}
-
-	@Override
-	String toString() {
-        if (fullName) {
-            return "$username($fullName)" 
-        } else {
-            return "${username}"
-        }
-	}
-
-	Set<Role> getAuthorities() {
-		UserRole.findAllByUser(this)*.role
+	Set<RoleGroup> getAuthorities() {
+		UserRoleGroup.findAllByUser(this)*.roleGroup
 	}
     
     boolean isAdmin() {
@@ -62,7 +48,7 @@ class User implements Serializable {
 	static constraints = {
 		username blank: false, unique: true
 		password blank: false
-		fullName nullable: true, blank: true
+        fullName nullable: true, blank: true
 		email nullable: true, blank: true
 		phone nullable: true, maxSize: 20
 		affiliation nullable: true
@@ -72,6 +58,6 @@ class User implements Serializable {
 
 	static mapping = {
 		password column: '`password`'
-		dynamicUpdate true
+        dynamicUpdate true
 	}
 }

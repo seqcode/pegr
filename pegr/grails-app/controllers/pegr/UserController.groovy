@@ -117,8 +117,9 @@ class UserController {
     }
     
     def email() {
-        emailService.getLabels()
+        //emailService.send(to, subject, bodyText)
         redirect(action: "profile")
+
     }
 }
 

@@ -132,7 +132,9 @@ grails.war.resources = { stagingDir ->
 grails.plugin.springsecurity.userLookup.userDomainClassName = 'pegr.User'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'pegr.UserRole'
 grails.plugin.springsecurity.authority.className = 'pegr.Role'
-grails.plugin.springsecurity.requestMap.className = 'pegr.Requestmap'
+grails.plugin.springsecurity.authority.groupAuthorityNameField = 'authorities'
+grails.plugin.springsecurity.useRoleGroups = true
+
 grails.plugin.springsecurity.securityConfigType = 'InterceptUrlMap'
 grails.plugin.springsecurity.interceptUrlMap = [
 	'/assets/**':       ['permitAll'],

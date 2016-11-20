@@ -10,6 +10,11 @@ class UrlMappings {
 			 action = "form"
 		}
         
+        "/login/auth"{
+			controller = "auth"
+			 action = "form"
+		}
+        
         "/login/full"{
 			controller = "auth"
 			 action = "form"

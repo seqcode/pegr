@@ -12,7 +12,7 @@ class UserController {
 	def profile(){
         def user = springSecurityService.currentUser
         if (!user) {
-            redirect(uri: "/login/form")
+            redirect(uri: "/login/auth")
         } else {
             [user:user]
         }
@@ -66,13 +66,12 @@ class UserController {
         redirect(action: "profile")
     }
     
-    def updatePassword(UserRegistrationCommand urc) {
+    def updatePassword(PasswordRegistrationCommand urc) {
         if(request.method=='POST') {
             withForm {
                 def user = springSecurityService.currentUser.attach()
-                urc.username = user.username
                 try {
-                    userService.updatePassword(urc)
+                    userService.updatePassword(user, urc)
                     flash.message = "Your password has been changed."
                     redirect(action: "profile")
                 } catch (UserException e) {
@@ -88,7 +87,7 @@ class UserController {
             try {
                 userService.create(urc)
                 flash.message = "You have registered with PEGR. Please login."
-                redirect(controller: "auth", action: "form")
+                redirect(controller: "login", action: "auth")
             } catch (UserException e) {
                 request.message = e.message
                 [user: urc]
@@ -114,22 +113,23 @@ class UserController {
         
     }
     
-    def sendResetPasswordEmail(){
+    def sendResetPasswordEmail(String email){
         try {
-            userService.sendResetPasswordEmail()
+            def baseUrl = g.createLink(action: "resetPassword", absolute: true)
+            userService.sendResetPasswordEmail(email, baseUrl)
         } catch (UserException e) {
             flash.message = e.message
             redirect(action: "forgetPassword")
         }
     }
     
-    def resetPassword(String token, UserRegistrationCommand urc) {
+    def resetPassword(String token, PasswordRegistrationCommand urc) {
         if (request.method == "POST") {
             try {
                 userService.resetPasswordByToken(token, urc)
                 redirect(controller: "login", action: "auth")
             } catch(UserException e) {
-                flash.message = e.message
+                request.message = e.message
                 [token: token]
             }
         } else {
@@ -141,12 +141,27 @@ class UserController {
 @grails.validation.Validateable
 class UserRegistrationCommand {
 	String username
+    String email
 	String password
 	String passwordRepeat
 
 	static constraints = {
 		importFrom User
+        email email: true, blank: false
+		password(size: 5..20, blank: false)		
+		passwordRepeat nullable: false,
+		   validator: { passwd2, urc ->
+			   return passwd2 == urc.password ?: 'validation.reenterSamePassword'
+		   }
+	}
+}
 
+@grails.validation.Validateable
+class PasswordRegistrationCommand {
+	String password
+	String passwordRepeat
+
+	static constraints = {
 		password(size: 5..20, blank: false)		
 		passwordRepeat nullable: false,
 		   validator: { passwd2, urc ->

@@ -4,7 +4,11 @@
     </head>
     <body>
         <div class="container">
-            <g:form controller="user" action="resetPassword">
+            <g:if test="${request.message}">
+                <div class="alert alert-danger">${request.message}</div>
+            </g:if>
+            <g:form controller="user" action="resetPassword" class="fields">
+                <input type="hidden" name="token" value="${token}">
                 <div>
                     <label>New Password</label>
                     <g:passwordField name="password"></g:passwordField>

@@ -18,6 +18,10 @@
             <label for="username">Username</label>
             <g:textField class="form-control" required="required" id="username" name="username" value="${user?.username}"></g:textField>
         </div>
+        <div class="form-group ${hasErrors(bean: user, field: 'email', 'error')}">
+            <label>Email</label>
+            <input name="email" class="form-control" required="required" value="${user?.email}">
+        </div>
         <div class="form-group ${hasErrors(bean: user, field: 'password', 'error')}">
             <label for="pwd">Password</label>
             <g:passwordField class="form-control" required="required" id="pwd" name="password" required="required"></g:passwordField>

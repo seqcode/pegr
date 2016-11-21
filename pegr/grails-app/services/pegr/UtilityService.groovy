@@ -3,6 +3,7 @@ import grails.transaction.Transactional
 import groovy.json.*
 import groovy.sql.Sql
 import org.springframework.web.multipart.MultipartHttpServletRequest 
+import org.apache.commons.lang.RandomStringUtils
     
 class UtilityException extends RuntimeException {
     String message
@@ -328,4 +329,8 @@ class UtilityService {
         return filepath
     }
 
+    def getRandomString(int length) {
+        String charset = (('A'..'Z') + ('a'..'z') + ('0'..'9')).join()
+        return RandomStringUtils.random(length, charset.toCharArray())
+    }
 }

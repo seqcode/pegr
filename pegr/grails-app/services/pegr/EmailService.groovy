@@ -155,8 +155,8 @@ class EmailService {
     def send(String to, String subject, String body) {
         // Build a new authorized API client service.
         Gmail service = getGmailService()
+        String from = grailsApplication.config.gmail.from
         String user = "me"
-        String from = "cegr.pegr@gmail.com"
         MimeMessage emailContent = createEmail(to, from, subject, body)
         sendMessage(service, user, emailContent)
     }

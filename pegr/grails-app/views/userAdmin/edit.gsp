@@ -15,8 +15,8 @@
                     <g:select name="affiliation" from="${pegr.Organization.list()}" optionKey="id" value="${user?.affiliation}" noSelection="['':'--Choose--']" class="select2"></g:select> 
                 </div>
                 <div>
-                    <label>Authority</label>
-                    <g:select name="roles" from="${pegr.Role.list()}" optionKey="id" value="${user?.authorities}" multiple="multiple"></g:select>
+                    <label>Group</label>
+                    <g:select name="groups" from="${pegr.RoleGroup.list()}" optionKey="id" value="${user?.authorities}" multiple="multiple"></g:select>
                 </div>
                 <div>
                     <label>Status</label>

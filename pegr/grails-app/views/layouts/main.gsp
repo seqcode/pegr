@@ -33,7 +33,7 @@
                     <a href="#" class="dropdown-toggle"  data-toggle="dropdown">
                         <span class="glyphicon glyphicon-user"></span>${sec.username()}<span class="caret"></span>
                     </a>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu" style="background-color:#2c5986">
                         <li><g:link controller="user" action="profile"><span class="glyphicon glyphicon-user"></span> Profile</g:link></li>
                       <li><g:remoteLink class="logout" controller="logout" method="post" asynchronous="false" onSuccess="location.reload()"><span class="glyphicon glyphicon-log-out"></span> Logout</g:remoteLink></li>
                     </ul>

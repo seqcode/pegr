@@ -18,7 +18,7 @@
 			<g:passwordField class="form-control" name="j_password" placeholder="Enter Password"/>
 		</div>
 		<div class="form-group">
-			<label><g:checkBox name="_spring_security_remember_me" value="true"/> Remember me</label>
+			<label><g:checkBox name="_spring_security_remember_me" value="true"/> Remember me</label> | <g:link controller="user" action="forgetPassword">Forget Password</g:link>
 		</div>
 		<div class="form-group">
 			<g:submitButton name="signIn" value="Sign in" class="btn btn-primary"/>

@@ -11,6 +11,10 @@ class RoleGroup implements Serializable {
 
 	String name
 
+	String toString() {
+		name
+	}
+    
 	RoleGroup(String name) {
 		this()
 		this.name = name

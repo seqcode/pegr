@@ -141,7 +141,7 @@ grails.plugin.springsecurity.interceptUrlMap = [
 	'/**/js/**':        ['permitAll'],
 	'/**/css/**':       ['permitAll'],
 	'/**/images/**':    ['permitAll'],
-    '/user/register':   ['permitAll'],
+    '/user/**':         ['permitAll'],
     '/login/**':        ['permitAll'],
 	'/logout/**':       ['permitAll'],
     '/api/**':          ['permitAll'],
@@ -182,5 +182,7 @@ grails.plugin.springsecurity.interceptUrlMap = [
     '/sequenceRun/**':  ['ROLE_MEMBER', 'ROLE_ADMIN'],
 	'/**':              ['isAuthenticated()'] // everything else requires authenticated user
 ]
+
+grails.plugin.springsecurity.logout.afterLogoutUrl = "/login/auth"
 
 

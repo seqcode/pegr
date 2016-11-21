@@ -35,12 +35,16 @@ class User implements Serializable {
 		UserRoleGroup.findAllByUser(this)*.roleGroup
 	}
     
+    Set<Role> getRoles() {
+        return this.authorities*.authorities.flatten()
+    }
+    
     boolean isAdmin() {
-        return this.authorities.any { it.authority == "ROLE_ADMIN" }
+        return this.roles.any { it.authority == "ROLE_ADMIN" }
     }
     
     boolean isMember() {
-        return this.authorities.any { it.authority == "ROLE_MEMBER" }
+        return this.roles.any { it.authority == "ROLE_MEMBER" }
     }
 
 	static transients = ['springSecurityService']

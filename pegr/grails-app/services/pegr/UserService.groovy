@@ -32,17 +32,17 @@ class UserService {
     }
     
     @Transactional
-    def updateByAdmin(User user, List roles) {
+    def updateByAdmin(User user, List groups) {
         user.save()
-        def toDelete = UserRole.findAllByUser(user)
-        roles.each { roleId ->
-            def role = Role.get(roleId)
-            if (role) {
-                def old = toDelete.find { it.role == role }
+        def toDelete = UserRoleGroup.findAllByUser(user)
+        groups.each { groupId ->
+            def group = RoleGroup.get(groupId)
+            if (group) {
+                def old = toDelete.find { it.roleGroup == group }
                 if (old) {
                     toDelete.remove(old)
                 } else {
-                    new UserRole(user: user, role: role).save()
+                    new UserRoleGroup(user: user, roleGroup: group).save()
                 }   
             }                     
         }
@@ -78,7 +78,7 @@ class UserService {
         }
         
         // API key configs
-        String charset = (('A'..'Z') + ('0'..'9') ).join()
+        String charset = (('A'..'Z') + ('a'..'z') + ('0'..'9')).join()
         final int length = 32
         final int maxAttempt = 10
         
@@ -123,5 +123,31 @@ class UserService {
         user.address.delete()
         user.address = null
         user.save()
+    }
+    
+    @Transactional
+    def updatePassword(UserRegistrationCommand urc) {
+        urc.validate()
+        if (urc.hasErrors()) {
+            throw new UserException(message: "Invalid input!")
+        } else {                                   
+            user.password = springSecurityService.encodePassword(urc.password)
+            user.save()
+        }
+    }
+    
+    @Transactional
+    def sendResetPasswordEmail() {
+        
+    }
+    
+    @Transactional
+    def resetPasswordByToken(String token, UserRegistrationCommand urc) {
+        def userToken = Token.findByToken(token)
+        if (!userToken) {
+            throw new UserException(message: "Invalid link!")
+        }
+        urc.username = userToken.user.username
+        updatePassword(urc)
     }
 }

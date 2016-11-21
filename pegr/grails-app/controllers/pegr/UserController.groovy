@@ -71,25 +71,19 @@ class UserController {
             withForm {
                 def user = springSecurityService.currentUser.attach()
                 urc.username = user.username
-                urc.validate()
-                if (urc.hasErrors()) {
+                try {
+                    userService.updatePassword(urc)
+                    flash.message = "Your password has been changed."
+                    redirect(action: "profile")
+                } catch (UserException e) {
+                    request.message = e.message
                     render(view: "updatePassword", model: [user: urc])
-                } else {                                   
-                    user.password = springSecurityService.encodePassword(urc.password)
-                    try {
-                        userService.save(user)
-                        flash.message = "Your password has been changed."
-                        redirect(action: "profile")
-                    } catch(UserException e) {
-                        request.message = e.message
-                        render(view: "updatePassword", model: [user: urc])
-                    }
                 }        
             }   
         }
     }
     
-	def register(UserRegistrationCommand urc) {
+    def register(UserRegistrationCommand urc) {
         if(request.method=='POST') {
             try {
                 userService.create(urc)
@@ -115,11 +109,32 @@ class UserController {
         def users = User.list().collect{[it.id, it.toString()]}
         render utilityService.arrayToSelect2Data(users) as JSON
     }
+        
+    def forgetPassword() {
+        
+    }
     
-    def email() {
-        //emailService.send(to, subject, bodyText)
-        redirect(action: "profile")
-
+    def sendResetPasswordEmail(){
+        try {
+            userService.sendResetPasswordEmail()
+        } catch (UserException e) {
+            flash.message = e.message
+            redirect(action: "forgetPassword")
+        }
+    }
+    
+    def resetPassword(String token, UserRegistrationCommand urc) {
+        if (request.method == "POST") {
+            try {
+                userService.resetPasswordByToken(token, urc)
+                redirect(controller: "login", action: "auth")
+            } catch(UserException e) {
+                flash.message = e.message
+                [token: token]
+            }
+        } else {
+            [token: token]
+        }
     }
 }
 

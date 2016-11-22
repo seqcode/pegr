@@ -115,8 +115,13 @@ class UserController {
     
     def sendResetPasswordEmail(String email){
         try {
-            def baseUrl = g.createLink(action: "resetPassword", absolute: true)
-            userService.sendResetPasswordEmail(email, baseUrl)
+            def token = userService.getToken(email)
+            def url = g.createLink(action: "resetPassword", params: [token: token], absolute: true)
+            sendMail {
+               to email
+               subject "[PEGR] Reset password"
+               body 'Please follow the link ' + url + ' to reset your password.'
+            }
         } catch (UserException e) {
             flash.message = e.message
             redirect(action: "forgetPassword")

@@ -138,7 +138,7 @@ class UserService {
     }
     
     @Transactional
-    def sendResetPasswordEmail(String email, String baseUrl) {
+    def getToken(String email) {
         def user = User.findByEmail(email)
         if (!user) {
             throw new UserException(message: "User not found!")
@@ -146,8 +146,7 @@ class UserService {
         def length = 32
         def token = utilityService.getRandomString(length)
         new Token(token: token, user: user, date: new Date()).save()
-        def url = baseUrl + "?token=" + token
-        EmailResetPasswordJob.triggerNow([email: email, url: url])
+        return token
     }
     
     @Transactional

@@ -51,9 +51,6 @@ grails.project.dependency.resolution = {
         runtime 'mysql:mysql-connector-java:5.1.29'
         // runtime 'org.postgresql:postgresql:9.3-1101-jdbc41'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
-        compile 'com.google.api-client:google-api-client:1.22.0'
-        compile 'com.google.oauth-client:google-oauth-client-jetty:1.22.0'
-        compile 'com.google.apis:google-api-services-gmail:v1-rev51-1.22.0'
     }
 
     plugins {
@@ -77,5 +74,6 @@ grails.project.dependency.resolution = {
         //compile ":handlebars-asset-pipeline:1.3.0.3"
 		compile ":spring-security-core:2.0.0"
         compile "org.grails.plugins:quartz:1.0.1"
+        compile "org.grails.plugins:mail:1.0.7"
     }
 }

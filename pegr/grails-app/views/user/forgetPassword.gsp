@@ -5,7 +5,7 @@
     <body>
         <div class="container">
             <g:if test="${flash.message}">
-                <div class="alert alert danger">${flash.message}</div>
+                <div class="alert alert-danger">${flash.message}</div>
             </g:if>
             <g:form controller="user" action="sendResetPasswordEmail">
                 <p>Please enter your username and we will email you the link to reset your password. </p>

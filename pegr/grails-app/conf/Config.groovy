@@ -193,3 +193,5 @@ grails {
               "mail.smtp.socketFactory.fallback":"false"]
    }
 }
+
+grails.plugin.springsecurity.providerNames = ['daoAuthenticationProvider', 'preAuthenticatedAuthenticationProvider', 'anonymousAuthenticationProvider', 'rememberMeAuthenticationProvider']

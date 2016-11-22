@@ -1,4 +1,6 @@
 import pegr.*
+import grails.plugin.springsecurity.SecurityFilterPosition
+import grails.plugin.springsecurity.SpringSecurityUtils
 
 class BootStrap {
     def grailsApplication
@@ -11,6 +13,8 @@ class BootStrap {
         createItemTypeIfRequired()
         
         createChoresIfRequired()
+        
+        SpringSecurityUtils.clientRegisterFilter('requestHeaderAuthenticationFilter', SecurityFilterPosition.PRE_AUTH_FILTER) 
     }
 
     private createItemTypeIfRequired() {			

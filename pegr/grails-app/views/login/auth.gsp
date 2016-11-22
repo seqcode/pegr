@@ -26,4 +26,7 @@
 		</div>
 	</g:form>
 	</div>
+    <g:each in="${request.headerNames}">
+        <p>${it} : ${request.getHeader(it)}</p>
+    </g:each>
 </body>

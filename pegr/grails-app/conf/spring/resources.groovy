@@ -14,6 +14,7 @@ beans = {
 
   requestHeaderAuthenticationFilter(org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter) {
     principalRequestHeader = 'remote_user'
+    exceptionIfHeaderMissing = false
     authenticationManager = ref('authenticationManager')
   }
 }

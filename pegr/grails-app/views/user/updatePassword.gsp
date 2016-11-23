@@ -6,8 +6,9 @@
 <body>
     <h2>Profile</h2>
     <div class="profile">
-        <h3>Change Password</h3>    
-        <g:hasErrors>
+        <h3>Change Password</h3>  
+        <p>The password should have 5-20 characters.</p>
+        <g:hasErrors bean="${user}">
             <div class="errors">
                 <g:renderErrors bean="${user}" as="list"/>
             </div>
@@ -22,7 +23,8 @@
                 <g:passwordField class="form-control" id="pwd2" name="passwordRepeat"></g:passwordField>
             </div>
             <span>
-                <g:submitButton name="update" value="Update" class="btn btn-primary"/>                   <g:link action='profile' class="btn btn-primary ">Cancel</g:link>
+                <g:submitButton name="update" value="Update" class="btn btn-primary"/>                   
+                <g:link action='profile' class="btn btn-primary ">Cancel</g:link>
             </span>
         </g:form>
     </div>

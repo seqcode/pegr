@@ -1,7 +1,6 @@
 package pegr
 
 import grails.transaction.Transactional
-import org.apache.commons.lang.RandomStringUtils
 
 class UserException extends RuntimeException {
     String message
@@ -10,6 +9,7 @@ class UserException extends RuntimeException {
 
 class UserService {
     def springSecurityService
+    def utilityService
     
     @Transactional
     User updateUser(UserInfoCommand uic, Long userId){
@@ -32,17 +32,17 @@ class UserService {
     }
     
     @Transactional
-    def updateByAdmin(User user, List roles) {
+    def updateByAdmin(User user, List groups) {
         user.save()
-        def toDelete = UserRole.findAllByUser(user)
-        roles.each { roleId ->
-            def role = Role.get(roleId)
-            if (role) {
-                def old = toDelete.find { it.role == role }
+        def toDelete = UserRoleGroup.findAllByUser(user)
+        groups.each { groupId ->
+            def group = RoleGroup.get(groupId)
+            if (group) {
+                def old = toDelete.find { it.roleGroup == group }
                 if (old) {
                     toDelete.remove(old)
                 } else {
-                    new UserRole(user: user, role: role).save()
+                    new UserRoleGroup(user: user, roleGroup: group).save()
                 }   
             }                     
         }
@@ -57,6 +57,8 @@ class UserService {
             throw new UserException(message: "Input error!")
         } else if(User.findByUsername(urc.username)) {
             throw new UserException(message: "Username already exists!")
+        } else if(User.findByEmail(urc.email)) {
+            throw new UserException(message: "Email has already been used!")
         } else {
             def user = new User(urc.properties)
             user.password = springSecurityService.encodePassword(urc.password)
@@ -77,15 +79,14 @@ class UserService {
             throw new UserException("Not logged in!")
         }
         
-        // API key configs
-        String charset = (('A'..'Z') + ('0'..'9') ).join()
+        // API key configs       
         final int length = 32
         final int maxAttempt = 10
         
         // generate a random string as the API key
         String randomString
         for (int i=0; i< maxAttempt; ++i) {
-            randomString = RandomStringUtils.random(length, charset.toCharArray())
+            randomString = utilityService.getRandomString(length)
             // avoid duplicate API keys
             if (!User.findByApiKey(randomString)) {
                 user.apiKey = randomString
@@ -97,5 +98,64 @@ class UserService {
             throw new UserException(message: "Error generating the API key!")
         }
         
+    }
+    
+    @Transactional
+    def save(User user) {
+        if (!user.save()) {
+            throw new UserException(message: "Error saving the user!")
+        }
+    }
+    
+    @Transactional
+    def updateAddress(User user, Address address) {
+        if (user.address) {
+            user.address.properties = address
+        } else {
+            user.address = address
+        }
+        if (!user.address.save()) {
+            throw new UserException(message: "Error saving the address!")
+        }
+    }
+    
+    @Transactional
+    def deleteAddress(User user) {
+        user.address.delete()
+        user.address = null
+        user.save()
+    }
+    
+    @Transactional
+    def updatePassword(User user, PasswordRegistrationCommand urc) {
+        urc.validate()
+        if (urc.hasErrors()) {
+            throw new UserException(message: "Invalid input!")
+        } else {                                   
+            user.password = springSecurityService.encodePassword(urc.password)
+            user.save()
+        }
+    }
+    
+    @Transactional
+    def getToken(String email) {
+        def user = User.findByEmail(email)
+        if (!user) {
+            throw new UserException(message: "User not found!")
+        }
+        def length = 32
+        def token = utilityService.getRandomString(length)
+        new Token(token: token, user: user, date: new Date()).save()
+        return token
+    }
+    
+    @Transactional
+    def resetPasswordByToken(String token, PasswordRegistrationCommand urc) {
+        def userToken = Token.findByToken(token)
+        if (!userToken) {
+            throw new UserException(message: "Invalid link!")
+        }
+        updatePassword(userToken.user, urc)
+        userToken.delete()
     }
 }

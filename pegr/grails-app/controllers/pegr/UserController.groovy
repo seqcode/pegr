@@ -7,11 +7,12 @@ class UserController {
 	def springSecurityService	
 	def userService
     def utilityService
+    def emailService
     
 	def profile(){
         def user = springSecurityService.currentUser
         if (!user) {
-            redirect(uri: "/login/form")
+            redirect(uri: "/login/auth")
         } else {
             [user:user]
         }
@@ -37,66 +38,56 @@ class UserController {
         }
     }
     
-    @Transactional
-    def editAddress(Address address){
+    def editAddress(Address newAddress){
+        def user = springSecurityService.currentUser
         if(request.method=='POST'){
             withForm {
-                if (address.validate() && address.save()) {
-                    def user = springSecurityService.currentUser?.attach()
-                    user.address = address
+                try {
+                    userService.updateAddress(user, newAddress)
                     flash.message = "Your address has been updated!"
                     redirect(action: "profile")
-                } else {
-                    request.message = "Invalid input!" 
-                    render(view:'editAddress', model:[address: address])
+                } catch(UserException e) {
+                    request.message = e.message
+                    render(view:'editAddress', model:[address: newAddress])
                 }
             }
         }else{
-            [address: address]
+            [address: user.address]
         }
     }
     
-    @Transactional
-    def deleteAddress(Address address) {
-        if (address == null) {
-            render status:404
-        }
-        def user = springSecurityService.currentUser?.attach()
-        user.address = null
-        address.delete()
-        flash.message = "Your address has been deleted!"
+    def deleteAddress() {
+        try {
+            def user = springSecurityService.currentUser
+            userService.deleteAddress(user)
+        } catch (UserException e) {
+            flash.message = "Your address has been deleted!"
+        }        
         redirect(action: "profile")
     }
     
-    @Transactional
-    def updatePassword() {
+    def updatePassword(PasswordRegistrationCommand urc) {
         if(request.method=='POST') {
             withForm {
                 def user = springSecurityService.currentUser.attach()
-                def urc = new UserRegistrationCommand(username: user.username, 
-                                                      password: params.password, 
-                                                passwordRepeat: params.passwordRepeat)
-                if (urc.hasErrors()) {
-                    [user: urc]
-                } else {
+                try {
+                    userService.updatePassword(user, urc)
                     flash.message = "Your password has been changed."
-                    user.password = springSecurityService.encodePassword(urc.password)
-                    if (user.validate() && user.save()) {
-                        redirect(action: "profile")
-                    }else {
-                        [user: urc]
-                    }
+                    redirect(action: "profile")
+                } catch (UserException e) {
+                    request.message = e.message
+                    render(view: "updatePassword", model: [user: urc])
                 }        
             }   
         }
     }
     
-    @Transactional
-	def register(UserRegistrationCommand urc) {
+    def register(UserRegistrationCommand urc) {
         if(request.method=='POST') {
             try {
                 userService.create(urc)
-                redirect(controller: "auth", action: "form")
+                flash.message = "You have registered with PEGR. Please login."
+                redirect(controller: "login", action: "auth")
             } catch (UserException e) {
                 request.message = e.message
                 [user: urc]
@@ -117,17 +108,66 @@ class UserController {
         def users = User.list().collect{[it.id, it.toString()]}
         render utilityService.arrayToSelect2Data(users) as JSON
     }
+        
+    def forgetPassword() {
+        
+    }
+    
+    def sendResetPasswordEmail(String email){
+        try {
+            def token = userService.getToken(email)
+            def url = g.createLink(action: "resetPassword", params: [token: token], absolute: true)
+            sendMail {
+               to email
+               subject "[PEGR] Reset password"
+               body 'Please follow the link ' + url + ' to reset your password.'
+            }
+        } catch (UserException e) {
+            flash.message = e.message
+            redirect(action: "forgetPassword")
+        }
+    }
+    
+    def resetPassword(String token, PasswordRegistrationCommand urc) {
+        if (request.method == "POST") {
+            try {
+                userService.resetPasswordByToken(token, urc)
+                redirect(controller: "login", action: "auth")
+            } catch(UserException e) {
+                request.message = e.message
+                [token: token]
+            }
+        } else {
+            [token: token]
+        }
+    }
 }
 
+@grails.validation.Validateable
 class UserRegistrationCommand {
 	String username
+    String email
 	String password
 	String passwordRepeat
 
 	static constraints = {
 		importFrom User
+        email email: true, blank: false
+		password(size: 5..20, blank: false)		
+		passwordRepeat nullable: false,
+		   validator: { passwd2, urc ->
+			   return passwd2 == urc.password ?: 'validation.reenterSamePassword'
+		   }
+	}
+}
 
-		password size: 5..20, blank: false		
+@grails.validation.Validateable
+class PasswordRegistrationCommand {
+	String password
+	String passwordRepeat
+
+	static constraints = {
+		password(size: 5..20, blank: false)		
 		passwordRepeat nullable: false,
 		   validator: { passwd2, urc ->
 			   return passwd2 == urc.password ?: 'validation.reenterSamePassword'

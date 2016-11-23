@@ -6,14 +6,23 @@
     <body>
         <div class="container-fluid">
             <div class="col-sm-10 text-left">
+                <div class="well">
+                    <g:form action="search">
+                        Username
+                        <input name="username">
+                        or Email
+                        <input name="email">
+                        <g:submitButton name="submit" value="Search" class="edit"></g:submitButton>
+                    </g:form>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <g:sortableColumn property="fullName" title="Name" params="[affiliationId: affiliationId, roleId: roleId, isEnabled: isEnabled]"></g:sortableColumn>
-                                <g:sortableColumn property="username" title="Username" params="[affiliationId: affiliationId, roleId: roleId, isEnabled: isEnabled]"></g:sortableColumn>
+                                <g:sortableColumn property="fullName" title="Name" params="[affiliationId: affiliationId, groupId: groupId, isEnabled: isEnabled]"></g:sortableColumn>
+                                <g:sortableColumn property="username" title="Username" params="[affiliationId: affiliationId, groupId: groupId, isEnabled: isEnabled]"></g:sortableColumn>
                                 <th>Affiliation</th>
-                                <th>Role</th>
+                                <th>Group</th>
                                 <th>Status</th>
                                 <th></th>
                             </tr>
@@ -24,7 +33,7 @@
                                     <td>${it.fullName}</td>
                                     <td>${it.username}</td>
                                     <td>${it.affiliation}</td>
-                                    <td>${it.authorities.join(", ")}</td>
+                                    <td>${it.authorities*.name.join(", ")}</td>
                                     <td>
                                         <g:if test="${it.enabled}">
                                             <span class="label label-primary">Active</span>
@@ -39,16 +48,16 @@
                         </tbody>
                     </table>
                     <div class="pagination">
-                        <g:paginate next="Next" prev="Prev" controller="userAdmin" action="index" params="[affiliationId: affiliationId, roleId: roleId, isEnabled: isEnabled]" max="25" total="${totalCount ?: 0}" />
+                        <g:paginate next="Next" prev="Prev" controller="userAdmin" action="index" params="[affiliationId: affiliationId, groupId: groupId, isEnabled: isEnabled]" max="25" total="${totalCount ?: 0}" />
                     </div>
                 </div>
             </div>
             <div class="col-sm-2 sidenav filter text-center">
                 <h5 id="all"><g:link controller="userAdmin" action="index">All</g:link></h5>
-                <h4>Role</h4>
+                <h4>Group</h4>
                 <ul>
-                    <g:each var="role" in="${pegr.Role.list()}">
-                        <li id="role-${role?.id}"><g:link controller="userAdmin" action="index" params="[roleId: role.id]">${role.authority}</g:link></li>
+                    <g:each var="group" in="${pegr.RoleGroup.list()}">
+                        <li id="group-${group?.id}"><g:link controller="userAdmin" action="index" params="[groupId:group.id]">${group.name}</g:link></li>
                     </g:each>
                 </ul>
                 <h4>Affiliation</h4>
@@ -69,8 +78,8 @@
             <g:if test="${affiliationId != null}">
                 $("#affiliation-${affiliationId}").addClass("active")
             </g:if>
-            <g:elseif test="${roleId != null}">
-                $("#role-${roleId}").addClass("active")
+            <g:elseif test="${groupId != null}">
+                $("#group-${groupId}").addClass("active")
             </g:elseif>
             <g:elseif test="${isEnabled == 'true'}">
                 $("#active").addClass("active")

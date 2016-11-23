@@ -1,16 +1,9 @@
 class UrlMappings {
 
 	static mappings = {
-        
-		"/login/form"{
-			controller = "auth"
-			 action = "form"
-		}
-        
-        "/login/full"{
-			controller = "auth"
-			 action = "form"
-		}
+        "500"(view:'/error')        
+        "404"(view:'/404')
+        "403"(view:'/auth/denied')
         
         "/$controller/$action?/$id?(.$format)?"{
             constraints {
@@ -23,8 +16,6 @@ class UrlMappings {
 			action = "index"
 		}
 		
-        "500"(view:'/error')
-        
-        "404"(view:'/404')
+
 	}
 }

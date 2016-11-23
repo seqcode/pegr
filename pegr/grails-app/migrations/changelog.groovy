@@ -2885,4 +2885,6 @@ databaseChangeLog = {
 	include file: 'addCellSourceStatus.groovy'
 
 	include file: 'addCohortNotes.groovy'
+
+	include file: 'addGroupRole.groovy'
 }

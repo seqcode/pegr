@@ -132,14 +132,16 @@ grails.war.resources = { stagingDir ->
 grails.plugin.springsecurity.userLookup.userDomainClassName = 'pegr.User'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'pegr.UserRole'
 grails.plugin.springsecurity.authority.className = 'pegr.Role'
-grails.plugin.springsecurity.requestMap.className = 'pegr.Requestmap'
+grails.plugin.springsecurity.authority.groupAuthorityNameField = 'authorities'
+grails.plugin.springsecurity.useRoleGroups = true
+
 grails.plugin.springsecurity.securityConfigType = 'InterceptUrlMap'
 grails.plugin.springsecurity.interceptUrlMap = [
 	'/assets/**':       ['permitAll'],
 	'/**/js/**':        ['permitAll'],
 	'/**/css/**':       ['permitAll'],
 	'/**/images/**':    ['permitAll'],
-    '/user/register':   ['permitAll'],
+    '/user/**':         ['permitAll'],
     '/login/**':        ['permitAll'],
 	'/logout/**':       ['permitAll'],
     '/api/**':          ['permitAll'],
@@ -180,7 +182,14 @@ grails.plugin.springsecurity.interceptUrlMap = [
     '/sequenceRun/**':  ['ROLE_MEMBER', 'ROLE_ADMIN'],
 	'/**':              ['isAuthenticated()'] // everything else requires authenticated user
 ]
-grails.plugin.springsecurity.auth.loginFormUrl = "/login/form"
-grails.plugin.springsecurity.logout.afterLogoutUrl = "/login/form"
-grails.plugin.springsecurity.failureHandler.defaultFailureUrl = "/login/form"
-grails.plugin.springsecurity.successHandler.defaultTargetUrl = "/"
+
+grails.plugin.springsecurity.logout.afterLogoutUrl = "/login/auth"
+
+grails {
+   mail {
+     props = ["mail.smtp.auth":"true", 					   
+              "mail.smtp.socketFactory.port":"465",
+              "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+              "mail.smtp.socketFactory.fallback":"false"]
+   }
+}

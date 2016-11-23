@@ -62,10 +62,26 @@ class UserService {
         } else {
             def user = new User(urc.properties)
             user.password = springSecurityService.encodePassword(urc.password)
+            user.enabled = false
             if (!user.save(flush:true)) {
-                throw new UserException(message: "Error creating the user!")              
+                throw new UserException(message: "Error creating the user!")
             }
+            def length = 32
+            def token = utilityService.getRandomString(length)
+            new Token(token: token, user: user, date: new Date()).save()
+            return token
         }
+    }
+    
+    @Transactional
+    def enableAccount(String token) {
+        def userToken = Token.findByToken(token)
+        if (!userToken) {
+            throw new UserException(message: "Invalid link!")
+        }
+        userToken.user.enabled = true
+        userToken.user.save()
+        userToken.delete()
     }
     
     /**

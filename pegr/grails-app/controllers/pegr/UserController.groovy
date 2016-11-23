@@ -85,15 +85,30 @@ class UserController {
     def register(UserRegistrationCommand urc) {
         if(request.method=='POST') {
             try {
-                userService.create(urc)
-                flash.message = "You have registered with PEGR. Please login."
-                redirect(controller: "login", action: "auth")
+                def token = userService.create(urc)
+                def url = g.createLink(action: "activateAccount", params: [token: token], absolute: true)
+                sendMail {
+                   to urc.email
+                   subject "[PEGR] Activate account"
+                   body 'Please follow the link ' + url + ' to activate your account.'
+                }
+                render "You have registered with PEGR. An email has been sent to your email. Please follow the link to activate your account."
             } catch (UserException e) {
                 request.message = e.message
                 [user: urc]
             }
         }
 	}
+    
+    def activateAccount(String token) {
+        try {
+            userService.enableAccount(token)
+            flash.message = "Your account has been activated!"
+        } catch(UserException e) {
+            flash.message = e.message
+        }
+        redirect(uri: "/login/auth")
+    }
     
     def generateApiKey() {
         try {

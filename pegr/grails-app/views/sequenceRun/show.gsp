@@ -75,7 +75,7 @@
                     <ul>
                     <g:each in="${cohort.imageMap?.gel}" var="filepath">
                         <li>
-                            <g:link controller="sequenceRun" action="displayImage" params="[cohortId:cohort.id,filepath:filepath]" target="_blank">filepath</g:link>
+                            <g:link controller="sequenceRun" action="displayImage" params="[cohortId:cohort.id,filepath:filepath]" target="_blank">${filepath}</g:link>
                             <g:if test="${editable}"><button>x</button></g:if>
                         </li>
                     </g:each>

@@ -53,7 +53,7 @@
         </div>
         <h3>Password</h3>
         <ul>
-        <g:link action='updatePassword' id="${user?.id}" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil">Change</span></g:link>
+        <g:link action='updatePassword' class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil">Change</span></g:link>
         </ul>
         <h3>API Key</h3>
         <g:if test="${user?.apiKey}">${user.apiKey}</g:if>

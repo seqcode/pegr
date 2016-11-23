@@ -158,7 +158,7 @@
             success:function(){                    
                 $td.find(".code").removeClass("label-default label-danger label-warning label-info").addClass(codeClasses[code]);
                 $td.find(".status-message").text(message);
-                $td.find(".edit-code").remove();
+                $td.find("div.edit-code").remove();
             }
         })
     });

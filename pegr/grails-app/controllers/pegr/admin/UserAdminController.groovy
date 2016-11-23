@@ -1,6 +1,6 @@
 package pegr.admin
 import pegr.AdminCategory
-import pegr.UserRole
+import pegr.UserRoleGroup
 import pegr.User
 import pegr.UserService
 import pegr.UserException
@@ -10,7 +10,7 @@ class UserAdminController {
 	
     def userService
     
-	def index(Integer max, Long affiliationId, Long roleId, String isEnabled) {
+	def index(Integer max, Long affiliationId, Long groupId, String isEnabled) {
 		params.max = Math.min(max ?: 25, 100)
         
         def affiliations = User.where{}.collect { it.affiliation }.unique()
@@ -18,13 +18,13 @@ class UserAdminController {
         def users 
         def totalCount
         
-        if (roleId) {
+        if (groupId) {
             def sort = params.sort ? ("user."+params.sort) : "user.fullName"
-            users = UserRole.createCriteria().list(max: params.max, offset: params.offset, sort: sort, order: params.order) {
-                eq("role.id", roleId) 
+            users = UserRoleGroup.createCriteria().list(max: params.max, offset: params.offset, sort: sort, order: params.order) {
+                eq("roleGroup.id", groupId) 
             }.collect { it.user }
             
-            totalCount = UserRole.where { role.id == roleId }.count()
+            totalCount = UserRoleGroup.where { roleGroup.id == groupId }.count()
         } else {
             def query
             if (affiliationId) {
@@ -42,10 +42,19 @@ class UserAdminController {
          totalCount: totalCount, 
          affiliations: affiliations,
          affiliationId: affiliationId,
-         roleId: roleId,
+         groupId: groupId,
          isEnabled: isEnabled]
 	}
-	
+    
+    def search(String username, String email) {
+        def users = []
+        if (username && username != "") {
+            users.push(User.findByUsername(username))
+        } else if (email && email != "") {
+            users = User.findAllByEmail(email)
+        }
+        render(view: "index", model: [users: users])
+    }
     
     def edit(Long userId) {
         def user  = User.get(userId)
@@ -57,16 +66,15 @@ class UserAdminController {
     }
     
     def update(Long userId) {
-        log.error userId
         def user = User.get(userId)
         if (!user) {
             render(view: "/404")
             return
         } 
         user.properties = params
-        def roles = params.list("roles")
+        def groups = params.list("groups")
         try {
-            userService.updateByAdmin(user, roles)
+            userService.updateByAdmin(user, groups)
             flash.message = "Success updating the user!"
         } catch(UserException e) {
             flash.message = e.message

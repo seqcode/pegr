@@ -134,6 +134,9 @@ grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'pegr.UserRole'
 grails.plugin.springsecurity.authority.className = 'pegr.Role'
 grails.plugin.springsecurity.authority.groupAuthorityNameField = 'authorities'
 grails.plugin.springsecurity.useRoleGroups = true
+grails.plugin.springsecurity.logout.postOnly=false
+
+grails.plugin.springsecurity.providerNames = ['daoAuthenticationProvider', 'preAuthenticatedAuthenticationProvider', 'anonymousAuthenticationProvider', 'rememberMeAuthenticationProvider']
 
 grails.plugin.springsecurity.securityConfigType = 'InterceptUrlMap'
 grails.plugin.springsecurity.interceptUrlMap = [
@@ -183,8 +186,6 @@ grails.plugin.springsecurity.interceptUrlMap = [
 	'/**':              ['isAuthenticated()'] // everything else requires authenticated user
 ]
 
-grails.plugin.springsecurity.logout.afterLogoutUrl = "/login/auth"
-
 grails {
    mail {
      props = ["mail.smtp.auth":"true", 					   
@@ -193,5 +194,3 @@ grails {
               "mail.smtp.socketFactory.fallback":"false"]
    }
 }
-
-grails.plugin.springsecurity.providerNames = ['daoAuthenticationProvider', 'preAuthenticatedAuthenticationProvider', 'anonymousAuthenticationProvider', 'rememberMeAuthenticationProvider']

@@ -7,7 +7,7 @@
 	<div class="container-fluid" id="login-form">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#">PEGR Login</a></li>
-        	<li><a href="https://webaccess.psu.edu/?cosign-shaunline.vmhost.psu.edu&https://shaunline.vmhost.psu.edu/pegr">PSU Web Access</a></li>
+        	<li><a href="${grailsApplication.config.cosign}">PSU Web Access</a></li>
         </ul>
         <g:form uri="/j_spring_security_check" method="POST" role="form">
             <g:if test="${flash.message}">

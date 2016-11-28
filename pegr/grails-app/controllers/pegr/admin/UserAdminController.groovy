@@ -49,7 +49,10 @@ class UserAdminController {
     def search(String username, String email) {
         def users = []
         if (username && username != "") {
-            users.push(User.findByUsername(username))
+            def user = User.findByUsername(username)
+            if (user) {
+                users.push(user)
+            }
         } else if (email && email != "") {
             users = User.findAllByEmail(email)
         }
@@ -81,6 +84,38 @@ class UserAdminController {
         }
         redirect(action:"index")
         
+    }	
+    
+    def createUser(CreateUserCommand cmd) {
+        def groupIds = []
+        if (params.groupIds) {
+            groupIds = params.list("groupIds")
+        }
+
+        if (cmd.hasErrors()) {
+            render(view: "index", model: [users: [], cmd: cmd])
+            return
+        }
+        try {            
+            def user = userService.create(cmd.email,
+                            groupIds,
+                            cmd.sendEmail
+                            )
+            request.message = "Success creating the user!"
+            render(view: "index", model: [users: [user]])
+        } catch (UserException e) {
+            request.message = e.message
+            render(view: "index", model: [users: []])
+        }
     }
-	
+}
+
+@grails.validation.Validateable
+class CreateUserCommand {
+    String email
+    Boolean sendEmail
+    
+    static constraints = {
+        email email: true, nullable: false, blank: false
+    }
 }

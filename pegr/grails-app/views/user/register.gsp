@@ -14,6 +14,7 @@
         </div>
     </g:hasErrors>
     <g:form action="register" method="POST"  role="form">
+        <g:hiddenField name="token" value="${token}"></g:hiddenField>
         <div class="form-group ${hasErrors(bean: user, field: 'username', 'error')}">
             <label for="username">Username</label>
             <g:textField class="form-control" required="required" id="username" name="username" value="${user?.username}"></g:textField>

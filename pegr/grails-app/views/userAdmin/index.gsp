@@ -2,19 +2,41 @@
     <head>
         <title>PEGR Admin - User</title>
         <meta name="layout" content="admin"/>
+        <style>
+            .well form {
+                padding-bottom: 10px;
+            }
+        </style>
     </head>
     <body>
         <div class="container-fluid">
             <div class="col-sm-10 text-left">
                 <div class="well">
                     <g:form action="search">
-                        Username
+                        <label>Username</label>
                         <input name="username">
-                        or Email
+                        <label>or Email</label>
                         <input name="email">
                         <g:submitButton name="submit" value="Search" class="edit"></g:submitButton>
+                    </g:form>                    
+                    <g:form action="createUser">
+                        <label>Email</label>
+                        <input id="email" name="email">
+                        <label>Groups</label>
+                        <g:select id="groupIds" name="groupIds" from="${pegr.RoleGroup.list()}" optionKey="id" multiple="multiple" style="width:300px"></g:select>
+                        <input type="checkbox" name="sendEmail" checked>
+                        <label>Send Email</label>
+                        <g:submitButton name="save" value="Add User" class="edit submit"></g:submitButton>
                     </g:form>
                 </div>
+                <g:hasErrors>
+                    <div class="errors">
+                        <g:renderErrors bean="${cmd}" as="list"/>
+                    </div>
+                </g:hasErrors>
+                <g:if test="${request.message}">
+                    <div class="alert alert-info">${request.message}</div>
+                </g:if>
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
@@ -75,6 +97,8 @@
             <br/>
         </div>
         <script>
+            $("select").select2();
+            $(".confirm").confirm();
             <g:if test="${affiliationId != null}">
                 $("#affiliation-${affiliationId}").addClass("active")
             </g:if>
@@ -90,6 +114,10 @@
             <g:else>
                 $("#all").addClass("active")
             </g:else>
+            $(".submit").on("click", function() {
+                $(this).prop("disabled", true); 
+                $(this).closest("form").submit();
+            });
         </script>
     </body>
 </html>

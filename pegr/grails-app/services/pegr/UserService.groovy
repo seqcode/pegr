@@ -10,6 +10,9 @@ class UserException extends RuntimeException {
 class UserService {
     def springSecurityService
     def utilityService
+    def mailService
+    def grailsApplication
+    def grailsLinkGenerator
     
     @Transactional
     User updateUser(UserInfoCommand uic, Long userId){
@@ -52,36 +55,90 @@ class UserService {
     }
     
     @Transactional
-    def create(UserRegistrationCommand urc) {
-        if (urc.hasErrors()) {
-            throw new UserException(message: "Input error!")
-        } else if(User.findByUsername(urc.username)) {
-            throw new UserException(message: "Username already exists!")
-        } else if(User.findByEmail(urc.email)) {
+    def create(String email, List groupIds, Boolean sendEmail){
+        def username, locked, text
+        if(User.findByEmail(email)) {
             throw new UserException(message: "Email has already been used!")
-        } else {
-            def user = new User(urc.properties)
-            user.password = springSecurityService.encodePassword(urc.password)
-            user.enabled = false
-            if (!user.save(flush:true)) {
-                throw new UserException(message: "Error creating the user!")
+        }
+        
+        // parse the email
+        def emailParts = email.split('@')
+        def emailServer = emailParts[1]
+        if (emailServer == "psu.edu") {
+            username = emailParts[0]
+            if (User.findByUsername(username)) {
+                throw new UserException(message: "Username ${username} has already been registered with PEGR!")
             }
+            locked = false
+            def url = grailsLinkGenerator.link(controller: 'login', action: 'auth', absolute: true)
+            text = "You can now login to PEGR ${url} with PSU Web Access."
+        } else {
+            username = email
+            locked = true
+        }
+        
+        // assign a random password
+        def password = springSecurityService.encodePassword(utilityService.getRandomString(15))
+        
+        def user = new User(username: username, 
+                            email: email, 
+                            password: password,
+                            accountLocked: locked,
+                            enabled: true
+                           )        
+        user.save(flush: true, failOnError: true)
+        
+        // add user to role groups
+        groupIds.each { groupId->
+            def group = RoleGroup.get(groupId)
+            if (group) {
+                new UserRoleGroup(user: user, roleGroup: group).save()
+            }
+        }
+
+        // create token
+        if (emailServer != "psu.edu") {
             def length = 32
             def token = utilityService.getRandomString(length)
             new Token(token: token, user: user, date: new Date()).save()
-            return token
+            
+            def url = grailsLinkGenerator.link(controller: 'user', action: 'register', params: [token:token], absolute: true)
+            text = "Your account has been created in PEGR. Please follow the link ${url} to set up your username and password."
         }
+        
+        // send email
+        if (sendEmail) {
+            mailService.sendMail {
+               to email
+               subject "[PEGR] Account Information"
+               body text
+            }
+        }        
+        return user
     }
     
     @Transactional
-    def enableAccount(String token) {
-        def userToken = Token.findByToken(token)
+    def unlockAccount(UserRegistrationCommand urc) {
+        def userToken = Token.findByToken(urc.token)
         if (!userToken) {
             throw new UserException(message: "Invalid link!")
         }
-        userToken.user.enabled = true
-        userToken.user.save()
+        def user = userToken.user
         userToken.delete()
+        if (urc.email != user.email) {
+            throw new UserException(message: "Email does not match the one registered with the system!")
+        } else if (urc.hasErrors()) {
+            throw new UserException(message: "Input error!")
+        } else if(user.username != urc.username && User.findByUsername(urc.username)) {
+            throw new UserException(message: "Username already exists!")
+        } else {
+            user.username = urc.username
+            user.password = springSecurityService.encodePassword(urc.password)
+            user.accountLocked = false
+            if (!user.save(flush:true)) {
+                throw new UserException(message: "Error activating the account!")
+            }
+        }
     }
     
     /**
@@ -114,13 +171,6 @@ class UserService {
             throw new UserException(message: "Error generating the API key!")
         }
         
-    }
-    
-    @Transactional
-    def save(User user) {
-        if (!user.save()) {
-            throw new UserException(message: "Error saving the user!")
-        }
     }
     
     @Transactional

@@ -74,6 +74,9 @@ class UserService {
             text = "You can now login to PEGR ${url} with PSU Web Access."
         } else {
             username = email
+            if (User.findByUsername(username)) {
+                throw new UserException(message: "Username ${username} has already been registered with PEGR!")
+            }
             locked = true
         }
         

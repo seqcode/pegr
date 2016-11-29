@@ -192,3 +192,8 @@ footer {
     content: counters(item, ".") " "; 
     counter-increment: item;
 }
+
+.external {
+    background-color: #8b99af;
+    border-color: #8b99af;
+}

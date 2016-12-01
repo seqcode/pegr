@@ -180,7 +180,7 @@ class QfileUploadService {
         def data = getNamedLaneData(rawdata)
         def run = SequenceRun.findByRunNum(data.runNum)
         if (!run) {
-            throw new UploadQformException(message: "Sequence run #Old${data.runNum} is not found!")
+            throw new QfileUploadException(message: "Sequence run #Old${data.runNum} is not found!")
         }
         def runStats = new RunStats(data)
         runStats.technician = getUser(data.technicianName)
@@ -470,9 +470,6 @@ class QfileUploadService {
 	    if (sampleNotes) {
 	        note['note'] = sampleNotes
 	    }
-        if (sampleId) {
-            note['sampleId'] = sampleId
-        }
 	    if (bioRep1SampleId) {
 	        note['bioRep1'] = bioRep1SampleId
 	    }
@@ -495,7 +492,7 @@ class QfileUploadService {
             }
         }
         
-	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes, assay: assay, growthMedia: growthMedia).save( failOnError: true)
+	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes, assay: assay, growthMedia: growthMedia, naturalId: sampleId).save( failOnError: true)
 	    return sample
 	}
 	
@@ -536,17 +533,7 @@ class QfileUploadService {
 	}
 	
 	def getSampleFromSampleId(String sampleId) {
-	    if (sampleId == null) {
-	        return null
-	    }
-		def s = '%sampleId":"' + sampleId + "%"
-	    def samples = Sample.findAllByNoteIlike(s)
-	    if (samples.size() > 1){
-	        return null
-	    } else {
-	        return samples[0]
-	    }
-	    
+        return Sample.findByNaturalId(sampleId)	    
 	}
 	
 	def getInventory(String dateReceived, String receivingUser, String inOrExternal, String inventoryNotes) {

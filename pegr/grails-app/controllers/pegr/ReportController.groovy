@@ -119,7 +119,8 @@ class ReportController {
 
         def currentProject = report.cohort?.project
         def projectUsers = ProjectUser.where { project == currentProject}.list()
-        [project: currentProject, projectUsers: projectUsers, report: report]
+        def imageMap = report.cohort?.imageMap
+        [project: currentProject, projectUsers: projectUsers, report: report, imageMap: imageMap]
     }
     
     def fetchDataForReportAjax(Long id) {

@@ -2887,4 +2887,6 @@ databaseChangeLog = {
 	include file: 'addCohortNotes.groovy'
 
 	include file: 'addGroupRole.groovy'
+
+	include file: 'addLaneStats.groovy'
 }

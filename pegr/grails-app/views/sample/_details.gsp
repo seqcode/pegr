@@ -129,6 +129,10 @@
             <g:if test="${sample.antibody?.igType}">
             <li>Ig Type: ${sample.antibody?.igType}</li>
             </g:if>  
+            
+            <g:if test="${sample.antibody?.concentration}">
+            <li>Concentration (ug/ul): ${sample.antibody?.concentration}</li>
+            </g:if>
 
             <g:if test="${sample.antibody?.externalId}">
             <li>External ID: ${sample.antibody.externalId}</li>

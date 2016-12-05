@@ -19,8 +19,8 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <g:sortableColumn property="runNum" defaultOrder="desc" title="Run #"></g:sortableColumn>
-                <g:sortableColumn property="date" defaultOrder="desc" title="Sequencing Date"></g:sortableColumn>  
+                <g:sortableColumn property="runNum" defaultOrder="desc" title="Run #" params="[requestedStatus:requestedStatus]"></g:sortableColumn>
+                <g:sortableColumn property="date" defaultOrder="desc" title="Sequencing Date" params="[requestedStatus:requestedStatus]"></g:sortableColumn>  
                 <th>Platform</th>
                 <th>Directory</th>
                 <th>Run status</th>
@@ -43,12 +43,12 @@
     </div>
 
     <div class="pagination">
-        <g:paginate next="Next" prev="Prev" controller="report" action="analysisStatus" params='[requestedStatus:"${status}"]' max="25" total="${totalCount ?: 0}" />
+        <g:paginate next="Next" prev="Prev" controller="report" action="analysisStatus" params='[requestedStatus:"${requestedStatus}"]' max="25" total="${totalCount ?: 0}" />
     </div>
     <script>        
         $(function(){
             $(".nav-status").addClass("active");
-            $("#${status}").addClass("active");
+            $("#${requestedStatus}").addClass("active");
         });
     </script>
 </body>

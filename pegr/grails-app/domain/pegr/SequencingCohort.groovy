@@ -2,6 +2,7 @@ package pegr
 import groovy.json.*
 
 class SequencingCohort {
+    String name
     Project project
     SequenceRun run
     SummaryReport report
@@ -31,6 +32,7 @@ class SequencingCohort {
     }
     
     static constraints = {
+        name nullable: true
         project unique: "run"
         report nullable: true
         images nullable: true

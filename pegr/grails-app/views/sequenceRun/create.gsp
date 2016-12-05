@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>Workbench</title> 
-    <meta name="layout" content="main"/>
+    <meta name="layout" content="sequenceRun"/>
 </head>
 <body>
 <div class="container-fluid">

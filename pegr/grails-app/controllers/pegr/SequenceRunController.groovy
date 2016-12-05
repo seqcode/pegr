@@ -10,7 +10,7 @@ import grails.converters.*
 class SequenceRunController {
     def springSecurityService    
     def sequenceRunService    
-    def csvConvertService    
+    def qfileUploadService    
     def walleService
     def reportService
     def utilityService
@@ -292,14 +292,14 @@ class SequenceRunController {
     
     }
     
-    def convertCsv() {
+    def convertXlsx() {
         def filesroot = utilityService.getFilesRoot()
         try {
             MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  
             def mpf = mpr.getFile("file");
             String filename = mpf.getOriginalFilename();
-            if(!mpf?.empty && filename[-4..-1] == ".csv") {  
-                File folder = new File(filesroot, 'csv'); 
+            if(!mpf?.empty && filename[-5..-1] == ".xlsx") {  
+                File folder = new File(filesroot, 'QueueFiles'); 
                 if (!folder.exists()) { 
                     folder.mkdirs(); 
                 } 
@@ -307,12 +307,54 @@ class SequenceRunController {
                 mpf.transferTo(fileDest)
                 def user = springSecurityService.currentUser
                 def basicCheck = true
-                def messages = csvConvertService.migrate(fileDest.getPath(), 
+                def messages = qfileUploadService.migrateXlsx(folder,
+                                        fileDest.getPath(),
+                                          params.sampleSheet,
+                                          params.laneSheet,
+                                          RunStatus.PREP, 
+                                          params.int("startLine"), 
+                                          params.int("endLine"),
+                                          params.int("laneLine"),
+                                          basicCheck
+                                         )
+                if (messages.size() == 0){
+                    flash.messageList = ["The xlsx file uploaded!",]
+                } else {
+                    flash.messageList = messages                   
+                }
+            } else {
+                flash.messageList = ["Only xlsx files are accepted!"]
+            }
+        } catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            flash.messageList = ["Error uploading the file!"]
+        }
+
+        redirect(action: "index")
+    }
+    
+    def convertCsv() {
+        def filesroot = utilityService.getFilesRoot()
+        try {
+            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  
+            def mpf = mpr.getFile("file");
+            String filename = mpf.getOriginalFilename();
+            if(!mpf?.empty && filename[-4..-1] == ".csv") {  
+                File folder = new File(filesroot, 'QueueFiles'); 
+                if (!folder.exists()) { 
+                    folder.mkdirs(); 
+                } 
+                File fileDest = new File(folder, filename)
+                mpf.transferTo(fileDest)
+                def user = springSecurityService.currentUser
+                def basicCheck = true
+                def results = qfileUploadService.migrateSamples(fileDest.getPath(), 
                                           RunStatus.PREP, 
                                           params.int("startLine"), 
                                           params.int("endLine"),
                                           basicCheck
                                          )
+                def messages = results.messages
                 if (messages.size() == 0){
                     flash.messageList = ["CSV file uploaded!",]
                 } else {
@@ -375,7 +417,7 @@ class SequenceRunController {
         redirect(action: "show", id: runId)
     }
     
-    def displayImage(Long cohortId, String filepath) {
+    def displayImage(String filepath) {
         File image = new File(utilityService.getFilesRoot(), filepath)
         if (!image.exists()) {
             render(view: "/404")

@@ -348,12 +348,13 @@ class SequenceRunController {
                 mpf.transferTo(fileDest)
                 def user = springSecurityService.currentUser
                 def basicCheck = true
-                def messages = qfileUploadService.migrateSamples(fileDest.getPath(), 
+                def results = qfileUploadService.migrateSamples(fileDest.getPath(), 
                                           RunStatus.PREP, 
                                           params.int("startLine"), 
                                           params.int("endLine"),
                                           basicCheck
                                          )
+                def messages = results.messages
                 if (messages.size() == 0){
                     flash.messageList = ["CSV file uploaded!",]
                 } else {

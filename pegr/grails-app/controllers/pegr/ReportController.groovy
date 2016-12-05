@@ -36,7 +36,7 @@ class ReportController {
             params.order = "desc"
         }
         def runs = SequenceRun.where { status == requestedStatus }.list(params)
-        [runs: runs, status: requestedStatus, totalCount: runs.totalCount]
+        [runs: runs, requestedStatus: requestedStatus, totalCount: runs.totalCount]
     }
     
     def runStatus(Long runId) {

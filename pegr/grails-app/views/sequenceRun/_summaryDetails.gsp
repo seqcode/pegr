@@ -13,7 +13,7 @@
         <ul>
             <li>Library Volume (ul): ${run.runStats?.libraryVolume}</li>
             <li>Library Stock (fmol): ${run.runStats?.libraryStock}</li>
-            <li>Std Dev: ${run.runStats?.libraryStdDev} <g:if test="${run.runStats?.pctLibraryStdDev}"> (${run.runStats?.pctLibraryStdDev}%)</g:if></li>
+            <li>Std Dev: ${run.runStats?.libraryStdDev} <g:if test="${run.runStats?.pctLibraryStdDev}"> (<g:formatNumber number="${run.runStats?.pctLibraryStdDev}" format="#0.##%"></g:formatNumber>)</g:if></li>
             <li>Cycles: ${run.runStats?.cycles}</li>
             <li>SR or PE: ${run.runStats?.srOrPe}</li>
             <li>Seq Ctrl: ${run.runStats?.seqCtrl}</li>

@@ -16,7 +16,6 @@ class QfileUploadService {
     def antibodyService
     def utilityService
     final int timeout = 1000 * 60 * 2; 
-    def messages = []
 	
     @NotTransactional
     def migrateXlsx(File folder, String filename, String sampleSheetName, String laneSheetName, RunStatus runStatus, int startLine, int endLine, int laneLine, boolean basicCheck) {
@@ -31,10 +30,13 @@ class QfileUploadService {
         }
         
         // migrate the samples
-        migrateSamples(csvNames[sampleSheetName], runStatus, startLine, endLine, basicCheck)
+        def results = migrateSamples(csvNames[sampleSheetName], runStatus, startLine, endLine, basicCheck)
+        def messages = results.messages
+        def laneRunNum = results.laneRunNum
         
         // migrate the lane
-        migrateLane(csvNames[laneSheetName], laneLine)	
+        def laneMessages = migrateLane(csvNames[laneSheetName], laneLine, laneRunNum)
+        messages.addAll(laneMessages)
 
         return messages
     }
@@ -45,7 +47,9 @@ class QfileUploadService {
         def file = new FileReader(filename)
 		CSVReader reader = new CSVReader(file);
 		String [] rawdata;
-		
+		def messages = []
+        def laneRunNum = 0
+        
 		while ((rawdata = reader.readNext()) != null) {
 		    ++lineNo
 		    if (lineNo < startLine) {
@@ -54,7 +58,7 @@ class QfileUploadService {
 		        break
 		    }
             try {
-                migrateOneSampleRow(rawdata, runStatus, basicCheck)
+                laneRunNum = Math.max(laneRunNum, migrateOneSampleRow(rawdata, runStatus, basicCheck))
 		 	} catch(QfileUploadException e) {
                 messages.push("Error: Line ${lineNo}. ${e.message}")
 		        continue
@@ -65,30 +69,31 @@ class QfileUploadService {
 		    }   
 		}
         new File(filename).delete()
-        return messages
+        return [messages: messages, laneRunNum: laneRunNum]
 	}
     
-    def migrateLane(String filename, int laneLine) {
+    def migrateLane(String filename, int laneLine, Integer laneRunNum) {
         def lineNo = 0    
         def file = new FileReader(filename)
 		CSVReader reader = new CSVReader(file);
         String [] rawdata;
-        
+        def messages = []
         while ((rawdata = reader.readNext()) != null) {
 		    ++lineNo
 		    if (lineNo < laneLine) {
 		        continue
 		    } else {
                 try {
-                    migrateOneLaneRow(rawdata)
+                    migrateOneLaneRow(rawdata, laneRunNum)
+                    new File(filename).delete()
                 } catch(Exception e) {
                     log.error "Error: Lane Info." + e
                     messages.push("Error: Lane Info.")
                 }   
 		        break
 		    }
-		}        
-        new File(filename).delete()
+		}
+        return messages
     }
     
     def cleanRawData(String[] rawdata) {
@@ -102,7 +107,7 @@ class QfileUploadService {
         }
     }
 	
-    void migrateOneSampleRow(String[] rawdata, RunStatus runStatus, boolean basicCheck) {
+    def migrateOneSampleRow(String[] rawdata, RunStatus runStatus, boolean basicCheck) {
 
         cleanRawData(rawdata)
         def data = getNamedData(rawdata)
@@ -172,22 +177,35 @@ class QfileUploadService {
 
         def genomeBuilds = [data.genomeBuild1, data.genomeBuild2, data.genomeBuild3]
         saveRequestedGenome(genomeBuilds, sample, species) 
-
+        
+        return results?.sequenceRun?.runNum
     }
     
-    def migrateOneLaneRow(String[] rawdata) {
+    def migrateOneLaneRow(String[] rawdata, Integer laneRunNum) {
         cleanRawData(rawdata)
         def data = getNamedLaneData(rawdata)
-        def run = SequenceRun.findByRunNum(data.runNum)
+        if(data.runNum) {
+            laneRunNum = data.runNum
+        }
+        if (!laneRunNum) {
+            throw new QfileUploadException(message: "Run number not found!")
+        }
+        def run = SequenceRun.findByRunNum(laneRunNum)
         if (!run) {
             throw new QfileUploadException(message: "Sequence run #Old${data.runNum} is not found!")
         }
-        def runStats = new RunStats(data)
-        runStats.technician = getUser(data.technicianName)
-        runStats.qPcrDate = getDate(data.qPcrDateStr)
+        def runStats
+        if (run.runStats) {
+            runStats = run.runStats
+            runStats.properties = data
+        } else {
+            runStats = new RunStats(data)
+        }
         runStats.save(flush: true, failOnError: true)
-        run.runStats = runStats
-        run.save()
+        if (!run.runStats) {
+            run.runStats = runStats
+            run.save()
+        }
     }
     
     def addExperimentToCohort(SequencingExperiment seqExp, Project project) {
@@ -723,7 +741,7 @@ class QfileUploadService {
 	
 	         run = run.save( failOnError: true)
 	    }
-	    
+
 	    [sequenceRun: run, seqId: seqId]
 	
 	}
@@ -876,24 +894,24 @@ class QfileUploadService {
     
      def getNamedLaneData(String[] data) {
 	    [libraryPoolArchiveId: data[0],         //A       
-	     libraryVolume: data[1],                //B
-         libraryStock: data[2],                 //C
-         libraryStdDev: data[3],                //D
-         pctLibraryStdDev: data[4],             //E
-         qPcrDateStr: data[5],                      //F
-         technicianName: data[6],                   //G
+	     libraryVolume: getFloat(data[1]),                //B
+         libraryStock: getFloat(data[2]),                 //C
+         libraryStdDev: getFloat(data[3]),                //D
+         pctLibraryStdDev: getFloat(data[4]),             //E
+         qPcrDateStr: getDate(data[5]),                      //F
+         technicianName: getUser(data[6]),                   //G
          // instrument: data[7],//H
          cycles: data[8],                       //I
          srOrPe: data[9],                       //J
          seqCtrl: data[10],                     //K
-         pcrCycles: data[11],                   //L
-         qubitConc: data[12],                   //M
-         qPcrConc: data[13],                    //N
-         libraryLoadedPm: data[14],             //O
-         phiXLoaed: data[15],                   //P
-         libraryLoadedFmol: data[16],           //Q
+         pcrCycles: getInteger(data[11]),                   //L
+         qubitConc: getFloat(data[12]),                   //M
+         qPcrConc: getFloat(data[13]),                    //N
+         libraryLoadedPm: getFloat(data[14]),             //O
+         phiXLoaed: getFloat(data[15]),                   //P
+         libraryLoadedFmol: getFloat(data[16]),           //Q
          notes: data[17],                       //R
-         runNum: data[18],                         //S
+         runNum: getInteger(data[18]),                         //S
          // data[19],//T
          // positiondata[20],//U
          //data[21],//V
@@ -901,15 +919,15 @@ class QfileUploadService {
          //data[23],//X
          //data[24],//Y
          //data[25],//Z
-         clusterNum: data[26],                  //AA
-         readPf: data[27],                      //AB
-         pctPf: data[28],                       //AC
-         pctQ30: data[29],                      //AD
-         qidx: data[30],                        //AE
-         totalReads: data[31],                  //AF
-         unmatchedIndices: data[32],            //AG
-         pctUnmatchedIndices: data[33],         //AH
-         pctAlignedToPhiX: data[34],            //AI
+         clusterNum: getFloat(data[26]),                  //AA
+         readPf: getFloat(data[27]),                      //AB
+         pctPf: getFloat(data[28]),                       //AC
+         pctQ30: getFloat(data[29]),                      //AD
+         qidx: getFloat(data[30]),                        //AE
+         totalReads: getFloat(data[31]),                  //AF
+         unmatchedIndices: getFloat(data[32]),            //AG
+         pctUnmatchedIndices: getFloat(data[33]),         //AH
+         pctAlignedToPhiX: getFloat(data[34]),            //AI
          //data[35],//AJ
          ]
     }

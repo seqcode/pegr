@@ -18,5 +18,7 @@ final int laneLine = 3
 (520..632).each { n ->
     def root = "/Users/dus73/temp/csv"
     def filepath = new File(root, "Queue_lane_${n}.csv").getPath()
-    qfileUploadService.migrateLane(filepath, laneLine) 
+    
+    qfileUploadService.migrateLane(filepath, laneLine, n) 
+    println n
 }

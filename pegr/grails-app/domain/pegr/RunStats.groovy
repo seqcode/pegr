@@ -5,7 +5,7 @@ class RunStats {
     Float libraryStock
     Float libraryStdDev
     Float pctLibraryStdDev
-    Integer cycles
+    String cycles
     String srOrPe
     String seqCtrl
     Integer pcrCycles
@@ -23,6 +23,10 @@ class RunStats {
     Float unmatchedIndices
     Float pctUnmatchedIndices
     Float pctAlignedToPhiX    
+    String libraryPoolArchiveId
+    Date qPcrDate
+    User technician
+    String notes
     
     static constraints = {
         libraryVolume nullable: true
@@ -47,5 +51,9 @@ class RunStats {
         unmatchedIndices nullable: true
         pctUnmatchedIndices nullable: true
         pctAlignedToPhiX nullable: true
+        libraryPoolArchiveId nullable: true
+        qPcrDate nullable: true
+        technician nullable: true
+        notes nullable: true
     }
 }

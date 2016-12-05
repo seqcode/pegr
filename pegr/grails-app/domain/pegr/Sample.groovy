@@ -25,6 +25,7 @@ class Sample {
     String requestedGenomes
     SampleAudit audit
     GrowthMedia growthMedia
+    String naturalId 
     
     List getRuns() {
         return SequencingExperiment.where{sample == this}.collect{it.sequenceRun}
@@ -83,6 +84,7 @@ class Sample {
         requestedGenomes nullable: true, blank: true
         audit nullable: true
         growthMedia nullable: true
+        naturalId nullable: true
     }
     
     static mapping = {

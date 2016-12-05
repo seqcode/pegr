@@ -17,7 +17,7 @@
                 <g:link controller="item" action="list" params="[categoryId: category.id]" class="btn btn-info item-${category.id}">${category.name}</g:link> 
             </g:each>
             <g:link controller="sequenceIndex" class="btn btn-info item-index">Index</g:link>
-            <a href="https://www.quartzy.com/e/groups/108111/order-requests" class="btn btn-info" target="_blank">Order</a>
+            <a href="https://www.quartzy.com/e/groups/108111/order-requests" class="btn btn-info external" target="_blank">Order</a>
         </div>
         <g:layoutBody/>
     </div>

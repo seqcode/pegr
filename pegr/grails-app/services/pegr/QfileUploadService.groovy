@@ -5,29 +5,51 @@ import com.opencsv.CSVReader
 import groovy.json.*
 import groovy.time.*
 
-class CsvConvertException extends RuntimeException {
+class QfileUploadException extends RuntimeException {
     String message
 }
     
 @Transactional
-class CsvConvertService {
+class QfileUploadService {
     def cellSourceService
     def sampleService
     def antibodyService
+    def utilityService
+    final int timeout = 1000 * 60 * 2; 
 	
     @NotTransactional
-	def migrate(String filename, RunStatus runStatus, int startLine, int endLine, boolean basicCheck){
-		
-        def timeStart = new Date()
-		def lineNo = 0    
-        def messages = []
+    def migrateXlsx(File folder, String filename, String sampleSheetName, String laneSheetName, RunStatus runStatus, int startLine, int endLine, int laneLine, boolean basicCheck) {
+        getDefaultUser()     
+        def csvNames = [:]
         
+        // convert xsxl to csv
+        [sampleSheetName, laneSheetName].each { sheet ->
+            csvNames[sheet] = new File(folder, sheet + ".csv").getPath()
+            def command = "xlsx2csv -n ${sheet} ${filename} ${csvNames[sheet]}"
+            utilityService.executeCommand(command, timeout)
+        }
+        
+        // migrate the samples
+        def results = migrateSamples(csvNames[sampleSheetName], runStatus, startLine, endLine, basicCheck)
+        def messages = results.messages
+        def laneRunNum = results.laneRunNum
+        
+        // migrate the lane
+        def laneMessages = migrateLane(csvNames[laneSheetName], laneLine, laneRunNum)
+        messages.addAll(laneMessages)
+
+        return messages
+    }
+    
+    @NotTransactional
+	def migrateSamples(String filename, RunStatus runStatus, int startLine, int endLine, boolean basicCheck){
+		def lineNo = 0  
         def file = new FileReader(filename)
 		CSVReader reader = new CSVReader(file);
 		String [] rawdata;
-		
-		getDefaultUser()
-		
+		def messages = []
+        def laneRunNum = 0
+        
 		while ((rawdata = reader.readNext()) != null) {
 		    ++lineNo
 		    if (lineNo < startLine) {
@@ -36,8 +58,8 @@ class CsvConvertService {
 		        break
 		    }
             try {
-                migrateOneRow(rawdata, runStatus, basicCheck)
-		 	} catch(CsvConvertException e) {
+                laneRunNum = Math.max(laneRunNum, migrateOneSampleRow(rawdata, runStatus, basicCheck))
+		 	} catch(QfileUploadException e) {
                 messages.push("Error: Line ${lineNo}. ${e.message}")
 		        continue
 		    } catch(Exception e) {
@@ -46,29 +68,53 @@ class CsvConvertService {
 		        continue
 		    }   
 		}
-        
-        def timeStop = new Date()
-        TimeDuration duration = TimeCategory.minus(timeStop, timeStart)
-        println "Time to upload the CSV file: " + duration
-        return messages
+        new File(filename).delete()
+        return [messages: messages, laneRunNum: laneRunNum]
 	}
-	
-    void migrateOneRow(String[] rawdata, RunStatus runStatus, boolean basicCheck) {
-
-        String[] cells = new String[rawdata.size()]
+    
+    def migrateLane(String filename, int laneLine, Integer laneRunNum) {
+        def lineNo = 0    
+        def file = new FileReader(filename)
+		CSVReader reader = new CSVReader(file);
+        String [] rawdata;
+        def messages = []
+        while ((rawdata = reader.readNext()) != null) {
+		    ++lineNo
+		    if (lineNo < laneLine) {
+		        continue
+		    } else {
+                try {
+                    migrateOneLaneRow(rawdata, laneRunNum)
+                    new File(filename).delete()
+                } catch(Exception e) {
+                    log.error "Error: Lane Info." + e
+                    messages.push("Error: Lane Info.")
+                }   
+		        break
+		    }
+		}
+        return messages
+    }
+    
+    def cleanRawData(String[] rawdata) {
         rawdata.eachWithIndex{ d, idx -> 
             def td = d.trim()
             if(td == "" || td == "-" || td == "." || td == "?" || td == "Not applicable" || td == "not applicable" || td == "None") {
-                cells[idx] = null
+                rawdata[idx] = null
             }else {
-                cells[idx] = td
+                rawdata[idx] = td
             }
-         }
-        def data = getNamedData(cells)
+        }
+    }
+	
+    def migrateOneSampleRow(String[] rawdata, RunStatus runStatus, boolean basicCheck) {
+
+        cleanRawData(rawdata)
+        def data = getNamedData(rawdata)
         
         // stop if basiceCheck is true and this row does not have a run number
         if (basicCheck && (!data.runStr || data.runStr == "Run #")) {
-            throw new CsvConvertException(message: "Run number is missing!")
+            throw new QfileUploadException(message: "Run number is missing!")
         }
         
         def runUser = getUser(data.userStr)
@@ -131,7 +177,35 @@ class CsvConvertService {
 
         def genomeBuilds = [data.genomeBuild1, data.genomeBuild2, data.genomeBuild3]
         saveRequestedGenome(genomeBuilds, sample, species) 
-
+        
+        return results?.sequenceRun?.runNum
+    }
+    
+    def migrateOneLaneRow(String[] rawdata, Integer laneRunNum) {
+        cleanRawData(rawdata)
+        def data = getNamedLaneData(rawdata)
+        if(data.runNum) {
+            laneRunNum = data.runNum
+        }
+        if (!laneRunNum) {
+            throw new QfileUploadException(message: "Run number not found!")
+        }
+        def run = SequenceRun.findByRunNum(laneRunNum)
+        if (!run) {
+            throw new QfileUploadException(message: "Sequence run #Old${data.runNum} is not found!")
+        }
+        def runStats
+        if (run.runStats) {
+            runStats = run.runStats
+            runStats.properties = data
+        } else {
+            runStats = new RunStats(data)
+        }
+        runStats.save(flush: true, failOnError: true)
+        if (!run.runStats) {
+            run.runStats = runStats
+            run.save()
+        }
     }
     
     def addExperimentToCohort(SequencingExperiment seqExp, Project project) {
@@ -151,7 +225,7 @@ class CsvConvertService {
         try {
             sampleService.splitAndAddIndexToSample(sample, indexStr)
         } catch (SampleException e) {
-            throw new CsvConvertException(message: e.message)
+            throw new QfileUploadException(message: e.message)
         }
     }
 	
@@ -414,9 +488,6 @@ class CsvConvertService {
 	    if (sampleNotes) {
 	        note['note'] = sampleNotes
 	    }
-        if (sampleId) {
-            note['sampleId'] = sampleId
-        }
 	    if (bioRep1SampleId) {
 	        note['bioRep1'] = bioRep1SampleId
 	    }
@@ -439,7 +510,7 @@ class CsvConvertService {
             }
         }
         
-	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes, assay: assay, growthMedia: growthMedia).save( failOnError: true)
+	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes, assay: assay, growthMedia: growthMedia, naturalId: sampleId).save( failOnError: true)
 	    return sample
 	}
 	
@@ -480,17 +551,7 @@ class CsvConvertService {
 	}
 	
 	def getSampleFromSampleId(String sampleId) {
-	    if (sampleId == null) {
-	        return null
-	    }
-		def s = '%sampleId":"' + sampleId + "%"
-	    def samples = Sample.findAllByNoteIlike(s)
-	    if (samples.size() > 1){
-	        return null
-	    } else {
-	        return samples[0]
-	    }
-	    
+        return Sample.findByNaturalId(sampleId)	    
 	}
 	
 	def getInventory(String dateReceived, String receivingUser, String inOrExternal, String inventoryNotes) {
@@ -662,7 +723,7 @@ class CsvConvertService {
 	    }
 	
 	    if (Sample.findBySourceId(seqId)) {
-            throw new CsvConvertException(message: "SeqId ${seqId} already exists!")
+            throw new QfileUploadException(message: "SeqId ${seqId} already exists!")
 	    }
 	
 	    def run = SequenceRun.findByPlatformAndRunNum(platform, runNum)
@@ -680,7 +741,7 @@ class CsvConvertService {
 	
 	         run = run.save( failOnError: true)
 	    }
-	    
+
 	    [sequenceRun: run, seqId: seqId]
 	
 	}
@@ -830,4 +891,44 @@ class CsvConvertService {
          indexStr: data[113]       //DJ
 	    ]
 	}
+    
+     def getNamedLaneData(String[] data) {
+	    [libraryPoolArchiveId: data[0],         //A       
+	     libraryVolume: getFloat(data[1]),                //B
+         libraryStock: getFloat(data[2]),                 //C
+         libraryStdDev: getFloat(data[3]),                //D
+         pctLibraryStdDev: getFloat(data[4]),             //E
+         qPcrDateStr: getDate(data[5]),                      //F
+         technicianName: getUser(data[6]),                   //G
+         // instrument: data[7],//H
+         cycles: data[8],                       //I
+         srOrPe: data[9],                       //J
+         seqCtrl: data[10],                     //K
+         pcrCycles: getInteger(data[11]),                   //L
+         qubitConc: getFloat(data[12]),                   //M
+         qPcrConc: getFloat(data[13]),                    //N
+         libraryLoadedPm: getFloat(data[14]),             //O
+         phiXLoaed: getFloat(data[15]),                   //P
+         libraryLoadedFmol: getFloat(data[16]),           //Q
+         notes: data[17],                       //R
+         runNum: getInteger(data[18]),                         //S
+         // data[19],//T
+         // positiondata[20],//U
+         //data[21],//V
+         //data[22],                      //W
+         //data[23],//X
+         //data[24],//Y
+         //data[25],//Z
+         clusterNum: getFloat(data[26]),                  //AA
+         readPf: getFloat(data[27]),                      //AB
+         pctPf: getFloat(data[28]),                       //AC
+         pctQ30: getFloat(data[29]),                      //AD
+         qidx: getFloat(data[30]),                        //AE
+         totalReads: getFloat(data[31]),                  //AF
+         unmatchedIndices: getFloat(data[32]),            //AG
+         pctUnmatchedIndices: getFloat(data[33]),         //AH
+         pctAlignedToPhiX: getFloat(data[34]),            //AI
+         //data[35],//AJ
+         ]
+    }
 }

@@ -1,5 +1,6 @@
 package pegr
 import grails.converters.*
+import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 class CellSourceController {
     
@@ -192,6 +193,33 @@ class CellSourceController {
             flash.message = e.message
             redirect(action: "show", id: cellSourceId)
         }
+    }
+    
+    def importCellStock() {
+        def filesroot = utilityService.getFilesRoot()
+        try {
+            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  
+            def mpf = mpr.getFile("file");
+            String filename = mpf.getOriginalFilename();
+            if(!mpf?.empty && filename[-4..-1] == ".csv") {  
+                File folder = new File(filesroot, 'temp'); 
+                if (!folder.exists()) { 
+                    folder.mkdirs(); 
+                } 
+                File fileDest = new File(folder, filename)
+                mpf.transferTo(fileDest)
+                
+                cellSourceService.importCellStock(fileDest.getPath(), 
+                                              params.int("startLine"), 
+                                              params.int("endLine"))
+                flash.message = "New cell stockes have been uploaded!"
+            } else {
+                flash.message = "Only csv file can be accepted!"
+            }
+        } catch (CellSourceException e) {
+            flash.message = e.message
+        }
+        redirect(action: "list")
     }
 }
 

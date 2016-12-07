@@ -40,7 +40,10 @@
         </div>
     </div>
     
-    <h4>Cell Stock</h4>
+    <ul class="nav nav-tabs">
+        <li class="active"><g:link action="list">Cell Stock</g:link></li>
+        <li><g:link action="listBatches">Batches</g:link></li>
+    </ul>
     <div>
         <g:form controller="cellSource" action="list">
             <label>Strain</label> 

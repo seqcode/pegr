@@ -109,13 +109,13 @@ class CellSourceController {
     }
     
     def batchSave(CellStockBatchCommand cmd) {
-        def categoryId = ItemTypeCategory.findByName(CELL_STOCK)?.id
         try {
-            cellSourceService.batchSave(cmd.cellSources)
+            def batch = cellSourceService.batchSave(cmd.cellSources)
+            redirect(action: "showBatch", id: batch.id)
         } catch(CellSourceException e) {
             flash.message = e.message
-        }
-        redirect(controller: "item", action: "list", params: [categoryId: categoryId])
+            redirect(action: "list")
+        }        
     }
         
     /* ----------------------------- Ajax ----------------------*/    
@@ -209,17 +209,35 @@ class CellSourceController {
                 File fileDest = new File(folder, filename)
                 mpf.transferTo(fileDest)
                 
-                cellSourceService.importCellStock(fileDest.getPath(), 
+                def batch = cellSourceService.importCellStock(fileDest.getPath(), 
                                               params.int("startLine"), 
                                               params.int("endLine"))
                 flash.message = "New cell stockes have been uploaded!"
+                redirect(action: "showBatch", id: batch.id)
             } else {
                 flash.message = "Only csv file can be accepted!"
+                redirect(action: "list")
             }
         } catch (CellSourceException e) {
             flash.message = e.message
+            redirect(action: "list")
         }
-        redirect(action: "list")
+        
+    }
+    
+    def listBatches() {
+        def batches = CellSourceBatch.list()
+        [batches: batches]
+    }
+    
+    def showBatch(Long id) {
+        def batch = CellSourceBatch.get(id)
+        [batch: batch]
+    }
+    
+    def batchAddBarcode() {
+        def sampleIds = params.list("sampleId")
+        cellSourceService.batchAddBarcode(sampleIds)
     }
 }
 

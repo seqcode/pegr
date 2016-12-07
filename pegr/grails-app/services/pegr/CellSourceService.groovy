@@ -11,6 +11,7 @@ class CellSourceException extends RuntimeException {
 class CellSourceService {
     def itemService
     def utilityService
+    def springSecurityService
     
     @Transactional
     def update(CellSourceCommand cmd) {
@@ -220,6 +221,8 @@ class CellSourceService {
             cellSource.status = DictionaryStatus.Y
             cellSource.save()
         }
+        def batch = createBatch(cellSources)
+        return batch
     }
     
     @Transactional
@@ -267,6 +270,7 @@ class CellSourceService {
         def file = new FileReader(filename)
         CSVReader reader = new CSVReader(file)
         String [] rawdata
+        def cellSources = []
 
         while ((rawdata = reader.readNext()) != null) {
             ++lineNo
@@ -290,11 +294,29 @@ class CellSourceService {
                                         parent: parent).save( failOnError: true)
                 }
                 def cellSource = new CellSource(strain: strain, status: DictionaryStatus.Y).save()
+                cellSources.push(cellSource)
             }catch(Exception e) {
                 log.error "Error: line ${lineNo}. " + e
                 throw new CellSourceException(message: "Error: line ${lineNo}.")
             }   
         }
+        def batch = createBatch(cellSources)
+        return batch
+    }
+    
+    @Transactional
+    def createBatch(List cellSources) {
+        if (cellSources.size() > 0) {
+            def batch = new CellSourceBatch(user: springSecurityService.currentUser, 
+                                            date: new Date())
+            batch.save()
+            cellSources.each {cs ->
+                new BatchCellSources(batch: batch, cellSource: cs).save()
+            }
+            return batch
+        } else {
+            return null
+        }        
     }
 
     def getCellStockData(String[] data) {

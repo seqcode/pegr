@@ -12,7 +12,7 @@
         <div class="col-sm-12 text-left">
             <div class="sub-nav">
                 <g:link controller="protocolInstanceBag" class="btn btn-info active">Work Records</g:link>
-                <g:link controller="sequenceRun" class="btn btn-info">Sequencing Submission</g:link>
+                <g:link controller="sequenceRun" class="btn btn-info">Sequencing Runs</g:link>
             </div>
             <g:layoutBody/>
         </div>

@@ -11,7 +11,7 @@
 		<div>
             <g:link action="labProtocols" class="btn btn-info">Lab Protocols</g:link>
             <g:link action="labProtocolGroups" class="btn btn-info">Lab Protocol Groups</g:link>
-            <g:link action="index" class="btn btn-info">My Protocols</g:link>
+            <g:link action="index" class="btn btn-info active">My Protocols</g:link>
         </div> 
 		<div id="list-protocol">
 			<h3>My Protocols <g:link action="create" class="edit">New</g:link></h3>

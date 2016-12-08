@@ -24,7 +24,9 @@
                 <tr>
                     <th>Species</th>
                     <th>Parent</th>
-                    <th>Strain</th>                    
+                    <th>Strain</th>
+                    <th>Mutation</th>
+                    <th>Biological Source ID</th>
                     <th>Barcode</th>
                     <th>Type</th>
                     <th>Location</th>
@@ -37,6 +39,8 @@
                         <td>${cellSource.strain?.species}</td>
                         <td>${cellSource.strain?.parent}</td>
                         <td><g:link controller="cellSource" action="show" params="[id:cellSource.id]">${cellSource.strain}</g:link></td>
+                        <td>${cellSource.strain?.geneticModification}</td>
+                        <td>${cellSource.biologicalSourceId}</td>
                         <td class="barcode item"><span class="value">${cellSource.item?.barcode}</span></td>
                         <td class="type item"><span class="value">${cellSource.item?.type}</span></td>
                         <td class="location item"><span class="value">${cellSource.item?.location}</span></td>

@@ -248,7 +248,13 @@ class ItemController {
     
     def generateBarcodeList() {
         def barcodeList = barcodeService.generateBarcodeList(80)
-        [barcodeList: barcodeList]
+        [barcodeList: barcodeList, date: new Date()]
+    }
+    
+    def updateStatusAjax(Long itemId, String status) {
+        def item = Item.get(itemId)
+        item.status = status as ItemStatus
+        itemService.save(item)
     }
 }
 

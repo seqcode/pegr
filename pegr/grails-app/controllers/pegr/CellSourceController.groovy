@@ -252,8 +252,23 @@ class CellSourceController {
     
     def printBatchBarcode(Long id) {
         def batch = CellSourceBatch.get(id)
+        if (!batch) {
+            render(view: "/404")
+            return
+        }
         def items = batch.cellSources*.item
-        render(view: "/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name])
+        render(view: "/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name, date: new Date()])
+    }
+    
+    def deleteBatch(Long id) {
+        try {
+            cellSourceService.deleteBatch(id)
+            flash.message = "The batch has been deleted!"
+            redirect(action: "listBatches")
+        } catch(Exception e) {
+            flash.message = "This batch cannot be deleted!"
+            redirect(action: "showBatch", id: id)
+        }
     }
 }
 

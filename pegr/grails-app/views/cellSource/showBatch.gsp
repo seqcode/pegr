@@ -13,13 +13,14 @@
 
     <div class="container-fluid">
         <g:link controller="cellSource" action="listBatches"><span class="glyphicon glyphicon-th-list"></span> List</g:link>
+        <g:link controller="cellSource" action="deleteBatch" id="${batch.id}" class="confirm"><span class="glyphicon glyphicon-trash"></span> Delete</g:link>
         <g:form controller="cellSource" action="saveItems">
         <g:hiddenField name="batchId" value="${batch.id}"></g:hiddenField>
         <h4>Batch: ${batch} 
             <g:link action="printBatchBarcode" id="${batch.id}" class="btn btn-default pull-right">Print Barcodes</g:link>
             <g:if test="${batch.cellSources.every{it.item == null}}">
                 <g:submitButton class="btn btn-primary pull-right" name="save" value="Save"></g:submitButton>
-                <span id="assign-barcodes" class="confirm btn btn-default pull-right">Assign Barcodes to All</span> 
+                <span id="assign-barcodes" class="confirm btn btn-default pull-right">Assign Barcodes to All</span>
             </g:if>
         </h4>
 
@@ -28,7 +29,9 @@
                 <tr>
                     <th>Species</th>
                     <th>Parent</th>
-                    <th>Strain</th>       
+                    <th>Strain</th>   
+                    <th>Mutation</th>
+                    <th>Biological Source ID</th>
                     <th>Name</th>
                     <th>Barcode</th>
                     <th>Type</th>
@@ -42,6 +45,8 @@
                         <td>${cellSource.strain?.species}</td>
                         <td>${cellSource.strain?.parent}</td>
                         <td><g:link controller="cellSource" action="show" params="[id:cellSource.id]">${cellSource.strain}</g:link></td>
+                        <td>${cellSource.strain?.geneticModification}</td>
+                        <td>${cellSource.biologicalSourceId}</td>
                         <td>
                             <g:if test="${cellSource.item}">
                                 <span class="value">${cellSource.item.name}</span>
@@ -81,6 +86,7 @@
         </g:form>
     </div>
     <script>
+        $(".confirm").confirm();
         $(".item-${categoryId}").addClass("active");
         $("select").select2();
         $("#assign-barcodes").on("click", function() {

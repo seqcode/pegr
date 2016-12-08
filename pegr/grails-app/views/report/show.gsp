@@ -25,10 +25,10 @@
             <small>
                 <span id="report-status-show" class="label label-default">${report.status}</span>
                 <span id="report-status-select" style="display:none">
-                <g:select name="reportStatus" from="${pegr.ReportStatus}" value="${report.status}"></g:select>
-                <button id="report-status-save" class="btn btn-primary">Save</button>
-                <button id="report-status-cancel" class="btn btn-default">Cancel</button>
-            </span>
+                    <g:select name="reportStatus" from="${pegr.ReportStatus}" value="${report.status}"></g:select>
+                    <button id="report-status-save" class="btn btn-primary">Save</button>
+                    <button id="report-status-cancel" class="btn btn-default">Cancel</button>
+                </span>
             </small>
         </h2>
         <i>Edit on ${report.date}</i>

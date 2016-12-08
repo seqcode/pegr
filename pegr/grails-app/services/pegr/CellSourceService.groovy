@@ -339,4 +339,16 @@ class CellSourceService {
             cellSources[index].save()
         }
     }
+    
+    @Transactional
+    def deleteBatch(Long id) {
+        def batch = CellSourceBatch.get(id)
+        def cellSources = batch.cellSources
+        BatchCellSources.executeUpdate("delete from BatchCellSources where batch.id =:batchId", [batchId: id])
+        cellSources.each { it ->
+            it.item.delete()
+            it.delete()
+        }
+        batch.delete()
+    }
 }

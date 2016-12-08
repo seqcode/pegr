@@ -2893,4 +2893,6 @@ databaseChangeLog = {
 	include file: 'addSampleNaturalId.groovy'
 
 	include file: 'addCellSourceBatch.groovy'
+
+	include file: 'addItemStatus.groovy'
 }

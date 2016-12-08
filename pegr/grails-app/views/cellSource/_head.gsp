@@ -1,7 +1,6 @@
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
-    <g:link controller="item" action="generateBarcodeList" class="edit pull-right" target="_blank">Generate Barcode List</g:link>
     <g:link controller="cellSource" action="batchCreate" class="edit pull-right">Batch Create</g:link>
     
     <button type="button" class="edit pull-right" data-toggle="modal" data-target="#myModal">Upload CSV</button>

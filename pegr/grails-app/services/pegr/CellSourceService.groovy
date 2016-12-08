@@ -215,11 +215,13 @@ class CellSourceService {
 	}
 
     @Transactional
-    def batchSave(List cellSources) {
-        cellSources.each { cmd ->
+    def batchSave(List cellSourceCmds) {
+        def cellSources = []
+        cellSourceCmds.each { cmd ->
             def cellSource = getCellSource(cmd)
             cellSource.status = DictionaryStatus.Y
             cellSource.save()
+            cellSources.push(cellSource)
         }
         def batch = createBatch(cellSources)
         return batch
@@ -311,7 +313,7 @@ class CellSourceService {
                                             date: new Date())
             batch.save()
             cellSources.each {cs ->
-                new BatchCellSources(batch: batch, cellSource: cs).save()
+                new BatchCellSources(batch: batch, cellSource: cs).save(flush: true, failOnError: true)
             }
             return batch
         } else {

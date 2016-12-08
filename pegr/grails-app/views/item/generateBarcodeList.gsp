@@ -33,10 +33,13 @@
         </style>        
     </head>
     <body>
-        <g:each in="${barcodeList}" var="barcode">
+        <g:each in="${barcodeList}" var="barcode" status="n">
         <div class="barcode">
             <img src='${createLink(controller:"item", action:"displayBarcode", params:[barcode:barcode, width:60, height:60, formatStr:"QR"])}' width="40" height="40"/>
             <span class="label">${barcode}</span>
+            <g:if test="nameList">
+                <span class="label">${nameList[n]}</span>
+            </g:if>
         </div>
         </g:each>
     </body>

@@ -9,6 +9,7 @@ class CellSourceController {
     def cellSourceService
 	def utilityService
     def itemService
+    def barcodeService
     
     final String CELL_STOCK = "Cell Stock"
     
@@ -221,8 +222,7 @@ class CellSourceController {
         } catch (CellSourceException e) {
             flash.message = e.message
             redirect(action: "list")
-        }
-        
+        }        
     }
     
     def listBatches() {
@@ -235,9 +235,20 @@ class CellSourceController {
         [batch: batch]
     }
     
-    def batchAddBarcode() {
-        def sampleIds = params.list("sampleId")
-        cellSourceService.batchAddBarcode(sampleIds)
+    def batchGenerateBarcodeAjax(int id) {
+        def batch = CellSourceBatch.get(id)
+        render barcodeService.generateBarcodeList(batch.cellSources.size()) as JSON
+        return
+    }
+    
+    def saveItems() {
+        cellSourceService.saveItems()
+    }
+    
+    def printBatchBarcode(int id) {
+        def batch = CellSourceBatch.get(id)
+        def items = batch.cellSources*.item
+        render(view: "/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name])
     }
 }
 

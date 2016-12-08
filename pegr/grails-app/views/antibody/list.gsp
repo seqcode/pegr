@@ -46,6 +46,7 @@
     </div>
     <script>
         $("select").select2();
+        $(".item-${currentCategory.id}").addClass("active");
     </script>
 </body>
 </html>

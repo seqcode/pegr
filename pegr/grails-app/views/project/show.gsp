@@ -28,14 +28,27 @@
         <div id="project-users">
             <g:render template="userTable"/>
         </div> 
-        <h3>Sequencing Runs <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MEMBER"> <g:link class="edit" controller="protocolInstanceBag" action="list" params="[projectId:project.id]">Experiments</g:link></sec:ifAnyGranted></h3>
+        
+        <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MEMBER">
+        <h3>Experiments <g:link class="edit" controller="protocolInstanceBag" action="list" params="[projectId:project.id]">link</g:link></h3>
+        </sec:ifAnyGranted>
+        
+        <h3>Sequencing Runs</h3>
         <ul>
-            <g:each in="${project.cohorts}" var="cohort">
-                <h4>${cohort}
-                    <g:if test="${cohort.report && cohort.report.status == pegr.ReportStatus.PUBLISH}"><g:link controller="report" action="show" id="${cohort.report?.id}">Report: ${cohort.report?.name}</g:link> 
-                    </g:if>
-                </h4>
-                <g:render template="/project/sampleTable" model="['sampleList':cohort.samples, 'project':project]" />
+            <g:each in="${project.cohorts}" var="cohort" status="n">
+                <div class="panel-group">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title"><a data-toggle="collapse" href="#collapse${n}">${cohort}</a> 
+                                <g:if test="${cohort.report && cohort.report.status == pegr.ReportStatus.PUBLISH}"><g:link controller="report" action="show" id="${cohort.report?.id}">Report: ${cohort.report?.name}</g:link> 
+                                </g:if>
+                            </h4>
+                        </div>
+                    </div>
+                    <div id="collapse${n}" class="panel-collapse collapse">
+                        <g:render template="/project/sampleTable" model="['sampleList':cohort.samples, 'project':project]" />
+                    </div>
+                </div>  
             </g:each>
         </ul>
         <h4>Other Samples</h4>

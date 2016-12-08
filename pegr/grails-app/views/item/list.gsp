@@ -37,7 +37,7 @@
           </table>
     </div>
     <div class="pagination">
-        <g:paginate next="Next" prev="Prev" action="list" total="${itemCount ?: 0}" />
+        <g:paginate next="Next" prev="Prev" action="list" params="[categoryId:currentCategory.id]" total="${itemCount ?: 0}" />
     </div>
     <script>
         $("select").select2();

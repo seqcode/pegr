@@ -3,6 +3,7 @@
         <thead>
             <tr>
                 <th>Sample ID</th>
+                <th>Description</th>
                 <th>Celltype/Strain</th>
                 <th>Antibody</th>
                 <th>Target</th>
@@ -14,6 +15,7 @@
             <g:each in="${sampleList}" var="sample">
                 <tr>
                     <td><g:link controller="sample" action="show" id="${sample.id}" target="_blank">${sample.id}</g:link></td>    
+                    <td>${sample.naturalId}</td>
                     <td>${sample.cellSource} </td>
                     <td>${sample.antibody}</td>
                     <td>${sample.target}</td>

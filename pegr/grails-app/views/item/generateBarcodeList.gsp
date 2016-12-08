@@ -22,6 +22,12 @@
                 top: -5mm;
             }
             
+            .name {
+                position: relative;
+                left: 11.5mm;
+                top: -5mm;
+            }
+            
             @media print {  
               @page {
                 size: 216mm 280mm;
@@ -38,7 +44,7 @@
             <img src='${createLink(controller:"item", action:"displayBarcode", params:[barcode:barcode, width:60, height:60, formatStr:"QR"])}' width="40" height="40"/>
             <span class="label">${barcode}</span>
             <g:if test="nameList">
-                <span class="label">${nameList[n]}</span>
+                <div class="name">${nameList[n]}</div>
             </g:if>
         </div>
         </g:each>

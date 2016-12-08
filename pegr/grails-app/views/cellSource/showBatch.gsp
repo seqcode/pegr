@@ -14,53 +14,64 @@
     <div class="container-fluid">
         <g:link controller="cellSource" action="listBatches"><span class="glyphicon glyphicon-th-list"></span> List</g:link>
         <g:form controller="cellSource" action="saveItems">
-        <h4>Batch ${batch} 
-            <span id="print" class="btn btn-default pull-right">Print Barcodes</span>
+        <g:hiddenField name="batchId" value="${batch.id}"></g:hiddenField>
+        <h4>Batch: ${batch} 
+            <g:link action="printBatchBarcode" id="${batch.id}" class="btn btn-default pull-right">Print Barcodes</g:link>
             <g:if test="${batch.cellSources.every{it.item == null}}">
-                <g:submitButton class="btn btn-default pull-right" name="save" value="Save"></g:submitButton>
+                <g:submitButton class="btn btn-primary pull-right" name="save" value="Save"></g:submitButton>
                 <span id="assign-barcodes" class="confirm btn btn-default pull-right">Assign Barcodes to All</span> 
             </g:if>
         </h4>
+
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>Species</th>
                     <th>Parent</th>
-                    <th>Strain</th>                    
+                    <th>Strain</th>       
+                    <th>Name</th>
                     <th>Barcode</th>
                     <th>Type</th>
                     <th>Location</th>
                 </tr>
             </thead>
             <tbody>
-                <g:each in="${batch.cellSources}" var="cellSource">
+                <g:each in="${batch.cellSources}" var="cellSource" status="n">
                     <tr>
                         <input type="hidden" name="cellSourceId" value="${cellSource.id}" class="cellSourceId">
                         <td>${cellSource.strain?.species}</td>
                         <td>${cellSource.strain?.parent}</td>
                         <td><g:link controller="cellSource" action="show" params="[id:cellSource.id]">${cellSource.strain}</g:link></td>
+                        <td>
+                            <g:if test="${cellSource.item}">
+                                <span class="value">${cellSource.item.name}</span>
+                            </g:if>
+                            <g:else>
+                                <input name="items[${n}].name" value="${cellSource.strain}">
+                            </g:else>
+                        </td>
                         <td class="barcode item">
-                            <g:if test="${cellSource.item?.barcode}">
+                            <g:if test="${cellSource.item}">
                                 <span class="value">${cellSource.item?.barcode}</span>
                             </g:if>
                             <g:else>
-                                <input name="barcode">
+                                <input name="items[${n}].barcode">
                             </g:else>
                         </td>
                         <td class="type item">
-                            <g:if test="${cellSource.item?.type}">
+                            <g:if test="${cellSource.item}">
                                 <span class="value">${cellSource.item?.type}</span>
                             </g:if>
                             <g:else>
-                                <g:select name="type" from="${pegr.ItemType.list()}" optionKey="id" noSelection="${['':'']}"></g:select> <span class="badge broadcast-type">All</span>
+                                <g:select name="items[${n}].type" from="${pegr.ItemType.list()}" optionKey="id" noSelection="${['':'']}"></g:select> <span class="badge broadcast-type">All</span>
                             </g:else>                            
                         </td>
                         <td class="location item">
-                            <g:if test="${cellSource.item?.location}">
+                            <g:if test="${cellSource.item}">
                                 <span class="value">${cellSource.item?.location}</span>                                
                             </g:if>
                             <g:else>
-                                <input name="location">
+                                <input name="items[${n}].location">
                             </g:else>
                         </td>
                     </tr>
@@ -87,7 +98,7 @@
         
         $(".broadcast-type").on("click", function(){
             var type = $(this).parent().find("select").val();
-            $(".type").val(type);
+            $(".type select").val(type).trigger("change");
         });
     </script>
 </body>

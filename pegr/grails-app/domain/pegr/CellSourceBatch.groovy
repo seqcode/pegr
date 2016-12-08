@@ -9,6 +9,6 @@ class CellSourceBatch {
     }
     
     def getCellSources() {
-        return BatchCellSources.findAllByBatch(this).collect {it.cellSource}
+        return BatchCellSources.findAllByBatch(this).collect {it.cellSource}.sort{it.id}
     }
 }

@@ -241,11 +241,16 @@ class CellSourceController {
         return
     }
     
-    def saveItems() {
-        cellSourceService.saveItems()
+    def saveItems(ItemBatchCommand cmd) {
+        try {
+            cellSourceService.saveItems(cmd)
+        } catch (Exception e) {
+            flash.message = "Error saving the barcodes!"
+        }
+        redirect(action: "showBatch", id: cmd.batchId)
     }
     
-    def printBatchBarcode(int id) {
+    def printBatchBarcode(Long id) {
         def batch = CellSourceBatch.get(id)
         def items = batch.cellSources*.item
         render(view: "/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name])
@@ -275,4 +280,10 @@ class CellSourceCommand {
 @grails.validation.Validateable
 class CellStockBatchCommand {
     List<CellSourceCommand> cellSources = [].withLazyDefault {new CellSourceCommand()}
+}
+
+@grails.validation.Validateable
+class ItemBatchCommand {
+    Long batchId
+    List<Item> items = [].withLazyDefault {new Item()}
 }

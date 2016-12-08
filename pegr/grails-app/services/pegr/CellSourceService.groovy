@@ -328,4 +328,15 @@ class CellSourceService {
          strain: data[3]
         ]
     }
+    
+    @Transactional
+    def saveItems(ItemBatchCommand cmd) {
+        def batch = CellSourceBatch.get(cmd.batchId)
+        def cellSources =  batch.cellSources
+        cmd.items.eachWithIndex {item, index->
+            itemService.save(item)
+            cellSources[index].item = item
+            cellSources[index].save()
+        }
+    }
 }

@@ -3,6 +3,7 @@ import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 import static org.springframework.http.HttpStatus.*
 import org.springframework.web.multipart.MultipartHttpServletRequest 
+import grails.converters.*
 
 class ItemController {
     def itemService
@@ -255,6 +256,20 @@ class ItemController {
         def item = Item.get(itemId)
         item.status = status as ItemStatus
         itemService.save(item)
+        def label
+        switch (status) {
+            case "GOOD":
+                label = "label label-success"
+                break
+            case "BAD":
+                label = "label label-danger"
+                break
+            default:
+                label = "label label-warning"
+        }
+        def result = [status: status, label: label] as JSON
+        render result
+        return
     }
 }
 

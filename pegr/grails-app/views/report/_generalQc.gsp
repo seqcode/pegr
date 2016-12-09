@@ -1,5 +1,5 @@
 <div>
-    <span class="label label-success"> </span> Data received; 
+    <span class="label label-success"> </span> Success; 
     <span class="label label-danger"> </span> Error message;
     <span class="label label-warning"> </span> Permission denied;
     <span class="label label-info"> </span> Empty dataset (e.g. no peaks, no peak-pairs, no motifs, etc.);

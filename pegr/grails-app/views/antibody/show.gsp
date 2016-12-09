@@ -18,6 +18,7 @@
             <div class="row">
                 <div class="col-sm-6">
                     <ul>
+                        <g:render template="/item/status" model="[item: antibody.item]"></g:render>
                         <g:if test="${antibody.item?.name}">
                         <li>Name: ${antibody.item.name}</li>
                         </g:if>

@@ -3,6 +3,7 @@ import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 import static org.springframework.http.HttpStatus.*
 import org.springframework.web.multipart.MultipartHttpServletRequest 
+import grails.converters.*
 
 class ItemController {
     def itemService
@@ -248,7 +249,27 @@ class ItemController {
     
     def generateBarcodeList() {
         def barcodeList = barcodeService.generateBarcodeList(80)
-        [barcodeList: barcodeList]
+        [barcodeList: barcodeList, date: new Date()]
+    }
+    
+    def updateStatusAjax(Long itemId, String status) {
+        def item = Item.get(itemId)
+        item.status = status as ItemStatus
+        itemService.save(item)
+        def label
+        switch (status) {
+            case "GOOD":
+                label = "label label-success"
+                break
+            case "BAD":
+                label = "label label-danger"
+                break
+            default:
+                label = "label label-warning"
+        }
+        def result = [status: status, label: label] as JSON
+        render result
+        return
     }
 }
 

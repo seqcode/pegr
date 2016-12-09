@@ -1,5 +1,7 @@
 package pegr
 
+import com.opencsv.CSVParser
+import com.opencsv.CSVReader
 import grails.transaction.Transactional
 
 class CellSourceException extends RuntimeException {
@@ -9,6 +11,7 @@ class CellSourceException extends RuntimeException {
 class CellSourceService {
     def itemService
     def utilityService
+    def springSecurityService
     
     @Transactional
     def update(CellSourceCommand cmd) {
@@ -212,12 +215,16 @@ class CellSourceService {
 	}
 
     @Transactional
-    def batchSave(List cellSources) {
-        cellSources.each { cmd ->
+    def batchSave(List cellSourceCmds) {
+        def cellSources = []
+        cellSourceCmds.each { cmd ->
             def cellSource = getCellSource(cmd)
             cellSource.status = DictionaryStatus.Y
             cellSource.save()
+            cellSources.push(cellSource)
         }
+        def batch = createBatch(cellSources)
+        return batch
     }
     
     @Transactional
@@ -257,5 +264,91 @@ class CellSourceService {
         } catch (Exception e) {
             throw new CellSourceException(message: "Cell stock cannot be removed!")
         }
+    }
+    
+    @Transactional
+    def importCellStock(String filename, int startLine, int endLine) {
+        def lineNo = 0    
+        def file = new FileReader(filename)
+        CSVReader reader = new CSVReader(file)
+        String [] rawdata
+        def cellSources = []
+
+        while ((rawdata = reader.readNext()) != null) {
+            ++lineNo
+            if (lineNo < startLine) {
+                continue
+            } else if (endLine > 0 && lineNo > endLine) {
+                break
+            }
+            try {
+                def data = getCellStockData(rawdata)
+                def species = Species.findByGenusNameAndName(data.genus, data.species)
+                def parent = Strain.findBySpeciesAndNameAndGenotypeAndGeneticModification(species, data.parent, null, null)
+                if (!parent) {
+                    parent = new Strain(species: species, name: data.parent)
+                    parent.save(failOnError: true)
+                }
+                def strain = Strain.findBySpeciesAndNameAndParentAndGenotypeAndGeneticModification(species, data.strain, parent, null, null)
+                if (!strain) {
+                    strain = new Strain(name: data.strain, 
+                                        species: species, 
+                                        parent: parent).save( failOnError: true)
+                }
+                def cellSource = new CellSource(strain: strain, status: DictionaryStatus.Y).save()
+                cellSources.push(cellSource)
+            }catch(Exception e) {
+                log.error "Error: line ${lineNo}. " + e
+                throw new CellSourceException(message: "Error: line ${lineNo}.")
+            }   
+        }
+        def batch = createBatch(cellSources)
+        return batch
+    }
+    
+    @Transactional
+    def createBatch(List cellSources) {
+        if (cellSources.size() > 0) {
+            def batch = new CellSourceBatch(user: springSecurityService.currentUser, 
+                                            date: new Date())
+            batch.save()
+            cellSources.each {cs ->
+                new BatchCellSources(batch: batch, cellSource: cs).save(flush: true, failOnError: true)
+            }
+            return batch
+        } else {
+            return null
+        }        
+    }
+
+    def getCellStockData(String[] data) {
+        [genus: data[0],         
+         species: data[1],
+         parent: data[2],
+         strain: data[3]
+        ]
+    }
+    
+    @Transactional
+    def saveItems(ItemBatchCommand cmd) {
+        def batch = CellSourceBatch.get(cmd.batchId)
+        def cellSources =  batch.cellSources
+        cmd.items.eachWithIndex {item, index->
+            itemService.save(item)
+            cellSources[index].item = item
+            cellSources[index].save()
+        }
+    }
+    
+    @Transactional
+    def deleteBatch(Long id) {
+        def batch = CellSourceBatch.get(id)
+        def cellSources = batch.cellSources
+        BatchCellSources.executeUpdate("delete from BatchCellSources where batch.id =:batchId", [batchId: id])
+        cellSources.each { it ->
+            it.item.delete()
+            it.delete()
+        }
+        batch.delete()
     }
 }

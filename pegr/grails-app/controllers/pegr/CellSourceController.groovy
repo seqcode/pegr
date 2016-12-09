@@ -1,5 +1,6 @@
 package pegr
 import grails.converters.*
+import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 class CellSourceController {
     
@@ -8,6 +9,7 @@ class CellSourceController {
     def cellSourceService
 	def utilityService
     def itemService
+    def barcodeService
     
     final String CELL_STOCK = "Cell Stock"
     
@@ -108,13 +110,13 @@ class CellSourceController {
     }
     
     def batchSave(CellStockBatchCommand cmd) {
-        def categoryId = ItemTypeCategory.findByName(CELL_STOCK)?.id
         try {
-            cellSourceService.batchSave(cmd.cellSources)
+            def batch = cellSourceService.batchSave(cmd.cellSources)
+            redirect(action: "showBatch", id: batch.id)
         } catch(CellSourceException e) {
             flash.message = e.message
-        }
-        redirect(controller: "item", action: "list", params: [categoryId: categoryId])
+            redirect(action: "list")
+        }        
     }
         
     /* ----------------------------- Ajax ----------------------*/    
@@ -193,6 +195,81 @@ class CellSourceController {
             redirect(action: "show", id: cellSourceId)
         }
     }
+    
+    def importCellStock() {
+        def filesroot = utilityService.getFilesRoot()
+        try {
+            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  
+            def mpf = mpr.getFile("file");
+            String filename = mpf.getOriginalFilename();
+            if(!mpf?.empty && filename[-4..-1] == ".csv") {  
+                File folder = new File(filesroot, 'temp'); 
+                if (!folder.exists()) { 
+                    folder.mkdirs(); 
+                } 
+                File fileDest = new File(folder, filename)
+                mpf.transferTo(fileDest)
+                
+                def batch = cellSourceService.importCellStock(fileDest.getPath(), 
+                                              params.int("startLine"), 
+                                              params.int("endLine"))
+                flash.message = "New cell stockes have been uploaded!"
+                redirect(action: "showBatch", id: batch.id)
+            } else {
+                flash.message = "Only csv file can be accepted!"
+                redirect(action: "list")
+            }
+        } catch (CellSourceException e) {
+            flash.message = e.message
+            redirect(action: "list")
+        }        
+    }
+    
+    def listBatches() {
+        def batches = CellSourceBatch.list()
+        [batches: batches]
+    }
+    
+    def showBatch(Long id) {
+        def batch = CellSourceBatch.get(id)
+        [batch: batch]
+    }
+    
+    def batchGenerateBarcodeAjax(int id) {
+        def batch = CellSourceBatch.get(id)
+        render barcodeService.generateBarcodeList(batch.cellSources.size()) as JSON
+        return
+    }
+    
+    def saveItems(ItemBatchCommand cmd) {
+        try {
+            cellSourceService.saveItems(cmd)
+        } catch (Exception e) {
+            flash.message = "Error saving the barcodes!"
+        }
+        redirect(action: "showBatch", id: cmd.batchId)
+    }
+    
+    def printBatchBarcode(Long id) {
+        def batch = CellSourceBatch.get(id)
+        if (!batch) {
+            render(view: "/404")
+            return
+        }
+        def items = batch.cellSources*.item
+        render(view: "/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name, date: new Date()])
+    }
+    
+    def deleteBatch(Long id) {
+        try {
+            cellSourceService.deleteBatch(id)
+            flash.message = "The batch has been deleted!"
+            redirect(action: "listBatches")
+        } catch(Exception e) {
+            flash.message = "This batch cannot be deleted!"
+            redirect(action: "showBatch", id: id)
+        }
+    }
 }
 
 @grails.validation.Validateable
@@ -218,4 +295,10 @@ class CellSourceCommand {
 @grails.validation.Validateable
 class CellStockBatchCommand {
     List<CellSourceCommand> cellSources = [].withLazyDefault {new CellSourceCommand()}
+}
+
+@grails.validation.Validateable
+class ItemBatchCommand {
+    Long batchId
+    List<Item> items = [].withLazyDefault {new Item()}
 }

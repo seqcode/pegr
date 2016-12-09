@@ -23,6 +23,7 @@
     <div class="row">
         <div class="col-sm-6">
             <ul>
+                <g:render template="/item/status" model="[item: cellSource.item]"></g:render>
                 <g:if test="${cellSource.item?.name}">
                 <li>Name: ${cellSource.item?.name}</li>
                 </g:if>

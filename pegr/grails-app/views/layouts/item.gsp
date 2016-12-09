@@ -18,6 +18,7 @@
             </g:each>
             <g:link controller="sequenceIndex" class="btn btn-info item-index">Index</g:link>
             <a href="https://www.quartzy.com/e/groups/108111/order-requests" class="btn btn-info external" target="_blank">Order</a>
+            <g:link controller="item" action="generateBarcodeList" class="edit pull-right" target="_blank">Generate Barcode List</g:link>
         </div>
         <g:layoutBody/>
     </div>

@@ -12,6 +12,7 @@ class Item {
     Item parent
     String customizedFields
     Project project
+    String status
 
     List getSamplesInPool() {
         return PoolSamples.where{pool == this}.collect{it.sample}
@@ -56,9 +57,11 @@ class Item {
         parent nullable: true
         customizedFields nullable: true
         project nullable: true
+        status nullalbe: true
     }
     
     static mapping = {
         customizedFields sqlType: 'longtext'
+        status defaultValue: "ItemStatus.GOOD"
     }
 }

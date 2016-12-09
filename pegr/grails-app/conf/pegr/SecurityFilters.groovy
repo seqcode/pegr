@@ -115,7 +115,7 @@ class SecurityFilters {
             }
         }
         
-        ItemEdit(controller: 'item', action: 'edit|update|upload|deleteImage|delete') {
+        ItemEdit(controller: 'item', action: 'edit|update|upload|deleteImage|delete|updateStatusAjax') {
             before = {
                 def itemId = params.long('itemId')
                 def item = Item.get(itemId)

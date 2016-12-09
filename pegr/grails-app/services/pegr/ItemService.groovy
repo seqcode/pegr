@@ -22,9 +22,10 @@ class ItemService {
         if (!item.id && Item.findByBarcode(item.barcode)){
             throw new ItemException(message: "This barcode has already been used!")
         } 
-        // add the current user if the item is new
+        // add the current user AND status "GOOD" if the item is new
         if (!item.id) {
             item.user = springSecurityService.currentUser
+            item.status = ItemStatus.GOOD
         }
         if(!item.save(flush: true)){
             throw new ItemException(message: "Invalid inputs for item!")

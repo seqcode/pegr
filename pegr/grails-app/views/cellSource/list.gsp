@@ -5,12 +5,12 @@
 </head>
 <body>
     <g:render template="/item/searchBar"></g:render>
-    <g:if test="${flash.message}">
-        <div class="message" role="status">${flash.message}</div>
-    </g:if>
-    <g:link controller="item" action="generateBarcodeList" class="edit pull-right" target="_blank">Generate Barcode List</g:link>
-    <g:link controller="cellSource" action="batchCreate" class="edit pull-right">Batch Create</g:link>
-    <h4>Cell Stock</h4>
+    <g:render template="/cellSource/head"></g:render>
+    
+    <ul class="nav nav-tabs">
+        <li class="active"><g:link action="list">Cell Stock</g:link></li>
+        <li><g:link action="listBatches">Batches</g:link></li>
+    </ul>
     <div>
         <g:form controller="cellSource" action="list">
             <label>Strain</label> 
@@ -24,7 +24,9 @@
                 <tr>
                     <th>Species</th>
                     <th>Parent</th>
-                    <th>Strain</th>                    
+                    <th>Strain</th>
+                    <th>Mutation</th>
+                    <th>Biological Source ID</th>
                     <th>Barcode</th>
                     <th>Type</th>
                     <th>Location</th>
@@ -37,6 +39,8 @@
                         <td>${cellSource.strain?.species}</td>
                         <td>${cellSource.strain?.parent}</td>
                         <td><g:link controller="cellSource" action="show" params="[id:cellSource.id]">${cellSource.strain}</g:link></td>
+                        <td>${cellSource.strain?.geneticModification}</td>
+                        <td>${cellSource.biologicalSourceId}</td>
                         <td class="barcode item"><span class="value">${cellSource.item?.barcode}</span></td>
                         <td class="type item"><span class="value">${cellSource.item?.type}</span></td>
                         <td class="location item"><span class="value">${cellSource.item?.location}</span></td>

@@ -124,7 +124,7 @@ class QfileUploadService {
         def cellProvider = getUser(data.senderNameStr, data.senderEmail, data.senderPhone)
         def dataTo = getUser(data.dataToUser, data.dataToEmail, null)
 
-        def project = getProject(data.projectName, data.projectUser, data.projectUserEmail)
+        def project = getProject(data.projectName, data.projectUser, data.projectUserEmail, data.service, data.invoice)
 
         def invoice = getInvoice(data.service, data.invoice)
 
@@ -161,7 +161,7 @@ class QfileUploadService {
 
         def abNotes = JsonOutput.toJson(abnoteMap)
         
-        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes, assay, growthMedia)
+        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes, assay, growthMedia, data.projectName)
 
         sampleService.addTreatment(sample, data.perturbation1)
         sampleService.addTreatment(sample, data.perturbation2)
@@ -173,7 +173,7 @@ class QfileUploadService {
 
         def seqExp = getSeqExperiment(sample, results.sequenceRun, data.rd1Start, data.rd1End, data.indexStart, data.indexEnd, data.rd2Start, data.rd2End)
         
-        addExperimentToCohort(seqExp, project)
+        addExperimentToCohort(seqExp, project, data.service, data.invoice)
 
         def genomeBuilds = [data.genomeBuild1, data.genomeBuild2, data.genomeBuild3]
         saveRequestedGenome(genomeBuilds, sample, species) 
@@ -208,13 +208,14 @@ class QfileUploadService {
         }
     }
     
-    def addExperimentToCohort(SequencingExperiment seqExp, Project project) {
+    def addExperimentToCohort(SequencingExperiment seqExp, Project project, String service, String invoice) {
         if (!project || !seqExp.sequenceRun) {
             return
         }
-        def cohort = SequencingCohort.findByProjectAndRun(project, seqExp.sequenceRun)
-        if (!cohort) {
-            cohort = new SequencingCohort(project: project, run: seqExp.sequenceRun)
+        def cohortName = "${seqExp.sequenceRun.id}_${service}-${invoice}"
+        def cohort = SequencingCohort.findByName(cohortName)
+        if (!cohort || cohort.project != project) {
+            cohort = new SequencingCohort(project: project, run: seqExp.sequenceRun, name: cohortName)
             cohort.save()
         }
         seqExp.cohort = cohort
@@ -310,13 +311,18 @@ class QfileUploadService {
 	    return user
 	}
 	
-	def getProject(String projectName, String projectUser, String projectUserEmail) {
-	    if (projectName == null) {
-	        return null
-	    }
+	def getProject(String projectStr, String projectUser, String projectUserEmail, String service, String invoice) {
+        def projectName
+        if (projectStr && (projectStr == "Yeast Encode 3.0" || projectStr.take(3) == "Y3E")) {
+            projectName = "Yeast Encode 3.0"
+        } else if (invoice && invoice[0].toUpperCase() in ["S", "P", "X"]) {
+            projectName = service
+        } else {
+            projectName = "${service}-${invoice}"
+        }
 	    def project = Project.findByName(projectName)
 	    if (!project) {
-	        project = new Project(name: projectName).save( failOnError: true)
+	        project = new Project(name: projectName, description: projectStr).save( failOnError: true)
 	    }
 	    def user = getUser(projectUser, projectUserEmail, null)
 	    if (user && project) {
@@ -483,7 +489,7 @@ class QfileUploadService {
 	    return cellSource
 	}
     
-	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId, String abNotes, Assay assay, GrowthMedia growthMedia) {
+	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId, String abNotes, Assay assay, GrowthMedia growthMedia, String projectName) {
 	    def note = [:]
 	    if (sampleNotes) {
 	        note['note'] = sampleNotes
@@ -494,6 +500,13 @@ class QfileUploadService {
 	    if (bioRep2SampleId) {
 	        note['bioRep2'] = bioRep2SampleId
 	    }
+        if (projectName) {
+            if (note['note']) {
+                note['note'] += ". " + projectName
+            } else {
+                note['note'] = projectName
+            }            
+        }
 	    def date = getDate(dateStr)
         def source = "PughLab"
         if (invoice?.invoiceNum && invoice.invoiceNum.size() >= 4 && invoice.invoiceNum[1..3] ==~ /\d+/ ) {

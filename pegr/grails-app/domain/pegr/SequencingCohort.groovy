@@ -10,7 +10,7 @@ class SequencingCohort {
     String notes
     
     String toString() {
-        run.id + "_" + project.name
+        this.name
 	}
     
     List getSamples() {

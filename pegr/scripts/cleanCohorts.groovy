@@ -110,6 +110,78 @@ def sql = new Sql(dataSource)
     }
 }
 */
+    
+Sample.list().each { sample ->
+    if (sample.invoice) {
+        def service = sample.invoice.serviceId
+        def invoice = sample.invoice.invoiceNum
+        
+        // project
+        def projectName            
+        if (invoice && invoice[0].toUpperCase() in ["S", "P", "X"]) {
+            projectName = service
+        } else {
+            projectName = "${service}-${invoice}"
+        }        
+        
+        def projectSample = ProjectSamples.findBySample(sample)
+        if (projectSample) {
+            if (projectSample.project.name == "Yeast Encode 3.0" || projectSample.project.name.take(3) == "Y3E") {
+                projectName = "Yeast Encode 3.0"
+            } 
+            if (projectSample.project.name != projectName) {
+                def project = Project.findByName(projectName)
+                if (project) {
+                    projectSample.project = project
+                    projectSample.save(flush: true, failOnError: true)
+                } else {
+                    projectSample.project.description = projectSample.project.name
+                    projectSample.project.name = projectName
+                    projectSample.project.save(flush: true, failOnError: true)
+                }
+            } 
+        } else {
+            def project = Project.findByName(projectName)
+            if (!project) {
+                project = new Project(name: projectName)  
+                project.save(flush: true, failOnError: true)
+            } 
+            new ProjectSamples(project: project, sample: sample).save(flush: true, failOnError: true)
+        }
+        
+        // cohort
+        def project = ProjectSamples.findBySample(sample)?.project
+        def exp = SequencingExperiment.findBySample(sample)
+        if (exp) {
+            def cohortName = "${exp.sequenceRun.id}_${service}-${invoice}"
+            if (exp.cohort) {
+                if (exp.cohort.name != cohortName) {
+                    def cohort = SequencingCohort.findByNameAndProjectAndRun(cohortName, project, exp.sequenceRun)
+                    if (cohort) {
+                        exp.cohort = cohort
+                        exp.save(flush: true, failOnError: true)
+                    } else {
+                        exp.cohort.name = cohortName
+                        exp.cohort.project = project
+                        exp.cohort.run = exp.sequenceRun
+                        exp.cohort.save(flush: true, failOnError: true)
+                    }
+                }
+            } else {
+                def cohort = SequencingCohort.findByNameAndProjectAndRun(cohortName, project, exp.sequenceRun)
+                if (!cohort) {
+                    cohort = new SequencingCohort(project: project, run: exp.sequenceRun, name: cohortName)
+                    cohort.save(flush: true, failOnError: true)
+                }
+                exp.cohort = cohort
+                exp.save(flush: true, failOnError: true)
+            }
+
+        }
+    }
+}
+    
+/*
 SequencingCohort.list().each {cohort ->
     if (cohort.experiments.size() == 0) {
         cohort.delete()     
@@ -128,3 +200,4 @@ SummaryReport.list().each {report ->
         report.delete()
     }
 }
+*/

@@ -18,7 +18,7 @@
     <tbody>
         <g:each in="${runStatusMap.value.sampleStatusList}" var="sample">
             <tr>
-                <td class="sample" rowspan="${Math.max(1, sample.alignmentStatusList.size())}"><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}</g:link></td>
+                <td class="sample" rowspan="${Math.max(1, sample.alignmentStatusList.size())}"><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}</g:link> ${sample.naturalId}</td>
                 <g:each in="${sample.alignmentStatusList}" var="alignment" status="n">
                     <g:if test="${n>0}"><tr></g:if>
                     <td class="target">${sample.target}</td>

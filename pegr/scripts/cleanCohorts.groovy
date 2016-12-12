@@ -111,6 +111,7 @@ def sql = new Sql(dataSource)
 }
 */
     
+// new script
 Sample.list().each { sample ->
     if (sample.invoice) {
         def service = sample.invoice.serviceId
@@ -180,24 +181,54 @@ Sample.list().each { sample ->
         }
     }
 }
-    
-/*
+
 SequencingCohort.list().each {cohort ->
     if (cohort.experiments.size() == 0) {
-        cohort.delete()     
+        try {
+            cohort.delete()     
+        } catch (Exception e) {
+            println "Cohort ${cohort.id} cannot be deleted!"
+        }
     }
 }
 
 Project.list().each {project ->
     if (project.samples.size() == 0) {
-        ProjectUser.executeUpdate("delete from ProjectUser where project.id=:projectId", [projectId: project.id])
-        project.delete()
+        if (!ProjectBags.findByProject(project)) {
+            try {
+                ProjectUser.executeUpdate("delete from ProjectUser where project.id=:projectId", [projectId: project.id])
+                project.delete()
+            } catch (Exception e) {
+                println "Project ${project.id} cannot be deleted!"
+            }
+        }
+    } else {
+        // get the project's date
+        def date
+        def nameParts = project.name.split("-")
+        if (nameParts.size() == 2) {
+            try {
+                date = new Date().parse("yyMMdd", nameParts[1])
+            } catch(Exception e) {
+
+            }
+        }
+        if (!date) {
+            date = project.samples[0].date
+        }
+        if (date) {
+            project.dateCreated = date
+            project.save()
+        }
     }
 }
 
 SummaryReport.list().each {report ->
     if (!report.cohort) {
-        report.delete()
+        try {
+            report.delete()
+        } catch (Exception e) {
+            println "Report ${report.id} cannot be deleted!"
+        }
     }
 }
-*/

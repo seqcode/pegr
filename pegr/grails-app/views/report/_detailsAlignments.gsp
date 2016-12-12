@@ -32,7 +32,7 @@
         <g:each in="${sampleDTOs}" var="sample">
             <g:each in="${sample.experiments}" var="experiment">
                 <g:each in="${experiment.alignments}" var="alignment">
-                    <h5>Sample <u>${sample.id}</u> &nbsp; Run <u>${experiment.runId}</u> &nbsp; Genome <u>${alignment.genome}</u> &nbsp; Target <u>${sample.target}</u> 
+                    <h5>Sample <u>${sample.id} ${sample.naturalId}</u> &nbsp; Run <u>${experiment.runId}</u> &nbsp; Genome <u>${alignment.genome}</u> &nbsp; Target <u>${sample.target}</u> 
                     </h5>
                     <table class="table table-bordered meme-table">                        
                         <thead>

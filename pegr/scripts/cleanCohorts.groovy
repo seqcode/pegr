@@ -3,6 +3,7 @@ import groovy.sql.Sql
 import com.opencsv.CSVParser
 import com.opencsv.CSVReader
 import groovy.json.*
+
 /*
 def minRun = 550
 def maxRun = 637
@@ -112,6 +113,7 @@ def sql = new Sql(dataSource)
 */
     
 // new script
+def jsonSlurper = new JsonSlurper()
 Sample.list().each { sample ->
     if (sample.invoice) {
         def service = sample.invoice.serviceId
@@ -131,6 +133,14 @@ Sample.list().each { sample ->
                 projectName = "Yeast Encode 3.0"
             } 
             if (projectSample.project.name != projectName) {
+                def note = jsonSlurper.parseText(sample.note)
+                if (note.note) {
+                    note.note += ". " + projectSample.project.name
+                } else {
+                    note.note = projectSample.project.name
+                }
+                sample.note = JsonOutput.toJson(note)
+                sample.save(flush: true, failOnError: true)
                 def project = Project.findByName(projectName)
                 if (project) {
                     projectSample.project = project
@@ -193,6 +203,7 @@ SequencingCohort.list().each {cohort ->
 }
 
 Project.list().each {project ->
+    def updateName = false
     if (project.samples.size() == 0) {
         if (!ProjectBags.findByProject(project)) {
             try {
@@ -207,6 +218,9 @@ Project.list().each {project ->
         def date
         def nameParts = project.name.split("-")
         if (nameParts.size() == 2) {
+            if (nameParts[1] == "null") {
+                updateName = true
+            }
             try {
                 date = new Date().parse("yyMMdd", nameParts[1])
             } catch(Exception e) {
@@ -215,6 +229,17 @@ Project.list().each {project ->
         }
         if (!date) {
             date = project.samples[0].date
+            if (date && updateName) {
+                nameParts[1] = date.format("yyMMdd")
+                project.name = nameParts.join("-")
+                project.cohorts.each { cohort ->
+                    def chnParts = cohort.name.split("-_")
+                    if (chnParts && chnParts.size() == 3 && chnParts[2] == "null") {
+                        chnPatts[2] = nameParts[1]
+                        cohort.name = "${chnParts[0]}_${chnParts[1]}-${chnParts[2]}"
+                    }
+                }
+            }
         }
         if (date) {
             project.dateCreated = date
@@ -226,6 +251,7 @@ Project.list().each {project ->
 SummaryReport.list().each {report ->
     if (!report.cohort) {
         try {
+            ReportAlignments.executeUpdate("delete from ReportAlignments where report.id =:reportId", [reportId: report.id])
             report.delete()
         } catch (Exception e) {
             println "Report ${report.id} cannot be deleted!"

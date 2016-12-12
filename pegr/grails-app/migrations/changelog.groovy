@@ -2895,4 +2895,6 @@ databaseChangeLog = {
 	include file: 'addCellSourceBatch.groovy'
 
 	include file: 'addItemStatus.groovy'
+
+	include file: 'removeCohortUnique.groovy'
 }

@@ -15,7 +15,7 @@
             <g:link action="all"><span class="glyphicon glyphicon-home"></span> Sample List</g:link>
         </div>     
         <h3>
-            Sample ${sample.id} <g:if test="${sample.sourceId}">(${sample.source}#${sample.sourceId})</g:if>
+            Sample ${sample.id} ${sample.naturalId}<g:if test="${sample.sourceId}">(${sample.source}#${sample.sourceId})</g:if>
             <g:link controller="sample" action="showItem" params="[sampleId:sample?.id]"><span class="glyphicon glyphicon-qrcode"></span></g:link>
             <small><span class="label label-default">${sample.status}</span></small> 
             <g:link action="show" id="${sample.id}" class="edit pull-right">Show</g:link>

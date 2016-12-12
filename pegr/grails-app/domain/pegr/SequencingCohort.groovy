@@ -10,7 +10,7 @@ class SequencingCohort {
     String notes
     
     String toString() {
-        run.id + "_" + project.name
+        this.name
 	}
     
     List getSamples() {
@@ -33,7 +33,6 @@ class SequencingCohort {
     
     static constraints = {
         name nullable: true
-        project unique: "run"
         report nullable: true
         images nullable: true
         notes nullable: true, blank: true

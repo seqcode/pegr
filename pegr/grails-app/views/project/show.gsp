@@ -34,6 +34,7 @@
         </sec:ifAnyGranted>
         
         <h3>Sequencing Runs</h3>
+        <p>Click each run to see the list of samples</p>
         <ul>
             <g:each in="${project.cohorts}" var="cohort" status="n">
                 <div class="panel-group">

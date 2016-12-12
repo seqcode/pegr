@@ -25,7 +25,8 @@ class ProtocolAdminController {
     def create() {
         if(request.method == "POST") {
             withForm{
-                def protocol = new Protocol(params)
+                def protocol = new Protocol()
+                bindData(protocol, params, [exclude: ['file']])
                 protocol.user = springSecurityService.currentUser
                 def protocolItemTypeIds = [ 
                         (pegr.ProtocolItemFunction.PARENT) : [params.long('startItemTypeId')],
@@ -36,10 +37,7 @@ class ProtocolAdminController {
                 ]
                 try {
                     protocolService.save(protocol, protocolItemTypeIds)
-                    protocolService.uploadFile( (MultipartHttpServletRequest)request, protocol.id, "file")
-                    flash.message = "New protocol saved!"
-                    redirect(action: "show", id: protocol.id)
-                }catch(ProtocolException e) {
+                } catch (ProtocolException e) {
                     request.message = e.message
                     render(view: "create", model: [protocol: protocol, 
                         startItemTypeId:params.startItemTypeId,
@@ -47,17 +45,16 @@ class ProtocolAdminController {
                         sharedItemTypeIds:params.sharedItemTypeIds,
                         startPoolTypeId:params.startPoolTypeId,
                         endPoolTypeId:params.endPoolTypeId])
-                }catch(Exception e) {
-                    request.message = "Error saving this protocol!"
-                    log.error "Error: ${e.message}", e
-                    render(view: "create", model: [protocol: protocol,
-                        startItemTypeId:params.startItemTypeId,
-                        endItemTypeId:params.endItemTypeId,
-                        sharedItemTypeIds:params.sharedItemTypeIds,
-                        startPoolTypeId:params.startPoolTypeId,
-                        endPoolTypeId:params.endPoolTypeId])
+                    return
                 }
-
+                try {
+                    flash.message = "New protocol saved! "
+                    protocolService.uploadFile( (MultipartHttpServletRequest)request, protocol.id, "file")
+                } catch(ProtocolException e) {
+                    flash.message = "New protocol saved, but the file is not uploaded!"
+                    flash.message += e.message
+                } 
+                redirect(action: "show", id: protocol.id)
             }
         }
     }

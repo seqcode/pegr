@@ -180,6 +180,32 @@
                     </li>
                 </ol>
             </div>
+            <div id="report">
+                <h3>Pipeline Status</h3>
+                <p>Each step in the pipeline is labeled with one of the following status </p>
+                <ul>
+                    <li><span class="label label-success"> </span> Success</li>
+                    <li><span class="label label-danger"> </span> Error message</li>
+                    <li><span class="label label-warning"> </span> Permission denied</li>
+                    <li><span class="label label-info"> </span> Empty dataset (e.g. no peaks, no peak-pairs, no motifs, etc.)</li>
+                    <li><span class="label label-default"> </span> No data received.</li>
+                </ul>
+                <p>The status is determined by the messages received from Galaxy and preliminary screening of the data.</p>
+                <ol>
+                    <li>The error messages from Galaxy are generally labed as <span class="label label-danger"> </span> Error message, except when the message contains "Permission denied", in which case , the step is labeled as <span class="label label-warning"> </span> Permission denied.</li>
+                    <li>Data received from the following steps are tested for <span class="label label-info"> </span>Empty dataset
+                        <ul>
+                            <li>bedtoolsIntersect: no peaks</li>
+                            <li>cwpair2: no peak pairs</li>
+                            <li>repeatMasker: no sequence in fasta</li>
+                            <li>meme: no motif</li>
+                        </ul>
+                    </li>
+                    <li>If the motif count from fimo or tagPileup does not match the motif count in meme, the fimo or tagPileup step will be labeled with error.
+                    </li>
+                </ol>
+                <p>You can learn more about a step with data received by clicking the colored label. A snippet will pop over, including the step's name, error message and notes. An admin can change the step's status by clicking the <span class="glyphicon glyphicon-pencil"></span> inside the snippet and following the instructions.</p>
+            </div>
         </div>
     </body>
 </html>

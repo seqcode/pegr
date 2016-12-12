@@ -110,21 +110,125 @@ def sql = new Sql(dataSource)
     }
 }
 */
+    
+// new script
+Sample.list().each { sample ->
+    if (sample.invoice) {
+        def service = sample.invoice.serviceId
+        def invoice = sample.invoice.invoiceNum
+        
+        // project
+        def projectName            
+        if (invoice && invoice[0].toUpperCase() in ["S", "P", "X"]) {
+            projectName = service
+        } else {
+            projectName = "${service}-${invoice}"
+        }        
+        
+        def projectSample = ProjectSamples.findBySample(sample)
+        if (projectSample) {
+            if (projectSample.project.name == "Yeast Encode 3.0" || projectSample.project.name.take(3) == "Y3E") {
+                projectName = "Yeast Encode 3.0"
+            } 
+            if (projectSample.project.name != projectName) {
+                def project = Project.findByName(projectName)
+                if (project) {
+                    projectSample.project = project
+                    projectSample.save(flush: true, failOnError: true)
+                } else {
+                    projectSample.project.description = projectSample.project.name
+                    projectSample.project.name = projectName
+                    projectSample.project.save(flush: true, failOnError: true)
+                }
+            } 
+        } else {
+            def project = Project.findByName(projectName)
+            if (!project) {
+                project = new Project(name: projectName)  
+                project.save(flush: true, failOnError: true)
+            } 
+            new ProjectSamples(project: project, sample: sample).save(flush: true, failOnError: true)
+        }
+        
+        // cohort
+        def project = ProjectSamples.findBySample(sample)?.project
+        def exp = SequencingExperiment.findBySample(sample)
+        if (exp) {
+            def cohortName = "${exp.sequenceRun.id}_${service}-${invoice}"
+            if (exp.cohort) {
+                if (exp.cohort.name != cohortName) {
+                    def cohort = SequencingCohort.findByNameAndProjectAndRun(cohortName, project, exp.sequenceRun)
+                    if (cohort) {
+                        exp.cohort = cohort
+                        exp.save(flush: true, failOnError: true)
+                    } else {
+                        exp.cohort.name = cohortName
+                        exp.cohort.project = project
+                        exp.cohort.run = exp.sequenceRun
+                        exp.cohort.save(flush: true, failOnError: true)
+                    }
+                }
+            } else {
+                def cohort = SequencingCohort.findByNameAndProjectAndRun(cohortName, project, exp.sequenceRun)
+                if (!cohort) {
+                    cohort = new SequencingCohort(project: project, run: exp.sequenceRun, name: cohortName)
+                    cohort.save(flush: true, failOnError: true)
+                }
+                exp.cohort = cohort
+                exp.save(flush: true, failOnError: true)
+            }
+
+        }
+    }
+}
+
 SequencingCohort.list().each {cohort ->
     if (cohort.experiments.size() == 0) {
-        cohort.delete()     
+        try {
+            cohort.delete()     
+        } catch (Exception e) {
+            println "Cohort ${cohort.id} cannot be deleted!"
+        }
     }
 }
 
 Project.list().each {project ->
     if (project.samples.size() == 0) {
-        ProjectUser.executeUpdate("delete from ProjectUser where project.id=:projectId", [projectId: project.id])
-        project.delete()
+        if (!ProjectBags.findByProject(project)) {
+            try {
+                ProjectUser.executeUpdate("delete from ProjectUser where project.id=:projectId", [projectId: project.id])
+                project.delete()
+            } catch (Exception e) {
+                println "Project ${project.id} cannot be deleted!"
+            }
+        }
+    } else {
+        // get the project's date
+        def date
+        def nameParts = project.name.split("-")
+        if (nameParts.size() == 2) {
+            try {
+                date = new Date().parse("yyMMdd", nameParts[1])
+            } catch(Exception e) {
+
+            }
+        }
+        if (!date) {
+            date = project.samples[0].date
+        }
+        if (date) {
+            project.dateCreated = date
+            project.save()
+        }
     }
 }
 
 SummaryReport.list().each {report ->
     if (!report.cohort) {
-        report.delete()
+        try {
+            report.delete()
+        } catch (Exception e) {
+            println "Report ${report.id} cannot be deleted!"
+        }
     }
 }

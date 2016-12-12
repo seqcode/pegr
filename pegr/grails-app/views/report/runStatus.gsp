@@ -164,6 +164,7 @@
                 <button id="run-status-cancel" class="btn btn-default">Cancel</button>
             </span>
         </small> 
+        <a href="#" onclick="window.open('/pegr/help#report', 'Help: report', 'width=600,height=400' )" class="pull-right"><small><u>Help</u></small></a>
     </h3>
     <g:link controller="report" action="unknownIndex" params="[runId: run.id]">Unknown index</g:link>
     <g:each in="${runStatus}">

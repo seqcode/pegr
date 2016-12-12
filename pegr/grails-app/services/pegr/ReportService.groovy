@@ -33,6 +33,7 @@ class ReportService {
         run.experiments.each { experiment ->
             if (experiment.alignments.size() == 0) {
                 noResultSamples << new SampleStatusDTO(sampleId: experiment.sample.id, 
+                                                       naturalId: experiment.sample.naturalId,
                                                        cohort: experiment.cohort)
             }
             experiment.alignments.each { alignment ->
@@ -89,6 +90,7 @@ class ReportService {
                 def sampleStatus = results[alignment.pipeline].sampleStatusList.find {it.sampleId == experiment.sample.id}
                 if (!sampleStatus) {
                     sampleStatus = new SampleStatusDTO(sampleId: experiment.sample.id,
+                                                       naturalId: experiment.sample.naturalId,
                                                        target: experiment.sample.target?.name,
                                                        cohort: experiment.cohort,
                                     alignmentStatusList: [alignmentStatusDTO])
@@ -473,6 +475,7 @@ class ReportService {
     */
     def getSampleDTO(Sample sample) {
         return new SampleDTO(id: sample.id,
+          naturalId: sample.naturalId,
           source: sample.source,
           sourceId: sample.sourceId,
           target: sample.target?.name,

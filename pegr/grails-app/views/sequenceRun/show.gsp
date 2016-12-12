@@ -149,7 +149,7 @@
                             <g:link action="removeExperiment" params="[experimentId:it.id, runId:run.id]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link>
                         </g:if>
                     </td>
-                    <td><g:link controller="sample" action="show" id="${it.sample.id}">${it.sample?.id}</g:link></td>
+                    <td><g:link controller="sample" action="show" id="${it.sample.id}">${it.sample?.id}</g:link> ${it.sample?.naturalId}</td>
                     <td>${it.sample?.cellSource?.strain}</td>
                     <td>${it.sample?.antibody}</td>
                     <td>${it.sample?.sequenceIndicesString}</td>

@@ -1,5 +1,5 @@
 <div>
-    <span class="label label-success"> </span> Data received; 
+    <span class="label label-success"> </span> Success; 
     <span class="label label-danger"> </span> Error message;
     <span class="label label-warning"> </span> Permission denied;
     <span class="label label-info"> </span> Empty dataset (e.g. no peaks, no peak-pairs, no motifs, etc.);
@@ -48,7 +48,7 @@
         <tbody>
         <g:each in="${runStatusMap.value.sampleStatusList}" var="sample">
             <tr>
-            <td class="col-sample group-analysis" rowspan="${Math.max(1, sample.alignmentStatusList.size())}"><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}</g:link></td>
+            <td class="col-sample group-analysis" rowspan="${Math.max(1, sample.alignmentStatusList.size())}"><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}</g:link> ${sample.naturalId}</td>
             <td class="col-target group-analysis" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.target}</td>
             <td class="col-cohort group-analysis" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.cohort}</td>
             <g:each in="${sample.alignmentStatusList}" var="alignment" status="n">

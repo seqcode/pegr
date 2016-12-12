@@ -15,7 +15,7 @@
         <tbody>
             <g:each in="${sampleList}" var="sample">
                 <tr>
-                    <td rowspan="${Math.max(1, sample.experiments.size())}"><g:link controller="sample" action="show" id="${sample?.id}">${sample?.id}</g:link></td>
+                    <td rowspan="${Math.max(1, sample.experiments.size())}"><g:link controller="sample" action="show" id="${sample?.id}">${sample?.id}</g:link> ${sample.naturalId}</td>
                     <td rowspan="${Math.max(1, sample.experiments.size())}">${sample?.nTermTag}</td>
                     <td rowspan="${Math.max(1, sample.experiments.size())}">${sample?.target}</td>
                     <td rowspan="${Math.max(1, sample.experiments.size())}">${sample?.cTermTag}</td>

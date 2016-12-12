@@ -13,6 +13,7 @@ class Item {
     String customizedFields
     Project project
     String status
+    Date lastUpdated
 
     List getSamplesInPool() {
         return PoolSamples.where{pool == this}.collect{it.sample}
@@ -58,6 +59,7 @@ class Item {
         customizedFields nullable: true
         project nullable: true
         status nullalbe: true
+        lastUpdated nullable: true
     }
     
     static mapping = {

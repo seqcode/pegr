@@ -245,6 +245,7 @@ class ReportController {
 
 class SampleDTO {
     Long id
+    String naturalId
     String source
     String sourceId
     String target
@@ -309,6 +310,7 @@ class RunStatusDTO {
 
 class SampleStatusDTO {
     Long sampleId
+    String naturalId
     String target
     SequencingCohort cohort
     List alignmentStatusList

@@ -9,13 +9,15 @@ class ProtocolController {
         def currentUser = springSecurityService.currentUser
         params.max = Math.min(max ?: 25, 100)
         def protocols = Protocol.where{ user == currentUser }.list(params)
-        [protocolList: protocols]
+        def protocolCount = Protocol.where{ user == currentUser }.count()
+        [protocolList: protocols, protocolCount: protocolCount]
     }
     
     def labProtocols(Integer max) {
         params.max = Math.min(max ?: 25, 100)
         def protocols = Protocol.where{ status == DictionaryStatus.Y }.list(params)
-        [protocolList: protocols]
+        def protocolCount = Protocol.where{ status == DictionaryStatus.Y }.count()
+        [protocolList: protocols, protocolCount: protocolCount]
     }
     
     def labProtocolGroups(Integer max) {

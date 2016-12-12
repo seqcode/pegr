@@ -13,7 +13,8 @@ class ProtocolService {
     
     @Transactional
     void save(Protocol protocol, Map protocolItemTypeIds) {
-        if(protocol.save(flush: true)) {
+        try {
+            protocol.save(flush: true, failOnError: true)
             def toDelete = ProtocolItemTypes.where{protocol == protocol}.list()
             
             def newTypes = []
@@ -40,7 +41,7 @@ class ProtocolService {
             toDelete.each { 
                 it.delete()
             }
-        }else {
+        } catch(Exception e) {
             throw new ProtocolException(message: "Invalid inputs!")
         }
     }

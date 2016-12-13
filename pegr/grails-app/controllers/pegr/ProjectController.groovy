@@ -205,6 +205,23 @@ class ProjectController {
         render "success"
     }
     
+    def search(String str) {
+        def c = Project.createCriteria()
+        def listParams = [
+                max: params.max ?: 25,
+                sort: params.sort ?: "dateCreated",
+                order: params.order ?: "desc",
+                offset: params.offset
+            ]
+        def projects = c.list(listParams) {
+            or {
+                ilike "name", "%${str}%"
+                ilike "description", "%${str}%"
+            }
+        }
+        [projects: projects, totalCount: projects.totalCount, str: str] 
+    }
+    
 }
 
 

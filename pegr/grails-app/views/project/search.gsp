@@ -15,12 +15,12 @@
     </div>
     </sec:ifAnyGranted>
     <g:form controller="project" action="search" class="pull-right">
-        <input name="str">
+        <input name="str" value="${str}">
         <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>
     </g:form>
     <g:render template="overview" model="[projects:projects]" />
     <div class="pagination">
-        <g:paginate next="Next" prev="Prev" controller="project" action="all" max="15" total="${totalCount ?: 0}" />
+        <g:paginate next="Next" prev="Prev" controller="project" action="search" max="25" total="${totalCount ?: 0}" params="${params}" />
     </div>
      <script>
         $("#nav-projects").addClass("active");

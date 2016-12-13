@@ -30,7 +30,7 @@
         </tbody>
       </table>
     <div class="pagination">
-        <g:paginate next="Next" prev="Prev" controller="report" action="all" max="25" total="${totalCount ?: 0}" />
+        <g:paginate next="Next" prev="Prev" controller="report" action="automatedReportList" max="25" total="${totalCount ?: 0}" />
     </div>
      <script>
         $(".nav-reports").addClass("active");

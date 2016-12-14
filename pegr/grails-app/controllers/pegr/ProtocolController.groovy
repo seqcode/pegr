@@ -166,4 +166,26 @@ class ProtocolController {
         render(contentType: "application/pdf", contentDisposition: "inline", file: file, fileName: file.getName())
     }
     
+    def search(String str) {
+        def c = Protocol.createCriteria()
+        def listParams = [
+                max: params.max ?: 25,
+                sort: params.sort ?: "id",
+                order: params.order ?: "desc",
+                offset: params.offset
+            ]
+        def protocols = c.list(listParams) {
+            and {
+                eq "status", DictionaryStatus.Y
+                or {
+                    ilike "name", "%${str}%"
+                    ilike "description", "%${str}%"
+                    user {
+                        ilike "username", "%${str}%"
+                    }
+                }
+            }
+        }
+        [protocolList: protocols, protocolCount: protocols.totalCount, str: str]        
+    }
 }

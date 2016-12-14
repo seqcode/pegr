@@ -288,6 +288,9 @@ class ItemController {
                 type {
                     ilike "name", "%${str}%"
                 }
+                user {
+                    ilike "username", "%${str}%"
+                }
             }
         }
         [itemList: items, itemCount: items.totalCount, str: str]

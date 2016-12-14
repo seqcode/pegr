@@ -22,7 +22,7 @@
 			<g:if test="${flash.message}">
 				<div class="message" role="status">${flash.message}</div>
 			</g:if>
-			<g:render template="overviewProtocols" model="[protocolList:protocolList, action:'labProtocols']"></g:render>
+			<g:render template="overviewProtocols" model="[protocolList:protocolList, action:'search']"></g:render>
 		</div>
 	</body>
 </html>

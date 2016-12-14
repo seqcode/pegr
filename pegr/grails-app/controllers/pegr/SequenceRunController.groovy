@@ -16,24 +16,42 @@ class SequenceRunController {
     def utilityService
     
     // list incomplete runs
-    def index(Integer max){
-        params.max = Math.min(max ?: 15, 100)
-        if (!params.sort) {
-            params.sort = "date"
-            params.order = "desc"
+    def index(Integer max, String str, String status){
+        def c = SequenceRun.createCriteria()
+        def listParams = [
+                max: params.max ?: 25,
+                sort: params.sort ?: "date",
+                order: params.order ?: "desc",
+                offset: params.offset
+            ]
+        def runs
+        if (status) {
+            runs = c.list(listParams) {
+                eq "status", status
+            }
+        } else if (str) {
+            runs = c.list(listParams) {
+                or {
+                    if (str.isInteger()) {
+                        eq "id", Long.parseLong(str)
+                        eq "runNum", str.toInteger()
+                    }
+                    
+                    ilike "fcId", "%${str}%"
+                    
+                    ilike "directoryName", "%${str}%"
+                    user {
+                        ilike "username", "%${str}%"
+                    }
+                    platform {
+                        ilike "name", "%${str}%"
+                    }
+                }
+            }
+        } else {
+            runs = SequenceRun.list(listParams) 
         }
-        def runs = SequenceRun.where { status != RunStatus.COMPLETED }.list(params)
-        [runs: runs]
-    }
-    
-    def completedRuns(Integer max) {
-        params.max = Math.min(max ?: 15, 100)
-        if (!params.sort) {
-            params.sort = "date"
-            params.order = "desc"
-        }
-        def runs = SequenceRun.where { status == RunStatus.COMPLETED }.list(params)
-        [runs: runs]
+        [runs: runs, str: str]
     }
     
     def show(Long id) {

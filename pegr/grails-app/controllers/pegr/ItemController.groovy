@@ -271,5 +271,26 @@ class ItemController {
         render result
         return
     }
+    
+    def search(String str) {
+        def c = Item.createCriteria()
+        def listParams = [
+                max: params.max ?: 25,
+                sort: params.sort ?: "id",
+                order: params.order ?: "desc",
+                offset: params.offset
+            ]
+        def items = c.list(listParams) {
+            or {
+                ilike "name", "%${str}%"
+                eq "barcode", "${str}"
+                ilike "location", "%${str}%"
+                type {
+                    ilike "name", "%${str}%"
+                }
+            }
+        }
+        [itemList: items, itemCount: items.totalCount, str: str]
+    }
 }
 

@@ -484,4 +484,21 @@ class ProtocolInstanceBagController {
         def results = protocolInstanceBagService.getParentsAndChildrenForInstance(instance, instance.protocol.startItemType, instance.protocol.endItemType)
         [parents: results.parents, children: results.children, instance: instance]
     }
+    
+    def search(String str) {
+        def c = ProtocolInstanceBag.createCriteria()
+        def listParams = [
+                max: params.max ?: 25,
+                sort: params.sort ?: "id",
+                order: params.order ?: "desc",
+                offset: params.offset
+            ]
+        def bags = c.list(listParams) {
+            or {
+                ilike "name", "%${str}%"
+            }
+        }
+            
+        render(view: "list", model: [bags: bags, totalCount: bags.totalCount, str: str])   
+    }
 }

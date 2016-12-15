@@ -45,7 +45,7 @@
             </ul>
         </div>
         <div class="col-sm-6">
-            <g:render template="/item/barcodeImage" model="[barcode:item.barcode]"></g:render>
+            <g:render template="/item/barcodeImage" model="[item: item]"></g:render>
         </div>
     </div>
     <g:if test="${traces?.size()}">

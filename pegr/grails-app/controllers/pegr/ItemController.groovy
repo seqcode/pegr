@@ -295,5 +295,20 @@ class ItemController {
         }
         [itemList: items, itemCount: items.totalCount, str: str]
     }
+    
+    def printBarcode(Long itemId, int row, int col) {
+        def item = Item.get(itemId)
+        if (!item) {
+            render(view: "/404")
+            return
+        }
+        def items = []
+        def nullCount = 5 * (row - 1) + col - 1
+        for (int i = 0; i < nullCount; ++i) {
+            items.push(null)
+        }
+        items.push(item) 
+        render(view: "/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name, date: new Date()])
+    }
 }
 

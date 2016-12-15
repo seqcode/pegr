@@ -1,4 +1,10 @@
-<img src='${createLink(controller:"item", action:"displayBarcode", params:[barcode:barcode, width:100, height:100, formatStr:"QR"])}'/>
+<img src='${createLink(controller:"item", action:"displayBarcode", params:[barcode:item?.barcode, width:100, height:100, formatStr:"QR"])}'/>
+<g:form controller="item" action="printBarcode">
+    <g:hiddenField name="itemId" value="${item?.id}"></g:hiddenField>
+    <g:submitButton name="print" value="Print" class="btn btn-primary"></g:submitButton>
+    Row<input name="row" value="1" size="2">
+    Column<input name="col" value="1" size="2">
+</g:form>
 <div class="fields">
     <div>
         <label>Height</label>
@@ -24,7 +30,7 @@
         var width = $("#width").val();
         var height = $("#height").val();
         var format = $("#format").val();
-        var s = '${createLink(controller:"item", action:"displayBarcode", params:[barcode:barcode])}';
+        var s = '${createLink(controller:"item", action:"displayBarcode", params:[barcode:item?.barcode])}';
         s += "&width=" + width + "&height=" + height + "&formatStr=" + format;
         $("img").attr("src", s);
     }

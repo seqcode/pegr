@@ -177,7 +177,7 @@ class ProtocolInstanceBagService {
             throw new ProtocolInstanceBagException(message: "Protocol instance not found!")
         }
         try {
-            def items = ProtocolInstanceItems.where {protocolInstance.id == priorInstanceId && function == ProtocolItemFunction.CHILD}.collect{ it.item }
+            def items = ProtocolInstanceItems.where {protocolInstance.id == priorInstanceId && function == ProtocolItemFunction.CHILD && it.item.status != ItemStatus.BAD}.collect{ it.item }
             items.each { tracedSample ->
                 // check if the traced sample is already in the bag
                 if (ProtocolInstanceItems.findByProtocolInstanceAndItem(instance, tracedSample)) {

@@ -43,7 +43,7 @@
                     </ul>
                 </div>
                 <div class="col-sm-6">
-                    <g:render template="/item/barcodeImage" model="[barcode:antibody?.item?.barcode]"></g:render>
+                    <g:render template="/item/barcodeImage" model="[item:antibody?.item]"></g:render>
                 </div>
             </div>
         </g:else>

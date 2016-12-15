@@ -52,7 +52,7 @@
             </ul>
         </div>
         <div class="col-sm-6">
-            <g:render template="/item/barcodeImage" model="[barcode:cellSource.item?.barcode]"></g:render>
+            <g:render template="/item/barcodeImage" model="[item:cellSource.item]"></g:render>
         </div>
     </div>
     </g:else>

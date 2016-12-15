@@ -11,7 +11,7 @@
         <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
         </g:if>
-        <h3>Protocol: ${protocolInstance?.protocol?.name} ${protocolInstance?.protocol?.protocolVersion}</h3>
+        <h3>Protocol: <g:link controller="protocol" action="show" id="${protocolInstance?.protocol?.id}">${protocolInstance?.protocol?.name} ${protocolInstance?.protocol?.protocolVersion}</g:link> </h3>
         <div id="protocol-details" class="collapse in">
             <g:if test="${protocolInstance?.protocol?.description}">
                 <h4>Description</h4>

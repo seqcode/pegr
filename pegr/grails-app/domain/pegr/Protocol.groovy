@@ -24,7 +24,7 @@ class Protocol {
     static hasMany = [protocolGroups: ProtocolGroup]
     static belongsTo = [ProtocolGroup]
     
-    List getSharedItemTypes(){
+    List getSharedItemTypes() {
         return ProtocolItemTypes.where{protocol == this && function == ProtocolItemFunction.SHARED}.collect{it.itemType}
     }
     
@@ -42,6 +42,10 @@ class Protocol {
     
     ItemType getEndPoolType() {
         return ProtocolItemTypes.where{protocol == this && function == ProtocolItemFunction.END_POOL}.get(max: 1)?.itemType
+    }
+    
+    List getEndProductTypes() {
+        return ProtocolItemTypes.where{protocol == this && function == ProtocolItemFunction.END_PRODUCT}.collect{it.itemType}
     }
     
     static constraints = {

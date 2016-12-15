@@ -377,13 +377,17 @@ class ProtocolInstanceBagService {
     
     Map getSharedItemAndPoolList(Long protocolInstanceId, Protocol protocol) {
         // get the existing items
-        def protocolItems = ProtocolInstanceItems.where {protocolInstance.id == protocolInstanceId}.collect {it.item}
+        def protocolItems = ProtocolInstanceItems.where {protocolInstance.id == protocolInstanceId}
         // shared item list
         def sharedItemList = []
-        protocol.sharedItemTypes.each{ t ->
+        def endProductList = []
+        protocol.sharedItemTypes.each { t ->
             sharedItemList.add([type: t, items: []])
         }
-        def result = [sharedItemList: sharedItemList]
+        protocol.endProductTypes.each { t ->
+            endProductList.add([type: t, items: []])
+        }
+        def result = [sharedItemList: sharedItemList, endProductList: endProductList]
         if (protocol.startPoolType) {
             result.startPool = [[type: protocol.startPoolType, items:[]]]
         }
@@ -391,15 +395,21 @@ class ProtocolInstanceBagService {
             result.endPool = [[type: protocol.endPoolType, items:[]]]
         }
         // insert items to the shared item list
-        protocolItems.each{ item ->
-            def itemsInType = result.sharedItemList.find{it.type == item.type}
-            if (itemsInType) {
-                itemsInType.items.add(item)
+        protocolItems.each { protocolItem ->
+            def item = protocolItem.item
+            def itemsInSharedType = result.sharedItemList.find {it.type == item.type}
+            def itemsInEndType = result.endProductList.find {it.type == item.type}
+            if (itemsInSharedType) {
+                itemsInSharedType.items.add(item)
+            } else if (itemsInEndType) {
+                itemsInEndType.items.add(item)
             } else if (item.type == protocol.startPoolType) {
                 result.startPool[0].items.add(item)
             } else if (item.type == protocol.endPoolType) {
                 result.endPool[0].items.add(item)
-            } else if (item.type.category.superCategory == ItemTypeSuperCategory.OTHER ){
+            } else if (protocolItem.function == ProtocolItemFunction.SHARED) {
+                result.endProductList.add([type: item.type, items: [item]])
+            } else if (protocolItem.function == ProtocolItemFunction.END_PRODUCT) {
                 result.sharedItemList.add([type: item.type, items: [item]])
             }
         }  

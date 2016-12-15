@@ -11,7 +11,7 @@
         <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
         </g:if>
-        <h3>Protocol: ${protocolInstance?.protocol?.name} ${protocolInstance?.protocol?.protocolVersion}</h3>
+        <h3>Protocol: <g:link controller="protocol" action="show" id="${protocolInstance?.protocol?.id}">${protocolInstance?.protocol?.name} ${protocolInstance?.protocol?.protocolVersion}</g:link></h3>
         <div id="protocol-details" class="collapse in">
             <g:if test="${protocolInstance?.protocol?.description}">
                 <h4>Description</h4>
@@ -24,6 +24,30 @@
         </div>
         <h4>Shared Items</h4>
         <g:render template="sharedItemsTable" model="['itemList':sharedItemAndPoolList.sharedItemList,'instanceId':protocolInstance.id, 'extra':true,'edit':true]"></g:render>
+        <h4>End Product</h4>
+        <g:render template="sharedItemsTable" model="['itemList':sharedItemAndPoolList.endProductList,'instanceId':protocolInstance.id, 'extra':true,'edit':true]"></g:render>
+        <h4>Required Images</h4>
+        <div class="row">
+        <g:each in="${protocolInstance.images}" var="img">
+            <h5>${img.key}</h5>
+            <ul>
+            <g:each in="${img.value}" var="filepath">
+                <li>
+                    <g:link controller="sequenceRun" action="displayImage" params="[filepath:filepath]" target="_blank">${filepath}</g:link>
+                    <button>x</button>
+                </li>
+            </g:each>
+            </ul>
+            <g:if test="${editable}">
+            <g:uploadForm controller="sequenceRun" action="uploadCohortImage">
+                <g:hiddenField name="type" value="gel"></g:hiddenField>
+                <g:hiddenField name="cohortId" value="${cohort.id}"></g:hiddenField>
+                <input type="file" name="image"/>
+                <g:submitButton name="upload" value="Upload"/>
+            </g:uploadForm>
+            </g:if>
+        </g:each>
+        </div>
         <g:if test="${sharedItemAndPoolList.startPool}">
             <h4>Import Pools</h4>
             <g:render template="sharedItemsTable" model="['itemList':sharedItemAndPoolList.startPool,'instanceId':protocolInstance.id, 'extra':false,'edit':true]"></g:render>

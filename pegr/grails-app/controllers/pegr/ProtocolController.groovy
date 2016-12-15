@@ -47,6 +47,7 @@ class ProtocolController {
                         (pegr.ProtocolItemFunction.PARENT) : [params.long('startItemTypeId')],
                         (pegr.ProtocolItemFunction.CHILD) : [params.long('endItemTypeId')],
                         (pegr.ProtocolItemFunction.SHARED) : params.list('sharedItemTypeIds'),
+                        (pegr.ProtocolItemFunction.END_PRODUCT) : params.list('endProductTypeIds'),
                         (pegr.ProtocolItemFunction.START_POOL) : [params.long('startPoolTypeId')],
                         (pegr.ProtocolItemFunction.END_POOL) : [params.long('endPoolTypeId')]
                 ]
@@ -57,6 +58,7 @@ class ProtocolController {
                     render(view: "create", model: [protocol: protocol, 
                         startItemTypeId:params.startItemTypeId,
                         endItemTypeId:params.endItemTypeId,
+                        endProductTypeIds:params.endProductTypeIds,
                         sharedItemTypeIds:params.sharedItemTypeIds,
                         startPoolTypeId:params.startPoolTypeId,
                         endPoolTypeId:params.endPoolTypeId])
@@ -87,6 +89,7 @@ class ProtocolController {
                         (pegr.ProtocolItemFunction.PARENT) : [params.long('startItemTypeId')],
                         (pegr.ProtocolItemFunction.CHILD) : [params.long('endItemTypeId')],
                         (pegr.ProtocolItemFunction.SHARED) : params.list('sharedItemTypeIds'),
+                        (pegr.ProtocolItemFunction.END_PRODUCT) : params.list('endProductTypeIds'),
                         (pegr.ProtocolItemFunction.START_POOL) : [params.long('startPoolTypeId')],
                         (pegr.ProtocolItemFunction.END_POOL) : [params.long('endPoolTypeId')]
                 ]
@@ -100,15 +103,7 @@ class ProtocolController {
                         startItemTypeId:params.startItemTypeId,
                         endItemTypeId:params.endItemTypeId,
                         sharedItemTypeIds:params.sharedItemTypeIds,
-                        startPoolTypeId:params.startPoolTypeId,
-                        endPoolTypeId:params.endPoolTypeId])
-                }catch(Exception e) {
-                    request.message = "Error updateing this protocol!"
-                    log.error "Error: ${e.message}", e
-                    render(view: "edit", model: [protocol: protocol,
-                        startItemTypeId:params.startItemTypeId,
-                        endItemTypeId:params.endItemTypeId,
-                        sharedItemTypeIds:params.sharedItemTypeIds,
+                        endProductTypeIds:params.endProductTypeIds,
                         startPoolTypeId:params.startPoolTypeId,
                         endPoolTypeId:params.endPoolTypeId])
                 }
@@ -118,6 +113,7 @@ class ProtocolController {
             startItemTypeId:protocol?.startItemType?.id,
             endItemTypeId:protocol?.endItemType?.id,
             sharedItemTypeIds:protocol?.sharedItemTypes*.id,
+            endProductTypeIds:protocol?.endProductTypes*.id,
             startPoolTypeId:protocol?.startPoolType?.id,
             endPoolTypeId:protocol?.endPoolType?.id]
         }

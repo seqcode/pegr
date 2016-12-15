@@ -11,6 +11,7 @@ class Protocol {
     Boolean addIndex
     DictionaryStatus status
     String file
+    String images
     
 	String toString() {
         String s = name
@@ -54,6 +55,7 @@ class Protocol {
         addIndex nullable: true
         status nullable: true
         file nullable: true
+        images nullable: true
 	}
 
 }

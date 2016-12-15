@@ -10,6 +10,7 @@ class ProtocolInstance {
 	ProtocolStatus status
 	ProtocolInstanceBag bag	
     Integer bagIdx
+    String images
 	
     static constraints = {
         protocol nullable: true
@@ -18,6 +19,7 @@ class ProtocolInstance {
         user nullable: true
         startTime nullable: true
         endTime nullable: true
+        images nullable: true
     }
     
     static mapping = {

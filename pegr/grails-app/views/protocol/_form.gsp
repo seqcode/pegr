@@ -24,6 +24,11 @@
     <g:select name="sharedItemTypeIds" id="sharedItem" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.OTHER}.list(sort:'name')}" optionKey="id" value="${sharedItemTypeIds}" multiple="multiple" size="10" style="width: 200px"/>
 </div>
 
+<div>
+    <label for="endProduct">End Product Type (multi-select)</label>
+    <g:select name="endProductTypeIds" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.OTHER}.list(sort:'name')}" optionKey="id" value="${sharedItemTypeIds}" multiple="multiple" size="10" style="width: 200px"/>
+</div>
+
 <h4>Traced Samples</h4>
 <div>
     <label for="startItem">Start State</label>

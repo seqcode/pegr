@@ -3,6 +3,7 @@
         <h4>Basic Information</h4>
         <ul>
             <li>Platform: ${run.platform}</li>
+            <li>Directory: ${run.directoryName}</li>
             <li>User: ${run.user}</li>
             <li>Date: <g:formatDate format="yyyy-MM-dd" date="${run.date}"/></li>
             <li>Notes: ${run.note}</li>        

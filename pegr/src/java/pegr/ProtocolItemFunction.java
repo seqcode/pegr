@@ -2,7 +2,7 @@ package pegr;
 
 public enum ProtocolItemFunction {
     SHARED,
-    INDIVIDUAL,
+    END_PRODUCT,
     PARENT,
     CHILD,
     START_POOL,

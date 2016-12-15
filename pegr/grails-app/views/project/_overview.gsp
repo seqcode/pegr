@@ -20,7 +20,7 @@
             <g:else>
                 <g:each in="${project.cohorts}" var="cohort" status="n">
                     <g:if test="${n>0}"><tr></g:if>
-                    <td>${cohort.name}</td>
+                    <td>${cohort.name} <g:if test="${cohort.report}"><g:link controller="report" action="show" id="${cohort.report.id}" class="edit">Report</g:link></g:if></td>
                     </tr>
                 </g:each>
             </g:else>

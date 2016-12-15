@@ -4,8 +4,6 @@
             <tr>
                 <g:sortableColumn property="runNum" defaultOrder="desc" title="Run #"></g:sortableColumn>
                 <g:sortableColumn property="date" defaultOrder="desc" title="Date"></g:sortableColumn>
-                <g:sortableColumn property="platform" title="Platform"></g:sortableColumn>
-                <th>Directory</th>
                 <th>Sample Submission</th>
                 <g:sortableColumn property="status" title="Status"></g:sortableColumn>
                 <th>Project</th>
@@ -15,12 +13,10 @@
         <tbody>
             <g:each in="${runs}" var="run">
                 <tr>
-                    <td class="col-sm-1" rowspan="${Math.max(1, run.cohorts.size())}">${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if></td>  
-                    <td class="col-sm-1" rowspan="${Math.max(1, run.cohorts.size())}"><g:formatDate format="yyyy-MM-dd" date="${run.date}"/></td>
-                    <td class="col-sm-1" rowspan="${Math.max(1, run.cohorts.size())}">${run.platform}</td>
-                    <td class="col-sm-1" rowspan="${Math.max(1, run.cohorts.size())}">${run.directoryName}</td>
-                    <td class="col-sm-1" rowspan="${Math.max(1, run.cohorts.size())}"><g:link controller="sequenceRun" action="show" id="${run.id}">view</g:link></td>
-                    <td class="col-sm-1" rowspan="${Math.max(1, run.cohorts.size())}"><g:link controller="report" action="runStatus"  params="[runId: run.id]"><span class="label">${run.status}</span></g:link></td>
+                    <td class="col-sm-2" rowspan="${Math.max(1, run.cohorts.size())}">${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if><br><i>${run.platform}</i></td>  
+                    <td class="col-sm-2" rowspan="${Math.max(1, run.cohorts.size())}"><g:formatDate format="yyyy-MM-dd" date="${run.date}"/></td>
+                    <td class="col-sm-2" rowspan="${Math.max(1, run.cohorts.size())}"><g:link controller="sequenceRun" action="show" id="${run.id}">Sample Submission</g:link></td>
+                    <td class="col-sm-2" rowspan="${Math.max(1, run.cohorts.size())}"><g:link controller="report" action="runStatus"  params="[runId: run.id]"><span class="label">${run.status}</span></g:link></td>
                     <g:each in="${run.cohorts}" var="cohort" status="n">
                     <g:if test="${n>0}"><tr></g:if>
                     <td class="col-sm-2"><g:link controller="project" action="show" id="${cohort.project.id}">${cohort.project}</g:link></td>

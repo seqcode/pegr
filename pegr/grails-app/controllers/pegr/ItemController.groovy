@@ -310,5 +310,30 @@ class ItemController {
         items.push(item) 
         render(view: "/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name, date: new Date()])
     }
+    
+    def batchEdit(Long instanceId) {
+        def instance = ProtocolInstance.get(instanceId)
+        def items = ProtocolInstanceItems.findAllByFunctionAndProtocolInstance(ProtocolItemFunction.CHILD, instance).sort {it.id}.collect { it.item }
+        def itemTypes = items*.type.unique()
+        if (itemTypes.size() == 0) {
+            render "No items found!"
+            return
+        } else if (itemTypes.size() >1) {
+            render "Items must have the same type!"
+            return
+        }
+        [items: items, itemType: itemTypes[0], instanceId: instanceId]
+    }
+    
+    def batchSave(ItemListCommand cmd) {
+        itemService.batchSave(cmd.items)
+        flash.message = "The items have been updated!"
+        redirect(action: "batchEdit", params: [instanceId: cmd.instanceId])
+    }
 }
 
+
+class ItemListCommand {
+    Long instanceId
+    List<Map> items
+}

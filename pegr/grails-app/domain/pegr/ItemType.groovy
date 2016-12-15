@@ -11,7 +11,7 @@ class ItemType {
 	}
     
     List getFieldList() {
-        def fieldList = fields ? fields.tokenize(",") : []
+        def fieldList = fields ? fields.tokenize(",")*.trim() : []
         return fieldList
     }
 	

@@ -151,4 +151,13 @@ class ItemService {
 
     }
     
+    @Transactional
+    def batchSave(List items) {
+        items.each { itemCmd ->
+            def item = Item.get(itemCmd.id)
+            if (item) {
+                updateCustomizedFields(item, itemCmd)
+            }
+        }
+    }
 }

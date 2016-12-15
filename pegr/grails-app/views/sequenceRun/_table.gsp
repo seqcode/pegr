@@ -9,9 +9,7 @@
                 <th>Sample Submission</th>
                 <g:sortableColumn property="status" title="Status"></g:sortableColumn>
                 <th>Project</th>
-                <th>Description</th>
                 <th>Report</th>
-                <th>Print</th>
             </tr>
         </thead>
         <tbody>
@@ -20,15 +18,13 @@
                     <td class="col-sm-1" rowspan="${Math.max(1, run.cohorts.size())}">${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if></td>  
                     <td class="col-sm-1" rowspan="${Math.max(1, run.cohorts.size())}"><g:formatDate format="yyyy-MM-dd" date="${run.date}"/></td>
                     <td class="col-sm-1" rowspan="${Math.max(1, run.cohorts.size())}">${run.platform}</td>
-                    <td class="col-sm-2" rowspan="${Math.max(1, run.cohorts.size())}">${run.directoryName}</td>
+                    <td class="col-sm-1" rowspan="${Math.max(1, run.cohorts.size())}">${run.directoryName}</td>
                     <td class="col-sm-1" rowspan="${Math.max(1, run.cohorts.size())}"><g:link controller="sequenceRun" action="show" id="${run.id}">view</g:link></td>
                     <td class="col-sm-1" rowspan="${Math.max(1, run.cohorts.size())}"><g:link controller="report" action="runStatus"  params="[runId: run.id]"><span class="label">${run.status}</span></g:link></td>
                     <g:each in="${run.cohorts}" var="cohort" status="n">
                     <g:if test="${n>0}"><tr></g:if>
-                    <td class="col-sm-1"><g:link controller="project" action="show" id="${cohort.project.id}">${cohort.project}</g:link></td>
-                    <td class="col-sm-2">${cohort.project?.description}</td>
-                    <td class="col-sm-1"><g:link controller="report" action="show" id="${cohort.report?.id}">${cohort.report?.name}</g:link></td>
-                    <td class="col-sm-1"></td>
+                    <td class="col-sm-2"><g:link controller="project" action="show" id="${cohort.project.id}">${cohort.project}</g:link></td>
+                    <td class="col-sm-2"><g:link controller="report" action="show" id="${cohort.report?.id}">${cohort.report?.name}</g:link></td>
                     </tr>
                     </g:each>                    
                 </tr>

@@ -27,7 +27,7 @@ class SequenceRunController {
         def runs
         if (status) {
             runs = c.list(listParams) {
-                eq "status", status
+                eq "status", (status as RunStatus)
             }
         } else if (str) {
             runs = c.list(listParams) {

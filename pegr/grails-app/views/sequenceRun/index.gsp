@@ -24,10 +24,10 @@
         </g:form>
     </div>
     <div class="row">
-        <div class="col-sm-11">
+        <div class="col-sm-10">
             <g:render template="/sequenceRun/table"></g:render>
         </div>
-        <div class="col-sm-1 well">
+        <div class="col-sm-2 well">
             <g:link >All</g:link>
             <h4>Status</h4>
             <ul>

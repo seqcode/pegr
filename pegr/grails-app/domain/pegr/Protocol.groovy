@@ -48,6 +48,10 @@ class Protocol {
         return ProtocolItemTypes.where{protocol == this && function == ProtocolItemFunction.END_PRODUCT}.collect{it.itemType}
     }
     
+    List getImageTypeList() {
+        return images ? images.tokenize(",")*.trim() : []
+    }
+    
     static constraints = {
 		name unique: 'protocolVersion'
         shortName nullable: true, blank: true

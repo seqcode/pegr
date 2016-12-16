@@ -5,8 +5,10 @@ import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 
 class FileController {
-    def displayImage(String filepath) {
-        File image = new File(utilityService.getFilesRoot(), filepath)
+    def utilityService
+    
+    def displayImage(String filepath, Boolean relative) {
+        File image = relative ? new File(utilityService.getFilesRoot(), filepath) : new File(filepath)
         if (!image.exists()) {
             render(view: "/404")
             return

@@ -213,7 +213,7 @@ class ProtocolInstanceBagController {
                                                  file: file])
                 } else {           
                     if (protocolInstance.status != ProtocolStatus.COMPLETED) {
-                        toBeCompleted = protocolInstanceBagService.readyToBeCompleted(sharedItemAndPoolList, results, protocol)
+                        toBeCompleted = protocolInstanceBagService.readyToBeCompleted(sharedItemAndPoolList, results, protocolInstance)
                     }                    
                     render(view: "editInstance", model: [protocolInstance: protocolInstance, 
                                                  sharedItemAndPoolList: sharedItemAndPoolList,
@@ -500,5 +500,23 @@ class ProtocolInstanceBagController {
         }
             
         render(view: "list", model: [bags: bags, totalCount: bags.totalCount, str: str])   
+    }
+    
+    def uploadImage(Long instanceId, String type) {
+        try {
+            def instance = ProtocolInstance.get(instanceId)
+            def fieldName = "image"
+            protocolInstanceBagService.upload((MultipartHttpServletRequest)request, instance, type, fieldName)
+            flash.message = "Image uploaded!"
+        } catch(UtilityException e) {
+            flash.message = e.message
+        }
+        redirect(action: "showInstance", id: instanceId)
+    }
+    
+    def removeInstanceImageAjax(Long instanceId, String filepath) {
+        protocolInstanceBagService.removeInstanceImage(instanceId, filepath)
+        render ""
+        return
     }
 }

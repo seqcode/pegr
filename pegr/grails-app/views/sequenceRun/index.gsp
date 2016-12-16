@@ -5,6 +5,9 @@
 </head>
 <body>
 <div class="container-fluid">
+    <sec:ifAnyGranted roles="ROLE_ADMIN">
+        <g:link controller="report" action="manage" class="edit pull-right">Manage</g:link>
+    </sec:ifAnyGranted>
     <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
     </g:if>

@@ -1,6 +1,7 @@
 package pegr
-
+import groovy.json.*
 import grails.transaction.Transactional
+import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 class ProtocolInstanceBagException extends RuntimeException {
     String message
@@ -353,7 +354,8 @@ class ProtocolInstanceBagService {
         }
     }
     
-    Boolean readyToBeCompleted(Map sharedItemAndPoolList, Map parentsAndChildren, Protocol protocol) {
+    Boolean readyToBeCompleted(Map sharedItemAndPoolList, Map parentsAndChildren, ProtocolInstance instance) {
+        def protocol = instance.protocol
         if (sharedItemAndPoolList.any { k, v -> v.any { it.items.empty }}) {
                 return false            
         } 
@@ -372,6 +374,11 @@ class ProtocolInstanceBagService {
                 return false
             }
         }
+        def imageMap = instance.imageMap
+        if (protocol.imageTypeList.any {!imageMap || !imageMap[it] || imageMap[it].size() == 0 }) {
+            return false
+        }
+        
         return true
     }
     
@@ -671,5 +678,45 @@ class ProtocolInstanceBagService {
         } else {
             throw new ProtocolInstanceBagException(message: "Bag not found!")
         }
+    }
+    
+    @Transactional
+    def upload(MultipartHttpServletRequest mpr, ProtocolInstance instance, String type, String fieldName) {
+        def folder = "protocolInstance"
+        def maxByte = 5 * 1024 * 1024 
+        def allowedFileTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif']
+        def filepath = utilityService.upload(mpr, fieldName, allowedFileTypes, folder, maxByte) 
+        def imageMap = utilityService.parseJson(instance.images)
+        if (!imageMap) {
+            imageMap = [:]
+        }
+        if (!imageMap[type]) {
+            imageMap[type] = []
+        }
+        imageMap[type].push(filepath)
+        instance.images = JsonOutput.toJson(imageMap)
+        instance.save()      
+    }
+    
+    @Transactional
+    def removeInstanceImage(Long instanceId, String filepath) {
+        def instance = ProtocolInstance.get(instanceId)
+        if (!instance) {
+            throw new ProtocolInstanceBagException(message: "Protocol instance not found!")
+        }
+        // remove file
+        def file = new File(utilityService.getFilesRoot(), filepath)
+        if (file.exists()) {
+            file.delete()
+        }
+        // update db
+        def images = utilityService.parseJson(instance.images)
+        images.each { k,v ->
+            if (filepath in v) {
+                v.remove(filepath)
+            }
+        }
+        instance.images = JsonOutput.toJson(images)
+        instance.save()
     }
 }

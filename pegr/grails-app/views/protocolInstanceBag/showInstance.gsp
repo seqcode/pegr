@@ -25,6 +25,23 @@
         </div>
         <h4>Shared Items</h4>
         <g:render template="sharedItemsTable" model="['itemList':sharedItemAndPoolList.sharedItemList,'instanceId':protocolInstance.id, 'extra':true,'edit':false]"></g:render>
+        <h4>End Product</h4>
+        <g:render template="sharedItemsTable" model="['itemList':sharedItemAndPoolList.endProductList,'instanceId':protocolInstance.id, 'extra':true,'edit':false]"></g:render>
+        <h4>Images</h4>
+        <ul>
+        <g:each in="${protocolInstance.protocol.imageTypeList}" var="imgType">
+            <h5>${imgType}</h5>
+            <g:if test="${protocolInstance.images}">
+            <div class="row">
+            <g:each in="${protocolInstance.imageMap[imgType]}" var="filepath">
+                <div class="col-sm-3">
+                    <img src='${createLink(controller:"file", action: "displayImage", params:[filepath: filepath, relative: true])}' height="300"/>
+                </div>
+            </g:each>
+            </div>
+            </g:if>
+        </g:each>
+        </ul>
         <g:if test="${sharedItemAndPoolList.startPool}">
             <h4>Imported Pools</h4>
             <g:render template="sharedItemsTable" model="['itemList':sharedItemAndPoolList.startPool,'instanceId':protocolInstance.id, 'extra':false,'edit':false]"></g:render>

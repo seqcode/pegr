@@ -45,6 +45,16 @@ class ItemController {
             render(view: "/404")
             return
         }
+        def cellSource = CellSource.findByItem(item)
+        if (cellSource) {
+            redirect(controller: "cellSource", action: "show", id: cellSource.id)
+            return
+        }
+        def antibody = Antibody.findByItem(item)
+        if (antibody) {
+            redirect(controller: "antibody", action: "show", id: antibody.id)
+            return
+        }
         def folder = itemService.getImageFolder(id)
         def images = folder.listFiles()
         switch (item.type.category.superCategory) {
@@ -55,7 +65,7 @@ class ItemController {
                     traces.push(tmp.parent)
                     tmp = tmp.parent
                 }
-                def cellSource = CellSource.findByItem(item)
+                cellSource = CellSource.findByItem(tmp)
                 [item: item, images: images, traces: traces, cellSource: cellSource]
                 break
             default:
@@ -181,25 +191,6 @@ class ItemController {
             flash.message = e.message
         }
         redirect(action: "show", id: params.itemId)
-    }
-    
-    
-    def displayImage(String img, Long itemId) {
-        File folder = itemService.getImageFolder(itemId); 
-        File image = new File(folder, img)
-        if(!image.exists()) {
-            response.status = 404
-        } else {
-            BufferedImage originalImage = ImageIO.read(image)
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
-            def fileType = getFileExtension(img)
-            ImageIO.write(originalImage, fileType, outputStream)
-            byte[] imageInByte = outputStream.toByteArray()
-            response.setHeader("Content-Length", imageInByte.length.toString())
-            response.contentType = "image/"+fileType
-            response.outputStream << imageInByte
-            response.outputStream.flush()
-        }
     }
     
     def displayBarcode(String barcode, Integer width, Integer height, String formatStr) {

@@ -26,28 +26,29 @@
         <g:render template="sharedItemsTable" model="['itemList':sharedItemAndPoolList.sharedItemList,'instanceId':protocolInstance.id, 'extra':true,'edit':true]"></g:render>
         <h4>End Product</h4>
         <g:render template="sharedItemsTable" model="['itemList':sharedItemAndPoolList.endProductList,'instanceId':protocolInstance.id, 'extra':true,'edit':true]"></g:render>
-        <h4>Required Images</h4>
-        <div class="row">
-        <g:each in="${protocolInstance.images}" var="img">
-            <h5>${img.key}</h5>
-            <ul>
-            <g:each in="${img.value}" var="filepath">
-                <li>
-                    <g:link controller="sequenceRun" action="displayImage" params="[filepath:filepath]" target="_blank">${filepath}</g:link>
-                    <button>x</button>
-                </li>
+        <h4>Images</h4>
+        <ul>
+        <g:each in="${protocolInstance.protocol.imageTypeList}" var="imgType">
+            <h5>${imgType}</h5>
+            <g:if test="${protocolInstance.images}">
+            <div class="row">
+            <g:each in="${protocolInstance.imageMap[imgType]}" var="filepath">
+                <div class="col-sm-3">
+                    <span class="glyphicon glyphicon-remove btn remove-image"></span>
+                    <img src='${createLink(controller:"file", action: "displayImage", params:[filepath: filepath, relative: true])}' height="300"/>
+                    <g:hiddenField class="filepath" name="filepath" value="${filepath}"></g:hiddenField>
+                </div>
             </g:each>
-            </ul>
-            <g:if test="${editable}">
-            <g:uploadForm controller="sequenceRun" action="uploadCohortImage">
+            </div>
+            </g:if>            
+            <g:uploadForm controller="protocolInstanceBag" action="uploadImage">
                 <g:hiddenField name="type" value="gel"></g:hiddenField>
-                <g:hiddenField name="cohortId" value="${cohort.id}"></g:hiddenField>
+                <g:hiddenField name="instanceId" value="${protocolInstance.id}"></g:hiddenField>
                 <input type="file" name="image"/>
                 <g:submitButton name="upload" value="Upload"/>
             </g:uploadForm>
-            </g:if>
         </g:each>
-        </div>
+        </ul>
         <g:if test="${sharedItemAndPoolList.startPool}">
             <h4>Import Pools</h4>
             <g:render template="sharedItemsTable" model="['itemList':sharedItemAndPoolList.startPool,'instanceId':protocolInstance.id, 'extra':false,'edit':true]"></g:render>
@@ -72,6 +73,18 @@
     <script>
         $("#nav-experiments").addClass("active"); 
         $(".confirm").confirm();
+        $(".remove-image").on("click", function(){
+            var parent = $(this).parent();
+            var filepath = parent.find("input.filepath").val();
+            var instanceId = ${protocolInstance.id};
+            $.ajax({
+                url:"/pegr/protocolInstanceBag/removeInstanceImageAjax",
+                type: "POST",
+                data: {instanceId: instanceId, filepath: filepath},
+                success: function(){
+                    parent.remove();
+                }});
+        });
     </script>
 </body>
 </html>

@@ -49,7 +49,7 @@
                 </tbody>
             </table>
             <g:submitButton name="save" value="Save" class="btn btn-primary"></g:submitButton>
-            <g:link controller="report" action="analysisStatus" class="btn btn-default">Cancel</g:link>
+            <g:link controller="sequenceRun" action="index" class="btn btn-default">Cancel</g:link>
             </g:form>
         </div>
         <div id="yeast-qc-settings" class="tab-pane fade">            
@@ -85,7 +85,7 @@
                 </tbody>
             </table>
             <g:submitButton name="save" value="Save" class="btn btn-primary"></g:submitButton>
-            <g:link controller="report" action="analysisStatus" class="btn btn-default">Cancel</g:link>
+            <g:link controller="sequenceRun" action="index" class="btn btn-default">Cancel</g:link>
             </g:form>
         </div>
         <div id="purge-alignments"  class="tab-pane fade">          
@@ -94,6 +94,7 @@
                 <g:if test="${purgeConfig?.status != 'RUN'}">
                     <input onclick="deletePurgedAlignments(this)" type="button" class="btn btn-primary" value="Submit">
                     <i class="fa fa-spinner fa-spin"></i>
+                    <g:link controller="sequenceRun" action="index" class="btn btn-default">Cancel</g:link>
                 </g:if>
             </g:form>
         </div>

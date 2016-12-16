@@ -36,7 +36,16 @@ class CellSourceController {
     
     def show(Integer id) {
         def cellSource = CellSource.get(id)
-        [cellSource: cellSource]
+        if (cellSource) {
+            def images
+            if (cellSource.item) {
+                def folder = itemService.getImageFolder(cellSource.item.id)
+                images = folder.listFiles()
+            }            
+            [cellSource: cellSource, images: images]
+        } else {
+            render status: 404
+        }
     }
     
     def save(Item item, CellSourceCommand cmd) {

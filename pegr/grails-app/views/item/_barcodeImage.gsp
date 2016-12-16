@@ -2,8 +2,9 @@
 <g:form controller="item" action="printBarcode">
     <g:hiddenField name="itemId" value="${item?.id}"></g:hiddenField>
     <g:submitButton name="print" value="Print" class="btn btn-primary"></g:submitButton>
-    Row<input name="row" value="1" size="2">
+    Start Row<input name="row" value="1" size="2">
     Column<input name="col" value="1" size="2">
+    Copies<input name="copies" value="1" size="2">
 </g:form>
 <div class="fields">
     <div>

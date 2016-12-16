@@ -287,7 +287,7 @@ class ItemController {
         [itemList: items, itemCount: items.totalCount, str: str]
     }
     
-    def printBarcode(Long itemId, int row, int col) {
+    def printBarcode(Long itemId, int row, int col, int copies) {
         def item = Item.get(itemId)
         if (!item) {
             render(view: "/404")
@@ -298,8 +298,10 @@ class ItemController {
         for (int i = 0; i < nullCount; ++i) {
             items.push(null)
         }
-        items.push(item) 
-        render(view: "/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name, date: new Date()])
+        for (int i = 0; i < copies; ++i) {
+            items.push(item) 
+        }        
+        render(view: "/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])
     }
     
     def batchEdit(Long instanceId) {

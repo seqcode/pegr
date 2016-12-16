@@ -16,24 +16,42 @@ class SequenceRunController {
     def utilityService
     
     // list incomplete runs
-    def index(Integer max){
-        params.max = Math.min(max ?: 15, 100)
-        if (!params.sort) {
-            params.sort = "date"
-            params.order = "desc"
+    def index(Integer max, String str, String status){
+        def c = SequenceRun.createCriteria()
+        def listParams = [
+                max: params.max ?: 25,
+                sort: params.sort ?: "date",
+                order: params.order ?: "desc",
+                offset: params.offset
+            ]
+        def runs
+        if (status) {
+            runs = c.list(listParams) {
+                eq "status", (status as RunStatus)
+            }
+        } else if (str) {
+            runs = c.list(listParams) {
+                or {
+                    if (str.isInteger()) {
+                        eq "id", Long.parseLong(str)
+                        eq "runNum", str.toInteger()
+                    }
+                    
+                    ilike "fcId", "%${str}%"
+                    
+                    ilike "directoryName", "%${str}%"
+                    user {
+                        ilike "username", "%${str}%"
+                    }
+                    platform {
+                        ilike "name", "%${str}%"
+                    }
+                }
+            }
+        } else {
+            runs = SequenceRun.list(listParams) 
         }
-        def runs = SequenceRun.where { status != RunStatus.COMPLETED }.list(params)
-        [runs: runs]
-    }
-    
-    def completedRuns(Integer max) {
-        params.max = Math.min(max ?: 15, 100)
-        if (!params.sort) {
-            params.sort = "date"
-            params.order = "desc"
-        }
-        def runs = SequenceRun.where { status == RunStatus.COMPLETED }.list(params)
-        [runs: runs]
+        [runs: runs, str: str]
     }
     
     def show(Long id) {
@@ -415,23 +433,6 @@ class SequenceRunController {
             flash.message = e.message
         }
         redirect(action: "show", id: runId)
-    }
-    
-    def displayImage(String filepath) {
-        File image = new File(utilityService.getFilesRoot(), filepath)
-        if (!image.exists()) {
-            render(view: "/404")
-            return
-        }
-        BufferedImage originalImage = ImageIO.read(image)
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
-        def fileType = filepath.substring(filepath.lastIndexOf('.') + 1)
-        ImageIO.write(originalImage, fileType, outputStream)
-        byte[] imageInByte = outputStream.toByteArray()
-        response.setHeader("Content-Length", imageInByte.length.toString())
-        response.contentType = "image/"+fileType
-        response.outputStream << imageInByte
-        response.outputStream.flush()
     }
     
     def removeCohortImageAjax(Long cohortId, String filepath) {

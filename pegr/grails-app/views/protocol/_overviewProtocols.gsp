@@ -23,10 +23,5 @@
     </table>
 </div>
 <div class="pagination">
-    <g:paginate total="${protocolCount ?: 0}" />
+    <g:paginate action="${action}" params="${params}" max="${max?:25}" total="${protocolCount ?: 0}" />
 </div>
-<span class="pagination pull-right">
-    <g:link params="[max:25]">25</g:link>
-    <g:link params="[max:100]">100</g:link>
-    / page
-</span>

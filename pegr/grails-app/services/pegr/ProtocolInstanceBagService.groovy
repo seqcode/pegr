@@ -1,6 +1,7 @@
 package pegr
-
+import groovy.json.*
 import grails.transaction.Transactional
+import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 class ProtocolInstanceBagException extends RuntimeException {
     String message
@@ -177,7 +178,7 @@ class ProtocolInstanceBagService {
             throw new ProtocolInstanceBagException(message: "Protocol instance not found!")
         }
         try {
-            def items = ProtocolInstanceItems.where {protocolInstance.id == priorInstanceId && function == ProtocolItemFunction.CHILD}.collect{ it.item }
+            def items = ProtocolInstanceItems.where {protocolInstance.id == priorInstanceId && function == ProtocolItemFunction.CHILD && it.item.status != ItemStatus.BAD}.collect{ it.item }
             items.each { tracedSample ->
                 // check if the traced sample is already in the bag
                 if (ProtocolInstanceItems.findByProtocolInstanceAndItem(instance, tracedSample)) {
@@ -353,7 +354,8 @@ class ProtocolInstanceBagService {
         }
     }
     
-    Boolean readyToBeCompleted(Map sharedItemAndPoolList, Map parentsAndChildren, Protocol protocol) {
+    Boolean readyToBeCompleted(Map sharedItemAndPoolList, Map parentsAndChildren, ProtocolInstance instance) {
+        def protocol = instance.protocol
         if (sharedItemAndPoolList.any { k, v -> v.any { it.items.empty }}) {
                 return false            
         } 
@@ -372,18 +374,27 @@ class ProtocolInstanceBagService {
                 return false
             }
         }
+        def imageMap = instance.imageMap
+        if (protocol.imageTypeList.any {!imageMap || !imageMap[it] || imageMap[it].size() == 0 }) {
+            return false
+        }
+        
         return true
     }
     
     Map getSharedItemAndPoolList(Long protocolInstanceId, Protocol protocol) {
         // get the existing items
-        def protocolItems = ProtocolInstanceItems.where {protocolInstance.id == protocolInstanceId}.collect {it.item}
+        def protocolItems = ProtocolInstanceItems.where {protocolInstance.id == protocolInstanceId}
         // shared item list
         def sharedItemList = []
-        protocol.sharedItemTypes.each{ t ->
+        def endProductList = []
+        protocol.sharedItemTypes.each { t ->
             sharedItemList.add([type: t, items: []])
         }
-        def result = [sharedItemList: sharedItemList]
+        protocol.endProductTypes.each { t ->
+            endProductList.add([type: t, items: []])
+        }
+        def result = [sharedItemList: sharedItemList, endProductList: endProductList]
         if (protocol.startPoolType) {
             result.startPool = [[type: protocol.startPoolType, items:[]]]
         }
@@ -391,15 +402,21 @@ class ProtocolInstanceBagService {
             result.endPool = [[type: protocol.endPoolType, items:[]]]
         }
         // insert items to the shared item list
-        protocolItems.each{ item ->
-            def itemsInType = result.sharedItemList.find{it.type == item.type}
-            if (itemsInType) {
-                itemsInType.items.add(item)
+        protocolItems.each { protocolItem ->
+            def item = protocolItem.item
+            def itemsInSharedType = result.sharedItemList.find {it.type == item.type}
+            def itemsInEndType = result.endProductList.find {it.type == item.type}
+            if (itemsInSharedType) {
+                itemsInSharedType.items.add(item)
+            } else if (itemsInEndType) {
+                itemsInEndType.items.add(item)
             } else if (item.type == protocol.startPoolType) {
                 result.startPool[0].items.add(item)
             } else if (item.type == protocol.endPoolType) {
                 result.endPool[0].items.add(item)
-            } else if (item.type.category.superCategory == ItemTypeSuperCategory.OTHER ){
+            } else if (protocolItem.function == ProtocolItemFunction.SHARED) {
+                result.endProductList.add([type: item.type, items: [item]])
+            } else if (protocolItem.function == ProtocolItemFunction.END_PRODUCT) {
                 result.sharedItemList.add([type: item.type, items: [item]])
             }
         }  
@@ -661,5 +678,45 @@ class ProtocolInstanceBagService {
         } else {
             throw new ProtocolInstanceBagException(message: "Bag not found!")
         }
+    }
+    
+    @Transactional
+    def upload(MultipartHttpServletRequest mpr, ProtocolInstance instance, String type, String fieldName) {
+        def folder = "protocolInstance"
+        def maxByte = 5 * 1024 * 1024 
+        def allowedFileTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif']
+        def filepath = utilityService.upload(mpr, fieldName, allowedFileTypes, folder, maxByte) 
+        def imageMap = utilityService.parseJson(instance.images)
+        if (!imageMap) {
+            imageMap = [:]
+        }
+        if (!imageMap[type]) {
+            imageMap[type] = []
+        }
+        imageMap[type].push(filepath)
+        instance.images = JsonOutput.toJson(imageMap)
+        instance.save()      
+    }
+    
+    @Transactional
+    def removeInstanceImage(Long instanceId, String filepath) {
+        def instance = ProtocolInstance.get(instanceId)
+        if (!instance) {
+            throw new ProtocolInstanceBagException(message: "Protocol instance not found!")
+        }
+        // remove file
+        def file = new File(utilityService.getFilesRoot(), filepath)
+        if (file.exists()) {
+            file.delete()
+        }
+        // update db
+        def images = utilityService.parseJson(instance.images)
+        images.each { k,v ->
+            if (filepath in v) {
+                v.remove(filepath)
+            }
+        }
+        instance.images = JsonOutput.toJson(images)
+        instance.save()
     }
 }

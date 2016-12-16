@@ -45,6 +45,16 @@ class ItemController {
             render(view: "/404")
             return
         }
+        def cellSource = CellSource.findByItem(item)
+        if (cellSource) {
+            redirect(controller: "cellSource", action: "show", id: cellSource.id)
+            return
+        }
+        def antibody = Antibody.findByItem(item)
+        if (antibody) {
+            redirect(controller: "antibody", action: "show", id: antibody.id)
+            return
+        }
         def folder = itemService.getImageFolder(id)
         def images = folder.listFiles()
         switch (item.type.category.superCategory) {
@@ -55,7 +65,7 @@ class ItemController {
                     traces.push(tmp.parent)
                     tmp = tmp.parent
                 }
-                def cellSource = CellSource.findByItem(item)
+                cellSource = CellSource.findByItem(tmp)
                 [item: item, images: images, traces: traces, cellSource: cellSource]
                 break
             default:
@@ -183,25 +193,6 @@ class ItemController {
         redirect(action: "show", id: params.itemId)
     }
     
-    
-    def displayImage(String img, Long itemId) {
-        File folder = itemService.getImageFolder(itemId); 
-        File image = new File(folder, img)
-        if(!image.exists()) {
-            response.status = 404
-        } else {
-            BufferedImage originalImage = ImageIO.read(image)
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
-            def fileType = getFileExtension(img)
-            ImageIO.write(originalImage, fileType, outputStream)
-            byte[] imageInByte = outputStream.toByteArray()
-            response.setHeader("Content-Length", imageInByte.length.toString())
-            response.contentType = "image/"+fileType
-            response.outputStream << imageInByte
-            response.outputStream.flush()
-        }
-    }
-    
     def displayBarcode(String barcode, Integer width, Integer height, String formatStr) {
         if (barcode && barcode != "") {
             barcodeService.renderImage(response, barcode, width, height, formatStr)
@@ -271,5 +262,71 @@ class ItemController {
         render result
         return
     }
+    
+    def search(String str) {
+        def c = Item.createCriteria()
+        def listParams = [
+                max: params.max ?: 25,
+                sort: params.sort ?: "id",
+                order: params.order ?: "desc",
+                offset: params.offset
+            ]
+        def items = c.list(listParams) {
+            or {
+                ilike "name", "%${str}%"
+                eq "barcode", "${str}"
+                ilike "location", "%${str}%"
+                type {
+                    ilike "name", "%${str}%"
+                }
+                user {
+                    ilike "username", "%${str}%"
+                }
+            }
+        }
+        [itemList: items, itemCount: items.totalCount, str: str]
+    }
+    
+    def printBarcode(Long itemId, int row, int col, int copies) {
+        def item = Item.get(itemId)
+        if (!item) {
+            render(view: "/404")
+            return
+        }
+        def items = []
+        def nullCount = 5 * (row - 1) + col - 1
+        for (int i = 0; i < nullCount; ++i) {
+            items.push(null)
+        }
+        for (int i = 0; i < copies; ++i) {
+            items.push(item) 
+        }        
+        render(view: "/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])
+    }
+    
+    def batchEdit(Long instanceId) {
+        def instance = ProtocolInstance.get(instanceId)
+        def items = ProtocolInstanceItems.findAllByFunctionAndProtocolInstance(ProtocolItemFunction.CHILD, instance).sort {it.id}.collect { it.item }
+        def itemTypes = items*.type.unique()
+        if (itemTypes.size() == 0) {
+            render "No items found!"
+            return
+        } else if (itemTypes.size() >1) {
+            render "Items must have the same type!"
+            return
+        }
+        [items: items, itemType: itemTypes[0], instanceId: instanceId]
+    }
+    
+    def batchSave(ItemListCommand cmd) {
+        itemService.batchSave(cmd.items)
+        flash.message = "The items have been updated!"
+        redirect(action: "batchEdit", params: [instanceId: cmd.instanceId])
+    }
 }
 
+
+class ItemListCommand {
+    Long instanceId
+    List<Map> items
+}

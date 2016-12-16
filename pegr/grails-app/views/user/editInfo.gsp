@@ -26,7 +26,7 @@
             </div>
             <div class="form-group ${hasErrors(bean: user, field: 'phone', 'error')}">
                 <label for="phone">Phone</label>
-                <g:textField type="tel" class="form-control" id="phone" name="phone"></g:textField>
+                <g:textField type="tel" class="form-control" id="phone" name="phone" value="${user?.phone}"></g:textField>
             </div>
             <span>
                 <g:submitButton name="update" value="Update" class="btn btn-primary"/> <g:link action='profile' class="btn btn-primary ">Cancel</g:link>

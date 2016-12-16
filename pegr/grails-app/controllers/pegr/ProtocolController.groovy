@@ -9,13 +9,15 @@ class ProtocolController {
         def currentUser = springSecurityService.currentUser
         params.max = Math.min(max ?: 25, 100)
         def protocols = Protocol.where{ user == currentUser }.list(params)
-        [protocolList: protocols]
+        def protocolCount = Protocol.where{ user == currentUser }.count()
+        [protocolList: protocols, protocolCount: protocolCount]
     }
     
     def labProtocols(Integer max) {
         params.max = Math.min(max ?: 25, 100)
         def protocols = Protocol.where{ status == DictionaryStatus.Y }.list(params)
-        [protocolList: protocols]
+        def protocolCount = Protocol.where{ status == DictionaryStatus.Y }.count()
+        [protocolList: protocols, protocolCount: protocolCount]
     }
     
     def labProtocolGroups(Integer max) {
@@ -45,6 +47,7 @@ class ProtocolController {
                         (pegr.ProtocolItemFunction.PARENT) : [params.long('startItemTypeId')],
                         (pegr.ProtocolItemFunction.CHILD) : [params.long('endItemTypeId')],
                         (pegr.ProtocolItemFunction.SHARED) : params.list('sharedItemTypeIds'),
+                        (pegr.ProtocolItemFunction.END_PRODUCT) : params.list('endProductTypeIds'),
                         (pegr.ProtocolItemFunction.START_POOL) : [params.long('startPoolTypeId')],
                         (pegr.ProtocolItemFunction.END_POOL) : [params.long('endPoolTypeId')]
                 ]
@@ -55,6 +58,7 @@ class ProtocolController {
                     render(view: "create", model: [protocol: protocol, 
                         startItemTypeId:params.startItemTypeId,
                         endItemTypeId:params.endItemTypeId,
+                        endProductTypeIds:params.endProductTypeIds,
                         sharedItemTypeIds:params.sharedItemTypeIds,
                         startPoolTypeId:params.startPoolTypeId,
                         endPoolTypeId:params.endPoolTypeId])
@@ -85,6 +89,7 @@ class ProtocolController {
                         (pegr.ProtocolItemFunction.PARENT) : [params.long('startItemTypeId')],
                         (pegr.ProtocolItemFunction.CHILD) : [params.long('endItemTypeId')],
                         (pegr.ProtocolItemFunction.SHARED) : params.list('sharedItemTypeIds'),
+                        (pegr.ProtocolItemFunction.END_PRODUCT) : params.list('endProductTypeIds'),
                         (pegr.ProtocolItemFunction.START_POOL) : [params.long('startPoolTypeId')],
                         (pegr.ProtocolItemFunction.END_POOL) : [params.long('endPoolTypeId')]
                 ]
@@ -98,15 +103,7 @@ class ProtocolController {
                         startItemTypeId:params.startItemTypeId,
                         endItemTypeId:params.endItemTypeId,
                         sharedItemTypeIds:params.sharedItemTypeIds,
-                        startPoolTypeId:params.startPoolTypeId,
-                        endPoolTypeId:params.endPoolTypeId])
-                }catch(Exception e) {
-                    request.message = "Error updateing this protocol!"
-                    log.error "Error: ${e.message}", e
-                    render(view: "edit", model: [protocol: protocol,
-                        startItemTypeId:params.startItemTypeId,
-                        endItemTypeId:params.endItemTypeId,
-                        sharedItemTypeIds:params.sharedItemTypeIds,
+                        endProductTypeIds:params.endProductTypeIds,
                         startPoolTypeId:params.startPoolTypeId,
                         endPoolTypeId:params.endPoolTypeId])
                 }
@@ -116,6 +113,7 @@ class ProtocolController {
             startItemTypeId:protocol?.startItemType?.id,
             endItemTypeId:protocol?.endItemType?.id,
             sharedItemTypeIds:protocol?.sharedItemTypes*.id,
+            endProductTypeIds:protocol?.endProductTypes*.id,
             startPoolTypeId:protocol?.startPoolType?.id,
             endPoolTypeId:protocol?.endPoolType?.id]
         }
@@ -164,4 +162,26 @@ class ProtocolController {
         render(contentType: "application/pdf", contentDisposition: "inline", file: file, fileName: file.getName())
     }
     
+    def search(String str) {
+        def c = Protocol.createCriteria()
+        def listParams = [
+                max: params.max ?: 25,
+                sort: params.sort ?: "id",
+                order: params.order ?: "desc",
+                offset: params.offset
+            ]
+        def protocols = c.list(listParams) {
+            and {
+                eq "status", DictionaryStatus.Y
+                or {
+                    ilike "name", "%${str}%"
+                    ilike "description", "%${str}%"
+                    user {
+                        ilike "username", "%${str}%"
+                    }
+                }
+            }
+        }
+        [protocolList: protocols, protocolCount: protocols.totalCount, str: str]        
+    }
 }

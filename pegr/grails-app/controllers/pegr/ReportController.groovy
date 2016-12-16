@@ -21,29 +21,11 @@ class ReportController {
         render template: "/report/reportRow", model: [cohort: cohort]
     }
     
-    /*
-     * list the analysis status of all the runs
-     * @param max max number of runs listed in a page
-     * @param requestedStatus requested status of sequence run
-     */
-    def analysisStatus(Integer max, String requestedStatus) {
-        if (requestedStatus == null || requestedStatus == "") {
-            requestedStatus = RunStatus.ANALYZING
-        }
-        params.max = Math.min(max ?: 15, 100)
-        if (!params.sort) {
-            params.sort = "date"
-            params.order = "desc"
-        }
-        def runs = SequenceRun.where { status == requestedStatus }.list(params)
-        [runs: runs, requestedStatus: requestedStatus, totalCount: runs.totalCount]
-    }
-    
     def runStatus(Long runId) {
         def run = SequenceRun.get(runId)
         if (!run) {
             flash.message = "Run not found!"
-            redirect(action: "analysisStatus")
+            redirect(controller: "sequenceRun", action: "index")
         } else {
             try {
                 def runStatus = reportService.fetchRunStatus(run)
@@ -77,7 +59,7 @@ class ReportController {
                 ]
             } catch (ReportException e) {
                 flash.message = e.message
-                redirect(action: "analysisStatus")
+                redirect(controller: "sequenceRun", action: "index")
             }       
         }
     }
@@ -100,14 +82,6 @@ class ReportController {
             flash.message = e.message
         }
         redirect(action: "runStatus", params: [runId: runId])
-    }
-
-    def automatedReportList(Integer max) {
-        params.max = Math.min(max ?: 25, 100)
-        def query = SequencingCohort.where {report != null}
-        def cohorts = query.list(params)
-        def totalCount = query.count()
-        [cohorts: cohorts, totalCount: totalCount]
     }
     
     def show(Long id) {
@@ -167,7 +141,7 @@ class ReportController {
     def saveQcSettings() {
         try {
             reportService.saveQcSettings(params)
-            redirect(action: "analysisStatus")
+            redirect(controller: "sequenceRun", action: "index")
         } catch (ReportException e) {
             flash.message = e.message
             redirect(action: "editQcSettings") 

@@ -54,7 +54,7 @@
                     <ul>
                     <g:each in="${imageMap?.sonication}" var="filepath">
                         <li>
-                            <img src='${createLink(controller: "sequenceRun", action: "displayImage", params:[filepath:filepath])}' height="200"/>
+                            <img src='${createLink(controller: "file", action: "displayImage", params:[filepath:filepath, relative:true])}' height="200"/>
                         </li>
                     </g:each>
                     </ul>
@@ -63,7 +63,7 @@
                     <ul>
                     <g:each in="${imageMap?.gel}" var="filepath">
                         <li>
-                            <img src='${createLink(controller: "sequenceRun", action: "displayImage", params:[filepath:filepath])}' height="200"/>
+                            <img src='${createLink(controller: "file", action: "displayImage", params:[filepath:filepath,relative:true])}' height="200"/>
                         </li>
                     </g:each>
                     </ul>

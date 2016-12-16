@@ -213,7 +213,7 @@ class ProtocolInstanceBagController {
                                                  file: file])
                 } else {           
                     if (protocolInstance.status != ProtocolStatus.COMPLETED) {
-                        toBeCompleted = protocolInstanceBagService.readyToBeCompleted(sharedItemAndPoolList, results, protocol)
+                        toBeCompleted = protocolInstanceBagService.readyToBeCompleted(sharedItemAndPoolList, results, protocolInstance)
                     }                    
                     render(view: "editInstance", model: [protocolInstance: protocolInstance, 
                                                  sharedItemAndPoolList: sharedItemAndPoolList,
@@ -483,5 +483,40 @@ class ProtocolInstanceBagController {
         }
         def results = protocolInstanceBagService.getParentsAndChildrenForInstance(instance, instance.protocol.startItemType, instance.protocol.endItemType)
         [parents: results.parents, children: results.children, instance: instance]
+    }
+    
+    def search(String str) {
+        def c = ProtocolInstanceBag.createCriteria()
+        def listParams = [
+                max: params.max ?: 25,
+                sort: params.sort ?: "id",
+                order: params.order ?: "desc",
+                offset: params.offset
+            ]
+        def bags = c.list(listParams) {
+            or {
+                ilike "name", "%${str}%"
+            }
+        }
+            
+        render(view: "list", model: [bags: bags, totalCount: bags.totalCount, str: str])   
+    }
+    
+    def uploadImage(Long instanceId, String type) {
+        try {
+            def instance = ProtocolInstance.get(instanceId)
+            def fieldName = "image"
+            protocolInstanceBagService.upload((MultipartHttpServletRequest)request, instance, type, fieldName)
+            flash.message = "Image uploaded!"
+        } catch(UtilityException e) {
+            flash.message = e.message
+        }
+        redirect(action: "showInstance", id: instanceId)
+    }
+    
+    def removeInstanceImageAjax(Long instanceId, String filepath) {
+        protocolInstanceBagService.removeInstanceImage(instanceId, filepath)
+        render ""
+        return
     }
 }

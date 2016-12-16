@@ -36,6 +36,15 @@
             </g:each>
             </ul>
             
+            <h4>End Product Types</h4>
+            <ul>
+            <g:each in="${protocol?.endProductTypes}">
+                <li>${it}</li>
+            </g:each>
+            </ul>
+            
+            <h4>Required Images</h4>
+            <ul>${protocol.images}</ul>
             
             <h4>Traced Sample</h4>
             <ul>

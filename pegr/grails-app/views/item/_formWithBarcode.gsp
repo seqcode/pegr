@@ -45,9 +45,7 @@
             </div>
         </g:each>
     </div>
-    <div class="col-sm-6" id="barcode-display">    
-            <g:render template="/item/barcodeImage" model="[barcode:'']"></g:render>
-    </div>
+    
 </div>
 
 <script>

@@ -11,6 +11,7 @@ class Protocol {
     Boolean addIndex
     DictionaryStatus status
     String file
+    String images
     
 	String toString() {
         String s = name
@@ -23,7 +24,7 @@ class Protocol {
     static hasMany = [protocolGroups: ProtocolGroup]
     static belongsTo = [ProtocolGroup]
     
-    List getSharedItemTypes(){
+    List getSharedItemTypes() {
         return ProtocolItemTypes.where{protocol == this && function == ProtocolItemFunction.SHARED}.collect{it.itemType}
     }
     
@@ -43,6 +44,14 @@ class Protocol {
         return ProtocolItemTypes.where{protocol == this && function == ProtocolItemFunction.END_POOL}.get(max: 1)?.itemType
     }
     
+    List getEndProductTypes() {
+        return ProtocolItemTypes.where{protocol == this && function == ProtocolItemFunction.END_PRODUCT}.collect{it.itemType}
+    }
+    
+    List getImageTypeList() {
+        return images ? images.tokenize(",")*.trim() : []
+    }
+    
     static constraints = {
 		name unique: 'protocolVersion'
         shortName nullable: true, blank: true
@@ -54,6 +63,7 @@ class Protocol {
         addIndex nullable: true
         status nullable: true
         file nullable: true
+        images nullable: true
 	}
 
 }

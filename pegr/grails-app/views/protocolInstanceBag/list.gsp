@@ -3,7 +3,13 @@
   <title>PEGR - Work Records</title> 
 </head>
 <body>
-    <h4>Work Records <g:link action='create' class="edit">New</g:link>    <a href="#" onclick="window.open('/pegr/help#bag', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><small><u>Help</u></small></a></h4>
+    <h4><g:link action="list">Work Records</g:link> <g:link action='create' class="edit">New</g:link>    <a href="#" onclick="window.open('/pegr/help#bag', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><small><u>Help</u></small></a></h4>
+    <div class="row">
+        <g:form controller="protocolInstanceBag" action="search" class="pull-right" style="padding-bottom:5px">
+            <input name="str">
+            <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>
+        </g:form>
+    </div>
     <div id="message" >
         <g:if test="${flash.message}">
              <div class="message" role="status">
@@ -53,7 +59,7 @@
         </div>
     </div>
     <div class="pagination">
-        <g:paginate next="Next" prev="Prev" total="${totalCount}" controller="protocolInstanceBag" action="list" max="25"/>
+        <g:paginate next="Next" prev="Prev" total="${totalCount}" params="${params}" controller="protocolInstanceBag" max="25"/>
     </div>
     <script>
         $("select").select2({width: '100%'});

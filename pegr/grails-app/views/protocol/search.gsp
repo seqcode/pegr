@@ -9,17 +9,20 @@
 	</head>
 	<body>
 		<div>
-            <g:link action="labProtocols" class="btn btn-info">Lab Protocols</g:link>
+            <g:link action="labProtocols" class="btn btn-info active">Lab Protocols</g:link>
             <g:link action="labProtocolGroups" class="btn btn-info">Lab Protocol Groups</g:link>
-            <g:link action="index" class="btn btn-info active">My Protocols</g:link>
-        </div> 
+            <g:link action="index" class="btn btn-info">My Protocols</g:link>
+        </div>            
+        <g:form controller="protocol" action="search" class="pull-right">
+            <input name="str">
+            <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>
+        </g:form>
 		<div id="list-protocol">
-			<h3>My Protocols <g:link action="create" class="edit">New</g:link></h3>
-            
+			<h3>Lab Protocols</h3>
 			<g:if test="${flash.message}">
 				<div class="message" role="status">${flash.message}</div>
 			</g:if>
-			<g:render template="overviewProtocols" model="[protocolList:protocolList, action: 'index']"></g:render>
+			<g:render template="overviewProtocols" model="[protocolList:protocolList, action:'search']"></g:render>
 		</div>
 	</body>
 </html>

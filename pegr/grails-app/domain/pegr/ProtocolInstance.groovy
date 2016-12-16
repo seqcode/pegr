@@ -1,7 +1,8 @@
 package pegr
 
 class ProtocolInstance {
-
+    def utilityService
+    
 	Protocol protocol
 	User user
     Date startTime
@@ -10,7 +11,12 @@ class ProtocolInstance {
 	ProtocolStatus status
 	ProtocolInstanceBag bag	
     Integer bagIdx
+    String images
 	
+    def getImageMap() {
+        return utilityService.parseJson(this.images)
+    }
+    
     static constraints = {
         protocol nullable: true
 		note nullable: true, blank: true
@@ -18,6 +24,7 @@ class ProtocolInstance {
         user nullable: true
         startTime nullable: true
         endTime nullable: true
+        images nullable: true
     }
     
     static mapping = {

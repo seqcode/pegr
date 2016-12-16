@@ -57,7 +57,8 @@
                     <ul>
                     <g:each in="${cohort.imageMap?.sonication}" var="filepath">
                         <li>
-                            <g:link controller="sequenceRun" action="displayImage" params="[filepath:filepath]" target="_blank">${filepath}</g:link>
+                            <img src='${createLink(controller:"file", action: "displayImage", params:[filepath: filepath, relative: true])}' height="300"/>
+                            <g:hiddenField class="filepath" name="filepath" value="${filepath}"></g:hiddenField>
                             <g:if test="${editable}"><span class="glyphicon glyphicon-remove btn remove-image"></span></g:if>
                         </li>
                     </g:each>
@@ -75,8 +76,9 @@
                     <ul>
                     <g:each in="${cohort.imageMap?.gel}" var="filepath">
                         <li>
-                            <g:link controller="sequenceRun" action="displayImage" params="[filepath:filepath]" target="_blank">${filepath}</g:link>
-                            <g:if test="${editable}"><button>x</button></g:if>
+                            <img src='${createLink(controller:"file", action: "displayImage", params:[filepath: filepath, relative: true])}' height="300"/>
+                            <g:hiddenField class="filepath" name="filepath" value="${filepath}"></g:hiddenField>
+                            <g:if test="${editable}"><span class="glyphicon glyphicon-remove btn remove-image"></span></g:if>
                         </li>
                     </g:each>
                     </ul>
@@ -278,7 +280,7 @@
         
         $(".remove-image").on("click", function(){
             var parent = $(this).parent();
-            var filepath = parent.find("a").text();
+            var filepath = parent.find("input.filepath").val();
             var cohortId = parent.closest("tr").find(".cohort-id").val();
             $.ajax({
                 url:"/pegr/sequenceRun/removeCohortImageAjax",

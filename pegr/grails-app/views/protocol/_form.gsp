@@ -21,7 +21,18 @@
 
 <div>
     <label for="sharedItem">Shared Item Types (multi-select)</label>
-    <g:select name="sharedItemTypeIds" id="sharedItem" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.OTHER}.list(sort:'name')}" optionKey="id" value="${sharedItemTypeIds}" multiple="multiple" size="10" style="width: 200px"/>
+    <g:select name="sharedItemTypeIds" class="sharedItem" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.OTHER}.list(sort:'name')}" optionKey="id" value="${sharedItemTypeIds}" multiple="multiple" size="10" style="width: 200px"/>
+</div>
+
+<div>
+    <label for="endProduct">End Product Type (multi-select)</label>
+    <g:select name="endProductTypeIds" class="sharedItem" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.OTHER}.list(sort:'name')}" optionKey="id" value="${endProductTypeIds}" multiple="multiple" size="10" style="width: 200px"/>
+</div>
+
+<div>
+    <label>Required Images</label>
+    <g:textField name="images" value="${protocol?.images}"/>
+    (multiple fields should be separated by comma)
 </div>
 
 <h4>Traced Samples</h4>
@@ -54,5 +65,5 @@
 </sec:ifAllGranted>
 
 <script>
-    $("#sharedItem").select2();
+    $(".sharedItem").select2();
 </script>

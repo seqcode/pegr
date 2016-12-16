@@ -52,29 +52,31 @@
             </ul>
         </div>
         <div class="col-sm-6">
-            <g:render template="/item/barcodeImage" model="[barcode:cellSource.item?.barcode]"></g:render>
+            <g:render template="/item/barcodeImage" model="[item:cellSource.item]"></g:render>
         </div>
     </div>
     </g:else>
     <h4>Cell Source Information <g:link controller="cellSource" action="edit" params="[cellSourceId:cellSource?.id]" class="edit">Edit</g:link></h4>
     <g:render template="/cellSource/details" model="[cellSource: cellSource]"></g:render>
+    <g:if test="${cellSource.item}">
     <h4>Images</h4>
     <div class="row">
     <g:each in="${images}" var="img">   
         <div class="col-md-4 item">
-            <g:link action="deleteImage" params="[img: img.name, itemId: cellSource.item?.id]" class="confirm" style="position: absolute; top: 0; let: 0"><span class="glyphicon glyphicon-remove-circle"></span></g:link> 
-            <img src='${createLink(action: "displayImage", params:[img: img.name, itemId: cellSource.item?.id])}' height="300"/>
+            <g:link controller="item" action="deleteImage" params="[img: img.name, itemId: cellSource.item?.id]" class="confirm" style="position: absolute; top: 0; let: 0"><span class="glyphicon glyphicon-remove-circle"></span></g:link> 
+            <img src='${createLink(controller:"file", action: "displayImage", params:[filepath: img.getAbsolutePath()])}' height="300"/>
         </div>
     </g:each>
     </div>
     </br>
-    <g:uploadForm action="upload" >
+    <g:uploadForm controller="item" action="upload" >
         <div class="form-group">
             <g:hiddenField name="itemId" value="${cellSource.item?.id}"></g:hiddenField>
             <input type="file" id="image" name="image"/>
             <g:submitButton name="upload" value="Upload"/> (only jpeg, png, gif files, size limit: 5 MB)
         </div>
     </g:uploadForm>
+    </g:if>
     <script>
         $(".confirm").confirm();
      </script>

@@ -7,16 +7,8 @@
 </head>
 <body>
 
-<div class="container-fluid text-center">    
-    <div class="row content">
-        <div class="col-sm-12 text-left">
-            <div class="sub-nav">
-                <g:link controller="protocolInstanceBag" class="btn btn-info active">Work Records</g:link>
-                <g:link controller="sequenceRun" class="btn btn-info">Sequencing Runs</g:link>
-            </div>
-            <g:layoutBody/>
-        </div>
-    </div>
+<div class="container-fluid">    
+    <g:layoutBody/>
 </div>
     
  <script>

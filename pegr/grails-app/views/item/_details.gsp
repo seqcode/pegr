@@ -1,6 +1,7 @@
 <g:if test="${item?.name}">
 <h4>Name: ${item.name}</h4>
 </g:if>
+<g:render template="/item/status" model="[item: item]"></g:render>
 <ul>
     <g:if test="${item?.type}">
     <li>Type: ${item.type}</li>
@@ -26,3 +27,4 @@
         <li>${it.key}: ${it.value}</li>
     </g:each>
 </ul>
+

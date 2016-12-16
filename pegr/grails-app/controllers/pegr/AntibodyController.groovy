@@ -24,7 +24,12 @@ class AntibodyController {
     def show(Long id) {
         def antibody = Antibody.get(id)
         if (antibody) {
-            [antibody: antibody]
+            def images
+            if (antibody.item) {
+                def folder = itemService.getImageFolder(antibody.item.id)
+                images = folder.listFiles()
+            }            
+            [antibody: antibody, images: images]
         } else {
             render status: 404
         }

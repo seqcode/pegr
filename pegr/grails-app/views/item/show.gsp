@@ -45,7 +45,7 @@
             </ul>
         </div>
         <div class="col-sm-6">
-            <g:render template="/item/barcodeImage" model="[barcode:item.barcode]"></g:render>
+            <g:render template="/item/barcodeImage" model="[item: item]"></g:render>
         </div>
     </div>
     <g:if test="${traces?.size()}">
@@ -65,7 +65,7 @@
     <g:each in="${images}" var="img">   
         <div class="col-md-4 item">
             <g:link action="deleteImage" params="[img: img.name, itemId: item.id]" class="confirm" style="position: absolute; top: 0; let: 0"><span class="glyphicon glyphicon-remove-circle"></span></g:link> 
-            <img src='${createLink(action: "displayImage", params:[img: img.name, itemId: item.id])}' height="300"/>
+            <img src='${createLink(controller: "file", action: "displayImage", params:[filepath: img.getAbsolutePath()])}' height="300"/>
         </div>
     </g:each>
     </div>

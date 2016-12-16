@@ -18,6 +18,12 @@
             </g:each>
             <g:link controller="sequenceIndex" class="btn btn-info item-index">Index</g:link>
             <a href="https://www.quartzy.com/e/groups/108111/order-requests" class="btn btn-info external" target="_blank">Order</a>
+            <g:form controller="item" action="search" class="pull-right" style="padding:3px 0px">
+                <input name="str" value="${str}">
+                <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>
+            </g:form>
+        </div>
+        <div class="row">
             <g:link controller="item" action="generateBarcodeList" class="edit pull-right" target="_blank">Generate Barcode List</g:link>
         </div>
         <g:layoutBody/>

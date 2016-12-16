@@ -46,13 +46,15 @@
         </style>        
     </head>
     <body>
-        <g:each in="${barcodeList}" var="barcode" status="n">
+        <g:each in="${barcodeList}" var="barcode" status="n">        
         <div class="barcode">
-            <img src='${createLink(controller:"item", action:"displayBarcode", params:[barcode:barcode, width:60, height:60, formatStr:"QR"])}' width="40" height="40"/>
-            <span class="date"><g:formatDate format="yyMMdd" date="${date}"/></span>
-            <span class="label">${barcode}</span>
-            <g:if test="${nameList}">
-                <div class="name">${nameList[n]}</div>
+            <g:if test="${barcode}">
+                <img src='${createLink(controller:"item", action:"displayBarcode", params:[barcode:barcode, width:60, height:60, formatStr:"QR"])}' width="40" height="40"/>
+                <span class="date"><g:formatDate format="yyMMdd" date="${date}"/></span>
+                <span class="label">${barcode}</span>
+                <g:if test="${nameList}">
+                    <div class="name">${nameList[n]}</div>
+                </g:if>
             </g:if>
         </div>
         </g:each>

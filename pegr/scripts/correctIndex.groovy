@@ -3,10 +3,10 @@ import com.opencsv.CSVParser
 import com.opencsv.CSVReader
 
 def sampleService = new SampleService()
-def filename = "/Users/dus73/csvFiles/Index_Curation_Run164-215.csv"
+def filename = "/Users/dus73/csvFiles/NextSeqIndexCuration_103-163.csv"
 
 def startLine = 2
-def endLine = 318
+def endLine = 136
 
 def lineNo = 0
 def file = new FileReader(filename)
@@ -20,20 +20,18 @@ while ((rawdata = reader.readNext()) != null) {
     } else if (endLine > 0 && lineNo > endLine) {
         break
     }
-    def sampleId = rawdata[0]
-    def sourceId = rawdata[1]
+    def runId = rawdata[0]
+    def sampleId = rawdata[1]
     def indexStr = rawdata[2]
     def sample  = Sample.get(sampleId)
     if (!sample) {
-        log.error "Sample ${sampleId} not found!"
-    } else if (sample.sourceId != sourceId) {
-        log.error "Source Id ${sourceId} does not match sample ID ${sampleId}"
+        println "Sample ${sampleId} not found!"
     } else {
         SampleSequenceIndices.executeUpdate("delete from SampleSequenceIndices where sample.id=?", [sample.id])
         def index = SequenceIndex.findBySequence(indexStr)
         if (!index) {
             index = new SequenceIndex(indexId: 0, sequence: indexStr, indexVersion: "UNKNOWN").save(failOnError: true)
-            log.error "new index ${index.sequence}"
+            println "new index ${index.sequence}"
         }
         new SampleSequenceIndices(sample: sample, index: index, setId: 1, indexInSet: 1).save(failOnError: true)
     }

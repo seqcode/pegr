@@ -233,7 +233,7 @@ class CellSourceService {
         if (cellSource) {
             try {
                 if (cellSource.item) {
-                    cellSource.item.properties = item
+                    cellSource.item.properties['name', 'type', 'barcode', 'location', 'notes'] = item
                     itemService.save(cellSource.item)
                 } else {
                     itemService.save(item)

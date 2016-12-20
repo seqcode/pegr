@@ -117,22 +117,19 @@ class ProtocolInstanceBagController {
         [bagId: bagId]       
     }
     
-    def previewItemAndBag(Long typeId, String barcode, Long bagId) {
-        def itemType = ItemType.get(typeId)
-        def item = Item.findByBarcode(barcode)
-        if (item) {        
-            if (item.type == itemType) {
-                def itemId = item.id
-                def priorInstance = ProtocolInstanceItems.where {item.id == itemId}.get(sort:"id", order: 'desc', max: 1)
-                render(view:"previewItemAndBag", model: [item: item, priorInstance: priorInstance?.protocolInstance, bagId: bagId])                
-            } else {
-                flash.message = "The item with barcode ${barcode} has type ${item.type}, which does not match the input type ${itemType}!"
-                redirect(action: "searchItemForBag", params: [bagId: bagId])
-            }
-        } else {
-            flash.message = "No item found!"
-            redirect(action: "searchItemForBag", params: [bagId: bagId])
+    def previewItemAndBag(Long bagId) {
+        def itemIds = params.list("items")
+        def items = []
+        itemIds.each { id ->
+            def item = Item.get(id)
+            items.push(item)
         }
+      
+        def priorInstance
+        if (itemIds.size() == 1) {
+            priorInstance = ProtocolInstanceItems.where {item.id == itemIds[0]}.get(sort:"id", order: 'desc', max: 1)
+        }
+        [items: items, priorInstance: priorInstance?.protocolInstance, bagId: bagId])                
     }
     
     def addItemToBag(Long itemId, Long bagId) {

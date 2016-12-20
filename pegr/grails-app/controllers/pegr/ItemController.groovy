@@ -323,6 +323,16 @@ class ItemController {
         flash.message = "The items have been updated!"
         redirect(action: "batchEdit", params: [instanceId: cmd.instanceId])
     }
+    
+    def queryAjax(String barcode) {
+        def item = Item.findByBarcode(barcode)
+        if (item) {
+            render item as JSON
+        } else {
+            render "Not found!"
+        }
+        return 
+    }
 }
 
 

@@ -475,14 +475,23 @@ class ProtocolInstanceBagController {
         redirect(action: "showInstance", id: instanceId)
     }
 
-    def showAllTracedSampleBarcodes(Long instanceId) {
+    def showAllTracedSampleBarcodes(Long instanceId, String type, int row, int column) {
         def instance = ProtocolInstance.get(instanceId)
         if (!instance) {
             render(view: "/404")
             return
         }
         def results = protocolInstanceBagService.getParentsAndChildrenForInstance(instance, instance.protocol.startItemType, instance.protocol.endItemType)
-        [parents: results.parents, children: results.children, instance: instance]
+        def items = []
+        def priorCount = 5 * (row - 1) + column - 1
+        for (int i = 0; i < priorCount; ++i) {
+            items.push(null)
+        }
+        def tracedSamples = (type == "Parents") ? results.parents : results.children  
+        tracedSamples.each { item ->
+            items.push(item)
+        }
+        render(view:"/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])        
     }
     
     def search(String str) {

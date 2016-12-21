@@ -525,4 +525,9 @@ class ProtocolInstanceBagController {
         def items = protocolInstanceBagService.getTracedSamples(bagId)
         render(view: "/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])
     }
+    
+    def searchTracedSampleWorksheet(Long bagId) {
+        def bag = ProtocolInstanceBag.get(bagId)
+        [bag:bag]
+    }
 }

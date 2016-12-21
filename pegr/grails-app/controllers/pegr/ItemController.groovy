@@ -333,6 +333,29 @@ class ItemController {
         render result as JSON
         return 
     }
+    
+    def searchTracedSamplesAjax(String str) {
+        def c = Item.createCriteria()
+        def items = c.list() {
+            or {
+                ilike "name", "%${str}%"
+                eq "barcode", "${str}"
+                ilike "location", "%${str}%"
+                type {
+                    ilike "name", "%${str}%"
+                }
+                user {
+                    ilike "username", "%${str}%"
+                }
+            }
+        }
+        def itemsArray = []
+        items.each {item->
+            itemsArray.push([item.id, item.type.name, item.name, item.barcode, item.location, item.user.username, item.status])
+        }
+        render itemsArray as JSON
+        return
+    }
 }
 
 

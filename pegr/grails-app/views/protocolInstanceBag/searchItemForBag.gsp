@@ -9,14 +9,26 @@
                 changingHash=true;
                 var hash=window.location.hash.substr(1);
                 var barcode = unescape(hash)
-                $('#barcode').val(barcode);                
-                $.ajax({ url: "/pegr/item/queryAjax?barcode=" +barcode,
+                $('#barcode').val(barcode); 
+                if (barcode && barcode != "") {
+                    $.ajax({ url: "/pegr/item/queryAjax?barcode=" +barcode,
                         success: function(result){
-                            $('#new-item').append("<span id='item-id' style='display:none'>" + result.id + "</span>");
-                            $('#new-item').append("<span>" + result.status + result.barcode + result.type + result.name +"</span>")
+                            if (result) {
+                                $('#new-item').append("<span id='item-id' style='display:none'>" + result.id + "</span>");
+                                var status
+                                if (result.status == "GOOD") {
+                                    status = "<span class='label label-success'>GOOD</span>"
+                                } else {
+                                    status = "<span class='label label-danger'>BAD</span>"
+                                }
+                                $('#new-item').append("<li>" + status + " " + result.type + " " + result.name +"</li>")
+                            } else {
+                                $('#new-item').text("Item not found!");
+                            }
                             $('#new-item').addClass("message");
                         }                    
-                });                
+                    }); 
+                }
                 changingHash=false;
             }else{
                 //Do something with barcode here
@@ -25,7 +37,7 @@
     </script>
     <style>
         select {
-            border: none;
+            display: none;
         }
     </style>
 </head>
@@ -46,24 +58,26 @@
         </div>
         <div id="new-item"></div>
         <a href="#" class="btn btn-primary" id="add-sample">Add</a>
-        <a href="#" onclick="refreshHash();" class="btn btn-default">Skip</a>
-        <g:submitButton class="btn btn-default" name="view" value="View"/>
+        <a href="#" onclick="refreshHash();$('#new-item').empty();" class="btn btn-default">Skip</a>
+        <g:submitButton class="btn btn-default" name="view" value="Finish and View"/>
         <div>
             <select name="items" id="added-items" size="20" multiple></select>
         </div>
-    </g:form>                    
+    </g:form>
+    <ul id="item-list"></ul>
     <script>
         $("#nav-experiments").addClass("active");
         
         $("#add-sample").on("click", function(){
-            var barcode = $("#barcode").val();
-            var id = $("#item-id").text();
-            var content = $("#new-item").html();
-            $("#added-items").append("<option value='" + id + "' selected>" + content + "</option>");
-            $("#new-item").html();
-            var count = $("#added-items option").length;
-            $("#item-count").text(count);
-            refreshHash();
+            if ($("#item-id")) {
+                var id = $("#item-id").text();            
+                $("#added-items").append("<option value='" + id + "' selected></option>");
+                $("#new-item li").appendTo("#item-list");            
+                var count = $("#added-items option").length;
+                $("#item-count").text(count);
+            }
+            $("#new-item").empty();
+            $("#barcode").val("");
         });
      </script>
 </div>

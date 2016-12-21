@@ -127,25 +127,20 @@ class ProtocolInstanceBagController {
       
         def priorInstance
         if (itemIds.size() == 1) {
-            priorInstance = ProtocolInstanceItems.where {item.id == itemIds[0]}.get(sort:"id", order: 'desc', max: 1)
+            def itemId = itemIds[0]
+            priorInstance = ProtocolInstanceItems.where {item.id == itemId}.get(sort:"id", order: 'desc', max: 1)
         }
-        [items: items, priorInstance: priorInstance?.protocolInstance, bagId: bagId])                
+        [items: items, priorInstance: priorInstance?.protocolInstance, bagId: bagId]              
     }
     
-    def addItemToBag(Long itemId, Long bagId) {
+    def addItemsToBag(Long bagId) {
         try {
-            protocolInstanceBagService.addItemToBag(itemId, bagId)
-            redirect(action: "showBag", id: bagId)
-        }catch(ProtocolInstanceBagException e){
-            flash.message = e.message
-            redirect(action: "searchItemForBag", params: [bagId: bagId])
-        }
-    }
-    
-    def splitAndAddItemToBag(Long itemId, Long bagId, Item item) {
-        try {
-            protocolInstanceBagService.splitAndAddItemToBag(itemId, bagId, item)
-            itemService.updateCustomizedFields(item, params)
+            def itemIds = params.list("itemIds")
+            if (params.split) {
+                protocolInstanceBagService.splitAndAddItemsToBag(itemIds, bagId)
+            } else {
+                protocolInstanceBagService.addItemsToBag(itemIds, bagId)
+            }            
             redirect(action: "showBag", id: bagId)
         }catch(ProtocolInstanceBagException e){
             flash.message = e.message
@@ -524,5 +519,10 @@ class ProtocolInstanceBagController {
         protocolInstanceBagService.removeInstanceImage(instanceId, filepath)
         render ""
         return
+    }
+    
+    def printTracedSamples(Long bagId) {
+        def items = protocolInstanceBagService.getTracedSamples(bagId)
+        render(view: "/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])
     }
 }

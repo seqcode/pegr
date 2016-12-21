@@ -54,7 +54,7 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Sample <g:link controller="sample" action="batchEdit" params="[bagId:bag?.id]" class="edit" target="_blank">Edit</g:link> </th>
+                            <th>Sample <span class="badge">${tracedSamples.size()}</span> <g:link action="printTracedSamples" class="edit" params="[bagId:bag.id]">Print</g:link> <g:link controller="sample" action="batchEdit" params="[bagId:bag?.id]" class="edit" target="_blank">Edit</g:link> </th>
                             <th>Project</th>
                             <th>
                                 <g:if test="${notStarted}">

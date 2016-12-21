@@ -326,11 +326,11 @@ class ItemController {
     
     def queryAjax(String barcode) {
         def item = Item.findByBarcode(barcode)
+        def result
         if (item) {
-            render item as JSON
-        } else {
-            render "Not found!"
+            result = [id: item.id, barcode: item.barcode, name: item.name, type: item.type.name, status: item.status]   
         }
+        render result as JSON
         return 
     }
 }

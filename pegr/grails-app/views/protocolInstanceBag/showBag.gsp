@@ -54,11 +54,11 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Sample <g:link controller="sample" action="batchEdit" params="[bagId:bag?.id]" class="edit" target="_blank">Edit</g:link> </th>
+                            <th>Sample <span class="badge">${tracedSamples.size()}</span> <g:link action="printTracedSamples" params="[bagId:bag.id]"><span class="glyphicon glyphicon-print"></span></g:link> <g:link controller="sample" action="batchEdit" params="[bagId:bag?.id]" class="edit" target="_blank">Edit</g:link> </th>
                             <th>Project</th>
                             <th>
                                 <g:if test="${notStarted}">
-                                    <g:link action="searchItemForBag" params="[bagId: bag?.id]" class="pull-right"><span class="glyphicon glyphicon-plus"></span> Add</g:link>
+                                    Add <g:link action="searchItemForBag" params="[bagId: bag?.id]"><span class="glyphicon glyphicon-qrcode"></span> </g:link> <g:link action="searchTracedSampleWorksheet" params="[bagId: bag?.id]"><span class="glyphicon glyphicon-list-alt"></span></g:link>
                                 </g:if>
                             </th>
                         </tr>

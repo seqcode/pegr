@@ -323,6 +323,39 @@ class ItemController {
         flash.message = "The items have been updated!"
         redirect(action: "batchEdit", params: [instanceId: cmd.instanceId])
     }
+    
+    def queryAjax(String barcode) {
+        def item = Item.findByBarcode(barcode)
+        def result
+        if (item) {
+            result = [id: item.id, barcode: item.barcode, name: item.name, type: item.type.name, status: item.status]   
+        }
+        render result as JSON
+        return 
+    }
+    
+    def searchTracedSamplesAjax(String str) {
+        def c = Item.createCriteria()
+        def items = c.list() {
+            or {
+                ilike "name", "%${str}%"
+                eq "barcode", "${str}"
+                ilike "location", "%${str}%"
+                type {
+                    ilike "name", "%${str}%"
+                }
+                user {
+                    ilike "username", "%${str}%"
+                }
+            }
+        }
+        def itemsArray = []
+        items.each {item->
+            itemsArray.push([item.id, item.type.name, item.name, item.barcode, item.location, item.user.username, item.status])
+        }
+        render itemsArray as JSON
+        return
+    }
 }
 
 

@@ -117,38 +117,30 @@ class ProtocolInstanceBagController {
         [bagId: bagId]       
     }
     
-    def previewItemAndBag(Long typeId, String barcode, Long bagId) {
-        def itemType = ItemType.get(typeId)
-        def item = Item.findByBarcode(barcode)
-        if (item) {        
-            if (item.type == itemType) {
-                def itemId = item.id
-                def priorInstance = ProtocolInstanceItems.where {item.id == itemId}.get(sort:"id", order: 'desc', max: 1)
-                render(view:"previewItemAndBag", model: [item: item, priorInstance: priorInstance?.protocolInstance, bagId: bagId])                
+    def previewItemAndBag(Long bagId) {
+        def itemIds = params.list("items")
+        def items = []
+        itemIds.each { id ->
+            def item = Item.get(id)
+            items.push(item)
+        }
+      
+        def priorInstance
+        if (itemIds.size() == 1) {
+            def itemId = itemIds[0]
+            priorInstance = ProtocolInstanceItems.where {item.id == itemId}.get(sort:"id", order: 'desc', max: 1)
+        }
+        [items: items, priorInstance: priorInstance?.protocolInstance, bagId: bagId]              
+    }
+    
+    def addItemsToBag(Long bagId) {
+        try {
+            def itemIds = params.list("itemIds")
+            if (params.split) {
+                protocolInstanceBagService.splitAndAddItemsToBag(itemIds, bagId)
             } else {
-                flash.message = "The item with barcode ${barcode} has type ${item.type}, which does not match the input type ${itemType}!"
-                redirect(action: "searchItemForBag", params: [bagId: bagId])
-            }
-        } else {
-            flash.message = "No item found!"
-            redirect(action: "searchItemForBag", params: [bagId: bagId])
-        }
-    }
-    
-    def addItemToBag(Long itemId, Long bagId) {
-        try {
-            protocolInstanceBagService.addItemToBag(itemId, bagId)
-            redirect(action: "showBag", id: bagId)
-        }catch(ProtocolInstanceBagException e){
-            flash.message = e.message
-            redirect(action: "searchItemForBag", params: [bagId: bagId])
-        }
-    }
-    
-    def splitAndAddItemToBag(Long itemId, Long bagId, Item item) {
-        try {
-            protocolInstanceBagService.splitAndAddItemToBag(itemId, bagId, item)
-            itemService.updateCustomizedFields(item, params)
+                protocolInstanceBagService.addItemsToBag(itemIds, bagId)
+            }            
             redirect(action: "showBag", id: bagId)
         }catch(ProtocolInstanceBagException e){
             flash.message = e.message
@@ -475,14 +467,23 @@ class ProtocolInstanceBagController {
         redirect(action: "showInstance", id: instanceId)
     }
 
-    def showAllTracedSampleBarcodes(Long instanceId) {
+    def showAllTracedSampleBarcodes(Long instanceId, String type, int row, int column) {
         def instance = ProtocolInstance.get(instanceId)
         if (!instance) {
             render(view: "/404")
             return
         }
         def results = protocolInstanceBagService.getParentsAndChildrenForInstance(instance, instance.protocol.startItemType, instance.protocol.endItemType)
-        [parents: results.parents, children: results.children, instance: instance]
+        def items = []
+        def priorCount = 5 * (row - 1) + column - 1
+        for (int i = 0; i < priorCount; ++i) {
+            items.push(null)
+        }
+        def tracedSamples = (type == "Parents") ? results.parents : results.children  
+        tracedSamples.each { item ->
+            items.push(item)
+        }
+        render(view:"/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])        
     }
     
     def search(String str) {
@@ -518,5 +519,15 @@ class ProtocolInstanceBagController {
         protocolInstanceBagService.removeInstanceImage(instanceId, filepath)
         render ""
         return
+    }
+    
+    def printTracedSamples(Long bagId) {
+        def items = protocolInstanceBagService.getTracedSamples(bagId)
+        render(view: "/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])
+    }
+    
+    def searchTracedSampleWorksheet(Long bagId) {
+        def bag = ProtocolInstanceBag.get(bagId)
+        [bag:bag]
     }
 }

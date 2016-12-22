@@ -132,7 +132,7 @@ class SecurityFilters {
         /**
          * before processing the bag
          */
-        ProtocolInstanceBagEdit(controller: "protocolInstanceBag", action: "searchItemForBag|previewItemAndBag|addItemToBag|addSubBagToBag|removeSampleFromBag") {
+        ProtocolInstanceBagEdit(controller: "protocolInstanceBag", action: "searchItemForBag|previewItemAndBag|addItemsToBag|addSubBagToBag|removeSampleFromBag") {
             before = {
                 def bagId = params.long('bagId')
                 def bag = ProtocolInstanceBag.get(bagId)

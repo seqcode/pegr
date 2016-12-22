@@ -30,7 +30,9 @@
             </table>
         </div>
         <div class="col-sm-6">
-            <h4>Selected traced samples <button id="add-btn" class="btn btn-primary pull-right">Add selected samples</button></h4>
+            <g:form action="previewItemAndBag">
+            <h4>Selected traced samples <g:submitButton name="submit" value="Add selected samples" id="add-btn" class="btn btn-primary pull-right"></g:submitButton></h4>            
+            <g:hiddenField name="bagId" value="${bag.id}"/>
             <table class="table-bordered" id="selected-table">
                 <thead>
                     <tr>
@@ -43,7 +45,9 @@
                         <th>Status</th>
                     </tr>
                 </thead>
+                <tbody></tbody>
             </table>
+            </g:form>
         </div>
     </div>
     <script>
@@ -57,17 +61,23 @@
                         searching: false,
                         data: result,
                     });
-                    $("tbody tr td:first-child").each(function(){
+                    $("#search-table tr td:first-child").each(function(){
                         var id = $(this).text();
-                        $(this).html("<input type='checkbox' name='itemIds' value='"+id+"'>");
+                        $(this).html("<input class='select-item' type='checkbox' name='items' value='"+id+"'>");
                     });
                 }
-            })
-            
+            });            
         });
         
-        $("#add-btn").on("click", function() {
-           
+        $("#search-table").on("click", "input[type=checkbox]", function() {
+            var tr = $(this).closest("tr");
+            tr.clone().appendTo($("#selected-table tbody")); 
+            tr.remove();
+        });
+        
+        $("#selected-table").on("click", "input[type=checkbox]", function() {
+            var tr = $(this).closest("tr");
+            tr.appendTo($("#search-table tbody")); 
         });
     </script>
 </body>

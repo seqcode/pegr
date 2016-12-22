@@ -1,4 +1,4 @@
-<h4>Traced Samples <g:link controller="protocolInstanceBag" action="showAllTracedSampleBarcodes" params="[instanceId: protocolInstance?.id]" target="_blank"><span class="glyphicon glyphicon-print"></span></g:link></h4>
+<h4>Traced Samples <g:render template="print"></g:render></h4>
 <table class="table table-striped">
     <thead>
         <g:if test="${children}">

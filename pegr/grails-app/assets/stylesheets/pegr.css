@@ -6,9 +6,15 @@ ul {
 /* Remove the navbar's default margin-bottom and rounded borders */ 
 .navbar {
   margin-bottom: 0;
+  border-style: none;
   border-radius: 0;
   background-color: #2c5986;
   z-index: +200;
+}
+
+.navbar-brand {
+    padding: 10px 0;
+    background-color: #658ced;//#496799;
 }
 
 .affix {

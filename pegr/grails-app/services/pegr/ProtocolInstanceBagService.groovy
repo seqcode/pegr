@@ -100,32 +100,30 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    void addItemToBag(Long itemId, Long bagId){
+    void addItemsToBag(List itemIds, Long bagId){
         // find the first protocol instance instance of the bag
         def instance = ProtocolInstance.where { bag.id == bagId && bagIdx == 0 }.get(max: 1)
         if (!instance) {
             throw new ProtocolInstanceBagException(message: "Protocol instance not found!")
         }
-        // find the item
-        def item = Item.get(itemId)
-        if (!item) {
-            throw new ProtocolInstanceBagException(message: "Item not found!")
-        }
-        // check if the traced sample is already in the bag
-        if (ProtocolInstanceItems.findByProtocolInstanceAndItem(instance, item)) {
-            throw new ProtocolInstanceBagException(message: "The sample is already inside the bag! You may choose to split and add the sample now or split it later inside the protocol instance.")
-        }
-        // add the traced sample to the bag
-        importItemToBag(item, bagId, instance)
-        
-        def sample = Sample.findByItem(item)
-        // create a new sample if the item is not yet attached to a sample
-        if (!sample) {  
-            itemService.createSample(item)
-        } else {
-            // update the sample's status
-            sample.status = SampleStatus.PREP 
-            sample.save()
+        itemIds.each { itemId ->
+            // find the item
+            def item = Item.get(itemId)
+            if (!item) {
+                throw new ProtocolInstanceBagException(message: "Item not found!")
+            }
+            // add the traced sample to the bag
+            importItemToBag(item, bagId, instance)
+
+            def sample = Sample.findByItem(item)
+            // create a new sample if the item is not yet attached to a sample
+            if (!sample) {  
+                itemService.createSample(item)
+            } else {
+                // update the sample's status
+                sample.status = SampleStatus.PREP 
+                sample.save()
+            }
         }
     }
     
@@ -142,31 +140,36 @@ class ProtocolInstanceBagService {
     }
     
     @Transactional
-    void splitAndAddItemToBag(Long itemId, Long bagId, Item item) {
+    void splitAndAddItemsToBag(List itemIds, Long bagId) {
         // find the first protocol instance instance of the bag
         def instance = ProtocolInstance.where { bag.id == bagId && bagIdx == 0 }.get(max: 1)
         if (!instance) {
             throw new ProtocolInstanceBagException(message: "Protocol instance not found!")
         }
-        // set the parent 
-        def parent = Item.get(itemId)
-        if (!parent) {
-            throw new ProtocolInstanceBagException(message: "Parent item not found!")
-        }
-        
-        // save the child
-        try {
-            item.parent = parent
-            item.project = parent.project
-            itemService.save(item)
-        } catch (ItemException e) {
-            throw new ProtocolInstanceBagException(message: e.message)
-        }
-        // add the child to the bag
-        importItemToBag(item, bagId, instance)
-        // create a new sample
-        itemService.createSample(item)
-        
+        itemIds.each { itemId ->
+            // set the parent 
+            def parent = Item.get(itemId)
+            if (!parent) {
+                throw new ProtocolInstanceBagException(message: "Parent item not found!")
+            }
+
+            // save the child
+            try {
+                def item = new Item(parent: parent,
+                                     name: parent.name,
+                                     type: parent.type,
+                                     barcode: barcodeService.generateBarcode(),
+                                     project: parent.project
+                                    )
+                itemService.save(item)
+                // add the child to the bag
+                importItemToBag(item, bagId, instance)
+                // create a new sample
+                itemService.createSample(item)
+            } catch (ItemException e) {
+                throw new ProtocolInstanceBagException(message: e.message)
+            }
+        }        
     }
     
     @Transactional

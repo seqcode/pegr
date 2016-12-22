@@ -13,7 +13,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>                        
               </button>
-              <a class="navbar-brand">PEGR</a>
+              <a class="navbar-brand"><img src="/pegr/assets/PEGR_Logo.png" height="100%"/></a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">

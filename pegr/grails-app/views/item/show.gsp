@@ -35,6 +35,8 @@
                 <g:if test="${item?.user}">
                 <li>User: ${item.user}</li>
                 </g:if>
+                
+                <li>Last updated: ${item.lastUpdated}</li>
 
                 <g:if test="${item?.notes}">
                 <li>Notes: ${item.notes}</li>

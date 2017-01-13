@@ -214,6 +214,17 @@ class ReportController {
         render ""
         return
     }
+    
+    def print(int id) {
+        def report = SummaryReport.get(id)
+        if (!report) {
+            render(view: "/404")
+            return
+        }
+        def data = reportService.fetchDataForReport(id)
+        def imageMap = report.cohort?.imageMap
+        [report: report, imageMap: imageMap, sampleList: data]
+    }
 }
 
 

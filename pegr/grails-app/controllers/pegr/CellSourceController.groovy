@@ -259,13 +259,20 @@ class CellSourceController {
         redirect(action: "showBatch", id: cmd.batchId)
     }
     
-    def printBatchBarcode(Long id) {
+    def printBatchBarcode(Long id, int row, int col) {
         def batch = CellSourceBatch.get(id)
         if (!batch) {
             render(view: "/404")
             return
         }
-        def items = batch.cellSources*.item
+        def items = []
+        def nullCount = 5 * (row - 1) + col - 1
+        for (int i = 0; i < nullCount; ++i) {
+            items.push(null)
+        }
+        batch.cellSources.each { it ->
+            items.push(it.item) 
+        }
         render(view: "/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name, date: new Date()])
     }
     
@@ -278,6 +285,12 @@ class CellSourceController {
             flash.message = "This batch cannot be deleted!"
             redirect(action: "showBatch", id: id)
         }
+    }
+    
+    def saveBatchNotesAjax(Long id, String notes) {
+        cellSourceService.saveBatchNotes(id, notes)
+        render ""
+        return
     }
 }
 

@@ -12,6 +12,7 @@
             <g:link action="labProtocols" class="btn btn-info">Lab Protocols</g:link>
             <g:link action="labProtocolGroups" class="btn btn-info active">Lab Protocol Groups</g:link>
             <g:link action="index" class="btn btn-info">My Protocols</g:link>
+            <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link action="allProtocols" class="btn btn-info">All Protocols</g:link></sec:ifAnyGranted>
         </div> 
 		<div id="list-protocol">
 			<h3>Lab Protocol Groups</h3>

@@ -20,6 +20,7 @@
                     <g:sortableColumn property="name" title="Name"></g:sortableColumn>
                     <g:sortableColumn property="barcode" title="Barcode"></g:sortableColumn>
                     <g:sortableColumn property="location" title="Location"></g:sortableColumn>
+                    <g:sortableColumn property="lastUpdated" title="Last Updated"></g:sortableColumn>
                     <th>Notes</th>
                 </tr>
             </thead>
@@ -30,6 +31,7 @@
                         <td><g:link action="show" params="[type:'Item', id:item.id]">${item.name}</g:link></td>
                         <td>${item.barcode}</td>
                         <td >${item.location}</td>
+                        <td>${item.lastUpdated}</td>
                         <td>${item.notes}</td>
                     </tr>
                 </g:each>

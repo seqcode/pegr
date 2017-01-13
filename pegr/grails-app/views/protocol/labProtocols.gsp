@@ -12,6 +12,7 @@
             <g:link action="labProtocols" class="btn btn-info active">Lab Protocols</g:link>
             <g:link action="labProtocolGroups" class="btn btn-info">Lab Protocol Groups</g:link>
             <g:link action="index" class="btn btn-info">My Protocols</g:link>
+            <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link action="allProtocols" class="btn btn-info">All Protocols</g:link></sec:ifAnyGranted>
         </div>            
         <g:form controller="protocol" action="search" class="pull-right">
             <input name="str">

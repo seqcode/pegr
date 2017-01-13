@@ -351,4 +351,11 @@ class CellSourceService {
         }
         batch.delete()
     }
+    
+    @Transactional
+    def saveBatchNotes(Long id, String notes) {
+        def batch = CellSourceBatch.get(id)
+        batch.notes = notes
+        batch.save()
+    }
 }

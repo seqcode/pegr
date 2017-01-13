@@ -13,6 +13,13 @@ class ProtocolController {
         [protocolList: protocols, protocolCount: protocolCount]
     }
     
+    def allProtocols(Integer max) {
+        params.max = Math.min(max ?: 25, 100)
+        def protocols = Protocol.list(params)
+        def protocolCount = Protocol.count()
+        [protocolList: protocols, protocolCount: protocolCount]
+    }
+    
     def labProtocols(Integer max) {
         params.max = Math.min(max ?: 25, 100)
         def protocols = Protocol.where{ status == DictionaryStatus.Y }.list(params)

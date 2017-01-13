@@ -121,13 +121,17 @@ class ProtocolInstanceBagController {
         def itemIds = params.list("items")
         def items = []
         itemIds.each { id ->
-            def item = Item.get(id)
-            items.push(item)
+            if (id.isLong()) {
+                def item = Item.get(id)
+                if (item) {
+                    items.push(item)
+                }
+            }
         }
       
         def priorInstance
-        if (itemIds.size() == 1) {
-            def itemId = itemIds[0]
+        if (items.size() == 1) {
+            def itemId = items[0].id
             priorInstance = ProtocolInstanceItems.where {item.id == itemId}.get(sort:"id", order: 'desc', max: 1)
         }
         [items: items, priorInstance: priorInstance?.protocolInstance, bagId: bagId]              
@@ -181,7 +185,7 @@ class ProtocolInstanceBagController {
         if (protocolInstance) {
             def protocol = protocolInstance.protocol
             def file = protocolService.getProtocolFile(protocol.id)
-            if (!file.exists()) {
+            if (!file?.exists()) {
                 file = null
             }
             // get shared item list
@@ -447,7 +451,7 @@ class ProtocolInstanceBagController {
     
     def renderFile(Long protocolId) {
         def file = protocolService.getProtocolFile(protocolId)
-        if (file.exists()) {
+        if (file?.exists()) {
             response.setHeader "Content-disposition", "inline; filename=${file.getName()}"
             response.contentType = 'application/pdf'
             response.outputStream << file

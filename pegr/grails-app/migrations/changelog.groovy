@@ -2899,4 +2899,6 @@ databaseChangeLog = {
 	include file: 'removeCohortUnique.groovy'
 
 	include file: 'addProtocolImages.groovy'
+
+	include file: 'addBatchNotes.groovy'
 }

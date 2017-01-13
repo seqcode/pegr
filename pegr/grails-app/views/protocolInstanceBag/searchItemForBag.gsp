@@ -14,6 +14,7 @@
                     $.ajax({ url: "/pegr/item/queryAjax?barcode=" +barcode,
                         success: function(result){
                             if (result) {
+                                $("#add-sample").removeClass("disabled");
                                 $('#new-item').append("<span id='item-id' style='display:none'>" + result.id + "</span>");
                                 var status
                                 if (result.status == "GOOD") {
@@ -57,7 +58,7 @@
             <button type="button" onclick="getScan();"><span class="glyphicon glyphicon-qrcode"></span> Scan</button>
         </div>
         <div id="new-item"></div>
-        <a href="#" class="btn btn-primary" id="add-sample">Add</a>
+        <a href="#" class="btn btn-primary disabled" id="add-sample">Add</a>
         <a href="#" onclick="refreshHash();$('#new-item').empty();" class="btn btn-default">Skip</a>
         <g:submitButton class="btn btn-default" name="view" value="Finish and View"/>
         <div>
@@ -78,6 +79,7 @@
             }
             $("#new-item").empty();
             $("#barcode").val("");
+            $("#add-sample").addClass("disabled");
         });
      </script>
 </div>

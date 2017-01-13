@@ -14,10 +14,10 @@
     <div class="container-fluid">
         <g:link controller="cellSource" action="listBatches"><span class="glyphicon glyphicon-th-list"></span> List</g:link>
         <g:link controller="cellSource" action="deleteBatch" id="${batch.id}" class="confirm"><span class="glyphicon glyphicon-trash"></span> Delete</g:link>
+        <span class="pull-right" style="font-weight: normal"><g:form action="printBatchBarcode"><input name="id" value="${batch.id}" hidden="hidden"> Start row <input name="row" value="1" size="2"> column <input name="col" value="1" size="2"> <g:submitButton name="print" class="edit" value="Print Barcodes"></g:submitButton></g:form></span>
         <g:form controller="cellSource" action="saveItems">
         <g:hiddenField name="batchId" value="${batch.id}"></g:hiddenField>
         <h4>Batch: ${batch} 
-            <g:link action="printBatchBarcode" id="${batch.id}" class="btn btn-default pull-right">Print Barcodes</g:link>
             <g:if test="${batch.cellSources.every{it.item == null}}">
                 <g:submitButton class="btn btn-primary pull-right" name="save" value="Save"></g:submitButton>
                 <span id="assign-barcodes" class="confirm btn btn-default pull-right">Assign Barcodes to All</span>

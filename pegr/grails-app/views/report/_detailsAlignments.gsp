@@ -140,6 +140,9 @@
                                            vAxis: { gridlines: {count: 3 } },
                                            hAxis: { gridlines: {count: 3 } },
                                           };
+                            google.visualization.events.addListener(chart, 'ready', function () {
+                                container.innerHTML = '<img src="' + chart.getImageURI() + '">';
+                            });
                             chart.draw(data, options);   
                             $(spinner).remove();
                         }

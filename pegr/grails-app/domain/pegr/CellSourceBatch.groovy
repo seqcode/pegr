@@ -13,7 +13,7 @@ class CellSourceBatch {
         return BatchCellSources.findAllByBatch(this).collect {it.cellSource}.sort{it.id}
     }
     
-    static constrains = {
+    static constraints = {
         notes nullable: true
     }
 }

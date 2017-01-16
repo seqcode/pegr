@@ -2901,4 +2901,6 @@ databaseChangeLog = {
 	include file: 'addProtocolImages.groovy'
 
 	include file: 'addBatchNotes.groovy'
+
+	include file: 'batchNotesNullable.groovy'
 }

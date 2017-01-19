@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>Workbench</title> 
-    <meta name="layout" content="sequenceRun"/>
+    <meta name="layout" content="main"/>
 </head>
 <body>
     <div class="message">

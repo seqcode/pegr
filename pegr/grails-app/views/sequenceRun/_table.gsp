@@ -20,7 +20,7 @@
                     <g:each in="${run.cohorts}" var="cohort" status="n">
                     <g:if test="${n>0}"><tr></g:if>
                     <td class="col-sm-2"><g:link controller="project" action="show" id="${cohort.project.id}">${cohort.project}</g:link></td>
-                    <td class="col-sm-2"><g:if test="${cohort.report}"><g:link controller="report" action="show" id="${cohort.report?.id}">${cohort.report?.name}</g:link> <g:link controller="report" action="print" id="${cohort.report?.id}" target="_blank"><span class="glyphicon glyphicon-print"></g:link></g:if></td>
+                    <td class="col-sm-2"><g:if test="${cohort.report}"><g:link controller="report" action="show" id="${cohort.report?.id}">${cohort.report?.name}</g:link> <g:link controller="report" action="print" id="${cohort.report?.id}" target="_blank"><span class="glyphicon glyphicon-print"></g:link> <g:link controller="report" action="listFiles" id="${cohort?.report?.id}" target="_blank"><span class="glyphicon glyphicon-list-alt"></g:link></g:if></td>
                     </tr>
                     </g:each>                    
                 </tr>

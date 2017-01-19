@@ -9,6 +9,7 @@
         <br>
         <div>
             <g:link action="showChecked" class="btn btn-default">View Checked Samples (<span id="checked-count">${checkedCount}</span>)</g:link>
+            <g:link action="showFilesForCheckedSamples" class="btn btn-default">Files</g:link>
             <a href="#" onclick="clearCheckedSamples()" class="btn btn-default">Clear Checkbox</a>
         </div>
         <g:render template="table" model="['sampleList':sampleList, 'checkbox':true]"></g:render>

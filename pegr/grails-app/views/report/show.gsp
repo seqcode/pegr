@@ -31,6 +31,7 @@
                 </span>
             </small>
             <g:link controller="report" action="print" id="${report?.id}" target="_blank"><span class="glyphicon glyphicon-print"></g:link>
+            <g:link controller="report" action="listFiles" id="${report?.id}" target="_blank"><span class="glyphicon glyphicon-list-alt"></g:link>
         </h2>
         <i>Edit on ${report.date}</i>
         <p>${report.note}</p>

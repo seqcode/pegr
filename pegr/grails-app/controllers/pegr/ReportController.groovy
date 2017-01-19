@@ -215,7 +215,7 @@ class ReportController {
         return
     }
     
-    def print(int id) {
+    def print(Long id) {
         def report = SummaryReport.get(id)
         if (!report) {
             render(view: "/404")
@@ -224,6 +224,11 @@ class ReportController {
         def data = reportService.fetchDataForReport(id)
         def imageMap = report.cohort?.imageMap
         [report: report, imageMap: imageMap, sampleList: data]
+    }
+    
+    def listFiles(Long id) {
+        def samples = reportService.fetchFilesForReport(id)
+        [samples: samples]
     }
 }
 

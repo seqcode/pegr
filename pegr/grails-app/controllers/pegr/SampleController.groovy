@@ -414,4 +414,10 @@ class SampleController {
         }
 
     }
+    
+    def showFilesForCheckedSamples() {
+        def sampleIds = session.checkedSample
+        def samples = reportService.fetchFilesForSamples(sampleIds)
+        render(view: "/report/listFiles", model: [samples: samples])
+    }
 }

@@ -21,7 +21,7 @@
         <div class="message" role="status">${flash.message}</div>
     </g:if>
     <div>
-        <h2>Summary Report ${report.name} 
+        <h2>Summary Report ${report.name}
             <small>
                 <span id="report-status-show" class="label label-default">${report.status}</span>
                 <span id="report-status-select" style="display:none">
@@ -30,6 +30,8 @@
                     <button id="report-status-cancel" class="btn btn-default">Cancel</button>
                 </span>
             </small>
+            <g:link controller="report" action="print" id="${report?.id}" target="_blank"><span class="glyphicon glyphicon-print"></g:link>
+            <g:link controller="report" action="listFiles" id="${report?.id}" target="_blank"><span class="glyphicon glyphicon-list-alt"></g:link>
         </h2>
         <i>Edit on ${report.date}</i>
         <p>${report.note}</p>

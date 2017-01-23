@@ -3281,3 +3281,21 @@ function make_motif(container, motif) {
     $(container).append(make_preview(meme_alphabet, motif));
     draw_on_screen();
 }
+
+function make_motif_static(container_plus, container_minus, motif) {
+    "use strict";
+    var pspm, preview, preview_rc;
+    var box, btn_box, logo_box, btn_plus, btn_minus;
+
+    pspm = new Pspm(motif["pwm"]);
+    preview = make_logo(meme_alphabet, pspm);
+
+    if (meme_alphabet.has_complement()) {
+        preview_rc = make_logo(meme_alphabet, pspm, true, 0);
+    }
+
+    container_plus.append(preview);
+    container_minus.append(preview_rc);
+}
+
+

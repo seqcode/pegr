@@ -146,8 +146,7 @@
                     <h4>${sample.naturalId}</h4>
                     <g:each in="${sample.experiments}" var="experiment">
                         <g:each in="${experiment.alignments}" var="alignment">
-                            <table class="table table-bordered meme-table">
-                                <span class="meme-url" hidden="hidden">${alignment.memeFile}</span>
+                            <table class="table table-bordered meme-table" data-meme-url="${alignment.memeFile}">
                                 <tbody>
                                 </tbody>
                             </table>
@@ -160,12 +159,19 @@
     <section>
         <h4>Tag PileUp</h4>
         <ol>
-            <g:each in="${sampleList}" var="sample" status="n">
+            <g:each in="${sampleList}" var="sample">
                 <li>
                     <h4>${sample.naturalId}</h4>
                     <g:each in="${sample.experiments}" var="experiment">
                         <g:each in="${experiment.alignments}" var="alignment">
-                            <i class="fa fa-spinner fa-spin"></i><span class="composite-url" hidden="hidden">${alignment.composite[n]}</span><div class="composite-fig"></div>
+                            <div class="row">
+                            <g:each in="${alignment.composite}" var="url" status="n">
+                                <span>
+                                    <h5>MOTIF ${n+1}</h5>
+                                    <span class="composite-fig" data-composite-url="${url}"></span>
+                                </span>                                
+                            </g:each>  
+                            </div>
                         </g:each>
                     </g:each>
                 </li>
@@ -178,25 +184,17 @@
         // plot meme
         $(".meme-table").each(function(){
             var memeTable = $(this);
-            var memeUrl = $(this).find(".meme-url").text();
+            var memeUrl = $(this).attr("data-meme-url");
             $.ajax({ 
                 url: "/pegr/report/fetchMemeDataAjax?url=" + memeUrl,
                 success: 
                     function(result) {
                         $.each(result, function(index, value){
-                            make_motif(memeFig, result[index]);
-                            memeTable.append("<tr></tr>");
-                            
-                            $(memeId).html("<p>MOTIF " + result[index].id + "</p><p>E-value: " + result[index].evalue + "</p><p>Sites: " + result[index].nsites + "</p><p>Width: " + result[index].len + "</p>");
-                            }
-                        });
-                        memeTable.find(".meme-fig").each(function(index, memeFig) {
-                            $(memeFig).find("i").remove();
-                            if (index < result.length) {
-                                
-                            } else {
-                                $(memeFig).html("No MEME data found!");
-                            }                            
+                            //make_motif(memeFig, result[index]);
+                            memeTable.append("<tr><td style='min-width:6em;line-height:1em'><p>MOTIF " + result[index].id + "</p><p>E-value: " + result[index].evalue + "</p><p>Sites: " + result[index].nsites + "</p><p>Width: " + result[index].len + "</p></td><td class='meme-fig1'></td><td class='meme-fig2'></td></tr>");
+                            var plus = memeTable.find(".meme-fig1");
+                            var minus = memeTable.find(".meme-fig2");
+                            make_motif_static(plus, minus, result[index]);
                         });
                     },
             });  
@@ -205,12 +203,9 @@
         // plot composites
         google.charts.load('current', {'packages':['corechart']});
         var t = 0;
-        $(".composite").each(function(){
-            t += 200;
-            var compositeTd = $(this);
-            var spinner = $(this).find("i");
-            var compositeUrl = $(this).find(".composite-url").text();
-            var container = $(this).find(".composite-fig")[0];
+        $(".composite-fig").each(function(){
+            var container = $(this);
+            var compositeUrl = $(this).attr("data-composite-url");
             setTimeout(function(){
                 google.charts.setOnLoadCallback(function(){
                     $.ajax({
@@ -218,22 +213,31 @@
                         dataType: "json"
                     }).done(function(jsonData){
                         if (jsonData["error"]) {
-                            $(compositeTd).empty();
-                            $(compositeTd).html(jsonData["error"]);
+                            container.html(jsonData["error"]);
                         } else {
                             // Create our data table out of JSON data loaded from server.
                             var data = new google.visualization.arrayToDataTable(jsonData);
 
                             // Instantiate and draw our chart, passing in some options.
-                            var chart = new google.visualization.LineChart(container);
-                            var options = { width: 200, 
-                                           height: 100, 
-                                           legend: { position: 'none'}, 
-                                           vAxis: { gridlines: {count: 3 } },
-                                           hAxis: { gridlines: {count: 3 } },
+                            var chart = new google.visualization.LineChart(container[0]);
+                            var options = { width: 400, 
+                                           height: 200, 
+                                           hAxis: { title: 'Distance from MEME motif (bp)', 
+                                                   titleTextStyle: {fontSize:12,italic:false},
+                                                   gridlines: { color: '#DDDDDD', count:5 },
+                                            },
+                                            vAxis: { title: 'Tag frequency', 
+                                                   titleTextStyle: {fontSize:12,italic:false},
+                                                   gridlines: { color: '#DDDDDD', count:4 },
+                                                    format: '#.##'
+                                            },
+                                            curveType: 'function',
+                                            legend: { position: 'top' }
                                           };
-                            chart.draw(data, options);   
-                            $(spinner).remove();
+                            google.visualization.events.addListener(chart, 'ready', function () {
+                                container.innerHTML = '<img src="' + chart.getImageURI() + '">';
+                            });
+                            chart.draw(data, options);
                         }
                     });
                 });

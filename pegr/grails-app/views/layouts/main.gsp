@@ -17,14 +17,15 @@
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
-                    <li class="external"><a href="http://sites.psu.edu/pughlab/">PughLab</a></li>
                     <li id="nav-projects"><g:link controller="project">Projects</g:link></li>
                     <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MEMBER">
                         <li id="nav-inventory"><g:link controller="item">Inventory</g:link></li>
                         <li id="nav-protocols"><g:link controller="protocol" action="labProtocols">Protocols</g:link></li>
                         <li id="nav-experiments"><g:link controller="protocolInstanceBag" action="list">Experiments</g:link></li>
-                        <li id="nav-analysis"><g:link controller="sequenceRun" action="index">Sequencing Records</g:link></li>
+                        <li id="nav-analysis"><g:link controller="sequenceRun" action="index">Sequencing Reports</g:link></li>
                         <li id="nav-bioinformatics"><g:link controller="bioinformatics">Bioinfomatics</g:link></li>
+                    </sec:ifAnyGranted>
+                    <sec:ifAnyGranted roles="ROLE_ADMIN">
                         <li id="nav-admin"><g:link controller="admin" action="index">Admin</g:link></li>
                     </sec:ifAnyGranted>
                 </ul>

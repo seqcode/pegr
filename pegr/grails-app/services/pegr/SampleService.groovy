@@ -394,6 +394,9 @@ class SampleService {
                 def id = utilityService.getLong(value)
                 sample.sendDataTo = User.get(id)
                 sample.save(failOnError: true)
+            case "recommend" :
+                sample.recommend = value
+                sample.save(faileOnError: true)
                 break
             default: 
                 sample[field] = utilityService.getFloat(value)

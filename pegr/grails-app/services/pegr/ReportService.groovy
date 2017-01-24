@@ -168,7 +168,8 @@ class ReportService {
                     deduplicatedPct: utilityService.divide(alignment.dedupUniquelyMappedReads, experiment.totalReads),
                     duplicationLevel: getDuplicationLevel(alignment.dedupUniquelyMappedReads, alignment.mappedReads),
                     isPreferred: alignment.isPreferred,            
-                    dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads
+                    dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
+                    recommend: experiment.sample.recommend
                 ]
         def stepsStr = Chores.findByName(DYNAMIC_ANALYSIS_STEPS)?.value
         def steps
@@ -537,6 +538,9 @@ class ReportService {
         def analysisList = Analysis.findAllByAlignment(alignment)
         analysisList.each { analysis ->
             switch (analysis.category) {
+                case "output_bamToScidx": //scidx
+                    alignmentDTO.scidx = alignmentStatsService.queryDatasetsUri(analysis.datasets, "scidx")
+                    break
                 case "output_genetrack": // GeneTrack
                     def params = utilityService.queryJson(analysis.parameters, ["filter", "sigma", "exclusion"])
                     alignmentDTO.peakCallingParam = getPeakCallingParam(params.filter, params.exclusion, params.sigma)
@@ -993,75 +997,5 @@ class ReportService {
         status.message = message
         analysis.note = JsonOutput.toJson(status)
         analysis.save()
-    }
-       
-   /**
-    * Fetch the fastq and bam files for a list of sammples
-    * @param sampleIds a list of sample IDs
-    * @param preferredOnly
-    * @return a list samples with their file urls
-    */
-    def fetchFilesForSamples(List sampleIds, Boolean preferredOnly=false) {
-        def sampleDTOs = []
-        
-        sampleIds.each { id ->
-            def sample = Sample.get(id)
-            if (sample) {
-                def sampleDTO = [id: sample.id,
-                                 naturalId: sample.naturalId,
-                                source: sample.source,
-                                sourceId: sample.sourceId,
-                                experiments: [],
-                                alignmentCount: 0]
-                sample.sequencingExperiments.each { experiment ->
-                    def expDTO = [fastqFile: utilityService.parseJson(experiment.fastqFile),
-                                  alignments: []
-                                 ]
-                    experiment.alignments.each { alignment ->
-                        if (!preferredOnly || alignment.isPreferred) {
-                            def alignmentDTO = getAlignmentFiles(alignment)
-                            expDTO.alignments << alignmentDTO
-                            sampleDTO.alignmentCount++
-                        }
-                    }
-                    sampleDTO.experiments << expDTO
-                }
-                sampleDTOs << sampleDTO
-            }            
-        }
-        return sampleDTOs
-    }
-    
-    def fetchFilesForReport(Long reportId, Boolean preferredOnly=false) {
-        def alignments = ReportAlignments.where { report.id == reportId }.collect { it.alignment }
-
-        def sampleDTOs = []
-        alignments.each { alignment ->
-            def alignmentDTO = getAlignmentFiles(alignment)
-            def sample = alignment.sequencingExperiment.sample
-            def sampleDTO = sampleDTOs.find{ it.id == sample.id}
-            if (!sampleDTO) {
-                sampleDTO = getSampleDTO(sample)
-                sampleDTOs << sampleDTO
-            } 
-            sampleDTO.alignmentCount++
-            
-            def experiment = alignment.sequencingExperiment
-            def experimentDTO = sampleDTO.experiments.find { it.id == experiment.id }
-            if (!experimentDTO) {
-                experimentDTO = [fastqFile: utilityService.parseJson(experiment.fastqFile),
-                                  alignments: []
-                                 ]
-                sampleDTO.experiments << experimentDTO
-            }            
-            experimentDTO.alignments << alignmentDTO
-        }
-        sampleDTOs.sort { it.id }
-        return sampleDTOs
-    }
-    
-    def getAlignmentFiles(SequenceAlignment alignment) {
-        return [genome: alignment.genome,
-                bamFile: alignment.bamFile]
     }
 }

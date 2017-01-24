@@ -5,9 +5,6 @@
 </head>
 <body>
 <div class="container-fluid">
-    <sec:ifAnyGranted roles="ROLE_ADMIN">
-        <g:link controller="report" action="manage" class="edit pull-right">Manage</g:link>
-    </sec:ifAnyGranted>
     <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
     </g:if>
@@ -19,8 +16,6 @@
          </g:each>   
     </g:if> 
     <div class="row">
-        <g:link action="create" class="edit pull-right">New</g:link>
-        <g:link action="upload" class="edit pull-right">Upload</g:link>
         <g:form controller="sequenceRun" action="index" class="pull-right">
             <input name="str">
             <g:submitButton class="edit" name="submit" value="Search" style="margin-right: 10px"></g:submitButton>
@@ -30,15 +25,32 @@
         <div class="col-sm-10">
             <g:render template="/sequenceRun/table"></g:render>
         </div>
-        <div class="col-sm-2 well">
-            <g:link >All</g:link>
-            <h4>Status</h4>
-            <ul>
-                <li><g:link params="[status:'PREP']">PREP</g:link></li>
-                <li><g:link params="[status:'QUEUE']">QUEUE</g:link></li>
-                <li><g:link params="[status:'ANALYZING']">ANALYZING</g:link></li>
-                <li><g:link params="[status:'COMPLETED']">COMPLETED</g:link></li>                
-            </ul>
+        <div class="col-sm-2">
+            <div class="well">
+                <h4>Filter by status</h4>
+                <ul>
+                    <li><g:link >All</g:link></li>
+                    <li title="The sample has not been submitted to bioinformatics pipeline."><g:link params="[status:'PREP']">PREP</g:link></li>
+                    <li title="The sample has been submitted and is waiting in the queue to be processed by the bioinformatics pipeline."><g:link params="[status:'QUEUE']">QUEUE</g:link></li>
+                    <li title="The sample is being processed by the bioinformatics pipeline."><g:link params="[status:'ANALYZING']">ANALYZING</g:link></li>
+                    <li title="The Sample has been processed by the bioinformatics pipeline and review by lab bioinformatician."><g:link params="[status:'COMPLETED']">COMPLETED</g:link></li>
+                </ul>
+            </div>
+            <div class="well">
+                <h4>Sample Submission</h4>
+                <ul>
+                    <li><g:link action="upload">Upload</g:link></li>
+                    <li><g:link action="create">Create Wizard</g:link></li>
+                </ul>
+            </div>
+            <sec:ifAnyGranted roles="ROLE_ADMIN">
+                <div class="well">
+                    <h4>Sequence QC</h4>
+                    <ul>
+                        <li><g:link controller="report" action="manage">Manage</g:link></li>
+                    </ul>                    
+                </div>
+            </sec:ifAnyGranted>
         </div>
     </div>
     <div class="pagination">

@@ -415,9 +415,20 @@ class SampleController {
 
     }
     
+    def updateListAjax(String sampleList) {
+        def slurper = new JsonSlurper()
+        def samples = slurper.parseText(sampleList)
+        samples.each { sample ->
+            sampleService.update(sample.sampleId, sample.name, sample.value)
+        }
+        
+        render ""
+        return
+    }
+    
     def showFilesForCheckedSamples() {
         def sampleIds = session.checkedSample
-        def samples = reportService.fetchFilesForSamples(sampleIds)
+        def samples = reportService.fetchDataForSamples(sampleIds)
         render(view: "/report/listFiles", model: [samples: samples])
     }
 }

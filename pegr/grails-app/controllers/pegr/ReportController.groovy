@@ -227,7 +227,7 @@ class ReportController {
     }
     
     def listFiles(Long id) {
-        def samples = reportService.fetchFilesForReport(id)
+        def samples = reportService.fetchDataForReport(id)
         [samples: samples]
     }
 }
@@ -291,6 +291,7 @@ class AlignmentDTO {
     String peHistogram
     List fourColor
     List composite
+    String scidx
 }
 
 class RunStatusDTO {

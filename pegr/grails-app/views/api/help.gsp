@@ -57,6 +57,7 @@ http://francline.vmhost.psu.edu:8080/pegr/api/fetchSampleData?apiKey=
         "treatments": "string",
         "assay": "string",
         "alignmentCount": integer,
+        "recommend":"string",
         "experiments": [{
                 "id": long,
                 "runId": integer,
@@ -81,6 +82,7 @@ http://francline.vmhost.psu.edu:8080/pegr/api/fetchSampleData?apiKey=
                     "peaks": long,
                     "singletons": long,
                     "peakPairsParam": "string",
+                    "scidx": "url",
                     "cwpairFile": "url",
                     "peakPairs": long,
                     "nonPairedPeaks": long,

@@ -24,7 +24,39 @@
             </div>
         </g:if>
     </div>
-    <h2>Sequence Run #${run.id}  <small><g:if test="${run.runNum}">(Old No.${run.runNum})</g:if> <span class="label label-default">${run.status}</span></small></h2>
+    <h2>Sequence Run #${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if> 
+        <small>
+            <span id="run-status-show" class="label label-default">${run.status}</span>
+            <span id="run-status-select" style="display:none">
+                <g:select name="runStatus" from="${pegr.RunStatus}" value="${run.status}"></g:select>
+                <button id="run-status-save" class="btn btn-primary">Save</button>
+                <button id="run-status-cancel" class="btn btn-default">Cancel</button>
+            </span>
+        </small></h2>
+    <a href="#" class="btn btn-primary pull-right" data-toggle="modal" data-target="#download-run-info">Download Run Info Files</a>
+    <div id="download-run-info" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+              <button type="button" class="pull-right close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <g:form controller="sequenceRun" action="downloadRunInfo">
+                <g:hiddenField name="runId" value="${run.id}"></g:hiddenField>
+                <div class="form-group">
+                    <label>Remote Root Folder</label>
+                    <input name="remoteRoot" class="form-control">
+                </div>
+                <ul>e.g. 
+                    <li>Wall-E: /home/nextseq/NSQData_PughLab/</li>
+                    <li>gpfs: /gpfs/cyberstar/pughhpc/storage/illumina/illuminaNextSeq/NSQData_PughLab/</li>
+                </ul>
+                <g:submitButton name="submit" class="btn btn-primary" value="Download Run Info Files"></g:submitButton>
+            </g:form>
+          </div>
+        </div>
+      </div>
+    </div>
     <h3>Summary <g:if test="${editable}"> <g:link action="editInfo" params="[runId:run.id]"><span class="edit">Edit</span></g:link></g:if></h3>
     <g:render template="summaryDetails"></g:render>  
     <h3>Projects 
@@ -220,7 +252,7 @@
         </g:else>
     </div>
     <script>
-        $("#nav-experiments").addClass("active");
+        $("#nav-analysis").addClass("active");
         $(".confirm").confirm();
         $("select").select2();
         $(".add-project-form").hide();
@@ -290,6 +322,29 @@
                     parent.remove();
                 }});
         });
+        
+        $("#run-status-show").click(function(){
+            $("#run-status-show").hide();
+            $("#run-status-select").show();
+        });
+
+        $("#run-status-save").click(function(){
+            var status = $("#run-status-select option:selected").text();
+            $.ajax({ url: "/pegr/report/updateRunStatusAjax?runId=${run.id}&status=" + status,
+                success: function(result) {
+                    $("#run-status-show").text(result);
+                    $("#run-status-select").val(result);
+                    $("#run-status-show").show();
+                    $("#run-status-select").hide();
+                }                
+            });
+        });
+
+        $("#run-status-cancel").click(function(){
+            $("#run-status-show").show();
+            $("#run-status-select").hide();
+        });
+            
      </script>
 </div>
 </body>

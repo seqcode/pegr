@@ -6,7 +6,8 @@ import java.awt.image.BufferedImage
 import groovy.time.TimeCategory
 import groovy.json.*
 import grails.converters.*
-
+import org.apache.commons.io.IOUtils
+    
 class SequenceRunController {
     def springSecurityService    
     def sequenceRunService    
@@ -439,5 +440,50 @@ class SequenceRunController {
         sequenceRunService.removeCohortImage(cohortId, filepath)
         render ""
         return
+    }
+    
+    def downloadRunInfo(String remoteRoot, Long runId) {
+        String RUN_INFO_TEMP = "runInfo${runId}"
+        def timeout = 60*1000
+        
+        // generate the run info files
+        def run = SequenceRun.get(runId)
+        def remotePath = new File(remoteRoot, run.directoryName).getPath()
+        def localRoot = utilityService.getFilesRoot()
+        def localFolder = new File(localRoot, RUN_INFO_TEMP)
+        if (!localFolder.exists()) { 
+            localFolder.mkdirs() 
+        } 
+        walleService.generateRunFilesInFolder(run, remotePath, localFolder)
+        
+        // compress the files
+        def compressedFilename = "runInfo${runId}.tar.gz"
+        def compressedFile = new File(localRoot, compressedFilename)
+        def command = "tar -cf ${compressedFile.getPath()} ${RUN_INFO_TEMP}"
+        def envVars = []
+        def workDir = localRoot
+        def out = command.execute(envVars, workDir)
+
+        // remove the original run info files
+        command = "rm -R ${localFolder.getPath()}"
+        utilityService.executeCommand(command, timeout)
+        
+        InputStream contentStream
+        try {
+            response.setContentType("application/gzip") 
+            response.setHeader("Content-disposition", "attachment;filename=\"${compressedFilename}\"")
+            contentStream = compressedFile.newInputStream()
+            response.outputStream << contentStream
+            // remove the compressed file
+            compressedFile.delete()
+            webRequest.renderView = false
+        } catch(Exception e) {
+            render "Error!"
+        } finally {
+            response.getOutputStream().flush()
+            response.getOutputStream().close()
+            IOUtils.closeQuietly(contentStream)
+        }
+
     }
 }

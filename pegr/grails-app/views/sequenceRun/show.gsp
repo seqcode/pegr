@@ -41,6 +41,7 @@
               <button type="button" class="pull-right close" data-dismiss="modal">&times;</button>
           </div>
           <div class="modal-body">
+            <p>Note: please verify the directory name of this sequence run before generating the run info files.</p>  
             <g:form controller="sequenceRun" action="downloadRunInfo">
                 <g:hiddenField name="runId" value="${run.id}"></g:hiddenField>
                 <div class="form-group">

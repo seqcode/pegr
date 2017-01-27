@@ -486,4 +486,19 @@ class SequenceRunController {
         }
 
     }
+    
+    def editQueue(Long runId) {
+        def queue = walleService.getQueue()
+        [runId: runId, previousRunFolder: queue.previousRunFolder, queuedRuns: queue.queuedRuns]
+    }
+    
+    def updateQueue(Long runId, String previousRunFolder, String queuedRuns) {
+        try {
+            walleService.updateQueue(runId, previousRunFolder.trim(), queuedRuns.trim())
+            redirect(action:"previewRun", params: [runId: runId])
+        } catch (WalleException e) {
+            flash.message = e.message
+            redirect(action: "editQueue", params: [runId: runId])
+        }
+    }
 }

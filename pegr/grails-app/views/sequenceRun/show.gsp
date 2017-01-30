@@ -74,7 +74,7 @@
     <table class="table table-bordered" id="project-table">
         <thead>
             <tr>
-                <g:if test="${editable}"><th></th></g:if>
+                <g:if test="${editable}"><th title="Remove the project from this sequence run, but the project remains."><span class="glyphicon glyphicon-question-sign"></span></th><th title="Delete the project."><span class="glyphicon glyphicon-question-sign"></span></th></g:if>
                 <th>Project</th>
                 <th>Sonication Images</th>
                 <th>Gel Images</th>
@@ -84,7 +84,10 @@
             <g:each in="${run.cohorts}" var="cohort">
             <tr>
                 <input class="cohort-id" type="hidden" name="cohortId" value="${cohort.id}">
-                <g:if test="${editable}"><td><g:link controller="sequenceRun" action="removeProject" params="[cohortId:cohort.id, runId:run.id]"><span class="glyphicon glyphicon-trash remove-project"></span></g:link></td></g:if>
+                <g:if test="${editable}">
+                    <td title="Remove the project from this sequence run, but the project remains."><g:link controller="sequenceRun" action="removeProject" params="[cohortId:cohort.id, runId:run.id]" class="confirm-remove-project"><span class="glyphicon glyphicon-remove remove-project"></span></g:link></td>
+                    <td title="Delete the project."><g:link controller="sequenceRun" action="deleteProject" params="[cohortId:cohort.id, runId:run.id]" class="confirm-delete-project"><span class="glyphicon glyphicon-trash remove-project"></span></g:link></td>
+                </g:if>
                 <td>${cohort.project.name}</td>
                 <td>
                     <ul>
@@ -165,7 +168,10 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th class="remove-sample"></th>
+                <g:if test="${editable}">
+                <th title="Remove the sample from this sequence run. All the analysis data will be removed, but the sample itself remains."><span class="glyphicon glyphicon-question-sign"></span></th>
+                <th title="Delete the sample and all the related data."><span class="glyphicon glyphicon-question-sign"></span></th>
+                </g:if>
                 <th>Sample ID</th>
                 <th>Strain</th>
                 <th>Antibody</th>
@@ -179,11 +185,10 @@
             <g:each in="${run.experiments}">
                 <tr>
                     <input type="hidden" name="experimentId" value="${it.id}">
-                    <td class="remove-sample">
-                        <g:if test="${editable}">
-                            <g:link action="removeExperiment" params="[experimentId:it.id, runId:run.id]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link>
-                        </g:if>
-                    </td>
+                    <g:if test="${editable}">
+                        <td title="Remove the sample from this sequence run. All the analysis data will be removed, but the sample itself remains."><g:link action="removeExperiment" params="[experimentId:it.id, runId:run.id]" class="confirm-remove-sample"><span class="glyphicon glyphicon-remove"></span></g:link></td>
+                        <td title="Delete the sample and all the related data."><g:link controller="sequenceRun" action="deleteSample" params="[sampleId:it.sample.id, runId:run.id]" class="confirm-delete-sample"><span class="glyphicon glyphicon-trash"></span></g:link></td> 
+                    </g:if>
                     <td><g:link controller="sample" action="show" id="${it.sample.id}">${it.sample?.id}</g:link> ${it.sample?.naturalId}</td>
                     <td>${it.sample?.cellSource?.strain}</td>
                     <td>${it.sample?.antibody}</td>
@@ -254,7 +259,13 @@
     </div>
     <script>
         $("#nav-analysis").addClass("active");
+        
         $(".confirm").confirm();
+        $(".confirm-remove-sample").confirm({text: "Remove the sample from this sequence run. All the analysis data will be removed, but the sample itself remains."});
+        $(".confirm-delete-sample").confirm({text: "Delete the sample and all the related data."});
+        $(".confirm-remove-project").confirm({text: "Remove the project from this sequence run, but the project remains."});
+        $(".confirm-delete-project").confirm({text: "Delete the project."});
+        
         $("select").select2();
         $(".add-project-form").hide();
         

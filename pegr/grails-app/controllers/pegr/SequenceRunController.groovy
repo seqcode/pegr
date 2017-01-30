@@ -15,6 +15,7 @@ class SequenceRunController {
     def walleService
     def reportService
     def utilityService
+    def sampleService
     
     // list incomplete runs
     def index(Integer max, String str, String status){
@@ -420,6 +421,16 @@ class SequenceRunController {
         redirect(action: "show", id: runId)
     }
     
+    def deleteProject(Long cohortId, Long runId) {
+        try {
+            sequenceRunService.deleteProject(cohortId)
+            flash.message = "Project deleted."
+        } catch (SequenceRunException e) {
+            flash.message = e.message
+        }
+        redirect(action: "show", id: runId)
+    }
+    
     def uploadCohortImage(Long cohortId, String type) {
         def cohort = SequencingCohort.get(cohortId)
         if (!cohort) {
@@ -500,5 +511,16 @@ class SequenceRunController {
             flash.message = e.message
             redirect(action: "editQueue", params: [runId: runId])
         }
+    }
+    
+    def deleteSample(Long sampleId, Long runId) {
+        try {
+            def sample = Sample.get(sampleId)
+            sampleService.delete(sample)
+            flash.message = "Sample${sampleId} deleted!"
+        } catch (SequenceRunException e) {
+            flash.message = e.message
+        }
+        redirect(action: "show", params: [id: runId])
     }
 }

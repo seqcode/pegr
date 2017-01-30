@@ -133,8 +133,11 @@ class SequenceRunService {
     void removeExperiment(Long experimentId) {
         def experiment = SequencingExperiment.get(experimentId)
         if (experiment) {
-            // remove the associated alignments
-            SequenceAlignment.executeUpdate("delete SequenceAlignment where sequencingExperiment.id = :experimentId", [experimentId: experimentId])
+            experiment.alignments.each {alignment ->
+                ReportAlignments.executeUpdate("delete from ReportAlignments where alignment.id=:alignmentId", [alignmentId: alignment.id])
+                Analysis.executeUpdate("delete from Analysis where alignment.id =:alignmentId", [alignmentId: alignment.id])
+                alignment.delete()
+            }
             // remove the experiment itself
             experiment.delete()
         } else {
@@ -238,6 +241,22 @@ class SequenceRunService {
         }
         SequencingExperiment.executeUpdate("update SequencingExperiment set cohort = null where cohort=?", [cohort])
         cohort.delete()
+    }
+    
+    @Transactional
+    void deleteProject(Long cohortId) {
+        def cohort = SequencingCohort.get(cohortId)
+        if (!cohort) {
+            throw new SequenceRunException(message: "Sequencing cohort not found!")
+        }
+        def project = cohort.project
+        SequencingExperiment.executeUpdate("update SequencingExperiment set cohort = null where cohort=?", [cohort])
+        cohort.delete()
+        try {
+            projectService.delete(project)
+        } catch(Exception e) {
+            throw new SequenceRunException(message: "The Project is not empty and cannot be deleted.")
+        }
     }
     
     def getCalendarTimeString(Date time) {

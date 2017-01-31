@@ -6,7 +6,8 @@ import java.awt.image.BufferedImage
 import groovy.time.TimeCategory
 import groovy.json.*
 import grails.converters.*
-
+import org.apache.commons.io.IOUtils
+    
 class SequenceRunController {
     def springSecurityService    
     def sequenceRunService    
@@ -14,6 +15,7 @@ class SequenceRunController {
     def walleService
     def reportService
     def utilityService
+    def sampleService
     
     // list incomplete runs
     def index(Integer max, String str, String status){
@@ -419,6 +421,16 @@ class SequenceRunController {
         redirect(action: "show", id: runId)
     }
     
+    def deleteProject(Long cohortId, Long runId) {
+        try {
+            sequenceRunService.deleteProject(cohortId)
+            flash.message = "Project deleted."
+        } catch (SequenceRunException e) {
+            flash.message = e.message
+        }
+        redirect(action: "show", id: runId)
+    }
+    
     def uploadCohortImage(Long cohortId, String type) {
         def cohort = SequencingCohort.get(cohortId)
         if (!cohort) {
@@ -439,5 +451,76 @@ class SequenceRunController {
         sequenceRunService.removeCohortImage(cohortId, filepath)
         render ""
         return
+    }
+    
+    def downloadRunInfo(String remoteRoot, Long runId) {
+        String RUN_INFO_TEMP = "runInfo${runId}"
+        def timeout = 60*1000
+        
+        // generate the run info files
+        def run = SequenceRun.get(runId)
+        def remotePath = new File(remoteRoot, run.directoryName).getPath()
+        def localRoot = utilityService.getFilesRoot()
+        def localFolder = new File(localRoot, RUN_INFO_TEMP)
+        if (!localFolder.exists()) { 
+            localFolder.mkdirs() 
+        } 
+        walleService.generateRunFilesInFolder(run, remotePath, localFolder)
+        
+        // compress the files
+        def compressedFilename = "runInfo${runId}.tar.gz"
+        def compressedFile = new File(localRoot, compressedFilename)
+        def command = "tar -cf ${compressedFile.getPath()} ${RUN_INFO_TEMP}"
+        def envVars = []
+        def workDir = localRoot
+        def out = command.execute(envVars, workDir)
+
+        // remove the original run info files
+        command = "rm -R ${localFolder.getPath()}"
+        utilityService.executeCommand(command, timeout)
+        
+        InputStream contentStream
+        try {
+            response.setContentType("application/gzip") 
+            response.setHeader("Content-disposition", "attachment;filename=\"${compressedFilename}\"")
+            contentStream = compressedFile.newInputStream()
+            response.outputStream << contentStream
+            // remove the compressed file
+            compressedFile.delete()
+            webRequest.renderView = false
+        } catch(Exception e) {
+            render "Error!"
+        } finally {
+            response.getOutputStream().flush()
+            response.getOutputStream().close()
+            IOUtils.closeQuietly(contentStream)
+        }
+
+    }
+    
+    def editQueue(Long runId) {
+        def queue = walleService.getQueue()
+        [runId: runId, previousRunFolder: queue.previousRunFolder, queuedRuns: queue.queuedRuns]
+    }
+    
+    def updateQueue(Long runId, String previousRunFolder, String queuedRuns) {
+        try {
+            walleService.updateQueue(runId, previousRunFolder.trim(), queuedRuns.trim())
+            redirect(action:"previewRun", params: [runId: runId])
+        } catch (WalleException e) {
+            flash.message = e.message
+            redirect(action: "editQueue", params: [runId: runId])
+        }
+    }
+    
+    def deleteSample(Long sampleId, Long runId) {
+        try {
+            def sample = Sample.get(sampleId)
+            sampleService.delete(sample)
+            flash.message = "Sample${sampleId} deleted!"
+        } catch (SequenceRunException e) {
+            flash.message = e.message
+        }
+        redirect(action: "show", params: [id: runId])
     }
 }

@@ -131,4 +131,18 @@ class ProjectService {
             throw new ProjectException(message: "Project not found!")
         }
     }
+    
+    @Transactional
+    def delete(Project project) {
+        def projectId = project.id
+        ProjectBags.executeUpdate("delete from ProjectBags where project.id =:projectId", [projectId: projectId])
+        ProjectFunding.executeUpdate("delete from ProjectFunding where project.id =:projectId", [projectId: projectId])
+        ProjectSamples.executeUpdate("delete from ProjectSamples where project.id =:projectId", [projectId: projectId])
+        ProjectUser.executeUpdate("delete from ProjectUser where project.id =:projectId", [projectId: projectId])
+        Item.executeUpdate("update Item set project = null where project.id=:projectId", [projectId: projectId])
+        ReplicateSet.executeUpdate("update ReplicateSet set project = null where project.id =:projectId", [projectId: projectId])        
+        SequencingCohort.executeUpdate("delete from SequencingCohort where project.id=:projectId", [projectId:projectId])
+        project.delete()
+    }
+    
 }

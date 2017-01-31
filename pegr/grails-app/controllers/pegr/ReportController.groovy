@@ -250,6 +250,7 @@ class SampleDTO {
     List experiments
     Integer alignmentCount
     String note
+    String recommend
 }
 
 class ExperimentDTO {

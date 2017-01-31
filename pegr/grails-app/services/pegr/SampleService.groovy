@@ -15,6 +15,7 @@ class SampleService {
     def cellSourceService
     def replicateService
     def itemService
+    def sequenceRunService
     
     def search(QuerySampleRegistrationCommand query) {
         def c = Sample.createCriteria()
@@ -322,13 +323,23 @@ class SampleService {
         }        
     }
     
+    @Transactional
     def delete(Sample sample) {
         if (!sample) {
             return
         }
         SampleSequenceIndices.executeUpdate("delete from SampleSequenceIndices where sample.id=:sampleId", [sampleId: sample.id])
         ProjectSamples.executeUpdate("delete from ProjectSamples where sample.id =:sampleId", [sampleId: sample.id])
-        sample.delete()
+        ControlSample.executeUpdate("delete from ControlSample where sample.id =:sampleId or controlSample.id =:sampleId", [sampleId: sample.id])
+        PoolSamples.executeUpdate("delete from PoolSamples where sample.id =:sampleId", [sampleId: sample.id])
+        ReplicateSamples.executeUpdate("delete from ReplicateSamples where sample.id =:sampleId", [sampleId: sample.id])
+        SampleInRun.executeUpdate("delete from SampleInRun where sample.id =:sampleId", [sampleId: sample.id])
+        SampleTreatments.executeUpdate("delete from SampleTreatments where sample.id =:sampleId", [sampleId: sample.id])
+        
+        sample.sequencingExperiments.each {
+            sequenceRunService.removeExperiment(it.id)
+        }        
+        sample.delete(failOnError: true)
     }
     
     /**

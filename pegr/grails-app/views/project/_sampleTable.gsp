@@ -20,7 +20,7 @@
                     <td>${sample.antibody}</td>
                     <td>${sample.target}</td>
                     <td>${sample.assay}</td>
-                    <td><g:if test="${sampleEditAuth}"><g:link action="removeSample" params="[sampleId:sample.id, projectId:project?.id]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link></g:if></td>
+                    <td><g:if test="${sampleEditAuth && removable}"><g:link action="removeSample" params="[sampleId:sample.id, projectId:project?.id]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link></g:if></td>
                 </tr>
             </g:each>              
             <tr>

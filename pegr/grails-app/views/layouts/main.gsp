@@ -23,7 +23,7 @@
                         <li id="nav-protocols"><g:link controller="protocol" action="labProtocols">Protocols</g:link></li>
                         <li id="nav-experiments"><g:link controller="protocolInstanceBag" action="list">Experiments</g:link></li>
                         <li id="nav-analysis"><g:link controller="sequenceRun" action="index">Sequencing Reports</g:link></li>
-                        <li id="nav-bioinformatics"><g:link controller="bioinformatics">Bioinfomatics</g:link></li>
+                        <li id="nav-bioinformatics"><g:link controller="bioinformatics">Bioinformatics</g:link></li>
                     </sec:ifAnyGranted>
                     <sec:ifAnyGranted roles="ROLE_ADMIN">
                         <li id="nav-admin"><g:link controller="admin" action="index">Admin</g:link></li>

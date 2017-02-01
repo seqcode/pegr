@@ -10,6 +10,14 @@
         <tr>
             <th>Sample ID</th>
             <th>Description</th>
+            <th>Target</th>
+            <th>Antibody</th>
+            <th>Celltype/Strain</th>
+            <th>Mutation</th>
+            <th>Growth Media</th>
+            <th>Treatments</th>
+            <th>Assay</th>
+            <th>Genome</th>
             <th>Fastq</th>
             <th>Bam</th>
             <th>Scidx</th>
@@ -22,6 +30,14 @@
                     <tr>
                         <td>${sample.id} (Old ${sample.source} ${sample.sourceId})</td>
                         <td>${sample.naturalId}</td>
+                        <td>${sample.target}</td>
+                        <td>${sample.antibody}</td>
+                        <td>${sample.strain} </td>
+                        <td>${sample.geneticModification}</td>
+                        <td>${sample.growthMedia}</td>
+                        <td>${sample.treatments}</td>
+                        <td>${sample.assay}</td>
+                        <td>${alignment.genome}</td>
                         <td><g:each in="${experiment.fastq}" var="fastq">${fastq.key}: <a href="${fastq.value}">${fastq.value}</a>; </g:each></td>
                         <td><a href="${alignment.bam}">${alignment.bam}</a></td>
                         <td><a href="${alignment.scidx}">${alignment.scidx}</a></td>

@@ -459,7 +459,20 @@ class SequenceRunController {
         
         // generate the run info files
         def run = SequenceRun.get(runId)
-        def remotePath = new File(remoteRoot, run.directoryName).getPath()
+        
+        // clean path
+        remoteRoot = remoteRoot.trim()
+        
+        def remotePath 
+        try {
+            if (!remoteRoot || !run.directoryName) {
+                throw new SequenceRunException()
+            }
+            remotePath = new File(remoteRoot, run.directoryName).getPath()
+        } catch (Exception e) {
+            flash.message = "Error! Please check the remote root and the directory name of Run #${runId}!"
+            redirect(action: "show", id: runId)
+        }
         def localRoot = utilityService.getFilesRoot()
         def localFolder = new File(localRoot, RUN_INFO_TEMP)
         if (!localFolder.exists()) { 

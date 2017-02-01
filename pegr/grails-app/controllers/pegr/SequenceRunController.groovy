@@ -498,19 +498,19 @@ class SequenceRunController {
 
     }
     
-    def editQueue(Long runId) {
+    def editQueue() {
         def queue = walleService.getQueue()
-        [runId: runId, previousRunFolder: queue.previousRunFolder, queuedRuns: queue.queuedRuns]
+        [previousRunFolder: queue.previousRunFolder, queuedRuns: queue.queuedRuns]
     }
     
-    def updateQueue(Long runId, String previousRunFolder, String queuedRuns) {
+    def updateQueue(String previousRunFolder, String queuedRuns) {
         try {
-            walleService.updateQueue(runId, previousRunFolder.trim(), queuedRuns.trim())
-            redirect(action:"previewRun", params: [runId: runId])
+            walleService.updateQueue(previousRunFolder.trim(), queuedRuns.trim())
+            flash.message = "Queue has been updated!"
         } catch (WalleException e) {
             flash.message = e.message
-            redirect(action: "editQueue", params: [runId: runId])
         }
+        redirect(action: "editQueue")
     }
     
     def deleteSample(Long sampleId, Long runId) {

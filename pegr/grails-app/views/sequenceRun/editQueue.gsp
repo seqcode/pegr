@@ -27,7 +27,7 @@
             <p>Multiple run IDs should be delimited by "," </p>
         <div class="form-group">
         <g:submitButton name="submit" value="save" class="btn btn-primary"></g:submitButton>
-        <g:link controller="sequenceRun" action="index"  class="btn btn-default" onclick="window.close()">Close</g:link>
+        <a href="#" class="btn btn-default" onclick="window.close()">Close</a>
     </g:form>
     
 </body>

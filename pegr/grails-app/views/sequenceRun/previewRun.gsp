@@ -4,7 +4,7 @@
     <meta name="layout" content="main"/>
 </head>
 <body>
-    <h3>Preview Sequence Run <g:link controller="sequenceRun" action="editQueue" params="[runId: currentRun.id]" class="edit">Edit</g:link></h3>
+    <h3>Preview Sequence Run <a href="#" onclick="window.open('${g.createLink(action:'editQueue')}', 'Edit Queue for Sample Submission', 'width=600,height=400' )" class="edit">Edit</a></h3>
     <h4>Previous Run</h4>
     <table>
         <thead>

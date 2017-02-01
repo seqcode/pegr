@@ -416,27 +416,35 @@ class WalleService {
                 queuedRuns: Chores.findByName(RUNS_IN_QUEUE)?.value]
     }
     
-    @Transactional
-    def updateQueue(Long runId, String previousRunFolder, String queuedRuns) {
+    def updateQueue(String previousRunFolder, String queuedRuns) {
         // update previous run's folder
         def previousRunFolderConfig = Chores.findByName(PRIOR_RUN_FOLDER)
         if (previousRunFolderConfig && previousRunFolderConfig.value != previousRunFolder) {
             previousRunFolderConfig.value = previousRunFolder
-            previousRunFolderConfig.save()
+            previousRunFolderConfig.save(failOnError: true)
         }
-        // check teh format of queuedRuns
-        queuedRuns = queuedRuns.replaceAll("\\s","")
-        def queueIds = queuedRuns.split(",")
-        queueIds.each {id ->
-            if (!id.isInteger()) {
-                throw new WalleException(message: "Format error in queued runs!")
+        // check teh format of queuedRuns        
+        if (queuedRuns == "") {
+            queuedRuns = null
+        } else {
+            def queueIds = queuedRuns.split(",")
+            def ids = []
+            queueIds.each { idRaw ->
+                def id = idRaw.trim()
+                if (!id.isInteger()) {
+                    throw new WalleException(message: "Format error in queued runs!${id}!")
+                } else {
+                    ids.push(id)
+                }
             }
+            queuedRuns = ids.join(",")
         }
+        
         // update the queuedRuns
         def queuedRunsConfig = Chores.findByName(RUNS_IN_QUEUE)
         if (queuedRunsConfig && queuedRunsConfig.value != queuedRuns) {
             queuedRunsConfig.value = queuedRuns
-            queuedRunsConfig.save()
+            queuedRunsConfig.save(failOnError: true)
         }
     }
 }

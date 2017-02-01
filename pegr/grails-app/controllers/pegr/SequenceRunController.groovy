@@ -459,7 +459,20 @@ class SequenceRunController {
         
         // generate the run info files
         def run = SequenceRun.get(runId)
-        def remotePath = new File(remoteRoot, run.directoryName).getPath()
+        
+        // clean path
+        remoteRoot = remoteRoot.trim()
+        
+        def remotePath 
+        try {
+            if (!remoteRoot || !run.directoryName) {
+                throw new SequenceRunException()
+            }
+            remotePath = new File(remoteRoot, run.directoryName).getPath()
+        } catch (Exception e) {
+            flash.message = "Error! Please check the remote root and the directory name of Run #${runId}!"
+            redirect(action: "show", id: runId)
+        }
         def localRoot = utilityService.getFilesRoot()
         def localFolder = new File(localRoot, RUN_INFO_TEMP)
         if (!localFolder.exists()) { 
@@ -498,19 +511,19 @@ class SequenceRunController {
 
     }
     
-    def editQueue(Long runId) {
+    def editQueue() {
         def queue = walleService.getQueue()
-        [runId: runId, previousRunFolder: queue.previousRunFolder, queuedRuns: queue.queuedRuns]
+        [previousRunFolder: queue.previousRunFolder, queuedRuns: queue.queuedRuns]
     }
     
-    def updateQueue(Long runId, String previousRunFolder, String queuedRuns) {
+    def updateQueue(String previousRunFolder, String queuedRuns) {
         try {
-            walleService.updateQueue(runId, previousRunFolder.trim(), queuedRuns.trim())
-            redirect(action:"previewRun", params: [runId: runId])
+            walleService.updateQueue(previousRunFolder.trim(), queuedRuns.trim())
+            flash.message = "Queue has been updated!"
         } catch (WalleException e) {
             flash.message = e.message
-            redirect(action: "editQueue", params: [runId: runId])
         }
+        redirect(action: "editQueue")
     }
     
     def deleteSample(Long sampleId, Long runId) {

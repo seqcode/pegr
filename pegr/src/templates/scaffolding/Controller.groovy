@@ -8,9 +8,26 @@ class ${className}Controller {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-    def index(Integer max) {
-        params.max = Math.min(max ?: 25, 100)
-        respond ${className}.list(params), model:[${propertyName}Count: ${className}.count()]
+    def index(Integer max, String str) {
+        if (str && ${className}.hasProperty("name")) {
+            def c = ${className}.createCriteria()
+            def listParams = [
+                    max: max ?: 25,
+                    sort: params.sort ?: "id",
+                    order: params.order ?: "desc",
+                    offset: params.offset
+                ]
+            def likeStr = "%" + str + "%"
+            def items = c.list(listParams) {
+                or {
+                    ilike "name", likeStr
+                }
+            }
+            respond items, model:[${propertyName}Count: items.totalCount, str: str]
+        } else {       
+            params.max = Math.min(max ?: 25, 100)
+            respond ${className}.list(params), model:[${propertyName}Count: ${className}.count()]
+        }
     }
 
     def show(${className} ${propertyName}) {

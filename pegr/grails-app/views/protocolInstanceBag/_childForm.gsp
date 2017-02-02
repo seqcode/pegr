@@ -29,13 +29,9 @@
             <g:textArea name="notes" value="${item?.notes}"/>
         </div>
     </div>
-    <div class="col-sm-6" id="barcode-display">    
-        <g:render template="/item/barcodeImage" model="[barcode:'']"></g:render>
-    </div>
 </div>
 
 <script>
-    $("#barcode-display").hide();
     function generateBarcode() {
         $.ajax({url: "/pegr/item/generateBarcodeAjax", success: function(result) {
             $("#barcode").val(result);

@@ -19,7 +19,8 @@
             <th>Assay</th>
             <th>Genome</th>
             <th>Fastq</th>
-            <th>Bam</th>
+            <th>Raw Bam</th>
+            <th>Filtered Bam</th>
             <th>Scidx</th>
         </tr>
     </thead>
@@ -39,6 +40,7 @@
                         <td>${sample.assay}</td>
                         <td>${alignment.genome}</td>
                         <td><g:each in="${experiment.fastq}" var="fastq">${fastq.key}: <a href="${fastq.value}">${fastq.value}</a>; </g:each></td>
+                        <td><a href="${alignment.bamRaw}">${alignment.bamRaw}</a> </td>
                         <td><a href="${alignment.bam}">${alignment.bam}</a></td>
                         <td><a href="${alignment.scidx}">${alignment.scidx}</a></td>
                     </tr>

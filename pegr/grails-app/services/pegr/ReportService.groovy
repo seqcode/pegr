@@ -539,6 +539,9 @@ class ReportService {
         def analysisList = Analysis.findAllByAlignment(alignment)
         analysisList.each { analysis ->
             switch (analysis.category) {
+                case "output_markDuplicates": //bam_raw
+                    alignmentDTO.bamRaw = alignmentStatsService.queryDatasetsUri(analysis.datasets, "bam")
+                    break
                 case "output_bamToScidx": //scidx
                     alignmentDTO.scidx = alignmentStatsService.queryDatasetsUri(analysis.datasets, "scidx")
                     break

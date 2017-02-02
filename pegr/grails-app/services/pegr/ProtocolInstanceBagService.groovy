@@ -418,9 +418,9 @@ class ProtocolInstanceBagService {
             } else if (item.type == protocol.endPoolType) {
                 result.endPool[0].items.add(item)
             } else if (protocolItem.function == ProtocolItemFunction.SHARED) {
-                result.endProductList.add([type: item.type, items: [item]])
-            } else if (protocolItem.function == ProtocolItemFunction.END_PRODUCT) {
                 result.sharedItemList.add([type: item.type, items: [item]])
+            } else if (protocolItem.function == ProtocolItemFunction.END_PRODUCT) {
+                result.endProductList.add([type: item.type, items: [item]])
             }
         }  
         return result

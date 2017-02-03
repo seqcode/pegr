@@ -267,6 +267,7 @@ class ExperimentDTO {
 class AlignmentDTO {
     Long id
     String genome
+    String bamRaw
     String bam
     Long mappedReads
     Long uniquelyMappedReads

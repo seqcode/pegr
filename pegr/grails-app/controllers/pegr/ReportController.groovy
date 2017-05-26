@@ -50,6 +50,29 @@ class ReportController {
                         }
                     }
                 }
+
+
+                 if (qcSettings.yep) {
+                    headers["yep"] = []
+                    subheaders["yep"] = []
+                    qcSettings.yep.each { setting ->
+                        if (setting.group) {
+                            subheaders.yep.push(setting.name)
+                            if (!priorGroup || setting.group != priorGroup) {
+                                headers.yep.push([name: setting.group, rowspan: 1, colspan: 1])
+                                priorGroup = setting.group
+                            } else {
+                                headers.yep.last().colspan++
+                            }
+                        } else {
+                            headers.yep.push([name: setting.name, rowspan: 2, colspan: 1])
+                        }
+                    }
+                }
+
+
+
+
                 [runStatus: runStatus.results, 
                  noResultSamples: runStatus.noResultSamples, 
                  qcSettings: qcSettings,

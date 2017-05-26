@@ -15,7 +15,7 @@ class ReportService {
     def utilityService
     def alignmentStatsService
     def springSecurityService
-    final Map QC_SETTINGS = ['general': "QC_SETTINGS", 'yeast': "YEAST_QC_SETTINGS"]
+    final Map QC_SETTINGS = ['general': "QC_SETTINGS", 'yeast': "YEAST_QC_SETTINGS",'yep': "YEP_QC_SETTINGS"]
     final String PURGE_ALIGNMENTS_CONFIG = "PurgeAlignmentsConfig"
     final String GALAXY_CONFIG = "GalaxyConfig"
     final String DYNAMIC_ANALYSIS_STEPS = "DYNAMIC_ANALYSIS_STEPS"

@@ -1,16 +1,16 @@
-<g:link class="edit pull-right" controller="report" action="decisionTree" params="[type:'YEAST_QC']" target="_blank">Decision Tree</g:link>
-<table id="yeast" class="table table-bordered">
+<g:link class="edit pull-right" controller="report" action="decisionTree" params="[type:'YEP_QC']" target="_blank">Decision Tree</g:link>
+<table id="yep" class="table table-bordered">
     <thead>
         <tr>
             <th rowspan="2">Sample ID</th>
             <th rowspan="2">Target</th>
-            <g:each in="${headers.yeast}" var="header">
+            <g:each in="${headers.yep}" var="header">
                 <th class="text-right" style="white-space:normal" rowspan="${header.rowspan}" colspan="${header.colspan}">${header.name}</th>
             </g:each>
             <th rowspan="2">Recommend<br><span class="edit" id="calculate-recommend">Calculate</span><i id="recommend-spin" class="fa fa-spinner fa-spin"></i></th>
         </tr>
         <tr>
-            <g:each in="${subheaders.yeast}" var="subheader">
+            <g:each in="${subheaders.yep}" var="subheader">
                 <th class="text-right" style="white-space:normal">${subheader}</th>
             </g:each>
         </tr>
@@ -22,7 +22,7 @@
                 <g:each in="${sample.alignmentStatusList}" var="alignment" status="n">
                     <g:if test="${n>0}"><tr></g:if>
                     <td class="target">${sample.target}</td>
-                    <g:each in="${qcSettings.yeast}" var="setting">
+                    <g:each in="${qcSettings.yep}" var="setting">
                         <td class="text-right ${setting.key}" title="${setting.key}">          
                             <g:if test="${setting.key == 'memER'}">
                                 <span style="display:none">${alignment[setting.key]}</span>
@@ -46,7 +46,7 @@
     $("#recommend-spin").hide();
     var colors;
     $.ajax({
-            url:"/pegr/report/getDecisionTreeAjax?type=YEAST_QC",
+            url:"/pegr/report/getDecisionTreeAjax?type=YEP_QC",
             success: function(result) {
                 var treeData = result.treeData;
                 colors = result.colors;
@@ -64,11 +64,11 @@
         $("#recommend-spin").show();
         var data = [];
         $.ajax({
-            url:"/pegr/report/getDecisionTreeAjax?type=YEAST_QC",
+            url:"/pegr/report/getDecisionTreeAjax?type=YEP_QC",
             success: function(result) {
                 var treeData = result.treeData;
                 var colors = result.colors;
-                $("#yeast tbody tr").each(function(){
+                $("#yep tbody tr").each(function(){
                     var v = {};
                     $(this).children("td").each(function(index, elem) {
                         var classes =  $(elem).attr("class").split(' ');

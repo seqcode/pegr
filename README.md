@@ -9,7 +9,7 @@ Some notes on adding an new tab
 
 2. Modify the Map QC_SETTINGS in ReportService and follow the format            test': "TEST_QC_SETTINGS"
 
-3. In runStatus, add one of these in nav-tabs "<li><a data-toggle="tab" href="#test">test</a></li>"" 
+3. In runStatus, add one of these in nav-tabs '<li><a data-toggle="tab" href="#test">test</a></li>'
 
 4. Then, add one of these in tab-content <div id="test" class="tab-pane fade"> 
 <g:render template="testQc" model="[runStatusMap:it]"></g:render>  </div>

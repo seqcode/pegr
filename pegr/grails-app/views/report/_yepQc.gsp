@@ -2,9 +2,9 @@
 <table id="yep" class="table table-bordered">
     <thead>
         <tr>
-            <th rowspan="2">ID</th>
+            <th rowspan="2">Galaxy ID</th>
             <th rowspan="2">File Type</th>
-            <th rowspan="2">URL </th>
+            <th rowspan="2">Link to Galaxy Data</th>
             <g:each in="${headers.yep}" var="header">
                 <th class="text-right" style="white-space:normal" rowspan="${header.rowspan}" colspan="${header.colspan}">${header.name}</th>
             </g:each>
@@ -21,6 +21,7 @@
         <g:each in="${runStatusMap.value.sampleStatusList}" var="sample">
             <tr>
                 <td class="id" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">
+                <b>Sample #${sample.sampleId}:</b> <i>Alignment</i> ${sample.alignmentStatusList.alignmentId}
                     <g:each in = "${sample.alignmentStatusList.datasets_id}" var ="set"> 
                             <g:each in="${set}" var ="id" status ="index">
                                 <tr> <td>${id}</td> 

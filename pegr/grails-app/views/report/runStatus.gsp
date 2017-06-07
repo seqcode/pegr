@@ -174,7 +174,7 @@
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#general">Core Pipeline</a></li>
                 <li><a data-toggle="tab" href="#yeast">Yeast QA Pipeline</a></li>
-                <li><a data-toggle="tab" href="#yep">YEP Pipeline</a></li> 
+                <li><a data-toggle="tab" href="#yep">Sample Details</a></li> 
             </ul>
             <div class="tab-content">
                 <div id="general" class="tab-pane fade in active">

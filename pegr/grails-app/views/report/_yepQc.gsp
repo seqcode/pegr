@@ -21,10 +21,7 @@
         <g:each in="${runStatusMap.value.sampleStatusList}" var="sample">
             <tr>
                 <td class="id" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">
-              
-              <%-- this loops through each entry (comprised of various entries of either type,id,url) --%>
                     <g:each in = "${sample.alignmentStatusList.datasets_id}" var ="set"> 
-                    <%-- this counts each string and keeps a counter to index the other lists --%>
                             <g:each in="${set}" var ="id" status ="index">
                                 <tr> <td>${id}</td> 
 
@@ -33,7 +30,8 @@
                                     </td> 
                                 
                                     <td>
-                                    http://galaxy-cegr.psu.edu:${sample.alignmentStatusList.datasets_url.get(0).get(index)}
+                                    <a href = "http://galaxy-cegr.psu.edu:${sample.alignmentStatusList.datasets_url.get(0).get(index)}=True"/>
+                                    http://galaxy-cegr.psu.edu:${sample.alignmentStatusList.datasets_url.get(0).get(index)}=True</a>
                                     </td> 
                                 
 

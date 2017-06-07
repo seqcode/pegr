@@ -176,7 +176,7 @@ class ReportService {
                     recommend: experiment.sample.recommend,
 
                   
-                    datasets_type: getFromDataSet(analysis.datasets, "type") + getFromDataSet(analysis.datasets,"Truetype"),
+                    datasets_type: getFromDataSet(analysis.datasets, "type"), //this also includes Truetype
                     datasets_id: getFromDataSet(analysis.datasets, "id"),
                     datasets_url:getFromDataSet(analysis.datasets,"edu"),
                 ]
@@ -229,14 +229,13 @@ class ReportService {
         def dataset_arr= dataset_str.split()
        
         //check each list element and see if is the field value desired
-        for (int i=0; i<dataset_arr.size();i++)
-        //dataset_arr[i].contains(':') && 
-            if (dataset_arr[i].contains(':') && dataset_arr[i].substring(0, dataset_arr[i].indexOf(":")) == field )
+        for (int i=0; i<dataset_arr.size();i++){
+            if (dataset_arr[i].contains(':') && dataset_arr[i].substring(0, dataset_arr[i].indexOf(":")).contains(field) )
                 //string test
                 //list+=dataset_arr[i].substring(dataset_arr[i].indexOf(':') + 1) + '\n'
                 
                 list.add(dataset_arr[i].substring(dataset_arr[i].indexOf(':') + 1))
-        
+        }
         return list
     }
 

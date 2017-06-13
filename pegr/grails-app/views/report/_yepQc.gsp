@@ -1,11 +1,11 @@
 <g:link class="edit pull-right" controller="report" action="decisionTree" params="[type:'YEP_QC']" id="_blank">Decision Tree</g:link>
-
+    <h3> Click on a sample to reveal more information </h3>
         <ul>
             <g:each in="${runStatusMap.value.sampleStatusList}" var="sample" status="n">
                 <div class="panel-group">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h4 class="panel-title"><a data-toggle="collapse" href="#collapse${n}">Sample <b>#${sample.sampleId}: </b><i>Alignment</i>${sample.alignmentStatusList.alignmentId}</a> 
+                            <h4 class="panel-title"><a data-toggle="collapse" href="#collapse${n}">Sample <b>#${sample.sampleId}: </b><i>Natural ID: </i><b>${sample.naturalId}</b></a> 
                             </h4>
                         </div>
                     <div id="collapse${n}" class="panel-collapse collapse">
@@ -30,7 +30,7 @@
                             <tbody>  
                                      <tr>
                                         <td class="id" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">
-                                        <b>Sample #${sample.sampleId}:</b> <i>Alignment</i> <b>${sample.alignmentStatusList.alignmentId}</b>
+                                      <%--  <b>Sample #${sample.sampleId}:</b> <i>Alignment</i> <b>${sample.alignmentStatusList.alignmentId}</b> --%>
                                             <g:each in = "${sample.alignmentStatusList.datasets_id}" var ="set"> 
                                                     <g:each in="${set}" var ="id" status ="index">
                                                         <tr> <td>${id}</td> 

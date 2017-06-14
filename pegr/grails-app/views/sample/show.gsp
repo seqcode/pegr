@@ -26,6 +26,7 @@
         <g:if test="${sample?.date}">
             <p>Date: <g:formatDate format="yyyy-MM-dd" date="${sample.date}"/></p>
         </g:if>
+        <h4><b>Click to reveal/edit the info below</b></h4>
         <g:render template="details" model="['sample': sample]"></g:render>
 
         <h3>Replicates</h3>

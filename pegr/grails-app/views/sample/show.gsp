@@ -31,7 +31,7 @@
 
         <div id="center_iframe">
             <div id="iframe_div">
-                <iframe src="http://localhost:8080/mastertemplate.html" id="yep_iframe" scrolling="no" frameborder="no"></iframe>
+                <iframe src="https://worm.hanfucw.com/13137/" id="yep_iframe" scrolling="no" frameborder="no"></iframe>
             </div>
         </div>
 

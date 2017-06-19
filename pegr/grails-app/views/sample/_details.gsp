@@ -1,7 +1,7 @@
     <div class="panel-group">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h4 class="panel-title"><a data-toggle="collapse" href="#collapse">Cell Source, Antibody, Target, Protocol, Other</a>
+                <h4 class="panel-title"><a data-toggle="collapse" href="#collapse">Metadata</a>
                 </h4>
             </div>
         </div>
@@ -77,6 +77,12 @@
                             <g:if test="${sampleEditAuth}">
                                 <g:link controller="sample" action="editOther" params="[sampleId:sample?.id]" class="edit">Edit</g:link>
                             </g:if>
+                        </th>
+                        <th>
+                        Replicates     
+                        </th>
+                        <th>
+                        Related Projects  
                         </th>
                     </tr>
                 </thead>
@@ -280,6 +286,20 @@
                                 <li><b>Notes: </b>${sample.note}</li>
                                 </g:if>
                             </ul>
+                        </td>
+                        <td>
+                            <div id="replicates">
+                                <g:render template="/replicate/list" model="[replicates: replicates]"></g:render>
+                            </div>
+                        </td>
+                        <td>
+                             <div id="project">
+                                <ol>
+                                <g:each in="${sample.projects}">
+                                    <li><g:link controller="project" action="show" id="${it.id}">${it}</g:link> <i>Created on <g:formatDate format="yyyy-MM-dd" date="${it.dateCreated}"/></i></li>
+                                </g:each>
+                                </ol>
+                            </div>
                         </td>
                     </tr>
                 </tbody>

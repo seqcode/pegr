@@ -37,6 +37,8 @@
             $(this).addClass("label-success");
         } else if ($(this).text() == "QUEUE") {
             $(this).addClass("label-warning");
+        } else if ($(this).text() == "FAILED") {
+            $(this).addClass("label-danger");
         } else {
             $(this).addClass("label-default");
         }

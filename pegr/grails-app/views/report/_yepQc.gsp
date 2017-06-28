@@ -31,7 +31,7 @@
                                         <td class="id" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">
                                             <g:each in = "${sample.alignmentStatusList.datasets_id}" var ="set"> 
                                                     <g:each in="${set}" var ="id" status ="index">
-                                                        <g:set var= "check" value="${index-sample.alignmentStatusList.datasets_type.get(0).size()}"/>
+                                                        <g:set var= "check" value= "${index-sample.alignmentStatusList.datasets_type.get(0).size()}"/>
                                                         <tr><td>${id}</td> 
                                                             <td>
                                                             <%-- ${index} --%>

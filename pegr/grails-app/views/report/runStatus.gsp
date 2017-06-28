@@ -168,6 +168,9 @@
         <a href="#" onclick="window.open('/pegr/help#report', 'Help: report', 'width=600,height=400' )" class="pull-right"><small><u>Help</u></small></a>
     </h3>
     <g:link controller="report" action="unknownIndex" params="[runId: run.id]">Unknown index</g:link>
+    <g:if test= "${run.note}">
+    Note: ${run.note}
+    </g:if>
     <g:each in="${runStatus}">
         <div>
             <h4>Pipeline: ${it.key.name}, version: ${it.key.pipelineVersion} (workflow ID: <a href="http://galaxy-cegr.psu.edu:8080/workflow/display_by_id?id=${it.key.workflowId}" target="_blank">${it.key.workflowId}</a>) <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link controller="pipelineAdmin" action="show" id="${it.key.id}" class="edit">Manage</g:link></sec:ifAnyGranted></h4>

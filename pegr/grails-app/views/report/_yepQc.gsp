@@ -29,21 +29,37 @@
                             <tbody>  
                                      <tr>
                                         <td class="id" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">
-                                      <%--  <b>Sample #${sample.sampleId}:</b> <i>Alignment</i> <b>${sample.alignmentStatusList.alignmentId}</b> --%>
                                             <g:each in = "${sample.alignmentStatusList.datasets_id}" var ="set"> 
                                                     <g:each in="${set}" var ="id" status ="index">
-                                                        <tr> <td>${id}</td> 
-
+                                                        <g:set var= "check" value="${index-sample.alignmentStatusList.datasets_type.get(0).size()}"/>
+                                                        <tr><td>${id}</td> 
                                                             <td>
-                                                            ${sample.alignmentStatusList.datasets_type.get(0).get(index)}
+                                                            <%-- ${index} --%>
+                                                                <g:if test= "${check >= 0}">
+
+                                                                    ${sample.alignmentStatusList.datasets_type.get(1).get(index)}
+                                                                
+                                                                </g:if>
+                                                                <g:else>
+                                                                    ${sample.alignmentStatusList.datasets_type.get(0).get(index)}
+                                                                </g:else>
+       
                                                             </td> 
                                                         
                                                             <td>
-                                                            <a href = "http://galaxy-cegr.psu.edu:${sample.alignmentStatusList.datasets_url.get(0).get(index)}=True"/>
-                                                            http://galaxy-cegr.psu.edu:${sample.alignmentStatusList.datasets_url.get(0).get(index)}=True</a>
+                                                            <%-- ${index} --%>
+                                                                <g:if test= "${check>=0}">
+                                                                    <a href = "http://galaxy-cegr.psu.edu:${sample.alignmentStatusList.datasets_url.get(1).get(index)}=True"/>
+                                                                    http://galaxy-cegr.psu.edu:${sample.alignmentStatusList.datasets_url.get(1).get(index)}=True</a>                                                      
+                                                                </g:if>
+                                                                <g:else>
+                                                                <a href = "http://galaxy-cegr.psu.edu:${sample.alignmentStatusList.datasets_url.get(0).get(index)}=True"/>
+                                                                    http://galaxy-cegr.psu.edu:${sample.alignmentStatusList.datasets_url.get(0).get(index)}=True</a>
+                                                                </g:else>
+         
                                                             </td> 
-                                                        
-
+                                                            
+                                                            
                                                         </tr>
                                                     </g:each>
                                             </g:each>

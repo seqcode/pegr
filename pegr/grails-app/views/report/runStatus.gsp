@@ -169,7 +169,9 @@
     </h3>
     <g:link controller="report" action="unknownIndex" params="[runId: run.id]">Unknown index</g:link>
     <g:if test= "${run.note}">
-    Note: ${run.note}
+    <div>
+    <i>Notes: </i>${run.note}
+    </div>
     </g:if>
     <g:each in="${runStatus}">
         <div>

@@ -33,8 +33,7 @@
                                                     <g:each in="${set}" var ="id" status ="index">
                                                         <g:set var= "check" value= "${index-sample.alignmentStatusList.datasets_type.get(0).size()}"/>
                                                         <tr><td>${id}</td> 
-                                                            <td>
-                                                            <%-- ${index} --%>
+                                                            <td>                                                             <%-- ${index} --%>
                                                                 <g:if test= "${check >= 0}">
 
                                                                     ${sample.alignmentStatusList.datasets_type.get(1).get(index)}
@@ -57,9 +56,7 @@
                                                                     http://galaxy-cegr.psu.edu:${sample.alignmentStatusList.datasets_url.get(0).get(index)}=True</a>
                                                                 </g:else>
          
-                                                            </td> 
-                                                            
-                                                            
+                                                            </td>         
                                                         </tr>
                                                     </g:each>
                                             </g:each>

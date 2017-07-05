@@ -15,7 +15,21 @@
                 <tr>
                     <td class="col-sm-2" rowspan="${Math.max(1, run.cohorts.size())}">${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if><br><i>${run.platform}</i></td>  
                     <td class="col-sm-2" rowspan="${Math.max(1, run.cohorts.size())}"><g:formatDate format="yyyy-MM-dd" date="${run.date}"/></td>
-                    <td class="col-sm-2" rowspan="${Math.max(1, run.cohorts.size())}"><g:link controller="sequenceRun" action="show" id="${run.id}">Sample Meta Information</g:link></td>
+                    <td class="col-sm-2" rowspan="${Math.max(1, run.cohorts.size())}"><g:link controller="sequenceRun" action="show" id="${run.id}">Sample Meta Information 
+                    </g:link><br/>
+                    <i>Notes:</i>
+                    <g:if test="${run.note}">
+                    ${run.note}
+                    </g:if>
+                    <g:else>
+                    No notes available
+                    </g:else>
+
+
+                    </td>
+                    
+                    
+
                     <td class="col-sm-2" rowspan="${Math.max(1, run.cohorts.size())}"><span class="label">${run.status}</span><g:link controller="report" action="runStatus"  params="[runId: run.id]"><br>Details</g:link></td>
                     <g:each in="${run.cohorts}" var="cohort" status="n">
                     <g:if test="${n>0}"><tr></g:if>
@@ -37,6 +51,8 @@
             $(this).addClass("label-success");
         } else if ($(this).text() == "QUEUE") {
             $(this).addClass("label-warning");
+        } else if ($(this).text() == "FAILED") {
+            $(this).addClass("label-danger");
         } else {
             $(this).addClass("label-default");
         }

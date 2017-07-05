@@ -1,0 +1,2 @@
+#Common	Systematic	SampleID	Condition	Description	Xsites	Ysites	Zsites
+Elp3	YPL086C	13137	YPD	Subunit of Elongator complex; Elongator is required for modification of wobble nucleosides in tRNA; exhibits histone acetyltransferase activity that is directed to histones H3 and H4; disruption confers resistance to K. lactis zymotoxin; human homolog ELP3 can partially complement yeast elp3 null mutant	139	149	149

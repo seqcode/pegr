@@ -274,7 +274,9 @@ class SampleDTO {
     Integer alignmentCount
     String note
     String recommend
-    List histories
+    String limits
+    String user
+    Date date
 }
 
 class ExperimentDTO {
@@ -331,4 +333,5 @@ class SampleStatusDTO {
     String target
     SequencingCohort cohort
     List alignmentStatusList
+    //List parameterNameList
 }

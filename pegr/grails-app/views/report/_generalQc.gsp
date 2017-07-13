@@ -48,7 +48,11 @@
         <tbody>
         <g:each in="${runStatusMap.value.sampleStatusList}" var="sample">
             <tr>
-            <td class="col-sample group-analysis" rowspan="${Math.max(1, sample.alignmentStatusList.size())}"><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}</g:link> ${sample.naturalId}</td>
+            <td class="col-sample group-analysis" rowspan="${Math.max(1, sample.alignmentStatusList.size())}"><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}
+            </g:link> ${sample.cohort} ${sample.target}
+          
+
+            </td>
             <td class="col-target group-analysis" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.target}</td>
             <td class="col-cohort group-analysis" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">${sample.cohort}</td>
             <g:each in="${sample.alignmentStatusList}" var="alignment" status="n">

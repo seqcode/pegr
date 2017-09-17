@@ -3,6 +3,7 @@ Grails 2.5.5 and MySQL
 
 # Coding Standards
 =====================
+
 References
 ==========
 flake8 is recommended for checking code and verifying coding conventional standards:

@@ -1,11 +1,9 @@
-PEGR is a web platform for sequencing metadata management
-Grails 2.5.5 and MySQL 
+# PEGR is a web platform for sequencing metadata management
+ * Grails 2.5.5 for Linux (x86_64) using readline 5.1 
+ * wrapper.dist.url=http://dist.springframework.org.s3.amazonaws.com/release/GRAILS/
+ * Java 8 Update 131 build 11;  MySQL Ver 14.14 Distrib 5.5.43;
 
 # Coding Standards
-
-
-References
-==========
 flake8 is recommended for checking code and verifying coding conventional standards:
 https://pypi.python.org/pypi/flake8/  based upon PEP-8 with exceptions as noted in the details below: https://www.python.org/dev/peps/pep-0008/
 
@@ -56,3 +54,8 @@ Meta-standards
 If you want to add something here, submit is as a Merge Request so that another developer can review it before it is incorporated. . These are best practices. They are not rigid. There are no enforcers.
 
 
+# Reference Books
+Original development used "Grails-in-Action" textbook examples to build PEGR and the APIs.mysql:
+[https://www.amazon.com/Grails-Action-Glen-Smith/dp/1933988932/ref=sr_1_3?ie=UTF8&qid=1505746618&sr=8-3&keywords=grails+in+action]
+bash-3.2$ cat workspace/graina2-1.0/README
+This directory contains the source code for the examples used in the book Grails in Action as well as the sample application that we create in the book: Hubbub.

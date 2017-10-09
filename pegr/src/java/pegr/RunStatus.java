@@ -4,7 +4,6 @@ public enum RunStatus {
     PREP,
     QUEUE,
     ANALYZING,
-    COMPLETED,
-    FAILED
+    COMPLETED
 	;
 }

@@ -98,7 +98,7 @@
 		<div class="Motif_rightbigtick1"></div>
 		<div class="Motif_lefttick3"></div>
 		<div class="Motif_lefttick5"></div>
-		<div class="searchfield_box"> </div>
+		<div class="searchfield_box"></div>
 		<div class="Afeaturesdivider"></div>
 		<div class="Bfeaturesdivider"></div>
 		<div class="conditionbar_graphics"></div>
@@ -123,7 +123,7 @@
 		<div class="ticknum" id="Bfeatures_bigtick3_num">0</div>
 		<div class="ticknum" id="Bfeatures_bigtick4_num">1</div>
 		<div class="ticknum" id="Bfeatures_bigtick5_num">2</div>
-		<div class="sidetextbox" id="Bfeatures_sidetext">ASITES~REPLACE ${text.YSITES}?</div>
+		<div class="sidetextbox" id="Bfeatures_sidetext">ASITES~REPLACE</div>
 		<div class="sidetextbox" id="Afeatures_sidetext">BSITES~REPLACE</div>
 		<div class="graphicbox" id="Bfeatures_graphicbox"></div>
 		<div class="graphicbox" id="Afeatures_graphicbox"></div>
@@ -154,15 +154,15 @@
 		<div class="ticknum" id="NFR_bigtick1_num">-500</div>
 		<div class="ticknum" id="NFR_bigtick3_num">0</div>
 		<div class="ticknum" id="NFR_bigtick5_num">500</div>
-		<div class="sidetextbox" id="NFR_sidetext">CSITES~REPLACE ${text.ZSITES}?</div>
+		<div class="sidetextbox" id="NFR_sidetext">CSITES~REPLACE</div>
 		<div class="Motif_graphic2"></div>
 		<div class="titlecard"> <i>Saccharomyces cerevisiae</i> epigenome</div>
 		<div class = "minussign">-</div>
 		<div id="header1">
-			<div>${text.COMMONSYSTEMATIC}</div>
+			<div>COMMONSYSTEMATIC~REPLACE</div>
 			<div>${sampleID}</div>
-			<div>${text.CONDITION}</div>
-			<div>ChIP-exo ASSAY-REPLACE-HERE</div>
+			<div>CONDITION~REPLACE</div>
+			<div>ASSAY~REPLACE</div>
 		</div>
 		<div id="meme">
 			<div>MEME</div>
@@ -172,7 +172,7 @@
 		<div id="meme_output">MEME output:</div>
 		<div id="description">
 			<div>Description:</div>
-			<div>${text.DESCRIPTION}</div>
+			<div>DESCRIPTION~REPLACE</div>
 		</div>
 		<div class="block" id="motif_block">
 			Motif

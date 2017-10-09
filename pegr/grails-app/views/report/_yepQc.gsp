@@ -1,65 +1,50 @@
 <g:link class="edit pull-right" controller="report" action="decisionTree" params="[type:'YEP_QC']" id="_blank">Decision Tree</g:link>
-
-        <ul>
-            <g:each in="${runStatusMap.value.sampleStatusList}" var="sample" status="n">
-                <div class="panel-group">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title"><a data-toggle="collapse" href="#collapse${n}">Sample <b>#${sample.sampleId}: </b><i>Alignment</i>${sample.alignmentStatusList.alignmentId}</a> 
-                            </h4>
-                        </div>
-                    <div id="collapse${n}" class="panel-collapse collapse">
-                        <table id="yep" class="table table-responsive">
-                            <thead>
-                                <tr>
-                                    <th rowspan="2">Galaxy ID</th>
-                                    <th rowspan="2">File Type</th>
-                                    <th rowspan="2">Link to Galaxy Data</th>
-                                    <g:each in="${headers.yep}" var="header">
-                                        <th class="text-right" style="white-space:normal" rowspan="${header.rowspan}" colspan="${header.colspan}">${header.name}</th>
-                                    </g:each>
-
-                                <tr>
-                                    <g:each in="${subheaders.yep}" var="subheader">
-                                        <th class="text-right" style="white-space:normal">${subheader}</th>
-                                    </g:each>
-                                </tr>
-                            </thead>
-
-
-                            <tbody>  
-                                     <tr>
-                                        <td class="id" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">
-                                        <b>Sample #${sample.sampleId}:</b> <i>Alignment</i> <b>${sample.alignmentStatusList.alignmentId}</b>
-                                            <g:each in = "${sample.alignmentStatusList.datasets_id}" var ="set"> 
-                                                    <g:each in="${set}" var ="id" status ="index">
-                                                        <tr> <td>${id}</td> 
-
-                                                            <td>
-                                                            ${sample.alignmentStatusList.datasets_type.get(0).get(index)}
-                                                            </td> 
-                                                        
-                                                            <td>
-                                                            <a href = "http://galaxy-cegr.psu.edu:${sample.alignmentStatusList.datasets_url.get(0).get(index)}=True"/>
-                                                            http://galaxy-cegr.psu.edu:${sample.alignmentStatusList.datasets_url.get(0).get(index)}=True</a>
-                                                            </td> 
-                                                        
-
-                                                        </tr>
-                                                    </g:each>
-                                            </g:each>
-                                   
-                                        </td>
-                                    </tr>
-                               
-                            </tbody>
-                        
-
-                        </table>
-                    </div>
-                </div>  
+<table id="yep" class="table table-bordered">
+    <thead>
+        <tr>
+            <th rowspan="2">Galaxy ID</th>
+            <th rowspan="2">File Type</th>
+            <th rowspan="2">Link to Galaxy Data</th>
+            <g:each in="${headers.yep}" var="header">
+                <th class="text-right" style="white-space:normal" rowspan="${header.rowspan}" colspan="${header.colspan}">${header.name}</th>
             </g:each>
-        </ul>
+
+        <tr>
+            <g:each in="${subheaders.yep}" var="subheader">
+                <th class="text-right" style="white-space:normal">${subheader}</th>
+            </g:each>
+        </tr>
+    </thead>
+
+
+    <tbody>
+        <g:each in="${runStatusMap.value.sampleStatusList}" var="sample">
+            <tr>
+                <td class="id" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">
+                <b>Sample #${sample.sampleId}:</b> <i>Alignment</i> ${sample.alignmentStatusList.alignmentId}
+                    <g:each in = "${sample.alignmentStatusList.datasets_id}" var ="set"> 
+                            <g:each in="${set}" var ="id" status ="index">
+                                <tr> <td>${id}</td> 
+
+                                    <td>
+                                    ${sample.alignmentStatusList.datasets_type.get(0).get(index)}
+                                    </td> 
+                                
+                                    <td>
+                                    <a href = "http://galaxy-cegr.psu.edu:${sample.alignmentStatusList.datasets_url.get(0).get(index)}=True"/>
+                                    http://galaxy-cegr.psu.edu:${sample.alignmentStatusList.datasets_url.get(0).get(index)}=True</a>
+                                    </td> 
+                                
+
+                                </tr>
+                            </g:each>
+                    </g:each>
+           
+                </td>
+            </tr>
+        </g:each>
+    </tbody>
+</table>
 
 <script>
     

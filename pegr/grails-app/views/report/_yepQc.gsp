@@ -1,3 +1,4 @@
+<g:link class="edit pull-right" controller="report" action="decisionTree" params="[type:'YEP_QC']" id="_blank">Decision Tree</g:link>
     <h3> Click on a sample to reveal more information </h3>
         <ul>
             <g:each in="${runStatusMap.value.sampleStatusList}" var="sample" status="n">

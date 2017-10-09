@@ -2,12 +2,15 @@ PEGR is a web platform for sequencing metadata management
 Grails 2.5.5 and MySQL 
 
 # Coding Standards
-
+=====================
 
 References
 ==========
 flake8 is recommended for checking code and verifying coding conventional standards:
-https://pypi.python.org/pypi/flake8/  based upon PEP-8 with exceptions as noted in the details below: https://www.python.org/dev/peps/pep-0008/
+https://pypi.python.org/pypi/flake8/
+
+Scriting Code Standards follow:
+https://www.python.org/dev/peps/pep-0008/
 
 Java Standards
 ===============
@@ -36,20 +39,17 @@ Java is less reliant on the code lay-out. That being said, here are our lab cod
 
 Python Standards
 ================
-Galaxy follows PEP-8, with particular emphasis on the parts about knowing when to be consistent, and readability being the ultimate goal. One divergence from PEP-8 is line length. 
+Galaxy follows PEP-8, with particular emphasis on the parts about knowing when to be consistent, and readability being the ultimate goal. One divergence from PEP-8 is line length. Logical (non-comment) lines should be formatted for readability, recognizing the existence of wide screens and scroll bars (sometimes a 200 character line is more readable, though rarely).
 
-1.  Logical (non-comment) lines should be formatted for readability, recognizing the existence of wide screens and scroll bars        (sometimes a 200 character line is more readable, though rarely).
+Use spaces, not tabs for indenting! 4 spaces per indent.
 
-2.  Use spaces, not tabs for indenting! 4 spaces per indent.
+File names must never include capital letters, and words must be separated by underscore. For example, thisIsWrong.py and this_is_right.py.
 
-3.  File names must never include capital letters, and words must be separated by underscore. For example, thisIsWrong.py and this_is_right.py.
+Comments and documentation comments should follow the 79 character per line rule.
 
-4.  Comments and documentation comments should follow the 79 character per line rule.
+Python docstrings need to be reStructured Text (RST) and Sphinx markup compatible. See https://wiki.galaxyproject.org/Develop/SourceDoc for more information.
 
-5.  Python docstrings need to be reStructured Text (RST) and Sphinx markup compatible. See https://wiki.galaxyproject.org/Develop/SourceDoc for more information.
-
-6.  Avoid from module import *. It can cause name collisions that are tedious to track down.
-
+Avoid from module import *. It can cause name collisions that are tedious to track down.
 
 Meta-standards
 ==============

@@ -42,7 +42,7 @@
             <table class="table table-responsive">
                 <div id="center_iframe">
                     <div id="iframe_div">
-                        <iframe src="https://shaunline.vmhost.psu.edu/pegr/yep/template?id=${sample.id}" id="yep_iframe" scrolling="no" frameborder="no"></iframe>
+                        <iframe src="http://localhost:8081/pegr/yep/template?id=${sample.id}" id="yep_iframe" scrolling="no" frameborder="no"></iframe>
                     </div>
                 </div>
             </table>

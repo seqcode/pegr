@@ -55,9 +55,6 @@ class ReportService {
                 def analysis = Analysis.findAllByAlignment(alignment) 
                 def alignmentStatusDTO = getAlignmentStatusDTO(alignment, experiment, analysis)
                 
-                //create a new parameter status
-                //def parameterStatusDTO = 
-
                 // iterate through the analysis and get each step's status  
                 def motifCount = 0
                 
@@ -97,7 +94,6 @@ class ReportService {
                                                        target: experiment.sample.target?.name,
                                                        cohort: experiment.cohort,
                                     alignmentStatusList: [alignmentStatusDTO])
-                                    //,parameterNameList: )
                     results[alignment.pipeline].sampleStatusList << sampleStatus
                 } else {    
                     sampleStatus.alignmentStatusList << alignmentStatusDTO
@@ -173,11 +169,7 @@ class ReportService {
                     duplicationLevel: getDuplicationLevel(alignment.dedupUniquelyMappedReads, alignment.mappedReads),
                     isPreferred: alignment.isPreferred,            
                     dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
-                    recommend: experiment.sample.recommend,
-
-                  
-                    datasets_type: getFromDataSet(analysis.datasets, "type") + getFromDataSet(analysis.datasets,"Truetype"),
-                    datasets_id: getFromDataSet(analysis.datasets, "id"),
+                    recommend: experiment.sample.recommend
                 ]
         def stepsStr = Chores.findByName(DYNAMIC_ANALYSIS_STEPS)?.value
         def steps
@@ -206,40 +198,8 @@ class ReportService {
         return dto
     }
     
-    /*
-    Returns specified field data from the dataset string
-    */
-    def getFromDataSet(java.util.ArrayList dataset, java.lang.String field){
-        def dataset_str=""
-        def list=[]
-        //take the arraylist and combine it into one big stinrg
-        for (int i=0; i<dataset.size();i++)
-                dataset_str+=(dataset.get(i))
-        
-        //trim the string and split and make it into a list
-        dataset_str= dataset_str.replace("."," ")
-        dataset_str= dataset_str.replace(','," ")
-        dataset_str= dataset_str.replace('"',"")
-        dataset_str= dataset_str.replace("{","")
-        dataset_str= dataset_str.replace('}',"")
-        dataset_str= dataset_str.replace('[',"")
-        dataset_str= dataset_str.replace(']',"")
-        dataset_str=dataset_str.replace('=',' ')
-        def dataset_arr= dataset_str.split()
-       
-        //check each list element and see if is the field value desired
-        for (int i=0; i<dataset_arr.size();i++)
-        //dataset_arr[i].contains(':') && 
-            if (dataset_arr[i].contains(':') && dataset_arr[i].substring(0, dataset_arr[i].indexOf(":")) == field )
-                //string test
-                //list+=dataset_arr[i].substring(dataset_arr[i].indexOf(':') + 1) + '\n'
-                
-                list.add(dataset_arr[i].substring(dataset_arr[i].indexOf(':') + 1))
-        
-        return list
-    }
-
-     /**
+    
+   /**
     * get the Quality Control settings
     * @return a list of quality control criterias
     */

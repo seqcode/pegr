@@ -1,45 +1,138 @@
-<g:link class="edit pull-right" controller="report" action="decisionTree" params="[type:'YEP_QC']" id="_blank">Decision Tree</g:link>
+<g:link class="edit pull-right" controller="report" action="decisionTree" params="[type:'YEP_QC']" target="_blank">Decision Tree</g:link>
 <table id="yep" class="table table-bordered">
     <thead>
         <tr>
-            <th rowspan="2">ID</th>
-            <th rowspan="2">File Type</th>
-
+            <th rowspan="2">Sample ID</th>
+            <th rowspan="2">Target</th>
             <g:each in="${headers.yep}" var="header">
                 <th class="text-right" style="white-space:normal" rowspan="${header.rowspan}" colspan="${header.colspan}">${header.name}</th>
             </g:each>
-
+            <th rowspan="2">Recommend<br><span class="edit" id="calculate-recommend">Calculate</span><i id="recommend-spin" class="fa fa-spinner fa-spin"></i></th>
+        </tr>
         <tr>
             <g:each in="${subheaders.yep}" var="subheader">
                 <th class="text-right" style="white-space:normal">${subheader}</th>
             </g:each>
         </tr>
     </thead>
-
-
     <tbody>
         <g:each in="${runStatusMap.value.sampleStatusList}" var="sample">
             <tr>
-                <td class="id" rowspan="${Math.max(1, sample.alignmentStatusList.size())}">
-                    <g:each in = "${sample.alignmentStatusList.datasets_id}" var ="set"> 
-                            <g:each in="${set}" var ="id" status ="index">
-                                <tr> <td>${id}</td> 
-                                    <td>
-                                    "${sample.alignmentStatusList.datasets_type.get(0).get(index)}"
-                                    </td> 
-                                </tr>
-                            </g:each>
+                <td class="sample" rowspan="${Math.max(1, sample.alignmentStatusList.size())}"><g:link controller="sample" action="show" id="${sample.sampleId}">${sample.sampleId}</g:link> ${sample.naturalId}</td>
+                <g:each in="${sample.alignmentStatusList}" var="alignment" status="n">
+                    <g:if test="${n>0}"><tr></g:if>
+                    <td class="target">${sample.target}</td>
+                    <g:each in="${qcSettings.yep}" var="setting">
+                        <td class="text-right ${setting.key}" title="${setting.key}">          
+                            <g:if test="${setting.key == 'memER'}">
+                                <span style="display:none">${alignment[setting.key]}</span>
+                            </g:if>
+                            <g:elseif test="${setting.numFormat && setting.numFormat != ''}">
+                                <g:formatNumber number="${alignment[setting.key]}" format="${setting.numFormat}" />
+                            </g:elseif>
+                            <g:else>
+                                ${alignment[setting.key]}
+                            </g:else>
+                        </td>
                     </g:each>
-                
-                </td>
+                    <td class="recommend" data-sample-id="${sample.sampleId}"><span class="value" style='padding:.2em .5em;fond-weight:bold;line-height:1;white-space:nowrap;display:inline;color: white;'>${alignment.recommend}</span></td>
+                </g:each>
             </tr>
         </g:each>
     </tbody>
 </table>
 
 <script>
+    $("#recommend-spin").hide();
+    var colors;
+    $.ajax({
+            url:"/pegr/report/getDecisionTreeAjax?type=YEP_QC",
+            success: function(result) {
+                var treeData = result.treeData;
+                colors = result.colors;
+                $(".recommend").each(function() {
+                    var text = $(this).text();
+                    if (text) {
+                        $(this).find("span").css('background-color', colors[text])
+                    }
+                });
+            }
+     });
     
+    $("#calculate-recommend").on("click", function(){
+        $(this).hide();
+        $("#recommend-spin").show();
+        var data = [];
+        $.ajax({
+            url:"/pegr/report/getDecisionTreeAjax?type=YEP_QC",
+            success: function(result) {
+                var treeData = result.treeData;
+                var colors = result.colors;
+                $("#yep tbody tr").each(function(){
+                    var v = {};
+                    $(this).children("td").each(function(index, elem) {
+                        var classes =  $(elem).attr("class").split(' ');
+                        for (n in classes) {
+                            if (classes[n] != "text-right") {
+                                v[classes[n]] = $(elem).text().trim();
+                            }
+                        }            
+                    });
+                    $(this).find(".recommend").text(v.target);
+                    var target = v.target.toUpperCase();
+                    if ( target == "NOTAG" || target == "NOTARGET") {
+                        recommend = "";
+                    } else {
+                        recommend = getDecision(v, treeData);
+                    }
+                    $(this).find(".recommend").html("<span style='padding:.2em .5em;fond-weight:bold;line-height:1;white-space:nowrap;display:inline;color: white; background-color:" + colors[recommend.name] + "'>" + recommend.name + "</span>");
+                    if (recommend.marks) {
+                        for ( n in recommend.marks){
+                            $(this).find("."+recommend.marks[n]).css("background-color", "#f2dede");
+                        }
+                    }
+                    var sampleId = Number($(this).find(".recommend").attr("data-sample-id"));
+                    data.push({ sampleId: sampleId, name: "recommend", value: recommend.name});
+                });
+                $("#recommend-spin").hide();
+                $("#calculate-recommend").show();
+                // save the recommedations
+                $.ajax({
+                    method: "POST",
+                    url: "/pegr/sample/updateListAjax",
+                    data: {"sampleList": JSON.stringify(data)}
+                });
+        }});
+    });
+    
+    $(".recommend .value").on("click", function() {
+        var value = $(this).text();
+        var edit = "<select class='input' name='recommend'><option>Done; success</option><option>Done; stress gene</option><option>Done; low exprs</option><option>Done; failed</option><option>Re-sequence</option><option>re-ChIP</option></select>";
+        appendEdit(this, edit);
+    });
+    
+    $(".recommend").on("click", ".cancel", function(){
+        var parent = $(this).parent();
+        toggleTd(parent);
+    });
 
+    $(".recommend").on("click", ".save", function(){
+        var parent = $(this).parent();
+        var sampleId = parent.attr("data-sample-id");
+        var recommend = parent.find(".input").val();
+        // save the recommedations
+        $.ajax({
+            method: "POST",
+            url: "/pegr/sample/updateAjax",
+            data: {sampleId: sampleId, name: "recommend", value: recommend},
+            success: function() {
+                var $value = parent.find(".value");
+                $value.text(recommend);
+                $value.css('background-color', colors[recommend]);
+                toggleTd(parent);
+            }
+        });
+    });
     
     $("td.memER").each(function(index, memeFig){
         var memER = $(memeFig).text().trim();

@@ -17,7 +17,7 @@
         <tbody>
             <g:each in="${sampleList}" var="sample">
                 <tr>
-                    <td rowspan="${Math.max(1, sample.alignmentCount)}"><g:link controller="sample" action="show" id="${sample?.id}">${sample?.id}</g:link> ${sample.naturalId}</td>
+                    <td rowspan="${Math.max(1, sample.alignmentCount)}"><g:link controller="sample" action="show" id="${sample?.id}">${sample?.id}</g:link> ${sample.user} <g:formatDate format="yyyy-MM-dd" date="${sample.date}"/> ${sample.target}</td>
                     <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.target}</td>
                     <g:each in="${sample.experiments}" var="experiment" status="nExp">
                         <g:if test="${nExp>0}"><tr></g:if>

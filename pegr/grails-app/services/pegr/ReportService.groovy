@@ -240,10 +240,10 @@ class ReportService {
                 list.add(dataset_arr[i].substring(dataset_arr[i].indexOf(':') + 1))
         }
         //debug
-       /*if (list.size == 8){
-            log.info list
+       if (list.size == 0){
+            log.info "WHOA EMPGTY LIST"
             log.info '\n'
-        }*/
+        }
 
         return list
     }
@@ -540,7 +540,10 @@ class ReportService {
           experiments: [],
           alignmentCount: 0,
           note: utilityService.queryJson(sample.note, "note"), 
-          recommend: sample.recommend
+          recommend: sample.recommend,
+          //added these two since naturalId is a bit wonky
+          user: sample.sendDataTo.username,
+          date: sample.date
          )
     }
     

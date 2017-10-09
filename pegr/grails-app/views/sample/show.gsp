@@ -29,12 +29,6 @@
         <h4><b>Click to reveal/edit the info below</b></h4>
         <g:render template="details" model="['sample': sample]"></g:render>
 
-        <div id="center_iframe">
-            <div id="iframe_div">
-                <iframe src="http://localhost:8080/mastertemplate.html" id="yep_iframe" scrolling="no" frameborder="no"></iframe>
-            </div>
-        </div>
-
         <h3>Replicates</h3>
         <div id="replicates">
             <g:render template="/replicate/list" model="[replicates: replicates]"></g:render>

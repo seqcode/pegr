@@ -1,24 +1,6 @@
     <style>
 /* The following is the content of meme.css */
 body { background-color:white; font-size: 12px; font-family: Verdana, Arial, Helvetica, sans-serif;}
-#center_iframe{
-  text-align: center;
-  width: 100%;
-}
-
-#iframe_div{
-  width: 1600px;
-  height:900px;
-  overflow: hidden;
-  margin: 0 auto;
-}
-
-#yep_iframe{
-  margin-left: -144px;
-  width: 1760px;
-  height:1080px;
-  margin-top: -150px;
-}
 
 div.help {
   display: inline-block;

@@ -178,7 +178,6 @@ class ReportService {
                   
                     datasets_type: getFromDataSet(analysis.datasets, "type") + getFromDataSet(analysis.datasets,"Truetype"),
                     datasets_id: getFromDataSet(analysis.datasets, "id"),
-                    datasets_url:getFromDataSet(analysis.datasets,"edu"),
                 ]
         def stepsStr = Chores.findByName(DYNAMIC_ANALYSIS_STEPS)?.value
         def steps

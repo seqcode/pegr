@@ -59,3 +59,12 @@ Original development used "Grails-in-Action" textbook examples to build PEGR and
 [https://www.amazon.com/Grails-Action-Glen-Smith/dp/1933988932/ref=sr_1_3?ie=UTF8&qid=1505746618&sr=8-3&keywords=grails+in+action]
 bash-3.2$ cat workspace/graina2-1.0/README
 This directory contains the source code for the examples used in the book Grails in Action as well as the sample application that we create in the book: Hubbub.
+
+Baseline Assumptions about Platform Interoperability
+====================================================
+* PEGR only collects meta-data information from core pipeline run off sequencer.
+* Galaxy platform is where further downstream analysis is performed.
+* PEGR will point the user to the right sample/dataset Galaxy history to work from.
+* PEGR collects only what is necessary and expedient for the visual summary report.
+* PEGR MUST retain what information does not change from one sequencing run to the next, for each run of the pipeline.
+* Anything prior to and including alignment will be named fields, everything after will be sent/stored in a blob (json dict).

@@ -318,6 +318,7 @@ class AlignmentDTO {
     List fourColor
     List composite
     String scidx
+    Integer readDbId
 }
 
 class RunStatusDTO {

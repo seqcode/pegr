@@ -17,6 +17,6 @@ class Pipeline {
     static mapping = {
         steps sqlType: 'longtext'
         workflowId defaultValue: "N/A"
-        pipelineVersion defaultValue: "0.0.0"
+        pipelineVersion defaultValue: "'0.0.0'"
     }
 }

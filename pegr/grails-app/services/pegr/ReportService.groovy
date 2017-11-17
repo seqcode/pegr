@@ -411,6 +411,9 @@ class ReportService {
                         updateAlignmentPct(alignmentDTO, expDTO)
                         expDTO.alignments << alignmentDTO
                         sampleDTO.alignmentCount++
+                        def analysis = Analysis.findAllByAlignment(alignment)
+                        def alignmentStatusDTO = getAlignmentStatusDTO(alignment, experiment, analysis)
+                        sampleDTO.histories << alignmentStatusDTO.historyId
                     }
                 }
                 sampleDTO.experiments << expDTO
@@ -540,7 +543,8 @@ class ReportService {
           experiments: [],
           alignmentCount: 0,
           note: utilityService.queryJson(sample.note, "note"), 
-          recommend: sample.recommend
+          recommend: sample.recommend,
+          histories: []
          )
     }
     
@@ -583,6 +587,9 @@ class ReportService {
                 composite: []
             )
 
+	if (alignment.readDbId > 0) {
+        	alignmentDTO.readDbId = alignment.readDbId;
+        }
         def statistics
         def parameter
         def analysisList = Analysis.findAllByAlignment(alignment)

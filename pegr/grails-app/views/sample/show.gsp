@@ -26,29 +26,20 @@
         <g:if test="${sample?.date}">
             <p>Date: <g:formatDate format="yyyy-MM-dd" date="${sample.date}"/></p>
         </g:if>
-        <h4><b>Click to reveal/edit the info below</b></h4>
         <g:render template="details" model="['sample': sample]"></g:render>
 
-
-        <div class="panel-group">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h4 class="panel-title"><a data-toggle="collapse" href="#collapse1">YEP Site Details</a>
-                </h4>
-            </div>
+        <h3>Replicates</h3>
+        <div id="replicates">
+            <g:render template="/replicate/list" model="[replicates: replicates]"></g:render>
         </div>
-
-        <div id="collapse1" class="panel-collapse collapse">
-            <table class="table table-responsive">
-                <div id="center_iframe">
-                    <div id="iframe_div">
-                        <iframe src="https://shaunline.vmhost.psu.edu/pegr/yep/template?id=${sample.id}" id="yep_iframe" scrolling="no" frameborder="no"></iframe>
-                    </div>
-                </div>
-            </table>
+        <div id="project">
+            <h3>Related Projects</h3>
+            <ol>
+            <g:each in="${sample.projects}">
+                <li><g:link controller="project" action="show" id="${it.id}">${it}</g:link> <i>Created on <g:formatDate format="yyyy-MM-dd" date="${it.dateCreated}"/></i></li>
+            </g:each>
+            </ol>
         </div>
-
-
         <div id="details">
             <div class="text-center">
                 <i class="fa fa-spinner fa-spin"></i>

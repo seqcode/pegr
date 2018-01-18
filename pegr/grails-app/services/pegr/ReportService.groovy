@@ -157,6 +157,7 @@ class ReportService {
         def dto = [ 
                     alignmentId: alignment.id,
                     historyId: alignment.historyId,
+		    galaxyBase: null,
                     genome: alignment.genome.name,
                     date: alignment.date,
                     status: [],
@@ -171,6 +172,11 @@ class ReportService {
                     dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
                     recommend: experiment.sample.recommend
                 ]
+	//bam_file in sequence_alignment has the Galaxy url
+        if (alignment.bamFile) {
+            int p = alignment.bamFile.indexOf('datasets');
+            dto["galaxyBase"] = alignment.bamFile.substring(0, p-1)
+        }
         def stepsStr = Chores.findByName(DYNAMIC_ANALYSIS_STEPS)?.value
         def steps
         if (stepsStr) {

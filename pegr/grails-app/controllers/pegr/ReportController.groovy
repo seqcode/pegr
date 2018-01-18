@@ -1,5 +1,6 @@
 package pegr
 import grails.converters.*
+import grails.util.Holders
 
 class ReportController {
     
@@ -33,6 +34,7 @@ class ReportController {
                 def headers = [:]
                 def subheaders = [:]
                 def priorGroup
+                def galaxy = Holders.config.defaultGalaxy
                 if (qcSettings.yeast) {
                     headers["yeast"] = []
                     subheaders["yeast"] = []
@@ -55,7 +57,8 @@ class ReportController {
                  qcSettings: qcSettings,
                  run: run,
                  headers: headers,
-                 subheaders: subheaders
+                 subheaders: subheaders,
+                 defaultGalaxy: galaxy
                 ]
             } catch (ReportException e) {
                 flash.message = e.message

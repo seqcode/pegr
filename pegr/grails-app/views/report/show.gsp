@@ -1,6 +1,7 @@
 <html>
 <head>
     <title>My Reports</title> 
+    <g:set var="defaultGalaxy" value="${defaultGalaxy}" scope="request"/>
     <meta name="layout" content="analysis"/>
     <asset:javascript src="meme.js"/>
     <asset:stylesheet href="meme.css"/>

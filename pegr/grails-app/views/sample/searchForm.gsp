@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <g:set var="defaultGalaxy" value="${defaultGalaxy}" scope="request"/>
     <meta name="layout" content="analysis">
     <title>Sample-Search</title>
 </head>

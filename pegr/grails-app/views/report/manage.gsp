@@ -1,6 +1,7 @@
 <html>
     <head>
         <title>PEGR - Analysis Status</title> 
+	<g:set var="defaultGalaxy" value="${defaultGalaxy}" scope="request"/>
         <meta name="layout" content="analysis"/>
         <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
         <style>

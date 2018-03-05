@@ -15,12 +15,12 @@ class ReportService {
     def utilityService
     def alignmentStatsService
     def springSecurityService
-    final Map QC_SETTINGS = ['general': "QC_SETTINGS", 'yeast': "YEAST_QC_SETTINGS",'yep': "YEP_QC_SETTINGS"]
+    final Map QC_SETTINGS = ['general': "QC_SETTINGS", 'yeast': "YEAST_QC_SETTINGS"]
     final String PURGE_ALIGNMENTS_CONFIG = "PurgeAlignmentsConfig"
     final String GALAXY_CONFIG = "GalaxyConfig"
     final String DYNAMIC_ANALYSIS_STEPS = "DYNAMIC_ANALYSIS_STEPS"
     final String DECISION_TREE = "DECISION_TREE"
-
+    
    /**
     * Fetch the status of the sequence run
     * @params run given sequence run
@@ -32,7 +32,7 @@ class ReportService {
         def noResultSamples = []
         run.experiments.each { experiment ->
             if (experiment.alignments.size() == 0) {
-                noResultSamples << new SampleStatusDTO(sampleId: experiment.sample.id,
+                noResultSamples << new SampleStatusDTO(sampleId: experiment.sample.id, 
                                                        naturalId: experiment.sample.naturalId,
                                                        cohort: experiment.cohort)
             }
@@ -50,26 +50,21 @@ class ReportService {
                         throw new ReportException(message: "Pipeline steps are not properly defined!")
                     }
                 }
-
-                // create a new alignment status
-                def analysis = Analysis.findAllByAlignment(alignment)
+                    
+                // create a new alignment status                    
+                def analysis = Analysis.findAllByAlignment(alignment) 
                 def alignmentStatusDTO = getAlignmentStatusDTO(alignment, experiment, analysis)
-                /*log.info alignment
-                                log.info experiment
-                                log.info analysis*/
-                //create a new parameter status
-                //def parameterStatusDTO =
-
-                // iterate through the analysis and get each step's status
+                
+                // iterate through the analysis and get each step's status  
                 def motifCount = 0
-
+                
                 steps.eachWithIndex { step, index ->
                     // find the step's analysis by step
                     def stepAnalysisList = analysis.findAll {it.step == step[0]}
-
+                    
                     // get the status for this step
                     alignmentStatusDTO.status[index] = getStepAnalysisStatus(stepAnalysisList)
-
+                    
                     // compare the motif count
                     if (alignmentStatusDTO.status[index].code == "OK") {
                         switch (step[1]) {
@@ -85,7 +80,7 @@ class ReportService {
                             case "tagPileup":
                                 if (stepAnalysisList.size() != motifCount) {
                                     alignmentStatusDTO.status[index] = [code: "Error", error: "Motif missing"]
-                                }
+                                }                         
                                 break
                         }
                     }
@@ -99,9 +94,8 @@ class ReportService {
                                                        target: experiment.sample.target?.name,
                                                        cohort: experiment.cohort,
                                     alignmentStatusList: [alignmentStatusDTO])
-                                    //,parameterNameList: )
                     results[alignment.pipeline].sampleStatusList << sampleStatus
-                } else {
+                } else {    
                     sampleStatus.alignmentStatusList << alignmentStatusDTO
                 }
             }
@@ -109,15 +103,15 @@ class ReportService {
 
         return [results: results, noResultSamples: noResultSamples]
     }
-
-   /**
+    
+   /** 
     * Get the step analysis' status
     * @param stepAnalysisList a list of analysis for a specific step
     * @return status map, including code, error(optional), and message(optional)
     */
     def getStepAnalysisStatus(List stepAnalysisList) {
         def result = [:]
-
+        
         if (stepAnalysisList.size() == 0){
             result = [code: "NO"]
         } else {
@@ -135,16 +129,16 @@ class ReportService {
                     }
                 }
                 // concatenate the note
-                if ((result.code == "OK" && note.code != "OK")
+                if ((result.code == "OK" && note.code != "OK") 
                     || (result.code == "Permission" && ["Zero", "Error"].contains(note.code))
                     || (result.code == "Zero" && note.code == "Error")) {
                     result.code = note.code
                 }
-
+                
                 if (note.error) {
                     result.error = result.error ? result.error + " " + note.error : note.error
                 }
-
+                
                 if (note.message) {
                     result.message = result.message ? result.message + " " + note.message : note.message
                 }
@@ -152,7 +146,7 @@ class ReportService {
         }
         return result
     }
-
+    
    /**
     * Get alignment status DTO from raw alignment and experiment
     * @param alignment the raw sequence alignment
@@ -160,7 +154,7 @@ class ReportService {
     * @return alignment status DTO
     */
     def getAlignmentStatusDTO(SequenceAlignment alignment, SequencingExperiment experiment, def analysis) {
-        def dto = [
+        def dto = [ 
                     alignmentId: alignment.id,
                     historyId: alignment.historyId,
                     genome: alignment.genome.name,
@@ -173,15 +167,9 @@ class ReportService {
                     uniquelyMappedPct: utilityService.divide(alignment.uniquelyMappedReads, experiment.totalReads),
                     deduplicatedPct: utilityService.divide(alignment.dedupUniquelyMappedReads, experiment.totalReads),
                     duplicationLevel: getDuplicationLevel(alignment.dedupUniquelyMappedReads, alignment.mappedReads),
-                    isPreferred: alignment.isPreferred,
+                    isPreferred: alignment.isPreferred,            
                     dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
-                    recommend: experiment.sample.recommend,
-
-
-                    //datasets hold lists of type,id and url for a respective sample
-                    datasets_type: getFromDataSet(analysis.datasets, "type"), //this also includes Truetype
-                    datasets_id: getFromDataSet(analysis.datasets, "id"),
-                    datasets_url:getFromDataSet(analysis.datasets,"edu"),
+                    recommend: experiment.sample.recommend
                 ]
         def stepsStr = Chores.findByName(DYNAMIC_ANALYSIS_STEPS)?.value
         def steps
@@ -209,47 +197,8 @@ class ReportService {
         }
         return dto
     }
-
-    /*
-    Returns specified field data from the dataset string
-    */
-    def getFromDataSet(java.util.ArrayList dataset, java.lang.String field){
-        def dataset_str=""
-        def list=[]
-        //take the arraylist and combine it into one big stinrg
-        for (int i=0; i<dataset.size();i++)
-                dataset_str+=(dataset.get(i))
-
-        //trim the string and split and make it into a list
-        dataset_str= dataset_str.replace(" ","")
-        dataset_str= dataset_str.replace("."," ")
-        dataset_str= dataset_str.replace(','," ")
-        dataset_str= dataset_str.replace('"',"")
-        dataset_str= dataset_str.replace("{","")
-        dataset_str= dataset_str.replace('}',"")
-        dataset_str= dataset_str.replace('[',"")
-        dataset_str= dataset_str.replace(']',"")
-        dataset_str=dataset_str.replace('=',' ')
-        def dataset_arr= dataset_str.split()
-
-        //check each list element and see if is the field value desired
-        for (int i=0; i<dataset_arr.size();i++){
-            if (dataset_arr[i].contains(':') && dataset_arr[i].substring(0, dataset_arr[i].indexOf(":")).contains(field) )
-                //string test
-                //list+=dataset_arr[i].substring(dataset_arr[i].indexOf(':') + 1) + '\n'
-
-                list.add(dataset_arr[i].substring(dataset_arr[i].indexOf(':') + 1))
-        }
-        //debug
-       /*if (list.size == 8){
-            log.info list
-            log.info '\n'
-        }*/
-
-        return list
-    }
-
-
+    
+    
    /**
     * get the Quality Control settings
     * @return a list of quality control criterias
@@ -268,7 +217,7 @@ class ReportService {
         }
         return [qcSettings:qcSettings, meta:meta]
     }
-
+    
    /**
     * delete a sequence alignment
     * @param alignmentId the ID of the alignment to be deleted
@@ -279,14 +228,14 @@ class ReportService {
             ReportAlignments.executeUpdate("delete from ReportAlignments where alignment.id =:alignmentId", [alignmentId: alignmentId])
 
             Analysis.executeUpdate("delete from Analysis where alignment.id =:alignmentId", [alignmentId: alignmentId])
-
+            
             SequenceAlignment.executeUpdate("delete from SequenceAlignment where id =:alignmentId", [alignmentId: alignmentId])
         } catch (Exception e) {
             log.error e
             throw new ReportException(message: "Error deleting the alignment!")
-        }
+        } 
     }
-
+    
    /**
     * Delete purged alignments with dates from saved chores
     * @param startDate
@@ -295,19 +244,19 @@ class ReportService {
     def deletePurgedAlignments(Date startDate, Date endDate) {
         final String RUN = "RUN"
         final String ERROR = "ERROR"
-
+        
         // get Galaxy config
         def galaxyConfig = utilityService.parseJson(Chores.findByName(GALAXY_CONFIG)?.value)
         if (!galaxyConfig || !galaxyConfig.url || !galaxyConfig.key) {
             throw new ReportException(message: "Galaxy config is not correctly defined!")
         }
-
+        
         // set current config in Chores
         def chore = Chores.findByName(PURGE_ALIGNMENTS_CONFIG)
         if (!chore) {
             chore = new Chores(name:PURGE_ALIGNMENTS_CONFIG)
         }
-
+        
         def config = utilityService.parseJson(chore.value)
         if (config) {
             if (config.status == RUN) {
@@ -325,7 +274,7 @@ class ReportService {
         if (!chore.save(flush:true)) {
             throw new ReportException(message: "The job status cannot be updated. Job canceled!")
         }
-
+        
         try {
             // find the alignments in the time interval
             def alignments = SequenceAlignment.where { date >= startDate && date <= endDate }.list()
@@ -345,16 +294,16 @@ class ReportService {
             log.error e
             config.status = ERROR
         }
-        // update config
+        // update config        
         chore.value = JsonOutput.toJson(config)
         if (!chore.save(flush:true)) {
             throw new ReportException(message: "Job finished successfully, but the job status cannot be updated.")
-        }
+        }        
     }
-
+    
    /**
-    * Create summary reports for each project linked to the samples inside the
-    * sequence run. And link the preferred alignments to the corresponding summary reports.
+    * Create summary reports for each project linked to the samples inside the 
+    * sequence run. And link the preferred alignments to the corresponding summary reports. 
     * @param cohort
     */
     @Transactional
@@ -370,12 +319,12 @@ class ReportService {
                 if (alignment.isPreferred) {
                     new ReportAlignments(report: report, alignment: alignment).save()
                 }
-            }
+            } 
         }
         cohort.report = report
         cohort.save()
     }
-
+    
    /**
     * Delete the given cohort's report
     * @param cohort
@@ -391,13 +340,13 @@ class ReportService {
         ReportAlignments.executeUpdate("delete from ReportAlignments where report=:report", [report: report])
         report.delete()
     }
-
+    
    /**
     * Fetch data for a given sample to be reported
     * @param sampleId sample's ID
     * @param preferredOnly whether to report preferred alignments only or report all alignments.
     * Default to be false.
-    * @return a list, containing only this sample's DTO if the sample exists,
+    * @return a list, containing only this sample's DTO if the sample exists, 
     * or nothing if the sample is not found.
     */
     def fetchDataForSample(Long sampleId, Boolean preferredOnly=false) {
@@ -421,7 +370,7 @@ class ReportService {
         }
         return sampleDTOs
     }
-
+    
    /**
     * Fetch data for a list of samples to be reported.
     * @param sampleIds a list of sample IDs
@@ -441,7 +390,7 @@ class ReportService {
         }
         return sampleList
     }
-
+    
    /**
     * Fetch data for a sequence run
     * @param runId sequence run ID
@@ -470,11 +419,11 @@ class ReportService {
                 }
             }
             sampleDTO.experiments << expDTO
-            sampleDTOs << sampleDTO
+            sampleDTOs << sampleDTO            
         }
         return sampleDTOs
     }
-
+    
    /**
     * Fetch data for a report.
     * @param reportId report's ID
@@ -491,35 +440,35 @@ class ReportService {
             if (!sampleDTO) {
                 sampleDTO = getSampleDTO(sample)
                 sampleDTOs << sampleDTO
-            }
+            } 
             sampleDTO.alignmentCount++
-
+            
             def experiment = alignment.sequencingExperiment
             def experimentDTO = sampleDTO.experiments.find { it.id == experiment.id }
             if (!experimentDTO) {
                 experimentDTO = getExperimentDTO(experiment)
                 sampleDTO.experiments << experimentDTO
             }
-
+            
             updateAlignmentPct(alignmentDTO, experimentDTO)
-
+            
             experimentDTO.alignments << alignmentDTO
         }
         sampleDTOs.sort { it.id }
         return sampleDTOs
     }
-
+    
    /**
     * Update sequence alignment's percentage type of statistics.
     * @param alignmentDTO alignmentDTO
     * @params experimentDTO experimentDTO
-    */
+    */ 
     def updateAlignmentPct(AlignmentDTO alignmentDTO, ExperimentDTO experimentDTO) {
         alignmentDTO.mappedReadPct = utilityService.divide(alignmentDTO.mappedReads, experimentDTO.totalReads)
         alignmentDTO.uniquelyMappedPct = utilityService.divide(alignmentDTO.uniquelyMappedReads, experimentDTO.totalReads)
         alignmentDTO.deduplicatedPct = utilityService.divide(alignmentDTO.dedupUniquelyMappedReads, experimentDTO.totalReads)
     }
-
+    
    /**
     * Get sampleDTO from raw sample
     * @param sample
@@ -541,11 +490,11 @@ class ReportService {
           assay: sample.assay?.name,
           experiments: [],
           alignmentCount: 0,
-          note: utilityService.queryJson(sample.note, "note"),
+          note: utilityService.queryJson(sample.note, "note"), 
           recommend: sample.recommend
          )
     }
-
+    
    /**
     * Get ExperimentDTO from raw experiment.
     * @params experiment
@@ -564,7 +513,7 @@ class ReportService {
                               alignments: []
                              )
     }
-
+    
    /**
     * Get AlignmentDTO from raw alignment
     * @param alignment
@@ -618,14 +567,14 @@ class ReportService {
                 case "output_fourColorPlot": // four color plot
                     alignmentDTO.fourColor = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "png")
                     break
-                case "output_tagPileup": //composite
+                case "output_tagPileup": //composite 
                     def motif = utilityService.queryJson(analysis.parameters, "input2X__identifier__")
                     def motifId = motif?.find( /\d+/ )?.toInteger()
                     def tabulars = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "tabular")
                     if (tabulars && tabulars.size() > 0) {
                         if (motifId && motifId > 0){
                             alignmentDTO.composite[motifId-1] = tabulars.last()
-                        }
+                        }                      
                     }
                     break
             }
@@ -639,7 +588,7 @@ class ReportService {
         alignmentDTO.nonPairedPeaks = getNonPairedPeaks(alignmentDTO.peaks, alignmentDTO.peakPairs)
         return alignmentDTO
     }
-
+    
    /**
     * Fetch Meme motifs from Meme file.
     * @param url of the Meme file
@@ -660,12 +609,12 @@ class ReportService {
             data.eachLine {
                 if (inBlock) {
                     if (it.startsWith("----------------")) {
-                        results.push([db: 0,
-                                id: count,
-                                alt: "MEME",
-                                len: len,
-                                nsites: nsites,
-                                evalue: evalue,
+                        results.push([db: 0, 
+                                id: count, 
+                                alt: "MEME", 
+                                len: len, 
+                                nsites: nsites, 
+                                evalue: evalue, 
                                 pwm: pwm])
                         inBlock = false
                     } else {
@@ -694,7 +643,7 @@ class ReportService {
         }
         return results
     }
-
+    
    /**
     * Fetch MemER motifs from MemER file.
     * @param url of the MemER file
@@ -707,7 +656,7 @@ class ReportService {
         def pwm = []
         try {
             def config = utilityService.getGpfsConfig()
-
+            
             def cmd = "ssh -i ${config.keyfile} ${config.username}@${config.host} cat ${url}"
             def timeout = 1000 * 60 * 1 // 1 min
             def data = utilityService.executeCommand(cmd, timeout)
@@ -727,7 +676,7 @@ class ReportService {
         }
         return [pwm: pwm]
     }
-
+    
    /**
     * Find the value of a given name in a string of motif information.
     * @param s the string of motif information
@@ -738,7 +687,7 @@ class ReportService {
         def nameStart = s.indexOf(name+"= ")
         if (nameStart < 0) {
             return null
-        }
+        }        
         def valueStart = nameStart + name.length() + 2
         if (valueStart >= s.length()) {
             return null
@@ -747,7 +696,7 @@ class ReportService {
         def value = s[valueStart..valueEnd-1]
         return value
     }
-
+    
    /**
     * Fetch composite from Composite file.
     * @param url of the Composite file
@@ -769,7 +718,7 @@ class ReportService {
             if (lineNum == 0) {
                 numbers.each { n ->
                     results.push([n])
-                }
+                } 
             } else {
                 numbers.eachWithIndex { n, c ->
                     if (c > 0) {
@@ -789,7 +738,7 @@ class ReportService {
         s += "]"
         return s
     }
-
+    
    /**
     * Construct peak calling parameter string from values
     * @param filter value of filter
@@ -804,7 +753,7 @@ class ReportService {
         result += getParam("F", filter)
         return result
     }
-
+    
    /**
     * Construct peak pairs parameter string from values
     * @param upDistance value of up distance
@@ -819,7 +768,7 @@ class ReportService {
         result += getParam("b", binSize)
         return result
     }
-
+    
    /**
     * Calculate the number of non-paired peaks
     * @param peaks number of peak
@@ -833,7 +782,7 @@ class ReportService {
         }
         return result
     }
-
+    
    /**
     * Calculate the duplication level
     * @param dedup the number deduplicated uniquely mapped reads
@@ -845,7 +794,7 @@ class ReportService {
         def dupLevel = dedupPct ? 1.0 - dedupPct : null
         return dupLevel
     }
-
+    
    /**
     * Construct the parameter string
     * @param shortName short name of the parameter
@@ -858,10 +807,10 @@ class ReportService {
             result += value.replace("\"", "")
         } else {
             result += "-"
-        }
+        }        
         return result
     }
-
+    
    /**
     * Update sequence run's status.
     * @param runId the sequence run's ID
@@ -882,8 +831,8 @@ class ReportService {
             throw new ReportException(message: "Wrong run status!")
         }
 
-    }
-
+    } 
+    
    /**
     * Update report status.
     * @param reportId the report's ID
@@ -904,8 +853,8 @@ class ReportService {
             throw new ReportException(message: "Wrong report status!")
         }
 
-    }
-
+    } 
+    
    /**
     * Save the QC settings
     * @param params received by controller
@@ -919,7 +868,7 @@ class ReportService {
         def fields = utilityService.parseJson(meta)
 
         def lists = []
-
+        
         fields.each { field ->
              lists.push(params.list(field))
         }
@@ -936,7 +885,7 @@ class ReportService {
                         default:
                             setting[field] = lists[n][i]
                             break
-                    }
+                    }                
                 }
             }
             settings << setting
@@ -949,7 +898,7 @@ class ReportService {
         chores.value = JsonOutput.toJson(settings)
         chores.save()
     }
-
+    
    /**
     * Toggle the "isPreferred" field of sequence alignment.
     * <p>
@@ -962,7 +911,7 @@ class ReportService {
         alignment.isPreferred = !alignment.isPreferred
         alignment.save()
     }
-
+    
    /**
     * Get the unknown index of a sequence run from Bcl2Fastq report.
     * <p>
@@ -975,9 +924,9 @@ class ReportService {
         final String localFolder = "Bcl2FastqUnknownIndex"
         def localRoot = utilityService.getFilesRoot()
         File localPath = new File(localRoot, localFolder)
-        if (!localPath.exists()) {
-            localPath.mkdirs()
-        }
+        if (!localPath.exists()) { 
+            localPath.mkdirs() 
+        } 
         def localFile = new File(localPath, "${run.directoryName}_unknownIndex.html")
         def filepath = localFile.getPath()
 
@@ -987,10 +936,10 @@ class ReportService {
         }
         return filepath
     }
-
+    
    /**
     * Fetch the unknown index file from GPFS using scp.
-    * @param run the sequence run
+    * @param run the sequence run  
     * @param localFile the local filepath of the unknown index file
     */
     def fetchUnknownIndexFromGpfs(SequenceRun run, String localFile) {
@@ -1000,19 +949,19 @@ class ReportService {
         def config = utilityService.getGpfsConfig()
 
         String remotePath = gpfsRoot + run.directoryName + reportDir + run.fcId + unknownIndexFile
-
+        
         def cmd = "scp -i ${config.keyfile} ${config.username}@${config.host}:${remotePath} ${localFile}"
-
+        
         def timeout = 1000 * 60 * 1 // 1 min
         utilityService.executeCommand(cmd, timeout)
-
+        
     }
-
+    
     def getDecisionTree(String type) {
         def name = [DECISION_TREE, type].join("_")
         return Chores.findByName(name)
     }
-
+    
     @Transactional
     def saveDecisionTree(String json, String type) {
         def chore = getDecisionTree(type)
@@ -1020,14 +969,14 @@ class ReportService {
             chore = new Chores(name: [DECISION_TREE, type].join("_"))
         }
         def map = utilityService.parseJson(json)
-        if (map) {
+        if (map) {            
             chore.value = JsonOutput.toJson(map)
             chore.save()
         } else {
             throw new ReportException(message: "Invalid json!")
         }
     }
-
+    
     @Transactional
     def saveNotes(Long cohortId, String notes) {
         def cohort = SequencingCohort.get(cohortId)
@@ -1037,7 +986,7 @@ class ReportService {
         cohort.notes = notes
         cohort.save()
     }
-
+    
     @Transactional
     def updateAnalysisCode(Long analysisId, String code, String message) {
         def analysis = Analysis.get(analysisId)

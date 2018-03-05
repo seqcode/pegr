@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>PEGR - Analysis Status</title>
+    <title>PEGR - Analysis Status</title> 
     <meta name="layout" content="analysis"/>
     <asset:javascript src="meme.js"/>
     <asset:stylesheet href="meme.css"/>
@@ -16,7 +16,7 @@
         }
 
         .step-header > div {
-            transform:
+            transform: 
                 /* Magic Numbers */
                 translate(25px, 51px)
                 rotate(315deg);
@@ -31,7 +31,7 @@
             border-bottom: 1px solid #ccc;
             padding: 5px 10px;
         }
-
+        
         /* The switch - the box around the slider */
         .switch {
           position: relative;
@@ -90,28 +90,28 @@
         .slider.round:before {
           border-radius: 50%;
         }
-
+        
         th.group-operation {
             background-color: #f0f0f5;
             background-image: none;
         }
-
+        
         th.group-pipeline {
             background-color: #ffffcc;
             background-image: none;
         }
-
+        
         th.group-qc {
             background-color: #e6ffe6;
             background-image: none;
         }
-
+        
         .popover-wrapper {
-            position: relative;
-            overflow: visible;
+            position: relative; 
+            overflow: visible; 
             height: 100%;
         }
-
+        
         .popover-content {
             border-radius: 5px;
             bottom: 25px;
@@ -127,7 +127,7 @@
             background-color: white;
             text-align: center;
         }
-
+        
         .popover-content:before {
             border-top: 7px solid white;
             border-right: 7px solid transparent;
@@ -140,15 +140,15 @@
             position: absolute;
             z-index: 1000;
         }
-
+        
         .popover-content h6 {
             margin: 2px;
         }
-
+        
         .popover-content p {
             margin: 2px;
         }
-
+        
     </style>
 </head>
 <body>
@@ -158,13 +158,13 @@
     <h3>
         <g:link controller="sequenceRun" action="show" id="${run.id}">Run ${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if></g:link>
         <small>
-            <span id="run-status-show" class="label label-default">${run.status}</span>
+            <span id="run-status-show" class="label label-default">${run.status}</span> 
             <span id="run-status-select" style="display:none">
                 <g:select name="runStatus" from="${pegr.RunStatus}" value="${run.status}"></g:select>
                 <button id="run-status-save" class="btn btn-primary">Save</button>
                 <button id="run-status-cancel" class="btn btn-default">Cancel</button>
             </span>
-        </small>
+        </small> 
         <a href="#" onclick="window.open('/pegr/help#report', 'Help: report', 'width=600,height=400' )" class="pull-right"><small><u>Help</u></small></a>
     </h3>
     <g:link controller="report" action="unknownIndex" params="[runId: run.id]">Unknown index</g:link>
@@ -173,7 +173,6 @@
             <h4>Pipeline: ${it.key.name}, version: ${it.key.pipelineVersion} (workflow ID: <a href="http://galaxy-cegr.psu.edu:8080/workflow/display_by_id?id=${it.key.workflowId}" target="_blank">${it.key.workflowId}</a>) <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link controller="pipelineAdmin" action="show" id="${it.key.id}" class="edit">Manage</g:link></sec:ifAnyGranted></h4>
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#general">Core Pipeline</a></li>
-                <li><a data-toggle="tab" href="#yep">Sample Details</a></li>
                 <li><a data-toggle="tab" href="#yeast">Yeast QA Pipeline</a></li>
             </ul>
             <div class="tab-content">
@@ -183,10 +182,7 @@
                 <div id="yeast" class="tab-pane fade">
                     <g:render template="yeastEncodeQc" model="[runStatusMap:it]"></g:render>
                 </div>
-                <div id="yep" class="tab-pane fade">
-                    <g:render template="yepQc" model="[runStatusMap:it]"></g:render>
-                </div>
-            </div>
+            </div>            
         </div>
     </g:each>
     <g:if test="${noResultSamples.size() > 0}">
@@ -227,8 +223,8 @@
         </tbody>
     </table>
     <br>
-    <script>
-        $(function(){
+    <script>        
+        $(function(){  
             var hash = window.location.hash;
             hash && $('ul.nav a[href="' + hash + '"]').tab('show');
 
@@ -238,10 +234,10 @@
                 window.location.hash = this.hash;
                 $('html,body').scrollTop(scrollmem);
             });
-
+            
             $(".confirm").confirm({text: "All data in this alignment will be deleted. Are you sure you want to delete this alignment?"});
             $(".nav-status").addClass("active");
-            $('[data-toggle="popover"]').popover();
+            $('[data-toggle="popover"]').popover(); 
 
             $("#run-status-show").click(function(){
                 $("#run-status-show").hide();
@@ -256,7 +252,7 @@
                         $("#run-status-select").val(result);
                         $("#run-status-show").show();
                         $("#run-status-select").hide();
-                    }
+                    }                
                 });
             });
 
@@ -264,11 +260,11 @@
                 $("#run-status-show").show();
                 $("#run-status-select").hide();
             });
-
+            
             $("#qc-statistics th").each(function(){
                 $(this).append(" <span class='glyphicon glyphicon-minus-sign small'></span>");
             });
-
+            
             $("#column-toggle").click(function() {
                 $("th").show();
                 $("td").show();
@@ -306,13 +302,13 @@
                             classToHide = classname;
                         }
                     }
-                }
+                }      
                 $("." + classToHide).hide();
                 if (category == "col") {
                     var groupHeader = $(".group + ." + groupClass);
                     var n = groupHeader.attr("colspan") - 1;
                     if (n == 0) {
-                        groupHeader.hide();
+                        groupHeader.hide();    
                     } else {
                         groupHeader.attr("colspan", n);
                     }
@@ -324,28 +320,28 @@
                 $(target).toggle();
             });
         });
-
+        
         function createReport(cohortId) {
             $.ajax({ url: "/pegr/report/createReportForCohortAjax?cohortId=" + cohortId, success: function(result) {
                 $("#cohort-"+cohortId).html(result);
             }});
             $('.confirm-remove-report').confirm({text: "Are you sure you want to delete this report?"});
         }
-
+        
         function removeReport(cohortId) {
             $.confirm({
                 text: "Are you sure you want to delete this report?",
                 confirm: function() {
                     $.ajax({ url: "/pegr/report/deleteReportForCohortAjax?cohortId=" + cohortId, success: function(result) {
                         $("#cohort-"+cohortId).html(result);
-                    }});
+                    }});  
                 },
                 cancel: function() {
                     // nothing to do
                 }
             });
         }
-
+        
         $(".prefer").on("click", function() {
             var $td = $(this).closest("td");
             var alignmentId = $td.find(".alignmentId").text();
@@ -360,10 +356,10 @@
                     $checkbox.checked = !$checkbox.checked;
                     alert("Error");
                 }
-            });
+            });            
         });
-
-        $(".save-notes").on("click", function() {
+        
+        $(".save-notes").on("click", function() {       
             var parent = $(this).parent();
             var notes = parent.find(".notes").val();
             var cohortId = parent.find(".cohort-id").val();
@@ -374,7 +370,7 @@
                 success: function(){parent.find(".orig-notes").val(notes);}
             });
         });
-
+        
         $(".cancel-notes").on("click", function() {
             var parent = $(this).parent();
             var origNotes = parent.find(".orig-notes").val();

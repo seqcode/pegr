@@ -157,6 +157,7 @@ class ReportService {
         def dto = [ 
                     alignmentId: alignment.id,
                     historyId: alignment.historyId,
+		    galaxyBase: null,
                     genome: alignment.genome.name,
                     date: alignment.date,
                     status: [],
@@ -171,6 +172,11 @@ class ReportService {
                     dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
                     recommend: experiment.sample.recommend
                 ]
+	//bam_file in sequence_alignment has the Galaxy url
+        if (alignment.bamFile) {
+            int p = alignment.bamFile.indexOf('datasets');
+            dto["galaxyBase"] = alignment.bamFile.substring(0, p-1)
+        }
         def stepsStr = Chores.findByName(DYNAMIC_ANALYSIS_STEPS)?.value
         def steps
         if (stepsStr) {
@@ -362,6 +368,9 @@ class ReportService {
                         updateAlignmentPct(alignmentDTO, expDTO)
                         expDTO.alignments << alignmentDTO
                         sampleDTO.alignmentCount++
+                        def analysis = Analysis.findAllByAlignment(alignment)
+                        def alignmentStatusDTO = getAlignmentStatusDTO(alignment, experiment, analysis)
+                        sampleDTO.histories << alignmentStatusDTO.historyId
                     }
                 }
                 sampleDTO.experiments << expDTO
@@ -491,7 +500,8 @@ class ReportService {
           experiments: [],
           alignmentCount: 0,
           note: utilityService.queryJson(sample.note, "note"), 
-          recommend: sample.recommend
+          recommend: sample.recommend,
+          histories: []
          )
     }
     
@@ -534,6 +544,9 @@ class ReportService {
                 composite: []
             )
 
+	if (alignment.readDbId > 0) {
+        	alignmentDTO.readDbId = alignment.readDbId;
+        }
         def statistics
         def parameter
         def analysisList = Analysis.findAllByAlignment(alignment)

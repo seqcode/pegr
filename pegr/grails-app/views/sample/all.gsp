@@ -1,6 +1,7 @@
 <html>
 <head>
   <title>Samples</title> 
+  <g:set var="defaultGalaxy" value="${defaultGalaxy}" scope="request"/>
   <meta name="layout" content="analysis"/>
 </head>
 <body>

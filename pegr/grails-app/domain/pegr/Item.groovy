@@ -58,12 +58,12 @@ class Item {
         parent nullable: true
         customizedFields nullable: true
         project nullable: true
-        status nullalbe: true
+        status nullable: true
         lastUpdated nullable: true
     }
     
     static mapping = {
         customizedFields sqlType: 'longtext'
-        status defaultValue: "ItemStatus.GOOD"
+        status defaultValue: "'ItemStatus.GOOD'"
     }
 }

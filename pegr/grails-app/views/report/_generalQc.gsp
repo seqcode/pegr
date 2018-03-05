@@ -54,7 +54,7 @@
             <g:each in="${sample.alignmentStatusList}" var="alignment" status="n">
                 <g:if test="${n>0}"><tr></g:if>
                     <td class="col-genome group-analysis">${alignment.genome}</td>
-                    <td class="col-history group-analysis"><a href="http://galaxy-cegr.psu.edu:8080/history?id=${alignment.historyId}" target="_blank">${alignment.historyId}</a></td>
+                    <td class="col-history group-analysis"><a href="${alignment.galaxyBase}/history?id=${alignment.historyId}" target="_blank">${alignment.historyId}</a></td>
                     <td class="col-date group-analysis">${alignment.date}</td>
                     <g:each in="${alignment.status}" var="status" status="j">
                         <td class="analysis-status col-step-${runStatusMap.value.steps[j][0]} group-pipeline">

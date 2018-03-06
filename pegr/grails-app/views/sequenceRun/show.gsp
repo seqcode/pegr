@@ -169,8 +169,11 @@
         <thead>
             <tr>
                 <g:if test="${editable}">
-                <th title="Remove the sample from this sequence run. All the analysis data will be removed, but the sample itself remains."><span class="glyphicon glyphicon-question-sign"></span></th>
-                <th title="Delete the sample and all the related data."><span class="glyphicon glyphicon-question-sign"></span></th>
+				
+				<th title="Delete the sample and all the related data.">
+					<input type="checkbox" id="selectAll" value="selectAll">
+					<a id="ajaxDeleteAll">
+					<span class="glyphicon glyphicon-trash"></span></a></th>
                 </g:if>
                 <th>Sample ID</th>
                 <th>Strain</th>
@@ -186,8 +189,7 @@
                 <tr>
                     <input type="hidden" name="experimentId" value="${it.id}">
                     <g:if test="${editable}">
-                        <td title="Remove the sample from this sequence run. All the analysis data will be removed, but the sample itself remains."><g:link action="removeExperiment" params="[experimentId:it.id, runId:run.id]" class="confirm-remove-sample"><span class="glyphicon glyphicon-remove"></span></g:link></td>
-                        <td title="Delete the sample and all the related data."><g:link controller="sequenceRun" action="deleteSample" params="[sampleId:it.sample.id, runId:run.id]" class="confirm-delete-sample"><span class="glyphicon glyphicon-trash"></span></g:link></td> 
+                        <td title="Delete the sample and all the related data."><input type="checkbox" name="delete" value="${it.sample.id}" data-runId="${run.id}"></td> 
                     </g:if>
                     <td><g:link controller="sample" action="show" id="${it.sample.id}">${it.sample?.id}</g:link> ${it.sample?.naturalId}</td>
                     <td>${it.sample?.cellSource?.strain}</td>
@@ -356,6 +358,50 @@
             $("#run-status-show").show();
             $("#run-status-select").hide();
         });
+		
+		$('#selectAll').click(function() {
+			if (this.checked) {
+				$('input[name="delete"]').prop('checked', true);
+			}
+			else {
+				$('input[name="delete"]').prop('checked', false);
+			}
+		});
+
+		$('input[name="delete"]').click(function(){
+			if (this.checked) {
+				$(this).prop('checked', true);
+			}
+			else {
+				$('#selectAll').prop('checked', false);
+			}
+		});
+		
+		// axa677-180306: added the following jQuery function so when the button(link): ajaxDeletAll clicked,
+		// it scans the checkboxes, retrieves their names, and stores them in an array
+		$("#ajaxDeleteAll").click(function() {
+			var sampleIds = [];
+			var runId = 0;
+			$('input[name="delete"]').each(function(){
+				if (this.checked) {
+					sampleIds.push(this.value);
+					runId = this.getAttribute("data-runId");
+				}
+			});
+			if (confirm('All data in the selected samples(s) will be deleted. Are you sure you want to delete the following sample(s): ' + sampleIds + ' for run number: ' + runId + '?'))
+			{
+				// axa677-180306: the next ajax call sends the array as a json dictionary with the run id to a controller action
+		  	  	// then get the results as html
+				$.ajax({
+					url:"${createLink(controller: 'sequenceRun', action: 'deleteAllSampleAjax')}",
+					type:"POST",
+					data: {"sampleIdsList": JSON.stringify(sampleIds), "runId": runId},
+					success: function(result){
+						$("html").html(result);
+					}
+				})
+			}
+		});
             
      </script>
 </div>

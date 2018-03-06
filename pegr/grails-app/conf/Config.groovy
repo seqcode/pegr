@@ -89,10 +89,20 @@ grails.hibernate.osiv.readonly = false
 environments {
     development {
         grails.logging.jul.usebridge = true
+		// axa677-20180306: If you are running pegr locally in development mode, you need the following line (ajax calls might work without it)
+		// if you want to add this config in the external file "pegr-config.properties", go to .grails folder and edit that file if
+		// it exists.
+		// note: you should have only this line in either development or production (having this line in both might generate some conflict/errors)
+		//grails.serverURL ="http://localhost:8080/${appName}"
     }
     production {
         grails.logging.jul.usebridge = false
-        // TODO: grails.serverURL = "http://www.changeme.com"
+		// axa677-20180306: This is important for the ajax calls to the controller actions with redirect to another action.
+		// Without this line the ajax call will redirect over http by defualt and the call will be blocked because 
+		// grails security. To make the ajax call identified and coming from the app context we added this line.
+		// This line will be commented if we already have it in the external config file "pegr-config.properties"
+		//grails.serverURL ="https://shaunline.vmhost.psu.edu/pegr"
+
     }
 }
 
@@ -102,22 +112,29 @@ log4j = {
     //
     appenders {
         console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
+		// axa677-20180306: added the following line
+		// difference between file and rollingFile
+		// file	FileAppender	Logs to a single file.
+		// rollingFile	RollingFileAppender	Logs to rolling files, for example a new file each day.
+		//file name:'pegrlog', file:'pegr.log', layout: pattern(conversionPattern: '%d{yyyy-MM-dd HH:mm:ss,SSS} %5p %c{1} - %m%n'), maxFileSize:'5MB', maxBackupIndex:2, threshold: org.apache.log4j.Level.INFO
 		
 		// limit the size of file 'stacktrace.log'
-		rollingFile name:'stacktrace', file:'stacktrace.log', layout: pattern(conversionPattern: '%d{dd-MM-yyyy HH:mm:ss,SSS} %5p %c{1} - %m%n'), maxFileSize:'5MB', maxBackupIndex:2
+		// axa677-20180306: On Shaunline, you should find this file in /usr/share/tomcat
+		rollingFile name:'stacktrace', file:'stacktrace.log', layout: pattern(conversionPattern: '%d{yyyy-MM-dd HH:mm:ss,SSS} %5p %c{1} - %m%n'), maxFileSize:'5MB', maxBackupIndex:2
     }
 
-    error  'org.codehaus.groovy.grails.web.servlet',        // controllers
-           'org.codehaus.groovy.grails.web.pages',          // GSP
-           'org.codehaus.groovy.grails.web.sitemesh',       // layouts
-           'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-           'org.codehaus.groovy.grails.web.mapping',        // URL mapping
-           'org.codehaus.groovy.grails.commons',            // core / classloading
-           'org.codehaus.groovy.grails.plugins',            // plugins
-           'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-           'org.springframework',
-           'org.hibernate'
-    info   'grails.app'
+    error 	'org.codehaus.groovy.grails.web.servlet',        // controllers
+           	'org.codehaus.groovy.grails.web.pages',          // GSP
+           	'org.codehaus.groovy.grails.web.sitemesh',       // layouts
+           	'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+           	'org.codehaus.groovy.grails.web.mapping',        // URL mapping
+           	'org.codehaus.groovy.grails.commons',            // core / classloading
+           	'org.codehaus.groovy.grails.plugins',            // plugins
+           	'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
+           	'org.springframework',
+           	'org.hibernate'
+	info   	'grails.app'
+    
     root {
         warn 'stdout', 'stacktrace'
         additivity = true
@@ -159,6 +176,7 @@ grails.plugin.springsecurity.interceptUrlMap = [
     '/report/runStatus/**':         ['ROLE_MEMBER', 'ROLE_ADMIN'],
     '/report/automatedReportList/**':['ROLE_MEMBER', 'ROLE_ADMIN'],
     '/report/deleteAlignment/**':   ['ROLE_ADMIN'],
+	'/report/deleteAllAlignmentAjax/**':   ['ROLE_ADMIN'],
     '/report/createReportForCohortAjax/**': ['ROLE_ADMIN'],
     '/report/deleteReportForCohortAjax/**': ['ROLE_ADMIN'],
     '/report/updateRunStatusAjax/**':           ['ROLE_ADMIN'],

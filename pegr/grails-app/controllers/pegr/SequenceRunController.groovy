@@ -1,6 +1,6 @@
 package pegr
 import static org.springframework.http.HttpStatus.*
-import org.springframework.web.multipart.MultipartHttpServletRequest 
+import org.springframework.web.multipart.MultipartHttpServletRequest
 import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 import groovy.time.TimeCategory
@@ -526,6 +526,7 @@ class SequenceRunController {
         redirect(action: "editQueue")
     }
     
+	// axa677-180306: No need for this function since we have written the next one to handle deletion using checkboxes
     def deleteSample(Long sampleId, Long runId) {
         try {
             def sample = Sample.get(sampleId)
@@ -536,4 +537,27 @@ class SequenceRunController {
         }
         redirect(action: "show", params: [id: runId])
     }
+	
+	
+	// axa677-180306: Added this function to handle the deletion of selected (multiple) samples
+	// This function is called in view sequenceRun/show.gsp 
+	// it receives a list of samples ids and run id in a json dictionary and iterates over the ids
+	// to send a request to sampleService.delete(sample) to delete each selected sample
+	// Then, it redirects to another action that already exists.
+    def deleteAllSampleAjax() {
+
+		def listSampleIds= JSON.parse(params.sampleIdsList)
+		def runId= params.runId
+		try {
+			listSampleIds.each {
+				def sample = Sample.get(it.toLong())
+				sampleService.delete(sample)
+				}
+			flash.message = "Selected samples deleted!"
+		}
+		catch(SequenceRunException e) {
+			flash.message = e.message
+		}
+		redirect(action: "show", params: [id: runId])
+	}
 }

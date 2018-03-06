@@ -158,16 +158,16 @@ grails.plugin.springsecurity.providerNames = ['daoAuthenticationProvider', 'preA
 
 grails.plugin.springsecurity.securityConfigType = 'InterceptUrlMap'
 grails.plugin.springsecurity.interceptUrlMap = [
-	'/assets/**':       ['permitAll'],
-	'/**/js/**':        ['permitAll'],
-	'/**/css/**':       ['permitAll'],
-	'/**/images/**':    ['permitAll'],
+    '/assets/**':       ['permitAll'],
+    '/**/js/**':        ['permitAll'],
+    '/**/css/**':       ['permitAll'],
+    '/**/images/**':    ['permitAll'],
     '/user/**':         ['permitAll'],
     '/login/**':        ['permitAll'],
-	'/logout/**':       ['permitAll'],
+    '/logout/**':       ['permitAll'],
     '/api/**':          ['permitAll'],
-	'/admin/**':        ['ROLE_ADMIN'],
-	'/*Admin/**':       ['ROLE_ADMIN'],
+    '/admin/**':        ['ROLE_ADMIN'],
+    '/*Admin/**':       ['ROLE_ADMIN'],
     '/project/all/**':              ['ROLE_MEMBER', 'ROLE_ADMIN'],
     '/project/search/**':              ['ROLE_MEMBER', 'ROLE_ADMIN'],
     '/project/create/**':           ['ROLE_MEMBER', 'ROLE_ADMIN'],
@@ -177,7 +177,7 @@ grails.plugin.springsecurity.interceptUrlMap = [
     '/report/runStatus/**':         ['ROLE_MEMBER', 'ROLE_ADMIN'],
     '/report/automatedReportList/**':['ROLE_MEMBER', 'ROLE_ADMIN'],
     '/report/deleteAlignment/**':   ['ROLE_ADMIN'],
-	'/report/deleteAllAlignmentAjax/**':   ['ROLE_ADMIN'],
+    '/report/deleteAllAlignmentAjax/**':   ['ROLE_ADMIN'],
     '/report/createReportForCohortAjax/**': ['ROLE_ADMIN'],
     '/report/deleteReportForCohortAjax/**': ['ROLE_ADMIN'],
     '/report/updateRunStatusAjax/**':           ['ROLE_ADMIN'],
@@ -205,7 +205,7 @@ grails.plugin.springsecurity.interceptUrlMap = [
     '/sequenceRun/create/**':     ['ROLE_ADMIN'],
     '/sequenceRun/save/**':       ['ROLE_ADMIN'],
     '/sequenceRun/**':  ['ROLE_MEMBER', 'ROLE_ADMIN'],
-	'/**':              ['isAuthenticated()'] // everything else requires authenticated user
+    '/**':              ['isAuthenticated()'] // everything else requires authenticated user
 ]
 
 grails {

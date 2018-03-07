@@ -101,6 +101,7 @@ environments {
 		// Without this line the ajax call will redirect over http by defualt and the call will be blocked because 
 		// grails security. To make the ajax call identified and coming from the app context we added this line.
 		// This line will be commented if we already have it in the external config file "pegr-config.properties"
+	    	// Important Note: if you add this line externally, make sure to remove the quotation marks. 
 		//grails.serverURL ="https://shaunline.vmhost.psu.edu/pegr"
 
     }

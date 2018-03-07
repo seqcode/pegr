@@ -13,7 +13,7 @@
         <thead>
             <tr>
                 <th colspan="6" class="text-center group group-analysis">Analysis</th>
-                <th colspan="${runStatusMap.value.steps.size()}" class="text-center group group-pipeline">Pipeline</th>
+                <th colspan="${runStatusMap.value.steps.size()-1}" class="text-center group group-pipeline">Pipeline</th>
                 <th colspan="${qcSettings.general?.size() + 1}" class="text-center group group-qc">Quality Control</th>
                 <th colspan="2" class="text-center group group-operation">Operation</th>
             </tr>
@@ -26,7 +26,9 @@
                 <th class="col-date group-analysis">Date</th>
                 <g:if test="${runStatusMap.value.steps}">
                     <g:each in="${runStatusMap.value.steps}" var="step">
-                        <th class="step-header col-step-${step[0]}  group-pipeline"><div><span>${step[1]}</span></div></th>
+						<g:if test="${step[0]!='repeatmasker_wrapper_output_stats2'}">
+	                        <th class="step-header col-step-${step[0]}  group-pipeline"><div><span>${step[1]}</span></div></th>
+						</g:if>
                     </g:each>
                 </g:if>
                 <th class="text-right col-tags group-qc">Requested Tags</th>
@@ -42,7 +44,10 @@
                     </th>
                 </g:each>
                 <th class="col-prefer group-operation">Verified</th>
-                <th class="col-delete group-operation">Delete</th>
+                <th class="col-delete group-operation"><input type="checkbox" id="selectAll" value="selectAll">
+						<a id="ajaxDeleteAll" type="button"><span class="glyphicon glyphicon-trash"></a>
+					</br>Delete
+				</th>
             </tr>
         </thead>
         <tbody>
@@ -57,6 +62,8 @@
                     <td class="col-history group-analysis"><a href="${alignment.galaxyBase}/history?id=${alignment.historyId}" target="_blank">${alignment.historyId}</a></td>
                     <td class="col-date group-analysis">${alignment.date}</td>
                     <g:each in="${alignment.status}" var="status" status="j">
+					
+					<g:if test="${runStatusMap.value.steps[j][0]!='repeatmasker_wrapper_output_stats2'}">
                         <td class="analysis-status col-step-${runStatusMap.value.steps[j][0]} group-pipeline">
                             <input class="analysisId" type="hidden" name="analysisId" value="${status.analysisId}">
                             <div class="popover-wrapper">
@@ -87,6 +94,7 @@
                             </div>
                             </div>
                         </td>
+					</g:if>
                     </g:each>
 
                     <td class="text-right col-tags group-qc"><g:formatNumber number="${alignment.requestedTags}" format="###,###,###" /></td>
@@ -107,7 +115,7 @@
                             <div class="slider round"></div>
                         </label>
                     </td>
-                    <td class="col-delete group-operation"><g:link controller="report" action="deleteAlignment" params="[alignmentId:alignment.alignmentId, runId:run.id]" class="confirm"><span class="glyphicon glyphicon-trash"</g:link></td>
+                    <td class="col-delete group-operation"><input type="checkbox" name="delete" value="${alignment.alignmentId}" data-runId="${run.id}"></td>
                 </tr>
             </g:each>
             <g:if test="${sample.alignmentStatusList.size()==0}">
@@ -116,7 +124,8 @@
         </g:each>
         </tbody>
     </table>
-<script>
+</div>
+<script type="text/javascript">
     var codes = {"OK":"OK", 
                  "Error":"Error",
                  "Permission":"Permission denied",
@@ -162,5 +171,51 @@
             }
         })
     });
+	$('#selectAll').click(function() {
+		if (this.checked) {
+			$('input[name="delete"]').prop('checked', true);
+		}
+		else {
+			$('input[name="delete"]').prop('checked', false);
+		}
+	});
+
+	$('input[name="delete"]').click(function(){
+		if (this.checked) {
+			$(this).prop('checked', true);
+		}
+		else {
+			$('#selectAll').prop('checked', false);
+		}
+	});
+	
+	// axa677-180306: added the following jQuery function so when the button(link): ajaxDeletAll clicked,
+	// it scans the checkboxes, retrieves their names, and stores them in an array
+	$("#ajaxDeleteAll").click(function() {
+		var alignmentIds = [];
+		var runId = 0;
+		$('input[name="delete"]').each(function(){
+			if (this.checked) {
+				alignmentIds.push(this.value);
+				runId = this.getAttribute("data-runId");
+			}
+		});
+		if (confirm('All data in the selected alignment(s) will be deleted. Are you sure you want to delete the following alignment(s): ' + alignmentIds + ' for run number: ' + runId + '?'))
+		{ // axa677-180306: the next ajax call sends the array as a json dictionary with the run id to a controller action
+		  // then get the results as html 
+			$.ajax({
+				url:"${createLink(controller: 'report', action: 'deleteAllAlignmentAjax')}",
+				type:"GET",
+				data: {"alignIdsList": JSON.stringify(alignmentIds), "runId": runId},
+				success : function(result){
+					$("html").html(result);
+
+				},
+				error : function(e) {
+					console.info("Error" + e);
+				}
+			});
+		}
+	});
+	
 </script>
-</div>

@@ -1,6 +1,7 @@
 package pegr
 import grails.converters.*
 import grails.util.Holders
+import groovy.json.JsonSlurper
 
 class ReportController {
     
@@ -76,8 +77,29 @@ class ReportController {
         reportService.updateReportStatus(reportId, status)
         render status 
     }
-    
-    def deleteAlignment(Long alignmentId, Long runId) {
+	// axa677-180306: Added this function to handle the deletion of selected (multiple) alignments
+	// This function is called in template report/_generalQc.gsp
+	// it receives a list of alignment ids + run id in a json dictionary and iterates over the ids
+	// to send a request to reportService.deleteAlignment(alignmentId) to delete each selected alignment
+	// Then, it redirects to another action that already exists.
+    def deleteAllAlignmentAjax() {
+		def listAlignmentIds= JSON.parse(params.alignIdsList)
+		def runId= params.runId
+		//println listAlignmentIds
+		//println runId
+		try {
+			listAlignmentIds.each{//println it
+			reportService.deleteAlignment(it.toLong())}
+			flash.message = "Success deleting the alignment!"
+		}
+		catch(ReportException e) {
+			flash.message = e.message
+		}
+		redirect(action: "runStatus", params: [runId: runId])
+    }
+	
+	// axa677-180306: No need for this function since we have written the previous one to handle deletion using checkboxes
+	def deleteAlignment(Long alignmentId, Long runId) {
         try {
             reportService.deleteAlignment(alignmentId)
             flash.message = "Success deleting the alignment!"

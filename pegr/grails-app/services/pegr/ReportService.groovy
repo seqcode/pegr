@@ -424,6 +424,9 @@ class ReportService {
                     def alignmentDTO = getAlignmentDTO(alignment)
                     updateAlignmentPct(alignmentDTO, expDTO)
                     expDTO.alignments << alignmentDTO
+                    def analysis = Analysis.findAllByAlignment(alignment)
+                    def alignmentStatusDTO = getAlignmentStatusDTO(alignment, experiment, analysis)
+                    sampleDTO.histories << alignmentStatusDTO.historyId 
                     sampleDTO.alignmentCount++
                 }
             }

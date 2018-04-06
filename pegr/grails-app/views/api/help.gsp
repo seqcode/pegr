@@ -58,6 +58,7 @@ http://francline.vmhost.psu.edu:8080/pegr/api/fetchSampleData?apiKey=
         "assay": "string",
         "alignmentCount": integer,
         "recommend":"string",
+        "histories": ["historyId", "historyId", ...],
         "experiments": [{
                 "id": long,
                 "runId": integer,

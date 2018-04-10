@@ -276,7 +276,7 @@ class SampleDTO {
     Integer alignmentCount
     String note
     String recommend
-	List histories
+    List histories
 }
 
 class ExperimentDTO {

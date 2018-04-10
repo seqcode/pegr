@@ -7,6 +7,7 @@ import groovy.time.TimeCategory
 import groovy.json.*
 import grails.converters.*
 import org.apache.commons.io.IOUtils
+import grails.util.Holders
     
 class SequenceRunController {
     def springSecurityService    
@@ -27,6 +28,7 @@ class SequenceRunController {
                 offset: params.offset
             ]
         def runs
+	def galaxy = Holders.config.defaultGalaxy
         if (status) {
             runs = c.list(listParams) {
                 eq "status", (status as RunStatus)
@@ -53,7 +55,7 @@ class SequenceRunController {
         } else {
             runs = SequenceRun.list(listParams) 
         }
-        [runs: runs, str: str]
+        [runs: runs, str: str, defaultGalaxy: galaxy]
     }
     
     def show(Long id) {

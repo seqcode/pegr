@@ -102,7 +102,7 @@ class ImportAlignmentStatsService {
                     }
                     if (stats.size > 0) {
                         new Analysis(alignment: alignment,
-                                     tool:"Unkonwn",
+                                     tool:"Unknown",
                                      statistics: JsonOutput.toJson(stats)).save()
                     }
                 }
@@ -157,7 +157,7 @@ class ImportAlignmentStatsService {
                     }
                     if (stats.size() > 0) {
                         new Analysis(alignment: alignment,
-                                     tool:"Unkonwn",
+                                     tool:"Unknown",
                                      statistics: JsonOutput.toJson(stats)).save()
                     }
                 }

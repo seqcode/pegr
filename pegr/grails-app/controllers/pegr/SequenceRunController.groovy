@@ -23,7 +23,7 @@ class SequenceRunController {
         def c = SequenceRun.createCriteria()
         def listParams = [
                 max: params.max ?: 25,
-                sort: params.sort ?: "date",
+                sort: params.sort ?: "id",
                 order: params.order ?: "desc",
                 offset: params.offset
             ]

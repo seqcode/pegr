@@ -22,10 +22,10 @@ class SequenceRunController {
     def index(Integer max, String str, String status){
         def c = SequenceRun.createCriteria()
         def listParams = [
-                max: params.max ?: 25,
-                sort: params.sort ?: "id",
+                max: params.max ?: 50,
+                sort: params.sort ?: "id", //if you would like to sort based on the runNum, just remeber it's basically for the old run number.
                 order: params.order ?: "desc",
-                offset: params.offset
+                offset: params.offset ?: 0
             ]
         def runs
 	def galaxy = Holders.config.defaultGalaxy

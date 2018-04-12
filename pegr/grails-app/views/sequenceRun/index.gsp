@@ -57,7 +57,7 @@
         </div>
     </div>
     <div class="pagination">
-        <g:paginate next="Next" prev="Prev" params="${params}" total="${runs.totalCount ?: 0}" />
+        <g:paginate next="Next" prev="Prev" max="${params.max ?: 50}" offset="${params.offset ?: 0}" total="${runs.totalCount ?: 0}" />
     </div>
     <script>
         $(".nav-runs").addClass("active");

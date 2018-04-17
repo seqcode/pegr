@@ -43,7 +43,8 @@
                         </ul>                                        
                     </th>
                 </g:each>
-                <th class="col-prefer group-operation">Verified</th>
+                <th class="col-prefer group-operation"><label class="switch"><input id="verifyAll" class="prefer2" type="checkbox"><div class="slider round"></div></label>
+					</br>Verified</th>
                 <th class="col-delete group-operation"><input type="checkbox" id="selectAll" value="selectAll">
 						<a id="ajaxDeleteAll" type="button"><span class="glyphicon glyphicon-trash"></a>
 					</br>Delete
@@ -217,5 +218,38 @@
 			});
 		}
 	});
-	
+
+	$("#verifyAll").click(function() {
+                var $all = $(this);
+		var $res = $all.prop("checked");
+        	var $rows = $("#qc-statistics").find("tr");
+        	$rows.each(function(i, row){
+			var $succ = -1;
+			$(row).find("td.analysis-status").each(function(j, cell){
+				$succ = $(cell).find("span.label-success").length;
+                                if ($succ == 0) { alert("Not successful step found"); return false; }
+                        });
+			// if all visible tools successful or unchecking all
+                        if ($succ + 1 > 1 || ($succ + 1 > 0 && !$res)) {
+				//replicate what the on click function does
+            			var $td = $(row).find("td.col-prefer");
+            			var alignmentId = $td.find(".alignmentId").text();
+				var $checkbox = $td.find(".prefer");
+                                var $prev = $checkbox.prop("checked");
+                                $checkbox.prop("checked", $res);
+				//if changing 
+				if ($prev != $res) {
+            			     $.ajax({ url: "/pegr/report/togglePreferredAlignment?alignmentId=" + alignmentId,
+                			     error: function(xhr, ajaxOptions, thrownError) {
+                    			         $checkbox.prop("checked", $prev);
+                    			         $all.prop("checked", false);
+                    			         alert("Error");
+                			     }
+            			     });
+				}
+			} 
+                });
+	});
+
+
 </script>

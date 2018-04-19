@@ -43,7 +43,7 @@
                         </ul>                                        
                     </th>
                 </g:each>
-                <th class="col-prefer group-operation"><label class="switch"><input id="verifyAll" class="prefer2" type="checkbox"><div class="slider round"></div></label>
+                <th class="col-prefer group-operation"><label class="switch"><input id="verifyAll" class="prefer2" type="checkbox"><div class="slider round"></div></label><span class="isAdmin" style="display:none">${isAdmin}</span>
 					</br>Verified</th>
                 <th class="col-delete group-operation"><input type="checkbox" id="selectAll" value="selectAll">
 						<a id="ajaxDeleteAll" type="button"><span class="glyphicon glyphicon-trash"></a>
@@ -221,6 +221,12 @@
 
 	$("#verifyAll").click(function() {
                 var $all = $(this);
+		var $admin = $(".isAdmin").text();
+                if ($admin == "false") { // save user from many alerts
+                        alert("Permission denied");
+                        $all.prop("checked", false);
+                        return false;
+                }
 		var $res = $all.prop("checked");
         	var $rows = $("#qc-statistics").find("tr");
         	$rows.each(function(i, row){

@@ -2,6 +2,7 @@
 <head>
     <title>PEGR - Analysis Status</title> 
     <g:set var="defaultGalaxy" value="${defaultGalaxy}" scope="request"/>
+    <g:set var="isAdmin" value="${isAdmin}" scope="request"/>
     <meta name="layout" content="analysis"/>
     <asset:javascript src="meme.js"/>
     <asset:stylesheet href="meme.css"/>

@@ -17,6 +17,7 @@
     <g:form controller="project" action="search" class="pull-right">
         <input name="str" value="${str}">
         <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>
+        <br>Search project name or description
     </g:form>
     <g:render template="overview" model="[projects:projects]" />
     <div class="pagination">

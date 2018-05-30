@@ -17,7 +17,7 @@ class ProtocolInstanceBagController {
         max = Math.min(max ?: 25, 100)
 
         def bags, totalCount
-        if (projectId) {
+        if (projectId) { // project from filter box
             def projectBags = ProjectBags.createCriteria().list(max: max, offset: offset) {
                 project {
                     eq("id", projectId)
@@ -28,11 +28,11 @@ class ProtocolInstanceBagController {
             }
             totalCount = projectBags.totalCount
             bags = projectBags.collect { it.bag }
-        } else if (status) {
+        } else if (status) {  // filtering status options
             bags = ProtocolInstanceBag.where {status == status}.list(max: max, offset: offset, sort: "startTime", order: "desc")
             totalCount = ProtocolInstanceBag.where {status == status}.count()
         } else {
-            bags = ProtocolInstanceBag.list(max: max, offset: offset)
+            bags = ProtocolInstanceBag.list(max: max, offset: offset, sort: "startTime", order: "desc")
             totalCount = ProtocolInstanceBag.count()
         }
         

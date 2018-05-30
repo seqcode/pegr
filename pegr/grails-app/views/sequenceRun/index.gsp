@@ -20,6 +20,7 @@
         <g:form controller="sequenceRun" action="index" class="pull-right">
             <input name="str">
             <g:submitButton class="edit" name="submit" value="Search" style="margin-right: 10px"></g:submitButton>
+            <br>Search run number, fcId, directory name, username, or platform
         </g:form>
     </div>
     <div class="row">

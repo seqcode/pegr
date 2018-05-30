@@ -21,6 +21,7 @@
             <g:form controller="item" action="search" class="pull-right" style="padding:3px 0px">
                 <input name="str" value="${str}">
                 <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>
+            <br>Search item name, barcode, location, type name, or username
             </g:form>
         </div>
         <div class="row">

@@ -14,15 +14,21 @@
     <div class="container-fluid">
         <g:if test="${flash.message}">
             <div class="message" role="status">${flash.message}</div>
-        </g:if>    
+        </g:if>
         <h3>
             Sample ${sample.id} ${sample.naturalId} <g:if test="${sample.sourceId}">(${sample.source}#${sample.sourceId})</g:if><g:if test="${editAuth && sample.item}"><g:link controller="sample" action="showItem" params="[sampleId:sample?.id]"><span class="glyphicon glyphicon-qrcode"></span></g:link></g:if>
-            <small><span class="label label-default">${sample.status}</span></small> 
+            <small><span class="label label-default">${sample.status}</span></small>
             <g:if test="${editAuth}">
                 <g:link action="edit" params="[sampleId:sample?.id]" class="edit pull-right">Edit</g:link>
             </g:if>
         </h3>
-        
+        <!-- pjchaffin | Pierce Chaffin -->
+        <!--ADDING RUN NUMBER HERE ABOVE THE DATE OUTPUT-->
+        <g:if test="${nRunNum}" && test="${oRunNum}">
+            <p><font size="+1"><strong>Run: ${nRunNum} (Old: ${oRunNum})</strong></font></p>
+        </g:if>
+        <!-- END CODE BLOCK HERE-->
+
         <g:if test="${sample?.date}">
             <p>Date: <g:formatDate format="yyyy-MM-dd" date="${sample.date}"/></p>
         </g:if>
@@ -46,14 +52,14 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         $(function(){
             $("#nav-metadata").addClass("active");
             $.ajax({url: "/pegr/sample/fetchDataForSampleAjax/${sample.id}", success: function(result) {
                 $("#details").html(result)
             }})
-        }); 
+        });
     </script>
 </body>
 </html>

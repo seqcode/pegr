@@ -2,9 +2,9 @@ package pegr
 import groovy.json.*
 import grails.converters.*
 import grails.util.Holders
-    
+
 class SampleController {
-    
+
     def springSecurityService
     def sampleService
     def antibodyService
@@ -13,7 +13,7 @@ class SampleController {
     def utilityService
     def reportService
     def protocolInstanceBagService
-    
+
     def all(Integer max) {
         params.max = Math.min(max ?: 15, 100)
         if (!params.sort) {
@@ -25,18 +25,22 @@ class SampleController {
 
         [sampleList: samples, sampleCount: Sample.count(), defaultGalaxy: galaxy]
     }
-    
+
 	def show(Long id) {
         def sample = Sample.get(id)
         if (sample) {
+            // pjchaffin | Pierce Chaffin | Adding line here to get runNumber of Sample
+            def runNum = sampleService.getRunNum(sample)
             def result = sampleService.getSampleDetails(sample)
             def editAuth = sampleService.editAuth(sample)
             result << [editAuth: editAuth]
+            // pjchaffin | Pierce Chaffin | Piping runNum into JSON Mapping for view
+            result << [runNum]
         } else {
             render(view: "/404")
         }
 	}
-    
+
     def edit(Long sampleId) {
         def sample = Sample.get(sampleId)
         if (sample) {
@@ -45,23 +49,23 @@ class SampleController {
             render(view: "/404")
         }
     }
-    
+
     def editOther(Long sampleId) {
         def sample = Sample.get(sampleId)
         if (sample) {
             def species = sample.cellSource?.strain?.species
-            def genomes 
+            def genomes
             if (species) {
                 genomes = Genome.executeQuery("select g.name from Genome g where g.species.id = ?", [species.id])
             } else {
                 genomes = Genome.executeQuery("select g.name from Genome g")
-            }            
+            }
             [sample: sample, genomes: genomes]
         } else {
             render(view: "/404")
         }
     }
-    
+
     def updateOther(Long sampleId, String indexType, String indices) {
         def sample = Sample.get(sampleId)
         if (sample) {
@@ -78,7 +82,7 @@ class SampleController {
             render(view: "/404")
         }
     }
-    
+
     def editProtocol(Long sampleId) {
         def sample = Sample.get(sampleId)
         if (sample) {
@@ -87,14 +91,14 @@ class SampleController {
                 def jsonSlurper = new JsonSlurper()
                 notes += jsonSlurper.parseText(sample.prtclInstSummary.note)
             } catch(Exception e) {
-                
+
             }
             [sample: sample, notes:notes]
         } else {
             render(view: "/404")
         }
     }
-    
+
     def updateProtocol(Long sampleId, Long assayId, String resin, Integer pcr, Long userId, String endTime, String growthMedia) {
         def sample = Sample.get(sampleId)
         if (sample) {
@@ -110,7 +114,7 @@ class SampleController {
             render(view: "/404")
         }
     }
-    
+
     def editTarget(Long sampleId) {
         def sample = Sample.get(sampleId)
         if (sample) {
@@ -120,7 +124,7 @@ class SampleController {
             render(view: "/404")
         }
     }
-    
+
     def updateTarget(Long sampleId, String type, String target, String cterm, String nterm) {
         def sample = Sample.get(sampleId)
         if (sample) {
@@ -135,7 +139,7 @@ class SampleController {
             render(view: "/404")
         }
     }
-    
+
     def editAntibody(Long sampleId, Long antibodyId){
         def cmd
         def item
@@ -148,7 +152,7 @@ class SampleController {
                 render(view: "/404")
                 return
             }
-            cmd = new AntibodyCommand(   
+            cmd = new AntibodyCommand(
                 antibodyId : antibody.id,
                 company : antibody.company?.name,
                 catalogNumber : antibody.catalogNumber,
@@ -168,7 +172,7 @@ class SampleController {
         def itemTypeOptions = ItemType.where {category.superCategory == ItemTypeSuperCategory.ANTIBODY}.list()
         [antibody: cmd, item: item, sampleId: sampleId, antibodyId: antibodyId, itemTypeOptions: itemTypeOptions]
     }
-    
+
     def updateAntibody(Long sampleId, Long antibodyId, AntibodyCommand cmd, Item item) {
         try {
             if (antibodyId) {
@@ -183,21 +187,21 @@ class SampleController {
             redirect(action:'editAntibody', params: [sampleId: sampleId, antibodyId: antibodyId])
         }
     }
-    
+
     def searchAntibody(Long sampleId) {
         def itemTypeOptions = ItemType.where {category.superCategory == ItemTypeSuperCategory.ANTIBODY}.list()
         [sampleId: sampleId, itemTypeOptions: itemTypeOptions]
     }
-    
+
     def previewAntibody(Long sampleId, Long typeId, String barcode) {
         def item = Item.where{type.id == typeId && barcode == barcode}.get(max: 1)
         if (item) {
-            [sampleId: sampleId, item: item]    
+            [sampleId: sampleId, item: item]
         } else {
             flash.message = "Antibody not found!"
         }
     }
-    
+
     def addAntibodyToSample(Long sampleId, Long itemId) {
         try {
             antibodyService.addAntibodyToSample(sampleId, itemId)
@@ -207,7 +211,7 @@ class SampleController {
         }
         redirect(action: "edit", params: [sampleId: sampleId])
     }
-    
+
     def editCellSource(Long sampleId, Long cellSourceId) {
         def cmd
         def item
@@ -216,7 +220,7 @@ class SampleController {
             // create
             cmd = new CellSourceCommand()
         } else {
-            // edit 
+            // edit
             def cellSource = CellSource.get(cellSourceId)
             if (!cellSource) {
                 render(view: "/404")
@@ -245,14 +249,14 @@ class SampleController {
         def itemTypeOptions = ItemType.where {category.superCategory == ItemTypeSuperCategory.TRACED_SAMPLE}.list()
         [cellSource: cmd, item: item, sampleId: sampleId, cellSourceId: cellSourceId, itemTypeOptions: itemTypeOptions]
     }
-    
+
     def updateCellSource(Long sampleId, Long cellSourceId, CellSourceCommand cmd, Item item) {
         try {
             if (cellSourceId) {
                 cellSourceService.update(cmd, item)
             } else {
                 cellSourceService.saveInSample(sampleId, cmd, item)
-            }   
+            }
             itemService.updateCustomizedFields(item, params)
             flash.message = "Cell source information updated!"
             redirect(action:"edit", params:[sampleId: sampleId])
@@ -261,21 +265,21 @@ class SampleController {
             redirect(action: "editCellSource", params: [sampleId: sampleId, cellSourceId: cellSourceId])
         }
     }
-    
+
     def searchCellSource(Long sampleId) {
         def itemTypeOptions = ItemType.where {category.superCategory == ItemTypeSuperCategory.TRACED_SAMPLE}.list()
         [sampleId: sampleId, itemTypeOptions: itemTypeOptions]
     }
-    
+
     def previewCellSource(Long sampleId, Long typeId, String barcode) {
         def item = Item.where{type.id == typeId && barcode == barcode}.get(max: 1)
         if (item) {
-            [sampleId: sampleId, item: item]    
+            [sampleId: sampleId, item: item]
         } else {
             flash.message = "Cell source not found!"
-        }            
+        }
     }
-    
+
     def addCellSourceToSample(Long sampleId, Long itemId) {
         try {
             cellSourceService.addCellSourceToSample(sampleId, itemId)
@@ -285,7 +289,7 @@ class SampleController {
         }
         redirect(action: "edit", params: [sampleId: sampleId])
     }
-    
+
     def showItem(Long sampleId) {
         def sample = Sample.get(sampleId)
         if (sample) {
@@ -299,7 +303,7 @@ class SampleController {
             render(view: "/404")
         }
     }
-    
+
     def saveBarcode(Long sampleId) {
         def sample = Sample.get(sampleId)
         if (sample) {
@@ -318,18 +322,18 @@ class SampleController {
             render(view: "/404")
         }
     }
-    
-    
+
+
     def showChecked(){
-        
+
     }
-    
+
     def searchForm() {
 	def galaxy = Holders.config.defaultGalaxy
 	[defaultGalaxy: galaxy]
     }
-    
-    def search(QuerySampleRegistrationCommand cmd) {       
+
+    def search(QuerySampleRegistrationCommand cmd) {
         cmd.max = cmd.max ?: 15
         def samples = sampleService.search(cmd)
 	def galaxy = Holders.config.defaultGalaxy
@@ -340,20 +344,20 @@ class SampleController {
         }
         [sampleList: samples, checkedCount: checkedCount, searchParams: cmd, defaultGalaxy: galaxy]
     }
-    
+
     def fetchDataForCheckedSamplesAjax() {
         def sampleIds = session.checkedSample
         def data = reportService.fetchDataForSamples(sampleIds)
-        render(template: '/report/details', model: [ sampleDTOs: data])        
+        render(template: '/report/details', model: [ sampleDTOs: data])
     }
-    
+
     def clearCheckedSampleAjax(){
         if (session.checkedSample) {
             session.checkedSample = null
         }
         render true
     }
-    
+
     def addCheckedSampleAjax(Long id) {
         if (!session.checkedSample) {
             session.checkedSample = []
@@ -363,37 +367,37 @@ class SampleController {
         }
         render session.checkedSample.size()
     }
-    
+
     def removeCheckedSampleAjax(Long id) {
         if (id in session.checkedSample) {
             session.checkedSample.remove(id)
         }
         render session.checkedSample.size()
     }
-    
+
     def fetchGrowthMediaAjax(Long speciesId) {
         def selectedSpecies = Species.get(speciesId)
         def growthMedias = GrowthMedia.where { (species == null) || (species == selectedSpecies) }.collect{it.name}
         render utilityService.stringToSelect2Data(growthMedias) as JSON
     }
-    
+
     def fetchTreatmentsAjax() {
         def treatments = CellSourceTreatment.executeQuery("select t.name from CellSourceTreatment t")
         render utilityService.stringToSelect2Data(treatments) as JSON
     }
-    
+
     def fetchDataForSampleAjax(Long id) {
         def data = reportService.fetchDataForSample(id)
-        render(template: '/sample/bioinformatics', model: [ sampleDTOs: data])    
+        render(template: '/sample/bioinformatics', model: [ sampleDTOs: data])
     }
-    
+
     def batchEdit() {
         def samples = []
         if (params.runId) {
             def run = SequenceRun.get(params.long("runId"))
             if (!run) {
                 render(view: "/404")
-                return                
+                return
             }
             samples = run.experiments*.sample
         } else if (params.bagId) {
@@ -405,10 +409,10 @@ class SampleController {
                 }
             }
         }
-        
+
         [samples: samples]
     }
-    
+
     def updateAjax(Long sampleId, String name, String value) {
         try {
             def result = sampleService.update(sampleId, name, value)
@@ -418,18 +422,18 @@ class SampleController {
         }
 
     }
-    
+
     def updateListAjax(String sampleList) {
         def slurper = new JsonSlurper()
         def samples = slurper.parseText(sampleList)
         samples.each { sample ->
             sampleService.update(sample.sampleId, sample.name, sample.value)
         }
-        
+
         render ""
         return
     }
-    
+
     def showFilesForCheckedSamples() {
         def sampleIds = session.checkedSample
         def samples = reportService.fetchDataForSamples(sampleIds)

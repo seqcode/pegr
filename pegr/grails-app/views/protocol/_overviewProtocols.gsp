@@ -16,7 +16,12 @@
                 <td>${fieldValue(bean: protocol, field: "protocolVersion")}</td>
                 <td>${fieldValue(bean: protocol, field: "description")}</td>
                 <!-- pjchaffin | Pierce Chaffin | Fixed user column to make it just xxxXXXX not User(username:xxxXXXX) ... as it was an object -->
-                <td>${protocol.user.username}</td>
+                <g:if test="${protocol.user != null}">
+                  <td>${protocol.user.username}</td>
+                </g:if>
+                <g:else>
+                  <td></td>
+                </g:else>
                 <td>${protocol.status}</td>
             </tr>
         </g:each>

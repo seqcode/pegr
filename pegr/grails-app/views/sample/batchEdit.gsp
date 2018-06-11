@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>PEGR - Experiments</title> 
+    <title>PEGR - Experiments</title>
     <meta name="layout" content="main"/>
     <style>
         .index .value {
@@ -19,6 +19,7 @@
             <thead>
                 <tr>
                     <th class="sampleId">Sample ID</th>
+                    <th class="naturalId">Natural ID</th>
                     <th class="barcode">Barcode</th>
                     <th class="strain">Strain</th>
                     <th class="genotype">Genotype</th>
@@ -44,6 +45,7 @@
                         <input type="hidden" class="sampleId" name="sampleId" value="${sample.id}">
                         <input type="hidden" class="speciesId" name="speciesId" value="${sample.cellSource?.strain?.species?.id}">
                         <td class="sampleId"><g:link controller="sample" action="show" id="${sample.id}" class="sample-id">${sample.id}</g:link></td>
+                        <td class="naturalId"><span class="value">${sample.naturalId}</span></td>
                         <td class="barcode">${sample.item?.barcode}</td>
                         <td class="strain">${sample.cellSource?.strain?.name}</td>
                         <td class="genotype">${sample.cellSource?.strain?.genotype}</td>
@@ -72,13 +74,13 @@
         var noTagPlaceholder = "Select...";
         var users, treatments, targets;
         var s0 = "NONE";
-        
+
         $(".value").each(function(){
             if ($(this).text() == "") {
                 $(this).text(s0);
             }
         });
-        
+
         $.ajax({url: "/pegr/sample/fetchTreatmentsAjax", success: function(result) {
             treatments = result;
         }});
@@ -86,11 +88,11 @@
         $.ajax({ url: "/pegr/user/fetchUserAjax", success: function(result) {
             users = result;
         }});
-            
+
         $.ajax({url: "/pegr/antibody/fetchTargetAjax", success: function(result){
             targets = result;
         }});
-        
+
         $("th").each(function(){
                 $(this).append(" <span class='glyphicon glyphicon-minus-sign small'></span>");
             });
@@ -100,43 +102,43 @@
         });
 
         $(".glyphicon-plus-sign").click(function() {
-            $("th").show();  
+            $("th").show();
             $("td").show();
         });
-        
+
         $("td").on("click", ".cancel", function() {
-            var td = $(this).parent();            
+            var td = $(this).parent();
             toggleTd(td);
         });
-        
+
         $("td.group-target").on("click", ".value", function(){
-            var tr = $(this).closest("tr");           
+            var tr = $(this).closest("tr");
             createSelect(tr, ".target-type", targets.types);
             createSelect(tr, ".cterm", targets.targets);
             createSelect(tr, ".nterm", targets.cterms);
-            createSelect(tr, ".target", targets.nterms);  
+            createSelect(tr, ".target", targets.nterms);
             var $save = "<button class='btn btn-primary save'>Save</button>";
             var $cancel = "<button class='btn btn-default cancel-target'>Cancel</button>";
             var td = tr.find(".target-type");
             td.append($save);
             td.append($cancel);
         });
-        
+
         $("td").on("click", ".cancel-target", function() {
-            var tr = $(this).closest("tr"); 
+            var tr = $(this).closest("tr");
             tr.find(".group-target .value").show();
             tr.find(".group-target .input").remove();
             tr.find(".group-target .cancel-target").remove();
-            tr.find(".group-target .save").remove();            
+            tr.find(".group-target .save").remove();
         });
-        
+
         $("td.group-target").on("click", ".save", function(){
             var tr = $(this).closest("tr");
             var sampleId = tr.find(".sampleId").val();
             var type = tr.find(".target-type select").val();
             var name = tr.find(".target select").val();
             var cterm = tr.find(".cterm select").val();
-            var nterm = tr.find(".nterm select").val();                
+            var nterm = tr.find(".nterm select").val();
             var map = {"type":type,
                       "name":name,
                       "cterm":cterm,
@@ -150,7 +152,7 @@
                     tr.find(".target .value").text(name);
                     tr.find(".cterm .value").text(cterm);
                     tr.find(".nterm .value").text(nterm);
-                    
+
                     tr.find(".group-target .value").show();
                     tr.find(".group-target .input").remove();
                     tr.find(".group-target .cancel-target").remove();
@@ -161,25 +163,25 @@
                 }
             })
         });
-        
+
         $("td.index").on("click", ".value", function(){
             var oldValue = $(this).text();
             var edit = "<input class='input' value='" + oldValue + "'>";
             appendEdit(this, edit);
         });
-        
+
         $("td.index").on("click", ".save", function() {
             var td = $(this).parent();
             var tr = td.closest("tr");
             var value = td.find("input").val();
             if (value == s0) {
                 value = "";
-            }            
+            }
             var sampleId = td.parent().find(".sampleId").val();
             $.ajax({
                 type: "POST",
                 url: "/pegr/sample/updateAjax",
-                data: {sampleId: sampleId, name: "index", value : value}, 
+                data: {sampleId: sampleId, name: "index", value : value},
                 success: function(result) {
                     var s = result.sequence;
                     var id = result.id;
@@ -194,7 +196,7 @@
                 }
             });
         });
-        
+
         $("td.genomes").on("click", ".value", function() {
             var td = $(this).parent();
             var oldValue = $(this).text();
@@ -216,7 +218,7 @@
                 });
             });
         });
-        
+
         $("td.genomes").on("click", ".save", function() {
             var td = $(this).parent();
             var value = td.find("select").val();
@@ -228,12 +230,12 @@
             $.ajax({
                 type: "POST",
                 url: "/pegr/sample/updateAjax",
-                data: {sampleId: sampleId, name: "genomes", value : valueToSend}, 
+                data: {sampleId: sampleId, name: "genomes", value : valueToSend},
                 success: function() {
                     var s = s0;
                     if (value) {
-                        s = value.join(",");    
-                    }  
+                        s = value.join(",");
+                    }
                     td.find(".value").text(s);
                     toggleTd(td);
                 },
@@ -242,7 +244,7 @@
                 }
             });
         });
-        
+
         $("td.growthMedia").on("click", ".value", function(){
             var td = $(this).parent();
             var oldValue = $(this).text();
@@ -257,9 +259,9 @@
                     placeholder: tagPlaceholder,
                     tags: true
                 });
-            });            
+            });
         });
-        
+
         $("td.growthMedia").on("click", ".save", function() {
             var td = $(this).parent();
             var value = td.find("select").val();
@@ -267,7 +269,7 @@
             $.ajax({
                 type: "POST",
                 url: "/pegr/sample/updateAjax",
-                data: {sampleId: sampleId, name: "growthMedia", value : value}, 
+                data: {sampleId: sampleId, name: "growthMedia", value : value},
                 success: function() {
                     var s = s0;
                     if (value) {
@@ -281,7 +283,7 @@
                 }
             });
         });
-        
+
         $("td.treatments").on("click", ".value", function() {
             var oldValue = $(this).text();
             var edit = "<span class='input'><select multiple='multiple' style='width:200px'>";
@@ -298,7 +300,7 @@
                 tags: true
             });
         });
-        
+
         $("td.treatments").on("click", ".save", function() {
             var td = $(this).parent();
             var value = td.find("select").val();
@@ -306,7 +308,7 @@
             $.ajax({
                 type: "POST",
                 url: "/pegr/sample/updateAjax",
-                data: {sampleId: sampleId, name: "treatments", value : JSON.stringify(value)}, 
+                data: {sampleId: sampleId, name: "treatments", value : JSON.stringify(value)},
                 success: function() {
                     var s = s0;
                     if (value) {
@@ -320,13 +322,46 @@
                 }
             });
         });
-        
+
+        // Editable naturalID field
+        $("td.naturalId").on("click", ".value", function(){
+            var oldValue = $(this).text();
+            var edit = "<input class='input' value='" + oldValue + "'>";
+            appendEdit(this, edit);
+        });
+
+        $("td.naturalId").on("click", ".save", function() {
+            var td = $(this).parent();
+            var tr = td.closest("tr");
+            var value = td.find("input").val();
+            if (value == s0) {
+                value = "";
+            }
+            var sampleId = td.parent().find(".sampleId").val();
+            $.ajax({
+                type: "POST",
+                url: "/pegr/sample/updateAjax",
+                data: {sampleId: sampleId, name: "naturalId", value : value},
+                success: function() {
+                    var s = s0;
+                    if (value) {
+                        s = value;
+                    }
+                    td.find(".value").text(s);
+                    toggleTd(td);
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(xhr.responseText);
+                }
+            });
+        });
+
         $("td.group-input .value").click(function() {
             var oldValue = $(this).text();
             var edit = "<input class='input' value='" + oldValue + "'>" ;
             appendEdit(this, edit);
         });
-        
+
         $("td.group-input").on("click", ".save", function(){
             var td = $(this).parent();
             var classes = td.attr("class").split(' ');
@@ -342,7 +377,7 @@
             $.ajax({
                 type: "POST",
                 url: "/pegr/sample/updateAjax",
-                data: {sampleId: sampleId, name: name, value: value}, 
+                data: {sampleId: sampleId, name: name, value: value},
                 success: function() {
                     var s = s0;
                     if (value) {
@@ -356,7 +391,7 @@
                 }
             });
         });
-        
+
         $("td.send").on("click", ".value", function(){
             var oldKey = $(this).parent().find(".key").val();
             var oldValue = $(this).text();
@@ -370,7 +405,7 @@
                 data: users
             });
         });
-        
+
         $("td.send").on("click", ".save", function(){
             var td = $(this).parent();
             var value = td.find("select").val();
@@ -378,7 +413,7 @@
             $.ajax({
                 type: "POST",
                 url: "/pegr/sample/updateAjax",
-                data: {sampleId: sampleId, name: "sendToId", value : value}, 
+                data: {sampleId: sampleId, name: "sendToId", value : value},
                 success: function() {
                     var s = s0;
                     var selectedElem = td.find("select :selected")

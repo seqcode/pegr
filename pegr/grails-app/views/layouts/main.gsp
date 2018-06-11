@@ -4,14 +4,14 @@
 <head>
   <g:layoutHead/>
 </head>
-<body onhashchange="${pageProperty(name:'body.onhashchange')}">	
+<body onhashchange="${pageProperty(name:'body.onhashchange')}">
 	<nav class="navbar">
         <div class="container-fluid">
             <div class="navbar-header">
               <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
-                <span class="icon-bar"></span>                        
+                <span class="icon-bar"></span>
               </button>
               <a class="navbar-brand"><img src="/pegr/assets/PEGR_Logo.png" height="100%"/></a>
             </div>
@@ -23,7 +23,8 @@
                         <li id="nav-protocols"><g:link controller="protocol" action="labProtocols">Protocols</g:link></li>
                         <li id="nav-experiments"><g:link controller="protocolInstanceBag" action="list">Experiments</g:link></li>
                         <li id="nav-analysis"><g:link controller="sequenceRun" action="index">Sequencing Reports</g:link></li>
-                        <li id="nav-bioinformatics"><g:link controller="bioinformatics">Bioinformatics</g:link></li>
+                        <!-- pjchaffin | Pierce Chaffin : Fixes redirect for Bioinformatics Btn from linking to Genome Build to API help page -->
+                        <li id="nav-bioinformatics"><g:link controller="api" action="help">Bioinformatics</g:link></li>
                     </sec:ifAnyGranted>
                     <sec:ifAnyGranted roles="ROLE_ADMIN">
                         <li id="nav-admin"><g:link controller="admin" action="index">Admin</g:link></li>
@@ -45,7 +46,7 @@
     </nav>
 	<div class="container-fluid text-left" id="main-content">
 	<g:layoutBody/>
-	</div>	
+	</div>
 </body>
 </html>
 </g:applyLayout>

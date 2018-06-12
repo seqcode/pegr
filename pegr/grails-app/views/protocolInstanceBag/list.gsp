@@ -8,6 +8,7 @@
         <g:form controller="protocolInstanceBag" action="search" class="pull-right" style="padding-bottom:5px">
             <input name="str">
             <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>
+	    <br>Search experiment name
         </g:form>
     </div>
     <div id="message" >
@@ -53,7 +54,7 @@
             </ul>
             <h5>Project</h5>
             <form action="list">
-                <g:select name="projectId" optionKey="id" from="${pegr.Project.list()}" noSelection="${['null':'Select...']}"></g:select>
+                <g:select name="projectId" optionKey="id" from="${pegr.Project.list(sort: 'name')}" noSelection="${['null':'Select...']}"></g:select>
                 <g:submitButton name="submit" value="Search" class="btn btn-default"></g:submitButton>
             </form>
         </div>

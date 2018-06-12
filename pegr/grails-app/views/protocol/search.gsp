@@ -16,6 +16,7 @@
         <g:form controller="protocol" action="search" class="pull-right">
             <input name="str">
             <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>
+            <br>Search protocol name, description, or username
         </g:form>
 		<div id="list-protocol">
 			<h3>Lab Protocols</h3>

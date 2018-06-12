@@ -10,11 +10,11 @@
         <h3>Search Sample</h3>
         <g:form action="search" class="fields">
             <div>
-                <label>ID</label>
+                <label>Sample ID</label>
                 <g:textField name="id" />
             </div>
             <div>
-                <label>Source</label>
+                <label>Sample Source</label>
                 <g:textField name="source" />
             </div>
             <div>

@@ -219,13 +219,12 @@
 		}
 	});
 
-  $("#verifyAll").click(function() {
+  $("#verifyAll").unbind().click(function() {
                 var $all = $(this);
 		var $admin = $(".isAdmin").text();
                 if ($admin == "false") { // save user from many alerts
                         alert("Permission denied");
                         $all.prop("checked", false);
-                        return false;
                 }
 		var $res = $all.prop("checked");
         	var $rows = $("#qc-statistics").find("tr");
@@ -252,13 +251,13 @@
                     			         $checkbox.prop("checked", $prev);
                     			         $all.prop("checked", false);
                     			         alert("Error");
+                                   return false;
                 			     }
             			     });
 				}
 			}
                 });
       if ($count != 0){ alert("Not successful step found"); } // alert once for any failed sample run
-
 	})
 
 

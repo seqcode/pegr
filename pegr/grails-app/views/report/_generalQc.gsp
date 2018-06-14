@@ -219,7 +219,7 @@
 		}
 	});
 
-	$("#verifyAll").click(function() {
+  $("#verifyAll").click(function() {
                 var $all = $(this);
 		var $admin = $(".isAdmin").text();
                 if ($admin == "false") { // save user from many alerts
@@ -229,14 +229,16 @@
                 }
 		var $res = $all.prop("checked");
         	var $rows = $("#qc-statistics").find("tr");
+          var $count = 0;
         	$rows.each(function(i, row){
 			var $succ = -1;
 			$(row).find("td.analysis-status").each(function(j, cell){
 				$succ = $(cell).find("span.label-success").length;
-                        });
-      if ($succ == 0) { alert("Not successful step found"); }                  
+        if ($succ == 0) { $count = 1; }
+      });
+
 			// if all visible tools successful or unchecking all
-                        if ($succ + 1 > 1 || ($succ + 1 > 0 && !$res)) {
+        if ($succ + 1 > 1 || ($succ + 1 > 0 && !$res)) {
 				//replicate what the on click function does
             			var $td = $(row).find("td.col-prefer");
             			var alignmentId = $td.find(".alignmentId").text();
@@ -255,7 +257,9 @@
 				}
 			}
                 });
-	});
+      if ($count != 0){ alert("Not successful step found"); } // alert once for any failed sample run
+
+	})
 
 
 </script>

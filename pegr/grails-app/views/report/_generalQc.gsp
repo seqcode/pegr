@@ -219,7 +219,7 @@
 		}
 	});
 
-  $("#verifyAll").unbind().click(function() {
+  $("#verifyAll").unbind().click(function() { 
                 var $all = $(this);
 		var $admin = $(".isAdmin").text();
                 if ($admin == "false") { // save user from many alerts

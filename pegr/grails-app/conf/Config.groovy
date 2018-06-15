@@ -98,10 +98,10 @@ environments {
     production {
         grails.logging.jul.usebridge = false
 		// axa677-20180306: This is important for the ajax calls to the controller actions with redirect to another action.
-		// Without this line the ajax call will redirect over http by defualt and the call will be blocked because 
+		// Without this line the ajax call will redirect over http by defualt and the call will be blocked because
 		// grails security. To make the ajax call identified and coming from the app context we added this line.
 		// This line will be commented if we already have it in the external config file "pegr-config.properties"
-	    	// Important Note: if you add this line externally, make sure to remove the quotation marks. 
+	    	// Important Note: if you add this line externally, make sure to remove the quotation marks.
 		//grails.serverURL ="https://shaunline.vmhost.psu.edu/pegr"
 
     }
@@ -118,7 +118,7 @@ log4j = {
 		// file	FileAppender	Logs to a single file.
 		// rollingFile	RollingFileAppender	Logs to rolling files, for example a new file each day.
 		//file name:'pegrlog', file:'pegr.log', layout: pattern(conversionPattern: '%d{yyyy-MM-dd HH:mm:ss,SSS} %5p %c{1} - %m%n'), maxFileSize:'5MB', maxBackupIndex:2, threshold: org.apache.log4j.Level.INFO
-		
+
 		// limit the size of file 'stacktrace.log'
 		// axa677-20180306: On Shaunline, you should find this file in /usr/share/tomcat
 		rollingFile name:'stacktrace', file:'stacktrace.log', layout: pattern(conversionPattern: '%d{yyyy-MM-dd HH:mm:ss,SSS} %5p %c{1} - %m%n'), maxFileSize:'5MB', maxBackupIndex:2
@@ -135,10 +135,10 @@ log4j = {
            	'org.springframework',
            	'org.hibernate'
 	info   	'grails.app'
-    
+
     root {
         warn 'stdout', 'stacktrace'
-	debug 'stacktrace'
+	 debug 'stacktrace'
         additivity = true
     }
 }
@@ -211,7 +211,7 @@ grails.plugin.springsecurity.interceptUrlMap = [
 
 grails {
    mail {
-     props = ["mail.smtp.auth":"true", 					   
+     props = ["mail.smtp.auth":"true",
               "mail.smtp.socketFactory.port":"465",
               "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
               "mail.smtp.socketFactory.fallback":"false"]

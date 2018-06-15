@@ -219,7 +219,7 @@
 		}
 	});
 
-  $("#verifyAll").unbind().click(function() { 
+  $("#verifyAll").unbind().click(function() {
                 var $all = $(this);
 		var $admin = $(".isAdmin").text();
                 if ($admin == "false") { // save user from many alerts
@@ -250,8 +250,11 @@
                 			     error: function(xhr, ajaxOptions, thrownError) {
                     			         $checkbox.prop("checked", $prev);
                     			         $all.prop("checked", false);
-                    			         alert("Error");
-                                   return false;
+                                   // Create cookie for the alert
+                                   if( $.cookie('example') == null ) {
+                                   $.cookie( 'example', '1',  { expires: 7, path: '/' } ); // Create cookie
+                    			         alert("Error"); // message pops up when there's a discrepency between run result and the switch
+                                   }
                 			     }
             			     });
 				}

@@ -5,22 +5,22 @@ class AntibodyController {
     def itemService
     def antibodyService
     def utilityService
-    
+
     def index(){
         redirect(action: "list")
     }
-    
+
     def list(Integer max) {
         params.max = Math.min(max ?: 15, 100)
         def category = ItemTypeCategory.findBySuperCategory(ItemTypeSuperCategory.ANTIBODY)
         def itemTypes = ItemType.list(sort: "name")
-        [objectList: Antibody.list(params), 
-         objectCount: Antibody.count(), 
+        [objectList: Antibody.list(params),
+         objectCount: Antibody.count(),
          currentCategory: category,
          itemTypes: itemTypes
         ]
     }
-    
+
     def show(Long id) {
         def antibody = Antibody.get(id)
         if (antibody) {
@@ -28,13 +28,13 @@ class AntibodyController {
             if (antibody.item) {
                 def folder = itemService.getImageFolder(antibody.item.id)
                 images = folder.listFiles()
-            }            
+            }
             [antibody: antibody, images: images]
         } else {
             render status: 404
         }
     }
-    
+
     def save(Item item, AntibodyCommand antibodyCommand) {
         withForm{
             try {
@@ -52,14 +52,14 @@ class AntibodyController {
             }
         }
     }
-    
+
     def edit(Long antibodyId){
         def antibody = Antibody.get(antibodyId)
         if (!antibody) {
             render(view: "/404")
             return
         }
-        def antibodyCommand = new AntibodyCommand(   
+        def antibodyCommand = new AntibodyCommand(
             antibodyId : antibody.id,
             company : antibody.company?.name,
             catalogNumber : antibody.catalogNumber,
@@ -76,7 +76,7 @@ class AntibodyController {
         )
         [antibody: antibodyCommand]
     }
-    
+
     def update(AntibodyCommand cmd) {
         try {
             antibodyService.update(cmd)
@@ -91,10 +91,10 @@ class AntibodyController {
             render(view:'edit', model:[antibody: cmd])
         }
     }
-    
+
     def editItem(Long antibodyId) {
         def antibody = Antibody.get(antibodyId)
-        if (antibody) {            
+        if (antibody) {
             def item = antibody.item
             if (!item) {
                 redirect(action: "addBarcode", params: [antibodyId: antibodyId])
@@ -106,7 +106,7 @@ class AntibodyController {
             redirect(action: 'list')
         }
     }
-    
+
     def updateItem(Long antibodyId, Long itemId) {
         def item = Item.get(itemId)
         item.properties = params
@@ -120,10 +120,10 @@ class AntibodyController {
             render(view:'editItem', model:[item: item, antibodyId: antibodyId])
         }
     }
-    
+
     def addBarcode(Long antibodyId) {
         def antibody = Antibody.get(antibodyId)
-        if (antibody) {        
+        if (antibody) {
             if (request.method == "POST") {
                 withForm {
                     def item = new Item(params)
@@ -135,7 +135,7 @@ class AntibodyController {
                     }catch(AntibodyException e) {
                         request.message = e.message
                         render(view: "addBarcode", model: [item:item, antibodyId: antibodyId])
-                    }                    
+                    }
                 }
             } else {
                 def type = ItemType.findByName("Antibody")
@@ -147,57 +147,57 @@ class AntibodyController {
             redirect(action: 'list')
         }
     }
-    
+
     def delete(Long antibodyId) {
-        try {   
+        try {
             antibodyService.delete(antibodyId)
             flash.message = "Antibody deleted!"
             redirect(action: 'list')
         }catch(AntibodyException e) {
             flash.message = e.message
             redirect(action: 'show', id: antibodyId)
-        }        
+        }
     }
-    
+
     /* ----------------------------- Ajax ----------------------*/
      def fetchCompanyAjax() {
         def companies = Company.executeQuery("select c.name from Company c")
         render utilityService.stringToSelect2Data(companies) as JSON
     }
-    
+
     def fetchCatalogAjax() {
         def catalogs = Antibody.executeQuery("select distinct a.catalogNumber from Antibody a")
         render utilityService.stringToSelect2Data(catalogs) as JSON
     }
-    
+
     def fetchImmunogeneAjax() {
         def immunogenes = Antibody.executeQuery("select distinct a.immunogene from Antibody a")
         render utilityService.stringToSelect2Data(immunogenes) as JSON
     }
-    
+
     def fetchAntibodyAjax(String catalog) {
         def antibody = Antibody.findByCatalogNumber(catalog)
-        def result = [host: antibody?.abHost?.name, 
-                immunogene: antibody?.immunogene, 
-                clonal: antibody?.clonal?.name(), 
-                ig: antibody?.igType?.name, 
+        def result = [host: antibody?.abHost?.name,
+                immunogene: antibody?.immunogene,
+                clonal: antibody?.clonal?.name(),
+                ig: antibody?.igType?.name,
                 conc: antibody?.concentration,
-                targetType: antibody?.defaultTarget?.targetType?.name, 
-                target: antibody?.defaultTarget?.name, 
+                targetType: antibody?.defaultTarget?.targetType?.name,
+                target: antibody?.defaultTarget?.name,
                 cterm: antibody?.defaultTarget?.cTermTag,
-                nterm: antibody?.defaultTarget?.nTermTag] 
+                nterm: antibody?.defaultTarget?.nTermTag]
         render result as JSON
     }
-    
+
     def fetchTargetAjax() {
-        def targets = Target.list()
-        def result = [types: utilityService.stringToSelect2Data(TargetType.list().collect{it.name}),
-                    targets: utilityService.stringToSelect2Data(targets.collect{it.name}.unique()),
-                     nterms: utilityService.stringToSelect2Data(targets.collect{it.nTermTag}.unique()),
-                     cterms: utilityService.stringToSelect2Data(targets.collect{it.cTermTag}.unique())]
+        // def targets = Target.list()
+        def result = [types: utilityService.stringToSelect2Data(TargetType.list(sort:"name").collect{it.name}),
+                    targets: utilityService.stringToSelect2Data(Target.list(sort:"name").collect{it.name}.unique()),
+                     nterms: utilityService.stringToSelect2Data(Target.list(sort:"nTermTag").collect{it.nTermTag}.unique()),
+                     cterms: utilityService.stringToSelect2Data(Target.list(sort:"cTermTag").collect{it.cTermTag}.unique())]
         render result as JSON
     }
-    
+
 }
 
 @grails.validation.Validateable

@@ -29,9 +29,8 @@
         </div>
         <div class="col-sm-2">
             <div class="well">
-                <h4>Filter by status</h4>
                 <div class="dropdown">
-                  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Status
+                  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Filter by Status
                   <span class="caret"></span></button>
                   <ul class="dropdown-menu">
                     <li><g:link >ALL</g:link></li>
@@ -42,8 +41,6 @@
                     <li title="The Sample has been processed by the bioinformatics pipeline and review by lab bioinformatician and considered failed."><g:link params="[status:'FAILED']">FAILED</g:link></li>
                   </ul>
                 </div>
-            </div>
-            <div class="well">
                 <h4>Sample Submission</h4>
                 <ul>
                     <li><g:link action="upload">Upload</g:link></li>

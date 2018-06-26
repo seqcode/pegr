@@ -44,9 +44,8 @@
             </table>
         </div>
         <div class="col-sm-2 well">
-            <h4>Filter</h4>
             <div class="dropdown">
-              <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Status
+              <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Filter by Status
               <span class="caret"></span></button>
               <ul class="dropdown-menu">
                 <li><g:link >ALL</g:link></li>

@@ -3,7 +3,7 @@ ul {
     padding-left: 10px;
 }
 
-/* Remove the navbar's default margin-bottom and rounded borders */ 
+/* Remove the navbar's default margin-bottom and rounded borders */
 .navbar {
   margin-bottom: 0;
   border-style: none;
@@ -87,16 +87,16 @@ footer {
     height: auto;
     padding: 0;
   }
-  .row .content {height:auto;} 
+  .row .content {height:auto;}
 }
 
 .dropdown-menu {
     min-width: 100px;
-    background-color: #3973ad;
+    background-color: white;
 }
 
 .dropdown-menu li a {
-    color: white;
+    color: black;
 }
 
 .dropdown-menu li a:hover {
@@ -109,7 +109,7 @@ footer {
 }
 
  #login-form, #register-form {
-  max-width:330px; 
+  max-width:330px;
   padding: 40px 10px;
  }
 
@@ -117,7 +117,7 @@ footer {
   	margin-top: 10px;
   	border-radius: 0
  }
- 
+
  #search button {
  	border-radius: 0;
  }
@@ -145,7 +145,7 @@ footer {
 }
 
 #sample-nav-header h3{
-    margin:0 10px; 
+    margin:0 10px;
     line-height:50px;
 }
 
@@ -164,14 +164,14 @@ footer {
     clear: left;
 }
 #sample-nav a:hover {
-    background-color: #E0E0E0; 
+    background-color: #E0E0E0;
 }
 #sample-nav .active {
     background-color: white;
 }
 
 .item {
-    border: 1px solid; 
+    border: 1px solid;
     margin: 5px;
     border-style: outset;
 }
@@ -186,16 +186,16 @@ footer {
     background-color: white;
 }
 
-.subnumber OL { 
+.subnumber OL {
     counter-reset: item;
     padding-left: 10px;
 }
-.subnumber LI { 
+.subnumber LI {
     display: block;
 }
 
-.subnumber LI:before { 
-    content: counters(item, ".") " "; 
+.subnumber LI:before {
+    content: counters(item, ".") " ";
     counter-increment: item;
 }
 

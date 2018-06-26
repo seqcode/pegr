@@ -14,8 +14,8 @@
             <div class="message" role="status">
                 ${it}
              </div>
-         </g:each>   
-    </g:if> 
+         </g:each>
+    </g:if>
     <div class="row">
         <g:form controller="sequenceRun" action="index" class="pull-right">
             <input name="str">
@@ -30,14 +30,18 @@
         <div class="col-sm-2">
             <div class="well">
                 <h4>Filter by status</h4>
-                <ul>
-                    <li><g:link >All</g:link></li>
+                <div class="dropdown">
+                  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Status
+                  <span class="caret"></span></button>
+                  <ul class="dropdown-menu">
+                    <li><g:link >ALL</g:link></li>
                     <li title="The sample has not been submitted to bioinformatics pipeline."><g:link params="[status:'PREP']">PREP</g:link></li>
                     <li title="The sample has been submitted and is waiting in the queue to be processed by the bioinformatics pipeline."><g:link params="[status:'QUEUE']">QUEUE</g:link></li>
                     <li title="The sample is being processed by the bioinformatics pipeline."><g:link params="[status:'ANALYZING']">ANALYZING</g:link></li>
                     <li title="The Sample has been processed by the bioinformatics pipeline and review by lab bioinformatician."><g:link params="[status:'COMPLETED']">COMPLETED</g:link></li>
-		    <li title="The Sample has been processed by the bioinformatics pipeline and review by lab bioinformatician and considered failed."><g:link params="[status:'FAILED']">FAILED</g:link></li>
-                </ul>
+                    <li title="The Sample has been processed by the bioinformatics pipeline and review by lab bioinformatician and considered failed."><g:link params="[status:'FAILED']">FAILED</g:link></li>
+                  </ul>
+                </div>
             </div>
             <div class="well">
                 <h4>Sample Submission</h4>
@@ -52,7 +56,7 @@
                     <ul>
                         <li><g:link controller="report" action="manage">Sequence QC</g:link></li>
                         <li><a href="#" onclick="window.open('${g.createLink(controller:'sequenceRun',action:'editQueue')}', 'Edit Queue for Sample Submission', 'width=600,height=400' )" >Edit Queue</a></li>
-                    </ul>                    
+                    </ul>
                 </div>
             </sec:ifAnyGranted>
         </div>

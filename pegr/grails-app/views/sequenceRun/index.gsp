@@ -14,8 +14,8 @@
             <div class="message" role="status">
                 ${it}
              </div>
-         </g:each>   
-    </g:if> 
+         </g:each>
+    </g:if>
     <div class="row">
         <g:form controller="sequenceRun" action="index" class="pull-right">
             <input name="str">
@@ -52,7 +52,7 @@
                     <ul>
                         <li><g:link controller="report" action="manage">Sequence QC</g:link></li>
                         <li><a href="#" onclick="window.open('${g.createLink(controller:'sequenceRun',action:'editQueue')}', 'Edit Queue for Sample Submission', 'width=600,height=400' )" >Edit Queue</a></li>
-                    </ul>                    
+                    </ul>
                 </div>
             </sec:ifAnyGranted>
         </div>

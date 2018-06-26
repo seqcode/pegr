@@ -27,6 +27,7 @@
             <p><b>Run: ${sample.runs.runNum[0]} (Old: ${sample.runs.id[0]})</b></p>
         </g:if>
 
+        <g:link controller="sequenceRun" action="show" id="${sample.runs.id}">Summary Report</g:link>
 
         <g:if test="${sample?.date}">
             <p>Date: <g:formatDate format="yyyy-MM-dd" date="${sample.date}"/></p>

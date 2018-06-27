@@ -138,7 +138,7 @@ log4j = {
 
     root {
         warn 'stdout', 'stacktrace'
-	 debug 'stacktrace'
+	  debug 'stacktrace'
         additivity = true
     }
 }

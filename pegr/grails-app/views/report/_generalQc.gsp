@@ -14,7 +14,7 @@
             <tr>
                 <th colspan="6" class="text-center group group-analysis">Analysis</th>
                 <th colspan="${runStatusMap.value.steps.size()-1}" class="text-center group group-pipeline">Pipeline</th>
-                <th colspan="${qcSettings.general?.size() + 1}" class="text-center group group-qc">Quality Control</th>
+                <th colspan="${qcSettings.general?.size()}" class="text-center group group-qc">Quality Control</th>
                 <th colspan="2" class="text-center group group-operation">Operation</th>
             </tr>
             <tr>
@@ -102,6 +102,7 @@
 
                     <td class="text-right col-tags group-qc"><g:formatNumber number="${alignment.requestedTags}" format="###,###,###" /></td>
                     <g:each in="${qcSettings.general}" var="setting">
+                      <g:if test="${setting.name != "Deduplicated"}">
                         <td class="text-right col-${setting.key} group-qc <g:if test='${
                                    (setting.min != null && alignment[setting.key] < setting.min)
                                    || (setting.max != null && alignment[setting.key] > setting.max)
@@ -109,7 +110,8 @@
                                    || (setting.reference_max != null && alignment.hasProperty(setting.reference_max) && alignment[setting.key] > alignment[setting.reference_max] * setting.reference_max_ratio)
                                    }'>bg-danger</g:if>">
                         <g:formatNumber number="${alignment[setting.key]}" format="${setting.numFormat}" />
-                    </td>
+                        </td>
+                      </g:if>
                     </g:each>
                     <td class="col-prefer group-operation">
                         <span class="alignmentId" style="display:none">${alignment.alignmentId}</span>

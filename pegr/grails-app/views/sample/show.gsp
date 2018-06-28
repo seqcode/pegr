@@ -23,8 +23,9 @@
             </g:if>
         </h3>
 
-        <g:if test="${sample?.date}">
-            <p><b>Run: ${sample.runs.runNum[0]} (Old: ${sample.runs.id[0]})</b></p>
+        <!-- pjchaffin | Adds Hyperlink Functionality to the Run# and also depricates the old Run Number -->
+        <g:if test="${sample?.runs.id[0]}">
+            <p><g:link controller="report" action="runStatus" params="[runId: sample.runs.id]"><b>Run:${sample.runs.id[0]}</b></g:link></p>
         </g:if>
 
 

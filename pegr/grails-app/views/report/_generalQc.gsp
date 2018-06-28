@@ -14,7 +14,7 @@
             <tr>
                 <th colspan="6" class="text-center group group-analysis">Analysis</th>
                 <th colspan="${runStatusMap.value.steps.size()-1}" class="text-center group group-pipeline">Pipeline</th>
-                <th colspan="${qcSettings.general?.size() + 1}" class="text-center group group-qc">Quality Control</th>
+                <th colspan="${qcSettings.general?.size()}" class="text-center group group-qc">Quality Control</th>
                 <th colspan="2" class="text-center group group-operation">Operation</th>
             </tr>
             <tr>

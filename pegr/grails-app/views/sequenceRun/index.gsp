@@ -46,16 +46,17 @@
                     <li><g:link action="upload">Upload</g:link></li>
                     <li><g:link action="create">Create Wizard</g:link></li>
                 </ul>
+                <sec:ifAnyGranted roles="ROLE_ADMIN">
+
+                        <h4>Manage</h4>
+                        <ul>
+                            <li><g:link controller="report" action="manage">Sequence QC</g:link></li>
+                            <li><a href="#" onclick="window.open('${g.createLink(controller:'sequenceRun',action:'editQueue')}', 'Edit Queue for Sample Submission', 'width=600,height=400' )" >Edit Queue</a></li>
+                        </ul>
+                    
+                </sec:ifAnyGranted>
             </div>
-            <sec:ifAnyGranted roles="ROLE_ADMIN">
-                <div class="well">
-                    <h4>Manage</h4>
-                    <ul>
-                        <li><g:link controller="report" action="manage">Sequence QC</g:link></li>
-                        <li><a href="#" onclick="window.open('${g.createLink(controller:'sequenceRun',action:'editQueue')}', 'Edit Queue for Sample Submission', 'width=600,height=400' )" >Edit Queue</a></li>
-                    </ul>
-                </div>
-            </sec:ifAnyGranted>
+
         </div>
     </div>
     <div class="pagination">

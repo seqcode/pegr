@@ -11,19 +11,21 @@
 </head>
 <body>
     <div class="container-fluid text-right" id="merge">
-        <button onclick="window.open('/pegr/admin/mergeForm', 'PEGR Admin', 'width=600,height=400')" class="edit">Merge</button>  
+        <button onclick="window.open('/pegr/admin/mergeForm', 'PEGR Admin', 'width=600,height=400')" class="edit">Merge</button>
     </div>
 	<div class="panel-group">
-	<g:each in="${controllerGroups}">
-		<div class="panel panel-info">
-		    <div class="panel-heading">${it.key}</div>
-		    <div class="panel-body">
-	        <g:each in="${it.value}">
-	           <g:link controller="${it.key}" class="btn btn-default" role="button">${it.value}</g:link>
-	        </g:each>
-	        </div>
-        </div>	
-    </g:each>
+		<div class="jumbotron">
+			<g:each in="${controllerGroups}">
+				<div class="well">
+				    <h3>${it.key}</h3>
+				    <div class="panel-body">
+			        <g:each in="${it.value}">
+			           <g:link controller="${it.key}" class="btn btn-default" role="button">${it.value}</g:link>
+			        </g:each>
+			        </div>
+					</div>
+		    </g:each>
+			</div>
     </div>
 </body>
 </html>

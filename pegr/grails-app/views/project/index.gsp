@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>My Projects</title> 
+  <title>My Projects</title>
   <meta name="layout" content="main"/>
 </head>
 <body>
@@ -13,6 +13,7 @@
         <g:link action='all'  class="btn btn-info" >All Projects</g:link>
         <g:link action='create'  class="btn btn-info" ><span class="glyphicon glyphicon-plus"></span>Add Project</g:link>
     </sec:ifAnyGranted>
+    <div class="spacer"></div>
     <g:render template="overview" model="[projects:projects]" />
     <div class="pagination">
         <g:paginate next="Next" prev="Prev" controller="project" action="index" max="15" total="${totalCount ?: 0}" />

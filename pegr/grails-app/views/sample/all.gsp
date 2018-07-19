@@ -23,8 +23,8 @@
 });
 
   </script>
-    <div class="container-fluid">
+  <div class="container-fluid">
       <g:render template="table" model="['sampleList':sampleList, 'checkbox':false]"></g:render>
-    </div>
+  </div>
 </body>
 </html>

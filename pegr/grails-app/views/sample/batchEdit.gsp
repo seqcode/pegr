@@ -63,7 +63,7 @@
                         <td class="group-input cellNumber"><span class="value">${sample.cellNumber}</span></td>
                         <td class="group-input volume"><span class="value">${sample.volume}</span></td>
                         <td class="group-input requestedTagNumber"><span class="value">${sample.requestedTagNumber}</span></td>
-                        <td class="send"><input type="hidden" class="key" value="${sample.sendDataTo?.id}"><span class="value">${sample.sendDataTo}</span></td>
+                        <td class="send"><input type="hidden" class="key" value="${sample.sendDataTo?.id}"><span class="value">${sample.sendDataTo.username}</span></td>
                     </tr>
                 </g:each>
             </tbody>
@@ -114,9 +114,9 @@
         $("td.group-target").on("click", ".value", function(){
             var tr = $(this).closest("tr");
             createSelect(tr, ".target-type", targets.types);
-            createSelect(tr, ".cterm", targets.targets);
-            createSelect(tr, ".nterm", targets.cterms);
-            createSelect(tr, ".target", targets.nterms);
+            createSelect(tr, ".target", targets.targets);
+            createSelect(tr, ".cterm", targets.cterms);
+            createSelect(tr, ".nterm", targets.nterms);
             var $save = "<button class='btn btn-primary save'>Save</button>";
             var $cancel = "<button class='btn btn-default cancel-target'>Cancel</button>";
             var td = tr.find(".target-type");

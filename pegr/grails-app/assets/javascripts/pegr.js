@@ -11,7 +11,7 @@ function getHash(){
     if(!changingHash){
         changingHash=true;
         var hash=window.location.hash.substr(1);
-        $('#barcode').val(unescape(hash));  
+        $('#barcode').val(unescape(hash));
         changingHash=false;
     }else{
         //Do something with barcode here
@@ -40,8 +40,8 @@ jQuery.validator.addClassRules({
         number: true
     }
 });
-        
-function appendEdit(elem, edit) {            
+
+function appendEdit(elem, edit) {
     var td = $(elem).parent();
     td.find(".value").hide();
     td.append(edit);
@@ -66,6 +66,8 @@ function createSelect(tr, classname, data) {
     td.append(edit);
     elem.hide();
     td.find("select").select2({
-        data: data
+        data: data,
+        placeholder: tagPlaceholder,
+        tags: true
     });
 }

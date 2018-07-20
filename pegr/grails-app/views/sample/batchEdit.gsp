@@ -114,9 +114,9 @@
         $("td.group-target").on("click", ".value", function(){
             var tr = $(this).closest("tr");
             createSelect(tr, ".target-type", targets.types);
-            createSelect(tr, ".cterm", targets.targets);
-            createSelect(tr, ".nterm", targets.cterms);
-            createSelect(tr, ".target", targets.nterms);
+            createSelect(tr, ".target", targets.targets);
+            createSelect(tr, ".cterm", targets.cterms);
+            createSelect(tr, ".nterm", targets.nterms);
             var $save = "<button class='btn btn-primary save'>Save</button>";
             var $cancel = "<button class='btn btn-default cancel-target'>Cancel</button>";
             var td = tr.find(".target-type");

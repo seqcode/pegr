@@ -12,6 +12,7 @@
 </head>
 <body>
     <div class="container-fluid">
+      <div class="well">
         <g:if test="${flash.message}">
             <div class="message" role="status">${flash.message}</div>
         </g:if>
@@ -33,7 +34,8 @@
             <p>Date: <g:formatDate format="yyyy-MM-dd" date="${sample.date}"/></p>
         </g:if>
         <g:render template="details" model="['sample': sample]"></g:render>
-
+      </div>
+      <div class="well">
         <h3>Replicates</h3>
         <div id="replicates">
             <g:render template="/replicate/list" model="[replicates: replicates]"></g:render>
@@ -51,6 +53,7 @@
                 <i class="fa fa-spinner fa-spin"></i>
             </div>
         </div>
+      </div>
     </div>
 
     <script>

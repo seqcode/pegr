@@ -3,18 +3,29 @@ ul {
     padding-left: 10px;
 }
 
+html * {
+  font-family: 'Roboto', sans-serif;
+}
+
+div.spacer
+{
+    font-size: 0;
+    height: 10px;
+    line-height: 0;
+}
 /* Remove the navbar's default margin-bottom and rounded borders */
 .navbar {
-  margin-bottom: 0;
+  height: 50px;
+  margin-bottom: 15px;
   border-style: none;
   border-radius: 0;
-  background-color: #2c5986;
+  background-color: #bf8226;
   z-index: +200;
 }
 
 .navbar-brand {
-    padding: 10px 0;
-    background-color: #658ced;//#496799;
+    padding: 7px 0;
+    background-color: #bf8226;//#496799;
 }
 
 .affix {
@@ -35,11 +46,11 @@ ul {
 }
 
 #myNavbar a:hover {
-  background-color: #3f7fc0;
+  background-color: #91959C;
 }
 
 #myNavbar .active {
-  background-color: #3973ad;
+  background-color: #54585A;
 }
 
 #myNavbar .dropdown-menu li {
@@ -176,14 +187,21 @@ footer {
     border-style: outset;
 }
 
+div.spacer
+{
+    font-size: 0;
+    height: 10px;
+    line-height: 0;
+}
+
 .edit {
     border: 1px solid;
     border-radius: 5px;
-    padding: 0 2px;
+    padding: 0 20px;
     font-size: 15px;
     font-weight: normal;
-    color: #3f7fc0;
-    background-color: white;
+    color: #f6f6f6;
+    background-color: #1E407C;
 }
 
 .subnumber OL {

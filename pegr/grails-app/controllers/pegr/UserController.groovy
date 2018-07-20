@@ -4,11 +4,11 @@ import grails.converters.*
 
 class UserController {
 
-	def springSecurityService	
+	def springSecurityService
 	def userService
     def utilityService
     def emailService
-    
+
 	def profile(){
         def user = springSecurityService.currentUser
         if (!user) {
@@ -17,10 +17,10 @@ class UserController {
             [user:user]
         }
 	}
-    
+
     def editInfo(UserInfoCommand uic) {
         if(request.method=='POST'){
-            withForm {                
+            withForm {
 				try {
                     int id = springSecurityService.currentUser.id
 				    userService.updateUser(uic, id)
@@ -37,7 +37,7 @@ class UserController {
             [user: uic]
         }
     }
-    
+
     def editAddress(Address newAddress){
         def user = springSecurityService.currentUser
         if(request.method=='POST'){
@@ -55,17 +55,17 @@ class UserController {
             [address: user.address]
         }
     }
-    
+
     def deleteAddress() {
         try {
             def user = springSecurityService.currentUser
             userService.deleteAddress(user)
         } catch (UserException e) {
             flash.message = "Your address has been deleted!"
-        }        
+        }
         redirect(action: "profile")
     }
-    
+
     def updatePassword(PasswordRegistrationCommand urc) {
         if(request.method=='POST') {
             withForm {
@@ -77,11 +77,11 @@ class UserController {
                 } catch (UserException e) {
                     request.message = e.message
                     render(view: "updatePassword", model: [user: urc])
-                }        
-            }   
+                }
+            }
         }
     }
-    
+
     def register(UserRegistrationCommand urc) {
         if(request.method=='POST') {
             try {
@@ -96,7 +96,7 @@ class UserController {
             [token: urc.token]
         }
     }
-    
+
     def generateApiKey() {
         try {
             userService.generateApiKey()
@@ -105,16 +105,16 @@ class UserController {
         }
         redirect(action: "profile")
     }
-    
+
     def fetchUserAjax() {
-        def users = User.list().collect{[it.id, it.toString()]}
+        def users = User.list().collect{[it.id, it.username.toString()]}
         render utilityService.arrayToSelect2Data(users) as JSON
     }
-        
+
     def forgetPassword() {
-        
+
     }
-    
+
     def sendResetPasswordEmail(String email){
         try {
             def token = userService.getToken(email)
@@ -129,7 +129,7 @@ class UserController {
             redirect(action: "forgetPassword")
         }
     }
-    
+
     def resetPassword(String token, PasswordRegistrationCommand urc) {
         if (request.method == "POST") {
             try {
@@ -156,7 +156,7 @@ class UserRegistrationCommand {
 	static constraints = {
 		importFrom User
         email email: true, blank: false
-		password(size: 5..20, blank: false)		
+		password(size: 5..20, blank: false)
 		passwordRepeat nullable: false,
 		   validator: { passwd2, urc ->
 			   return passwd2 == urc.password ?: 'validation.reenterSamePassword'
@@ -170,7 +170,7 @@ class PasswordRegistrationCommand {
 	String passwordRepeat
 
 	static constraints = {
-		password(size: 5..20, blank: false)		
+		password(size: 5..20, blank: false)
 		passwordRepeat nullable: false,
 		   validator: { passwd2, urc ->
 			   return passwd2 == urc.password ?: 'validation.reenterSamePassword'

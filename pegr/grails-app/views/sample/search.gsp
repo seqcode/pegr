@@ -34,12 +34,9 @@
         //BugFix || git:hedgiejo || Add checkbox feature that can select and deselect all checkboxes.
         $('#selectAll').click(function(checkedCount) {
           if (this.checked) {
-            var checkedSampleIds = [];
             $('input[name="checkedSample"]').prop('checked', true);
             $('input[name="checkedSample"]').each(function(checkedCount){
               if (this.checked){
-                checkedSampleIds.push(this.value);
-
                 $.ajax({url:"/pegr/sample/addCheckedSampleAjax?id="+this.value, success: function(checkedCount) {
                   $("#checked-count").text(checkedCount);
                 }});

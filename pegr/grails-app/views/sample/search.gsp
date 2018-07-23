@@ -19,7 +19,7 @@
     </div>
     <script>
         $(function(){
-            $(".nav-datasets").addClass("active");
+            $("#nav-datasets").addClass("active");
         });
 
         $(document).ready(function(){
@@ -34,18 +34,16 @@
         //BugFix || git:hedgiejo || Add checkbox feature that can select and deselect all checkboxes.
         $('#selectAll').click(function(checkedCount) {
           if (this.checked) {
-            $('input[name="checkedSample"]').prop('checked', true);
-            $('input[name="checkedSample"]').each(function(checkedCount){
+            $('.checkbox').prop('checked', true);
+            $('.checkbox').each(function(checkedCount){
               if (this.checked){
-                $.ajax({url:"/pegr/sample/addCheckedSampleAjax?id="+this.value, success: function(checkedCount) {
-                  $("#checked-count").text(checkedCount);
-                }});
+                toggleChecked(this);
               }
             })
           }
           else {
               $.ajax({url:"/pegr/sample/clearCheckedSampleAjax", success: function(checkedCount) {
-                  $('input[name="checkedSample"]').prop('checked', false);
+                  $('.checkbox').prop('checked', false);
                   checkedCount = 0;
                   $("#checked-count").text(checkedCount);
               }});

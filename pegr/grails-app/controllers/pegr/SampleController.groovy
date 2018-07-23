@@ -330,7 +330,7 @@ class SampleController {
     }
 
     def search(QuerySampleRegistrationCommand cmd) {
-        cmd.max = cmd.max ?: 15
+        // cmd.max = cmd.max ?: 15
         def samples = sampleService.search(cmd)
 	def galaxy = Holders.config.defaultGalaxy
 

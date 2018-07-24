@@ -349,9 +349,22 @@ class SampleController {
 
     def clearCheckedSampleAjax(){
         if (session.checkedSample) {
-            session.checkedSample = null
+            session.checkedSample = []
+            // session.checkedSample = null
         }
-        render true
+        render session.checkedSample.size()
+    }
+
+    // add all checked sample ids to the current session
+    def addAllCheckedSampleAjax(Long[] ids) {
+        def sampleIdsList= JSON.parse(params.sampleIdsList)
+        if (session.checkedSample) {
+            session.checkedSample = []
+        }
+        sampleIdsList.each{
+          session.checkedSample << it.toLong()
+        }
+        render session.checkedSample.size()
     }
 
     def addCheckedSampleAjax(Long id) {
@@ -416,7 +429,6 @@ class SampleController {
         } catch (SampleException e) {
             render (status: 500, text: e.message)
         }
-
     }
 
     def updateListAjax(String sampleList) {

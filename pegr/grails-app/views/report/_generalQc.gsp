@@ -214,7 +214,6 @@
 				data: {"alignIdsList": JSON.stringify(alignmentIds), "runId": runId},
 				success : function(result){
 					$("html").html(result);
-
 				},
 				error : function(e) {
 					console.info("Error" + e);

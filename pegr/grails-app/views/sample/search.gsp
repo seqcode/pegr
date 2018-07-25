@@ -3,7 +3,7 @@
     <title>Samples</title>
     <g:set var="defaultGalaxy" value="${defaultGalaxy}" scope="request"/>
     <meta name="layout" content="analysis"/>
-    <!-- <asset:javascript src="cookie.js"/> -->
+    <asset:javascript src="cookie.js"/>
     <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"></style>
     <script type="text/javascript" src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 </head>
@@ -23,11 +23,12 @@
         });
 
         $(document).ready(function(){
-          // hedgiejo: reset all the checkboxes and checkedCount (View Checked Samples number)
+          // BugFix || git:hedgiejo || Reset all the checkboxes and checkedCount when reloading
+          $('#selectAll').prop('checked', false);
+          $('.checkbox').prop('checked', false);
           $.ajax({url:"/pegr/sample/clearCheckedSampleAjax", success: function(checkedCount) {
-              $('.checkbox').prop('checked', false);
-              $('#selectAll').prop('checked', false);
-              $("#checked-count").text(checkedCount);
+            checkedCount = 0;
+            $("#checked-count").text(checkedCount);
           }});
 
         $('#table_id').DataTable()({
@@ -38,7 +39,7 @@
         });
       });
 
-        //BugFix || git:hedgiejo || Add checkbox feature that can select and deselect all checkboxes.
+        // BugFix || git:hedgiejo || Add checkbox feature that can select and deselect all checkboxes.
         $('#selectAll').click(function(checkedCount) {
           if (this.checked) {
 		        var sampleIds = [];
@@ -46,18 +47,19 @@
             $('.checkbox').each(function(){
                 sampleIds.push(this.value);
             })
+            console.log(JSON.stringify(sampleIds))
             $.ajax({
-        				url:"${createLink(controller: 'sample', action: 'addAllCheckedSampleAjax')}",
-        				type:"GET",
-        				data: {"sampleIdsList": JSON.stringify(sampleIds)},
+        				url:"/pegr/sample/addAllCheckedSampleAjax",
+        				data: {"sampleIdsList":JSON.stringify(sampleIds)},
         				success : function(checkedCount){
                   $("#checked-count").text(checkedCount);
         				}
 			       });
           }
           else {
-              $.ajax({url:"/pegr/sample/clearCheckedSampleAjax", success: function(checkedCount) {
                   $('.checkbox').prop('checked', false);
+              $.ajax({url:"/pegr/sample/clearCheckedSampleAjax", success: function(checkedCount) {
+                checkedCount = 0;
                   $("#checked-count").text(checkedCount);
               }});
           }

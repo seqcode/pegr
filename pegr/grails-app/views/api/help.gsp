@@ -6,7 +6,8 @@
     <div class="row">
         <div class="col-sm-9">
         <h2>PEGR API</h2>
-        To use PEGR APIs, you need a registered email and API key at PEGR. Please set up the information in your <g:link controller="user" action="profile">Profile</g:link>.
+       
+	 To use PEGR APIs, you need a registered email and API key at PEGR. Please set up the information in your <g:link controller="user" action="profile">Profile</g:link>.
         <div class="chapter">
         <h3 id="query">Query Data from PEGR</h3>
         <h4 id="query-sample">Query Data by Sample Properties</h4>

@@ -18,25 +18,25 @@ class UserAdminController {
         def users
         def totalCount
 
-        // if (groupId) {
-        //     def sort = params.sort ? ("user."+params.sort) : "user.fullName"
-        //     users = UserRoleGroup.createCriteria().list(max: params.max, offset: params.offset, sort: sort, order: params.order) {
-        //         eq("roleGroup.id", groupId)
-        //     }.collect { it.user }
-				//
-        //     totalCount = UserRoleGroup.where { roleGroup.id == groupId }.count()
-        // } else {
-        //     def query
-        //     if (affiliationId) {
-        //         query = User.where { affiliation.id == affiliationId }
-        //     } else if (isEnabled != null && isEnabled != "") {
-        //         query = User.where { enabled == isEnabled }
-        //     } else {
-        //         query = User.where{}
-        //     }
-        //     users = query.list(params)
-        //     totalCount = query.count()
-        // }
+        if (groupId) {
+            def sort = params.sort ? ("user."+params.sort) : "user.fullName"
+            users = UserRoleGroup.createCriteria().list(max: params.max, offset: params.offset, sort: sort, order: params.order) {
+                eq("roleGroup.id", groupId)
+            }.collect { it.user }
+
+            totalCount = UserRoleGroup.where { roleGroup.id == groupId }.count()
+        } else {
+            def query
+            if (affiliationId) {
+                query = User.where { affiliation.id == affiliationId }
+            } else if (isEnabled != null && isEnabled != "") {
+                query = User.where { enabled == isEnabled }
+            } else {
+                query = User.where{}
+            }
+            users = query.list(params)
+            totalCount = query.count()
+        }
 
 				[users: users,
          totalCount: totalCount,

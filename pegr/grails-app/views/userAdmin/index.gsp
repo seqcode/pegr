@@ -74,7 +74,6 @@
                 </table>
             </div>
 
-
             <div class="col-sm-2 sidenav filter text-center">
                 <h5 id="all"><g:link controller="userAdmin" action="index">All</g:link></h5>
                 <h4>Group</h4>
@@ -87,7 +86,6 @@
                           <td>
                             <input type="checkbox" id="group" value="${group.name}">
                           </td>
-
                         </tr>
                     </g:each>
                   </table>
@@ -125,7 +123,7 @@
                       </td>
                     </tr>
                 </table>
-                <button type="button" class="btn btn-warning btn-lg"><i class="fab fa-empire"></i>  Filter Table   <i class="fab fa-empire"></i></button>
+                <button type="button" id="filter" class="btn btn-warning btn-lg"><i class="fab fa-empire"></i>  Filter Table   <i class="fab fa-empire"></i></button>
                 <div class="spacer"></div>
             </div>
             <br/>
@@ -134,15 +132,15 @@
 
           $(document).ready(function() {
               $('#example').DataTable({
-                // scrollY: '50vh',
-                // scrollCollapse: true,
-                // paging: false
+                scrollY: '50vh',
+                scrollCollapse: true,
+                paging: true
               });
           });
 
 
           // User Filter JQuery and AJAX | git:pjchaffin || Gucci Gang Gang Got Dah Code Working Yeet Yeet
-          $('input[type="checkbox"]').click(function(){
+          $('#filter').click(function(){
 
               // initialize 3 lists for groups, activities, and affiliations
               let groups = [];
@@ -169,7 +167,6 @@
                   affiliations.push(this.value);
                  }
               });
-
               // logging for debugging purposes
               console.log(groups);
               console.log(activities);

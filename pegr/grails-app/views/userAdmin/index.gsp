@@ -139,7 +139,7 @@
           });
 
 
-          // User Filter JQuery and AJAX | git:pjchaffin || Gucci Gang Gang Got Dah Code Working Yeet Yeet
+          // User Filter JQuery and AJAX | git:pjchaffin
           $('#filter').click(function(){
 
               // initialize 3 lists for groups, activities, and affiliations
@@ -167,10 +167,6 @@
                   affiliations.push(this.value);
                  }
               });
-              // logging for debugging purposes
-              console.log(groups);
-              console.log(activities);
-              console.log(affiliations);
 
               // action redirect pushing these lists to page logic
               // redirect(controller: "userAdmin", action: "index", params: [groupLoad: groups, activityLoad: activities, affiliateLoad: affliatiations]);

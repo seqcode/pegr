@@ -715,7 +715,7 @@ class QfileUploadService {
         } else if (indexIdStr.length() == 1) {
             indexIdStr = "0" + indexIdStr
         }
-        
+        // remove 
 	    if (runStr.take(1) == "S") {
 	         runNum = getInteger(runStr.substring(1))
 	         platform = SequencingPlatform.findByName("SOLiD")
@@ -813,48 +813,50 @@ class QfileUploadService {
 	     projectUserEmail: data[11],  //L   
 	     service: data[12],        //M
 	     invoice: data[13],        //N
-	     abCompName: data[14],     //O
-	     abCatNum: data[15],       //P
-	     abLotNum: data[16],       //Q
-	     abNotes: data[17],        //R
-	     abClonal: data[18],       //S
-	     abAnimal: data[19],       //T
-	     ig: data[20],             //U
+	     
+		 
+		 abCompName: data[14],     //O  --------
+	     abCatNum: data[15],       //P  --------
+	     abLotNum: data[16],       //Q  --------
+	     abNotes: data[17],        //R  --------
+	     abClonal: data[18],       //S  ---------
+	     abAnimal: data[19],       //T  ---------
+	     ig: data[20],             //U  ---------
 	     antigen: data[21],        //V
 	     ulSampleSent: data[22],   //W
 	     abConc: data[23],         //X 
-	     amountUseUg: data[24],    //Y
-	     amountUseUl: data[25],    //Z
+	     amountUseUg: data[24],    //Y  ---------
+	     amountUseUl: data[25],    //Z  ---------
 	     // data[26],              //AA
 	     // data[27],              //AB
 	     // abName: data[28],      //AC
 	     samplePrepUser: data[29], //AD
-	     genus: data[30],          //AE
-	     species: data[31],        //AF
-	     strain: data[32],         //AG
-	     parentStrain: data[33],   //AH        
+	     genus: data[30],          //AE ---------
+	     species: data[31],        //AF ---------
+	     strain: data[32],         //AG ---------  
+	     parentStrain: data[33],   //AH       
 	     genotype: data[34],       //AI
 	     mutation: data[35],       //AJ    
-	     growthMedia: data[36],    //AK    
-	     perturbation1: data[37],  //AL
+	     growthMedia: data[36],    //AK ---------    
+	     perturbation1: data[37],  //AL ---------  
 	     perturbation2: data[38],  //AM
 	     targetType: data[39], // changed  //AN
 	     // data[40],              //AO
-	     //bioRep: data[41],       //AP
+	     //bioRep: data[41],       //AP ---------  
 	     sampleId: data[42],       //AQ
 	     bioRep1SampleId: data[43],//AR
 	     bioRep2SampleId: data[44],//AS
-	     sampleNotes: data[45],    //AT
+	     sampleNotes: data[45],    //AT ---------  
 	     nTag: data[46],           //AU    
-	     target: data[47],         //AV
-	     cTag: data[48],           //AW
+	     target: data[47],         //AV ---------      
+	     cTag: data[48],           //AW ---------      
 	     chromAmount: data[49],    //AX
-	     cellNum: data[50],        //AY    
+	     cellNum: data[50],        //AY ---------        
 	     volume: data[51],         //AZ
-	     assay: data[52],          //BA
-	     genomeBuild1: data[53],   //BB    
-	     genomeBuild2: data[54],   //BC
-	     genomeBuild3: data[55],   //BD    
+	     assay: data[52],          //BA --------- 
+	     genomeBuild1: data[53],   //BB ---------       
+	     genomeBuild2: data[54],   //BC ---------    
+	     genomeBuild3: data[55],   //BD ---------       
 	     // data[56],              //BE    
 	     dateReceived: data[57],   //BF
 	     receivingUser: data[58],  //BG    
@@ -893,7 +895,7 @@ class QfileUploadService {
 	     rd2Start: data[91],       //CN
 	     rd2End: data[92],         //CO
 	     // data[93],              //CP
-	     runStr: data[94],         //CQ
+	     runStr: data[94],         //CQ --------- 
 	     // data[95],              //CR
 	     // data[96],              //CS
 	     // data9[7],              //CT

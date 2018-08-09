@@ -13,6 +13,7 @@ class SequenceRun {
     RunStatus status
     RunStats runStats
     Item poolItem
+	String runNumAlias
 	
     List getExperiments() {
         return SequencingExperiment.where{sequenceRun == this}.list()
@@ -31,6 +32,7 @@ class SequenceRun {
         date nullable: true
         runStats nullable: true
         poolItem nullable: true
+		runNumAlias nullable: true //new field added on 08/09/2018 by axa677
     }
 
 }

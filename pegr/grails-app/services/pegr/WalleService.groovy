@@ -62,15 +62,15 @@ class WalleService {
         if (runsInQueue) {
             // if the queue is not empty, append run ID to the end.
             if (runsInQueue.value && runsInQueue.value != "") {
-                runsInQueue.value += ",${runId}"
+                runsInQueue.value += ",${runNum}"
             } else {
                 // else, set run ID to be the only one in queue
-                runsInQueue.value = runId
+                runsInQueue.value = runNum
             }
             runsInQueue.save()        
         } else {
             // else, create the queue and put run ID into queue
-            new Chores(name: RUNS_IN_QUEUE, value: "${runId}").save()
+            new Chores(name: RUNS_IN_QUEUE, value: "${runNum}").save()
         }    
     }
     
@@ -113,9 +113,12 @@ class WalleService {
             String message = "More than ${MAX_QUEUE_LENGTH} waiting in the queue!" 
             log.error message
         }
-        // get the first sequence run in the queue
-        Long runId = Long.parseLong(runIds[0])
-        def run = SequenceRun.get(runId)
+        
+		
+		
+		// get the first sequence run in the queue
+        //Long runId = Long.parseLong(runIds[0])
+        def run = SequenceRun.findByRunNum(runIds[0].toInteger())//.get(runId)
         
         // return if the prior run has not been processed by the remote server
         def remoteFiles = getRemoteFiles()
@@ -304,14 +307,15 @@ class WalleService {
                     def genomes = genomesStr.split(",")
                     // write the config xml file for each genome.
                     genomes.eachWithIndex { genome, idx ->
-                        def xmlName = generateXmlFile(genome, run.id, experiment.sample.id, idx, configLocalFolder)
-                        xmlNames.push(xmlName)
+                        def xmlName = generateXmlFile(genome, run.runNum, experiment.sample.id, idx, configLocalFolder)
+                        xmlNames.push(xmlName) //axa677: Careful!!!!!!
                     }
                 }
                 // write the sample's runID, sampleID, indices and config xml file names.
                 def indicesString = experiment.sample?.sequenceIndicesString
                 def xmlNamesString= xmlNames.join(",")
-                def data = "${run.id} ; ${experiment.sample?.id} ; ${indicesString} ; ${xmlNamesString}"           
+                //axa677: Careful!!!!!!
+				def data = "${run.runNum} ; ${experiment.sample?.id} ; ${indicesString} ; ${xmlNamesString}"           
                 it.println data
             }
         }

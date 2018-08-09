@@ -23,7 +23,7 @@ class SequenceRunController {
         def c = SequenceRun.createCriteria()
         def listParams = [
                 max: params.max ?: 50,
-                sort: params.sort ?: "id", //if you would like to sort based on the runNum, just remeber it's basically for the old run number.
+                sort: params.sort ?: "runNum", //if you would like to sort based on the runNum, just remeber it's basically for the old run number. //changed it back to runNum
                 order: params.order ?: "desc",
                 offset: params.offset ?: 0
             ]
@@ -133,6 +133,7 @@ class SequenceRunController {
         [defaultRunNum: largestRunNum + 1]
     }
     
+	//Does it need change???!
     def save() {
         def run = new SequenceRun(params)
         try {
@@ -455,13 +456,14 @@ class SequenceRunController {
         return
     }
     
+	//axa677-180808: Use runNum to name the files instead of run.id!!
     def downloadRunInfo(String remoteRoot, Long runId) {
-        String RUN_INFO_TEMP = "runInfo${runId}"
+        //String RUN_INFO_TEMP = "runInfo${runId}"
         def timeout = 60*1000
         
         // generate the run info files
         def run = SequenceRun.get(runId)
-        
+        String RUN_INFO_TEMP = "runInfo${run.runNum}" // I changed the id to runNum for naming only!
         // clean path
         remoteRoot = remoteRoot.trim()
         
@@ -483,7 +485,7 @@ class SequenceRunController {
         walleService.generateRunFilesInFolder(run, remotePath, localFolder)
         
         // compress the files
-        def compressedFilename = "runInfo${runId}.tar.gz"
+        def compressedFilename = "runInfo${run.runNum}.tar.gz"
         def compressedFile = new File(localRoot, compressedFilename)
         def command = "tar -cf ${compressedFile.getPath()} ${RUN_INFO_TEMP}"
         def envVars = []

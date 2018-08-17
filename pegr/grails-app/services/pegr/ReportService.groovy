@@ -402,16 +402,17 @@ class ReportService {
     
    /**
     * Fetch data for a sequence run
-    * @param runId sequence run ID
+    * @param runNum sequence run #
     * @param preferredOnly whether to report preferred alignments only or report all alignments.
     * Default to be false.
     * @return a list sampleDTOs
     */
-    def fetchDataForRun(Long runId, Boolean preferredOnly=false) {
-        if (!runId) {
-            throw new ReportException(message: "Sequence run ID is missing!")
+    def fetchDataForRun(Integer runNum, Boolean preferredOnly=false) {
+        if (!runNum) {
+            throw new ReportException(message: "Sequence run Num is missing!")
         }
-        def run = SequenceRun.get(runId)
+		def run = SequenceRun.findByRunNum(runNum)
+        //def run = SequenceRun.get(runId)
         if (!run) {
             throw new ReportException(message: "Sequence run not found!")
         }
@@ -517,8 +518,8 @@ class ReportService {
         def fastqc = utilityService.parseJson(experiment.fastqcReport)
         def fastq = utilityService.parseJson(experiment.fastqFile)
         return new ExperimentDTO(id: experiment.id,
-                              runId: experiment.sequenceRun?.id,
-                              oldRunNum: experiment.sequenceRun?.runNum,
+                              runNum: experiment.sequenceRun?.runNum,
+                              runNumAlias: experiment.sequenceRun?.runNumAlias,
                               totalReads: experiment.totalReads,
                               adapterDimerCount: experiment.adapterDimerCount,
                               fastqc: fastqc,

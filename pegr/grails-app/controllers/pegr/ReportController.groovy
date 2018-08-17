@@ -287,8 +287,8 @@ class SampleDTO {
 
 class ExperimentDTO {
     Long id
-    Long runId
-    Long oldRunNum
+    Integer runNum
+    String runNumAlias
     Long totalReads
     Long adapterDimerCount
     Map fastqc

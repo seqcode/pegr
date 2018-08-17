@@ -133,7 +133,6 @@ class SequenceRunController {
         [defaultRunNum: largestRunNum + 1]
     }
     
-	//Does it need change???!
     def save() {
         def run = new SequenceRun(params)
         try {
@@ -160,7 +159,7 @@ class SequenceRunController {
             redirect(action: "index")
         }
     }
-    
+    // re - check again, later!
     def update(Long runId) {
         def run = SequenceRun.get(runId)
         if (run) {
@@ -182,7 +181,7 @@ class SequenceRunController {
             redirect(action: "index")
         }
     }
-    
+    // re - check again, later!
     def searchPool(Long runId, Long typeId, String barcode) {
         if (request.method == "POST") {
             def poolItem = Item.where {type.id == typeId && barcode == barcode}.find()
@@ -196,7 +195,7 @@ class SequenceRunController {
             [runId: runId]   
         }
     }
-    
+    // re - check again, later!
     def addPool(Long poolItemId, Long runId) {
         try {
             sequenceRunService.addPool(poolItemId, runId)
@@ -209,7 +208,7 @@ class SequenceRunController {
         }
         redirect(action: "show", params: [id: runId])
     }
-    
+    // re - check again, later!
     def removePool(Long runId) {
         try {
             sequenceRunService.removePool(runId)

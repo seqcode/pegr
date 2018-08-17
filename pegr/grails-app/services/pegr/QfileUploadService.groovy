@@ -698,7 +698,7 @@ class QfileUploadService {
     }
 	
 	def getSequenceRun(RunStatus runStatus, String runStr, String laneStr, String dateStr, String fcidStr, String indexIdStr, User user) {
-	    int runNum
+	    def runNum
 	    def platform
 	    def seqId
         if (runStr == null) {
@@ -716,6 +716,7 @@ class QfileUploadService {
             indexIdStr = "0" + indexIdStr
         }
         // remove 
+		/*
 	    if (runStr.take(1) == "S") {
 	         runNum = getInteger(runStr.substring(1))
 	         platform = SequencingPlatform.findByName("SOLiD")
@@ -734,7 +735,11 @@ class QfileUploadService {
 	             seqId = runStr + indexIdStr
 	         }
 	    }
-	
+		*/
+	    runNum = getInteger(runStr)
+	    platform = SequencingPlatform.findByName("NextSeq 500") 
+	    seqId = runStr + laneStr + indexIdStr	 
+		
 	    if (Sample.findBySourceId(seqId)) {
             throw new QfileUploadException(message: "SeqId ${seqId} already exists!")
 	    }
@@ -799,7 +804,7 @@ class QfileUploadService {
     }
 	
 	def getNamedData(String[] data) {
-	    [laneStr: data[0],         //A       
+	    [laneStr: data[0],         //A  xxxxxxxxxxx     
 	     // data[1]                //B
 	     // data[2]                //C
          indexIdStr: data[3],      //D
@@ -901,8 +906,8 @@ class QfileUploadService {
 	     // data9[7],              //CT
 	     // data[98],              //CU
 	     userStr: data[99],        //CV
-	     dateStr: data[100],       //CW
-	     fcidStr: data[101],       //CX
+	     dateStr: data[100],       //CW ???????????
+	     fcidStr: data[101],       //CX xxxxxxxxxxx     
          indexStr: data[113]       //DJ
 	    ]
 	}

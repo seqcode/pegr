@@ -24,7 +24,7 @@
             </div>
         </g:if>
     </div>
-    <h2>Sequence Run #${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if> 
+    <h2>Sequence Run #${run.runNum} <g:if test="${run.runNumAlias}">(Old No.${run.runNumAlias})</g:if> 
         <small>
             <span id="run-status-show" class="label label-default">${run.status}</span>
             <span id="run-status-select" style="display:none">
@@ -147,7 +147,7 @@
                 <div class="modal-content">
                     <g:form action="addSamplesById">
                         <div class="modal-header">
-                            <h3 class="modal-title">Add Samples to Sequence Run #${run.id}</h3>
+                            <h3 class="modal-title">Add Samples to Sequence Run #${run.runNum}</h3>
                         </div>
                         <div class="modal-body">
                             <g:hiddenField name="runId" value="${run.id}"></g:hiddenField>
@@ -189,7 +189,7 @@
                 <tr>
                     <input type="hidden" name="experimentId" value="${it.id}">
                     <g:if test="${editable}">
-                        <td title="Delete the sample and all the related data."><input type="checkbox" name="delete" value="${it.sample.id}" data-runId="${run.id}"></td> 
+                        <td title="Delete the sample and all the related data."><input type="checkbox" name="delete" value="${it.sample.id}" data-runId="${run.id}" data-runNum="${run.runNum}"></td> 
                     </g:if>
                     <td><g:link controller="sample" action="show" id="${it.sample.id}">${it.sample?.id}</g:link> ${it.sample?.naturalId}</td>
                     <td>${it.sample?.cellSource?.strain}</td>
@@ -382,13 +382,15 @@
 		$("#ajaxDeleteAll").click(function() {
 			var sampleIds = [];
 			var runId = 0;
+			var runNum = 0;
 			$('input[name="delete"]').each(function(){
 				if (this.checked) {
 					sampleIds.push(this.value);
 					runId = this.getAttribute("data-runId");
+					runNum = this.getAttribute("data-runNum");
 				}
 			});
-			if (confirm('All data in the selected samples(s) will be deleted. Are you sure you want to delete the following sample(s): ' + sampleIds + ' for run number: ' + runId + '?'))
+			if (confirm('All data in the selected samples(s) will be deleted. Are you sure you want to delete the following sample(s): ' + sampleIds + ' for run number: ' + runNum + '?'))
 			{
 				// axa677-180306: the next ajax call sends the array as a json dictionary with the run id to a controller action
 		  	  	// then get the results as html

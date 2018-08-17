@@ -109,19 +109,19 @@ class ApiController {
         def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
         def message, data, code
         if (apiUser) {
-            if (query.runId) {
+            if (query.runNum) {
                 try {
                     def preferredOnly = query.preferredOnly
-                    data = reportService.fetchDataForRun(query.runId, preferredOnly)       
+                    data = reportService.fetchDataForRun(query.runNum, preferredOnly)       
                     code = 200
-                    message = "Success fetching data from Run ${query.runId}!"
+                    message = "Success fetching data from Run ${query.runNum}!"
                 } catch (ReportException e) {
                     code = 500
                     message = e.message
                 }
             } else {
                 code = 404
-                message = "Sequence Run ID is missing!"
+                message = "Sequence Run # is missing!"
             }
         } else {
             code = 401
@@ -143,7 +143,7 @@ class ResponseMessage {
 @grails.validation.Validateable
 class StatsRegistrationCommand {
     Long alignmentId
-    Long run
+    Integer runNum
     Long sample
     String genome
     String statsToolId
@@ -180,7 +180,7 @@ class QuerySampleRegistrationCommand {
 class QueryRunRegistrationCommand {
     String userEmail // required
     Boolean preferredOnly
-    Long runId // required
+    Integer runNum // required
 }
 
 

@@ -50,10 +50,10 @@ class WalleService {
     
     /**
      * Append a sequence run to the end of a first-in-first-out queue,
-     * which consists of a list of sequence run IDs, delimited by ','. 
+     * which consists of a list of sequence run ID, delimited by ','. 
      * The information of the sequence runs will be sequentially sent 
      * to remote server.
-     * @param runId ID of the sequence run to be appended to the queue
+     * @param run ID of the sequence run to be appended to the queue
      */
     void addToQueue(Long runId) {
         // query the current queue
@@ -62,15 +62,15 @@ class WalleService {
         if (runsInQueue) {
             // if the queue is not empty, append run ID to the end.
             if (runsInQueue.value && runsInQueue.value != "") {
-                runsInQueue.value += ",${runNum}"
+                runsInQueue.value += ",${runId}"
             } else {
                 // else, set run ID to be the only one in queue
-                runsInQueue.value = runNum
+                runsInQueue.value = runId
             }
             runsInQueue.save()        
         } else {
             // else, create the queue and put run ID into queue
-            new Chores(name: RUNS_IN_QUEUE, value: "${runNum}").save()
+            new Chores(name: RUNS_IN_QUEUE, value: "${runId}").save()
         }    
     }
     
@@ -117,9 +117,9 @@ class WalleService {
 		
 		
 		// get the first sequence run in the queue
-        //Long runId = Long.parseLong(runIds[0])
-        def run = SequenceRun.findByRunNum(runIds[0].toInteger())//.get(runId)
-        
+        Long runId = Long.parseLong(runIds[0])
+        //def run = SequenceRun.findByRunNum(runIds[0].toInteger())//.get(runId)
+		
         // return if the prior run has not been processed by the remote server
         def remoteFiles = getRemoteFiles()
         if (findPriorInfoOnRemote(remoteFiles)) {
@@ -161,7 +161,7 @@ class WalleService {
         removeRunFromQueue()  
         updatePriorRunFolder(newFolder)
         
-        log.warn "WallE service has sent the info of run ${run.id} to Wall E."
+        log.warn "WallE service has sent the info of run ${run.runNum} to Wall E."
     }
     
     /**
@@ -311,7 +311,7 @@ class WalleService {
                         xmlNames.push(xmlName) //axa677: Careful!!!!!!
                     }
                 }
-                // write the sample's runID, sampleID, indices and config xml file names.
+                // write the sample's runNum, sampleID, indices and config xml file names.
                 def indicesString = experiment.sample?.sequenceIndicesString
                 def xmlNamesString= xmlNames.join(",")
                 //axa677: Careful!!!!!!
@@ -369,7 +369,7 @@ class WalleService {
      * @param folder the config folder
      * @return the filename of the xml config file
      */
-    String generateXmlFile(String genome, Long runId, Long sampleId, int idx, File folder) {
+    String generateXmlFile(String genome, int runNum, Long sampleId, int idx, File folder) {
         // create the config xml file
         def filename = "${sampleId}_${idx}.xml"
         def file = new File(folder, filename)

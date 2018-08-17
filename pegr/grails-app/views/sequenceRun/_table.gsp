@@ -12,7 +12,7 @@
         <tbody>
             <g:each in="${runs}" var="run">
                 <tr>
-                    <td class="col-sm-2" rowspan="${Math.max(1, run.cohorts.size())}"><g:link controller="sequenceRun" action="show" id="${run.id}">${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if><br><i>${run.platform}</i></g:link></td>
+                    <td class="col-sm-2" rowspan="${Math.max(1, run.cohorts.size())}"><g:link controller="sequenceRun" action="show" id="${run.id}">${run.runNum} <g:if test="${run.runNumAlias}">(Old No.${run.runNumAlias})</g:if><br><i>${run.platform}</i></g:link></td>
                     <td class="col-sm-1" rowspan="${Math.max(1, run.cohorts.size())}"><g:formatDate format="yyyy-MM-dd" date="${run.date}"/></td>
                     <td class="col-sm-2" rowspan="${Math.max(1, run.cohorts.size())}"><span class="label">${run.status}</span><g:link controller="report" action="runStatus"  params="[runId: run.id]"><br>Details</g:link></td>
                     <g:each in="${run.cohorts}" var="cohort" status="n">

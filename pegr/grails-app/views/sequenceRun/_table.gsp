@@ -2,7 +2,7 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <g:sortableColumn property="id" defaultOrder="desc" title="Run #"></g:sortableColumn>
+                <g:sortableColumn property="runNum" defaultOrder="desc" title="Run #"></g:sortableColumn>
                 <g:sortableColumn property="date" defaultOrder="desc" title="Date"></g:sortableColumn>
                 <g:sortableColumn property="status" title="Run Analysis Status"></g:sortableColumn>
                 <th>Project</th>

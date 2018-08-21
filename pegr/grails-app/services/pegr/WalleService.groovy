@@ -161,7 +161,7 @@ class WalleService {
         removeRunFromQueue()  
         updatePriorRunFolder(newFolder)
         
-        log.warn "WallE service has sent the info of run ${run.runNum} to Wall E."
+        log.warn "WallE service has sent the info of run id ${run.id} with run # ${run.runNum} to Wall E."
     }
     
     /**
@@ -307,15 +307,15 @@ class WalleService {
                     def genomes = genomesStr.split(",")
                     // write the config xml file for each genome.
                     genomes.eachWithIndex { genome, idx ->
-                        def xmlName = generateXmlFile(genome, run.runNum, experiment.sample.id, idx, configLocalFolder)
+                        def xmlName = generateXmlFile(genome, run.id, experiment.sample.id, idx, configLocalFolder)
                         xmlNames.push(xmlName) //axa677: Careful!!!!!!
                     }
                 }
-                // write the sample's runNum, sampleID, indices and config xml file names.
+                // write the sample's runId, sampleID, indices and config xml file names.
                 def indicesString = experiment.sample?.sequenceIndicesString
                 def xmlNamesString= xmlNames.join(",")
                 //axa677: Careful!!!!!!
-				def data = "${run.runNum} ; ${experiment.sample?.id} ; ${indicesString} ; ${xmlNamesString}"           
+				def data = "${run.id} ; ${experiment.sample?.id} ; ${indicesString} ; ${xmlNamesString}"           
                 it.println data
             }
         }
@@ -369,7 +369,7 @@ class WalleService {
      * @param folder the config folder
      * @return the filename of the xml config file
      */
-    String generateXmlFile(String genome, int runNum, Long sampleId, int idx, File folder) {
+    String generateXmlFile(String genome, Long runId, Long sampleId, int idx, File folder) {
         // create the config xml file
         def filename = "${sampleId}_${idx}.xml"
         def file = new File(folder, filename)
@@ -427,7 +427,7 @@ class WalleService {
             previousRunFolderConfig.value = previousRunFolder
             previousRunFolderConfig.save(failOnError: true)
         }
-        // check teh format of queuedRuns        
+        // check the format of queuedRuns        
         if (queuedRuns == "") {
             queuedRuns = null
         } else {

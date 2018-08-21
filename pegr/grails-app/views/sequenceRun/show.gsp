@@ -191,7 +191,7 @@
                     <g:if test="${editable}">
                         <td title="Delete the sample and all the related data."><input type="checkbox" name="delete" value="${it.sample.id}" data-runId="${run.id}" data-runNum="${run.runNum}"></td> 
                     </g:if>
-                    <td><g:link controller="sample" action="show" id="${it.sample.id}">${it.sample?.id}</g:link> ${it.sample?.naturalId}</td>
+                    <td><g:link controller="sample" action="show" id="${it.sample.id}" params="${[runId: run.id]}">${it.sample?.id}</g:link> ${it.sample?.naturalId}</td>
                     <td>${it.sample?.cellSource?.strain}</td>
                     <td>${it.sample?.antibody}</td>
                     <td>${it.sample?.sequenceIndicesString}</td>

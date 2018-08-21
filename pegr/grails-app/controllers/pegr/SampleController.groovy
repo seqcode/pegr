@@ -31,7 +31,7 @@ class SampleController {
         if (sample) {
             def result = sampleService.getSampleDetails(sample)
             def editAuth = sampleService.editAuth(sample)
-            result << [editAuth: editAuth]
+            result << [editAuth: editAuth, runId: params.runId]
         } else {
             render(view: "/404")
         }

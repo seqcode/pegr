@@ -143,7 +143,7 @@ class ResponseMessage {
 @grails.validation.Validateable
 class StatsRegistrationCommand {
     Long alignmentId
-    Integer runNum
+    Integer runNum  // axa677: changed the runId to runNum since the id is going to be used only for the backend functions. The end user should only use the runNum to retrieve whatever info needed
     Long sample
     String genome
     String statsToolId
@@ -180,7 +180,7 @@ class QuerySampleRegistrationCommand {
 class QueryRunRegistrationCommand {
     String userEmail // required
     Boolean preferredOnly
-    Integer runNum // required
+    Integer runNum  // axa677: changed the runId to runNum since the id is going to be used only for the backend functions. The end user should only use the runNum to retrieve whatever info needed
 }
 
 

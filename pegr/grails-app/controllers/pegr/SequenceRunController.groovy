@@ -23,7 +23,7 @@ class SequenceRunController {
         def c = SequenceRun.createCriteria()
         def listParams = [
                 max: params.max ?: 50,
-                sort: params.sort ?: "runNum", //if you would like to sort based on the runNum, just remeber it's basically for the old run number. //changed it back to runNum
+                sort: params.sort ?: "runNum",
                 order: params.order ?: "desc",
                 offset: params.offset ?: 0
             ]
@@ -129,7 +129,7 @@ class SequenceRunController {
             projections {
                 max "runNum"
             }
-        } as Long 
+        } as Integer 
         [defaultRunNum: largestRunNum + 1]
     }
     
@@ -145,7 +145,7 @@ class SequenceRunController {
                 projections {
                     max "runNum"
                 }
-            } as Long 
+            } as Integer 
             render(view: "create", model: [run:run, defaultRunNum: largestRunNum + 1]) 
         }
     }
@@ -455,7 +455,7 @@ class SequenceRunController {
         return
     }
     
-	//axa677-180808: Use runNum to name the files instead of run.id!!
+	//axa677-180820: Use runNum to name the files instead of run.id!!
     def downloadRunInfo(String remoteRoot, Long runId) {
         //String RUN_INFO_TEMP = "runInfo${runId}"
         def timeout = 60*1000
@@ -516,12 +516,51 @@ class SequenceRunController {
     
     def editQueue() {
         def queue = walleService.getQueue()
-        [previousRunFolder: queue.previousRunFolder, queuedRuns: queue.queuedRuns]
+		
+		//axa677-180820: get the runNums using the queuedRuns (ids) to display for the end users
+        def queuedRunIds = queue.queuedRuns.split(",")
+        def runNums = []
+        queuedRunIds.each { idRaw ->
+            def id = idRaw.trim()
+            if (!id.isInteger()) {
+                throw new WalleException(message: "Format error in queued runs!${id}!")
+            } else {
+				def run = SequenceRun.get(id)
+				if(run) {
+					runNums.push(run.runNum)
+				}
+            }
+        }
+        def queuedRunNums = runNums.join(",")
+		//axa677-180820: =======================================================================
+		
+		
+        [previousRunFolder: queue.previousRunFolder, queuedRuns: queuedRunNums]
     }
     
     def updateQueue(String previousRunFolder, String queuedRuns) {
         try {
-            walleService.updateQueue(previousRunFolder.trim(), queuedRuns.trim())
+			//axa677-180820: get the runIds using the queuedRuns (runNum) to update the Chores table
+	        def queuedRunNums = queuedRuns.split(",")
+	        def runIds = []
+	        queuedRunNums.each { numRaw ->
+	            def num = numRaw.trim()
+	            if (!num.isInteger()) {
+	                throw new WalleException(message: "Format error in queued runs!${num}!")
+	            } else {
+					def run = SequenceRun.findByRunNum(num)
+					if(run) {
+					    runIds.push(run.id)
+					}
+					else {
+						throw new WalleException(message: "This run number is not found!${num}!")
+					}
+	            }
+	        }
+	        def queuedRunIds = runIds.join(",")
+			//axa677-180820: =======================================================================
+			
+            walleService.updateQueue(previousRunFolder.trim(), queuedRunIds.trim())
             flash.message = "Queue has been updated!"
         } catch (WalleException e) {
             flash.message = e.message

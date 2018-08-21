@@ -402,7 +402,7 @@ class ReportService {
     
    /**
     * Fetch data for a sequence run
-    * @param runNum sequence run #
+    * @param runNum sequence run # [axa677: changed from runId to runNum]
     * @param preferredOnly whether to report preferred alignments only or report all alignments.
     * Default to be false.
     * @return a list sampleDTOs
@@ -413,6 +413,7 @@ class ReportService {
         }
 		def run = SequenceRun.findByRunNum(runNum)
         //def run = SequenceRun.get(runId)
+		//axa677: commented the previous line because I'm using the runNum given by the end user to retrieve the sequence run
         if (!run) {
             throw new ReportException(message: "Sequence run not found!")
         }

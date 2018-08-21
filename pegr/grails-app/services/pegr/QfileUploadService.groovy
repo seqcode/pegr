@@ -22,7 +22,7 @@ class QfileUploadService {
         getDefaultUser()     
         def csvNames = [:]
         
-        // convert xsxl to csv
+        // convert xsxl to csv (axa677: it the csv gets deleted at the end of the samples migration)
         [sampleSheetName, laneSheetName].each { sheet ->
             csvNames[sheet] = new File(folder, sheet + ".csv").getPath()
             def command = "xlsx2csv -n ${sheet} ${filename} ${csvNames[sheet]}"
@@ -212,7 +212,7 @@ class QfileUploadService {
         if (!project || !seqExp.sequenceRun) {
             return
         }
-        def cohortName = "${seqExp.sequenceRun.id}_${service}-${invoice}"
+        def cohortName = "${seqExp.sequenceRun.runNum}_${service}-${invoice}"
         def cohort = SequencingCohort.findByNameAndProjectAndRun(cohortName, project, seqExp.sequenceRun)
         if (!cohort) {
             cohort = new SequencingCohort(project: project, run: seqExp.sequenceRun, name: cohortName)
@@ -738,7 +738,7 @@ class QfileUploadService {
 		*/
 	    runNum = getInteger(runStr)
 	    platform = SequencingPlatform.findByName("NextSeq 500") 
-	    seqId = runStr + laneStr + indexIdStr	 
+	    //seqId = runStr + laneStr + indexIdStr	 
 		
 	    if (Sample.findBySourceId(seqId)) {
             throw new QfileUploadException(message: "SeqId ${seqId} already exists!")
@@ -807,7 +807,7 @@ class QfileUploadService {
 	    [laneStr: data[0],         //A  xxxxxxxxxxx     
 	     // data[1]                //B
 	     // data[2]                //C
-         indexIdStr: data[3],      //D
+         indexIdStr: data[3],      //D  xxxxxxxxxxx 
 	     senderNameStr: data[4],   //E
 	     senderEmail: data[5],     //F
 	     senderPhone: data[6],     //G

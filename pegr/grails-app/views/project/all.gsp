@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>My Projects</title> 
+  <title>My Projects</title>
   <meta name="layout" content="main"/>
 </head>
 <body>
@@ -25,6 +25,19 @@
     </div>
      <script>
         $("#nav-projects").addClass("active");
+        $(".label").each(function() {
+            if ($(this).text() == "ANALYZING") {
+                $(this).addClass("label-info");
+            } else if ($(this).text() == "COMPLETED") {
+                $(this).addClass("label-success");
+            } else if ($(this).text() == "QUEUE") {
+                $(this).addClass("label-warning");
+            } else if ($(this).text() == "FAILED") {
+                $(this).addClass("label-danger");
+            } else {
+                $(this).addClass("label-default");
+            }
+        });
      </script>
 </body>
 </html>

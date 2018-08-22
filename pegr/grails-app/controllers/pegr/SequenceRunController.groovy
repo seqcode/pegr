@@ -455,7 +455,7 @@ class SequenceRunController {
         return
     }
     
-	//axa677-180820: Use runNum to name the files instead of run.id!!
+	//axa677-180820: Use runNum to name the file instead of run.id, sinch this file is for the end user!!
     def downloadRunInfo(String remoteRoot, Long runId) {
         //String RUN_INFO_TEMP = "runInfo${runId}"
         def timeout = 60*1000
@@ -514,6 +514,8 @@ class SequenceRunController {
 
     }
     
+	// axa677-180822: Instead of showing the queued run ids (which should be use only by the backend system),
+	// retrieve the runNus for those ids and display them for the end user
     def editQueue() {
         def queue = walleService.getQueue()
 		
@@ -538,6 +540,9 @@ class SequenceRunController {
         [previousRunFolder: queue.previousRunFolder, queuedRuns: queuedRunNums]
     }
     
+	// axa677-180822: Instead of showing the queued run ids (which should be use only by the backend system),
+	// retrieve the runNums for those ids and display them for the end user, then the backend system will convert them
+	// back to the ids to update the Chores Table.
     def updateQueue(String previousRunFolder, String queuedRuns) {
         try {
 			//axa677-180820: get the runIds using the queuedRuns (runNum) to update the Chores table

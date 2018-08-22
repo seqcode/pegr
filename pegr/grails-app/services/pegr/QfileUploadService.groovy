@@ -715,8 +715,8 @@ class QfileUploadService {
         } else if (indexIdStr.length() == 1) {
             indexIdStr = "0" + indexIdStr
         }
-        // remove 
-		/*
+		
+        // ---------- remove ----------------
 	    if (runStr.take(1) == "S") {
 	         runNum = getInteger(runStr.substring(1))
 	         platform = SequencingPlatform.findByName("SOLiD")
@@ -735,10 +735,11 @@ class QfileUploadService {
 	             seqId = runStr + indexIdStr
 	         }
 	    }
-		*/
+		// ----------------------------------
+		
 	    runNum = getInteger(runStr)
 	    platform = SequencingPlatform.findByName("NextSeq 500") 
-	    //seqId = runStr + laneStr + indexIdStr	 
+	    seqId = runStr + laneStr + indexIdStr	 
 		
 	    if (Sample.findBySourceId(seqId)) {
             throw new QfileUploadException(message: "SeqId ${seqId} already exists!")

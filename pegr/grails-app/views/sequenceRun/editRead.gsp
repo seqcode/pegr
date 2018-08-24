@@ -5,7 +5,7 @@
     </head>
     <body>
         <div class="container-fluid">
-            <h3>Edit Read Type and Positions for Sequence Run #${run?.id}</h3>
+            <h3>Edit Read Type and Positions for Sequence Run #${run?.runNum}</h3>
             <g:form action="updateRead" class="fields">
                 <g:hiddenField name="runId" value="${run?.id}"></g:hiddenField>
                 <div>

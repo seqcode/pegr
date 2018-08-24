@@ -52,7 +52,7 @@ class AlignmentStatsService {
     */
     def createAlignment(StatsRegistrationCommand data, User apiUser) {
         // check required fields
-        checkRequiredFields(data, ["run", "sample", "genome", "workflowId"])
+        checkRequiredFields(data, ["runNum", "sample", "genome", "workflowId"])
         
         // find the pipeline by workflowId
         def pipeline = Pipeline.findByWorkflowId(data.workflowId)
@@ -62,9 +62,9 @@ class AlignmentStatsService {
         }
         
         // find the sequencing experiment by runId and sampleId
-        def experiment = SequencingExperiment.where {sequenceRun.id == data.run && sample.id == data.sample}.find()
+        def experiment = SequencingExperiment.where {sequenceRun.id == SequenceRun.findByRunNum(data.runNum) && sample.id == data.sample}.find()
         if (!experiment) {
-            throw new AlignmentStatsException(message: "Sample ${data.sample} is not found in Run ${data.run}!")
+            throw new AlignmentStatsException(message: "Sample ${data.sample} is not found in Run ${data.runNum}!")
         }
         
         // find the genome

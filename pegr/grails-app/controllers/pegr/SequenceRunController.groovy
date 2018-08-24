@@ -23,7 +23,7 @@ class SequenceRunController {
         def c = SequenceRun.createCriteria()
         def listParams = [
                 max: params.max ?: 50,
-                sort: params.sort ?: "id", //if you would like to sort based on the runNum, just remeber it's basically for the old run number.
+                sort: params.sort ?: "runNum",
                 order: params.order ?: "desc",
                 offset: params.offset ?: 0
             ]
@@ -129,7 +129,7 @@ class SequenceRunController {
             projections {
                 max "runNum"
             }
-        } as Long 
+        } as Integer 
         [defaultRunNum: largestRunNum + 1]
     }
     
@@ -145,7 +145,7 @@ class SequenceRunController {
                 projections {
                     max "runNum"
                 }
-            } as Long 
+            } as Integer 
             render(view: "create", model: [run:run, defaultRunNum: largestRunNum + 1]) 
         }
     }
@@ -159,7 +159,7 @@ class SequenceRunController {
             redirect(action: "index")
         }
     }
-    
+    // re - check again, later!
     def update(Long runId) {
         def run = SequenceRun.get(runId)
         if (run) {
@@ -181,7 +181,7 @@ class SequenceRunController {
             redirect(action: "index")
         }
     }
-    
+    // re - check again, later!
     def searchPool(Long runId, Long typeId, String barcode) {
         if (request.method == "POST") {
             def poolItem = Item.where {type.id == typeId && barcode == barcode}.find()
@@ -195,7 +195,7 @@ class SequenceRunController {
             [runId: runId]   
         }
     }
-    
+    // re - check again, later!
     def addPool(Long poolItemId, Long runId) {
         try {
             sequenceRunService.addPool(poolItemId, runId)
@@ -208,7 +208,7 @@ class SequenceRunController {
         }
         redirect(action: "show", params: [id: runId])
     }
-    
+    // re - check again, later!
     def removePool(Long runId) {
         try {
             sequenceRunService.removePool(runId)
@@ -455,16 +455,16 @@ class SequenceRunController {
         return
     }
     
+	//axa677-180820: Use runNum to name the file instead of run.id, sinch this file is for the end user!!
     def downloadRunInfo(String remoteRoot, Long runId) {
-        String RUN_INFO_TEMP = "runInfo${runId}"
         def timeout = 60*1000
         
         // generate the run info files
         def run = SequenceRun.get(runId)
-        
+        String RUN_INFO_TEMP = "runInfo${run.runNum}" // axa677-180822: I changed the id to runNum for naming only!
         // clean path
         remoteRoot = remoteRoot.trim()
-        
+        // remoteRoot = remoteRoot.replaceAll("/","\\\\") // axa677-180823: 
         def remotePath 
         try {
             if (!remoteRoot || !run.directoryName) {
@@ -483,7 +483,7 @@ class SequenceRunController {
         walleService.generateRunFilesInFolder(run, remotePath, localFolder)
         
         // compress the files
-        def compressedFilename = "runInfo${runId}.tar.gz"
+        def compressedFilename = "runInfo${run.runNum}.tar.gz"
         def compressedFile = new File(localRoot, compressedFilename)
         def command = "tar -cf ${compressedFile.getPath()} ${RUN_INFO_TEMP}"
         def envVars = []
@@ -513,14 +513,58 @@ class SequenceRunController {
 
     }
     
+	// axa677-180822: Instead of showing the queued run ids (which should be use only by the backend system),
+	// retrieve the runNus for those ids and display them for the end user
     def editQueue() {
         def queue = walleService.getQueue()
-        [previousRunFolder: queue.previousRunFolder, queuedRuns: queue.queuedRuns]
+		
+		//axa677-180820: get the runNums using the queuedRuns (ids) to display for the end users
+        def queuedRunIds = queue.queuedRuns.split(",")
+        def runNums = []
+        queuedRunIds.each { idRaw ->
+            def id = idRaw.trim()
+            if (!id.isInteger()) {
+                throw new WalleException(message: "Format error in queued runs!${id}!")
+            } else {
+				def run = SequenceRun.get(id)
+				if(run) {
+					runNums.push(run.runNum)
+				}
+            }
+        }
+        def queuedRunNums = runNums.join(",")
+		//axa677-180820: =======================================================================
+		
+		
+        [previousRunFolder: queue.previousRunFolder, queuedRuns: queuedRunNums]
     }
     
+	// axa677-180822: Instead of showing the queued run ids (which should be use only by the backend system),
+	// retrieve the runNums for those ids and display them for the end user, then the backend system will convert them
+	// back to the ids to update the Chores Table.
     def updateQueue(String previousRunFolder, String queuedRuns) {
         try {
-            walleService.updateQueue(previousRunFolder.trim(), queuedRuns.trim())
+			//axa677-180820: get the runIds using the queuedRuns (runNum) to update the Chores table
+	        def queuedRunNums = queuedRuns.split(",")
+	        def runIds = []
+	        queuedRunNums.each { numRaw ->
+	            def num = numRaw.trim()
+	            if (!num.isInteger()) {
+	                throw new WalleException(message: "Format error in queued runs!${num}!")
+	            } else {
+					def run = SequenceRun.findByRunNum(num)
+					if(run) {
+					    runIds.push(run.id)
+					}
+					else {
+						throw new WalleException(message: "This run number is not found!${num}!")
+					}
+	            }
+	        }
+	        def queuedRunIds = runIds.join(",")
+			//axa677-180820: =======================================================================
+			
+            walleService.updateQueue(previousRunFolder.trim(), queuedRunIds.trim())
             flash.message = "Queue has been updated!"
         } catch (WalleException e) {
             flash.message = e.message

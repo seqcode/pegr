@@ -120,7 +120,7 @@
                             <div class="slider round"></div>
                         </label>
                     </td>
-                    <td class="col-delete group-operation"><input type="checkbox" name="delete" value="${alignment.alignmentId}" data-runId="${run.id}"></td>
+                    <td class="col-delete group-operation"><input type="checkbox" name="delete" value="${alignment.alignmentId}" data-runId="${run.id}" data-runNum="${run.runNum}"></td>
                 </tr>
             </g:each>
             <g:if test="${sample.alignmentStatusList.size()==0}">
@@ -199,13 +199,15 @@
 	$("#ajaxDeleteAll").click(function() {
 		var alignmentIds = [];
 		var runId = 0;
+		var runNum = 0;
 		$('input[name="delete"]').each(function(){
 			if (this.checked) {
 				alignmentIds.push(this.value);
 				runId = this.getAttribute("data-runId");
+				runNum = this.getAttribute("data-runNum");
 			}
 		});
-		if (confirm('All data in the selected alignment(s) will be deleted. Are you sure you want to delete the following alignment(s): ' + alignmentIds + ' for run number: ' + runId + '?'))
+		if (confirm('All data in the selected alignment(s) will be deleted. Are you sure you want to delete the following alignment(s): ' + alignmentIds + ' for run number: ' + runNum + '?'))
 		{ // axa677-180306: the next ajax call sends the array as a json dictionary with the run id to a controller action
 		  // then get the results as html
 			$.ajax({

@@ -158,7 +158,7 @@
         <div class="message" role="status">${flash.message}</div>
     </g:if>
     <h3>
-        <g:link controller="sequenceRun" action="show" id="${run.id}">Run ${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if></g:link>
+        <g:link controller="sequenceRun" action="show" id="${run.id}">Run ${run.runNum} <g:if test="${run.runNumAlias}">(Old No.${run.runNumAlias})</g:if></g:link>
         <small>
             <span id="run-status-show" class="label label-default">${run.status}</span> 
             <span id="run-status-select" style="display:none">

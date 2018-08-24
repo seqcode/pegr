@@ -24,11 +24,16 @@
             </g:if>
         </h3>
 
-        <!-- pjchaffin | Adds Hyperlink Functionality to the Run# and also depricates the old Run Number -->
+        <!-- pjchaffin | Adds Hyperlink Functionality to the Run# and also depricates the old Run Number (axa677: read the following comment)-->
+		<!-- axa677: the previous script uses sample.runs.id[0] so it always takes the most recent run even when we have many runs for same sample.
+			To address this problem: this show view is visited from two places: 1) when it comes from the sequenceRun page (so we're clicking on a sample that belongs to a sepecifc page). In that case, we need to make sure the run # is the right only one from the previous view. 
+			2) when we are coming from the sample list page, then we need to list all runs related to that sample -->
         <g:if test="${sample?.runs.id[0]}">
             <p><g:link controller="report" action="runStatus" params="[runId: sample.runs.id]"><b>Run:${sample.runs.id[0]}</b></g:link></p>
         </g:if>
-
+                                <g:else>
+                                    <span class="code label label-danger"> </span>
+                                </g:else>
 
         <g:if test="${sample?.date}">
             <p>Date: <g:formatDate format="yyyy-MM-dd" date="${sample.date}"/></p>

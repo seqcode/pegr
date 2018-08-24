@@ -457,15 +457,14 @@ class SequenceRunController {
     
 	//axa677-180820: Use runNum to name the file instead of run.id, sinch this file is for the end user!!
     def downloadRunInfo(String remoteRoot, Long runId) {
-        //String RUN_INFO_TEMP = "runInfo${runId}"
         def timeout = 60*1000
         
         // generate the run info files
         def run = SequenceRun.get(runId)
-        String RUN_INFO_TEMP = "runInfo${run.runNum}" // I changed the id to runNum for naming only!
+        String RUN_INFO_TEMP = "runInfo${run.runNum}" // axa677-180822: I changed the id to runNum for naming only!
         // clean path
         remoteRoot = remoteRoot.trim()
-        
+        // remoteRoot = remoteRoot.replaceAll("/","\\\\") // axa677-180823: 
         def remotePath 
         try {
             if (!remoteRoot || !run.directoryName) {

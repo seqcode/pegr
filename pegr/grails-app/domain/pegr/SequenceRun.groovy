@@ -24,7 +24,7 @@ class SequenceRun {
     }
     
     static constraints = {
-		runNum nullable: false, blank: false, unique: true //new constraints added to start using runNum proprely. It's never been used correctly or at all (08/09/2018 by axa677)
+		runNum nullable: false, unique: true //new constraints added to start using runNum proprely. It's never been used correctly or at all (08/09/2018 by axa677)
 		note nullable: true, blank: true
 		fcId nullable: true, blank: true
 		directoryName nullable: true, blank: true

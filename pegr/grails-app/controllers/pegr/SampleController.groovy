@@ -28,6 +28,7 @@ class SampleController {
 
 	def show(Long id) {
         def sample = Sample.get(id)
+
         if (sample) {
             def result = sampleService.getSampleDetails(sample)
             def editAuth = sampleService.editAuth(sample)

@@ -15,7 +15,7 @@ class SampleController {
     def protocolInstanceBagService
 
     def all(Integer max) {
-        // params.max = Math.min(max ?: 15, 100)
+        params.max = Math.min(max ?: 15, 100)
         if (!params.sort) {
             params.sort = "id"
             params.order = "desc"

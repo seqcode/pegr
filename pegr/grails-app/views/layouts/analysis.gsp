@@ -10,14 +10,13 @@
         <g:link controller="sequenceRun" action="index" class="btn btn-info nav-runs">Sequencing Runs</g:link>
         <g:link controller="sample" action="all" class="btn btn-info nav-datasets">Samples</g:link>
         <a href="${defaultGalaxy}" class="btn btn-info external" target="_blank">Galaxy</a>
-        <g:link controller="sample" action="searchForm" class="btn btn-info">Search</g:link>
+        <!-- <g:link controller="sample" action="searchForm" class="btn btn-info">Search</g:link> -->
     </div>
     <g:layoutBody/>
 
      <script>
-       $(function(){
          $("#nav-datasets").addClass("active");
-       });
+
      </script>
 </body>
 </html>

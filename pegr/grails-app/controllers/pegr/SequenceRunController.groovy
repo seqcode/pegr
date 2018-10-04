@@ -105,7 +105,7 @@ class SequenceRunController {
             }
 
             // check how to get sample users from sequence run.
-            def authorized = (isCohortUser || currUser.isAdmin())
+            def authorized = (isCohortUser == true || currUser.isAdmin())
             def editable = (run?.status!=pegr.RunStatus.COMPLETED) && (authorized)
             [run: run, read: read, editable: editable]
         } else {

@@ -10,8 +10,7 @@
 <div class="container-fluid">
     <h3>Add Pool</h3>
     <g:render template="/item/details" bean="${item}" var="item"></g:render>
-    <g:link action="addPoolToInstance" params="[itemId: item.id,
-                               instanceId: instanceId]" class="btn btn-primary">Add</g:link>
+    <g:link action="addPoolToInstance" params="[itemId: item.id, instanceId: instanceId]" class="btn btn-primary">Add</g:link>
     <g:link action="searchItemForInstance" id="${instanceId}" class="btn btn-primary">Cancel</g:link>
     <script>
         $("#nav-experiments").addClass("active");

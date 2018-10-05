@@ -50,10 +50,10 @@ class WalleService {
     
     /**
      * Append a sequence run to the end of a first-in-first-out queue,
-     * which consists of a list of sequence run IDs, delimited by ','. 
+     * which consists of a list of sequence run ID, delimited by ','. 
      * The information of the sequence runs will be sequentially sent 
      * to remote server.
-     * @param runId ID of the sequence run to be appended to the queue
+     * @param run ID of the sequence run to be appended to the queue
      */
     void addToQueue(Long runId) {
         // query the current queue
@@ -113,10 +113,13 @@ class WalleService {
             String message = "More than ${MAX_QUEUE_LENGTH} waiting in the queue!" 
             log.error message
         }
-        // get the first sequence run in the queue
-        Long runId = Long.parseLong(runIds[0])
-        def run = SequenceRun.get(runId)
         
+		
+		
+		// get the first sequence run in the queue
+        Long runId = Long.parseLong(runIds[0])
+        //def run = SequenceRun.findByRunNum(runIds[0].toInteger())//.get(runId)
+		
         // return if the prior run has not been processed by the remote server
         def remoteFiles = getRemoteFiles()
         if (findPriorInfoOnRemote(remoteFiles)) {
@@ -158,7 +161,7 @@ class WalleService {
         removeRunFromQueue()  
         updatePriorRunFolder(newFolder)
         
-        log.warn "WallE service has sent the info of run ${run.id} to Wall E."
+        log.warn "WallE service has sent the info of run id ${run.id} with run # ${run.runNum} to Wall E."
     }
     
     /**
@@ -305,13 +308,14 @@ class WalleService {
                     // write the config xml file for each genome.
                     genomes.eachWithIndex { genome, idx ->
                         def xmlName = generateXmlFile(genome, run.id, experiment.sample.id, idx, configLocalFolder)
-                        xmlNames.push(xmlName)
+                        xmlNames.push(xmlName) //axa677: Careful!!!!!!
                     }
                 }
-                // write the sample's runID, sampleID, indices and config xml file names.
+                // write the sample's runId, sampleID, indices and config xml file names.
                 def indicesString = experiment.sample?.sequenceIndicesString
                 def xmlNamesString= xmlNames.join(",")
-                def data = "${run.id} ; ${experiment.sample?.id} ; ${indicesString} ; ${xmlNamesString}"           
+                //axa677: Careful!!!!!!
+				def data = "${run.id} ; ${experiment.sample?.id} ; ${indicesString} ; ${xmlNamesString}"           
                 it.println data
             }
         }
@@ -423,7 +427,7 @@ class WalleService {
             previousRunFolderConfig.value = previousRunFolder
             previousRunFolderConfig.save(failOnError: true)
         }
-        // check teh format of queuedRuns        
+        // check the format of queuedRuns        
         if (queuedRuns == "") {
             queuedRuns = null
         } else {

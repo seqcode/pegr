@@ -4,11 +4,11 @@ import grails.util.Holders
 import groovy.json.JsonSlurper
 
 class ReportController {
-    
+
     def springSecurityService
     def reportService
     def utilityService
-    
+
     def createReportForCohortAjax(Long cohortId) {
         def cohort = SequencingCohort.get(cohortId)
         if (cohort && !cohort.report) {
@@ -16,13 +16,13 @@ class ReportController {
         }
         render template: "/report/reportRow", model: [cohort: cohort]
     }
-    
+
     def deleteReportForCohortAjax(Long cohortId) {
         def cohort = SequencingCohort.get(cohortId)
         reportService.deleteReportForCohort(cohort)
         render template: "/report/reportRow", model: [cohort: cohort]
     }
-    
+
     def runStatus(Long runId) {
         def run = SequenceRun.get(runId)
         if (!run) {
@@ -40,7 +40,7 @@ class ReportController {
                 def user = springSecurityService.currentUser
                 if (user.isAdmin()) {
                     admin = true
-                } 
+                }
                 if (qcSettings.yeast) {
                     headers["yeast"] = []
                     subheaders["yeast"] = []
@@ -58,8 +58,8 @@ class ReportController {
                         }
                     }
                 }
-                [runStatus: runStatus.results, 
-                 noResultSamples: runStatus.noResultSamples, 
+                [runStatus: runStatus.results,
+                 noResultSamples: runStatus.noResultSamples,
                  qcSettings: qcSettings,
                  run: run,
                  headers: headers,
@@ -70,18 +70,18 @@ class ReportController {
             } catch (ReportException e) {
                 flash.message = e.message
                 redirect(controller: "sequenceRun", action: "index")
-            }       
+            }
         }
     }
-    
+
     def updateRunStatusAjax(Long runId, String status) {
         reportService.updateRunStatus(runId, status)
-        render status 
+        render status
     }
-     
+
     def updateReportStatusAjax(Long reportId, String status) {
         reportService.updateReportStatus(reportId, status)
-        render status 
+        render status
     }
 	// axa677-180306: Added this function to handle the deletion of selected (multiple) alignments
 	// This function is called in template report/_generalQc.gsp
@@ -103,7 +103,7 @@ class ReportController {
 		}
 		redirect(action: "runStatus", params: [runId: runId])
     }
-	
+
 	// axa677-180306: No need for this function since we have written the previous one to handle deletion using checkboxes
 	def deleteAlignment(Long alignmentId, Long runId) {
         try {
@@ -114,7 +114,7 @@ class ReportController {
         }
         redirect(action: "runStatus", params: [runId: runId])
     }
-    
+
     def show(Long id) {
         def report = SummaryReport.get(id)
         if (!report) {
@@ -127,26 +127,26 @@ class ReportController {
         def imageMap = report.cohort?.imageMap
         [project: currentProject, projectUsers: projectUsers, report: report, imageMap: imageMap]
     }
-    
+
     def fetchDataForReportAjax(Long id) {
         def data = reportService.fetchDataForReport(id)
-        render(template: 'details', model: [ sampleDTOs: data])        
+        render(template: 'details', model: [ sampleDTOs: data])
     }
-    
+
     def fetchMemeDataAjax(String url) {
         def results = reportService.fetchMemeMotif(url) as JSON
         render results
     }
-    
+
     def fetchMemERDataAjax(String url) {
         def results = reportService.fetchMemERMotif(url) as JSON
         render results
     }
-    
+
     def composite(String url) {
         [url: url]
     }
-    
+
     def fetchCompositeDataAjax(String url) {
         def result
         try {
@@ -156,29 +156,29 @@ class ReportController {
             }
         } catch(ReportException e) {
             result = [error: e.message] as JSON
-        } 
+        }
         render result
     }
-    
+
     def manage() {
         // get QC settings
         def results = reportService.getQcSettings()
         // get the purge alignments configs for the last time
         def purgeConfigStr = Chores.findByName(reportService.PURGE_ALIGNMENTS_CONFIG)?.value
         def purgeConfig = utilityService.parseJson(purgeConfigStr)
-        [qcSettings: results.qcSettings, meta: results.meta, purgeConfig: purgeConfig]        
+        [qcSettings: results.qcSettings, meta: results.meta, purgeConfig: purgeConfig]
     }
-    
+
     def saveQcSettings() {
         try {
             reportService.saveQcSettings(params)
             redirect(controller: "sequenceRun", action: "index")
         } catch (ReportException e) {
             flash.message = e.message
-            redirect(action: "editQcSettings") 
+            redirect(action: "editQcSettings")
         }
     }
-    
+
     def deletePurgedAlignments() {
         def message
         try {
@@ -193,12 +193,12 @@ class ReportController {
         def purgeConfig = utilityService.parseJson(purgeConfigStr)
         render(template: "purgeAlignments", model: [purgeConfig:purgeConfig, message: message])
     }
-    
+
     def togglePreferredAlignment(Long alignmentId) {
         reportService.togglePreferredAlignment(alignmentId)
         render ""
     }
-    
+
     def unknownIndex(Long runId) {
         def run = SequenceRun.get(runId)
         if (!run) {
@@ -207,24 +207,24 @@ class ReportController {
             try {
                 def file = reportService.getUnknownIndex(run)
                 def htmlContent = new File(file).text
-                render text: htmlContent, contentType:"text/html", encoding:"UTF-8"    
+                render text: htmlContent, contentType:"text/html", encoding:"UTF-8"
             } catch (Exception e) {
                 render(view: "/404")
             }
         }
     }
-    
+
     def decisionTree(String type) {
         [type: type]
     }
-    
+
     def getDecisionTreeAjax(String type) {
         def tree = reportService.getDecisionTree(type)
         def map = utilityService.parseJson(tree?.value)
         render (map as JSON)
         return
     }
-    
+
     def saveDecisionTree(String json, String type) {
         try {
             reportService.saveDecisionTree(json, type)
@@ -233,19 +233,19 @@ class ReportController {
         }
         redirect(action: "decisionTree", params: [type: type])
     }
-    
+
     def saveNotesAjax(Long cohortId, String notes) {
         reportService.saveNotes(cohortId, notes)
         render ""
         return
     }
-    
+
     def updateAnalysisCodeAjax(Long analysisId, String code, String message) {
         reportService.updateAnalysisCode(analysisId, code, message)
         render ""
         return
     }
-    
+
     def print(Long id) {
         def report = SummaryReport.get(id)
         if (!report) {
@@ -256,7 +256,7 @@ class ReportController {
         def imageMap = report.cohort?.imageMap
         [report: report, imageMap: imageMap, sampleList: data]
     }
-    
+
     def listFiles(Long id) {
         def samples = reportService.fetchDataForReport(id)
         [samples: samples]
@@ -287,8 +287,8 @@ class SampleDTO {
 
 class ExperimentDTO {
     Long id
-    Long runId
-    Long oldRunNum
+    Integer runNum
+    String runNumAlias
     Long totalReads
     Long adapterDimerCount
     Map fastqc
@@ -304,7 +304,7 @@ class AlignmentDTO {
     Long mappedReads
     Long uniquelyMappedReads
     Long dedupUniquelyMappedReads
-    
+
     Float mappedReadPct
     Float uniquelyMappedPct
     Float deduplicatedPct
@@ -312,7 +312,7 @@ class AlignmentDTO {
     Integer avgInsertSize
     Float stdInsertSize
     Float genomeCoverage
-    
+
     String peakCallingParam
     Long peaks
     Long singletons

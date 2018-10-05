@@ -22,7 +22,7 @@ class QfileUploadService {
         getDefaultUser()     
         def csvNames = [:]
         
-        // convert xsxl to csv
+        // convert xsxl to csv (axa677: it the csv gets deleted at the end of the samples migration)
         [sampleSheetName, laneSheetName].each { sheet ->
             csvNames[sheet] = new File(folder, sheet + ".csv").getPath()
             def command = "xlsx2csv -n ${sheet} ${filename} ${csvNames[sheet]}"
@@ -212,7 +212,7 @@ class QfileUploadService {
         if (!project || !seqExp.sequenceRun) {
             return
         }
-        def cohortName = "${seqExp.sequenceRun.id}_${service}-${invoice}"
+        def cohortName = "${seqExp.sequenceRun.runNum}_${service}-${invoice}"
         def cohort = SequencingCohort.findByNameAndProjectAndRun(cohortName, project, seqExp.sequenceRun)
         if (!cohort) {
             cohort = new SequencingCohort(project: project, run: seqExp.sequenceRun, name: cohortName)
@@ -698,7 +698,7 @@ class QfileUploadService {
     }
 	
 	def getSequenceRun(RunStatus runStatus, String runStr, String laneStr, String dateStr, String fcidStr, String indexIdStr, User user) {
-	    int runNum
+	    def runNum
 	    def platform
 	    def seqId
         if (runStr == null) {
@@ -715,7 +715,8 @@ class QfileUploadService {
         } else if (indexIdStr.length() == 1) {
             indexIdStr = "0" + indexIdStr
         }
-        
+		
+        // ---------- remove ----------------
 	    if (runStr.take(1) == "S") {
 	         runNum = getInteger(runStr.substring(1))
 	         platform = SequencingPlatform.findByName("SOLiD")
@@ -734,7 +735,12 @@ class QfileUploadService {
 	             seqId = runStr + indexIdStr
 	         }
 	    }
-	
+		// ----------------------------------
+		
+	    runNum = getInteger(runStr)
+	    platform = SequencingPlatform.findByName("NextSeq 500") 
+	    seqId = runStr + laneStr + indexIdStr	 
+		
 	    if (Sample.findBySourceId(seqId)) {
             throw new QfileUploadException(message: "SeqId ${seqId} already exists!")
 	    }
@@ -799,10 +805,10 @@ class QfileUploadService {
     }
 	
 	def getNamedData(String[] data) {
-	    [laneStr: data[0],         //A       
+	    [laneStr: data[0],         //A  xxxxxxxxxxx     
 	     // data[1]                //B
 	     // data[2]                //C
-         indexIdStr: data[3],      //D
+         indexIdStr: data[3],      //D  xxxxxxxxxxx 
 	     senderNameStr: data[4],   //E
 	     senderEmail: data[5],     //F
 	     senderPhone: data[6],     //G
@@ -813,48 +819,50 @@ class QfileUploadService {
 	     projectUserEmail: data[11],  //L   
 	     service: data[12],        //M
 	     invoice: data[13],        //N
-	     abCompName: data[14],     //O
-	     abCatNum: data[15],       //P
-	     abLotNum: data[16],       //Q
-	     abNotes: data[17],        //R
-	     abClonal: data[18],       //S
-	     abAnimal: data[19],       //T
-	     ig: data[20],             //U
+	     
+		 
+		 abCompName: data[14],     //O  --------
+	     abCatNum: data[15],       //P  --------
+	     abLotNum: data[16],       //Q  --------
+	     abNotes: data[17],        //R  --------
+	     abClonal: data[18],       //S  ---------
+	     abAnimal: data[19],       //T  ---------
+	     ig: data[20],             //U  ---------
 	     antigen: data[21],        //V
 	     ulSampleSent: data[22],   //W
 	     abConc: data[23],         //X 
-	     amountUseUg: data[24],    //Y
-	     amountUseUl: data[25],    //Z
+	     amountUseUg: data[24],    //Y  ---------
+	     amountUseUl: data[25],    //Z  ---------
 	     // data[26],              //AA
 	     // data[27],              //AB
 	     // abName: data[28],      //AC
 	     samplePrepUser: data[29], //AD
-	     genus: data[30],          //AE
-	     species: data[31],        //AF
-	     strain: data[32],         //AG
-	     parentStrain: data[33],   //AH        
+	     genus: data[30],          //AE ---------
+	     species: data[31],        //AF ---------
+	     strain: data[32],         //AG ---------  
+	     parentStrain: data[33],   //AH       
 	     genotype: data[34],       //AI
 	     mutation: data[35],       //AJ    
-	     growthMedia: data[36],    //AK    
-	     perturbation1: data[37],  //AL
+	     growthMedia: data[36],    //AK ---------    
+	     perturbation1: data[37],  //AL ---------  
 	     perturbation2: data[38],  //AM
 	     targetType: data[39], // changed  //AN
 	     // data[40],              //AO
-	     //bioRep: data[41],       //AP
+	     //bioRep: data[41],       //AP ---------  
 	     sampleId: data[42],       //AQ
 	     bioRep1SampleId: data[43],//AR
 	     bioRep2SampleId: data[44],//AS
-	     sampleNotes: data[45],    //AT
+	     sampleNotes: data[45],    //AT ---------  
 	     nTag: data[46],           //AU    
-	     target: data[47],         //AV
-	     cTag: data[48],           //AW
+	     target: data[47],         //AV ---------      
+	     cTag: data[48],           //AW ---------      
 	     chromAmount: data[49],    //AX
-	     cellNum: data[50],        //AY    
+	     cellNum: data[50],        //AY ---------        
 	     volume: data[51],         //AZ
-	     assay: data[52],          //BA
-	     genomeBuild1: data[53],   //BB    
-	     genomeBuild2: data[54],   //BC
-	     genomeBuild3: data[55],   //BD    
+	     assay: data[52],          //BA --------- 
+	     genomeBuild1: data[53],   //BB ---------       
+	     genomeBuild2: data[54],   //BC ---------    
+	     genomeBuild3: data[55],   //BD ---------       
 	     // data[56],              //BE    
 	     dateReceived: data[57],   //BF
 	     receivingUser: data[58],  //BG    
@@ -893,14 +901,14 @@ class QfileUploadService {
 	     rd2Start: data[91],       //CN
 	     rd2End: data[92],         //CO
 	     // data[93],              //CP
-	     runStr: data[94],         //CQ
+	     runStr: data[94],         //CQ --------- 
 	     // data[95],              //CR
 	     // data[96],              //CS
 	     // data9[7],              //CT
 	     // data[98],              //CU
 	     userStr: data[99],        //CV
-	     dateStr: data[100],       //CW
-	     fcidStr: data[101],       //CX
+	     dateStr: data[100],       //CW ???????????
+	     fcidStr: data[101],       //CX xxxxxxxxxxx     
          indexStr: data[113]       //DJ
 	    ]
 	}

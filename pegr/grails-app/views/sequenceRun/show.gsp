@@ -1,13 +1,13 @@
 <html>
 <head>
-    <title>Workbench</title> 
+    <title>Workbench</title>
     <meta name="layout" content="main"/>
     <style>
         .btn {
             padding: 0 5px;
         }
         .project {
-            width: 250px;    
+            width: 250px;
         }
         input[type="file"] {
             display: inline;
@@ -16,7 +16,7 @@
 </head>
 <body>
 <div class="container-fluid">
-    <g:link action="index"><span class="glyphicon glyphicon-home"></span> Sequencing Run List</g:link>   
+    <g:link action="index"><span class="glyphicon glyphicon-home"></span> Sequencing Run List</g:link>
     <div id="message" >
         <g:if test="${flash.message}">
              <div class="message" role="status">
@@ -24,7 +24,7 @@
             </div>
         </g:if>
     </div>
-    <h2>Sequence Run #${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if> 
+    <h2>Sequence Run #${run.runNum} <g:if test="${run.runNumAlias}">(Old No.${run.runNumAlias})</g:if>
         <small>
             <span id="run-status-show" class="label label-default">${run.status}</span>
             <span id="run-status-select" style="display:none">
@@ -41,14 +41,14 @@
               <button type="button" class="pull-right close" data-dismiss="modal">&times;</button>
           </div>
           <div class="modal-body">
-            <p>Note: please verify the directory name of this sequence run before generating the run info files.</p>  
+            <p>Note: please verify the directory name of this sequence run before generating the run info files.</p>
             <g:form controller="sequenceRun" action="downloadRunInfo">
                 <g:hiddenField name="runId" value="${run.id}"></g:hiddenField>
                 <div class="form-group">
                     <label>Remote Root Folder</label>
                     <input name="remoteRoot" class="form-control">
                 </div>
-                <ul>e.g. 
+                <ul>e.g.
                     <li>Wall-E: /home/nextseq/NSQData_PughLab/</li>
                     <li>gpfs: /gpfs/cyberstar/pughhpc/storage/illumina/illuminaNextSeq/NSQData_PughLab/</li>
                 </ul>
@@ -59,8 +59,8 @@
       </div>
     </div>
     <h3>Summary <g:if test="${editable}"> <g:link action="editInfo" params="[runId:run.id]"><span class="edit">Edit</span></g:link></g:if></h3>
-    <g:render template="summaryDetails"></g:render>  
-    <h3>Projects 
+    <g:render template="summaryDetails"></g:render>
+    <h3>Projects
         <g:if test="${editable}">
             <span class="edit add-project">Add</span>
             <g:form controller="sequenceRun" action="addProject" class="add-project-form">
@@ -75,7 +75,7 @@
         <thead>
             <tr>
                 <g:if test="${editable}"><th title="Remove the project from this sequence run, but the project remains."><span class="glyphicon glyphicon-question-sign"></span></th><th title="Delete the project."><span class="glyphicon glyphicon-question-sign"></span></th></g:if>
-                <th>Project</th>
+                <th>Sequencing Cohort</th>
                 <th>Sonication Images</th>
                 <th>Gel Images</th>
             <tr>
@@ -132,8 +132,8 @@
         </tbody>
     </table>
     <p> (only png/jpg/gif files, size limit: 5MB)</p>
-    <h3>Samples 
-    <g:if test="${editable}"> 
+    <h3>Samples
+    <g:if test="${editable}">
         <g:link controller="sample" action="batchEdit" params="[runId: run.id]" class="edit" target="_blank">Edit</g:link>
         <button type="button" class="edit" data-toggle="modal" data-target="#add-samples-by-id">Add Sample</button>
         <g:if test="${run?.poolItem == null}">
@@ -147,7 +147,7 @@
                 <div class="modal-content">
                     <g:form action="addSamplesById">
                         <div class="modal-header">
-                            <h3 class="modal-title">Add Samples to Sequence Run #${run.id}</h3>
+                            <h3 class="modal-title">Add Samples to Sequence Run #${run.runNum}</h3>
                         </div>
                         <div class="modal-body">
                             <g:hiddenField name="runId" value="${run.id}"></g:hiddenField>
@@ -169,7 +169,7 @@
         <thead>
             <tr>
                 <g:if test="${editable}">
-				
+
 				<th title="Delete the sample and all the related data.">
 					<input type="checkbox" id="selectAll" value="selectAll">
 					<a id="ajaxDeleteAll">
@@ -189,9 +189,9 @@
                 <tr>
                     <input type="hidden" name="experimentId" value="${it.id}">
                     <g:if test="${editable}">
-                        <td title="Delete the sample and all the related data."><input type="checkbox" name="delete" value="${it.sample.id}" data-runId="${run.id}"></td> 
+                        <td title="Delete the sample and all the related data."><input type="checkbox" name="delete" value="${it.sample.id}" data-runId="${run.id}" data-runNum="${run.runNum}"></td>
                     </g:if>
-                    <td><g:link controller="sample" action="show" id="${it.sample.id}">${it.sample?.id}</g:link> ${it.sample?.naturalId}</td>
+                    <td><g:link controller="sample" action="show" id="${it.sample.id}" params="${[runId: run.id]}">${it.sample?.id}</g:link> ${it.sample?.naturalId}</td>
                     <td>${it.sample?.cellSource?.strain}</td>
                     <td>${it.sample?.antibody}</td>
                     <td>${it.sample?.sequenceIndicesString}</td>
@@ -199,7 +199,7 @@
                     <td>${it.sample?.requestedGenomes}</td>
                     <td class="project"><span class="value">${it.cohort?.project ?: "NONE"}</span></td>
                 </tr>
-            </g:each>              
+            </g:each>
             <tr>
                 <td colspan="5"></td>
             </tr>
@@ -241,7 +241,7 @@
                         <td>${read?.index2?.getAt(1)}</td>
                     </tr>
                 </g:else>
-                <g:if test="${read?.rd2}">                
+                <g:if test="${read?.rd2}">
                     <tr>
                         <td>Read 2</td>
                         <td>${read?.rd2?.getAt(0)}</td>
@@ -261,24 +261,24 @@
     </div>
     <script>
         $("#nav-analysis").addClass("active");
-        
+
         $(".confirm").confirm();
         $(".confirm-remove-sample").confirm({text: "Remove the sample from this sequence run. All the analysis data will be removed, but the sample itself remains."});
         $(".confirm-delete-sample").confirm({text: "Delete the sample and all the related data."});
         $(".confirm-remove-project").confirm({text: "Remove the project from this sequence run, but the project remains."});
         $(".confirm-delete-project").confirm({text: "Delete the project."});
-        
+
         $("select").select2();
         $(".add-project-form").hide();
-        
+
         $(".add-project").on("click", function(){
-            $(".add-project-form").show();    
+            $(".add-project-form").show();
         });
-        
+
         $(".cancel-project").on("click", function(){
             $(".add-project-form").hide()
         });
-        
+
         $(".project").on('click', ".value", function() {
             var td = $(this).parent();
             var oldValue = $(this).text();
@@ -293,15 +293,15 @@
                 td.find("select").select2({
                     data: result,
                     tags: false
-                });    
+                });
             });
         });
-        
+
         $(".project").on("click", ".cancel", function() {
             var td = $(this).parent();
             toggleTd(td);
         });
-        
+
         $(".project").on("click", ".save", function(){
             var td = $(this).parent();
             var tr = $(this).closest("tr");
@@ -314,7 +314,7 @@
             $.ajax({
                 type: "POST",
                 url: "/pegr/sequenceRun/updateExperimentCohortAjax",
-                data: {experimentId: experimentId, 
+                data: {experimentId: experimentId,
                        projectName: projectName,
                       runId: ${run?.id}},
                 success: function() {
@@ -323,7 +323,7 @@
                 }
             });
         });
-        
+
         $(".remove-image").on("click", function(){
             var parent = $(this).parent();
             var filepath = parent.find("input.filepath").val();
@@ -336,7 +336,7 @@
                     parent.remove();
                 }});
         });
-        
+
         $("#run-status-show").click(function(){
             $("#run-status-show").hide();
             $("#run-status-select").show();
@@ -350,7 +350,7 @@
                     $("#run-status-select").val(result);
                     $("#run-status-show").show();
                     $("#run-status-select").hide();
-                }                
+                }
             });
         });
 
@@ -358,7 +358,7 @@
             $("#run-status-show").show();
             $("#run-status-select").hide();
         });
-		
+
 		$('#selectAll').click(function() {
 			if (this.checked) {
 				$('input[name="delete"]').prop('checked', true);
@@ -376,19 +376,21 @@
 				$('#selectAll').prop('checked', false);
 			}
 		});
-		
+
 		// axa677-180306: added the following jQuery function so when the button(link): ajaxDeletAll clicked,
 		// it scans the checkboxes, retrieves their names, and stores them in an array
 		$("#ajaxDeleteAll").click(function() {
 			var sampleIds = [];
 			var runId = 0;
+			var runNum = 0;
 			$('input[name="delete"]').each(function(){
 				if (this.checked) {
 					sampleIds.push(this.value);
 					runId = this.getAttribute("data-runId");
+					runNum = this.getAttribute("data-runNum");
 				}
 			});
-			if (confirm('All data in the selected samples(s) will be deleted. Are you sure you want to delete the following sample(s): ' + sampleIds + ' for run number: ' + runId + '?'))
+			if (confirm('All data in the selected samples(s) will be deleted. Are you sure you want to delete the following sample(s): ' + sampleIds + ' for run number: ' + runNum + '?'))
 			{
 				// axa677-180306: the next ajax call sends the array as a json dictionary with the run id to a controller action
 		  	  	// then get the results as html
@@ -402,7 +404,7 @@
 				})
 			}
 		});
-            
+
      </script>
 </div>
 </body>

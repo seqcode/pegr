@@ -6,7 +6,8 @@
     <div class="row">
         <div class="col-sm-9">
         <h2>PEGR API</h2>
-        To use PEGR APIs, you need a registered email and API key at PEGR. Please set up the information in your <g:link controller="user" action="profile">Profile</g:link>.
+       
+	 To use PEGR APIs, you need a registered email and API key at PEGR. Please set up the information in your <g:link controller="user" action="profile">Profile</g:link>.
         <div class="chapter">
         <h3 id="query">Query Data from PEGR</h3>
         <h4 id="query-sample">Query Data by Sample Properties</h4>
@@ -61,8 +62,8 @@ http://francline.vmhost.psu.edu:8080/pegr/api/fetchSampleData?apiKey=
         "histories": ["historyId", "historyId", ...],
         "experiments": [{
                 "id": long,
-                "runId": integer,
-                "oldRunNum": integer,
+				"runNum": integer,
+                "runNumAlias": String,
                 "totalReads": long,
                 "adapterDimerCount": long,
                 "fastqc": {"read1":"url", "read2":"url"},
@@ -208,19 +209,19 @@ public class FetchSampleDataFromPegr {
     "preferredOnly": "true/false", 
     
     // required
-    "runId": long
+    "runNum": integer
 }
             </pre>
             <p>PEGR will return the results in the same format as above.</p>
             <p>The API can be simply called through curl</p>
             <pre>
-curl  -X POST -H "Content-Type: application/json" -d '{"runId": 215, "userEmail": "xxxx@psu.edu"}' francline.vmhost.psu.edu:8080/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX -o output
+curl  -X POST -H "Content-Type: application/json" -d '{"runNum": 215, "userEmail": "xxxx@psu.edu"}' francline.vmhost.psu.edu:8080/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX -o output
             </pre>
             <p>The following is an example in Python.</p>
             <pre>
 import requests
 url = "http://francline.vmhost.psu.edu:8080/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX"
-query = {"userEmail": "xxxxx@psu.edu", "runId": 212, "preferredOnly": "true"}
+query = {"userEmail": "xxxxx@psu.edu", "runNum": 212, "preferredOnly": "true"}
 r = requests.post(url, json=query)
 results = r.json()
             </pre>
@@ -251,7 +252,7 @@ public class FetchSequenceRunDataFromPegr {
             // construct the data in JSON format 
             JsonObject object = Json.createObjectBuilder()
                     .add("userEmail", "xxxx@psu.edu")
-                    .add("runId", 212)
+                    .add("runNum", 212)
                     .build();
 
             System.out.println(object.toString());
@@ -311,7 +312,7 @@ http://francline.vmhost.psu.edu:8080/pegr/api/stats?apiKey=
     
     // required if this is from a new alignment
     // used to identify the sequence sample/experiment/alignment in PEGR 
-    "run": long, 
+    "run": integer, 
     "sample": long, 
     "genome": "string",
     "workflowId": "string", 

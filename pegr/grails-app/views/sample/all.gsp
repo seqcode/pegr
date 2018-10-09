@@ -11,6 +11,10 @@
   <div class="container-fluid">
       <br>
       <g:render template="table" model="['sampleList':sampleList, 'checkbox':false]"></g:render>
+
+      <div class="pagination">
+            <g:paginate next="Next" prev="Prev" controller="sample" action="all" max="15" total="${sampleCount ?: 0}" />
+      </div>
 </div>
   <script>
   $(function(){

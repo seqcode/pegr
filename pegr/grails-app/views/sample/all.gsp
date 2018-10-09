@@ -16,15 +16,6 @@
   $(function(){
     $(".nav-datasets").addClass("active");
   });
-
-  $(document).ready(function(){
-    $('#table_id').DataTable()({
-      scrollY: '50vh',
-      dom: 'Bfrtip',
-      scrollCollapse: true,
-      paging: true
-    });
-  });
   </script>
 </body>
 </html>

@@ -8,16 +8,16 @@ import groovy.json.*
 import grails.converters.*
 import org.apache.commons.io.IOUtils
 import grails.util.Holders
-    
+
 class SequenceRunController {
-    def springSecurityService    
-    def sequenceRunService    
-    def qfileUploadService    
+    def springSecurityService
+    def sequenceRunService
+    def qfileUploadService
     def walleService
     def reportService
     def utilityService
     def sampleService
-    
+
     // list incomplete runs
     def index(Integer max, String str, String status){
         def c = SequenceRun.createCriteria()
@@ -40,9 +40,9 @@ class SequenceRunController {
                         eq "id", Long.parseLong(str)
                         eq "runNum", str.toInteger()
                     }
-                    
+
                     ilike "fcId", "%${str}%"
-                    
+
                     ilike "directoryName", "%${str}%"
                     user {
                         ilike "username", "%${str}%"
@@ -53,24 +53,59 @@ class SequenceRunController {
                 }
             }
         } else {
-            runs = SequenceRun.list(listParams) 
+            runs = SequenceRun.list(listParams)
         }
         [runs: runs, str: str, defaultGalaxy: galaxy]
     }
-    
+
     def show(Long id) {
         def run = SequenceRun.get(id)
+        def sample = Sample.get(id)
+        def cohorts = run.cohorts
+        def cohortUserList = []
+        def isCohortUser = false
+
+        //cohortUserList += cohorts.split("-_")
+
         if (run) {
             def read = null
             if (run.experiments.size() > 0) {
                 def jsonSlurper = new JsonSlurper()
-                read = utilityService.parseJson(run.experiments[0].readPositions)   
+                read = utilityService.parseJson(run.experiments[0].readPositions)
                 if (read) {
                     read.readType = run.experiments[0].readType
                 }
             }
+
+            // get current user
             def currUser = springSecurityService.currentUser
-            def authorized = (run.user == currUser || currUser.isAdmin())
+            def currUsername = currUser.toString()
+            currUsername = currUsername.split(":")
+            currUsername = currUsername[1]
+            currUsername = currUsername.substring(0, currUsername.length() - 1);
+
+            // check if current user is a cohort user
+            if (cohorts.size() != 0){
+              cohorts.each() {
+                if (it != null){
+                  it = it.toString()
+                  it = it?.replace("_", "-")
+                  it = it?.split("-")
+                  if (it != null){
+                    cohortUserList << it[1]
+                  }
+                }
+              }
+
+              for (i in 0..(cohortUserList.size()-1)) {
+                if (currUsername in cohortUserList){
+                  isCohortUser = true
+                }
+              }
+            }
+
+            // check how to get sample users from sequence run.
+            def authorized = (isCohortUser == true || currUser.isAdmin())
             def editable = (run?.status!=pegr.RunStatus.COMPLETED) && (authorized)
             [run: run, read: read, editable: editable]
         } else {
@@ -78,7 +113,7 @@ class SequenceRunController {
             redirect(action: "index")
         }
     }
-    
+
     def editRead(Long runId) {
         def run = SequenceRun.get(runId)
         if (run) {
@@ -95,20 +130,20 @@ class SequenceRunController {
             redirect(action: "show", id: runId)
         }
     }
-    
+
     def updateRead(Long runId, String indexType, String readType) {
         def readPositions
         def posMap
         if (indexType == "single") {
             posMap = [
-                rd1: [params.rd1Start, params.rd1End], 
-                index: [params.indexStart, params.indexEnd], 
+                rd1: [params.rd1Start, params.rd1End],
+                index: [params.indexStart, params.indexEnd],
                 rd2: [params.rd2Start, params.rd2End]]
-            
+
         } else {
             posMap = [
-                rd1: [params.rd1Start, params.rd1End], 
-                index1: [params.index1Start, params.index1End], 
+                rd1: [params.rd1Start, params.rd1End],
+                index1: [params.index1Start, params.index1End],
                 index2: [params.index2Start, params.index2End]]
         }
         if (readType == "PE") {
@@ -123,16 +158,16 @@ class SequenceRunController {
         }
         redirect(action: "show", id: runId)
     }
-    
+
     def create() {
         def largestRunNum = SequenceRun.createCriteria().get {
             projections {
                 max "runNum"
             }
-        } as Long 
+        } as Long
         [defaultRunNum: largestRunNum + 1]
     }
-    
+
     def save() {
         def run = new SequenceRun(params)
         try {
@@ -145,11 +180,11 @@ class SequenceRunController {
                 projections {
                     max "runNum"
                 }
-            } as Long 
-            render(view: "create", model: [run:run, defaultRunNum: largestRunNum + 1]) 
+            } as Long
+            render(view: "create", model: [run:run, defaultRunNum: largestRunNum + 1])
         }
     }
-    
+
     def editInfo(Long runId) {
         def run = SequenceRun.get(runId)
         if (run) {
@@ -159,18 +194,18 @@ class SequenceRunController {
             redirect(action: "index")
         }
     }
-    
+
     def update(Long runId) {
         def run = SequenceRun.get(runId)
         if (run) {
             try {
-                run.properties = params 
+                run.properties = params
                 if (run.runStats) {
                     run.runStats.properties = params
                 } else {
                     run.runStats = new RunStats(params)
                 }
-                sequenceRunService.save(run)                   
+                sequenceRunService.save(run)
                 redirect(action: "show", id:runId)
             } catch(SequenceRunException e) {
                 request.message = e.message
@@ -181,7 +216,7 @@ class SequenceRunController {
             redirect(action: "index")
         }
     }
-    
+
     def searchPool(Long runId, Long typeId, String barcode) {
         if (request.method == "POST") {
             def poolItem = Item.where {type.id == typeId && barcode == barcode}.find()
@@ -192,10 +227,10 @@ class SequenceRunController {
                 [runId: runId]
             }
         } else {
-            [runId: runId]   
+            [runId: runId]
         }
     }
-    
+
     def addPool(Long poolItemId, Long runId) {
         try {
             sequenceRunService.addPool(poolItemId, runId)
@@ -208,7 +243,7 @@ class SequenceRunController {
         }
         redirect(action: "show", params: [id: runId])
     }
-    
+
     def removePool(Long runId) {
         try {
             sequenceRunService.removePool(runId)
@@ -218,7 +253,7 @@ class SequenceRunController {
         }
         redirect(action: "show", params: [id: runId])
     }
-    
+
     def addSamplesById(Long runId, String sampleIds) {
         try {
             def unknownSampleIds = sequenceRunService.addSamplesById(runId, sampleIds)
@@ -226,7 +261,7 @@ class SequenceRunController {
                 flash.message = "Unknown Samples ${unknownSampleIds} are not added to the sequence Run!"
             } else {
                 flash.message = "Success! All samples have been added to the sequence run."
-            }           
+            }
         } catch(SequenceRunException e) {
             flash.message = e.message
         } catch (Exception e) {
@@ -235,7 +270,7 @@ class SequenceRunController {
         }
         redirect(action: "show", params: [id: runId])
     }
-    
+
     def removeExperiment(Long experimentId, Long runId) {
         try {
             sequenceRunService.removeExperiment(experimentId)
@@ -245,7 +280,7 @@ class SequenceRunController {
         }
         redirect(action: "show", params: [id: runId])
     }
-    
+
     def updateSamples(Long runId) {
         def messages = ""
         def expIds = params.list('experimentId')
@@ -255,7 +290,7 @@ class SequenceRunController {
                 sequenceRunService.updateSample(it, genomeIds)
             } catch (SequenceRunException e) {
                 messages += "<p>e.message</p>"
-            } 
+            }
         }
         if (messages == "") {
             messages = "All genomes added successfully!"
@@ -263,7 +298,7 @@ class SequenceRunController {
         flash.message = messages
         redirect(action: "show", id: runId)
     }
-    
+
     def previewRun(Long runId) {
         try {
             def previousRun = walleService.getPreviousRun()
@@ -273,8 +308,8 @@ class SequenceRunController {
             def queuedRuns = []
             queuedRunIds.eachWithIndex { id, n ->
                  def run = SequenceRun.get(Long.parseLong(id))
-                queuedRuns.push([id: id, 
-                                 runNum: run?.runNum, 
+                queuedRuns.push([id: id,
+                                 runNum: run?.runNum,
                                  directoryName: n < newFolders.size() ? newFolders[n] : null])
 
             }
@@ -283,7 +318,7 @@ class SequenceRunController {
                               directoryName: queuedRunIds.size() < newFolders.size() ? newFolders[queuedRunIds.size()] : null]
             def startTime
             use(TimeCategory) {
-                def now = new Date() 
+                def now = new Date()
                 startTime = now.clearTime() + 10.hours + 1.week
             }
             [previousRun: previousRun,
@@ -299,7 +334,7 @@ class SequenceRunController {
             redirect(action: "show", id: runId)
         }
     }
-    
+
     def run(Long runId) {
         try {
             sequenceRunService.run(runId)
@@ -309,22 +344,22 @@ class SequenceRunController {
             redirect(action: "show", id: runId)
         }
     }
-    
-    def upload() { 
-    
+
+    def upload() {
+
     }
-    
+
     def convertXlsx() {
         def filesroot = utilityService.getFilesRoot()
         try {
-            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  
+            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;
             def mpf = mpr.getFile("file");
             String filename = mpf.getOriginalFilename();
-            if(!mpf?.empty && filename[-5..-1] == ".xlsx") {  
-                File folder = new File(filesroot, 'QueueFiles'); 
-                if (!folder.exists()) { 
-                    folder.mkdirs(); 
-                } 
+            if(!mpf?.empty && filename[-5..-1] == ".xlsx") {
+                File folder = new File(filesroot, 'QueueFiles');
+                if (!folder.exists()) {
+                    folder.mkdirs();
+                }
                 File fileDest = new File(folder, filename)
                 mpf.transferTo(fileDest)
                 def user = springSecurityService.currentUser
@@ -333,8 +368,8 @@ class SequenceRunController {
                                         fileDest.getPath(),
                                           params.sampleSheet,
                                           params.laneSheet,
-                                          RunStatus.PREP, 
-                                          params.int("startLine"), 
+                                          RunStatus.PREP,
+                                          params.int("startLine"),
                                           params.int("endLine"),
                                           params.int("laneLine"),
                                           basicCheck
@@ -342,7 +377,7 @@ class SequenceRunController {
                 if (messages.size() == 0){
                     flash.messageList = ["The xlsx file uploaded!",]
                 } else {
-                    flash.messageList = messages                   
+                    flash.messageList = messages
                 }
             } else {
                 flash.messageList = ["Only xlsx files are accepted!"]
@@ -354,25 +389,25 @@ class SequenceRunController {
 
         redirect(action: "index")
     }
-    
+
     def convertCsv() {
         def filesroot = utilityService.getFilesRoot()
         try {
-            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;  
+            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;
             def mpf = mpr.getFile("file");
             String filename = mpf.getOriginalFilename();
-            if(!mpf?.empty && filename[-4..-1] == ".csv") {  
-                File folder = new File(filesroot, 'QueueFiles'); 
-                if (!folder.exists()) { 
-                    folder.mkdirs(); 
-                } 
+            if(!mpf?.empty && filename[-4..-1] == ".csv") {
+                File folder = new File(filesroot, 'QueueFiles');
+                if (!folder.exists()) {
+                    folder.mkdirs();
+                }
                 File fileDest = new File(folder, filename)
                 mpf.transferTo(fileDest)
                 def user = springSecurityService.currentUser
                 def basicCheck = true
-                def results = qfileUploadService.migrateSamples(fileDest.getPath(), 
-                                          RunStatus.PREP, 
-                                          params.int("startLine"), 
+                def results = qfileUploadService.migrateSamples(fileDest.getPath(),
+                                          RunStatus.PREP,
+                                          params.int("startLine"),
                                           params.int("endLine"),
                                           basicCheck
                                          )
@@ -380,7 +415,7 @@ class SequenceRunController {
                 if (messages.size() == 0){
                     flash.messageList = ["CSV file uploaded!",]
                 } else {
-                    flash.messageList = messages                   
+                    flash.messageList = messages
                 }
             } else {
                 flash.messageList = ["Only csv files are accepted!"]
@@ -397,12 +432,12 @@ class SequenceRunController {
         def projects = SequencingCohort.where{ run.id == runId }.collect {it.project?.name}.toList()
         render utilityService.stringToSelect2Data(projects) as JSON
     }
-    
+
     def updateExperimentCohortAjax(Long runId, Long experimentId, String projectName) {
         sequenceRunService.updateExperimentCohort(runId, experimentId, projectName)
         render ""
     }
-    
+
     def addProject(Long runId, Long projectId) {
         try {
             sequenceRunService.addProject(runId, projectId)
@@ -412,7 +447,7 @@ class SequenceRunController {
         }
         redirect(action: "show", id: runId)
     }
-    
+
     def removeProject(Long cohortId, Long runId) {
         try {
             sequenceRunService.removeProject(cohortId)
@@ -422,7 +457,7 @@ class SequenceRunController {
         }
         redirect(action: "show", id: runId)
     }
-    
+
     def deleteProject(Long cohortId, Long runId) {
         try {
             sequenceRunService.deleteProject(cohortId)
@@ -432,7 +467,7 @@ class SequenceRunController {
         }
         redirect(action: "show", id: runId)
     }
-    
+
     def uploadCohortImage(Long cohortId, String type) {
         def cohort = SequencingCohort.get(cohortId)
         if (!cohort) {
@@ -448,24 +483,24 @@ class SequenceRunController {
         }
         redirect(action: "show", id: runId)
     }
-    
+
     def removeCohortImageAjax(Long cohortId, String filepath) {
         sequenceRunService.removeCohortImage(cohortId, filepath)
         render ""
         return
     }
-    
+
     def downloadRunInfo(String remoteRoot, Long runId) {
         String RUN_INFO_TEMP = "runInfo${runId}"
         def timeout = 60*1000
-        
+
         // generate the run info files
         def run = SequenceRun.get(runId)
-        
+
         // clean path
         remoteRoot = remoteRoot.trim()
-        
-        def remotePath 
+
+        def remotePath
         try {
             if (!remoteRoot || !run.directoryName) {
                 throw new SequenceRunException()
@@ -477,11 +512,11 @@ class SequenceRunController {
         }
         def localRoot = utilityService.getFilesRoot()
         def localFolder = new File(localRoot, RUN_INFO_TEMP)
-        if (!localFolder.exists()) { 
-            localFolder.mkdirs() 
-        } 
+        if (!localFolder.exists()) {
+            localFolder.mkdirs()
+        }
         walleService.generateRunFilesInFolder(run, remotePath, localFolder)
-        
+
         // compress the files
         def compressedFilename = "runInfo${runId}.tar.gz"
         def compressedFile = new File(localRoot, compressedFilename)
@@ -493,10 +528,10 @@ class SequenceRunController {
         // remove the original run info files
         command = "rm -R ${localFolder.getPath()}"
         utilityService.executeCommand(command, timeout)
-        
+
         InputStream contentStream
         try {
-            response.setContentType("application/gzip") 
+            response.setContentType("application/gzip")
             response.setHeader("Content-disposition", "attachment;filename=\"${compressedFilename}\"")
             contentStream = compressedFile.newInputStream()
             response.outputStream << contentStream
@@ -512,12 +547,12 @@ class SequenceRunController {
         }
 
     }
-    
+
     def editQueue() {
         def queue = walleService.getQueue()
         [previousRunFolder: queue.previousRunFolder, queuedRuns: queue.queuedRuns]
     }
-    
+
     def updateQueue(String previousRunFolder, String queuedRuns) {
         try {
             walleService.updateQueue(previousRunFolder.trim(), queuedRuns.trim())
@@ -527,7 +562,7 @@ class SequenceRunController {
         }
         redirect(action: "editQueue")
     }
-    
+
 	// axa677-180306: No need for this function since we have written the next one to handle deletion using checkboxes
     def deleteSample(Long sampleId, Long runId) {
         try {
@@ -539,10 +574,10 @@ class SequenceRunController {
         }
         redirect(action: "show", params: [id: runId])
     }
-	
-	
+
+
 	// axa677-180306: Added this function to handle the deletion of selected (multiple) samples
-	// This function is called in view sequenceRun/show.gsp 
+	// This function is called in view sequenceRun/show.gsp
 	// it receives a list of samples ids and run id in a json dictionary and iterates over the ids
 	// to send a request to sampleService.delete(sample) to delete each selected sample
 	// Then, it redirects to another action that already exists.

@@ -35,7 +35,7 @@ hibernate {
 environments {
     development {
         dataSource {
-            dbCreate = "" // one of 'create', 'create-drop', 'update', 'validate', ''
+            dbCreate = "none" // one of 'create', 'create-drop', 'update', 'validate', ''
             url = ""
 			username=""
 			password=""

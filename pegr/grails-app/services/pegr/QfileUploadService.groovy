@@ -313,10 +313,11 @@ class QfileUploadService {
 	
 	def getProject(String projectStr, String projectUser, String projectUserEmail, String service, String invoice) {
         def projectName
-        if (projectStr && (projectStr == "Yeast Encode 3.0" || projectStr.take(3) == "Y3E")) {
-            projectName = "Yeast Encode 3.0"
-        } else if (invoice && invoice[0].toUpperCase() in ["S", "P", "X"]) {
+        
+        if (invoice && invoice[0].toUpperCase() in ["S", "P", "X"]) {
             projectName = service
+        } else if (projectStr && projectStr != "") {
+            projectName = projectStr
         } else {
             projectName = "${service}-${invoice}"
         }

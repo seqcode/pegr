@@ -204,6 +204,12 @@ div.spacer
     background-color: #1E407C;
 }
 
+.edit:hover, .edit:active, .edit:focus {
+    text-decoration: none;
+    color: #f6f6f6;
+    background-color: #467ad2;
+}
+
 .subnumber OL {
     counter-reset: item;
     padding-left: 10px;

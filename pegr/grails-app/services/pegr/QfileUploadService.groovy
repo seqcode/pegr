@@ -17,25 +17,58 @@ class QfileUploadService {
     def utilityService
     final int timeout = 1000 * 60 * 2; 
 	
-    @NotTransactional
-    def migrateXlsx(File folder, String filename, String sampleSheetName, String laneSheetName, RunStatus runStatus, int startLine, int endLine, int laneLine, boolean basicCheck) {
-        getDefaultUser()     
-        def csvNames = [:]
+    def checkFile(String filepath, int startLine, int endLine) {
+        def lineNo = 0  
+        def file = new FileReader(filepath)
+		CSVReader reader = new CSVReader(file)
+		String [] rawdata
+		def warnings = []
+        def newProjectCount = 0
+        def MAX_NEW_PROJECT_COUNT = 10
         
+		while ((rawdata = reader.readNext()) != null) {
+		    ++lineNo
+		    if (lineNo < startLine) {
+		        continue
+		    } else if (endLine > 0 && lineNo > endLine) {
+		        break
+		    }
+            cleanRawData(rawdata)
+            def data = getNamedData(rawdata)
+            def projectName = getProjectName(data.projectName, data.service, data.invoice)
+            def project = Project.findByName(projectName)
+	        if (!project) {
+                newProjectCount++
+            }
+        }
+        if (newProjectCount > MAX_NEW_PROJECT_COUNT) {
+            warnings.push("More than ${MAX_NEW_PROJECT_COUNT} new projects will be created!")
+        }
+        return warnings
+    }
+    
+    def convertXlsxToCsv(File folder, String filename, String sampleSheetName, String laneSheetName) {
+        def csvNames = [:]
         // convert xsxl to csv
         [sampleSheetName, laneSheetName].each { sheet ->
             csvNames[sheet] = new File(folder, sheet + ".csv").getPath()
             def command = "xlsx2csv -n ${sheet} ${filename} ${csvNames[sheet]}"
             utilityService.executeCommand(command, timeout)
         }
+        return csvNames
+    } 
+    
+    @NotTransactional
+    def migrateXlsx(String sampleSheet, String laneSheet, RunStatus runStatus, int startLine, int endLine, int laneLine, boolean basicCheck) {
+        getDefaultUser()     
         
         // migrate the samples
-        def results = migrateSamples(csvNames[sampleSheetName], runStatus, startLine, endLine, basicCheck)
+        def results = migrateSamples(sampleSheet, runStatus, startLine, endLine, basicCheck)
         def messages = results.messages
         def laneRunNum = results.laneRunNum
         
         // migrate the lane
-        def laneMessages = migrateLane(csvNames[laneSheetName], laneLine, laneRunNum)
+        def laneMessages = migrateLane(laneSheet, laneLine, laneRunNum)
         messages.addAll(laneMessages)
 
         return messages
@@ -311,7 +344,7 @@ class QfileUploadService {
 	    return user
 	}
 	
-	def getProject(String projectStr, String projectUser, String projectUserEmail, String service, String invoice) {
+    def getProjectName(String projectStr, String service, String invoice) {
         def projectName
         
         if (invoice && invoice[0].toUpperCase() in ["S", "P", "X"]) {
@@ -321,6 +354,11 @@ class QfileUploadService {
         } else {
             projectName = "${service}-${invoice}"
         }
+        return projectName
+    }
+    
+	def getProject(String projectStr, String projectUser, String projectUserEmail, String service, String invoice) {
+        def projectName = getProjectName(projectStr, service, invoice)
 	    def project = Project.findByName(projectName)
 	    if (!project) {
 	        project = new Project(name: projectName, description: projectStr).save( failOnError: true)

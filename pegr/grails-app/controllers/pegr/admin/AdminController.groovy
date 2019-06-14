@@ -25,9 +25,7 @@ class AdminController {
 	}
     
     def mergeForm(String table) {
-        def tables = ['user', 
-                      'ab_host', 
-                      'cell_source_treatment',
+        def tables = ['ab_host', 
                       'growth_media',
                       'histology',
                       'ig_type',
@@ -37,9 +35,7 @@ class AdminController {
                       'target',
                       'target_type',
                       'tissue',
-                      'assay',
-                      'protocol',
-                      'genome'
+                      'assay'
                      ] 
         [tables: tables, table: table]
     }

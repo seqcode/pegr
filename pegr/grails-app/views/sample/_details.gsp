@@ -68,7 +68,7 @@
             </g:if>
 
             <g:if test="${sample?.spikeInCellSource}">
-            Spike In Cell Source: ${sample?.spikeInCellSource?.encodeAsHTML()}
+            <li>Spike In Cell Source: ${sample?.spikeInCellSource?.encodeAsHTML()}</li>
             </g:if>
         </ul>
     </div>

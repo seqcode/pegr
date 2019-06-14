@@ -279,9 +279,8 @@ class UtilityService {
                 cmd = "select 1 from information_schema.key_column_usage kcu inner join information_schema.TABLE_CONSTRAINTS tc on kcu.constraint_name = tc.constraint_name and kcu.table_name = tc.table_name and kcu.table_schema = tc.table_schema where kcu.constraint_schema = 'pegr' and kcu.table_name = ? and kcu.column_name= ? and tc.constraint_type='UNIQUE' and kcu.constraint_schema = 'pegr'"
                 def constraints = sql.rows(cmd, [table.table_name, table.column_name])
                 if (constraints && constraints.size() > 0 ) {
-                    // if there is UNIQUE constraint that prevent changing reference key, remove this row
-                    cmd = "delete from " + table.table_name + " where " + table.column_name + "= ?"
-                    sql.execute(cmd, [fromId])
+                    // if there is UNIQUE constraint that prevent changing reference key, throw an error.
+                    throw new UtilityException(message:"Database UNIQUE contraint!")
                 } else {
                     // change reference key from the fromId to the toId   
                     cmd = "update " + table.table_name + " set " + table.column_name + "= ? where " + table.column_name + " = ?"
@@ -299,6 +298,35 @@ class UtilityService {
             throw new UtilityException(message: "Error merging ${tableName} from ID#${fromId} to ID#${toId}!")
         }
     }
+    
+    @Transactional
+    def updateForeignKeyInDb(String table, String field, Long fromId, Long toId) {
+        def sql = new Sql(dataSource)
+        def cmd = "update " + table + " set " + field +"_id = ? where " + field + "_id = ?"
+        sql.execute(cmd, [toId, fromId])
+        sql.close()
+    }
+    
+    @Transactional
+    def updateLinksInDb(String linkTable, String fieldConstraint, String fieldToMerge, Long fromId, Long toId) {
+        def sql = new Sql(dataSource)
+        def toDelete = []
+        
+        sql.eachRow("select id, " + fieldConstraint + "_id from " + linkTable + " where " + fieldToMerge + "_id = ?", [fromId]) { row ->
+            def newLink = sql.rows("select 1 from " + linkTable + " where " + fieldConstraint + "_id = ? and " + fieldToMerge + "_id = ?", [row[1],  toId])
+            if (true) {//(!newLink || newLink.size() == 0) {
+                sql.execute("update " + linkTable + " set " + fieldToMerge + "_id = ? where " + fieldToMerge + "_id = ?", [toId, fromId])
+            } else {
+                toDelete.push(row[0])
+            }
+        }
+ 
+        toDelete.each {id -> 
+            sql.execute("delete from " + linkTable + " where id = ?", [id] )
+        }
+        sql.close()
+    }
+    
     
     def getGpfsConfig() {
         return [username: grailsApplication.config.gpfs.username,

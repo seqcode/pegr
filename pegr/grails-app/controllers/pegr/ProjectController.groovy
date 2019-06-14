@@ -205,7 +205,7 @@ class ProjectController {
         render "success"
     }
     
-    def search(String str) {
+    def search(String str, String merge) {
         def c = Project.createCriteria()
         def listParams = [
                 max: params.max ?: 25,
@@ -219,9 +219,72 @@ class ProjectController {
                 ilike "description", "%${str}%"
             }
         }
-        [projects: projects, totalCount: projects.totalCount, str: str] 
+        if (merge == "Merge") {
+            def checkedCount = 0;
+            if (session.checkedProject) {
+                checkedCount = session.checkedProject.size()
+            }
+            render(view: "mergeSelect", model: [totalCount: projects.totalCount, projects: projects, str: str, checkedCount: checkedCount])
+        } else {
+            [projects: projects, totalCount: projects.totalCount, str: str] 
+        }
     }
     
+    def merge(String projectName) {
+        if (session.checkedProject) {
+            try {
+                def mergeToProjectId = projectService.mergeProjects(projectName, session.checkedProject)
+                session.checkedProject = null
+                flash.message = "Success!"
+                redirect(action: "show", id: mergeToProjectId)
+            } catch (Exception e) {
+                flash.message = e.message 
+                redirect(action: "showChecked")
+            }
+        } else {
+            flash.message = "No projects selected to merge from!"
+            redirect(action: "all")
+        }       
+    }
+    
+    def cancelMerge() {
+        if (session.checkedProject) {
+            session.checkedProject = null
+        }        
+        redirect(action: "all")
+    }
+    
+    def clearCheckedProjectAjax(){
+        if (session.checkedProject) {
+            session.checkedProject = null
+        }
+        render true
+    }
+
+    def addCheckedProjectAjax(Long id) {
+        if (!session.checkedProject) {
+            session.checkedProject = []
+        }
+        if (!(id in session.checkedProject)) {
+            session.checkedProject << id
+        }
+        render session.checkedProject.size()
+    }
+
+    def removeCheckedProjectAjax(Long id) {
+        if (id in session.checkedProject) {
+            session.checkedProject.remove(id)
+        }
+        render session.checkedProject.size()
+    }
+
+    def showChecked(){
+        def projects = []
+        session.checkedProject.each {
+            projects.push(Project.get(it))
+        }
+        [projects: projects]
+    }
 }
 
 

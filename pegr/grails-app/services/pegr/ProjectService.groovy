@@ -1,4 +1,5 @@
 package pegr
+import groovy.sql.Sql
 import grails.transaction.Transactional
 
 class ProjectException extends RuntimeException {
@@ -8,7 +9,7 @@ class ProjectException extends RuntimeException {
 class ProjectService {
     def springSecurityService
     def utilityService
-
+    
     @Transactional
     void save(Project project, List fundings) {
         if (!project.save(flush: true)) {   
@@ -145,4 +146,57 @@ class ProjectService {
         project.delete()
     }
     
+    @Transactional
+    def mergeProjects(String mergeToProjectName, List mergeFromProjectIds) {
+        def currUser = springSecurityService.currentUser
+        
+        // check if the mergeTo project already exists
+        def mergeToProject = Project.where {name == mergeToProjectName}.get(max:1)
+        
+        // if the mergeToProject does not exit, create one
+        if (!mergeToProject) {
+            mergeToProject = new Project(name: mergeToProjectName)
+            if (!mergeToProject.save(flush: true)) {   
+                throw new ProjectException(message: "Invalid ProjectName!")
+            }
+        }
+        
+        // add current user as owner       
+        if (!ProjectUser.where {user == currUser && project== mergeToProject}.find()) {
+            new ProjectUser(user: currUser, 
+                      project: mergeToProject, 
+                      projectRole: ProjectRole.OWNER).save()            
+        }
+        
+        // merge
+        mergeFromProjectIds.each { fromId ->
+            if (fromId != mergeToProject.id) {
+                mergeProject(fromId, mergeToProject) 
+            }
+        }
+
+        return mergeToProject.id
+    }
+    
+    @Transactional
+    def mergeProject(Long fromId, Project toProject) {
+        def fromProject = Project.get(fromId)
+        def toId = toProject.id
+        
+        ["history", "item", "replicate_set", "sequencing_cohort"].each { table ->
+            utilityService.updateForeignKeyInDb(table, "project", fromId, toId)
+        }
+        
+        utilityService.updateLinksInDb("project_samples", "sample", 'project', fromId, toId)
+        utilityService.updateLinksInDb("project_funding", "funding", 'project', fromId, toId)
+        utilityService.updateLinksInDb("project_bags", "bag", 'project', fromId, toId)
+        utilityService.updateLinksInDb("project_user", "user", 'project', fromId, toId)
+        
+        
+        fromProject.delete()
+    }
+    
+    
+    
+
 }

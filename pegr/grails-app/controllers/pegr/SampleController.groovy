@@ -325,14 +325,14 @@ class SampleController {
     }
 
     def searchForm() {
-	def galaxy = Holders.config.defaultGalaxy
+	   def galaxy = Holders.config.defaultGalaxy
 	[defaultGalaxy: galaxy]
     }
 
     def search(QuerySampleRegistrationCommand cmd) {
         // cmd.max = cmd.max ?: 15
         def samples = sampleService.search(cmd)
-	def galaxy = Holders.config.defaultGalaxy
+	    def galaxy = Holders.config.defaultGalaxy
 
         def checkedCount = 0;
         if (session.checkedSample) {

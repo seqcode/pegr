@@ -26,10 +26,26 @@
                     <g:if test="${n>0}"><tr></g:if>
                     <td>${cohort.name} <g:if test="${cohort.report}"><g:link controller="report" action="show" id="${cohort.report.id}" class="edit">Report</g:link></g:if></td>
                     <!-- ADDED COLUMN DATA FOR COHORT RUN STATUS -->
-                    <td><span class="label" style="background-color:#7FB88C">${cohort.run.status}</span></td>
+                    <td><span class="label">${cohort.run.status}</span></td>
                     </tr>
                 </g:each>
             </g:else>
         </g:each>
     </tbody>
 </table>
+<script>
+    $("#nav-projects").addClass("active");
+    $(".label").each(function() {
+        if ($(this).text() == "ANALYZING") {
+            $(this).addClass("label-info");
+        } else if ($(this).text() == "COMPLETED") {
+            $(this).addClass("label-success");
+        } else if ($(this).text() == "QUEUE") {
+            $(this).addClass("label-warning");
+        } else if ($(this).text() == "FAILED") {
+            $(this).addClass("label-danger");
+        } else {
+            $(this).addClass("label-default");
+        }
+    });
+</script>

@@ -230,10 +230,10 @@ class ProjectController {
         }
     }
     
-    def merge(String projectName) {
+    def merge(UserRoleListCommand cmd) {
         if (session.checkedProject) {
             try {
-                def mergeToProjectId = projectService.mergeProjects(projectName, session.checkedProject)
+                def mergeToProjectId = projectService.mergeProjects(cmd.projectName, session.checkedProject, cmd.userRoles)
                 session.checkedProject = null
                 flash.message = "Success!"
                 redirect(action: "show", id: mergeToProjectId)
@@ -244,7 +244,7 @@ class ProjectController {
         } else {
             flash.message = "No projects selected to merge from!"
             redirect(action: "all")
-        }       
+        }
     }
     
     def cancelMerge() {
@@ -280,10 +280,35 @@ class ProjectController {
 
     def showChecked(){
         def projects = []
-        session.checkedProject.each {
-            projects.push(Project.get(it))
+        if (session.checkedProject) {
+            session.checkedProject.each {
+                def project = Project.get(it)
+                if (project) {
+                    projects.push(Project.get(it))
+                }
+            }
         }
-        [projects: projects]
+        if (projects.size() == 0) {
+            flash.message = "No projects to merge!"
+            redirect(action: "all")
+        }
+        def projectUsers = []
+        projects.each { p ->
+            def oldProjectUsers = ProjectUser.where {project == p}.list()
+            if (oldProjectUsers && oldProjectUsers.size() > 0) {
+                oldProjectUsers.each { pu ->
+                    if (!projectUsers.collect { it.user }.contains(pu.user)) {
+                        projectUsers.push(pu)
+                    }
+                }
+            }
+        }
+        def currUser = springSecurityService.currentUser
+        if (!projectUsers.collect { it.user }.contains(currUser)) {
+            projectUsers.push(new ProjectUser(user:currUser, 
+                                              projectRole: ProjectRole.OWNER))
+        }
+        [projects: projects, projectUsers: projectUsers]
     }
 }
 
@@ -335,4 +360,14 @@ class SampleListCommand {
     Long assayId
     Long projectId
     List<SampleCommand> samples = [].withLazyDefault { new SampleCommand() } 
+}
+
+class UserRoleCommand {
+    Long userId
+    String role
+}
+
+class UserRoleListCommand {
+    String projectName
+    List<UserRoleCommand> userRoles = [].withLazyDefault { new UserRoleCommand() } 
 }

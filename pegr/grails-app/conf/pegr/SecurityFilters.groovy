@@ -38,16 +38,22 @@ class SecurityFilters {
                 def auth = true
                 if (!currUser.isAdmin() && session.checkedProject) {
                     def projects = session.checkedProject
-                    def mergeToProject = Project.where {name == mergeToProjectName}.get(max:1)
-                    if (mergeToProject) {
-                        projects.push(mergeToProject.id)    
-                    }                    
+                    if (params.projectName) {
+                        def mergeToProject = Project.where {name == params.projectName}.get(max:1)
+                        if (mergeToProject) {
+                            projects.push(mergeToProject.id)    
+                        }    
+                    }
+                                    
                     projects.each { projectId ->
-                        projectUser = ProjectUser.where {project.id == projectId && user.id == currUser.Id}.first()
+                        def projectUser = ProjectUser.where {project.id == projectId && user.id == currUser.id}.find()
                         if (!projectUser || projectUser.projectRole != ProjectRole.OWNER) {
                             auth = false
                         }
                     }                     
+                }
+                if (auth == false) {
+                    render(view: '/login/denied')
                 }
                 return auth
             }

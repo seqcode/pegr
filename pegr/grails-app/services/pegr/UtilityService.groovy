@@ -292,30 +292,29 @@ class UtilityService {
             sql.execute(cmd, [fromId])
             sql.close()
         } catch(UtilityException e) {
+            sql.close()
             throw e
         } catch (Exception e) {
+            sql.close()
             log.error e
             throw new UtilityException(message: "Error merging ${tableName} from ID#${fromId} to ID#${toId}!")
         }
     }
     
     @Transactional
-    def updateForeignKeyInDb(String table, String field, Long fromId, Long toId) {
-        def sql = new Sql(dataSource)
+    def updateForeignKeyInDb(String table, String field, Long fromId, Long toId, Sql sql) {
         def cmd = "update " + table + " set " + field +"_id = ? where " + field + "_id = ?"
         sql.execute(cmd, [toId, fromId])
-        sql.close()
     }
     
     @Transactional
-    def updateLinksInDb(String linkTable, String fieldConstraint, String fieldToMerge, Long fromId, Long toId) {
-        def sql = new Sql(dataSource)
+    def updateLinksInDb(String linkTable, String fieldConstraint, String fieldToMerge, Long fromId, Long toId, Sql sql) {
         def toDelete = []
-        
+
         sql.eachRow("select id, " + fieldConstraint + "_id from " + linkTable + " where " + fieldToMerge + "_id = ?", [fromId]) { row ->
             def newLink = sql.rows("select 1 from " + linkTable + " where " + fieldConstraint + "_id = ? and " + fieldToMerge + "_id = ?", [row[1],  toId])
-            if (true) {//(!newLink || newLink.size() == 0) {
-                sql.execute("update " + linkTable + " set " + fieldToMerge + "_id = ? where " + fieldToMerge + "_id = ?", [toId, fromId])
+            if (!newLink || newLink.size() == 0) {
+                sql.execute("update " + linkTable + " set " + fieldToMerge + "_id = ? where id = ?", [toId, row[0]])
             } else {
                 toDelete.push(row[0])
             }
@@ -324,9 +323,7 @@ class UtilityService {
         toDelete.each {id -> 
             sql.execute("delete from " + linkTable + " where id = ?", [id] )
         }
-        sql.close()
     }
-    
     
     def getGpfsConfig() {
         return [username: grailsApplication.config.gpfs.username,

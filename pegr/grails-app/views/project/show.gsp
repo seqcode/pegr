@@ -48,6 +48,7 @@
                     </div>
                     <div id="collapse${n}" class="panel-collapse collapse">
                         <g:render template="/project/sampleTable" model="['sampleList':cohort.samples, 'project':project]" />
+                        <p>${cohort.notes}</p>
                     </div>
                 </div>  
             </g:each>

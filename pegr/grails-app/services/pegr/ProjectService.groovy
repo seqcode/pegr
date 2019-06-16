@@ -9,6 +9,7 @@ class ProjectException extends RuntimeException {
 class ProjectService {
     def springSecurityService
     def utilityService
+    def dataSource
     
     @Transactional
     void save(Project project, List fundings) {
@@ -147,7 +148,7 @@ class ProjectService {
     }
     
     @Transactional
-    def mergeProjects(String mergeToProjectName, List mergeFromProjectIds) {
+    def mergeProjects(String mergeToProjectName, List mergeFromProjectIds,  List userRoles) {
         def currUser = springSecurityService.currentUser
         
         // check if the mergeTo project already exists
@@ -161,20 +162,27 @@ class ProjectService {
             }
         }
         
-        // add current user as owner       
-        if (!ProjectUser.where {user == currUser && project== mergeToProject}.find()) {
-            new ProjectUser(user: currUser, 
-                      project: mergeToProject, 
-                      projectRole: ProjectRole.OWNER).save()            
-        }
-        
         // merge
         mergeFromProjectIds.each { fromId ->
             if (fromId != mergeToProject.id) {
                 mergeProject(fromId, mergeToProject) 
             }
         }
+        
+        userRoles.each {userRole ->
+            def userToAdd = User.get(userRole.userId)
 
+            if (userToAdd) {
+                def existingProjectUser = ProjectUser.where{ project == mergeToProject && user == userToAdd}.find()
+
+                if (userRole.role && !existingProjectUser) {
+                    new ProjectUser(project: mergeToProject,
+                                   user: userToAdd,
+                                   projectRole: userRole.role).save(flush:true, failOnError: true)
+                }
+            }
+        }
+        
         return mergeToProject.id
     }
     
@@ -182,16 +190,23 @@ class ProjectService {
     def mergeProject(Long fromId, Project toProject) {
         def fromProject = Project.get(fromId)
         def toId = toProject.id
-        
-        ["history", "item", "replicate_set", "sequencing_cohort"].each { table ->
-            utilityService.updateForeignKeyInDb(table, "project", fromId, toId)
+        def sql = new Sql(dataSource)
+        try {
+            ["history", "item", "replicate_set", "sequencing_cohort"].each { table ->
+                utilityService.updateForeignKeyInDb(table, "project", fromId, toId, sql)
+            }
+
+            utilityService.updateLinksInDb("project_samples", "sample", 'project', fromId, toId, sql)
+            utilityService.updateLinksInDb("project_funding", "funding", 'project', fromId, toId, sql)
+            utilityService.updateLinksInDb("project_bags", "bag", 'project', fromId, toId, sql)
+
+            sql.execute("delete from project_user where project_id = ?", [fromId])
+            sql.close()
+        } catch(Exception e) {
+            sql.close()
+            log.error e
+            throw new ProjectException(message: "Error merging project ${fromId} to project ${toProject.id}!")
         }
-        
-        utilityService.updateLinksInDb("project_samples", "sample", 'project', fromId, toId)
-        utilityService.updateLinksInDb("project_funding", "funding", 'project', fromId, toId)
-        utilityService.updateLinksInDb("project_bags", "bag", 'project', fromId, toId)
-        utilityService.updateLinksInDb("project_user", "user", 'project', fromId, toId)
-        
         
         fromProject.delete()
     }

@@ -53,6 +53,7 @@ class SecurityFilters {
                     }                     
                 }
                 if (auth == false) {
+                    session.checkedProject = null
                     render(view: '/login/denied')
                 }
                 return auth

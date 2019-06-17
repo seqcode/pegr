@@ -174,8 +174,7 @@ class ProjectService {
 
             if (userToAdd) {
                 def existingProjectUser = ProjectUser.where{ project == mergeToProject && user == userToAdd}.find()
-
-                if (userRole.role && !existingProjectUser) {
+                if (userRole.role != "null" && !existingProjectUser) {
                     new ProjectUser(project: mergeToProject,
                                    user: userToAdd,
                                    projectRole: userRole.role).save(flush:true, failOnError: true)

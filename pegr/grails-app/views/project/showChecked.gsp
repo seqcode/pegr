@@ -18,10 +18,11 @@
                 <div>
                     <label>Merge to</label>
                     <input name="projectName" placeholder="Project Name">
+                    <p><i>You may input the name of an existing project or a new project name. In the later case, a new project will be created.</i></p>
                 </div>
                 <div>
                     <label>Add Users </label>
-                    <p>The following users will be added to the merged project if they are not already in the merged project. You may change their project roles or remove them from the merged project by selecting "None".</p>
+                    <p><i>The following users will be added to the merged project if they are not already in that project. You may change their project roles or remove them from the merged project by selecting "None".</i></p>
                     <table class="table table-striped">
                         <thead>
                             <tr>

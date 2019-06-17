@@ -46,9 +46,13 @@
                             </h4>
                         </div>
                     </div>
+                    <g:if test="${cohort.notes}">
+                    <div>
+                         <p><i>Notes: ${cohort.notes}</i></p>
+                    </div>
+                    </g:if>
                     <div id="collapse${n}" class="panel-collapse collapse">
                         <g:render template="/project/sampleTable" model="['sampleList':cohort.samples, 'project':project]" />
-                        <p>${cohort.notes}</p>
                     </div>
                 </div>  
             </g:each>

@@ -169,6 +169,7 @@ class ProjectService {
             }
         }
         
+        ProjectUser.executeUpdate("delete ProjectUser where project.id=?", [mergeToProject.id])
         userRoles.each {userRole ->
             def userToAdd = User.get(userRole.userId)
 

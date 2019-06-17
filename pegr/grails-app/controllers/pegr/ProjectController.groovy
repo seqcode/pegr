@@ -292,6 +292,28 @@ class ProjectController {
             flash.message = "No projects to merge!"
             redirect(action: "all")
         }
+        
+        [projects: projects]
+    }
+    
+    def confirmUsersInMergedProject(String projectName) {
+        def projects = []
+        if (session.checkedProject) {
+            session.checkedProject.each {
+                def project = Project.get(it)
+                if (project) {
+                    projects.push(Project.get(it))
+                }
+            }
+        }
+        if (projects.size() == 0) {
+            flash.message = "No projects to merge!"
+            redirect(action: "all")
+        }
+        def mergeToProject = Project.where {name == projectName}.get(max:1)
+        if (mergeToProject) {
+            projects.push(mergeToProject)
+        }
         def projectUsers = []
         projects.each { p ->
             def oldProjectUsers = ProjectUser.where {project == p}.list()
@@ -308,7 +330,7 @@ class ProjectController {
             projectUsers.push(new ProjectUser(user:currUser, 
                                               projectRole: ProjectRole.OWNER))
         }
-        [projects: projects, projectUsers: projectUsers]
+        [projectName: projectName, projects: projects, projectUsers: projectUsers, mergeToProject: mergeToProject]
     }
 }
 

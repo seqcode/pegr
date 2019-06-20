@@ -50,7 +50,7 @@
         </div>
         <br>
         <label>Merge from</label>
-        <g:render template="overview" model="['projects':projects]"></g:render>
+        <g:render template="overview" model="['projects':mergeFromProjects]"></g:render>
     </div>
     <script>
         $("#nav-projects").addClass("active");

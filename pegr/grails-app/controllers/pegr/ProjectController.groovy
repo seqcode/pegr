@@ -298,22 +298,28 @@ class ProjectController {
     
     def confirmUsersInMergedProject(String projectName) {
         def projects = []
+        def mergeFromProjects = []
         if (session.checkedProject) {
             session.checkedProject.each {
                 def project = Project.get(it)
                 if (project) {
-                    projects.push(Project.get(it))
+                    mergeFromProjects.push(Project.get(it))
                 }
             }
         }
-        if (projects.size() == 0) {
+        if (mergeFromProjects.size() == 0) {
             flash.message = "No projects to merge!"
             redirect(action: "all")
         }
+       
+        // add mergeToProject
         def mergeToProject = Project.where {name == projectName}.get(max:1)
-        if (mergeToProject) {
-            projects.push(mergeToProject)
+        if (mergeToProject && !projects.contains(mergeToProject)) {
+            projects = [mergeFromProjects, mergeToProject]
+        } else {
+            projects = mergeFromProjects
         }
+        
         def projectUsers = []
         projects.each { p ->
             def oldProjectUsers = ProjectUser.where {project == p}.list()
@@ -325,12 +331,14 @@ class ProjectController {
                 }
             }
         }
+        
+        // add current user
         def currUser = springSecurityService.currentUser
         if (!projectUsers.collect { it.user }.contains(currUser)) {
             projectUsers.push(new ProjectUser(user:currUser, 
                                               projectRole: ProjectRole.OWNER))
         }
-        [projectName: projectName, projects: projects, projectUsers: projectUsers, mergeToProject: mergeToProject]
+        [projectName: projectName, mergeFromProjects: mergeFromProjects, projectUsers: projectUsers, mergeToProject: mergeToProject]
     }
 }
 

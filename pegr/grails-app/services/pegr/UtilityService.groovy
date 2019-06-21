@@ -22,7 +22,7 @@ class UtilityService {
     * @return a collection of maps with both "id" and "text" to be the string.
     */
     def stringToSelect2Data(def strings) {
-        return strings.collect {s -> [id: s, text: s]}
+        return strings.findAll {it && it.trim() != ""}.collect {s -> [id: s, text: s]}
     }
     
    /**

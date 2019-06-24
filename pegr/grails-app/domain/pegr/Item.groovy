@@ -58,7 +58,7 @@ class Item {
         parent nullable: true
         customizedFields nullable: true
         project nullable: true
-        status nullable: true
+        status nullable: false
         lastUpdated nullable: true
     }
     

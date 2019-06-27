@@ -46,11 +46,18 @@
                             </h4>
                         </div>
                     </div>
-                    <g:if test="${cohort.notes}">
+                    <br>
                     <div>
-                         <p><i>Notes: ${cohort.notes}</i></p>
+                        <p><i>Notes:</i> 
+                        <span class="cohort-notes-input" style="display:none">
+                            <g:hiddenField class="cohort-id" name="id" value="${cohort.id}"></g:hiddenField>
+                            <input class="cohort-notes-text" name="notes" value="${cohort.notes}">
+                            <button class="cohort-notes-save btn btn-primary">Save</button>
+                            <button class="cohort-notes-cancel btn btn-default">Cancel</button>
+                        </span>                            
+                        <i class="cohort-notes-show">${cohort.notes}</i> <button class="cohort-notes-edit btn btn-default">Edit</button>
+                        </p>
                     </div>
-                    </g:if>
                     <div id="collapse${n}" class="panel-collapse collapse">
                         <g:render template="/project/sampleTable" model="['sampleList':cohort.samples, 'project':project]" />
                     </div>
@@ -207,6 +214,35 @@
                 url: '/pegr/project/saveNotesAjax'
             });
         }
+        
+        $(".cohort-notes-edit").click(function(){
+            var div = $(this).closest("div");
+            div.find(".cohort-notes-show").hide()
+            $(this).hide();
+            div.find(".cohort-notes-input").show();
+        });
+
+        $(".cohort-notes-save").click(function(){
+            var div = $(this).closest("div");
+            var notes = div.find(".cohort-notes-text").val();
+            var id = div.find(".cohort-id").val();
+            $.ajax({ url: "/pegr/project/updateCohortNotesAjax?cohortId=" + id + "&notes=" + notes,
+                success: function(result) {
+                    div.find(".cohort-notes-show").text(result);
+                    div.find(".cohort-notes-text").val(result);
+                    div.find(".cohort-notes-show").show();
+                    div.find(".cohort-notes-edit").show();
+                    div.find(".cohort-notes-input").hide();
+                }                
+            });
+        });
+
+        $(".cohort-notes-cancel").click(function(){
+            var div = $(this).closest("div");
+            div.find(".cohort-notes-show").show();
+            div.find(".cohort-notes-edit").show();
+            div.find(".cohort-notes-input").hide();
+        });
 	</script>
 </body>
 </html>

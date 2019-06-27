@@ -211,7 +211,19 @@ class ProjectService {
         fromProject.delete()
     }
     
-    
+    @Transactional
+    def updateCohortNotes(Long cohortId, String notes) {
+        def cohort = SequencingCohort.get(cohortId)
+        if (!cohort) {
+            throw new ProjectException(message: "Sequencing cohort not found!")
+        }
+        notes = notes.trim()
+        if (notes == "") {
+            notes = null
+        }
+        cohort.notes = notes
+        cohort.save()
+    }
     
 
 }

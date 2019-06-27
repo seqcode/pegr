@@ -340,6 +340,11 @@ class ProjectController {
         }
         [projectName: projectName, mergeFromProjects: mergeFromProjects, projectUsers: projectUsers, mergeToProject: mergeToProject]
     }
+    
+    def updateCohortNotesAjax(Long cohortId, String notes) {
+        projectService.updateCohortNotes(cohortId, notes)
+        render notes
+    }
 }
 
 

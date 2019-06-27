@@ -169,12 +169,20 @@ class SampleController {
         [antibody: cmd, item: item, sampleId: sampleId, antibodyId: antibodyId, itemTypeOptions: itemTypeOptions]
     }
 
-    def updateAntibody(Long sampleId, Long antibodyId, AntibodyCommand cmd, Item item) {
+    def updateAntibody(Long sampleId, Long antibodyId, AntibodyCommand cmd, Item item, String ifUpdateItem) {
         try {
             if (antibodyId) {
-                antibodyService.update(cmd, item)
+                if (ifUpdateItem == "yes") {
+                    antibodyService.update(cmd, item)
+                } else {
+                    antibodyService.update(cmd)
+                }
             } else {
-                antibodyService.saveInSample(sampleId, cmd, item)
+                if (ifUpdateItem == "yes") {
+                    antibodyService.saveInSample(sampleId, cmd, item)
+                } else {
+                    antibodyService.saveInSample(sampleId, cmd)
+                }
             }
             flash.message = "Antibody update!"
             redirect(action: "edit", params: [sampleId: sampleId])
@@ -246,20 +254,27 @@ class SampleController {
         [cellSource: cmd, item: item, sampleId: sampleId, cellSourceId: cellSourceId, itemTypeOptions: itemTypeOptions]
     }
 
-    def updateCellSource(Long sampleId, Long cellSourceId, CellSourceCommand cmd, Item item) {
+    def updateCellSource(Long sampleId, Long cellSourceId, CellSourceCommand cmd, Item item, String ifUpdateItem) {
         try {
             if (cellSourceId) {
-                cellSourceService.update(cmd, item)
+                if (ifUpdateItem == "yes") {
+                    cellSourceService.update(cmd, item)
+                } else {
+                    cellSourceService.update(cmd)
+                }
             } else {
-                cellSourceService.saveInSample(sampleId, cmd, item)
+                if (ifUpdateItem == "yes") {
+                    cellSourceService.saveInSample(sampleId, cmd, item)
+                } else {
+                    cellSourceService.saveInSample(sampleId, cmd)
+                }
             }
-            itemService.updateCustomizedFields(item, params)
             flash.message = "Cell source information updated!"
-            redirect(action:"edit", params:[sampleId: sampleId])
+            redirect(action:"edit", params:[sampleId: sampleId])  
         } catch (CellSourceException e) {
             flash.message = e.message
             redirect(action: "editCellSource", params: [sampleId: sampleId, cellSourceId: cellSourceId])
-        }
+        }           
     }
 
     def searchCellSource(Long sampleId) {

@@ -51,7 +51,7 @@
 </div>
 <div>
     <label>Target</label>
-    <select name="target" class="target tag-select2 textcontrol" style="width: 150px" required>
+    <select name="target" class="target tag-select2 textcontrol" style="width: 150px">
         <option value="${antibody?.target}">${antibody?.target}</option>
     </select>
 </div>

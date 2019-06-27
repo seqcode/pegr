@@ -129,7 +129,7 @@ class SampleController {
                 redirect(action: "edit", params: [sampleId: sampleId])
             } catch(SampleException e) {
                 flash.message = e.message
-                redirect(action: "editProtocol", params: [sampleId: sampleId])
+                redirect(action: "editTarget", params: [sampleId: sampleId])
             }
         } else {
             render(view: "/404")

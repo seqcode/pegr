@@ -161,7 +161,12 @@ class QfileUploadService {
 
         def invoice = getInvoice(data.service, data.invoice)
 
-        def target = antibodyService.getTarget(data.target, data.targetType, data.nTag, data.cTag)
+        def target 
+        try {
+            target = antibodyService.getTarget(data.target, data.targetType, data.nTag, data.cTag)
+        } catch(AntibodyException e) {
+            throw new QfileUploadException(message: e.message)
+        }
 
         def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.abConc)
 

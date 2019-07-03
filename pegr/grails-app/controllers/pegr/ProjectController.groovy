@@ -13,11 +13,15 @@ class ProjectController {
 		def currentUser = springSecurityService.currentUser
 		
         // query the user's the projects
+        if (!params.sort) {
+            params.sort = "dateCreated"
+            params.order = "desc"
+        }
         def c = ProjectUser.createCriteria()
         def projects = c.list(max: max, offset: offset) {
             eq("user", currentUser)
             project {
-                order("dateCreated", "desc")
+                order(params.sort, params.order)
             }
         }.collect{it.project}
         // get the total count of projects linked to the user

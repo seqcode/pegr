@@ -2,9 +2,9 @@
     <thead>
         <tr>
             <th></th>
-            <th>Name</th>
+            <g:sortableColumn property="name" title="Name"></g:sortableColumn>
             <th>Description</th>
-            <th>Date Created</th>
+            <g:sortableColumn property="dateCreated" defaultOrder="desc" title="Date Created"></g:sortableColumn>
             <th>Sequencing Cohorts</th>
             <th>Status</th>
         </tr>
@@ -22,7 +22,7 @@
                 </tr>
             </g:if>
             <g:else>
-                <g:each in="${project.cohorts}" var="cohort" status="n">
+                <g:each in="${project.cohorts.sort { it.name }.reverse()}" var="cohort" status="n">
                     <g:if test="${n>0}"><tr></g:if>
                     <td>${cohort.name} <g:if test="${cohort.report}"><g:link controller="report" action="show" id="${cohort.report.id}" class="edit">Report</g:link></g:if></td>
                     <!-- ADDED COLUMN DATA FOR COHORT RUN STATUS -->

@@ -27,50 +27,52 @@
                 </div>
             </g:if>
         </h4>
-        <ul>
-            <li>Strain: ${sample.cellSource?.strain?.name}</li>
-            <li>Species: ${sample.cellSource?.strain?.species}</li>
+        <table class="table table-bordered">
+            <tbody>
+            <tr><td>Strain</td><td> ${sample.cellSource?.strain?.name}</td></tr>
+            <tr><td>Species</td><td> ${sample.cellSource?.strain?.species}</td></tr>
             <g:if test="${sample.cellSource?.strain?.parent}">
-                <li>Parent Strain: ${sample.cellSource?.strain?.parent}</li>
+                <tr><td>Parent Strain</td><td> ${sample.cellSource?.strain?.parent}</td></tr>
             </g:if>
-            <li>Genotype: ${sample.cellSource?.strain?.genotype}</li>
+            <tr><td>Genotype</td><td> ${sample.cellSource?.strain?.genotype}</td></tr>
             <g:if test="${sample.cellSource?.strain?.geneticModification}">
-                <li>Genetic Modifications: ${sample.cellSource?.strain?.geneticModification}</li>
+                <tr><td>Genetic Modifications</td><td> ${sample.cellSource?.strain?.geneticModification}</td></tr>
             </g:if>          
 
             <g:if test="${sample.cellSource?.sex}">
-            <li>Sex:${sample.cellSource.sex}	</li>
+            <tr><td>Sex</td><td>${sample.cellSource.sex}</td></tr>
             </g:if>
 
             <g:if test="${sample.cellSource?.age}">
-            <li>Age:${sample.cellSource.age}	</li>
+            <tr><td>Age</td><td>${sample.cellSource.age}</td></tr>
             </g:if>
 
             <g:if test="${sample.cellSource?.tissue}">
-            <li>Tissue:${sample.cellSource.tissue}	</li>
+            <tr><td>Tissue</td><td>${sample.cellSource.tissue}</td></tr>
             </g:if>
 
             <g:if test="${sample.cellSource?.histology}">
-            <li>Histology:${sample.cellSource.histology}	</li>
+            <tr><td>Histology</td><td>${sample.cellSource.histology}</td></tr>
             </g:if>
 
-            <li>Provider: 
+            <tr><td>Provider</td><td> 
             <g:if test="${sample.cellSource?.providerUser}">
                ${sample.cellSource.providerUser}
             </g:if>
             <g:if test="${sample.cellSource?.providerLab}">
                 , ${sample.cellSource.providerLab}
             </g:if>
-            </li>
+            </td></tr>
 
             <g:if test="${sample.cellSource?.biologicalSourceId}">
-            <li>Biological Source ID: ${sample.cellSource.biologicalSourceId}</li>
+            <tr><td>Biological Source ID</td><td> ${sample.cellSource.biologicalSourceId}</td></tr>
             </g:if>
 
             <g:if test="${sample?.spikeInCellSource}">
-            <li>Spike In Cell Source: ${sample?.spikeInCellSource?.encodeAsHTML()}</li>
+            <tr><td>Spike In Cell Source</td><td> ${sample?.spikeInCellSource?.encodeAsHTML()}</td></tr>
             </g:if>
-        </ul>
+            </tbody>
+        </table>
     </div>
     <div id="antibody" class="col-sm-3">
         <h4>Antibody 
@@ -100,102 +102,107 @@
                 </div>
             </g:if>
         </h4>
-        <ul>
+        <table class="table table-bordered">
+            <tbody>
             <g:if test="${sample.antibody?.company}">
-            <li>Company: ${sample.antibody?.company}</li>
+            <tr><td>Company</td><td> ${sample.antibody?.company}</td></tr>
             </g:if>
 
             <g:if test="${sample.antibody?.catalogNumber}">
-            <li>Catalog Number: ${sample.antibody.catalogNumber}</li>
+            <tr><td>Catalog Number</td><td> ${sample.antibody.catalogNumber}</td></tr>
             </g:if>
 
             <g:if test="${sample.antibody?.lotNumber}">
-            <li>Lot Number:${sample.antibody.lotNumber}</li>
+            <tr><td>Lot Number</td><td>${sample.antibody.lotNumber}</td></tr>
             </g:if>
 
             <g:if test="${sample.antibody?.abHost}">
-            <li>Antibody Host: ${sample.antibody?.abHost}</li>
+            <tr><td>Antibody Host</td><td> ${sample.antibody?.abHost}</td></tr>
             </g:if>
 
             <g:if test="${sample.antibody?.immunogene}">
-            <li>Immunogene: ${sample.antibody.immunogene}</li>
+            <tr><td>Immunogene</td><td> ${sample.antibody.immunogene}</td></tr>
             </g:if>
 
             <g:if test="${sample.antibody?.clonal}">
-            <li>Mono/Poly Clonal: ${sample.antibody.clonal}</li>
+            <tr><td>Mono/Poly Clonal</td><td> ${sample.antibody.clonal}</td></tr>
             </g:if>
 
             <g:if test="${sample.antibody?.igType}">
-            <li>Ig Type: ${sample.antibody?.igType}</li>
+            <tr><td>Ig Type</td><td> ${sample.antibody?.igType}</td></tr>
             </g:if>  
             
             <g:if test="${sample.antibody?.concentration}">
-            <li>Concentration (ug/ul): ${sample.antibody?.concentration}</li>
+            <tr><td>Concentration (ug/ul)</td><td> ${sample.antibody?.concentration}</td></tr>
             </g:if>
 
             <g:if test="${sample.antibody?.externalId}">
-            <li>External ID: ${sample.antibody.externalId}</li>
+            <tr><td>External ID</td><td> ${sample.antibody.externalId}</td></tr>
             </g:if>  
 
             <g:if test="${notes?.containsKey('Volume Sent (ul)')}">
-            <li>Volume Sent (ul): ${notes['Volume Sent (ul)']}</li>
+            <tr><td>Volume Sent (ul)</td><td> ${notes['Volume Sent (ul)']}</td></tr>
             </g:if> 
             
             <g:if test="${notes?.containsKey('Usage Per ChIP (ug)')}">
-            <li>Usage Per ChIP (ug): ${notes['Usage Per ChIP (ug)']}</li>
+            <tr><td>Usage Per ChIP (ug)</td><td> ${notes['Usage Per ChIP (ug)']}</td></tr>
             </g:if> 
             
             <g:if test="${notes?.containsKey('Usage Per ChIP (ul)')}">
-            <li>Usage Per ChIP (ul): ${notes['Usage Per ChIP (ul)']}</li>
+            <tr><td>Usage Per ChIP (ul)</td><td> ${notes['Usage Per ChIP (ul)']}</td></tr>
             </g:if> 
                    
             <g:if test="${sample.antibody?.note}">
-            <li>Notes: ${sample.antibody?.note}</li>
+            <tr><td>Notes</td><td> ${sample.antibody?.note}</td></tr>
             </g:if>
-        </ul>
+            </tbody>
+        </table>
         <h4>Target <g:if test="${sampleEditAuth}"><g:link action="editTarget" params="[sampleId: sample.id]" class="edit">Edit</g:link></g:if>
         </h4>
-        <ul>
-            <li>Target: ${sample.target?.name}</li>
+        <table class="table table-bordered">
+            <tbody>
+            <tr><td>Target</td><td> ${sample.target?.name}</td></tr>
             <g:if test="${sample.target?.targetType}">
-            <li>Type: ${sample.target.targetType}</li>
+            <tr><td>Type </td><td>${sample.target.targetType}</td></tr>
             </g:if>
             <g:if test="${sample.target?.cTermTag}">
-            <li>C-Tag: ${sample.target.cTermTag}</li>
+            <tr><td>C-Tag </td><td>${sample.target.cTermTag}</td></tr>
             </g:if>
             <g:if test="${sample.target?.nTermTag}">
-            <li>N-Tag: ${sample.target.nTermTag}</li>
+            <tr><td>N-Tag </td><td>${sample.target.nTermTag}</td></tr>
             </g:if>
             <g:if test="${sample.target?.note}">
-            <li>Target Notes: ${sample.target.note}</li>
+            <tr><td>Target Notes </td><td>${sample.target.note}</td></tr>
             </g:if>
-        </ul>
+            </tbody></table>
     </div>
 
     <div id="protocol" class="col-sm-3">
         <h4>Protocol <g:if test="${sampleEditAuth}"><g:link action="editProtocol" params="[sampleId: sample.id]" class="edit">Edit</g:link></g:if></h4>   
-        <ul>
-            <li>Assay: ${sample.assay}</li>
+        <table class="table table-bordered">
+            <tbody>
+            <tr><td>Assay</td><td> ${sample.assay}</td></tr>
             
-            <li>Growth Media: ${sample.growthMedia}	</li>
+            <tr><td>Growth Media</td><td> ${sample.growthMedia}	</td></tr>
             
-            <li>Treatments:
+            <tr><td>Treatments</td><td>
                 <g:each in="${sample?.treatments}" var="c">
                     ${c}
                 </g:each>	
-            </li>
+            </td></tr>
 
             <g:if test="${sample?.prtclInstSummary}">
                 <g:if test="${notes['Resin']}">
-                <li>Resin: ${notes['Resin']}</li>
+                <tr><td>Resin</td><td> ${notes['Resin']}</td></tr>
                 </g:if>
                 <g:if test="${notes['PCR Cycle']}">
-                <li>PCR Cycle: ${notes['PCR Cycle']}</li>
+                <tr><td>PCR Cycle</td><td> ${notes['PCR Cycle']}</td></tr>
                 </g:if>
-                <li>Technician: ${sample?.prtclInstSummary?.user?.fullName}</li>
-                <li>Date: <g:formatDate format="yyyy-MM-dd" date="${sample?.prtclInstSummary?.endTime}"/></li>
+                <tr><td>Technician</td><td> ${sample?.prtclInstSummary?.user?.fullName}</td></tr>
+                <tr><td>Date</td><td> <g:formatDate format="yyyy-MM-dd" date="${sample?.prtclInstSummary?.endTime}"/></td></tr>
             </g:if>
-        </ul>
+            </tbody>
+        </table>
         
         <g:if test="${protocols && protocols.size()>0}">
         <div class="dropdown">
@@ -234,28 +241,30 @@
                 <g:link controller="sample" action="editOther" params="[sampleId:sample?.id]" class="edit">Edit</g:link>
             </g:if>
         </h4>
-        <ul>
-            <li>Index: ${sample.sequenceIndicesString} (${sample.sequenceIndicesIdString})</li>
+        <table class="table table-bordered">
+            <tbody>
+            <tr><td>Index</td><td> ${sample.sequenceIndicesString} (${sample.sequenceIndicesIdString})</td></tr>
 
-            <li>Chromosome (ug): <g:if test="${sample?.chromosomeAmount}">${sample.chromosomeAmount}</g:if></li>
+            <tr><td>Chromosome (ug)</td><td> <g:if test="${sample?.chromosomeAmount}">${sample.chromosomeAmount}</g:if></td></tr>
 
-            <li>Avail. Cell# per aliquot (M): <g:if test="${sample?.cellNumber}">${sample.cellNumber}</g:if></li>
+            <tr><td>Avail. Cell# per aliquot (M)</td><td> <g:if test="${sample?.cellNumber}">${sample.cellNumber}</g:if></td></tr>
 
-            <li>Volume per aliquot (ul): <g:if test="${sample?.volume}">${sample.volume}</g:if></li>
+            <tr><td>Volume per aliquot (ul)</td><td> <g:if test="${sample?.volume}">${sample.volume}</g:if></td></tr>
 
-            <li>Requested Tags (M): <g:if test="${sample?.requestedTagNumber}">${sample.requestedTagNumber}</g:if></li>
+            <tr><td>Requested Tags (M)</td><td> <g:if test="${sample?.requestedTagNumber}">${sample.requestedTagNumber}</g:if></td></tr>
 
-            <li>Requested genomes: ${sample?.requestedGenomes}</li>
+            <tr><td>Requested genomes</td><td> ${sample?.requestedGenomes}</td></tr>
             
-            <li>Send data to: ${sample?.sendDataTo}</li>
+            <tr><td>Send data to</td><td> ${sample?.sendDataTo}</td></tr>
             
             <g:if test="${sample?.publicationReference}">
-            <li>Publication Reference: ${sample.publicationReference}</li>
+            <tr><td>Publication Reference</td><td> ${sample.publicationReference}</td></tr>
             </g:if>
             
             <g:if test="${sample.note}">
-            <li>Notes: ${sample.note}</li>
+            <tr><td>Notes</td><td> ${sample.note}</td></tr>
             </g:if>
-        </ul>
+            </tbody>
+        </table>
     </div>  
 </div>

@@ -245,9 +245,18 @@ class QfileUploadService {
         if (!project || !seqExp.sequenceRun) {
             return
         }
-        def cohortName = "${seqExp.sequenceRun.id}_${service}-${invoice}"
-        def cohort = SequencingCohort.findByNameAndProjectAndRun(cohortName, project, seqExp.sequenceRun)
+
+        def cohort = SequencingCohort.findByProjectAndRun(project, seqExp.sequenceRun)
         if (!cohort) {
+            def cohortNameDefault = "${seqExp.sequenceRun.id}_${service}-${invoice}"
+            def cohortName = cohortNameDefault
+            def cohortWithName = SequencingCohort.findByName(cohortName)
+            def count = 1
+            while (cohortWithName) {
+                cohortName = cohortNameDefault + "_" + count
+                cohortWithName = SequencingCohort.findByName(cohortName)
+                count++
+            }
             cohort = new SequencingCohort(project: project, run: seqExp.sequenceRun, name: cohortName)
             cohort.save()
         }

@@ -207,7 +207,7 @@ class AntibodyService {
 	    if (!target) {
 	        def type = getTargetType(targetTypeStr)
 	        target = new Target(name: targetStr, cTermTag: cTag, nTermTag: nTag, targetType: type).save( failOnError: true)
-        } else if(target.targetType?.name != targetTypeStr) {
+        } else if(target.targetType?.name?.toLowerCase() != targetTypeStr?.toLowerCase()) {
             throw new AntibodyException(message: "The target in the database has a different target type!")
         }
 	    return target

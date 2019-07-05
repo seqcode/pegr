@@ -5,10 +5,13 @@ import grails.transaction.Transactional
 
 @Transactional(readOnly = true)
 class ${className}Controller {
-
+    
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max, String str) {
+        if (params.merge == "Merge") {
+            redirect(action:"mergeSearch", params: [str: str])
+        }
         if (str && ${className}.hasProperty("name")) {
             def c = ${className}.createCriteria()
             def listParams = [
@@ -101,7 +104,57 @@ class ${className}Controller {
             redirect(controller: '${className}Admin', action: 'index')
         }
     }
+    
+    def cancelMerge() {
+        if (session.checked${className}) {
+            session.checked${className} = null
+        }        
+        redirect(action: "index")
+    }
+    
+    def clearChecked${className}Ajax(){
+        if (session.checked${className}) {
+            session.checked${className} = null
+        }
+        render true
+    }
 
+    def addChecked${className}Ajax(Long id) {
+        if (!session.checked${className}) {
+            session.checked${className} = []
+        }
+        if (!(id in session.checked${className})) {
+            session.checked${className} << id
+        }
+        render session.checked${className}.size()
+    }
+
+    def removeChecked${className}Ajax(Long id) {
+        if (id in session.checked${className}) {
+            session.checked${className}.remove(id)
+        }
+        render session.checked${className}.size()
+    }
+
+    def showChecked(){
+        def list = []
+        if (session.checked${className}) {
+            session.checked${className}.each {
+                def ${className} = ${className}.get(it)
+                if (${className}) {
+                    list.push(${className}.get(it))
+                }
+            }
+        }
+        if (list.size() == 0) {
+            flash.message = "No ${className}s to merge!"
+            redirect(action: "index")
+        }
+        
+        [list: list]
+    }
+    
+    
     protected void notFound() {
         request.withFormat {
             form multipartForm {

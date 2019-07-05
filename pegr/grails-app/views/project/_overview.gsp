@@ -2,9 +2,9 @@
     <thead>
         <tr>
             <th></th>
-            <g:sortableColumn property="name" title="Name"></g:sortableColumn>
+            <g:sortableColumn property="name" title="Name" params="${params}"></g:sortableColumn>
             <th>Description</th>
-            <g:sortableColumn property="dateCreated" defaultOrder="desc" title="Date Created"></g:sortableColumn>
+            <g:sortableColumn property="dateCreated" defaultOrder="desc" title="Date Created" params="${params}"></g:sortableColumn>
             <th>Sequencing Cohorts</th>
             <th>Status</th>
         </tr>

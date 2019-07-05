@@ -15,6 +15,7 @@
         <g:form class="pull-right" style="padding:3px 0px">
             <input name="str">
             <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>
+            <g:submitButton name="merge" value="Merge" class="edit"></g:submitButton>
         </g:form>
 		<div id="list-${domainClass.propertyName}" class="content scaffold-list" role="main">
 			<h3><g:message code="default.list.label" args="[entityName]" /></h3>

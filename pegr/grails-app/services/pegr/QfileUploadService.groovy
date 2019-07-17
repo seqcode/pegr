@@ -25,6 +25,7 @@ class QfileUploadService {
 		def warnings = []
         def newProjectCount = 0
         def MAX_NEW_PROJECT_COUNT = 10
+        def projectNames = []
         
 		while ((rawdata = reader.readNext()) != null) {
 		    ++lineNo
@@ -36,9 +37,13 @@ class QfileUploadService {
             cleanRawData(rawdata)
             def data = getNamedData(rawdata)
             def projectName = getProjectName(data.projectName, data.service, data.invoice)
-            def project = Project.findByName(projectName)
-	        if (!project) {
-                newProjectCount++
+            if (!projectNames.contains(projectName)) {
+                projectNames.push(projectName)
+            
+                def project = Project.findByName(projectName)
+                if (!project) {
+                    newProjectCount++
+                }
             }
         }
         if (newProjectCount > MAX_NEW_PROJECT_COUNT) {

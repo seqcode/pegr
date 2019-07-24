@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage
 import groovy.time.TimeCategory
 import groovy.json.*
 import grails.converters.*
-import org.apache.commons.io.IOUtils
 import grails.util.Holders
 
 class SequenceRunController {
@@ -362,20 +361,37 @@ class SequenceRunController {
                 }
                 File fileDest = new File(folder, filename)
                 mpf.transferTo(fileDest)
+                
+                def filepath = fileDest.getPath()
+                def startLine = params.int("startLine")
+                def endLine = params.int("endLine")
+                def laneLine = params.int("laneLine")
+                
+                def csvNames = qfileUploadService.convertXlsxToCsv(folder, filepath, params.sampleSheet, params.laneSheet)
+                
+                // check file for potential errors, e.g. unreasonal number of new projects
+                def warnings = qfileUploadService.checkFile(csvNames[params.sampleSheet],
+                                             startLine,
+                                            endLine)
+                
+                // if warnings found, render confirm page before procedding
+                if (warnings.size() > 0) {
+                    render(view:"confirmXlsx", model:[filename: filename, sampleSheet: csvNames[params.sampleSheet], laneSheet: csvNames[params.laneSheet], startLine: startLine, endLine: endLine, laneLine: laneLine, warnings: warnings])
+                    return
+                }
+                
                 def user = springSecurityService.currentUser
                 def basicCheck = true
-                def messages = qfileUploadService.migrateXlsx(folder,
-                                        fileDest.getPath(),
-                                          params.sampleSheet,
-                                          params.laneSheet,
+                def messages = qfileUploadService.migrateXlsx(csvNames[params.sampleSheet],
+                                        csvNames[params.laneSheet],
                                           RunStatus.PREP,
-                                          params.int("startLine"),
-                                          params.int("endLine"),
-                                          params.int("laneLine"),
+                                          startLine,
+                                          endLine,
+                                          laneLine,
                                           basicCheck
                                          )
                 if (messages.size() == 0){
-                    flash.messageList = ["The xlsx file uploaded!",]
+                    flash.messageList = ["The xlsx file has been uploaded!",]
                 } else {
                     flash.messageList = messages
                 }
@@ -390,6 +406,34 @@ class SequenceRunController {
         redirect(action: "index")
     }
 
+    def continueXlsx() {
+        try {
+            def startLine = params.int("startLine")
+            def endLine = params.int("endLine")
+            def laneLine = params.int("laneLine")                
+            def user = springSecurityService.currentUser
+            def basicCheck = true
+            def messages = qfileUploadService.migrateXlsx(params.sampleSheet,
+                                      params.laneSheet,
+                                      RunStatus.PREP,
+                                      startLine,
+                                      endLine,
+                                      laneLine,
+                                      basicCheck
+                                     )
+            if (messages.size() == 0){
+                flash.messageList = ["The xlsx file has been uploaded!",]
+            } else {
+                flash.messageList = messages
+            }            
+        } catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            flash.messageList = ["Error uploading the file!"]
+        }
+
+        redirect(action: "index")
+    }
+    
     def convertCsv() {
         def filesroot = utilityService.getFilesRoot()
         try {
@@ -403,23 +447,65 @@ class SequenceRunController {
                 }
                 File fileDest = new File(folder, filename)
                 mpf.transferTo(fileDest)
+                
+                def filepath = fileDest.getPath()
+                def startLine = params.int("startLine")
+                def endLine = params.int("endLine")
+                
+                // check file for potential errors, e.g. unreasonal number of new projects
+                def warnings = qfileUploadService.checkFile(filepath,
+                                             startLine,
+                                            endLine)
+                
+                // if warnings found, render confirm page before procedding
+                if (warnings.size() > 0) {
+                    render(view:"confirmCsv", model:[filename: filename, filepath:filepath, startLine: startLine, endLine: endLine, warnings: warnings])
+                    return
+                }
+                
                 def user = springSecurityService.currentUser
                 def basicCheck = true
-                def results = qfileUploadService.migrateSamples(fileDest.getPath(),
+                def results = qfileUploadService.migrateSamples(filepath,
                                           RunStatus.PREP,
-                                          params.int("startLine"),
-                                          params.int("endLine"),
+                                          startLine,
+                                          endLine,
                                           basicCheck
                                          )
                 def messages = results.messages
                 if (messages.size() == 0){
-                    flash.messageList = ["CSV file uploaded!",]
+                    flash.messageList = ["The CSV file has been uploaded!",]
                 } else {
                     flash.messageList = messages
                 }
             } else {
                 flash.messageList = ["Only csv files are accepted!"]
             }
+        } catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            flash.messageList = ["Error uploading the file!"]
+        }
+
+        redirect(action: "index")
+    }
+    
+    def continueCsv() {
+        try {
+            def startLine = params.int("startLine")
+            def endLine = params.int("endLine")              
+            def user = springSecurityService.currentUser
+            def basicCheck = true
+            def results = qfileUploadService.migrateSamples(params.sampleSheet,
+                                      RunStatus.PREP,
+                                      startLine,
+                                      endLine,
+                                      basicCheck
+                                     )
+            def messages = results.messages
+            if (messages.size() == 0){
+                flash.messageList = ["The CSV file has been uploaded!",]
+            } else {
+                flash.messageList = messages
+            }            
         } catch(Exception e) {
             log.error "Error: ${e.message}", e
             flash.messageList = ["Error uploading the file!"]
@@ -538,12 +624,15 @@ class SequenceRunController {
             // remove the compressed file
             compressedFile.delete()
             webRequest.renderView = false
+            contentStream.close()
         } catch(Exception e) {
             render "Error!"
         } finally {
             response.getOutputStream().flush()
             response.getOutputStream().close()
-            IOUtils.closeQuietly(contentStream)
+            if (contentStream != null) {
+                contentStream.close()
+            }
         }
 
     }

@@ -200,8 +200,7 @@ class AntibodyController {
 
 }
 
-@grails.validation.Validateable
-class AntibodyCommand {
+class AntibodyCommand implements grails.validation.Validateable {
     Long antibodyId
     String company
     String catalogNumber

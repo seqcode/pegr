@@ -140,8 +140,7 @@ class ResponseMessage {
 /* 
  * Class that defines the underlying structure of input JSON data
  */
-@grails.validation.Validateable
-class StatsRegistrationCommand {
+class StatsRegistrationCommand implements grails.validation.Validateable {
     Long alignmentId
     Long run
     Long sample
@@ -159,8 +158,7 @@ class StatsRegistrationCommand {
     List datasets
 }
 
-@grails.validation.Validateable
-class QuerySampleRegistrationCommand {
+class QuerySampleRegistrationCommand implements grails.validation.Validateable {
     String userEmail // required
     Boolean preferredOnly
     Integer max
@@ -176,8 +174,7 @@ class QuerySampleRegistrationCommand {
     String target
 }
 
-@grails.validation.Validateable
-class QueryRunRegistrationCommand {
+class QueryRunRegistrationCommand implements grails.validation.Validateable {
     String userEmail // required
     Boolean preferredOnly
     Long runId // required

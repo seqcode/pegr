@@ -14,7 +14,7 @@
 
 <div>
     <label>Parent Strain</label>
-    <select name="parentStrain" class="parent-strain tag-select2" style="width: 150px" required>
+    <select name="parentStrain" class="parent-strain tag-select2" style="width: 150px">
         <option value="${cellSource?.parentStrain}" selected>${cellSource?.parentStrain}</option>
     </select>
 </div>

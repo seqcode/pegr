@@ -45,6 +45,7 @@
         $(document).ready(function(){
             $("#nav-metadata").addClass("active");
             $(".tag-select2").select2({
+                tags: true,
                 placeholder: tagPlaceholder
             });
             $.ajax({url: "/pegr/antibody/fetchTargetAjax", success: function(result){

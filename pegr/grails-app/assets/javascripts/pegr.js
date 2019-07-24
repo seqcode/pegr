@@ -67,7 +67,7 @@ function createSelect(tr, classname, data) {
     elem.hide();
     td.find("select").select2({
         data: data,
-        placeholder: tagPlaceholder,
+        placeholder: "Select or type",
         tags: true
     });
 }

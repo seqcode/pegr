@@ -10,34 +10,19 @@
     <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MEMBER">
     <div>
         <g:link action='index'  class="btn btn-info">My Projects</g:link>
-        <g:link action='all'  class="btn btn-info active"></span>All Projects</g:link>
+        <g:link action='all'  class="btn btn-info active">All Projects</g:link>
         <g:link action='create'  class="btn btn-info" ><span class="glyphicon glyphicon-plus"></span>Add Project</g:link>
     </div>
     </sec:ifAnyGranted>
     <g:form controller="project" action="search" class="pull-right">
         <input name="str">
         <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>
+        <g:submitButton name="merge" value="Merge" class="edit"></g:submitButton>
         <br>Search project name or description
     </g:form>
     <g:render template="overview" model="[projects:projects]" />
     <div class="pagination">
         <g:paginate next="Next" prev="Prev" controller="project" action="all" max="15" total="${totalCount ?: 0}" />
-    </div>
-     <script>
-        $("#nav-projects").addClass("active");
-        $(".label").each(function() {
-            if ($(this).text() == "ANALYZING") {
-                $(this).addClass("label-info");
-            } else if ($(this).text() == "COMPLETED") {
-                $(this).addClass("label-success");
-            } else if ($(this).text() == "QUEUE") {
-                $(this).addClass("label-warning");
-            } else if ($(this).text() == "FAILED") {
-                $(this).addClass("label-danger");
-            } else {
-                $(this).addClass("label-default");
-            }
-        });
-     </script>
+    </div>     
 </body>
 </html>

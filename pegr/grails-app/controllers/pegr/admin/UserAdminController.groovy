@@ -183,8 +183,7 @@ class UserAdminController {
     }
 }
 
-@grails.validation.Validateable
-class CreateUserCommand {
+class CreateUserCommand implements grails.validation.Validateable {
     String email
     Boolean sendEmail
 

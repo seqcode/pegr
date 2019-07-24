@@ -13,11 +13,15 @@ class ProjectController {
 		def currentUser = springSecurityService.currentUser
 		
         // query the user's the projects
+        if (!params.sort) {
+            params.sort = "dateCreated"
+            params.order = "desc"
+        }
         def c = ProjectUser.createCriteria()
         def projects = c.list(max: max, offset: offset) {
             eq("user", currentUser)
             project {
-                order("dateCreated", "desc")
+                order(params.sort, params.order)
             }
         }.collect{it.project}
         // get the total count of projects linked to the user
@@ -205,7 +209,7 @@ class ProjectController {
         render "success"
     }
     
-    def search(String str) {
+    def search(String str, String merge) {
         def c = Project.createCriteria()
         def listParams = [
                 max: params.max ?: 25,
@@ -219,9 +223,132 @@ class ProjectController {
                 ilike "description", "%${str}%"
             }
         }
-        [projects: projects, totalCount: projects.totalCount, str: str] 
+        if (merge == "Merge") {
+            def checkedCount = 0;
+            if (session.checkedProject) {
+                checkedCount = session.checkedProject.size()
+            }
+            render(view: "mergeSelect", model: [totalCount: projects.totalCount, projects: projects, str: str, checkedCount: checkedCount])
+        } else {
+            [projects: projects, totalCount: projects.totalCount, str: str] 
+        }
     }
     
+    def merge(UserRoleListCommand cmd) {
+        if (session.checkedProject) {
+            try {
+                def mergeToProjectId = projectService.mergeProjects(cmd.projectName, session.checkedProject, cmd.userRoles)
+                session.checkedProject = null
+                flash.message = "Success!"
+                redirect(action: "show", id: mergeToProjectId)
+            } catch (Exception e) {
+                flash.message = e.message 
+                redirect(action: "showChecked")
+            }
+        } else {
+            flash.message = "No projects selected to merge from!"
+            redirect(action: "all")
+        }
+    }
+    
+    def cancelMerge() {
+        if (session.checkedProject) {
+            session.checkedProject = null
+        }        
+        redirect(action: "all")
+    }
+    
+    def clearCheckedProjectAjax(){
+        if (session.checkedProject) {
+            session.checkedProject = null
+        }
+        render true
+    }
+
+    def addCheckedProjectAjax(Long id) {
+        if (!session.checkedProject) {
+            session.checkedProject = []
+        }
+        if (!(id in session.checkedProject)) {
+            session.checkedProject << id
+        }
+        render session.checkedProject.size()
+    }
+
+    def removeCheckedProjectAjax(Long id) {
+        if (id in session.checkedProject) {
+            session.checkedProject.remove(id)
+        }
+        render session.checkedProject.size()
+    }
+
+    def showChecked(){
+        def projects = []
+        if (session.checkedProject) {
+            session.checkedProject.each {
+                def project = Project.get(it)
+                if (project) {
+                    projects.push(Project.get(it))
+                }
+            }
+        }
+        if (projects.size() == 0) {
+            flash.message = "No projects to merge!"
+            redirect(action: "all")
+        }
+        
+        [projects: projects]
+    }
+    
+    def confirmUsersInMergedProject(String projectName) {
+        def projects = []
+        def mergeFromProjects = []
+        if (session.checkedProject) {
+            session.checkedProject.each {
+                def project = Project.get(it)
+                if (project) {
+                    mergeFromProjects.push(Project.get(it))
+                }
+            }
+        }
+        if (mergeFromProjects.size() == 0) {
+            flash.message = "No projects to merge!"
+            redirect(action: "all")
+        }
+       
+        // add mergeToProject
+        def mergeToProject = Project.where {name == projectName}.get(max:1)
+        if (mergeToProject && !projects.contains(mergeToProject)) {
+            projects = [mergeFromProjects, mergeToProject]
+        } else {
+            projects = mergeFromProjects
+        }
+        
+        def projectUsers = []
+        projects.each { p ->
+            def oldProjectUsers = ProjectUser.where {project == p}.list()
+            if (oldProjectUsers && oldProjectUsers.size() > 0) {
+                oldProjectUsers.each { pu ->
+                    if (!projectUsers.collect { it.user }.contains(pu.user)) {
+                        projectUsers.push(pu)
+                    }
+                }
+            }
+        }
+        
+        // add current user
+        def currUser = springSecurityService.currentUser
+        if (!projectUsers.collect { it.user }.contains(currUser)) {
+            projectUsers.push(new ProjectUser(user:currUser, 
+                                              projectRole: ProjectRole.OWNER))
+        }
+        [projectName: projectName, mergeFromProjects: mergeFromProjects, projectUsers: projectUsers, mergeToProject: mergeToProject]
+    }
+    
+    def updateCohortNotesAjax(Long cohortId, String notes) {
+        projectService.updateCohortNotes(cohortId, notes)
+        render notes
+    }
 }
 
 
@@ -272,4 +399,14 @@ class SampleListCommand {
     Long assayId
     Long projectId
     List<SampleCommand> samples = [].withLazyDefault { new SampleCommand() } 
+}
+
+class UserRoleCommand {
+    Long userId
+    String role
+}
+
+class UserRoleListCommand {
+    String projectName
+    List<UserRoleCommand> userRoles = [].withLazyDefault { new UserRoleCommand() } 
 }

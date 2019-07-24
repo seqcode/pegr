@@ -8,10 +8,10 @@ class History {
 	Integer objectId
 	String objectType
 	String action
-	String log
+	String notes
 
     static constraints = {
 		project nullable: true
-		log nullable: true, blank: true
+		notes nullable: true, blank: true
     }
 }

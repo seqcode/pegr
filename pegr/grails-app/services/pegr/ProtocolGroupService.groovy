@@ -7,6 +7,19 @@ class ProtocolGroupException extends RuntimeException {
 }
 
 class ProtocolGroupService {
+    
+    ProtocolGroup get(Serializable id) {
+        ProtocolGroup.get(id)
+    }
+
+    List<ProtocolGroup> list(Map args) {
+        ProtocolGroup.list(args)
+    }
+
+    Long count() {
+        ProtocolGroup.count()
+    }
+
     def springSecurityService
     
     @Transactional

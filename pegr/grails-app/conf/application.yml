@@ -65,6 +65,9 @@ grails:
             maxsize: 1000
     controllers:
         defaultScope: singleton
+        upload:
+            maxFileSize: 10000000
+            maxRequestSize: 10000000
     converters:
         encoding: UTF-8
     views:
@@ -86,11 +89,11 @@ endpoints:
 hibernate:
     cache:
         queries: false
-        use_second_level_cache: false
+        use_second_level_cache: true
         use_query_cache: false
         # region:
             # factory_class: 'org.hibernate.cache.ehcache.EhCacheRegionFactory' # Hibernate 4
-    flush.mode: 'manual' # OSIV session flush mode outside of transactional context
+    flush.mode: AUTO # OSIV session flush mode outside of transactional context
 dataSource:
     pooled: true
     jmxExport: true

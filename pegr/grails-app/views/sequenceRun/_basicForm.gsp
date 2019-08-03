@@ -4,7 +4,7 @@
 </div>
 <div>
     <label>Date</label>
-    <g:datePicker name="date" default="${run?.date ?: new Date()}"/>
+    <g:datePicker name="date" value="${run?.date ?: new Date()}"/>
 </div>
 <div>
     <label>Old Run No.</label>

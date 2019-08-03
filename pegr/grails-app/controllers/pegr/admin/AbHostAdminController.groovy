@@ -10,9 +10,26 @@ class AbHostAdminController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-    def index(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
-        respond abHostService.list(params), model:[abHostCount: abHostService.count()]
+    def index(Integer max, String str) {
+        if (str && AbHost.hasProperty("name")) {
+            def c = AbHost.createCriteria()
+            def listParams = [
+                    max: max ?: 25,
+                    sort: params.sort ?: "id",
+                    order: params.order ?: "desc",
+                    offset: params.offset
+                ]
+            def likeStr = "%" + str + "%"
+            def items = c.list(listParams) {
+                or {
+                    ilike "name", likeStr
+                }
+            }
+            respond items, model:[AbHostCount: items.totalCount, str: str]
+        } else {       
+            params.max = Math.min(max ?: 25, 100)
+            respond AbHost.list(params), model:[AbHostCount: AbHost.count()]
+        }
     }
 
     def show(Long id) {

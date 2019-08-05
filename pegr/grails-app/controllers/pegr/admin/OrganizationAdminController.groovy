@@ -26,10 +26,10 @@ class OrganizationAdminController {
                     ilike "name", likeStr
                 }
             }
-            respond items, model:[organizationCount: items.totalCount, str: str]
+            [organizationInstanceList: items, organizationCount: items.totalCount, str: str]
         } else {       
             params.max = Math.min(max ?: 25, 100)
-            respond Organization.list(params), model:[organizationCount: Organization.count()]
+            [organizationInstanceList: Organization.list(params), organizationCount: Organization.count()]
         }
     }
 

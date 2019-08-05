@@ -351,8 +351,7 @@ class SequenceRunController {
     def convertXlsx() {
         def filesroot = utilityService.getFilesRoot()
         try {
-            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;
-            def mpf = mpr.getFile("file");
+            def mpf = request.getFile( "file" )
             String filename = mpf.getOriginalFilename();
             if(!mpf?.empty && filename[-5..-1] == ".xlsx") {
                 File folder = new File(filesroot, 'QueueFiles');
@@ -437,8 +436,7 @@ class SequenceRunController {
     def convertCsv() {
         def filesroot = utilityService.getFilesRoot()
         try {
-            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;
-            def mpf = mpr.getFile("file");
+            def mpf = request.getFile( "file" )
             String filename = mpf.getOriginalFilename();
             if(!mpf?.empty && filename[-4..-1] == ".csv") {
                 File folder = new File(filesroot, 'QueueFiles');

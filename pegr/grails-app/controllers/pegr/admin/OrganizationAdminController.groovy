@@ -34,11 +34,11 @@ class OrganizationAdminController {
     }
 
     def show(Long id) {
-        respond organizationService.get(id)
+        [organizationInstance: organizationService.get(id)]
     }
 
     def create() {
-        respond new Organization(params)
+        [organizationInstance: new Organization(params)]
     }
 
     def save(Organization organization) {
@@ -64,7 +64,7 @@ class OrganizationAdminController {
     }
 
     def edit(Long id) {
-        respond organizationService.get(id)
+        [organizationInstance: organizationService.get(id)]
     }
 
     def update(Organization organization) {

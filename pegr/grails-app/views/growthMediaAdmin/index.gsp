@@ -22,7 +22,7 @@
             <f:table collection="${growthMediaInstanceList}" />
 
             <div class="pagination">
-                <g:paginate total="${growthMediaCount ?: 0}" params="${params}/>
+                <g:paginate total="${growthMediaCount ?: 0}" params="${params}"/>
             </div>
         </div>
     </body>

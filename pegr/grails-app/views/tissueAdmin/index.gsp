@@ -22,7 +22,7 @@
             <f:table collection="${tissueInstanceList}" />
 
             <div class="pagination">
-                <g:paginate total="${tissueCount ?: 0}" params="${params}/>
+                <g:paginate total="${tissueCount ?: 0}" params="${params}"/>
             </div>
         </div>
     </body>

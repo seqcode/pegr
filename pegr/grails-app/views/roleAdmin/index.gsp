@@ -22,7 +22,7 @@
             <f:table collection="${roleInstanceList}" />
 
             <div class="pagination">
-                <g:paginate total="${roleCount ?: 0}" params="${params}/>
+                <g:paginate total="${roleCount ?: 0}" params="${params}"/>
             </div>
         </div>
     </body>

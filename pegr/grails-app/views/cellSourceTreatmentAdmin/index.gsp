@@ -22,7 +22,7 @@
             <f:table collection="${cellSourceTreatmentInstanceList}" />
 
             <div class="pagination">
-                <g:paginate total="${cellSourceTreatmentCount ?: 0}" params="${params}/>
+                <g:paginate total="${cellSourceTreatmentCount ?: 0}" params="${params}"/>
             </div>
         </div>
     </body>

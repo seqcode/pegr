@@ -22,7 +22,7 @@
             <f:table collection="${igTypeInstanceList}" />
 
             <div class="pagination">
-                <g:paginate total="${igTypeCount ?: 0}" params="${params}/>
+                <g:paginate total="${igTypeCount ?: 0}" params="${params}"/>
             </div>
         </div>
     </body>

@@ -22,7 +22,7 @@
             <f:table collection="${alignTypeInstanceList}" />
 
             <div class="pagination">
-                <g:paginate total="${alignTypeCount ?: 0}" params="${params}/>
+                <g:paginate total="${alignTypeCount ?: 0}" params="${params}"/>
             </div>
         </div>
     </body>

@@ -22,7 +22,7 @@
             <f:table collection="${abHostInstanceList}" />
 
             <div class="pagination">
-                <g:paginate total="${abHostCount ?: 0}" params="${params}/>
+                <g:paginate total="${abHostCount ?: 0}" params="${params}"/>
             </div>
         </div>
     </body>

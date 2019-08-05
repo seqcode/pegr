@@ -22,7 +22,7 @@
             <f:table collection="${readTypeInstanceList}" />
 
             <div class="pagination">
-                <g:paginate total="${readTypeCount ?: 0}" />
+                <g:paginate total="${readTypeCount ?: 0}" params="${params}/>
             </div>
         </div>
     </body>

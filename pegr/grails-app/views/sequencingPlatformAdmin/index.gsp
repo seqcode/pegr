@@ -22,7 +22,7 @@
             <f:table collection="${sequencingPlatformInstanceList}" />
 
             <div class="pagination">
-                <g:paginate total="${sequencingPlatformCount ?: 0}" />
+                <g:paginate total="${sequencingPlatformCount ?: 0}" params="${params}/>
             </div>
         </div>
     </body>

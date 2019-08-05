@@ -11,9 +11,26 @@ class TargetTypeAdminController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-    def index(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
-        respond targetTypeService.list(params), model:[targetTypeCount: targetTypeService.count()]
+    def index(Integer max, String str) {
+        if (str && TargetType.hasProperty("name")) {
+            def c = TargetType.createCriteria()
+            def listParams = [
+                    max: max ?: 25,
+                    sort: params.sort ?: "id",
+                    order: params.order ?: "desc",
+                    offset: params.offset
+                ]
+            def likeStr = "%" + str + "%"
+            def items = c.list(listParams) {
+                or {
+                    ilike "name", likeStr
+                }
+            }
+            respond items, model:[TargetTypeCount: items.totalCount, str: str]
+        } else {       
+            params.max = Math.min(max ?: 25, 100)
+            respond TargetType.list(params), model:[TargetTypeCount: TargetType.count()]
+        }
     }
 
     def show(Long id) {

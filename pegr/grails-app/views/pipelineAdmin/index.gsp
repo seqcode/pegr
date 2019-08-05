@@ -22,7 +22,7 @@
             <f:table collection="${pipelineInstanceList}" />
 
             <div class="pagination">
-                <g:paginate total="${pipelineCount ?: 0}" />
+                <g:paginate total="${pipelineCount ?: 0}" params="${params}/>
             </div>
         </div>
     </body>

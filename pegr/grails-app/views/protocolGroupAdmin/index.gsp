@@ -22,7 +22,7 @@
             <f:table collection="${protocolGroupInstanceList}" />
 
             <div class="pagination">
-                <g:paginate total="${protocolGroupCount ?: 0}" />
+                <g:paginate total="${protocolGroupCount ?: 0}" params="${params}/>
             </div>
         </div>
     </body>

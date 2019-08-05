@@ -22,7 +22,7 @@
             <f:table collection="${sequenceIndexInstanceList}" />
 
             <div class="pagination">
-                <g:paginate total="${sequenceIndexCount ?: 0}" />
+                <g:paginate total="${sequenceIndexCount ?: 0}" params="${params}/>
             </div>
         </div>
     </body>

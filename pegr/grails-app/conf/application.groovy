@@ -107,6 +107,10 @@ grails.war.resources = { stagingDir ->
     delete { fileset dir: "${stagingDir}/files/" }
 }
 
+grails.gorm.default.constraints = {
+    '*'(nullable: true)
+}
+
 // Added by the Spring Security Core plugin:
 grails.plugin.springsecurity.userLookup.userDomainClassName = 'pegr.User'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'pegr.UserRole'

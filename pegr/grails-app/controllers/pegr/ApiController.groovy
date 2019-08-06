@@ -82,7 +82,7 @@ class ApiController {
                 code = 200
                 message = "Success! Accepted filters:\n"
                 cmd.properties.each { prop, val ->
-                    if (!(prop in ["userEmail", "class", "metaClass"]) && val != null)
+                    if (!(prop in ["userEmail", "class", "metaClass", "constraintsMap"]) && val != null)
                     message += "${prop}: ${val} \n"
                 }
                 if (cmd.id) {

@@ -17,25 +17,63 @@ class QfileUploadService {
     def utilityService
     final int timeout = 1000 * 60 * 2; 
 	
-    @NotTransactional
-    def migrateXlsx(File folder, String filename, String sampleSheetName, String laneSheetName, RunStatus runStatus, int startLine, int endLine, int laneLine, boolean basicCheck) {
-        getDefaultUser()     
-        def csvNames = [:]
+    def checkFile(String filepath, int startLine, int endLine) {
+        def lineNo = 0  
+        def file = new FileReader(filepath)
+		CSVReader reader = new CSVReader(file)
+		String [] rawdata
+		def warnings = []
+        def newProjectCount = 0
+        def MAX_NEW_PROJECT_COUNT = 10
+        def projectNames = []
         
+		while ((rawdata = reader.readNext()) != null) {
+		    ++lineNo
+		    if (lineNo < startLine) {
+		        continue
+		    } else if (endLine > 0 && lineNo > endLine) {
+		        break
+		    }
+            cleanRawData(rawdata)
+            def data = getNamedData(rawdata)
+            def projectName = getProjectName(data.projectName, data.service, data.invoice)
+            if (!projectNames.contains(projectName)) {
+                projectNames.push(projectName)
+            
+                def project = Project.findByName(projectName)
+                if (!project) {
+                    newProjectCount++
+                }
+            }
+        }
+        if (newProjectCount > MAX_NEW_PROJECT_COUNT) {
+            warnings.push("More than ${MAX_NEW_PROJECT_COUNT} new projects will be created!")
+        }
+        return warnings
+    }
+    
+    def convertXlsxToCsv(File folder, String filename, String sampleSheetName, String laneSheetName) {
+        def csvNames = [:]
         // convert xsxl to csv
         [sampleSheetName, laneSheetName].each { sheet ->
             csvNames[sheet] = new File(folder, sheet + ".csv").getPath()
             def command = "xlsx2csv -n ${sheet} ${filename} ${csvNames[sheet]}"
             utilityService.executeCommand(command, timeout)
         }
+        return csvNames
+    } 
+    
+    @NotTransactional
+    def migrateXlsx(String sampleSheet, String laneSheet, RunStatus runStatus, int startLine, int endLine, int laneLine, boolean basicCheck) {
+        getDefaultUser()     
         
         // migrate the samples
-        def results = migrateSamples(csvNames[sampleSheetName], runStatus, startLine, endLine, basicCheck)
+        def results = migrateSamples(sampleSheet, runStatus, startLine, endLine, basicCheck)
         def messages = results.messages
         def laneRunNum = results.laneRunNum
         
         // migrate the lane
-        def laneMessages = migrateLane(csvNames[laneSheetName], laneLine, laneRunNum)
+        def laneMessages = migrateLane(laneSheet, laneLine, laneRunNum)
         messages.addAll(laneMessages)
 
         return messages
@@ -128,7 +166,12 @@ class QfileUploadService {
 
         def invoice = getInvoice(data.service, data.invoice)
 
-        def target = antibodyService.getTarget(data.target, data.targetType, data.nTag, data.cTag)
+        def target 
+        try {
+            target = antibodyService.getTarget(data.target, data.targetType, data.nTag, data.cTag)
+        } catch(AntibodyException e) {
+            throw new QfileUploadException(message: e.message)
+        }
 
         def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.abConc)
 
@@ -212,9 +255,18 @@ class QfileUploadService {
         if (!project || !seqExp.sequenceRun) {
             return
         }
-        def cohortName = "${seqExp.sequenceRun.id}_${service}-${invoice}"
-        def cohort = SequencingCohort.findByNameAndProjectAndRun(cohortName, project, seqExp.sequenceRun)
+
+        def cohort = SequencingCohort.findByProjectAndRun(project, seqExp.sequenceRun)
         if (!cohort) {
+            def cohortNameDefault = "${seqExp.sequenceRun.id}_${service}-${invoice}"
+            def cohortName = cohortNameDefault
+            def cohortWithName = SequencingCohort.findByName(cohortName)
+            def count = 1
+            while (cohortWithName) {
+                cohortName = cohortNameDefault + "_" + count
+                cohortWithName = SequencingCohort.findByName(cohortName)
+                count++
+            }
             cohort = new SequencingCohort(project: project, run: seqExp.sequenceRun, name: cohortName)
             cohort.save()
         }
@@ -311,15 +363,21 @@ class QfileUploadService {
 	    return user
 	}
 	
-	def getProject(String projectStr, String projectUser, String projectUserEmail, String service, String invoice) {
+    def getProjectName(String projectStr, String service, String invoice) {
         def projectName
-        if (projectStr && (projectStr == "Yeast Encode 3.0" || projectStr.take(3) == "Y3E")) {
-            projectName = "Yeast Encode 3.0"
-        } else if (invoice && invoice[0].toUpperCase() in ["S", "P", "X"]) {
+        
+        if (invoice && invoice[0].toUpperCase() in ["S", "P", "X"]) {
             projectName = service
+        } else if (projectStr && projectStr != "") {
+            projectName = projectStr
         } else {
             projectName = "${service}-${invoice}"
         }
+        return projectName
+    }
+    
+	def getProject(String projectStr, String projectUser, String projectUserEmail, String service, String invoice) {
+        def projectName = getProjectName(projectStr, service, invoice)
 	    def project = Project.findByName(projectName)
 	    if (!project) {
 	        project = new Project(name: projectName, description: projectStr).save( failOnError: true)

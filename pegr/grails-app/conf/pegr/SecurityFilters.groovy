@@ -29,6 +29,37 @@ class SecurityFilters {
             }
         }
         
+        /**
+         * The current user must be the owner of all the merged from and merged to projects or the admin
+         */
+        projectMerge(controller:'project', action:'showChecked|merge') {
+            before = {
+                def currUser = springSecurityService.currentUser
+                def auth = true
+                if (!currUser.isAdmin() && session.checkedProject) {
+                    def projects = session.checkedProject
+                    if (params.projectName) {
+                        def mergeToProject = Project.where {name == params.projectName}.get(max:1)
+                        if (mergeToProject) {
+                            projects.push(mergeToProject.id)    
+                        }    
+                    }
+                                    
+                    projects.each { projectId ->
+                        def projectUser = ProjectUser.where {project.id == projectId && user.id == currUser.id}.find()
+                        if (!projectUser || projectUser.projectRole != ProjectRole.OWNER) {
+                            auth = false
+                        }
+                    }                     
+                }
+                if (auth == false) {
+                    session.checkedProject = null
+                    render(view: '/login/denied')
+                }
+                return auth
+            }
+        }
+        
         /*
          * The authorization to view a summary report is the same as 
          * that of viewing the project that the report belongs to.

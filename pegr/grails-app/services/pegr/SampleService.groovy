@@ -233,7 +233,12 @@ class SampleService {
 
     @Transactional
     def updateTarget(Sample sample, String targetName, String targetType, String nterm, String cterm) {
-        def target = antibodyService.getTarget(targetName, targetType, nterm, cterm)
+        def target 
+        try {
+            target = antibodyService.getTarget(targetName, targetType, nterm, cterm)
+        } catch(AntibodyException e) {
+            throw new SampleException(message: e.message)
+        }
         sample.target = target
         sample.save()
     }
@@ -376,7 +381,11 @@ class SampleService {
         switch (field) {
             case "target" :
                 def data = utilityService.parseJson(value)
-                sample.target = antibodyService.getTarget(data.name, data.type, data.nterm, data.cterm)
+                try {
+                    sample.target = antibodyService.getTarget(data.name, data.type, data.nterm, data.cterm)
+                } catch(AntibodyException e) {
+                    throw new SampleException(message: e.message)
+                }
                 sample.save(failOnError: true)
                 break
             case "index" :

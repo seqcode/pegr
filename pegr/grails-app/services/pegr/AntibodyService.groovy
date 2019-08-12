@@ -75,6 +75,17 @@ class AntibodyService {
     }
     
     @Transactional
+    def saveInSample(Long sampleId, AntibodyCommand cmd) {
+        def sample = Sample.get(sampleId)
+        if (!sample) {
+            throw new AntibodyException(message: "Sample not found!")
+        }
+        def antibody = save(cmd)
+        sample.antibody = antibody
+        sample.save()
+    }
+    
+    @Transactional
     def update(AntibodyCommand cmd) {
         def antibody = Antibody.get(cmd.antibodyId)
         if (antibody) {
@@ -103,14 +114,12 @@ class AntibodyService {
                 antibody.item.properties = item
                 antibody.item.save()
             } else {
-                try {
-                    itemService.save(item)
-                } catch (ItemException e) {
-                    throw new ItemException(message: e.message)
-                }
+                itemService.save(item)
                 antibody.item = item
                 antibody.save()
             }
+        } catch (ItemException e) {
+            throw new AntibodyException(message: e.message)
         } catch (Exception e) {
             log.error e
             throw new AntibodyException(message: "Error saving the item!")
@@ -193,15 +202,14 @@ class AntibodyService {
 	    if ([targetStr, cTag, nTag].every{ it == null }) {
 	        return null
 	    }
-        if(targetStr) {
-            targetStr = targetStr.trim()
-        }
         
 	    def target = Target.findByNameAndCTermTagAndNTermTag(targetStr, cTag, nTag)
 	    if (!target) {
 	        def type = getTargetType(targetTypeStr)
 	        target = new Target(name: targetStr, cTermTag: cTag, nTermTag: nTag, targetType: type).save( failOnError: true)
-	    }
+        } else if(target.targetType?.name?.toLowerCase() != targetTypeStr?.toLowerCase()) {
+            throw new AntibodyException(message: "The target in the database has a different target type: " + target.targetType?.name)
+        }
 	    return target
 	}
 	

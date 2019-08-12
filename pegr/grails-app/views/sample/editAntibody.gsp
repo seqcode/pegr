@@ -14,25 +14,36 @@
     <h3>Edit Antibody for Sample ${sampleId}</h3>
     <g:form action="updateAntibody" role="form" method="post">
         <g:hiddenField name="sampleId" value="${sampleId}"></g:hiddenField>
-        <g:hiddenField name="antibodyId" value="${antibodyId}"></g:hiddenField>
-        <div class="row">
-            <div class="col-md-6 fields">
-                <h4>Barcode Information</h4>
-                <g:render template="/item/formWithBarcode" model="[item: item, 'itemTypeOptions':itemTypeOptions]"></g:render>
-            </div>
-            <div class="col-md-6 fields">
-                <h4>Antibody Information</h4>
-                <g:render template="/antibody/form" model="['object': antibody]"></g:render>
-            </div>
+        <g:hiddenField name="antibodyId" value="${antibodyId}"></g:hiddenField>    
+        <div>
+            <h4>Antibody Information</h4>
+            <g:render template="/antibody/form" model="['object': antibody]"></g:render>
+        </div>
+        <div id="update-item">
+            <h4>Do you want to update item?</h4>
+            <input type="radio" name="ifUpdateItem" value="yes"/> <label>Yes</label>
+            <input type="radio" name="ifUpdateItem" value="no" checked/> <label>No</label>
+        </div>
+        <div id="barcode-form" style="display:none">
+            <h4>Barcode Information</h4>
+            <g:render template="/item/formWithBarcode" model="[item: item, 'itemTypeOptions':itemTypeOptions]"></g:render>
         </div>
         <div class="text-center well">
             <g:submitButton class="btn btn-primary" name="save" value="Save"/>
             <g:link action="edit" class="btn btn-default" params="[sampleId: sampleId]">Cancel</g:link>
-        </div>
+        </div>        
     </g:form>
     
     <script>
         $("#nav-metadata").addClass("active");
+        
+        $("#update-item input").click(function(){
+            if($(this).val() == "yes"){
+                $("#barcode-form").show();
+            } else {
+                $("#barcode-form").hide();
+            }
+        })
      </script>
 </div>
 </body>

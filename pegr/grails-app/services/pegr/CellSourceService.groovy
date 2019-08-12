@@ -40,9 +40,7 @@ class CellSourceService {
     @Transactional
     def update(CellSourceCommand cmd, Item item){
         def cellSource = update(cmd)
-        if (!item.type && !item.barcode) {
-            return
-        }
+
         if (cellSource.item) {
             try {
                 cellSource.item.properties = item
@@ -77,12 +75,31 @@ class CellSourceService {
     }
     
     @Transactional
+    def save(CellSourceCommand cmd){
+        def cellSource = getCellSource(cmd)
+        cellSource.status = DictionaryStatus.Y
+        cellSource.save()
+        return cellSource
+    }
+    
+    @Transactional
     def saveInSample(Long sampleId, CellSourceCommand cmd, Item item) {
         def sample = Sample.get(sampleId)
         if (!sample) {
             throw new CellSourceException(message: "Sample not found!")
         }
         def cellSource = save(item, cmd)
+        sample.cellSource = cellSource
+        sample.save()
+    }
+    
+    @Transactional
+    def saveInSample(Long sampleId, CellSourceCommand cmd) {
+        def sample = Sample.get(sampleId)
+        if (!sample) {
+            throw new CellSourceException(message: "Sample not found!")
+        }
+        def cellSource = save(cmd)
         sample.cellSource = cellSource
         sample.save()
     }

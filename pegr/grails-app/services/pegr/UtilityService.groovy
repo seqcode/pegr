@@ -22,7 +22,7 @@ class UtilityService {
     * @return a collection of maps with both "id" and "text" to be the string.
     */
     def stringToSelect2Data(def strings) {
-        return strings.collect {s -> [id: s, text: s]}
+        return strings.findAll {it && it.trim() != ""}.collect {s -> [id: s, text: s]}
     }
     
    /**
@@ -279,9 +279,8 @@ class UtilityService {
                 cmd = "select 1 from information_schema.key_column_usage kcu inner join information_schema.TABLE_CONSTRAINTS tc on kcu.constraint_name = tc.constraint_name and kcu.table_name = tc.table_name and kcu.table_schema = tc.table_schema where kcu.constraint_schema = 'pegr' and kcu.table_name = ? and kcu.column_name= ? and tc.constraint_type='UNIQUE' and kcu.constraint_schema = 'pegr'"
                 def constraints = sql.rows(cmd, [table.table_name, table.column_name])
                 if (constraints && constraints.size() > 0 ) {
-                    // if there is UNIQUE constraint that prevent changing reference key, remove this row
-                    cmd = "delete from " + table.table_name + " where " + table.column_name + "= ?"
-                    sql.execute(cmd, [fromId])
+                    // if there is UNIQUE constraint that prevent changing reference key, throw an error.
+                    throw new UtilityException(message:"Database UNIQUE contraint!")
                 } else {
                     // change reference key from the fromId to the toId   
                     cmd = "update " + table.table_name + " set " + table.column_name + "= ? where " + table.column_name + " = ?"
@@ -293,10 +292,36 @@ class UtilityService {
             sql.execute(cmd, [fromId])
             sql.close()
         } catch(UtilityException e) {
+            sql.close()
             throw e
         } catch (Exception e) {
+            sql.close()
             log.error e
             throw new UtilityException(message: "Error merging ${tableName} from ID#${fromId} to ID#${toId}!")
+        }
+    }
+    
+    @Transactional
+    def updateForeignKeyInDb(String table, String field, Long fromId, Long toId, Sql sql) {
+        def cmd = "update " + table + " set " + field +"_id = ? where " + field + "_id = ?"
+        sql.execute(cmd, [toId, fromId])
+    }
+    
+    @Transactional
+    def updateLinksInDb(String linkTable, String fieldConstraint, String fieldToMerge, Long fromId, Long toId, Sql sql) {
+        def toDelete = []
+
+        sql.eachRow("select id, " + fieldConstraint + "_id from " + linkTable + " where " + fieldToMerge + "_id = ?", [fromId]) { row ->
+            def newLink = sql.rows("select 1 from " + linkTable + " where " + fieldConstraint + "_id = ? and " + fieldToMerge + "_id = ?", [row[1],  toId])
+            if (!newLink || newLink.size() == 0) {
+                sql.execute("update " + linkTable + " set " + fieldToMerge + "_id = ? where id = ?", [toId, row[0]])
+            } else {
+                toDelete.push(row[0])
+            }
+        }
+ 
+        toDelete.each {id -> 
+            sql.execute("delete from " + linkTable + " where id = ?", [id] )
         }
     }
     

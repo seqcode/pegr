@@ -3,11 +3,11 @@ package pegr
 class ProcessAnalysisJob {
     static triggers = {}
 
-    def concurrent = false
+    static concurrent = false
     
     def alignmentStatsService
     
-    def execute(context) {        
+    void execute(context) {        
         def id = context.mergedJobDataMap.get('id')
         try {
             alignmentStatsService.processAnalysis(id)

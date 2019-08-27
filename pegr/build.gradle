@@ -62,7 +62,7 @@ dependencies {
     runtime 'mysql:mysql-connector-java:5.1.29'
     compile 'org.grails.plugins:database-migration:3.1.0.RC1'
     compile 'org.grails.plugins:spring-security-core:3.2.3'
-    compile 'org.grails.plugins:quartz:2.0.1'
+    compile 'org.grails.plugins:quartz:2.0.13'
     compile "org.grails.plugins:mail:2.0.0"
     compile 'org.grails.plugins:external-config:1.2.2'
     compile fileTree(dir: 'libs', include: '*.jar')

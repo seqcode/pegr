@@ -6,6 +6,7 @@
 
 grails.config.locations = [ "classpath:${appName}-config.properties",
                              "classpath:${appName}-config.groovy",
+                             "file:/usr/local/${appName}/${appName}-config.properties",
                              "file:${userHome}/.grails/${appName}-config.properties",
                              "file:${userHome}/.grails/${appName}-config.groovy"]
 

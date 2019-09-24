@@ -38,7 +38,7 @@
             </pre>
             and send a POST request to the url
             <pre>
-http://francline.vmhost.psu.edu:8080/pegr/api/fetchSampleData?apiKey=
+https://francline.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=
             </pre> 
             Once the request is authenticated by the user's email and API key, the samples that match all the property values in the query will be returned in the following JSON format.
             <pre>
@@ -114,7 +114,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"id": 11690, "userEmail": 
             <p>The following is an example in Python.</p>
             <pre>
 import requests
-url = "http://francline.vmhost.psu.edu:8080/pegr/api/fetchSampleData?apiKey=XXXXXXX"
+url = "https://francline.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=XXXXXXX"
 data = {"userEmail": "xxxx@psu.edu",
         "preferredOnly": "true",
         "target": "CTCF",
@@ -151,7 +151,7 @@ public class FetchSampleDataFromPegr {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {          
             // create a http post request
-            HttpPost httpPost = new HttpPost("http://francline.vmhost.psu.edu:8080/pegr/api/fetchSampleData?apiKey=XXXXXXXXX);
+            HttpPost httpPost = new HttpPost("https://francline.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=XXXXXXXXX);
             
             // construct the data in JSON format 
             JsonObject object = Json.createObjectBuilder()
@@ -219,7 +219,7 @@ curl  -X POST -H "Content-Type: application/json" -d '{"runId": 215, "userEmail"
             <p>The following is an example in Python.</p>
             <pre>
 import requests
-url = "http://francline.vmhost.psu.edu:8080/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX"
+url = "https://francline.vmhost.psu.edu/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX"
 query = {"userEmail": "xxxxx@psu.edu", "runId": 212, "preferredOnly": "true"}
 r = requests.post(url, json=query)
 results = r.json()
@@ -246,7 +246,7 @@ public class FetchSequenceRunDataFromPegr {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {
             // create a http post request
-            HttpPost httpPost = new HttpPost("http://francline.vmhost.psu.edu:8080/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX");
+            HttpPost httpPost = new HttpPost("https://francline.vmhost.psu.edu/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX");
                         
             // construct the data in JSON format 
             JsonObject object = Json.createObjectBuilder()
@@ -296,7 +296,7 @@ public class FetchSequenceRunDataFromPegr {
         <div>
             <p>PEGR accepts POST request at </p>
             <pre>
-http://francline.vmhost.psu.edu:8080/pegr/api/stats?apiKey=
+https://francline.vmhost.psu.edu/pegr/api/stats?apiKey=
             </pre>
             <p>The data sent to PEGR should be in the following JSON format:</p>
             <pre>
@@ -370,7 +370,7 @@ curl  -X POST -H "Content-Type: application/json" -d '{"run": 1, "sample": 1, "g
             <pre>
 import requests
 
-url = "http://francline.vmhost.psu.edu:8080/pegr/api/stats?apiKey=XXXXXX"
+url = "https://francline.vmhost.psu.edu/pegr/api/stats?apiKey=XXXXXX"
 data = {"userEmail": "xxxx@psu.edu", 
         "run": 1, 
         "sample": 1, 
@@ -385,10 +385,10 @@ data = {"userEmail": "xxxx@psu.edu",
         "toolId": "toolshed.g2.bx.psu.edu/repos/iuc/tag_pileup_frequency/tag_pileup_frequency/1.0.0", 
         "datasets": [{"type": "tabular", 
                       "id": "e4f3485fe716bd91", 
-                      "uri": "http://xxx.xxx.xxx"}, 
+                      "uri": "https://xxx.xxx.xxx"}, 
                      {"type": "tabular", 
                       "id": "4f409d81b442bdb9", 
-                      "uri": "http://xxx.xxx.xxx"}], 
+                      "uri": "https://xxx.xxx.xxx"}], 
        }
 r = requests.post(url, json=data)
 results = r.json()
@@ -414,7 +414,7 @@ public class PostDataToPegr {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {            
             // create a http post request
-            HttpPost httpPost = new HttpPost("http://francline.vmhost.psu.edu:8080/pegr/api/stats?apiKey=XXXXXXX");
+            HttpPost httpPost = new HttpPost("https://francline.vmhost.psu.edu/pegr/api/stats?apiKey=XXXXXXX");
             
             // construct the data in JSON format 
             JsonObject object = Json.createObjectBuilder()
@@ -432,7 +432,7 @@ public class PostDataToPegr {
             			.add(Json.createObjectBuilder()
             				.add("type", "tabular")
             				.add("id", "id1234")
-            				.add("uri", "http://xxx.xxx.xxx")))
+            				.add("uri", "https://xxx.xxx.xxx")))
             		.build();
 
             System.out.println(object.toString());

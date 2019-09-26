@@ -108,7 +108,7 @@ https://francline.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=
     
             <p>The API can be simply called through curl</p>
             <pre>
-curl -X POST -H "Content-Type: application/json" -d '{"id": 11690, "userEmail": "xxxx@psu.edu"}' francline.vmhost.psu.edu:8080/pegr/api/fetchSampleData?apiKey=XXXXXXX -o output
+curl -X POST -H "Content-Type: application/json" -d '{"id": 11690, "userEmail": "xxxx@psu.edu"}' https://francline.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=XXXXXXX -o output
             </pre>
 
             <p>The following is an example in Python.</p>
@@ -214,7 +214,7 @@ public class FetchSampleDataFromPegr {
             <p>PEGR will return the results in the same format as above.</p>
             <p>The API can be simply called through curl</p>
             <pre>
-curl  -X POST -H "Content-Type: application/json" -d '{"runId": 215, "userEmail": "xxxx@psu.edu"}' francline.vmhost.psu.edu:8080/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX -o output
+curl  -X POST -H "Content-Type: application/json" -d '{"runId": 215, "userEmail": "xxxx@psu.edu"}' https://francline.vmhost.psu.edu/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX -o output
             </pre>
             <p>The following is an example in Python.</p>
             <pre>
@@ -364,7 +364,7 @@ https://francline.vmhost.psu.edu/pegr/api/stats?apiKey=
             </pre>
             <p>The API can be simply called through curl</p>
             <pre>
-curl  -X POST -H "Content-Type: application/json" -d '{"run": 1, "sample": 1, "genome": "sacCer3_cegr", "workflowId": "b266c9aed69b2935", "historyId": "58d3202e3", "toolCategory": "output_tagPileup", "statsToolId": "tag_pileup_frequency_output_stats", "workflowStepId": "10a140b06", "userEmail": "xxxx@psu.edu", "statistics": [{}, {}], "parameters": {}, "toolId": "sometool", "datasets": [{"type": "tabular", "id": "e4f3485fe716bd91", "uri": "someuri"}, {"type": "tabular", "id": "55f6655ba0a1f0ca", "uri": "someuri"}]}' francline.vmhost.psu.edu:8080/pegr/api/stats?apiKey=XXXXXX
+curl  -X POST -H "Content-Type: application/json" -d '{"run": 1, "sample": 1, "genome": "sacCer3_cegr", "workflowId": "b266c9aed69b2935", "historyId": "58d3202e3", "toolCategory": "output_tagPileup", "statsToolId": "tag_pileup_frequency_output_stats", "workflowStepId": "10a140b06", "userEmail": "xxxx@psu.edu", "statistics": [{}, {}], "parameters": {}, "toolId": "sometool", "datasets": [{"type": "tabular", "id": "e4f3485fe716bd91", "uri": "someuri"}, {"type": "tabular", "id": "55f6655ba0a1f0ca", "uri": "someuri"}]}' https://francline.vmhost.psu.edu/pegr/api/stats?apiKey=XXXXXX
             </pre>
             <p>Here is a Python example</p>
             <pre>

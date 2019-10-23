@@ -577,10 +577,12 @@ class SequenceRunController {
 
     def downloadQueueFile(Long runId) {
         def results = qfileService.exportRun(runId)
-        def sampleProperties = ["laneStr", "emptyB"]
-        def laneProperties = ["libraryPoolArchiveId", "libraryVolume"]
+        def sampleProperties = results.sampleExports.size() > 0 ? results.sampleExports[0].keySet() as List : ["No data!"]
+        def laneProperties = results.laneExports.size() > 0 ? results.laneExports[0].keySet() as List : ["No data!"]
         
-        WebXlsxExporter webXlsxExporter = new WebXlsxExporter()
+        def filesroot = utilityService.getFilesRoot()
+        def template = new File(filesroot, 'QueueTemplate.xlsx');
+        WebXlsxExporter webXlsxExporter = new WebXlsxExporter(template.getPath())
         webXlsxExporter.setWorksheetName("SAMPLE")
 
         webXlsxExporter.with {

@@ -860,7 +860,7 @@ class QfileService {
         def run = SequenceRun.get(runId)
         
         def laneExports = []
-        laneExports << new LaneExportData(
+        laneExports << [
             libraryPoolArchiveId: run.runStats?.libraryPoolArchiveId,          //A       
             libraryVolume: run.runStats?.libraryVolume,                //B
             libraryStock: run.runStats?.libraryStock,                 //C
@@ -876,7 +876,7 @@ class QfileService {
             qubitConc: run.runStats?.qubitConc,                   //M
             qPcrConc: run.runStats?.qPcrConc,                   //N
             libraryLoadedPm: run.runStats?.libraryLoadedPm,             //O
-            phiXLoaed: run.runStats?.phiXLoaded,                   //P
+            phiXLoaded: run.runStats?.phiXLoaded,                   //P
             libraryLoadedFmol: run.runStats?.libraryLoadedFmol,           //Q
             notes: run.runStats?.notes,                      //R
             runNum: run.runNum,                         //S
@@ -896,7 +896,7 @@ class QfileService {
             unmatchedIndices: run.runStats?.unmatchedIndices,           //AG
             pctUnmatchedIndices: run.runStats?.pctUnmatchedIndices,       //AH
             pctAlignedToPhiX: run.runStats?.pctAlignedToPhiX        //AI
-        )
+        ]
         
         def sampleExports = []
         run.experiments.each { it ->
@@ -929,8 +929,10 @@ class QfileService {
                 platform = "G"
             }
             
-            sampleExports << new SampleExportData(
+            sampleExports << [
                 laneStr: run.lane,      //A       
+                emptyB: "",
+                emptyC:"",
                 indexIdStr: (sample.sourceId && sample.sourceId.size() > 1) ? sample.sourceId[-2..-1] : "",     //D
                 senderNameStr: sample.cellSource?.providerUser?.fullName, //E
                 senderEmail: sample.cellSource?.providerUser?.email,     //F
@@ -984,40 +986,65 @@ class QfileService {
                 genomeBuild1: genomes.size() > 0 ? genomes[0] : "", //BB    
                 genomeBuild2: genomes.size() > 1 ? genomes[1] : "",   //BC
                 genomeBuild3: genomes.size() > 2 ? genomes[2] : "",   //BD      
-                dateReceived: sample.cellSource?.inventory?.dateReceived,   //BF
+                emptyBE: "",
+                dateReceived: sample.cellSource?.inventory?.dateReceived?.format('yyMMdd'),   //BF
                 receivingUser: sample.cellSource?.inventory?.receivingUser?.fullName,   //BG    
-                inOrExternal: sample.cellSource?.inventory?.sourceType,          //BH
+                inOrExternal: sample.cellSource?.inventory?.sourceType?.name()?.take(1),          //BH
+                emptyBI: "",
                 inventoryNotes: sample.cellSource?.inventory?.notes,      //BJ
                 chipUser: sample.prtclInstSummary?.user?.fullName,             //BK
                 emptyBL: "",              //BL
-                chipDate: sample.prtclInstSummary?.startTime,               //BM
+                chipDate: sample.prtclInstSummary?.startTime?.format('yyMMdd'),               //BM
+                emptyBN: "",
                 protocolVersion: sample.prtclInstSummary?.protocol?.protocolVersion,       //BO
                 techRep: "",                 //BP
                 requestedTagNum: sample.requestedTagNumber,         //BQ
+                emptyBR: "",
+                emptyBS: "",
+                emptyBT: "",
+                emptyBU: "",
+                emptyBV: "",
+                emptyBW: "",
                 resin: (prtclNote && prtclNote.containsKey("Resin")) ? prtclNote.Resin : "",          //BX
                 pool: sampleInRun?.pool,           //BY
                 volToPool: sampleInRun?.volumeToPool,     //BZ
-                poolDate: sampleInRun?.poolDate,       //CA
+                poolDate: sampleInRun?.poolDate?.format('yyMMdd'),       //CA
                 PCRCycle: (prtclNote && prtclNote.containsKey("PCR Cycle")) ? prtclNote["PCR Cycle"] : "",        //CB
                 quibitReading: (poolNote && poolNote.containsKey("quibitReading")) ? poolNote["quibitReading"] : "",  //CC
                 quibitDilution: (poolNote && poolNote.containsKey("quibitDilution")) ? poolNote["quibitDilution"] : "", //CD
                 concentration: (poolNote && poolNote.containsKey("concentration")) ? poolNote["concentration"] : "",  //CE
                 poolDilution: "",   //CF
+                emptyCG: "",
                 seqRepNum: "",      //CH
                 seqRepId: "",       //CI
                 rd1Start: (readPositions && readPositions.containsKey("rd1")) ? readPositions.rd1[0] : "",       //CJ
                 rd1End: (readPositions && readPositions.containsKey("rd1")) ? readPositions.rd1[1] : "",         //CK
-                indexStart: (readPositions && readPositions.containsKey("index")) ? readPositions.index[0] : "",     //CL
-                indexEnd: (readPositions && readPositions.containsKey("index")) ? readPositions.index[1] : "",        //CM
+                indexStart: (readPositions && readPositions.containsKey("index1")) ? readPositions.index1.join(",") : "",     //CL
+                indexEnd: (readPositions && readPositions.containsKey("index2")) ? readPositions.index2.join(",") : "",        //CM
                 rd2Start: (readPositions && readPositions.containsKey("rd2")) ? readPositions.rd2[0] : "",       //CN
                 rd2End: (readPositions && readPositions.containsKey("rd2")) ? readPositions.rd2[1] : "",         //CO
                 emptyCP: "",              //CP
                 runStr: platform + run.runNum,         //CQ
+                emptyCR: "",
+                emptyCS: "",
+                emptyCT: "",
+                emptyCU: "",
                 userStr: run.user?.fullName,        //CV
-                dateStr: sample.date,       //CW
+                dateStr: sample.date?.format('yyMMdd'),       //CW
                 fcidStr: run.fcId,       //CX
-                indexStr: sample.sequenceIndicesString    //DJ
-            )
+                emptyCY: "",
+                emptyCZ: "",
+                emptyDA: "",
+                emptyDB: "",
+                emptyDC: "",
+                emptyDD: "",
+                emptyDE: "",
+                emptyDF: "", 
+                emptyDG: "",
+                emptyDH: "",
+                emptyDI: "",
+                indexStr: sample.sequenceIndicesIdString    //DJ
+            ]
         }
         return [sampleExports: sampleExports, laneExports: laneExports]
         
@@ -1147,7 +1174,7 @@ class QfileService {
          qubitConc: getFloat(data[12]),                   //M
          qPcrConc: getFloat(data[13]),                    //N
          libraryLoadedPm: getFloat(data[14]),             //O
-         phiXLoaed: getFloat(data[15]),                   //P
+         phiXLoaded: getFloat(data[15]),                   //P
          libraryLoadedFmol: getFloat(data[16]),           //Q
          notes: data[17],                       //R
          runNum: getInteger(data[18]),                         //S
@@ -1170,148 +1197,4 @@ class QfileService {
          //data[35],//AJ
          ]
     }
-}
-
-class SampleExportData {
-    String laneStr         //A       
-    String emptyB                //B
-    String emptyC          //C
-    String indexIdStr      //D
-    String senderNameStr   //E
-    String senderEmail     //F
-    String senderPhone     //G
-    String dataToUser      //H
-    String dataToEmail     //I
-    String projectName     //J
-    String projectUser    //K
-    String projectUserEmail  //L   
-    String service        //M
-    String invoice     //N
-    String abCompName     //O
-    String abCatNum      //P
-    String abLotNum     //Q
-    String abNotes       //R
-    String abClonal       //S
-    String abAnimal      //T
-    String ig             //U
-    String antigen        //V
-    String ulSampleSent   //W
-    String abConc         //X 
-    String amountUseUg    //Y
-    String amountUseUl   //Z
-    String emptyAA              //AA
-    String emptyAB              //AB
-    String emptyAC      //AC
-    String samplePrepUser //AD
-    String genus         //AE
-    String species       //AF
-    String strain         //AG
-    String parentStrain   //AH        
-    String genotype       //AI
-    String mutation       //AJ    
-    String growthMedia    //AK    
-    String perturbation1  //AL
-    String perturbation2  //AM
-    String targetType // changed  //AN
-    String emptyAO            //AO
-    String emptyAP           //AP
-    String sampleId       //AQ
-    String bioRep1SampleId            //AR
-    String bioRep2SampleId           //AS
-    String sampleNotes    //AT
-    String nTag          //AU    
-    String target         //AV
-    String cTag           //AW
-    String chromAmount    //AX
-    String cellNum        //AY    
-    String volume                    //AZ
-    String assay                     //BA
-    String genomeBuild1  //BB    
-    String genomeBuild2   //BC
-    String genomeBuild3   //BD    
-    String emptyBE         //BE    
-    String dateReceived   //BF
-    String receivingUser        //BG    
-    String inOrExternal          //BH
-    String emptyBI              //BI
-    String inventoryNotes      //BJ
-    String chipUser             //BK
-    String emptyBL              //BL
-    String chipDate               //BM
-    String emptyBN              //BN
-    String protocolVersion       //BO
-    String techRep                  //BP
-    String requestedTagNum          //BQ
-    String emptyBR     //BR
-    String emptyBS        //BS
-    String emptyBT              //BT
-    String emptyBU   //BU
-    String emptyBV            //BV
-    String emptyBW            //BW
-    String resin          //BX
-    String pool           //BY
-    String volToPool      //BZ
-    String poolDate       //CA
-    String PCRCycle       //CB
-    String quibitReading  //CC
-    String quibitDilution //CD
-    String concentration  //CE
-    String poolDilution   //CF
-    String emptyCG              //CG
-    String seqRepNum      //CH
-    String seqRepId       //CI
-    String rd1Start       //CJ
-    String rd1End         //CK
-    String indexStart     //CL
-    String indexEnd       //CM
-    String rd2Start       //CN
-    String rd2End         //CO
-    String emptyCP              //CP
-    String runStr         //CQ
-    String emptyCR              //CR
-    String emptyCS           //CS
-    String emptyCT            //CT
-    String emptyCU              //CU
-    String userStr        //CV
-    String dateStr       //CW
-    String fcidStr       //CX
-    String indexStr      //DJ
-}
-    
-class LaneExportData {
-    String libraryPoolArchiveId         //A       
-    String libraryVolume                //B
-    String libraryStock                 //C
-    String libraryStdDev               //D
-    String pctLibraryStdDev             //E
-    String qPcrDateStr                     //F
-    String technicianName                  //G
-    String emptyH //H
-    String cycles                      //I
-    String srOrPe                       //J
-    String seqCtrl                     //K
-    String pcrCycles                   //L
-    String qubitConc                   //M
-    String qPcrConc                   //N
-    String libraryLoadedPm             //O
-    String phiXLoaed                   //P
-    String libraryLoadedFmol           //Q
-    String notes                      //R
-    String runNum                         //S
-    String emptyT                     //T
-    String emptyU                    //U
-    String emptyV                   //V
-    String emptyW                      //W
-    String emptyX                    //X
-    String emptyY                 //Y
-    String emptyZ          //Z
-    String clusterNum                  //AA
-    String readPf                      //AB
-    String pctPf                       //AC
-    String pctQ30                      //AD
-    String qidx                        //AE
-    String totalReads                  //AF
-    String unmatchedIndices           //AG
-    String pctUnmatchedIndices       //AH
-    String pctAlignedToPhiX        //AI
 }

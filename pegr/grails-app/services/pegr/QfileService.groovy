@@ -5,12 +5,12 @@ import com.opencsv.CSVReader
 import groovy.json.*
 import groovy.time.*
 
-class QfileUploadException extends RuntimeException {
+class QfileException extends RuntimeException {
     String message
 }
     
 @Transactional
-class QfileUploadService {
+class QfileService {
     def cellSourceService
     def sampleService
     def antibodyService
@@ -97,7 +97,7 @@ class QfileUploadService {
 		    }
             try {
                 laneRunNum = Math.max(laneRunNum, migrateOneSampleRow(rawdata, runStatus, basicCheck))
-		 	} catch(QfileUploadException e) {
+		 	} catch(QfileException e) {
                 messages.push("Error: Line ${lineNo}. ${e.message}")
 		        continue
 		    } catch(Exception e) {
@@ -152,7 +152,7 @@ class QfileUploadService {
         
         // stop if basiceCheck is true and this row does not have a run number
         if (basicCheck && (!data.runStr || data.runStr == "Run #")) {
-            throw new QfileUploadException(message: "Run number is missing!")
+            throw new QfileException(message: "Run number is missing!")
         }
         
         def runUser = getUser(data.userStr)
@@ -170,7 +170,7 @@ class QfileUploadService {
         try {
             target = antibodyService.getTarget(data.target, data.targetType, data.nTag, data.cTag)
         } catch(AntibodyException e) {
-            throw new QfileUploadException(message: e.message)
+            throw new QfileException(message: e.message)
         }
 
         def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.abConc)
@@ -231,11 +231,11 @@ class QfileUploadService {
             laneRunNum = data.runNum
         }
         if (!laneRunNum) {
-            throw new QfileUploadException(message: "Run number not found!")
+            throw new QfileException(message: "Run number not found!")
         }
         def run = SequenceRun.findByRunNum(laneRunNum)
         if (!run) {
-            throw new QfileUploadException(message: "Sequence run #Old${data.runNum} is not found!")
+            throw new QfileException(message: "Sequence run #Old${data.runNum} is not found!")
         }
         def runStats
         if (run.runStats) {
@@ -278,7 +278,7 @@ class QfileUploadService {
         try {
             sampleService.splitAndAddIndexToSample(sample, indexStr)
         } catch (SampleException e) {
-            throw new QfileUploadException(message: e.message)
+            throw new QfileException(message: e.message)
         }
     }
 	
@@ -794,7 +794,7 @@ class QfileUploadService {
 	    }
 	
 	    if (Sample.findBySourceId(seqId)) {
-            throw new QfileUploadException(message: "SeqId ${seqId} already exists!")
+            throw new QfileException(message: "SeqId ${seqId} already exists!")
 	    }
 	
 	    def run = SequenceRun.findByPlatformAndRunNum(platform, runNum)
@@ -855,6 +855,173 @@ class QfileUploadService {
 		}
 		
     }
+    
+    def exportRun(Long runId) {
+        def run = SequenceRun.get(runId)
+        
+        def laneExport = new LaneExportData(
+            libraryPoolArchiveId: run.runStats?.libraryPoolArchiveId,          //A       
+            libraryVolume: run.runStats?.libraryVolume,                //B
+            libraryStock: run.runStats?.libraryStock,                 //C
+            libraryStdDev: run.runStats?.libraryStdDev,               //D
+            pctLibraryStdDev: run.runStats?.pctLibraryStdDev,             //E
+            qPcrDateStr: "",                    //F
+            technicianName: "",                  //G
+            emptyH: "", //H
+            cycles: run.runStats?.cycles,                      //I
+            srOrPe: run.runStats?.srOrPe,                       //J
+            seqCtrl: run.runStats?.seqCtrl,                     //K
+            pcrCycles: run.runStats?.pcrCycles,                   //L
+            qubitConc: run.runStats?.qubitConc,                   //M
+            qPcrConc: run.runStats?.qPcrConc,                   //N
+            libraryLoadedPm: run.runStats?.libraryLoadedPm,             //O
+            phiXLoaed: run.runStats?.phiXLoaded,                   //P
+            libraryLoadedFmol: run.runStats?.libraryLoadedFmol,           //Q
+            notes: run.runStats?.notes,                      //R
+            runNum: run.runNum,                         //S
+            emptyT: "",                     //T
+            emptyU: "",                    //U
+            emptyV: "",                   //V
+            emptyW: "",                      //W
+            emptyX: "",                    //X
+            emptyY: "",                 //Y
+            emptyZ: "",          //Z
+            clusterNum: run.runStats?.clusterNum,                  //AA
+            readPf: run.runStats?.readPf,                      //AB
+            pctPf: run.runStats?.pctPf,                       //AC
+            pctQ30: run.runStats?.pctQ30,                      //AD
+            qidx: run.runStats?.qidx,                        //AE
+            totalReads: run.runStats?.totalReads,                  //AF
+            unmatchedIndices: run.runStats?.unmatchedIndices,           //AG
+            pctUnmatchedIndices: run.runStats?.pctUnmatchedIndices,       //AH
+            pctAlignedToPhiX: run.runStats?.pctAlignedToPhiX        //AI
+        )
+        
+        def sampleExports = []
+        run.experiments.each { it ->
+            def sample = it.sample
+            def project = ProjectSamples.findBySample(sample).project
+            def projectUser = ProjectUser.findByProject(project).user
+            
+            def abNotes = utilityService.parseJson(sample.antibodyNotes)
+            
+            def perturbations = SampleTreatments.findAllBySample(sample)
+            def perturbation1 = perturbations.size() > 0 ? perturbations[0].treatment.name : ""
+            def perturbation2 = perturbations.size() > 1 ? perturbations[1].treatment.name : ""
+            
+            def note = utilityService.parseJson(sample.note)
+            
+            def genomes = sample.requestedGenomes ? sample.requestedGenomes.split(',') : []
+            
+            def prtclNote = utilityService.parseJson(sample.prtclInstSummary.note)
+            
+            def sampleInRun = SampleInRun.findBySample(sample)
+            def poolNote = utilityService.parseJson(sampleInRun.params)
+            
+            def seqExperiment = SequencingExperiment.findBySampleAndSequenceRun(sample, run)
+            def readPositions = utilityService.parseJson(seqExperiment.readPositions)
+            
+            def platform = ""
+            if (run.platform?.name == "SOLiD") {
+                platform = "S"
+            } else if (run.platform?.name == "Illumina GA") {
+                platform = "G"
+            }
+            
+            sampleExports << new SampleExportData(
+                laneStr: run.lane,      //A       
+                indexIdStr: (sample.sourceId && sample.sourceId.size() > 1) ? sample.sourceId[-2..-1] : "",     //D
+                senderNameStr: sample.cellSource?.providerUser?.fullName, //E
+                senderEmail: sample.cellSource?.providerUser?.email,     //F
+                senderPhone: sample.cellSource?.providerUser?.phone,     //G
+                dataToUser: sample.sendDataTo?.fullName,    //H
+                dataToEmail: sample.sendDataTo?.email,     //I
+                projectName: project?.name,     //J
+                projectUser: projectUser?.fullName,    //K
+                projectUserEmail: projectUser?.email,  //L   
+                service: sample.invoice?.serviceId,        //M
+                invoice: sample.invoice?.invoiceNum,     //N
+                abCompName: sample.antibody?.company?.name,     //O
+                abCatNum: sample.antibody?.catalogNumber,      //P
+                abLotNum: sample.antibody?.lotNumber,     //Q
+                abNotes: sample.antibody?.note,       //R
+                abClonal: sample.antibody?.clonal,       //S
+                abAnimal: sample.antibody?.abHost,      //T
+                ig: sample.antibody?.igType,             //U
+                antigen: sample.antibody?.immunogene,        //V
+                ulSampleSent: (abNotes && abNotes.containsKey("Volume Sent (ul)")) ? abNotes["Volume Sent (ul)"] : "",   //W
+                abConc: sample.antibody?.concentration,         //X 
+                amountUseUg: (abNotes && abNotes.containsKey("Usage Per ChIP (ug)")) ? abNotes["Usage Per ChIP (ug)"] : "",    //Y
+                amountUseUl: (abNotes && abNotes.containsKey("Usage Per ChIP (ul)")) ? abNotes["Usage Per ChIP (ul)"] : "",   //Z
+                emptyAA: "",              //AA
+                emptyAB: "",              //AB
+                emptyAC: "",      //AC
+                samplePrepUser: sample.cellSource?.prepUser?.fullName, //AD
+                genus: sample.cellSource?.strain?.species?.genusName,         //AE
+                species: sample.cellSource?.strain?.species?.name,       //AF
+                strain: sample.cellSource?.strain?.name,         //AG
+                parentStrain: sample.cellSource?.strain?.parent?.name,   //AH        
+                genotype: sample.cellSource?.strain?.genotype,       //AI
+                mutation: sample.cellSource?.strain?.geneticModification,       //AJ    
+                growthMedia: sample.growthMedia?.name,    //AK    
+                perturbation1: perturbation1,   //AL
+                perturbation2: perturbation2,  //AM
+                targetType: sample.target?.targetType?.name, // changed  //AN
+                emptyAO: "",            //AO
+                emptyAP: "",           //AP
+                sampleId: sample.naturalId,       //AQ
+                bioRep1SampleId: (note && note.containsKey("bioRep1")) ? note.bioRep1: "",            //AR
+                bioRep2SampleId: (note && note.containsKey("bioRep2")) ? note.bioRep2: "",             //AS
+                sampleNotes:  (note && note.containsKey("note")) ? note.note: "",      //AT
+                nTag: sample.target?.nTermTag,          //AU    
+                target: sample.target?.name,         //AV
+                cTag: sample.target?.cTermTag,           //AW
+                chromAmount: sample.chromosomeAmount,    //AX
+                cellNum: sample.cellNumber,        //AY    
+                volume: sample.volume,                    //AZ
+                assay: sample.assay?.name,                     //BA
+                genomeBuild1: genomes.size() > 0 ? genomes[0] : "", //BB    
+                genomeBuild2: genomes.size() > 1 ? genomes[1] : "",   //BC
+                genomeBuild3: genomes.size() > 2 ? genomes[2] : "",   //BD      
+                dateReceived: sample.cellSource?.inventory?.dateReceived,   //BF
+                receivingUser: sample.cellSource?.inventory?.receivingUser?.fullName,   //BG    
+                inOrExternal: sample.cellSource?.inventory?.sourceType,          //BH
+                inventoryNotes: sample.cellSource?.inventory?.notes,      //BJ
+                chipUser: sample.prtclInstSummary?.user?.fullName,             //BK
+                emptyBL: "",              //BL
+                chipDate: sample.prtclInstSummary?.startTime,               //BM
+                protocolVersion: sample.prtclInstSummary?.protocol?.protocolVersion,       //BO
+                techRep: "",                 //BP
+                requestedTagNum: sample.requestedTagNumber,         //BQ
+                resin: (prtclNote && prtclNote.containsKey("Resin")) ? prtclNote.Resin : "",          //BX
+                pool: sampleInRun?.pool,           //BY
+                volToPool: sampleInRun?.volumeToPool,     //BZ
+                poolDate: sampleInRun?.poolDate,       //CA
+                PCRCycle: (prtclNote && prtclNote.containsKey("PCR Cycle")) ? prtclNote["PCR Cycle"] : "",        //CB
+                quibitReading: (poolNote && poolNote.containsKey("quibitReading")) ? poolNote["quibitReading"] : "",  //CC
+                quibitDilution: (poolNote && poolNote.containsKey("quibitDilution")) ? poolNote["quibitDilution"] : "", //CD
+                concentration: (poolNote && poolNote.containsKey("concentration")) ? poolNote["concentration"] : "",  //CE
+                poolDilution: "",   //CF
+                seqRepNum: "",      //CH
+                seqRepId: "",       //CI
+                rd1Start: (readPositions && readPositions.containsKey("rd1")) ? readPositions.rd1[0] : "",       //CJ
+                rd1End: (readPositions && readPositions.containsKey("rd1")) ? readPositions.rd1[1] : "",         //CK
+                indexStart: (readPositions && readPositions.containsKey("index")) ? readPositions.index[0] : "",     //CL
+                indexEnd: (readPositions && readPositions.containsKey("index")) ? readPositions.index[1] : "",        //CM
+                rd2Start: (readPositions && readPositions.containsKey("rd2")) ? readPositions.rd2[0] : "",       //CN
+                rd2End: (readPositions && readPositions.containsKey("rd2")) ? readPositions.rd2[1] : "",         //CO
+                emptyCP: "",              //CP
+                runStr: platform + run.runNum,         //CQ
+                userStr: run.user?.fullName,        //CV
+                dateStr: sample.date,       //CW
+                fcidStr: run.fcId,       //CX
+                indexStr: sample.sequenceIndicesString    //DJ
+            )
+        }
+        return [sampleExports: sampleExports, laneExport: laneExport]
+        
+    }
+    
 	
 	def getNamedData(String[] data) {
 	    [laneStr: data[0],         //A       
@@ -963,7 +1130,7 @@ class QfileUploadService {
 	    ]
 	}
     
-     def getNamedLaneData(String[] data) {
+    def getNamedLaneData(String[] data) {
 	    [libraryPoolArchiveId: data[0],         //A       
 	     libraryVolume: getFloat(data[1]),                //B
          libraryStock: getFloat(data[2]),                 //C
@@ -1002,4 +1169,148 @@ class QfileUploadService {
          //data[35],//AJ
          ]
     }
+}
+
+class SampleExportData {
+    String laneStr         //A       
+    String emptyB                //B
+    String emptyC          //C
+    String indexIdStr      //D
+    String senderNameStr   //E
+    String senderEmail     //F
+    String senderPhone     //G
+    String dataToUser      //H
+    String dataToEmail     //I
+    String projectName     //J
+    String projectUser    //K
+    String projectUserEmail  //L   
+    String service        //M
+    String invoice     //N
+    String abCompName     //O
+    String abCatNum      //P
+    String abLotNum     //Q
+    String abNotes       //R
+    String abClonal       //S
+    String abAnimal      //T
+    String ig             //U
+    String antigen        //V
+    String ulSampleSent   //W
+    String abConc         //X 
+    String amountUseUg    //Y
+    String amountUseUl   //Z
+    String emptyAA              //AA
+    String emptyAB              //AB
+    String emptyAC      //AC
+    String samplePrepUser //AD
+    String genus         //AE
+    String species       //AF
+    String strain         //AG
+    String parentStrain   //AH        
+    String genotype       //AI
+    String mutation       //AJ    
+    String growthMedia    //AK    
+    String perturbation1  //AL
+    String perturbation2  //AM
+    String targetType // changed  //AN
+    String emptyAO            //AO
+    String emptyAP           //AP
+    String sampleId       //AQ
+    String bioRep1SampleId            //AR
+    String bioRep2SampleId           //AS
+    String sampleNotes    //AT
+    String nTag          //AU    
+    String target         //AV
+    String cTag           //AW
+    String chromAmount    //AX
+    String cellNum        //AY    
+    String volume                    //AZ
+    String assay                     //BA
+    String genomeBuild1  //BB    
+    String genomeBuild2   //BC
+    String genomeBuild3   //BD    
+    String emptyBE         //BE    
+    String dateReceived   //BF
+    String receivingUser        //BG    
+    String inOrExternal          //BH
+    String emptyBI              //BI
+    String inventoryNotes      //BJ
+    String chipUser             //BK
+    String emptyBL              //BL
+    String chipDate               //BM
+    String emptyBN              //BN
+    String protocolVersion       //BO
+    String techRep                  //BP
+    String requestedTagNum          //BQ
+    String emptyBR     //BR
+    String emptyBS        //BS
+    String emptyBT              //BT
+    String emptyBU   //BU
+    String emptyBV            //BV
+    String emptyBW            //BW
+    String resin          //BX
+    String pool           //BY
+    String volToPool      //BZ
+    String poolDate       //CA
+    String PCRCycle       //CB
+    String quibitReading  //CC
+    String quibitDilution //CD
+    String concentration  //CE
+    String poolDilution   //CF
+    String emptyCG              //CG
+    String seqRepNum      //CH
+    String seqRepId       //CI
+    String rd1Start       //CJ
+    String rd1End         //CK
+    String indexStart     //CL
+    String indexEnd       //CM
+    String rd2Start       //CN
+    String rd2End         //CO
+    String emptyCP              //CP
+    String runStr         //CQ
+    String emptyCR              //CR
+    String emptyCS           //CS
+    String emptyCT            //CT
+    String emptyCU              //CU
+    String userStr        //CV
+    String dateStr       //CW
+    String fcidStr       //CX
+    String indexStr      //DJ
+}
+    
+class LaneExportData {
+    String libraryPoolArchiveId         //A       
+    String libraryVolume                //B
+    String libraryStock                 //C
+    String libraryStdDev               //D
+    String pctLibraryStdDev             //E
+    String qPcrDateStr                     //F
+    String technicianName                  //G
+    String emptyH //H
+    String cycles                      //I
+    String srOrPe                       //J
+    String seqCtrl                     //K
+    String pcrCycles                   //L
+    String qubitConc                   //M
+    String qPcrConc                   //N
+    String libraryLoadedPm             //O
+    String phiXLoaed                   //P
+    String libraryLoadedFmol           //Q
+    String notes                      //R
+    String runNum                         //S
+    String emptyT                     //T
+    String emptyU                    //U
+    String emptyV                   //V
+    String emptyW                      //W
+    String emptyX                    //X
+    String emptyY                 //Y
+    String emptyZ          //Z
+    String clusterNum                  //AA
+    String readPf                      //AB
+    String pctPf                       //AC
+    String pctQ30                      //AD
+    String qidx                        //AE
+    String totalReads                  //AF
+    String unmatchedIndices           //AG
+    String pctUnmatchedIndices       //AH
+    String pctAlignedToPhiX        //AI
 }

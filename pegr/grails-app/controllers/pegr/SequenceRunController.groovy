@@ -7,6 +7,7 @@ import groovy.time.TimeCategory
 import groovy.json.*
 import grails.converters.*
 import grails.util.Holders
+import pl.touk.excel.export.WebXlsxExporter
 
 class SequenceRunController {
     def springSecurityService
@@ -573,8 +574,22 @@ class SequenceRunController {
         return
     }
 
-    def downloadQueueFile() {
-        def
+    def downloadQueueFile(Long runId) {
+        def results = qfileService.exportRun(runId)
+        def sampleProperties = ["laneStr", "emptyB"]
+        def laneProperties = ["libraryPoolArchiveId", "libraryVolume"]
+        
+        WebXlsxExporter webXlsxExporter = new WebXlsxExporter()
+        webXlsxExporter.setWorksheetName("SAMPLE")
+
+        webXlsxExporter.with {
+            setResponseHeaders(response)
+            fillHeader(sampleProperties)
+            add(results.sampleExports, sampleProperties )
+
+            save(response.outputStream)
+        }
+            
     }
     
     def downloadRunInfo(String remoteRoot, Long runId) {

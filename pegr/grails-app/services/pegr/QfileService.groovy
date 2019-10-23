@@ -859,7 +859,8 @@ class QfileService {
     def exportRun(Long runId) {
         def run = SequenceRun.get(runId)
         
-        def laneExport = new LaneExportData(
+        def laneExports = []
+        laneExports << new LaneExportData(
             libraryPoolArchiveId: run.runStats?.libraryPoolArchiveId,          //A       
             libraryVolume: run.runStats?.libraryVolume,                //B
             libraryStock: run.runStats?.libraryStock,                 //C
@@ -1018,7 +1019,7 @@ class QfileService {
                 indexStr: sample.sequenceIndicesString    //DJ
             )
         }
-        return [sampleExports: sampleExports, laneExport: laneExport]
+        return [sampleExports: sampleExports, laneExports: laneExports]
         
     }
     

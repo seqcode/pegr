@@ -8,6 +8,7 @@ import groovy.json.*
 import grails.converters.*
 import grails.util.Holders
 import pl.touk.excel.export.WebXlsxExporter
+import pl.touk.excel.export.XlsxExporter
 
 class SequenceRunController {
     def springSecurityService
@@ -586,7 +587,10 @@ class SequenceRunController {
             setResponseHeaders(response)
             fillHeader(sampleProperties)
             add(results.sampleExports, sampleProperties )
-
+            sheet('Lane').with {
+                fillHeader(laneProperties)
+                add(results.laneExports, laneProperties )
+            }
             save(response.outputStream)
         }
             

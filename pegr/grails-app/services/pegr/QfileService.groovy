@@ -901,8 +901,20 @@ class QfileService {
         def sampleExports = []
         run.experiments.each { it ->
             def sample = it.sample
-            def project = ProjectSamples.findBySample(sample).project
-            def projectUser = ProjectUser.findByProject(project).user
+            
+            def sampleId = sample.id
+            def project = ProjectSamples.createCriteria().get {
+                eq "sample.id", sampleId
+                order("id", "asc")
+                maxResults(1)
+            }.project
+            
+            def projectId = project.id
+            def projectUser = ProjectUser.createCriteria().get {
+                eq "project.id", projectId
+                order("id", "asc")
+                maxResults(1)
+            }.user
             
             def abNotes = utilityService.parseJson(sample.antibodyNotes)
             

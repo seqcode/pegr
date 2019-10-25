@@ -866,8 +866,8 @@ class QfileService {
             libraryStock: run.runStats?.libraryStock,                 //C
             libraryStdDev: run.runStats?.libraryStdDev,               //D
             pctLibraryStdDev: run.runStats?.pctLibraryStdDev,             //E
-            qPcrDateStr: "",                    //F
-            technicianName: "",                  //G
+            qPcrDate: run.runStats?.qPcrDate?.format("yyMMdd"),                    //F
+            technicianName: run.runStats?.technician?.username,                  //G
             emptyH: "", //H
             cycles: run.runStats?.cycles,                      //I
             srOrPe: run.runStats?.srOrPe,                       //J
@@ -1164,8 +1164,8 @@ class QfileService {
          libraryStock: getFloat(data[2]),                 //C
          libraryStdDev: getFloat(data[3]),                //D
          pctLibraryStdDev: getFloat(data[4]),             //E
-         qPcrDateStr: getDate(data[5]),                      //F
-         technicianName: getUser(data[6]),                   //G
+         qPcrDate: getDate(data[5]),                      //F
+         technician: getUser(data[6]),                   //G
          // instrument: data[7],//H
          cycles: data[8],                       //I
          srOrPe: data[9],                       //J

@@ -587,10 +587,8 @@ class SequenceRunController {
 
         webXlsxExporter.with {
             setResponseHeaders(response)
-            fillHeader(sampleProperties)
             add(results.sampleExports, sampleProperties )
             sheet('Lane').with {
-                fillHeader(laneProperties)
                 add(results.laneExports, laneProperties )
             }
             save(response.outputStream)

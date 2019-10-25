@@ -997,7 +997,7 @@ class QfileService {
                 chipDate: sample.prtclInstSummary?.startTime?.format('yyMMdd'),               //BM
                 emptyBN: "",
                 protocolVersion: sample.prtclInstSummary?.protocol?.protocolVersion,       //BO
-                techRep: "",                 //BP
+                emptyBP: "",                 //BP
                 requestedTagNum: sample.requestedTagNumber,         //BQ
                 emptyBR: "",
                 emptyBS: "",
@@ -1013,10 +1013,10 @@ class QfileService {
                 quibitReading: (poolNote && poolNote.containsKey("quibitReading")) ? poolNote["quibitReading"] : "",  //CC
                 quibitDilution: (poolNote && poolNote.containsKey("quibitDilution")) ? poolNote["quibitDilution"] : "", //CD
                 concentration: (poolNote && poolNote.containsKey("concentration")) ? poolNote["concentration"] : "",  //CE
-                poolDilution: "",   //CF
+                emptyCF: "",   //CF
                 emptyCG: "",
-                seqRepNum: "",      //CH
-                seqRepId: "",       //CI
+                emptyCH: "",      //CH
+                emptyCI: "",       //CI
                 rd1Start: (readPositions && readPositions.containsKey("rd1")) ? readPositions.rd1[0] : "",       //CJ
                 rd1End: (readPositions && readPositions.containsKey("rd1")) ? readPositions.rd1[1] : "",         //CK
                 indexStart: (readPositions && readPositions.containsKey("index1")) ? readPositions.index1.join(",") : "",     //CL
@@ -1029,7 +1029,7 @@ class QfileService {
                 emptyCS: "",
                 emptyCT: "",
                 emptyCU: "",
-                userStr: run.user?.fullName,        //CV
+                userStr: run.user?.username,        //CV
                 dateStr: sample.date?.format('yyMMdd'),       //CW
                 fcidStr: run.fcId,       //CX
                 emptyCY: "",

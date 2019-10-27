@@ -482,15 +482,15 @@ class QfileService {
         def tissue = getTissue(strainStr)
         if (!tissue) {
             tissue = parentTissue
-			if (strainStr || parentStrain || genotypeStr || mutationStr || species) {
-	            strain = Strain.findByNameAndParentAndGenotypeAndGeneticModificationAndSpecies(strainStr, parentStrain, genotypeStr, mutationStr, species)
-	            if (!strain) {
-	                strain = new Strain(name: strainStr, 
-	                                    species: species, 
-	                                    genotype: genotypeStr, 
-	                                    parent: parentStrain, 
-	                                    geneticModification: mutationStr).save( failOnError: true)
-	            }
+        }
+        if (strainStr || parentStrain || genotypeStr || mutationStr || species) {
+            strain = Strain.findByNameAndParentAndGenotypeAndGeneticModificationAndSpecies(strainStr, parentStrain, genotypeStr, mutationStr, species)
+            if (!strain) {
+                strain = new Strain(name: strainStr, 
+                                    species: species, 
+                                    genotype: genotypeStr, 
+                                    parent: parentStrain, 
+                                    geneticModification: mutationStr).save( failOnError: true)
 			}
         }
         

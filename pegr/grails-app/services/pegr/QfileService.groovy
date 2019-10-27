@@ -482,8 +482,8 @@ class QfileService {
         def tissue = getTissue(strainStr)
         if (!tissue) {
             tissue = parentTissue
-			if (strainStr || parentStrain || genotypeStr || mutationStr) {
-	            strain = Strain.findByNameAndParentAndGenotypeAndGeneticModification(strainStr, parentStrain, genotypeStr, mutationStr)
+			if (strainStr || parentStrain || genotypeStr || mutationStr || species) {
+	            strain = Strain.findByNameAndParentAndGenotypeAndGeneticModificationAndSpecies(strainStr, parentStrain, genotypeStr, mutationStr, species)
 	            if (!strain) {
 	                strain = new Strain(name: strainStr, 
 	                                    species: species, 
@@ -1004,7 +1004,7 @@ class QfileService {
                 inOrExternal: sample.cellSource?.inventory?.sourceType?.name()?.take(1),          //BH
                 emptyBI: "",
                 inventoryNotes: sample.cellSource?.inventory?.notes,      //BJ
-                chipUser: sample.prtclInstSummary?.user?.fullName,             //BK
+                chipUser: sample.prtclInstSummary?.user?.username,             //BK
                 emptyBL: "",              //BL
                 chipDate: sample.prtclInstSummary?.startTime?.format('yyMMdd'),               //BM
                 emptyBN: "",

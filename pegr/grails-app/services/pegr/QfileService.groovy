@@ -5,12 +5,12 @@ import com.opencsv.CSVReader
 import groovy.json.*
 import groovy.time.*
 
-class QfileUploadException extends RuntimeException {
+class QfileException extends RuntimeException {
     String message
 }
     
 @Transactional
-class QfileUploadService {
+class QfileService {
     def cellSourceService
     def sampleService
     def antibodyService
@@ -97,7 +97,7 @@ class QfileUploadService {
 		    }
             try {
                 laneRunNum = Math.max(laneRunNum, migrateOneSampleRow(rawdata, runStatus, basicCheck))
-		 	} catch(QfileUploadException e) {
+		 	} catch(QfileException e) {
                 messages.push("Error: Line ${lineNo}. ${e.message}")
 		        continue
 		    } catch(Exception e) {
@@ -152,7 +152,7 @@ class QfileUploadService {
         
         // stop if basiceCheck is true and this row does not have a run number
         if (basicCheck && (!data.runStr || data.runStr == "Run #")) {
-            throw new QfileUploadException(message: "Run number is missing!")
+            throw new QfileException(message: "Run number is missing!")
         }
         
         def runUser = getUser(data.userStr)
@@ -170,7 +170,7 @@ class QfileUploadService {
         try {
             target = antibodyService.getTarget(data.target, data.targetType, data.nTag, data.cTag)
         } catch(AntibodyException e) {
-            throw new QfileUploadException(message: e.message)
+            throw new QfileException(message: e.message)
         }
 
         def antibody = getAntibody(data.abCompName, data.abCatNum, data.abLotNum, data.abNotes, data.abClonal, data.abAnimal, data.ig, data.antigen, data.abConc)
@@ -231,11 +231,11 @@ class QfileUploadService {
             laneRunNum = data.runNum
         }
         if (!laneRunNum) {
-            throw new QfileUploadException(message: "Run number not found!")
+            throw new QfileException(message: "Run number not found!")
         }
         def run = SequenceRun.findByRunNum(laneRunNum)
         if (!run) {
-            throw new QfileUploadException(message: "Sequence run #Old${data.runNum} is not found!")
+            throw new QfileException(message: "Sequence run #Old${data.runNum} is not found!")
         }
         def runStats
         if (run.runStats) {
@@ -278,7 +278,7 @@ class QfileUploadService {
         try {
             sampleService.splitAndAddIndexToSample(sample, indexStr)
         } catch (SampleException e) {
-            throw new QfileUploadException(message: e.message)
+            throw new QfileException(message: e.message)
         }
     }
 	
@@ -482,15 +482,15 @@ class QfileUploadService {
         def tissue = getTissue(strainStr)
         if (!tissue) {
             tissue = parentTissue
-			if (strainStr || parentStrain || genotypeStr || mutationStr) {
-	            strain = Strain.findByNameAndParentAndGenotypeAndGeneticModification(strainStr, parentStrain, genotypeStr, mutationStr)
-	            if (!strain) {
-	                strain = new Strain(name: strainStr, 
-	                                    species: species, 
-	                                    genotype: genotypeStr, 
-	                                    parent: parentStrain, 
-	                                    geneticModification: mutationStr).save( failOnError: true)
-	            }
+        }
+        if (strainStr || parentStrain || genotypeStr || mutationStr || species) {
+            strain = Strain.findByNameAndParentAndGenotypeAndGeneticModificationAndSpecies(strainStr, parentStrain, genotypeStr, mutationStr, species)
+            if (!strain) {
+                strain = new Strain(name: strainStr, 
+                                    species: species, 
+                                    genotype: genotypeStr, 
+                                    parent: parentStrain, 
+                                    geneticModification: mutationStr).save( failOnError: true)
 			}
         }
         
@@ -794,7 +794,7 @@ class QfileUploadService {
 	    }
 	
 	    if (Sample.findBySourceId(seqId)) {
-            throw new QfileUploadException(message: "SeqId ${seqId} already exists!")
+            throw new QfileException(message: "SeqId ${seqId} already exists!")
 	    }
 	
 	    def run = SequenceRun.findByPlatformAndRunNum(platform, runNum)
@@ -855,6 +855,213 @@ class QfileUploadService {
 		}
 		
     }
+    
+    def exportRun(Long runId) {
+        def run = SequenceRun.get(runId)
+        
+        def laneExports = []
+        laneExports << [
+            libraryPoolArchiveId: run.runStats?.libraryPoolArchiveId,          //A       
+            libraryVolume: run.runStats?.libraryVolume,                //B
+            libraryStock: run.runStats?.libraryStock,                 //C
+            libraryStdDev: run.runStats?.libraryStdDev,               //D
+            pctLibraryStdDev: run.runStats?.pctLibraryStdDev,             //E
+            qPcrDate: run.runStats?.qPcrDate?.format("yyMMdd"),                    //F
+            technicianName: run.runStats?.technician?.username,                  //G
+            emptyH: "", //H
+            cycles: run.runStats?.cycles,                      //I
+            srOrPe: run.runStats?.srOrPe,                       //J
+            seqCtrl: run.runStats?.seqCtrl,                     //K
+            pcrCycles: run.runStats?.pcrCycles,                   //L
+            qubitConc: run.runStats?.qubitConc,                   //M
+            qPcrConc: run.runStats?.qPcrConc,                   //N
+            libraryLoadedPm: run.runStats?.libraryLoadedPm,             //O
+            phiXLoaded: run.runStats?.phiXLoaded,                   //P
+            libraryLoadedFmol: run.runStats?.libraryLoadedFmol,           //Q
+            notes: run.runStats?.notes,                      //R
+            runNum: run.runNum,                         //S
+            emptyT: "",                     //T
+            emptyU: "",                    //U
+            emptyV: "",                   //V
+            emptyW: "",                      //W
+            emptyX: "",                    //X
+            emptyY: "",                 //Y
+            emptyZ: "",          //Z
+            clusterNum: run.runStats?.clusterNum,                  //AA
+            readPf: run.runStats?.readPf,                      //AB
+            pctPf: run.runStats?.pctPf,                       //AC
+            pctQ30: run.runStats?.pctQ30,                      //AD
+            qidx: run.runStats?.qidx,                        //AE
+            totalReads: run.runStats?.totalReads,                  //AF
+            unmatchedIndices: run.runStats?.unmatchedIndices,           //AG
+            pctUnmatchedIndices: run.runStats?.pctUnmatchedIndices,       //AH
+            pctAlignedToPhiX: run.runStats?.pctAlignedToPhiX        //AI
+        ]
+        
+        def sampleExports = []
+        run.experiments.each { it ->
+            def sample = it.sample
+            
+            def sampleId = sample.id
+            def project = ProjectSamples.createCriteria().get {
+                eq "sample.id", sampleId
+                order("id", "asc")
+                maxResults(1)
+            }.project
+            
+            def projectId = project.id
+            def projectUser = ProjectUser.createCriteria().get {
+                eq "project.id", projectId
+                order("id", "asc")
+                maxResults(1)
+            }.user
+            
+            def abNotes = utilityService.parseJson(sample.antibodyNotes)
+            
+            def perturbations = SampleTreatments.findAllBySample(sample)
+            def perturbation1 = perturbations.size() > 0 ? perturbations[0].treatment.name : ""
+            def perturbation2 = perturbations.size() > 1 ? perturbations[1].treatment.name : ""
+            
+            def note = utilityService.parseJson(sample.note)
+            
+            def genomes = sample.requestedGenomes ? sample.requestedGenomes.split(',') : []
+            
+            def prtclNote = utilityService.parseJson(sample.prtclInstSummary.note)
+            
+            def sampleInRun = SampleInRun.findBySample(sample)
+            def poolNote = utilityService.parseJson(sampleInRun.params)
+            
+            def seqExperiment = SequencingExperiment.findBySampleAndSequenceRun(sample, run)
+            def readPositions = utilityService.parseJson(seqExperiment.readPositions)
+            
+            def platform = ""
+            if (run.platform?.name == "SOLiD") {
+                platform = "S"
+            } else if (run.platform?.name == "Illumina GA") {
+                platform = "G"
+            }
+            
+            sampleExports << [
+                laneStr: run.lane,      //A       
+                emptyB: "",
+                emptyC:"",
+                indexIdStr: (sample.sourceId && sample.sourceId.size() > 1) ? sample.sourceId[-2..-1] : "",     //D
+                senderNameStr: sample.cellSource?.providerUser?.fullName, //E
+                senderEmail: sample.cellSource?.providerUser?.email,     //F
+                senderPhone: sample.cellSource?.providerUser?.phone,     //G
+                dataToUser: sample.sendDataTo?.fullName,    //H
+                dataToEmail: sample.sendDataTo?.email,     //I
+                projectName: project?.name,     //J
+                projectUser: projectUser?.fullName,    //K
+                projectUserEmail: projectUser?.email,  //L   
+                service: sample.invoice?.serviceId,        //M
+                invoice: sample.invoice?.invoiceNum,     //N
+                abCompName: sample.antibody?.company?.name,     //O
+                abCatNum: sample.antibody?.catalogNumber,      //P
+                abLotNum: sample.antibody?.lotNumber,     //Q
+                abNotes: sample.antibody?.note,       //R
+                abClonal: sample.antibody?.clonal,       //S
+                abAnimal: sample.antibody?.abHost,      //T
+                ig: sample.antibody?.igType,             //U
+                antigen: sample.antibody?.immunogene,        //V
+                ulSampleSent: (abNotes && abNotes.containsKey("Volume Sent (ul)")) ? abNotes["Volume Sent (ul)"] : "",   //W
+                abConc: sample.antibody?.concentration,         //X 
+                amountUseUg: (abNotes && abNotes.containsKey("Usage Per ChIP (ug)")) ? abNotes["Usage Per ChIP (ug)"] : "",    //Y
+                amountUseUl: (abNotes && abNotes.containsKey("Usage Per ChIP (ul)")) ? abNotes["Usage Per ChIP (ul)"] : "",   //Z
+                emptyAA: "",              //AA
+                emptyAB: "",              //AB
+                emptyAC: "",      //AC
+                samplePrepUser: sample.cellSource?.prepUser?.fullName, //AD
+                genus: sample.cellSource?.strain?.species?.genusName,         //AE
+                species: sample.cellSource?.strain?.species?.name,       //AF
+                strain: sample.cellSource?.strain?.name,         //AG
+                parentStrain: sample.cellSource?.strain?.parent?.name,   //AH        
+                genotype: sample.cellSource?.strain?.genotype,       //AI
+                mutation: sample.cellSource?.strain?.geneticModification,       //AJ    
+                growthMedia: sample.growthMedia?.name,    //AK    
+                perturbation1: perturbation1,   //AL
+                perturbation2: perturbation2,  //AM
+                targetType: sample.target?.targetType?.name, // changed  //AN
+                emptyAO: "",            //AO
+                emptyAP: "",           //AP
+                sampleId: sample.naturalId,       //AQ
+                bioRep1SampleId: (note && note.containsKey("bioRep1")) ? note.bioRep1: "",            //AR
+                bioRep2SampleId: (note && note.containsKey("bioRep2")) ? note.bioRep2: "",             //AS
+                sampleNotes:  (note && note.containsKey("note")) ? note.note: "",      //AT
+                nTag: sample.target?.nTermTag,          //AU    
+                target: sample.target?.name,         //AV
+                cTag: sample.target?.cTermTag,           //AW
+                chromAmount: sample.chromosomeAmount,    //AX
+                cellNum: sample.cellNumber,        //AY    
+                volume: sample.volume,                    //AZ
+                assay: sample.assay?.name,                     //BA
+                genomeBuild1: genomes.size() > 0 ? genomes[0] : "", //BB    
+                genomeBuild2: genomes.size() > 1 ? genomes[1] : "",   //BC
+                genomeBuild3: genomes.size() > 2 ? genomes[2] : "",   //BD      
+                emptyBE: "",
+                dateReceived: sample.cellSource?.inventory?.dateReceived?.format('yyMMdd'),   //BF
+                receivingUser: sample.cellSource?.inventory?.receivingUser?.fullName,   //BG    
+                inOrExternal: sample.cellSource?.inventory?.sourceType?.name()?.take(1),          //BH
+                emptyBI: "",
+                inventoryNotes: sample.cellSource?.inventory?.notes,      //BJ
+                chipUser: sample.prtclInstSummary?.user?.username,             //BK
+                emptyBL: "",              //BL
+                chipDate: sample.prtclInstSummary?.startTime?.format('yyMMdd'),               //BM
+                emptyBN: "",
+                protocolVersion: sample.prtclInstSummary?.protocol?.protocolVersion,       //BO
+                emptyBP: "",                 //BP
+                requestedTagNum: sample.requestedTagNumber,         //BQ
+                emptyBR: "",
+                emptyBS: "",
+                emptyBT: "",
+                emptyBU: "",
+                emptyBV: "",
+                emptyBW: "",
+                resin: (prtclNote && prtclNote.containsKey("Resin")) ? prtclNote.Resin : "",          //BX
+                pool: sampleInRun?.pool,           //BY
+                volToPool: sampleInRun?.volumeToPool,     //BZ
+                poolDate: sampleInRun?.poolDate?.format('yyMMdd'),       //CA
+                PCRCycle: (prtclNote && prtclNote.containsKey("PCR Cycle")) ? prtclNote["PCR Cycle"] : "",        //CB
+                quibitReading: (poolNote && poolNote.containsKey("quibitReading")) ? poolNote["quibitReading"] : "",  //CC
+                quibitDilution: (poolNote && poolNote.containsKey("quibitDilution")) ? poolNote["quibitDilution"] : "", //CD
+                concentration: (poolNote && poolNote.containsKey("concentration")) ? poolNote["concentration"] : "",  //CE
+                emptyCF: "",   //CF
+                emptyCG: "",
+                emptyCH: "",      //CH
+                emptyCI: "",       //CI
+                rd1Start: (readPositions && readPositions.containsKey("rd1")) ? readPositions.rd1[0] : "",       //CJ
+                rd1End: (readPositions && readPositions.containsKey("rd1")) ? readPositions.rd1[1] : "",         //CK
+                indexStart: (readPositions && readPositions.containsKey("index1")) ? readPositions.index1.join(",") : "",     //CL
+                indexEnd: (readPositions && readPositions.containsKey("index2")) ? readPositions.index2.join(",") : "",        //CM
+                rd2Start: (readPositions && readPositions.containsKey("rd2")) ? readPositions.rd2[0] : "",       //CN
+                rd2End: (readPositions && readPositions.containsKey("rd2")) ? readPositions.rd2[1] : "",         //CO
+                emptyCP: "",              //CP
+                runStr: platform + run.runNum,         //CQ
+                emptyCR: "",
+                emptyCS: "",
+                emptyCT: "",
+                emptyCU: "",
+                userStr: run.user?.username,        //CV
+                dateStr: sample.date?.format('yyMMdd'),       //CW
+                fcidStr: run.fcId,       //CX
+                emptyCY: "",
+                emptyCZ: "",
+                emptyDA: "",
+                emptyDB: "",
+                emptyDC: "",
+                emptyDD: "",
+                emptyDE: "",
+                emptyDF: "", 
+                emptyDG: "",
+                emptyDH: "",
+                emptyDI: "",
+                indexStr: sample.sequenceIndicesIdString    //DJ
+            ]
+        }
+        return [sampleExports: sampleExports, laneExports: laneExports]
+        
+    }
+    
 	
 	def getNamedData(String[] data) {
 	    [laneStr: data[0],         //A       
@@ -963,14 +1170,14 @@ class QfileUploadService {
 	    ]
 	}
     
-     def getNamedLaneData(String[] data) {
+    def getNamedLaneData(String[] data) {
 	    [libraryPoolArchiveId: data[0],         //A       
 	     libraryVolume: getFloat(data[1]),                //B
          libraryStock: getFloat(data[2]),                 //C
          libraryStdDev: getFloat(data[3]),                //D
          pctLibraryStdDev: getFloat(data[4]),             //E
-         qPcrDateStr: getDate(data[5]),                      //F
-         technicianName: getUser(data[6]),                   //G
+         qPcrDate: getDate(data[5]),                      //F
+         technician: getUser(data[6]),                   //G
          // instrument: data[7],//H
          cycles: data[8],                       //I
          srOrPe: data[9],                       //J
@@ -979,7 +1186,7 @@ class QfileUploadService {
          qubitConc: getFloat(data[12]),                   //M
          qPcrConc: getFloat(data[13]),                    //N
          libraryLoadedPm: getFloat(data[14]),             //O
-         phiXLoaed: getFloat(data[15]),                   //P
+         phiXLoaded: getFloat(data[15]),                   //P
          libraryLoadedFmol: getFloat(data[16]),           //Q
          notes: data[17],                       //R
          runNum: getInteger(data[18]),                         //S

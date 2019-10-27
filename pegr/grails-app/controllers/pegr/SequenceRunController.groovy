@@ -7,11 +7,13 @@ import groovy.time.TimeCategory
 import groovy.json.*
 import grails.converters.*
 import grails.util.Holders
+import pl.touk.excel.export.WebXlsxExporter
+import pl.touk.excel.export.XlsxExporter
 
 class SequenceRunController {
     def springSecurityService
     def sequenceRunService
-    def qfileUploadService
+    def qfileService
     def walleService
     def reportService
     def utilityService
@@ -27,7 +29,7 @@ class SequenceRunController {
                 offset: params.offset ?: 0
             ]
         def runs
-	def galaxy = Holders.config.defaultGalaxy
+        def galaxy = Holders.config.defaultGalaxy
         if (status) {
             runs = c.list(listParams) {
                 eq "status", (status as RunStatus)
@@ -59,7 +61,6 @@ class SequenceRunController {
 
     def show(Long id) {
         def run = SequenceRun.get(id)
-        def sample = Sample.get(id)
         def cohorts = run.cohorts
         def cohortUserList = []
         def isCohortUser = false
@@ -366,10 +367,10 @@ class SequenceRunController {
                 def endLine = params.int("endLine")
                 def laneLine = params.int("laneLine")
                 
-                def csvNames = qfileUploadService.convertXlsxToCsv(folder, filepath, params.sampleSheet, params.laneSheet)
+                def csvNames = qfileService.convertXlsxToCsv(folder, filepath, params.sampleSheet, params.laneSheet)
                 
                 // check file for potential errors, e.g. unreasonal number of new projects
-                def warnings = qfileUploadService.checkFile(csvNames[params.sampleSheet],
+                def warnings = qfileService.checkFile(csvNames[params.sampleSheet],
                                              startLine,
                                             endLine)
                 
@@ -381,7 +382,7 @@ class SequenceRunController {
                 
                 def user = springSecurityService.currentUser
                 def basicCheck = true
-                def messages = qfileUploadService.migrateXlsx(csvNames[params.sampleSheet],
+                def messages = qfileService.migrateXlsx(csvNames[params.sampleSheet],
                                         csvNames[params.laneSheet],
                                           RunStatus.PREP,
                                           startLine,
@@ -412,7 +413,7 @@ class SequenceRunController {
             def laneLine = params.int("laneLine")                
             def user = springSecurityService.currentUser
             def basicCheck = true
-            def messages = qfileUploadService.migrateXlsx(params.sampleSheet,
+            def messages = qfileService.migrateXlsx(params.sampleSheet,
                                       params.laneSheet,
                                       RunStatus.PREP,
                                       startLine,
@@ -451,7 +452,7 @@ class SequenceRunController {
                 def endLine = params.int("endLine")
                 
                 // check file for potential errors, e.g. unreasonal number of new projects
-                def warnings = qfileUploadService.checkFile(filepath,
+                def warnings = qfileService.checkFile(filepath,
                                              startLine,
                                             endLine)
                 
@@ -463,7 +464,7 @@ class SequenceRunController {
                 
                 def user = springSecurityService.currentUser
                 def basicCheck = true
-                def results = qfileUploadService.migrateSamples(filepath,
+                def results = qfileService.migrateSamples(filepath,
                                           RunStatus.PREP,
                                           startLine,
                                           endLine,
@@ -492,7 +493,7 @@ class SequenceRunController {
             def endLine = params.int("endLine")              
             def user = springSecurityService.currentUser
             def basicCheck = true
-            def results = qfileUploadService.migrateSamples(params.sampleSheet,
+            def results = qfileService.migrateSamples(params.sampleSheet,
                                       RunStatus.PREP,
                                       startLine,
                                       endLine,
@@ -574,6 +575,27 @@ class SequenceRunController {
         return
     }
 
+    def downloadQueueFile(Long runId) {
+        def results = qfileService.exportRun(runId)
+        def sampleProperties = results.sampleExports.size() > 0 ? results.sampleExports[0].keySet() as List : ["No data!"]
+        def laneProperties = results.laneExports.size() > 0 ? results.laneExports[0].keySet() as List : ["No data!"]
+        
+        def filesroot = utilityService.getFilesRoot()
+        def template = new File(filesroot, 'QueueTemplate.xlsx');
+        WebXlsxExporter webXlsxExporter = new WebXlsxExporter(template.getPath())
+        webXlsxExporter.setWorksheetName("SAMPLE")
+
+        webXlsxExporter.with {
+            setResponseHeaders(response)
+            add(results.sampleExports, sampleProperties )
+            sheet('Lane').with {
+                add(results.laneExports, laneProperties )
+            }
+            save(response.outputStream)
+        }
+            
+    }
+    
     def downloadRunInfo(String remoteRoot, Long runId) {
         String RUN_INFO_TEMP = "runInfo${runId}"
         def timeout = 60*1000

@@ -33,6 +33,7 @@
                 <button id="run-status-cancel" class="btn btn-default">Cancel</button>
             </span>
         </small></h2>
+    <g:link action="downloadQueueFile" params="[runId:run.id]" class="btn btn-primary pull-right">Download Queue File</g:link>
     <a href="#" class="btn btn-primary pull-right" data-toggle="modal" data-target="#download-run-info">Download Run Info Files</a>
     <div id="download-run-info" class="modal fade" role="dialog">
       <div class="modal-dialog">

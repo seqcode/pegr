@@ -1058,7 +1058,8 @@ class QfileService {
                 indexStr: sample.sequenceIndicesIdString    //DJ
             ]
         }
-        return [sampleExports: sampleExports, laneExports: laneExports]
+        def filename = sprintf('Run%d-%s-%s.xlsx', [runId, run.directoryName, new Date().format('yyyyMMdd')])
+        return [sampleExports: sampleExports, laneExports: laneExports, filename: filename]
         
     }
     

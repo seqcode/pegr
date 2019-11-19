@@ -577,6 +577,7 @@ class SequenceRunController {
 
     def downloadQueueFile(Long runId) {
         def results = qfileService.exportRun(runId)
+        
         def sampleProperties = results.sampleExports.size() > 0 ? results.sampleExports[0].keySet() as List : ["No data!"]
         def laneProperties = results.laneExports.size() > 0 ? results.laneExports[0].keySet() as List : ["No data!"]
         
@@ -586,7 +587,7 @@ class SequenceRunController {
         webXlsxExporter.setWorksheetName("SAMPLE")
 
         webXlsxExporter.with {
-            setResponseHeaders(response)
+            setResponseHeaders(response, results.filename)
             add(results.sampleExports, sampleProperties )
             sheet('Lane').with {
                 add(results.laneExports, laneProperties )

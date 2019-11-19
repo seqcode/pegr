@@ -33,7 +33,7 @@
                 </g:if>
                 <th class="text-right col-tags group-qc">Requested Tags</th>
                 <g:each in="${qcSettings.general}" var="setting">
-                  <g:if test="${setting.name != "Deduplicated"}">
+                  <g:if test="${setting.name != 'Deduplicated'}">
                     <th class="text-right col-${setting.key} group-qc">
                         ${setting.name}
                         <ul style="font-weight: normal">
@@ -46,10 +46,10 @@
                   </g:if>
                 </g:each>
                 <th class="col-prefer group-operation"><label class="switch"><input id="verifyAll" class="prefer2" type="checkbox"><div class="slider round"></div></label><span class="isAdmin" style="display:none">${isAdmin}</span>
-					</br>Verified</th>
+					<br/>Verified</th>
                 <th class="col-delete group-operation"><input type="checkbox" id="selectAll" value="selectAll">
-						<a id="ajaxDeleteAll" type="button"><span class="glyphicon glyphicon-trash"></a>
-					</br>Delete
+                    <a id="ajaxDeleteAll" type="button"><span class="glyphicon glyphicon-trash"></span></a>
+					<br/>Delete
 				</th>
             </tr>
         </thead>

@@ -35,8 +35,7 @@ class ReportController {
                 def headers = [:]
                 def subheaders = [:]
                 def priorGroup
-                def galaxy = Holders.config.defaultGalaxy
-		def admin = false
+		        def admin = false
                 def user = springSecurityService.currentUser
                 if (user.isAdmin()) {
                     admin = true
@@ -58,14 +57,14 @@ class ReportController {
                         }
                     }
                 }
+                
                 [runStatus: runStatus.results,
                  noResultSamples: runStatus.noResultSamples,
                  qcSettings: qcSettings,
                  run: run,
                  headers: headers,
                  subheaders: subheaders,
-                 defaultGalaxy: galaxy,
-		 isAdmin: admin
+         		 isAdmin: admin
                 ]
             } catch (ReportException e) {
                 flash.message = e.message

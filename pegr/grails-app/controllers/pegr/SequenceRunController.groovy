@@ -29,7 +29,6 @@ class SequenceRunController {
                 offset: params.offset ?: 0
             ]
         def runs
-        def galaxy = Holders.config.defaultGalaxy
         if (status) {
             runs = c.list(listParams) {
                 eq "status", (status as RunStatus)
@@ -56,7 +55,7 @@ class SequenceRunController {
         } else {
             runs = SequenceRun.list(listParams)
         }
-        [runs: runs, str: str, defaultGalaxy: galaxy]
+        [runs: runs, str: str]
     }
 
     def show(Long id) {

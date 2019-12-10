@@ -1,7 +1,6 @@
 <html>
 <head>
     <title>Workbench</title> 
-    <g:set var="defaultGalaxy" value="${defaultGalaxy}" scope="request"/>
     <meta name="layout" content="analysis"/>
     <style>
         form {

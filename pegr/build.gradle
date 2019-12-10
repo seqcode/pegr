@@ -7,6 +7,7 @@ buildscript {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.15.1"
+        classpath 'org.grails.plugins:database-migration:3.1.0.RC1'
     }
 }
 
@@ -23,6 +24,14 @@ apply plugin:"org.grails.grails-gsp"
 repositories {
     mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir 'grails-app/migrations'
+        }
+    }
 }
 
 dependencies {
@@ -67,6 +76,7 @@ dependencies {
     compile 'org.grails.plugins:external-config:1.2.2'
     compile 'org.grails.plugins:excel-export:2.1'
     compile fileTree(dir: 'libs', include: '*.jar')
+    compile 'org.liquibase:liquibase-core:3.6.1'
 }
 
 bootRun {

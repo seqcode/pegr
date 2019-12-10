@@ -1,7 +1,6 @@
 <html>
 <head>
     <title>Samples</title>
-    <g:set var="defaultGalaxy" value="${defaultGalaxy}" scope="request"/>
     <meta name="layout" content="analysis"/>
     <asset:javascript src="cookie.js"/>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">

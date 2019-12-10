@@ -21,9 +21,8 @@ class SampleController {
             params.order = "desc"
         }
         def samples = Sample.where{status == SampleStatus.COMPLETED}.list(params)
-	def galaxy = Holders.config.defaultGalaxy
 
-        [sampleList: samples, sampleCount: Sample.count(), defaultGalaxy: galaxy]
+        [sampleList: samples, sampleCount: Sample.count()]
     }
 
 	def show(Long id) {
@@ -340,20 +339,18 @@ class SampleController {
     }
 
     def searchForm() {
-	   def galaxy = Holders.config.defaultGalaxy
-	[defaultGalaxy: galaxy]
+	   
     }
 
     def search(QuerySampleRegistrationCommand cmd) {
         // cmd.max = cmd.max ?: 15
         def samples = sampleService.search(cmd)
-	    def galaxy = Holders.config.defaultGalaxy
 
         def checkedCount = 0;
         if (session.checkedSample) {
             checkedCount = session.checkedSample.size()
         }
-        [sampleList: samples, checkedCount: checkedCount, searchParams: cmd, defaultGalaxy: galaxy]
+        [sampleList: samples, checkedCount: checkedCount, searchParams: cmd]
     }
 
     def fetchDataForCheckedSamplesAjax() {

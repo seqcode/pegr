@@ -2905,4 +2905,5 @@ databaseChangeLog = {
 	include file: 'batchNotesNullable.groovy'
 
 	include file: 'addSampleRecommend.groovy'
+    include file: 'historyAndWorkflowUrl.groovy'
 }

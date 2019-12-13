@@ -157,6 +157,7 @@ class ReportService {
         def dto = [ 
                     alignmentId: alignment.id,
                     historyId: alignment.historyId,
+                    historyUrl: alignment.historyUrl,
 		    		galaxyBase: null,
                     genome: alignment.genome.name,
                     date: alignment.date,

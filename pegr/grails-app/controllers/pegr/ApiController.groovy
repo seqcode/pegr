@@ -149,6 +149,7 @@ class StatsRegistrationCommand implements grails.validation.Validateable {
     String toolId
     String workflowId
     String historyId
+    String history_url
     String workflowStepId
     String userEmail
     String toolCategory

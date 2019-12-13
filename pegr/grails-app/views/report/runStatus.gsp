@@ -171,7 +171,7 @@
     <g:link controller="report" action="unknownIndex" params="[runId: run.id]">Unknown index</g:link>
     <g:each in="${runStatus}">
         <div>
-            <h4>Pipeline: ${it.key.name}, version: ${it.key.pipelineVersion} (workflow ID: <a href="${it.key.workflowId}" target="_blank">${it.key.workflowId}</a>) <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link controller="pipelineAdmin" action="show" id="${it.key.id}" class="edit">Manage</g:link></sec:ifAnyGranted></h4>
+            <h4>Pipeline: ${it.key.name}, version: ${it.key.pipelineVersion} (workflow ID: <a href="${it.key.workflowUrl}" target="_blank">${it.key.workflowId}</a>) <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link controller="pipelineAdmin" action="show" id="${it.key.id}" class="edit">Manage</g:link></sec:ifAnyGranted></h4>
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#general">Core Pipeline</a></li>
                 <li><a data-toggle="tab" href="#yeast">Yeast QA Pipeline</a></li>

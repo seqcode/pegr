@@ -308,6 +308,7 @@ https://francline.vmhost.psu.edu/pegr/api/stats?apiKey=
     // else either "alingmentId" or "historyId" must be included.
     "alignmentId": long,
     "historyId": "string", 
+    "history_url": "string", 
     
     // required if this is from a new alignment
     // used to identify the sequence sample/experiment/alignment in PEGR 
@@ -323,7 +324,7 @@ https://francline.vmhost.psu.edu/pegr/api/stats?apiKey=
     
     // optional
     "workflowStepId": "string", 
-    
+
     // optional
     "statistics": [{
             "read": 1 or 2, // optional
@@ -364,7 +365,7 @@ https://francline.vmhost.psu.edu/pegr/api/stats?apiKey=
             </pre>
             <p>The API can be simply called through curl</p>
             <pre>
-curl  -X POST -H "Content-Type: application/json" -d '{"run": 1, "sample": 1, "genome": "sacCer3_cegr", "workflowId": "b266c9aed69b2935", "historyId": "58d3202e3", "toolCategory": "output_tagPileup", "statsToolId": "tag_pileup_frequency_output_stats", "workflowStepId": "10a140b06", "userEmail": "xxxx@psu.edu", "statistics": [{}, {}], "parameters": {}, "toolId": "sometool", "datasets": [{"type": "tabular", "id": "e4f3485fe716bd91", "uri": "someuri"}, {"type": "tabular", "id": "55f6655ba0a1f0ca", "uri": "someuri"}]}' https://francline.vmhost.psu.edu/pegr/api/stats?apiKey=XXXXXX
+curl  -X POST -H "Content-Type: application/json" -d '{"run": 1, "sample": 1, "genome": "sacCer3_cegr", "workflowId": "b266c9aed69b2935", "historyId": "58d3202e3", "history_url": "https://somepath/hisotry?id=58d3202e3", "toolCategory": "output_tagPileup", "statsToolId": "tag_pileup_frequency_output_stats", "workflowStepId": "10a140b06", "userEmail": "xxxx@psu.edu", "statistics": [{}, {}], "parameters": {}, "toolId": "sometool", "datasets": [{"type": "tabular", "id": "e4f3485fe716bd91", "uri": "someuri"}, {"type": "tabular", "id": "55f6655ba0a1f0ca", "uri": "someuri"}]}' https://francline.vmhost.psu.edu/pegr/api/stats?apiKey=XXXXXX
             </pre>
             <p>Here is a Python example</p>
             <pre>
@@ -377,6 +378,7 @@ data = {"userEmail": "xxxx@psu.edu",
         "genome": "sacCer3_cegr", 
         "workflowId": "b266c9aed69b2935", 
         "historyId": "58d3202e3", 
+        "history_url": "https://somepath/history?id=58d3202e3", 
         "toolCategory": "output_tagPileup", 
         "statsToolId": "tag_pileup_frequency_output_stats",
         "workflowStepId": "10a140b06", 
@@ -424,6 +426,7 @@ public class PostDataToPegr {
             		.add("genome", "sacCer3_cegr")
             		.add("workflowId", "b266c9aed69b2935")
             		.add("historyId", "abcd1234")
+                    .add("history_url", "https://somepath/history?id=abcd1234")
             		.add("toolCategory", "output_tagPileup")
                     .add("statsToolId", "tag_pileup_frequency_output_stats")
             		.add("workflowStepId", "abcdefg")

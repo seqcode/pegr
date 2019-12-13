@@ -1,4 +1,5 @@
 package pegr
+import groovy.json.*
 
 class Item {
     def utilityService
@@ -45,8 +46,15 @@ class Item {
         return indexList.join(",")
     }
     
-    Map getFieldMap() {
-        return utilityService.parseJson(this.customizedFields)
+    Map getFieldMap() {        
+        def jsonSlurper = new JsonSlurper()
+        def json
+
+        try {
+            json = jsonSlurper.parseText(this.customizedFields)
+        } catch(Exception e) {   
+        }
+        return json
     }
     
     static constraints = {
@@ -64,6 +72,6 @@ class Item {
     
     static mapping = {
         customizedFields sqlType: 'longtext'
-        status defaultValue: "'ItemStatus.GOOD'"
+        status defaultValue: "GOOD"
     }
 }

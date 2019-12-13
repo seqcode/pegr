@@ -109,7 +109,7 @@ grails.war.resources = { stagingDir ->
 }
 
 grails.gorm.default.constraints = {
-    '*'(nullable: true)
+    '*'(nullable: false)
 }
 
 // Added by the Spring Security Core plugin:

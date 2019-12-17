@@ -156,7 +156,6 @@ grails.plugin.springsecurity.interceptUrlMap = [
     [pattern: '/report/togglePreferredAlignment/**',  access: ['ROLE_ADMIN']],
     [pattern: '/report/updateReportStatusAjax/**',    access: ['ROLE_ADMIN']],
     [pattern: '/report/updateAnalysisCodeAjax/**',    access: ['ROLE_ADMIN']],
-    [pattern: '/report/deletePurgedAlignments/**',    access: ['ROLE_ADMIN']],
     [pattern: '/protocolInstanceBag/renderFile/**',   access: ['permitAll']],
     [pattern: '/protocolInstanceBag/reopenBag/**',    access: ['ROLE_ADMIN']],
     [pattern: '/protocolInstanceBag/deleteBag/**',    access: ['ROLE_ADMIN']],

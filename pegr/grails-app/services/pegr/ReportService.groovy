@@ -15,9 +15,7 @@ class ReportService {
     def utilityService
     def alignmentStatsService
     def springSecurityService
-    final Map QC_SETTINGS = ['general': "QC_SETTINGS", 'yeast': "YEAST_QC_SETTINGS"]
-    final String PURGE_ALIGNMENTS_CONFIG = "PurgeAlignmentsConfig"
-    final String GALAXY_CONFIG = "GalaxyConfig"
+    final Map QC_SETTINGS = ['general': "QC_SETTINGS"]
     final String DYNAMIC_ANALYSIS_STEPS = "DYNAMIC_ANALYSIS_STEPS"
     final String DECISION_TREE = "DECISION_TREE"
     
@@ -158,7 +156,6 @@ class ReportService {
                     alignmentId: alignment.id,
                     historyId: alignment.historyId,
                     historyUrl: alignment.historyUrl,
-		    		galaxyBase: null,
                     genome: alignment.genome.name,
                     date: alignment.date,
                     status: [],
@@ -173,11 +170,7 @@ class ReportService {
                     dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
                     recommend: experiment.sample.recommend
                 ]
-	//bam_file in sequence_alignment has the Galaxy url
-        if (alignment.bamFile) {
-            int p = alignment.bamFile.indexOf('datasets');
-            dto["galaxyBase"] = alignment.bamFile.substring(0, p-1)
-        }
+
         def stepsStr = Chores.findByName(DYNAMIC_ANALYSIS_STEPS)?.value
         def steps
         if (stepsStr) {
@@ -241,71 +234,6 @@ class ReportService {
             log.error e
             throw new ReportException(message: "Error deleting the alignment!")
         } 
-    }
-    
-   /**
-    * Delete purged alignments with dates from saved chores
-    * @param startDate
-    * @param endDate
-    */
-    def deletePurgedAlignments(Date startDate, Date endDate) {
-        final String RUN = "RUN"
-        final String ERROR = "ERROR"
-        
-        // get Galaxy config
-        def galaxyConfig = utilityService.parseJson(Chores.findByName(GALAXY_CONFIG)?.value)
-        if (!galaxyConfig || !galaxyConfig.url || !galaxyConfig.key) {
-            throw new ReportException(message: "Galaxy config is not correctly defined!")
-        }
-        
-        // set current config in Chores
-        def chore = Chores.findByName(PURGE_ALIGNMENTS_CONFIG)
-        if (!chore) {
-            chore = new Chores(name:PURGE_ALIGNMENTS_CONFIG)
-        }
-        
-        def config = utilityService.parseJson(chore.value)
-        if (config) {
-            if (config.status == RUN) {
-                throw new ReportException(message: "A job is currently running to delete purged alignments!")
-            }
-        } else {
-            config = [:]
-        }
-        def runTime = new Date()
-        config.currentRunTime = runTime
-        config.currentStartDate = startDate
-        config.currentEndDate = endDate
-        config.status = RUN
-        chore.value = JsonOutput.toJson(config)
-        if (!chore.save(flush:true)) {
-            throw new ReportException(message: "The job status cannot be updated. Job canceled!")
-        }
-        
-        try {
-            // find the alignments in the time interval
-            def alignments = SequenceAlignment.where { date >= startDate && date <= endDate }.list()
-            alignments.each { alignment ->
-                def url = galaxyConfig.url + "api/histories/" + alignment.historyId + "?key=" + galaxyConfig.key
-                def s = new URL(url).getText()
-                def result = utilityService.parseJson(s)
-                if (result?.purged) {
-                    deleteAlignment(alignment.id)
-                }
-            }
-            config = [lastStartDate: startDate,
-                      lastEndDate: endDate,
-                      lastRunTime: runTime
-                     ]
-        } catch (Exception e) {
-            log.error e
-            config.status = ERROR
-        }
-        // update config        
-        chore.value = JsonOutput.toJson(config)
-        if (!chore.save(flush:true)) {
-            throw new ReportException(message: "Job finished successfully, but the job status cannot be updated.")
-        }        
     }
     
    /**
@@ -662,39 +590,6 @@ class ReportService {
     }
     
    /**
-    * Fetch MemER motifs from MemER file.
-    * @param url of the MemER file
-    * @return a list of memER motifs's information
-    */
-    def fetchMemERMotif(String url) {
-        if (url == null || url == "") {
-            throw new ReportException(message: "Missing URL!")
-        }
-        def pwm = []
-        try {
-            def config = utilityService.getGpfsConfig()
-            
-            def cmd = "ssh -i ${config.keyfile} ${config.username}@${config.host} cat ${url}"
-            def timeout = 1000 * 60 * 1 // 1 min
-            def data = utilityService.executeCommand(cmd, timeout)
-
-            data.eachLine {
-                def numbers = it.tokenize()
-                def a = []
-                numbers.eachWithIndex { n, index ->
-                    if (index > 0 && index < 5) {
-                        a.push(utilityService.getFloat(n))
-                    }
-                }
-                pwm.push(a)
-            }
-        } catch (Exception e) {
-            throw new ReportException(message: "Error fetching the memER data!")
-        }
-        return [pwm: pwm]
-    }
-    
-   /**
     * Find the value of a given name in a string of motif information.
     * @param s the string of motif information
     * @param name the value's name
@@ -931,13 +826,10 @@ class ReportService {
     
    /**
     * Get the unknown index of a sequence run from Bcl2Fastq report.
-    * <p>
-    * First, try to get it from the local folder; if it's not there, fetch it from remote GPFS.
     * @param run sequence run
     * @return the unknown index file's path
     */
     def getUnknownIndex(SequenceRun run) {
-        // First, try to get it from the local folder
         final String localFolder = "Bcl2FastqUnknownIndex"
         def localRoot = utilityService.getFilesRoot()
         File localPath = new File(localRoot, localFolder)
@@ -947,31 +839,7 @@ class ReportService {
         def localFile = new File(localPath, "${run.directoryName}_unknownIndex.html")
         def filepath = localFile.getPath()
 
-        // If the file is not in the local folder, fetch it from the remote GPFS.
-        if (!localFile.exists()) {
-            fetchUnknownIndexFromGpfs(run, filepath)
-        }
         return filepath
-    }
-    
-   /**
-    * Fetch the unknown index file from GPFS using scp.
-    * @param run the sequence run  
-    * @param localFile the local filepath of the unknown index file
-    */
-    def fetchUnknownIndexFromGpfs(SequenceRun run, String localFile) {
-        final String gpfsRoot = "/gpfs/cyberstar/pughhpc/galaxy-cegr/files/prep/prep_dir/"
-        final String reportDir = "/Reports/html/"
-        final String unknownIndexFile = "/default/unknown/unknown/lane.html"
-        def config = utilityService.getGpfsConfig()
-
-        String remotePath = gpfsRoot + run.directoryName + reportDir + run.fcId + unknownIndexFile
-        
-        def cmd = "scp -i ${config.keyfile} ${config.username}@${config.host}:${remotePath} ${localFile}"
-        
-        def timeout = 1000 * 60 * 1 // 1 min
-        utilityService.executeCommand(cmd, timeout)
-        
     }
     
     def getDecisionTree(String type) {

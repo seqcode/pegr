@@ -41,6 +41,6 @@
         </g:form>
     </div>
     <script>
-    $(".nav-datasets").addClass("active");
+    $(".nav-search-sample").addClass("active");
     </script>
 </body>

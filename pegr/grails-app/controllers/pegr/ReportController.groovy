@@ -40,23 +40,6 @@ class ReportController {
                 if (user.isAdmin()) {
                     admin = true
                 }
-                if (qcSettings.yeast) {
-                    headers["yeast"] = []
-                    subheaders["yeast"] = []
-                    qcSettings.yeast.each { setting ->
-                        if (setting.group) {
-                            subheaders.yeast.push(setting.name)
-                            if (!priorGroup || setting.group != priorGroup) {
-                                headers.yeast.push([name: setting.group, rowspan: 1, colspan: 1])
-                                priorGroup = setting.group
-                            } else {
-                                headers.yeast.last().colspan++
-                            }
-                        } else {
-                            headers.yeast.push([name: setting.name, rowspan: 2, colspan: 1])
-                        }
-                    }
-                }
                 
                 [runStatus: runStatus.results,
                  noResultSamples: runStatus.noResultSamples,
@@ -137,11 +120,6 @@ class ReportController {
         render results
     }
 
-    def fetchMemERDataAjax(String url) {
-        def results = reportService.fetchMemERMotif(url) as JSON
-        render results
-    }
-
     def composite(String url) {
         [url: url]
     }
@@ -162,10 +140,7 @@ class ReportController {
     def manage() {
         // get QC settings
         def results = reportService.getQcSettings()
-        // get the purge alignments configs for the last time
-        def purgeConfigStr = Chores.findByName(reportService.PURGE_ALIGNMENTS_CONFIG)?.value
-        def purgeConfig = utilityService.parseJson(purgeConfigStr)
-        [qcSettings: results.qcSettings, meta: results.meta, purgeConfig: purgeConfig]
+        [qcSettings: results.qcSettings, meta: results.meta]
     }
 
     def saveQcSettings() {
@@ -176,21 +151,6 @@ class ReportController {
             flash.message = e.message
             redirect(action: "editQcSettings")
         }
-    }
-
-    def deletePurgedAlignments() {
-        def message
-        try {
-            def startDate = params.startDate
-            def endDate = params.endDate
-            reportService.deletePurgedAlignments(startDate, endDate)
-            message = "Sucess deleting purged alignments between ${startDate} and ${endDate}!"
-        } catch (ReportException e) {
-            message = e.message
-        }
-        def purgeConfigStr = Chores.findByName(reportService.PURGE_ALIGNMENTS_CONFIG)?.value
-        def purgeConfig = utilityService.parseJson(purgeConfigStr)
-        render(template: "purgeAlignments", model: [purgeConfig:purgeConfig, message: message])
     }
 
     def togglePreferredAlignment(Long alignmentId) {

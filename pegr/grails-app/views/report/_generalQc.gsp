@@ -62,7 +62,9 @@
             <g:each in="${sample.alignmentStatusList}" var="alignment" status="n">
                 <g:if test="${n>0}"><tr></g:if>
                     <td class="col-genome group-analysis">${alignment.genome}</td>
-                    <td class="col-history group-analysis"><a href="${alignment.historyUrl}" target="_blank">${alignment.historyId}</a></td>
+                    <td class="col-history group-analysis">
+                        <g:if test="${alignment.historyUrl}"><a href="${alignment.historyUrl}" target="_blank">${alignment.historyId}</a></g:if><g:else>${alignment.historyId}</g:else>
+                </td>
                     <td class="col-date group-analysis">${alignment.date}</td>
                     <g:each in="${alignment.status}" var="status" status="j">
 

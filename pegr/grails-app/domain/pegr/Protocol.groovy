@@ -21,9 +21,6 @@ class Protocol {
         return s
 	}
     
-    static hasMany = [protocolGroups: ProtocolGroup]
-    static belongsTo = [ProtocolGroup]
-    
     List getSharedItemTypes() {
         return ProtocolItemTypes.where{protocol == this && function == ProtocolItemFunction.SHARED}.collect{it.itemType}
     }

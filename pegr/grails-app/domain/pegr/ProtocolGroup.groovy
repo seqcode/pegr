@@ -5,13 +5,14 @@ class ProtocolGroup {
 	String name
 	Date dateCreated
     User user
-    List protocols
+    
+    List getProtocols() {
+        return ProtocolGroupProtocols.where {protocolGroup == this}.collect {it.protocol}
+    }
     
 	String toString() {
 		name
 	}
-    
-    static hasMany = [protocols: Protocol]
 	
     static constraints = {
     	name unique: true

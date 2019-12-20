@@ -60,9 +60,11 @@ class ProtocolGroupAdminController {
     def save() {
         // update with new input
         def protocolGroup = new ProtocolGroup(params)
+        def protocolList = params.list("protocolList")
+
         try {
-            protocolGroupService.save(protocolGroup)
-            flash.message = "Protocol Group ${protocolGroup.name} has been updated!"
+            protocolGroupService.save(protocolGroup, protocolList)
+            flash.message = "Protocol Group ${protocolGroup.name} has been saved!"
             redirect(id: protocolGroup.id, action: 'show')
         } catch(ProtocolGroupException e) {
             flash.message = e.message
@@ -73,15 +75,12 @@ class ProtocolGroupAdminController {
     def update() {
         withForm {
             def protocolGroup = ProtocolGroup.get(params.id)
-            
+            def protocolList = params.list("protocolList")
             if (protocolGroup) {
-                //remove old protocols
-                protocolGroup.protocols.clear()
-                
                 // update with new input
                 protocolGroup.properties = params
                 try {
-                    protocolGroupService.save(protocolGroup)
+                    protocolGroupService.update(protocolGroup, protocolList)
                     flash.message = "Protocol Group ${protocolGroup.name} has been updated!"
                     redirect(id: protocolGroup.id, action: 'show')
                 } catch(ProtocolGroupException e) {

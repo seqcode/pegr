@@ -2906,4 +2906,5 @@ databaseChangeLog = {
 
 	include file: 'addSampleRecommend.groovy'
     include file: 'historyAndWorkflowUrl.groovy'
+    include file: 'updateProtocolGroupProtocols.groovy'
 }

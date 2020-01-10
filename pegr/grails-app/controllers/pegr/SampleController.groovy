@@ -168,9 +168,20 @@ class SampleController {
         [antibody: cmd, item: item, sampleId: sampleId, antibodyId: antibodyId, itemTypeOptions: itemTypeOptions]
     }
 
-    def updateAntibody(Long sampleId, Long antibodyId, AntibodyCommand cmd, Item item, String ifUpdateItem) {
+    def updateAntibody(Long sampleId, Long antibodyId, AntibodyCommand cmd, Item item, String ifCascade, String ifUpdateItem) {
         try {
+            def updateInPlace = true
             if (antibodyId) {
+                if (ifCascade != "yes") {
+                    def sampleCount = Sample.where {antibody.id == antibodyId}.count() 
+                    if (sampleCount > 1) {
+                        updateInPlace = false
+                    }
+                }
+            } else {
+                updateInPlace = false
+            }
+            if (updateInPlace) {
                 if (ifUpdateItem == "yes") {
                     antibodyService.update(cmd, item)
                 } else {
@@ -183,6 +194,7 @@ class SampleController {
                     antibodyService.saveInSample(sampleId, cmd)
                 }
             }
+
             flash.message = "Antibody update!"
             redirect(action: "edit", params: [sampleId: sampleId])
         } catch(AntibodyException e) {
@@ -193,13 +205,15 @@ class SampleController {
 
     def searchAntibody(Long sampleId) {
         def itemTypeOptions = ItemType.where {category.superCategory == ItemTypeSuperCategory.ANTIBODY}.list()
-        [sampleId: sampleId, itemTypeOptions: itemTypeOptions]
+        def antibodyTypeId = itemTypeOptions[0].id
+        [sampleId: sampleId, itemTypeOptions: itemTypeOptions, antibodyTypeId: antibodyTypeId]
     }
 
     def previewAntibody(Long sampleId, Long typeId, String barcode) {
         def item = Item.where{type.id == typeId && barcode == barcode}.get(max: 1)
+        def antibody = Antibody.findByItem(item)
         if (item) {
-            [sampleId: sampleId, item: item]
+            [sampleId: sampleId, item: item, antibody: antibody]
         } else {
             flash.message = "Antibody not found!"
         }

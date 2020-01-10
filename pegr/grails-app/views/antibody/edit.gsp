@@ -15,10 +15,10 @@
         </div>
     </g:hasErrors>
     <g:form action="update" class="fields" role="form" method="post">
-        <g:hiddenField name="id" value="${antibody.id}"></g:hiddenField>
+        <g:hiddenField name="antibodyId" value="${antibody.antibodyId}"></g:hiddenField>
         <g:render template="form" model="['object': antibody]"></g:render>
         <g:submitButton class="btn btn-primary" name="save" value="Save"/>
-        <g:link class="btn btn-default" action="show" id="${antibody.id}">Cancel</g:link>
+        <g:link class="btn btn-default" action="show" id="${antibody.antibodyId}">Cancel</g:link>
     </g:form>
 </div>
 </body>

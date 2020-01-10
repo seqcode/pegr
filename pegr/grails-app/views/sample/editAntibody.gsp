@@ -19,6 +19,13 @@
             <h4>Antibody Information</h4>
             <g:render template="/antibody/form" model="['object': antibody]"></g:render>
         </div>
+        <div id="ifCascade">
+            <h4>Do you want to cascade this change to all the samples linked to this antibody?</h4>
+            <ul>
+                <li><input type="radio" name="ifCascade" value="yes"/> <label>Yes, change all the samples linked to this antibody.</label></li>
+                <li><input type="radio" name="ifCascade" value="no" checked/> <label>No, only change sample ${sampleId}.</label></li>
+            </ul>
+        </div>
         <div id="update-item">
             <h4>Do you want to update item?</h4>
             <input type="radio" name="ifUpdateItem" value="yes"/> <label>Yes</label>

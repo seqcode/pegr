@@ -14,9 +14,9 @@
     </g:if>
     <g:form class="fields" role="form" action="previewAntibody" >
         <g:hiddenField name="sampleId" value="${sampleId}"/>
-        <div class=" ${hasErrors(bean: item, field: 'type', 'error')} ">
+        <div class="form-group">
             <label>Type</label>
-            <select id="type" name="type.id">
+            <select id="type" name="typeId">
                 <option value="${antibodyTypeId}" selected>Antibody</option>
             </select>
         </div>      
@@ -27,6 +27,7 @@
             <a href="#" onclick="refreshHash();"><span class="glyphicon glyphicon-refresh"></span></a>
         </div>
         <g:submitButton class="btn btn-primary" name="search" value="Search"/>
+        <g:link action="edit" params="[sampleId: sampleId]" class="btn btn-default">Cancel</g:link>
     </g:form>                    
 
     <script>

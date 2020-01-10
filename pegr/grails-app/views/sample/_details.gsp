@@ -87,14 +87,8 @@
                             </div>
                             <div class="modal-body">
                                 <ul>
-                                    <g:if test="${sample.antibody}">
-                                        <li>- <g:link action="editAntibody" params="[sampleId:sample.id, antibodyId:sample.antibody.id]">Edit this antibody.</g:link></li>
-                                        <li>- <g:link action="searchAntibody" params="[sampleId:sample.id]">Change to an existing antibody.</g:link></li>
-                                        </g:if>
-                                    <g:else>
-                                        <li>- <g:link action="searchAntibody" params="[sampleId:sample.id]">Add an existing antibody.</g:link></li>
-                                    </g:else>
-                                    <li>- <g:link action="editAntibody" params="[sampleId:sample.id]">Create a new antibody.</g:link></li>
+                                    <li>- <g:link action="editAntibody" params="[sampleId:sample.id, antibodyId:sample.antibody.id]">Edit this antibody.</g:link></li>
+                                    <li>- <g:link action="searchAntibody" params="[sampleId:sample.id]">Search existing antibody through barcode.</g:link></li>
                                 </ul>
                             </div>
                         </div>

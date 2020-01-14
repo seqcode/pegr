@@ -31,10 +31,7 @@ class AlignmentStatsService {
                 throw new AlignmentStatsException(message: "Sequence alignment not found!")
             }
         } else if (data.historyId) {
-            alignment = SequenceAlignment.findByHistoryId(data.historyId)
-            if (!alignment) {
-                alignment = createAlignment(data, apiUser)
-            }
+            alignment = getAlignment(data, apiUser)
         } else {
             throw new AlignmentStatsException(message: "Missing historyId or alignmentId!")
         }
@@ -50,7 +47,7 @@ class AlignmentStatsService {
     * @param apiUser
     * @return created sequence alignment
     */
-    def createAlignment(StatsRegistrationCommand data, User apiUser) {
+    def getAlignment(StatsRegistrationCommand data, User apiUser) {
         // check required fields
         checkRequiredFields(data, ["run", "sample", "genome", "workflowId"])
         
@@ -73,15 +70,18 @@ class AlignmentStatsService {
             throw new AlignmentStatsException(message: "Genome ${data.genome} not found!")
         }           
         
-        // create a new alignment.
-        def alignment = new SequenceAlignment(sequencingExperiment: experiment, 
+        def alignment = SequenceAlignment.findByHistoryIdAndPipelineAndGenomeAndSequencingExperiment(data.historyId, pipeline, genome, experiment)
+        if (!alignment) {
+            // create a new alignment.
+            alignment = new SequenceAlignment(sequencingExperiment: experiment, 
                                              genome: genome, 
                                              pipeline: pipeline,
                                              historyId: data.historyId,
                                              historyUrl: data.history_url,
                                              isPreferred: false, 
                                              date: new Date())
-        alignment.save(flush:true, failOnError: true)
+            alignment.save(flush:true, failOnError: true)
+        }
         return alignment 
     }
     

@@ -3,6 +3,7 @@ package pegr
 class ReplicateInterceptor {
 
     def springSecurityService
+    def projectService
     
     boolean before() { 
         if (actionName == 'show') {

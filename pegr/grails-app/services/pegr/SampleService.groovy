@@ -359,7 +359,7 @@ class SampleService {
         } else {
             def sampleId = sample?.id
             def sql = new Sql(dataSource)
-            def count = sql.rows("SELECT count(*) as cnt FROM project_user pu JOIN project_samples ps ON pu.project_id = ps.project_id WHERE pu.user_id = ${user.id} and ps.sample_id = ${sampleId} and pu.project_role in (${ProjectRole.OWNER}, ${ProjectRole.PARTICIPANT})")
+            def count = sql.rows("SELECT count(*) as cnt FROM project_user pu JOIN project_samples ps ON pu.project_id = ps.project_id WHERE pu.user_id = ${user.id} and ps.sample_id = ${sampleId} and pu.project_role in ('OWNER', 'PARTICIPANT')")
             if (count[0].cnt > 0) {
                 return true
             } else {

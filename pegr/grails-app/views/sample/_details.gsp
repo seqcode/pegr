@@ -239,7 +239,7 @@
             <tbody>
             <tr><td>Index</td><td> ${sample.sequenceIndicesString} (${sample.sequenceIndicesIdString})</td></tr>
 
-            <tr><td>Chromosome (ug)</td><td> <g:if test="${sample?.chromosomeAmount}">${sample.chromosomeAmount}</g:if></td></tr>
+            <tr><td>Chromatin (ug)</td><td> <g:if test="${sample?.chromosomeAmount}">${sample.chromosomeAmount}</g:if></td></tr>
 
             <tr><td>Avail. Cell# per aliquot (M)</td><td> <g:if test="${sample?.cellNumber}">${sample.cellNumber}</g:if></td></tr>
 

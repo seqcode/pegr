@@ -353,7 +353,7 @@ class SampleController {
     }
 
     def searchForm() {
-	   
+
     }
 
     def search(QuerySampleRegistrationCommand cmd) {

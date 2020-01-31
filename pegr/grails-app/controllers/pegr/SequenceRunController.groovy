@@ -365,7 +365,7 @@ class SequenceRunController {
                 def startLine = params.int("startLine")
                 def endLine = params.int("endLine")
                 def laneLine = params.int("laneLine")
-                
+
                 def csvNames = qfileService.convertXlsxToCsv(folder, filepath, params.sampleSheet, params.laneSheet)
                 
                 // check file for potential errors, e.g. unreasonal number of new projects

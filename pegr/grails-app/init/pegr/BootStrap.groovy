@@ -33,28 +33,15 @@ class BootStrap {
             itemType.save()
         }
 
-        if (!SequencingPlatform.findByName("SOLiD")) {
-            new SequencingPlatform(name: "SOLiD").save(flush: true)
-        }
-
-        if (!SequencingPlatform.findByName("Illumina GA")) {
-            new SequencingPlatform(name: "Illumina GA").save(flush: true)
-        }
-
-        if (!SequencingPlatform.findByName("HiSeq 2000")) {
-            new SequencingPlatform(name: "HiSeq 2000").save(flush: true)
-        }
-
-        if (!SequencingPlatform.findByName("NextSeq 500")) {
-            new SequencingPlatform(name: "NextSeq 500").save(flush: true)
-        }
     }
     
     private createChoresIfRequired() {
         if (!Chores.findByName("RunsInQueue")) {
+            println "Creating RunsInQueue"
             new Chores(name: "RunsInQueue").save(flush: true)                   
         }
         if (!Chores.findByName("PriorRunFolder")) {
+            println "Creating PriorRunFoler"
             new Chores(name: "PriorRunFolder").save(flush: true)                   
         }
     }    
@@ -64,14 +51,16 @@ class BootStrap {
         if (!User.findByUsername("labadmin")) {
             println "Fresh Database. Creating ADMIN user."
 
-        def adminRole = new Role(authority: "ROLE_ADMIN").save(failOnError: true)
-        def username = grailsApplication.config.defaultUser.username
-        def origPassword = grailsApplication.config.defaultUser.password
-        def adminUser = new User(
+            def adminRole = new Role(authority: "ROLE_ADMIN").save(failOnError: true)
+            def adminGroup = new RoleGroup(name: "Admin").save(failOnError: true)
+            def adminGroupRole = new RoleGroupRole(role: adminRole, roleGroup: adminGroup).save(failOnError: true)
+            def username = "labadmin"
+            def origPassword = "labadmin"
+            def adminUser = new User(
                     username: username,
                     password: springSecurityService.encodePassword(origPassword),
                     enabled: true).save(failOnError: true)
-            UserRole.create adminUser, adminRole
+            UserRoleGroup.create adminUser, adminGroup
         }
         else {
             println "Existing admin user, skipping creation"

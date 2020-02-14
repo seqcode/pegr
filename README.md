@@ -21,21 +21,21 @@ $ git clone https://github.com/seqcode/pegr.git
 $ cd pegr
 ```
 
-2. Set up database.
-   First, create an empty database with utf8 coding and assign privileges.
+2. Set up database. First, create an empty database with utf8 coding and assign privileges.
 
 ```
 CREATE DATABASE <DB_NAME> CHARACTER SET utf8 COLLATE utf8_general_ci;
 GRANT ALL PRIVILEGES ON <DB_NAME>.* TO '<USER_NAME>'@'localhost' with grant option;
 FLUSH PRIVILEGES;
 ```
-   Then import the baseline database.
+
+Then import the baseline database.
    
 ```
-$ mysql -u <USER_NAME> -p <DB_NAME> < database/pegr_baseline.sql 
+$ mysql -u <USER_NAME> -p <DB_NAME> < sample_files/pegr_baseline.sql 
 ```
 
-   And configure the database connection in PEGR. There are two places that you can put the database connection settings. One is in the pegr/grails-app/conf/application.yml file. You can have different connection settings for development, test and production environments.
+And configure the database connection in PEGR. There are two places that you can put the database connection settings. One is in the pegr/grails-app/conf/application.yml file. You can have different connection settings for development, test and production environments.
      
 ```
 environments:
@@ -86,9 +86,9 @@ $ cd pegr
 $ grails run-app
 ```
 
-4. go to http://localhost:8080/pegr/ and you will see the login page. Login with the default user name "labadmin" and password "labadmin". Change the password right away at the user's profile page.
+4. Go to http://localhost:8080/pegr/ and you will see the login page. Login with the default user name "labadmin" and password "labadmin". Change the password right away at the user's profile page. You may also want to add sequencing platforms and sequence indexes in the Admin page. 
 
-Now you are ready to use PEGR. For more information, please visit https://github.com/seqcode/pegr/wiki.
+For more information, please visit https://github.com/seqcode/pegr/wiki.
 
 ### Reference
 

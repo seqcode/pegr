@@ -17,8 +17,8 @@ A tested stack of versions is listed below.
 1. Clone the codes.
 
 ```
-git clone https://github.com/seqcode/pegr.git 
-cd pegr
+$ git clone https://github.com/seqcode/pegr.git 
+$ cd pegr
 ```
 
 2. Set up database.
@@ -32,7 +32,7 @@ FLUSH PRIVILEGES;
    Then import the baseline database.
    
 ```
-mysql -u <USER_NAME> -p <DB_NAME> < database/pegr_baseline.sql 
+$ mysql -u <USER_NAME> -p <DB_NAME> < database/pegr_baseline.sql 
 ```
 
    And configure the database connection in PEGR. There are two places that you can put the database connection settings. One is in the pegr/grails-app/conf/application.yml file. You can have different connection settings for development, test and production environments.
@@ -82,7 +82,7 @@ grails.config.locations = [ ...
 3. Run PEGR.
 
 ```
-cd pegr
+$ cd pegr
 $ grails run-app
 ```
 

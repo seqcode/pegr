@@ -209,6 +209,12 @@ class ProjectController {
         render "success"
     }
     
+    /**
+     * Given the search string, search for the project with matching string in name or description.
+     * @param str the search string
+     * @param merge indicator. If the given value is "merge", the next step is to merge projects; 
+     * else simply list the projects. 
+     */
     def search(String str, String merge) {
         def c = Project.createCriteria()
         def listParams = [
@@ -234,6 +240,13 @@ class ProjectController {
         }
     }
     
+    /**
+     * Merge the projects stored in session to the project in cmd. If the "merge to" project does not exist 
+     * yet, a new project will be saved first. The users in cmd are added to the "merge to" project. After 
+     * the merge, all references (except project_user) to the "merge from" projects
+     * will be changed to the "merge to" project and the "merge from" projects will be removed.
+     * @param cmd a class with project name and a list user and roles in the "merge to" project
+     */
     def merge(UserRoleListCommand cmd) {
         if (session.checkedProject) {
             try {
@@ -250,7 +263,10 @@ class ProjectController {
             redirect(action: "all")
         }
     }
-    
+        
+    /**
+     * Clear the session and return to the project/all page
+     */
     def cancelMerge() {
         if (session.checkedProject) {
             session.checkedProject = null
@@ -258,6 +274,9 @@ class ProjectController {
         redirect(action: "all")
     }
     
+    /**
+     * Clear the stored project IDs in session
+     */
     def clearCheckedProjectAjax(){
         if (session.checkedProject) {
             session.checkedProject = null
@@ -265,6 +284,11 @@ class ProjectController {
         render true
     }
 
+    /**
+     * Given a project ID, store it in the session.
+     * @param id project ID
+     * Return the number of projects stored in the session.
+     */
     def addCheckedProjectAjax(Long id) {
         if (!session.checkedProject) {
             session.checkedProject = []
@@ -274,7 +298,12 @@ class ProjectController {
         }
         render session.checkedProject.size()
     }
-
+    
+    /**
+     * Given a project ID, remove it from the session.
+     * Return the number of projects stored in the session.
+     * @param id project ID
+     */
     def removeCheckedProjectAjax(Long id) {
         if (id in session.checkedProject) {
             session.checkedProject.remove(id)
@@ -282,6 +311,9 @@ class ProjectController {
         render session.checkedProject.size()
     }
 
+    /**
+     * Get project IDs stored from session and query the projects form the IDs.
+     */
     def showChecked(){
         def projects = []
         if (session.checkedProject) {

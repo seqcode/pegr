@@ -4,6 +4,11 @@ class SequenceRunInterceptor {
 
     def springSecurityService
     
+    /** 
+     * This is executed before the following actions in sequenceRun controller. 
+     * Only when the status of the sequence run is not "COMPLETED" 
+     * and only the admin or the sequence run user is allowed to make the changes.
+     */
     boolean before() { 
         if (actionName in ['editRead',
                            'updateRead',

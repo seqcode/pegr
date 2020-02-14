@@ -5,6 +5,11 @@ class ReportInterceptor {
     def springSecurityService
     def projectService
     
+    /**
+     * This is executed before the following actions in report controller.
+     * If the report is automatically generated, admin or member or the porject user can view it;
+     * else only the admin or the report user can view it.
+     */
     boolean before() { 
         if (actionName == 'show') {
             def user = springSecurityService.currentUser

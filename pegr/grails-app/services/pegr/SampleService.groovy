@@ -349,7 +349,7 @@ class SampleService {
 
     /**
      * Authorization to edit the given sample: Admin or
-     * the owner or participant in the project which the sample belong to
+     * the owner or participant in the project which the sample belongs to
      * @param sample the given sample
      **/
     def editAuth(Sample sample) {
@@ -359,6 +359,10 @@ class SampleService {
         } else {
             def sampleId = sample?.id
             def sql = new Sql(dataSource)
+            
+            // Count the number of projects that 
+            // (1) the sample belongs to and 
+            // (2) the user has a role of OWNER or PARTICIPANT in the project.
             def count = sql.rows("SELECT count(*) as cnt FROM project_user pu JOIN project_samples ps ON pu.project_id = ps.project_id WHERE pu.user_id = ${user.id} and ps.sample_id = ${sampleId} and pu.project_role in ('OWNER', 'PARTICIPANT')")
             if (count[0].cnt > 0) {
                 return true

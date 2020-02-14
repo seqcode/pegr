@@ -10,6 +10,12 @@ class AbHostAdminController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
+    /**
+     * List of ab hosts. If str is not given, all ab hosts are listed; 
+     * else only ab hosts whose name contains the search string are listed. 
+     * @param max the maximum number of ab hosts to shoow on one page
+     * @param str search string
+     */
     def index(Integer max, String str) {
         if (str && AbHost.hasProperty("name")) {
             def c = AbHost.createCriteria()

@@ -120,6 +120,10 @@ class TargetAdminController {
     
 	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS
     
+    /**
+     * Given the search string, search for targets with matching name, c-term tag or n-term tag.
+     * @param str the search string
+     */
     def mergeSearch(String str) {
         def c = Target.createCriteria()
         def listParams = [
@@ -143,6 +147,34 @@ class TargetAdminController {
         [totalCount: targets.totalCount, targets: targets, str: str, checkedCount: checkedCount]
     }
     
+    /**
+     * Get target IDs stored from session and query the targets form the IDs.
+     */
+    def showChecked(){
+        def targets = []
+        if (session.checkedTarget) {
+            session.checkedTarget.each {
+                def target = Target.get(it)
+                if (target) {
+                    targets.push(Target.get(it))
+                }
+            }
+        }
+        if (targets.size() == 0) {
+            flash.message = "No targets to merge!"
+            redirect(action: "index")
+        }
+        
+        [list: targets]
+    }
+    
+    /**
+     * Merge the targets stored in session to the target with the given name, type, n-term tag 
+     * and c-term tag. If the "merge to" target does not exist yet, a new target will be saved first.
+     * Note that this function is called after search in admin/target, and allows for multiple 
+     * targets merged at a time. After the merge, all references to the "merge from" targets will be 
+     * changed to the "merge to" target and the "merge from" targets will be removed.
+     */
     def merge(String targetName, String targetType, String nTermTag, String cTermTag) {
         if (session.checkedTarget) {
             try {
@@ -165,4 +197,52 @@ class TargetAdminController {
             redirect(action: "index")
         }
     }
+    
+    /**
+     * Clear the session and return to the admin/target page
+     */
+    def cancelMerge() {
+        if (session.checkedTarget) {
+            session.checkedTarget = null
+        }        
+        redirect(action: "index")
+    }
+    
+    /**
+     * Clear the stored target IDs in session
+     */
+    def clearCheckedTargetAjax(){
+        if (session.checkedTarget) {
+            session.checkedTarget = null
+        }
+        render true
+    }
+
+    /**
+     * Given a target ID, store it in the session.
+     * @param id target ID
+     * Return the number of targets stored in the session.
+     */
+    def addCheckedTargetAjax(Long id) {
+        if (!session.checkedTarget) {
+            session.checkedTarget = []
+        }
+        if (!(id in session.checkedTarget)) {
+            session.checkedTarget << id
+        }
+        render session.checkedTarget.size()
+    }
+
+    /**
+     * Given a target ID, remove it from the session.
+     * Return the number of targets stored in the session.
+     * @param id target ID
+     */
+    def removeCheckedTargetAjax(Long id) {
+        if (id in session.checkedTarget) {
+            session.checkedTarget.remove(id)
+        }
+        render session.checkedTarget.size()
+    }
+
 }

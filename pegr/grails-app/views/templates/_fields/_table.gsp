@@ -1,3 +1,4 @@
+<!-- to use this template, add <f:table collection="COLLECTION_NAME"/> -->
 <table>
     <thead>
          <tr>

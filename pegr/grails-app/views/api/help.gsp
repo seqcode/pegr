@@ -38,7 +38,7 @@
             </pre>
             and send a POST request to the url
             <pre>
-https://francline.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=
+https://thanos.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=
             </pre> 
             Once the request is authenticated by the user's email and API key, the samples that match all the property values in the query will be returned in the following JSON format.
             <pre>
@@ -108,13 +108,13 @@ https://francline.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=
     
             <p>The API can be simply called through curl</p>
             <pre>
-curl -X POST -H "Content-Type: application/json" -d '{"id": 11690, "userEmail": "xxxx@psu.edu"}' https://francline.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=XXXXXXX -o output
+curl -X POST -H "Content-Type: application/json" -d '{"id": 11690, "userEmail": "xxxx@psu.edu"}' https://thanos.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=XXXXXXX -o output
             </pre>
 
             <p>The following is an example in Python.</p>
             <pre>
 import requests
-url = "https://francline.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=XXXXXXX"
+url = "https://thanos.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=XXXXXXX"
 data = {"userEmail": "xxxx@psu.edu",
         "preferredOnly": "true",
         "target": "CTCF",
@@ -151,7 +151,7 @@ public class FetchSampleDataFromPegr {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {          
             // create a http post request
-            HttpPost httpPost = new HttpPost("https://francline.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=XXXXXXXXX);
+            HttpPost httpPost = new HttpPost("https://thanos.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=XXXXXXXXX);
             
             // construct the data in JSON format 
             JsonObject object = Json.createObjectBuilder()
@@ -214,12 +214,12 @@ public class FetchSampleDataFromPegr {
             <p>PEGR will return the results in the same format as above.</p>
             <p>The API can be simply called through curl</p>
             <pre>
-curl  -X POST -H "Content-Type: application/json" -d '{"runId": 215, "userEmail": "xxxx@psu.edu"}' https://francline.vmhost.psu.edu/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX -o output
+curl  -X POST -H "Content-Type: application/json" -d '{"runId": 215, "userEmail": "xxxx@psu.edu"}' https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX -o output
             </pre>
             <p>The following is an example in Python.</p>
             <pre>
 import requests
-url = "https://francline.vmhost.psu.edu/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX"
+url = "https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX"
 query = {"userEmail": "xxxxx@psu.edu", "runId": 212, "preferredOnly": "true"}
 r = requests.post(url, json=query)
 results = r.json()
@@ -246,7 +246,7 @@ public class FetchSequenceRunDataFromPegr {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {
             // create a http post request
-            HttpPost httpPost = new HttpPost("https://francline.vmhost.psu.edu/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX");
+            HttpPost httpPost = new HttpPost("https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX");
                         
             // construct the data in JSON format 
             JsonObject object = Json.createObjectBuilder()
@@ -296,7 +296,7 @@ public class FetchSequenceRunDataFromPegr {
         <div>
             <p>PEGR accepts POST request at </p>
             <pre>
-https://francline.vmhost.psu.edu/pegr/api/stats?apiKey=
+https://thanos.vmhost.psu.edu/pegr/api/stats?apiKey=
             </pre>
             <p>The data sent to PEGR should be in the following JSON format:</p>
             <pre>
@@ -365,13 +365,13 @@ https://francline.vmhost.psu.edu/pegr/api/stats?apiKey=
             </pre>
             <p>The API can be simply called through curl</p>
             <pre>
-curl  -X POST -H "Content-Type: application/json" -d '{"run": 1, "sample": 1, "genome": "sacCer3_cegr", "workflowId": "b266c9aed69b2935", "historyId": "58d3202e3", "history_url": "https://somepath/hisotry?id=58d3202e3", "toolCategory": "output_tagPileup", "statsToolId": "tag_pileup_frequency_output_stats", "workflowStepId": "10a140b06", "userEmail": "xxxx@psu.edu", "statistics": [{}, {}], "parameters": {}, "toolId": "sometool", "datasets": [{"type": "tabular", "id": "e4f3485fe716bd91", "uri": "someuri"}, {"type": "tabular", "id": "55f6655ba0a1f0ca", "uri": "someuri"}]}' https://francline.vmhost.psu.edu/pegr/api/stats?apiKey=XXXXXX
+curl  -X POST -H "Content-Type: application/json" -d '{"run": 1, "sample": 1, "genome": "sacCer3_cegr", "workflowId": "b266c9aed69b2935", "historyId": "58d3202e3", "history_url": "https://somepath/hisotry?id=58d3202e3", "toolCategory": "output_tagPileup", "statsToolId": "tag_pileup_frequency_output_stats", "workflowStepId": "10a140b06", "userEmail": "xxxx@psu.edu", "statistics": [{}, {}], "parameters": {}, "toolId": "sometool", "datasets": [{"type": "tabular", "id": "e4f3485fe716bd91", "uri": "someuri"}, {"type": "tabular", "id": "55f6655ba0a1f0ca", "uri": "someuri"}]}' https://thanos.vmhost.psu.edu/pegr/api/stats?apiKey=XXXXXX
             </pre>
             <p>Here is a Python example</p>
             <pre>
 import requests
 
-url = "https://francline.vmhost.psu.edu/pegr/api/stats?apiKey=XXXXXX"
+url = "https://thanos.vmhost.psu.edu/pegr/api/stats?apiKey=XXXXXX"
 data = {"userEmail": "xxxx@psu.edu", 
         "run": 1, 
         "sample": 1, 
@@ -416,7 +416,7 @@ public class PostDataToPegr {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {            
             // create a http post request
-            HttpPost httpPost = new HttpPost("https://francline.vmhost.psu.edu/pegr/api/stats?apiKey=XXXXXXX");
+            HttpPost httpPost = new HttpPost("https://thanos.vmhost.psu.edu/pegr/api/stats?apiKey=XXXXXXX");
             
             // construct the data in JSON format 
             JsonObject object = Json.createObjectBuilder()

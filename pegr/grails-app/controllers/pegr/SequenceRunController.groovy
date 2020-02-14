@@ -513,6 +513,7 @@ class SequenceRunController {
     }
 
     def fetchProjectsAjax(Long runId) {
+        // Given sequnece run ID, find all projects related to the sequence run. Return the list of related projects in the format [[project_name, project_name],...] to conform with select2 in view.
         def projects = SequencingCohort.where{ run.id == runId }.collect {it.project?.name}.toList()
         render utilityService.stringToSelect2Data(projects) as JSON
     }
@@ -574,6 +575,12 @@ class SequenceRunController {
         return
     }
 
+    /**
+     * download Q-file for the sequence run, 
+     * including information about samples and lane.
+     * This can be activated when downloading the Queue File
+     * @param runId ID of the seuqnce run
+     */
     def downloadQueueFile(Long runId) {
         def results = qfileService.exportRun(runId)
         

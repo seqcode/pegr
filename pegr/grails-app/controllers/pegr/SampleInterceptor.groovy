@@ -7,8 +7,12 @@ class SampleInterceptor {
     def dataSource
     def sampleService
     
+    /**
+     * This is executed before the following actions in sample controller and checks authorization. 
+     */
     boolean before() { 
         if (actionName == 'show') {
+            // Only admin, member and users of projects that the sample belongs to can view the sample.
             def user = springSecurityService.currentUser
             if (user.isAdmin() || user.isMember()) {
                 return true
@@ -24,6 +28,7 @@ class SampleInterceptor {
                 }                    
             }
         } else if (actionName == 'edit') {
+            // Only admin and the owner and participant in the project which the sample belong to can edit the sample.
             def sample = Sample.get(params.long('sampleId'))
             if (sampleService.editAuth(sample)) {
                 return true

@@ -35,6 +35,11 @@ class BootStrap {
 
     }
     
+    /**
+     * Create rows in table "chores" to record 
+     * (1) the sequence runs waiting in the queue to be analyzed and 
+     * (2) the foler of the prior analyzed sequence run.
+     */
     private createChoresIfRequired() {
         if (!Chores.findByName("RunsInQueue")) {
             println "Creating RunsInQueue"

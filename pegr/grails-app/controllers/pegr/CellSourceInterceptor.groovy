@@ -4,6 +4,10 @@ class CellSourceInterceptor {
 
     def springSecurityService
     
+    /**
+     * This is executed before the following actionsin cell source controller. 
+     * Only admin or the cell source user is authorized to make the change.
+     */
     boolean before() { 
         if (actionName in ['edit',
                            'update',

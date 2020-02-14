@@ -1,3 +1,6 @@
+/*
+ * draw the interactive meme figure
+ */
 function MemeDrawer () {
 function toggle_class(node, cls, enabled) {
   var classes = node.className;

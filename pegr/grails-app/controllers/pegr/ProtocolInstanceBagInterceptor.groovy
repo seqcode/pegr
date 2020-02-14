@@ -4,6 +4,9 @@ class ProtocolInstanceBagInterceptor {
 
     def springSecurityService
     
+    /**
+     * This is executed before the following actions in protocolInstanceBag controller and checks authorization. 
+     */
     boolean before() { 
         if (actionName in ['searchItemForBag',
                            'previewItemAndBag',

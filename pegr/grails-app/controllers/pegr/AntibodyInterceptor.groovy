@@ -4,6 +4,10 @@ class AntibodyInterceptor {
 
     def springSecurityService
     
+    /**
+     * This is executed before the following actions in antibody controller. 
+     * Only the admin or the antibody user is authorized to make the change.
+     */
     boolean before() { 
         if (actionName in ['edit',
                            'update',

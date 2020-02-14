@@ -9,6 +9,9 @@ class QfileException extends RuntimeException {
     String message
 }
     
+/**
+ * Service to import and export sample submission form (Q-file) .
+ */
 @Transactional
 class QfileService {
     def cellSourceService
@@ -856,6 +859,11 @@ class QfileService {
 		
     }
     
+    /**
+     * Given a sequence run's ID, export the Qfile of the sequence run, 
+     * including information for the samples and the lane.
+     * @param runId ID of the sequence run that needs to be exported.
+     */
     def exportRun(Long runId) {
         def run = SequenceRun.get(runId)
         

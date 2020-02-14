@@ -1,3 +1,4 @@
+<!-- this template is called from show.gsp and shows the top panel on the sample/show page. It has four tables, including cell source, antibody, protocol and other. -->
 <div class="row">
     <div id="cellSource" class="col-sm-3">
         <h4>Cell Source 

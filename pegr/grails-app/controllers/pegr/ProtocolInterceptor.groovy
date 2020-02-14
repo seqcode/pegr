@@ -4,6 +4,10 @@ class ProtocolInterceptor {
 
     def springSecurityService
     
+    /**
+     * This is executed before the following actions in protocol controller.
+     * Only admin or portocol user are authorized to make the change.
+     */
     boolean before() { 
         if (actionName in ['edit',
                            'delete',

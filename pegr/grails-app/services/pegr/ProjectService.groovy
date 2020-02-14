@@ -86,7 +86,7 @@ class ProjectService {
     }
     
     /**
-     * ADMIN, MEMBER and project users are allow to view the project
+     * ADMIN, MEMBER and project users are allowed to view the project
      */
     def projectViewAuth(Long projectId) {
         def authorized = false

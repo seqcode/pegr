@@ -5,6 +5,9 @@ class ReplicateInterceptor {
     def springSecurityService
     def projectService
     
+    /**
+     * This is executed before the following actions in replicate controller and checks authorization. 
+     */
     boolean before() { 
         if (actionName == 'show') {
             def currUser = springSecurityService.currentUser

@@ -281,21 +281,25 @@
         });
         
         $(".project").on('click', ".value", function() {
-            var td = $(this).parent();
-            var oldValue = $(this).text();
-            if (oldValue == "NONE") {
-                oldValue = ""
+            // show the project edit widget when the status is not 'COMPLETED'.
+            var status = $("#run-status-show").text();
+            if (status != "COMPLETED") {
+                var td = $(this).parent();
+                var oldValue = $(this).text();
+                if (oldValue == "NONE") {
+                    oldValue = ""
+                }
+                var edit = "<span class='input'><select style='width:200px; display:none'><option selected value='" + oldValue + "'>" + oldValue + "</option></select></span>";
+                appendEdit(this, edit);
+                $.ajax({
+                    url: "/pegr/sequenceRun/fetchProjectsAjax?runId=${run.id}"
+                }).done(function(result){
+                    td.find("select").select2({
+                        data: result,
+                        tags: false
+                    });    
+                });
             }
-            var edit = "<span class='input'><select style='width:200px; display:none'><option selected value='" + oldValue + "'>" + oldValue + "</option></select></span>";
-            appendEdit(this, edit);
-            $.ajax({
-                url: "/pegr/sequenceRun/fetchProjectsAjax?runId=${run.id}"
-            }).done(function(result){
-                td.find("select").select2({
-                    data: result,
-                    tags: false
-                });    
-            });
         });
         
         $(".project").on("click", ".cancel", function() {

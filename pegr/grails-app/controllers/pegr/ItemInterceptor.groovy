@@ -4,6 +4,10 @@ class ItemInterceptor {
 
     def springSecurityService
     
+    /**
+     * This is executed before the following actions in item controller. 
+     * Only admin or the item user is authorized to make the change.
+     */
     boolean before() { 
         if (actionName in ['edit',
                            'update',

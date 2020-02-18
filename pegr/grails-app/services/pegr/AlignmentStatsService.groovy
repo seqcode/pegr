@@ -298,7 +298,7 @@ class AlignmentStatsService {
                     if (experiment.fastqFile) {
                         fastq = jsonSlurper.parseText(experiment.fastqFile)
                     }
-                    def newFastq = queryDatasetsUri(datasets, "fastqsanger")
+                    def newFastq = queryDatasetsUri(datasets, "fastqsanger.gz")
                     if (newFastq) {
                         def key = "read${category[-1]}"
                         fastq[key] = newFastq

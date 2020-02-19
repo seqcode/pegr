@@ -1,0 +1,16 @@
+{
+    "mysql":{
+        "host":"localhost",
+        "user":"xxx",
+        "passwd":"xxxx",
+        "database":"pegr"
+    },
+    "field":"treatment",
+    "data":[
+        {
+            "sample_id":10828,
+            "old":"ZL1",
+            "new":"ZL2"
+        }      
+    ]
+}

@@ -1,11 +1,10 @@
 <html>
 <head>
     <title>Samples</title>
-    <g:set var="defaultGalaxy" value="${defaultGalaxy}" scope="request"/>
     <meta name="layout" content="analysis"/>
     <asset:javascript src="cookie.js"/>
-    <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
-    <script type="text/javascript" src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 </head>
 <body>
     <div class="container-fluid">
@@ -16,6 +15,9 @@
             <g:link action="showFilesForCheckedSamples" class="btn btn-default">Files</g:link>
         </div>
         <g:render template="table" model="['sampleList':sampleList, 'checkbox':true]"></g:render>
+        <div class="pagination">
+            <g:paginate next="Next" prev="Prev" controller="sample" action="search" max="50" total="${sampleList.totalCount?: 0}" params="${params}" />
+        </div>
     </div>
     <script>
         $(function(){
@@ -30,13 +32,6 @@
             checkedCount = 0;
             $("#checked-count").text(checkedCount);
           }});
-
-        $('#table_id').DataTable()({
-          'scrollY': '50vh',
-          'dom': 'Bfrtip',
-          'scrollCollapse': true,
-          'paging': true
-        });
       });
 
         // BugFix || git:hedgiejo || Add checkbox feature that can select and deselect all checkboxes.

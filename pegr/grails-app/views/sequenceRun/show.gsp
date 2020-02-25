@@ -33,6 +33,7 @@
                 <button id="run-status-cancel" class="btn btn-default">Cancel</button>
             </span>
         </small></h2>
+    <g:link action="downloadQueueFile" params="[runId:run.id]" class="btn btn-primary pull-right">Download Queue File</g:link>
     <a href="#" class="btn btn-primary pull-right" data-toggle="modal" data-target="#download-run-info">Download Run Info Files</a>
     <div id="download-run-info" class="modal fade" role="dialog">
       <div class="modal-dialog">
@@ -280,21 +281,25 @@
         });
         
         $(".project").on('click', ".value", function() {
-            var td = $(this).parent();
-            var oldValue = $(this).text();
-            if (oldValue == "NONE") {
-                oldValue = ""
+            // show the project edit widget when the status is not 'COMPLETED'.
+            var status = $("#run-status-show").text();
+            if (status != "COMPLETED") {
+                var td = $(this).parent();
+                var oldValue = $(this).text();
+                if (oldValue == "NONE") {
+                    oldValue = ""
+                }
+                var edit = "<span class='input'><select style='width:200px; display:none'><option selected value='" + oldValue + "'>" + oldValue + "</option></select></span>";
+                appendEdit(this, edit);
+                $.ajax({
+                    url: "/pegr/sequenceRun/fetchProjectsAjax?runId=${run.id}"
+                }).done(function(result){
+                    td.find("select").select2({
+                        data: result,
+                        tags: false
+                    });    
+                });
             }
-            var edit = "<span class='input'><select style='width:200px; display:none'><option selected value='" + oldValue + "'>" + oldValue + "</option></select></span>";
-            appendEdit(this, edit);
-            $.ajax({
-                url: "/pegr/sequenceRun/fetchProjectsAjax?runId=${run.id}"
-            }).done(function(result){
-                td.find("select").select2({
-                    data: result,
-                    tags: false
-                });    
-            });
         });
         
         $(".project").on("click", ".cancel", function() {

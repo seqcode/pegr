@@ -1,11 +1,10 @@
 <html>
 <head>
   <title>Samples</title>
-  <g:set var="defaultGalaxy" value="${defaultGalaxy}" scope="request"/>
   <meta name="layout" content="analysis"/>
   <!-- <asset:javascript src="cookie.js"/> -->
-  <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
-  <script type="text/javascript" src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+  <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 </head>
 <body>
   <div class="container-fluid">
@@ -13,7 +12,7 @@
       <g:render template="table" model="['sampleList':sampleList, 'checkbox':false]"></g:render>
 
       <div class="pagination">
-            <g:paginate next="Next" prev="Prev" controller="sample" action="all" max="15" total="${sampleCount ?: 0}" />
+            <g:paginate next="Next" prev="Prev" controller="sample" action="all" max="50" total="${sampleList.totalCount ?: 0}" />
       </div>
 </div>
   <script>

@@ -9,9 +9,26 @@ class StrainAdminController {
     
     def strainService
     
-    def index(Integer max) {
-        params.max = Math.min(max ?: 25, 100)
-        [strainList: Strain.list(params), strainCount: Strain.count()]
+    def index(Integer max, String str) {
+        if (str && Strain.hasProperty("name")) {
+            def c = Strain.createCriteria()
+            def listParams = [
+                    max: max ?: 25,
+                    sort: params.sort ?: "id",
+                    order: params.order ?: "desc",
+                    offset: params.offset
+                ]
+            def likeStr = "%" + str + "%"
+            def items = c.list(listParams) {
+                or {
+                    ilike "name", likeStr
+                }
+            }
+            respond items, model:[strainCount: items.totalCount, str: str]
+        } else {       
+            params.max = Math.min(max ?: 25, 100)
+            respond Strain.list(params), model:[strainCount: Strain.count()]
+        }
     }
     
     def show(Long id) {

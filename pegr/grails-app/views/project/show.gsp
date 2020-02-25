@@ -119,10 +119,7 @@
                                 <label for="projectRole">Project Role</label>
                                 <g:select id="projectRole" name="projectRole" from="${pegr.ProjectRole.values()}" keys="${pegr.ProjectRole.values()*.name()}" noSelection="['null': '-- choose --']" /> 
                             </div>
-                            <g:submitToRemote type="button" class="btn btn-primary" value="Save" data-dismiss="modal"
-                                              url="[action: 'addUserAjax']"
-                                              update="[success: 'project-users']"
-                                              onComplete="closeModal()"/>
+                            <input onclick="jQuery.ajax({type:'POST',data:jQuery(this).parents('form:first').serialize(), url:'/pegr/project/addUserAjax',success:function(data,textStatus){jQuery('#project-users').html(data);},error:function(XMLHttpRequest,textStatus,errorThrown){},complete:function(XMLHttpRequest,textStatus){closeModal()}});return false" type="button" value="Save" class="btn btn-primary">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                         </form>                    
                     </div>
@@ -144,10 +141,7 @@
                                 <label for="projectRole">Project Role</label>
                                 <g:select id="projectRole" name="projectRole" from="${pegr.ProjectRole.values()}" keys="${pegr.ProjectRole.values()*.name()}" noSelection="['null': '-- choose --']" /> 
                             </div>
-                            <g:submitToRemote type="button" class="btn btn-primary" value="Save" data-dismiss="modal"
-                                              url="[action: 'editUserRoleAjax']"
-                                              update="[success: 'project-users']"
-                                              onComplete="closeModal()"/>
+                            <input onclick="jQuery.ajax({type:'POST',data:jQuery(this).parents('form:first').serialize(), url:'/pegr/project/editUserRoleAjax',success:function(data,textStatus){jQuery('#project-users').html(data);},error:function(XMLHttpRequest,textStatus,errorThrown){},complete:function(XMLHttpRequest,textStatus){closeModal()}});return false" type="button" value="Save" class="btn btn-primary">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                         </form>                    
                     </div>
@@ -169,10 +163,7 @@
                             </div>
                             <g:render template="/sample/inputSampleIds"></g:render>
                             <g:hiddenField name="projectId" value="${project.id}"></g:hiddenField>
-                            <g:submitToRemote type="button" class="btn btn-primary" name="save" value="Save" data-dismiss="modal"
-                                              url="[controller: 'replicate', action: 'saveAjax']"
-                                              update="[success: 'replicates']"
-                                              onComplete="closeModal()"/>
+                            <input onclick="jQuery.ajax({type:'POST',data:jQuery(this).parents('form:first').serialize(), url:'/pegr/replicate/saveAjax',success:function(data,textStatus){jQuery('#replicates').html(data);},error:function(XMLHttpRequest,textStatus,errorThrown){},complete:function(XMLHttpRequest,textStatus){closeModal()}});return false" type="button" name="save" value="Save" class="btn btn-primary">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                         </form>
                     </div>

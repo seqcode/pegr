@@ -80,14 +80,7 @@ class ApiController {
             } else {
                 data = reportService.fetchDataForSamples(sampleIds, cmd.preferredOnly)     
                 code = 200
-                message = "Success! Accepted filters:\n"
-                cmd.properties.each { prop, val ->
-                    if (!(prop in ["userEmail", "class", "metaClass"]) && val != null)
-                    message += "${prop}: ${val} \n"
-                }
-                if (cmd.id) {
-                    message += "id: ${cmd.id} \n"
-                }
+                message = "Success!"
             }
         } else {
             code = 401
@@ -140,8 +133,7 @@ class ResponseMessage {
 /* 
  * Class that defines the underlying structure of input JSON data
  */
-@grails.validation.Validateable
-class StatsRegistrationCommand {
+class StatsRegistrationCommand implements grails.validation.Validateable {
     Long alignmentId
     Long run
     Long sample
@@ -150,6 +142,7 @@ class StatsRegistrationCommand {
     String toolId
     String workflowId
     String historyId
+    String history_url
     String workflowStepId
     String userEmail
     String toolCategory
@@ -159,8 +152,7 @@ class StatsRegistrationCommand {
     List datasets
 }
 
-@grails.validation.Validateable
-class QuerySampleRegistrationCommand {
+class QuerySampleRegistrationCommand implements grails.validation.Validateable {
     String userEmail // required
     Boolean preferredOnly
     Integer max
@@ -176,8 +168,7 @@ class QuerySampleRegistrationCommand {
     String target
 }
 
-@grails.validation.Validateable
-class QueryRunRegistrationCommand {
+class QueryRunRegistrationCommand implements grails.validation.Validateable {
     String userEmail // required
     Boolean preferredOnly
     Long runId // required

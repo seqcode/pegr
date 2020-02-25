@@ -41,8 +41,8 @@ div.spacer
 	background-color:white;
 }
 
-#myNavbar a:visited {
-  background-color: #2c5986;
+#myNavbar {
+  background-color: #0077c2;
 }
 
 #myNavbar a:hover {
@@ -53,8 +53,13 @@ div.spacer
   background-color: #54585A;
 }
 
+#myNavbar .dropdown-menu li a {
+  color: white;
+}
+
 #myNavbar .dropdown-menu li {
-    padding: 5px 0;
+  padding: 5px 0;    
+  background-color: #0077c2;
 }
 
 .nav .open > a:focus {

@@ -15,15 +15,13 @@ class SampleController {
     def protocolInstanceBagService
 
     def all(Integer max) {
-        params.max = Math.min(max ?: 15, 100)
+        params.max = Math.min(max ?: 50, 100)
         if (!params.sort) {
             params.sort = "id"
             params.order = "desc"
         }
-        def samples = Sample.where{status == SampleStatus.COMPLETED}.list(params)
-	def galaxy = Holders.config.defaultGalaxy
-
-        [sampleList: samples, sampleCount: Sample.count(), defaultGalaxy: galaxy]
+        def samples = Sample.list(params)        
+        [sampleList: samples]
     }
 
 	def show(Long id) {
@@ -169,9 +167,20 @@ class SampleController {
         [antibody: cmd, item: item, sampleId: sampleId, antibodyId: antibodyId, itemTypeOptions: itemTypeOptions]
     }
 
-    def updateAntibody(Long sampleId, Long antibodyId, AntibodyCommand cmd, Item item, String ifUpdateItem) {
+    def updateAntibody(Long sampleId, Long antibodyId, AntibodyCommand cmd, Item item, String ifCascade, String ifUpdateItem) {
         try {
+            def updateInPlace = true
             if (antibodyId) {
+                if (ifCascade != "yes") {
+                    def sampleCount = Sample.where {antibody.id == antibodyId}.count() 
+                    if (sampleCount > 1) {
+                        updateInPlace = false
+                    }
+                }
+            } else {
+                updateInPlace = false
+            }
+            if (updateInPlace) {
                 if (ifUpdateItem == "yes") {
                     antibodyService.update(cmd, item)
                 } else {
@@ -184,6 +193,7 @@ class SampleController {
                     antibodyService.saveInSample(sampleId, cmd)
                 }
             }
+
             flash.message = "Antibody update!"
             redirect(action: "edit", params: [sampleId: sampleId])
         } catch(AntibodyException e) {
@@ -194,13 +204,15 @@ class SampleController {
 
     def searchAntibody(Long sampleId) {
         def itemTypeOptions = ItemType.where {category.superCategory == ItemTypeSuperCategory.ANTIBODY}.list()
-        [sampleId: sampleId, itemTypeOptions: itemTypeOptions]
+        def antibodyTypeId = itemTypeOptions[0].id
+        [sampleId: sampleId, itemTypeOptions: itemTypeOptions, antibodyTypeId: antibodyTypeId]
     }
 
     def previewAntibody(Long sampleId, Long typeId, String barcode) {
         def item = Item.where{type.id == typeId && barcode == barcode}.get(max: 1)
+        def antibody = Antibody.findByItem(item)
         if (item) {
-            [sampleId: sampleId, item: item]
+            [sampleId: sampleId, item: item, antibody: antibody]
         } else {
             flash.message = "Antibody not found!"
         }
@@ -340,20 +352,18 @@ class SampleController {
     }
 
     def searchForm() {
-	   def galaxy = Holders.config.defaultGalaxy
-	[defaultGalaxy: galaxy]
+
     }
 
     def search(QuerySampleRegistrationCommand cmd) {
         // cmd.max = cmd.max ?: 15
         def samples = sampleService.search(cmd)
-	    def galaxy = Holders.config.defaultGalaxy
 
         def checkedCount = 0;
         if (session.checkedSample) {
             checkedCount = session.checkedSample.size()
         }
-        [sampleList: samples, checkedCount: checkedCount, searchParams: cmd, defaultGalaxy: galaxy]
+        [sampleList: samples, checkedCount: checkedCount, searchParams: cmd]
     }
 
     def fetchDataForCheckedSamplesAjax() {
@@ -438,7 +448,12 @@ class SampleController {
     def updateAjax(Long sampleId, String name, String value) {
         try {
             def result = sampleService.update(sampleId, name, value)
-            render result as JSON
+            if (result) {
+                render result as JSON
+            } else {
+                render "success"
+            }
+            
         } catch (SampleException e) {
             render (status: 500, text: e.message)
         }

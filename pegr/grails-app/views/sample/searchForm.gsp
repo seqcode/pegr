@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <g:set var="defaultGalaxy" value="${defaultGalaxy}" scope="request"/>
     <meta name="layout" content="analysis">
     <title>Sample-Search</title>
 </head>
@@ -42,6 +41,6 @@
         </g:form>
     </div>
     <script>
-    $(".nav-datasets").addClass("active");
+    $(".nav-search-sample").addClass("active");
     </script>
 </body>

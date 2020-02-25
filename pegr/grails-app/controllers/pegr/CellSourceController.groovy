@@ -294,8 +294,7 @@ class CellSourceController {
     }
 }
 
-@grails.validation.Validateable
-class CellSourceCommand {
+class CellSourceCommand implements grails.validation.Validateable {
     Long cellSourceId
     Long itemId
     String genus
@@ -314,13 +313,11 @@ class CellSourceCommand {
     String bioSourceId
 }
 
-@grails.validation.Validateable
-class CellStockBatchCommand {
+class CellStockBatchCommand implements grails.validation.Validateable {
     List<CellSourceCommand> cellSources = [].withLazyDefault {new CellSourceCommand()}
 }
 
-@grails.validation.Validateable
-class ItemBatchCommand {
+class ItemBatchCommand implements grails.validation.Validateable {
     Long batchId
     List<Item> items = [].withLazyDefault {new Item()}
 }

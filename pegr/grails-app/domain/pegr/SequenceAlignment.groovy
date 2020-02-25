@@ -6,6 +6,7 @@ class SequenceAlignment {
 	Genome genome
     Pipeline pipeline
     String historyId
+    String historyUrl
 	Integer readDbId
     Aligner aligner
 	AlignType alignType
@@ -32,7 +33,7 @@ class SequenceAlignment {
         alignType nullable: true
         params nullable: true, blank: true, maxSize: 2000
         date nullable: true
-        
+        historyUrl nullable: true, blank: true
         bamFile nullable: true, blank: true, maxSize: 1000
         peHistogram nullable: true, blank: true, maxSize: 1000
         mappedReads nullable: true

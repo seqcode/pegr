@@ -1,3 +1,7 @@
+/*
+ * draw the interactive meme figure
+ */
+function MemeDrawer () {
 function toggle_class(node, cls, enabled) {
   var classes = node.className;
   var list = classes.replace(/^\s+/, '').replace(/\s+$/, '').split(/\s+/);
@@ -194,7 +198,7 @@ function find_parent_tag(node, tag_name) {
       drawable.task.run();
     }
     //allow UI updates between tasks
-    draw_timer = window.setTimeout("process_draw_tasks()", delay);
+    draw_timer = setTimeout(process_draw_tasks, delay);
   }
 
   //
@@ -208,7 +212,7 @@ function find_parent_tag(node, tag_name) {
     //reset the timer
     if (drawable_list.length > 0) { 
       if (draw_timer != null) clearTimeout(draw_timer);
-      draw_timer = window.setTimeout("process_draw_tasks()", user_delay);
+      draw_timer = setTimeout(process_draw_tasks, user_delay);
     }
   }
 
@@ -226,7 +230,7 @@ function find_parent_tag(node, tag_name) {
       drawable_list.push(drawable);
       //reset timer
       if (draw_timer != null) clearTimeout(draw_timer);
-      draw_timer = window.setTimeout("process_draw_tasks()", user_delay);
+      draw_timer = setTimeout(process_draw_tasks, user_delay);
     }
   }
 
@@ -3277,7 +3281,7 @@ var data = {
 var current_motif = 0;
 var meme_alphabet = new Alphabet(data.alphabet, data.background.freqs);
 
-function make_motif(container, motif) {
+this.make_motif = function(container, motif) {
     $(container).append(make_preview(meme_alphabet, motif));
     draw_on_screen();
 }
@@ -3297,5 +3301,5 @@ function make_motif_static(container_plus, container_minus, motif) {
     container_plus.append(preview);
     container_minus.append(preview_rc);
 }
-
+}
 

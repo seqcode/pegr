@@ -63,7 +63,7 @@
                         <td class="group-input cellNumber"><span class="value">${sample.cellNumber}</span></td>
                         <td class="group-input volume"><span class="value">${sample.volume}</span></td>
                         <td class="group-input requestedTagNumber"><span class="value">${sample.requestedTagNumber}</span></td>
-                        <td class="send"><input type="hidden" class="key" value="${sample.sendDataTo?.id}"><span class="value">${sample.sendDataTo.username}</span></td>
+                        <td class="send"><input type="hidden" class="key" value="${sample.sendDataTo?.id}"><span class="value">${sample.sendDataTo?.username}</span></td>
                     </tr>
                 </g:each>
             </tbody>

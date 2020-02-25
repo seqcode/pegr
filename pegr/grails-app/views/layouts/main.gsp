@@ -35,7 +35,7 @@
                     <a href="#" class="dropdown-toggle"  data-toggle="dropdown">
                         <span class="glyphicon glyphicon-user"></span> ${sec.username()}<span class="caret"></span>
                     </a>
-                    <ul class="dropdown-menu" style="background-color:#2c5986">
+                    <ul class="dropdown-menu" >
                         <li><g:link controller="user" action="profile"><span class="glyphicon glyphicon-user"></span> Profile</g:link></li>
                         <li><g:link controller="logout"><span class="glyphicon glyphicon-log-out"></span> Logout</g:link></li>
                     </ul>

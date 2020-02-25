@@ -4,12 +4,12 @@
 <div class=" ${hasErrors(bean: strain, field: 'species', 'error')} required">
 	<label for="species">Species<span class="required-indicator">*</span>
 	</label>
-	<g:select id="species" name="species.id" from="${pegr.Species.list()}" optionKey="id" required="" value="${strain?.species?.id}" noSelection="['null': '']" onchange="speciesChanged(this.value);"/>
+	<g:select id="species" name="species.id" from="${pegr.Species.list()}" optionKey="id" required="" value="${strain?.species?.id}" noSelection="['null': '']"/>
 </div>
 
 <div class=" ${hasErrors(bean: strain, field: 'name', 'error')} required">
 	<label for="name">Strain</label>
-	<g:textField name="name" pattern="${Strain.constraints.name.matches}" value="${strain?.name}"/>
+	<g:textField name="name" value="${strain?.name}"/>
     (use only alphanumeric characters and "-")
 </div>
 
@@ -25,7 +25,7 @@
 
 <div class=" ${hasErrors(bean: strain, field: 'geneticModification', 'error')}">
 <label>Genetic Modifications</label>
-	<g:textField name="geneticModification" pattern="${Strain.constraints.geneticModification.matches}"  value="${strain?.geneticModification}"/>
+	<g:textField name="geneticModification" value="${strain?.geneticModification}"/>
     (use only alphanumeric characters and "-")
 </div>
 
@@ -41,12 +41,6 @@
 </div>
 
 <script type="text/javascript">
-    function speciesChanged(speciesId) {
-        <g:remoteFunction controller="strainAdmin" action="speciesChangedAjax"
-            update="genotype"
-            params="'speciesId='+speciesId"/>
-    }
-            
     jQuery(document).ready(function($) {
         $('#search').multipleselect({
             search: {

@@ -33,7 +33,7 @@
                 </g:if>
                 <th class="text-right col-tags group-qc">Requested Tags</th>
                 <g:each in="${qcSettings.general}" var="setting">
-                  <g:if test="${setting.name != "Deduplicated"}">
+                  <g:if test="${setting.name != 'Deduplicated'}">
                     <th class="text-right col-${setting.key} group-qc">
                         ${setting.name}
                         <ul style="font-weight: normal">
@@ -46,10 +46,10 @@
                   </g:if>
                 </g:each>
                 <th class="col-prefer group-operation"><label class="switch"><input id="verifyAll" class="prefer2" type="checkbox"><div class="slider round"></div></label><span class="isAdmin" style="display:none">${isAdmin}</span>
-					</br>Verified</th>
+					<br/>Verified</th>
                 <th class="col-delete group-operation"><input type="checkbox" id="selectAll" value="selectAll">
-						<a id="ajaxDeleteAll" type="button"><span class="glyphicon glyphicon-trash"></a>
-					</br>Delete
+                    <a id="ajaxDeleteAll" type="button"><span class="glyphicon glyphicon-trash"></span></a>
+					<br/>Delete
 				</th>
             </tr>
         </thead>
@@ -62,7 +62,9 @@
             <g:each in="${sample.alignmentStatusList}" var="alignment" status="n">
                 <g:if test="${n>0}"><tr></g:if>
                     <td class="col-genome group-analysis">${alignment.genome}</td>
-                    <td class="col-history group-analysis"><a href="${alignment.galaxyBase}/history?id=${alignment.historyId}" target="_blank">${alignment.historyId}</a></td>
+                    <td class="col-history group-analysis">
+                        <g:if test="${alignment.historyUrl}"><a href="${alignment.historyUrl}" target="_blank">${alignment.historyId}</a></g:if><g:else>${alignment.historyId}</g:else>
+                </td>
                     <td class="col-date group-analysis">${alignment.date}</td>
                     <g:each in="${alignment.status}" var="status" status="j">
 

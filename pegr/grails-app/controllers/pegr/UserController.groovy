@@ -145,8 +145,7 @@ class UserController {
     }
 }
 
-@grails.validation.Validateable
-class UserRegistrationCommand {
+class UserRegistrationCommand implements grails.validation.Validateable {
     String token
 	String username
     String email
@@ -164,8 +163,7 @@ class UserRegistrationCommand {
 	}
 }
 
-@grails.validation.Validateable
-class PasswordRegistrationCommand {
+class PasswordRegistrationCommand implements grails.validation.Validateable {
 	String password
 	String passwordRepeat
 

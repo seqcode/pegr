@@ -86,7 +86,8 @@
                         memeTable.find(".meme-fig").each(function(index, memeFig) {
                             $(memeFig).find("i").remove();
                             if (index < result.length) {
-                                make_motif(memeFig, result[index]);
+                                const memeDrawer = new MemeDrawer();
+                                memeDrawer.make_motif(memeFig, result[index]);
                             } else {
                                 $(memeFig).html("No MEME data found!");
                             }                            

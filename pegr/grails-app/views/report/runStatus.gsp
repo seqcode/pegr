@@ -1,12 +1,11 @@
 <html>
 <head>
     <title>PEGR - Analysis Status</title> 
-    <g:set var="defaultGalaxy" value="${defaultGalaxy}" scope="request"/>
     <g:set var="isAdmin" value="${isAdmin}" scope="request"/>
     <meta name="layout" content="analysis"/>
     <asset:javascript src="meme.js"/>
     <asset:stylesheet href="meme.css"/>
-    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
     <style>
         .dropdown-menu {
             background-color: white;
@@ -170,23 +169,22 @@
         <a href="#" onclick="window.open('/pegr/help#report', 'Help: report', 'width=600,height=400' )" class="pull-right"><small><u>Help</u></small></a>
     </h3>
     <g:link controller="report" action="unknownIndex" params="[runId: run.id]">Unknown index</g:link>
-    <g:each in="${runStatus}">
-        <div>
-            <h4>Pipeline: ${it.key.name}, version: ${it.key.pipelineVersion} (workflow ID: <a href="${defaultGalaxy}workflow/display_by_id?id=${it.key.workflowId}" target="_blank">${it.key.workflowId}</a>) <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link controller="pipelineAdmin" action="show" id="${it.key.id}" class="edit">Manage</g:link></sec:ifAnyGranted></h4>
-            <ul class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" href="#general">Core Pipeline</a></li>
-                <li><a data-toggle="tab" href="#yeast">Yeast QA Pipeline</a></li>
-            </ul>
-            <div class="tab-content">
-                <div id="general" class="tab-pane fade in active">
+    <div>
+        <ul class="nav nav-tabs">
+            <g:each in="${runStatus}" var="it" status="i">
+                <li <g:if test="${i==0}">class="active"</g:if>><a data-toggle="tab" href="#pipeline${i}" style="font-size:1.2em">${it.key.name}-${it.key.pipelineVersion}</a></li>
+            </g:each>
+        </ul>
+        <div class="tab-content">
+            <g:each in="${runStatus}" var="it" status="i">
+                <div id="pipeline${i}" class="tab-pane fade <g:if test="${i==0}">in active</g:if>">
+                    <h4>Pipeline: ${it.key.name}, version: ${it.key.pipelineVersion} (workflow ID: <a href="${it.key.workflowUrl}" target="_blank">${it.key.workflowId}</a>) <sec:ifAnyGranted roles="ROLE_ADMIN"><g:link controller="pipelineAdmin" action="show" id="${it.key.id}" class="edit">Manage</g:link></sec:ifAnyGranted></h4>
                     <g:render template="generalQc" model="[runStatusMap:it]"></g:render>
                 </div>
-                <div id="yeast" class="tab-pane fade">
-                    <g:render template="yeastEncodeQc" model="[runStatusMap:it]"></g:render>
-                </div>
-            </div>            
-        </div>
-    </g:each>
+            </g:each>
+        </div>            
+    </div>
+
     <g:if test="${noResultSamples.size() > 0}">
         <table class="table">
             <caption><h4>No Results</h4></caption>

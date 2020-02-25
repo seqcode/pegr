@@ -16,103 +16,101 @@ class UserAdminController {
     def userService
 
 	def index(Long affiliationId, Long groupId, String isEnabled) {
+        def query
+        def users
+        def affiliations = User.where{}.collect { it.affiliation }.unique()
 
-	  			def query
-					def users
-	        def affiliations = User.where{}.collect { it.affiliation }.unique()
+        if (params.groupLoad != null && params.affiliateLoad != null && params.activityLoad != null){
+            def groupList = JSON.parse(params.groupLoad)
+            def affiliateList = JSON.parse(params.affiliateLoad)
+            def activityList = JSON.parse(params.activityLoad)
+            def c
+            if (groupList.size() != 0 || affiliateList.size() != 0 || activityList.size() != 0){
+            // def a = RoleGroup.where{name == "Admin"}.collect { it.id }.unique()
 
-				if (params.groupLoad != null && params.affiliateLoad != null && params.activityLoad != null){
-					def groupList = JSON.parse(params.groupLoad)
-					def affiliateList = JSON.parse(params.affiliateLoad)
-					def activityList = JSON.parse(params.activityLoad)
-					def c
-					if (groupList.size() != 0 || affiliateList.size() != 0 || activityList.size() != 0){
-					// def a = RoleGroup.where{name == "Admin"}.collect { it.id }.unique()
+            // groupList start
+            def i = 0;
+            def a = RoleGroup.createCriteria().list{
+                if (groupList.size() != 0){
+                    or{
+                        for (i=0; i<groupList.size(); i++){
+                                eq("name", groupList[i])
+                        }
+                    }
+                }
+            }.collect { it.id }
+            // get username of users who meet group criteria
+            c = UserRoleGroup.createCriteria().list{
+                if (groupList.size() != 0){
+                    or{
+                        for (i=0; i<a.size(); i++){
+                                eq("roleGroup.id", a[i])
+                        }
+                    }
+                }
+            }.collect { it.user }
+            // groupList end
 
-					// groupList start
-					def i = 0;
-					def a = RoleGroup.createCriteria().list{
-						if (groupList.size() != 0){
-							or{
-								for (i=0; i<groupList.size(); i++){
-										eq("name", groupList[i])
-								}
-							}
-						}
-					}.collect { it.id }
-					// get username of users who meet group criteria
-					c = UserRoleGroup.createCriteria().list{
-						if (groupList.size() != 0){
-							or{
-								for (i=0; i<a.size(); i++){
-										eq("roleGroup.id", a[i])
-								}
-							}
-						}
-					}.collect { it.user }
-					// groupList end
+            // affiliateList start
+            def b = Organization.createCriteria().list{
+                if (affiliateList.size() != 0) {
+                    or{
+                        for (i=0; i<affiliateList.size(); i++){
+                                eq("name", affiliateList[i])
+                        }
+                    }
+                }
+            }.collect { it.id }
 
-						// affiliateList start
-						def b = Organization.createCriteria().list{
-						if (affiliateList.size() != 0) {
-							or{
-								for (i=0; i<affiliateList.size(); i++){
-										eq("name", affiliateList[i])
-								}
-							}
-						}
-					}.collect { it.id }
+                // activityList start
+            Boolean status = true;
+            def e = User.createCriteria().list{
+                if (activityList.size() != 0){
+                    or{
+                        for (i=0; i<activityList.size(); i++){
+                                if (activityList[i] == "Active"){
+                                    status = true;
+                                } else{
+                                    status = false;
+                                }
+                                eq("enabled", status)
+                        }
+                    }
+                }
+            }.collect { it.id }
 
-						// activityList start
-						Boolean status = true;
-						def e = User.createCriteria().list{
-						if (activityList.size() != 0){
-							or{
-								for (i=0; i<activityList.size(); i++){
-										if (activityList[i] == "Active"){
-											status = true;
-										} else{
-											status = false;
-										}
-										eq("enabled", status)
-								}
-							}
-						}
-					}.collect { it.id }
-
-					// get members by status
-					def f = User.createCriteria().list{
-						if (groupList.size() != 0){
-							or{
-								for (i=0; i<c.size(); i++){
-										eq("username", c[i].username)
-								}
-							}
-						}
-						if (affiliateList.size() != 0){
-							or{
-								for (i=0; i<b.size(); i++){
-										eq("affiliation.id", b[i])
-								}
-							}
-						}
-						if (activityList.size() != 0){
-							or{
-								for (i=0; i<e.size(); i++){
-										eq("id", e[i])
-								}
-							}
-						}
-					}
-						users = f
-					}
-				}
-        else {
-          query = User.where{}
-					users = query.list(params)
+            // get members by status
+            def f = User.createCriteria().list{
+                if (groupList.size() != 0){
+                    or{
+                        for (i=0; i<c.size(); i++){
+                                eq("username", c[i].username)
+                        }
+                    }
+                }
+                if (affiliateList.size() != 0){
+                    or{
+                        for (i=0; i<b.size(); i++){
+                                eq("affiliation.id", b[i])
+                        }
+                    }
+                }
+                if (activityList.size() != 0){
+                    or{
+                        for (i=0; i<e.size(); i++){
+                                eq("id", e[i])
+                        }
+                    }
+                }
+            }
+                users = f
+            }
+        } else {
+            query = User.where{}
+            users = query.list(params)
         }
-
-				[users: users,
+        
+        [users: users,
          affiliations: affiliations,
          affiliationId: affiliationId,
          groupId: groupId,
@@ -183,8 +181,7 @@ class UserAdminController {
     }
 }
 
-@grails.validation.Validateable
-class CreateUserCommand {
+class CreateUserCommand implements grails.validation.Validateable {
     String email
     Boolean sendEmail
 

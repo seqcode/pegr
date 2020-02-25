@@ -6,13 +6,14 @@ import java.awt.image.BufferedImage
 import groovy.time.TimeCategory
 import groovy.json.*
 import grails.converters.*
-import org.apache.commons.io.IOUtils
 import grails.util.Holders
+import pl.touk.excel.export.WebXlsxExporter
+import pl.touk.excel.export.XlsxExporter
 
 class SequenceRunController {
     def springSecurityService
     def sequenceRunService
-    def qfileUploadService
+    def qfileService
     def walleService
     def reportService
     def utilityService
@@ -28,7 +29,6 @@ class SequenceRunController {
                 offset: params.offset ?: 0
             ]
         def runs
-	def galaxy = Holders.config.defaultGalaxy
         if (status) {
             runs = c.list(listParams) {
                 eq "status", (status as RunStatus)
@@ -55,12 +55,11 @@ class SequenceRunController {
         } else {
             runs = SequenceRun.list(listParams)
         }
-        [runs: runs, str: str, defaultGalaxy: galaxy]
+        [runs: runs, str: str]
     }
 
     def show(Long id) {
         def run = SequenceRun.get(id)
-        def sample = Sample.get(id)
         def cohorts = run.cohorts
         def cohortUserList = []
         def isCohortUser = false
@@ -352,8 +351,7 @@ class SequenceRunController {
     def convertXlsx() {
         def filesroot = utilityService.getFilesRoot()
         try {
-            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;
-            def mpf = mpr.getFile("file");
+            def mpf = request.getFile( "file" )
             String filename = mpf.getOriginalFilename();
             if(!mpf?.empty && filename[-5..-1] == ".xlsx") {
                 File folder = new File(filesroot, 'QueueFiles');
@@ -367,11 +365,11 @@ class SequenceRunController {
                 def startLine = params.int("startLine")
                 def endLine = params.int("endLine")
                 def laneLine = params.int("laneLine")
-                
-                def csvNames = qfileUploadService.convertXlsxToCsv(folder, filepath, params.sampleSheet, params.laneSheet)
+
+                def csvNames = qfileService.convertXlsxToCsv(folder, filepath, params.sampleSheet, params.laneSheet)
                 
                 // check file for potential errors, e.g. unreasonal number of new projects
-                def warnings = qfileUploadService.checkFile(csvNames[params.sampleSheet],
+                def warnings = qfileService.checkFile(csvNames[params.sampleSheet],
                                              startLine,
                                             endLine)
                 
@@ -383,7 +381,7 @@ class SequenceRunController {
                 
                 def user = springSecurityService.currentUser
                 def basicCheck = true
-                def messages = qfileUploadService.migrateXlsx(csvNames[params.sampleSheet],
+                def messages = qfileService.migrateXlsx(csvNames[params.sampleSheet],
                                         csvNames[params.laneSheet],
                                           RunStatus.PREP,
                                           startLine,
@@ -414,7 +412,7 @@ class SequenceRunController {
             def laneLine = params.int("laneLine")                
             def user = springSecurityService.currentUser
             def basicCheck = true
-            def messages = qfileUploadService.migrateXlsx(params.sampleSheet,
+            def messages = qfileService.migrateXlsx(params.sampleSheet,
                                       params.laneSheet,
                                       RunStatus.PREP,
                                       startLine,
@@ -438,8 +436,7 @@ class SequenceRunController {
     def convertCsv() {
         def filesroot = utilityService.getFilesRoot()
         try {
-            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;
-            def mpf = mpr.getFile("file");
+            def mpf = request.getFile( "file" )
             String filename = mpf.getOriginalFilename();
             if(!mpf?.empty && filename[-4..-1] == ".csv") {
                 File folder = new File(filesroot, 'QueueFiles');
@@ -454,7 +451,7 @@ class SequenceRunController {
                 def endLine = params.int("endLine")
                 
                 // check file for potential errors, e.g. unreasonal number of new projects
-                def warnings = qfileUploadService.checkFile(filepath,
+                def warnings = qfileService.checkFile(filepath,
                                              startLine,
                                             endLine)
                 
@@ -466,7 +463,7 @@ class SequenceRunController {
                 
                 def user = springSecurityService.currentUser
                 def basicCheck = true
-                def results = qfileUploadService.migrateSamples(filepath,
+                def results = qfileService.migrateSamples(filepath,
                                           RunStatus.PREP,
                                           startLine,
                                           endLine,
@@ -495,7 +492,7 @@ class SequenceRunController {
             def endLine = params.int("endLine")              
             def user = springSecurityService.currentUser
             def basicCheck = true
-            def results = qfileUploadService.migrateSamples(params.sampleSheet,
+            def results = qfileService.migrateSamples(params.sampleSheet,
                                       RunStatus.PREP,
                                       startLine,
                                       endLine,
@@ -516,6 +513,7 @@ class SequenceRunController {
     }
 
     def fetchProjectsAjax(Long runId) {
+        // Given sequnece run ID, find all projects related to the sequence run. Return the list of related projects in the format [[project_name, project_name],...] to conform with select2 in view.
         def projects = SequencingCohort.where{ run.id == runId }.collect {it.project?.name}.toList()
         render utilityService.stringToSelect2Data(projects) as JSON
     }
@@ -577,6 +575,34 @@ class SequenceRunController {
         return
     }
 
+    /**
+     * download Q-file for the sequence run, 
+     * including information about samples and lane.
+     * This can be activated when downloading the Queue File
+     * @param runId ID of the seuqnce run
+     */
+    def downloadQueueFile(Long runId) {
+        def results = qfileService.exportRun(runId)
+        
+        def sampleProperties = results.sampleExports.size() > 0 ? results.sampleExports[0].keySet() as List : ["No data!"]
+        def laneProperties = results.laneExports.size() > 0 ? results.laneExports[0].keySet() as List : ["No data!"]
+        
+        def filesroot = utilityService.getFilesRoot()
+        def template = new File(filesroot, 'QueueTemplate.xlsx');
+        WebXlsxExporter webXlsxExporter = new WebXlsxExporter(template.getPath())
+        webXlsxExporter.setWorksheetName("SAMPLE")
+
+        webXlsxExporter.with {
+            setResponseHeaders(response, results.filename)
+            add(results.sampleExports, sampleProperties )
+            sheet('Lane').with {
+                add(results.laneExports, laneProperties )
+            }
+            save(response.outputStream)
+        }
+            
+    }
+    
     def downloadRunInfo(String remoteRoot, Long runId) {
         String RUN_INFO_TEMP = "runInfo${runId}"
         def timeout = 60*1000
@@ -625,12 +651,15 @@ class SequenceRunController {
             // remove the compressed file
             compressedFile.delete()
             webRequest.renderView = false
+            contentStream.close()
         } catch(Exception e) {
             render "Error!"
         } finally {
             response.getOutputStream().flush()
             response.getOutputStream().close()
-            IOUtils.closeQuietly(contentStream)
+            if (contentStream != null) {
+                contentStream.close()
+            }
         }
 
     }

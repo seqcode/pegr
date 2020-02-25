@@ -325,12 +325,6 @@ class UtilityService {
         }
     }
     
-    def getGpfsConfig() {
-        return [username: grailsApplication.config.gpfs.username,
-                keyfile: grailsApplication.config.gpfs.keyfile,
-                host: grailsApplication.config.gpfs.host]
-    }
-    
     def upload(MultipartHttpServletRequest mpr, String fileField, List allowedFileTypes, String folderName, Long maxByte) {
         def mpf = mpr.getFile(fileField);
         String fileType = mpf.getContentType();

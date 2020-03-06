@@ -15,14 +15,13 @@ class SampleController {
     def protocolInstanceBagService
 
     def all(Integer max) {
-        params.max = Math.min(max ?: 15, 100)
+        params.max = Math.min(max ?: 50, 100)
         if (!params.sort) {
             params.sort = "id"
             params.order = "desc"
         }
-        def samples = Sample.where{status == SampleStatus.COMPLETED}.list(params)
-
-        [sampleList: samples, sampleCount: Sample.count()]
+        def samples = Sample.list(params)        
+        [sampleList: samples]
     }
 
 	def show(Long id) {

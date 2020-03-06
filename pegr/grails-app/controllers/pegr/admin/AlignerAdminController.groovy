@@ -5,8 +5,12 @@ import static org.springframework.http.HttpStatus.*
 import pegr.AdminCategory
 import pegr.Aligner
 
+/**
+ * Controller for Aligner. This is intended for Admin only. 
+ */
 class AlignerAdminController {
 
+    // inject alignerService
     AlignerService alignerService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]

@@ -15,6 +15,9 @@
             <g:link action="showFilesForCheckedSamples" class="btn btn-default">Files</g:link>
         </div>
         <g:render template="table" model="['sampleList':sampleList, 'checkbox':true]"></g:render>
+        <div class="pagination">
+            <g:paginate next="Next" prev="Prev" controller="sample" action="search" max="50" total="${sampleList.totalCount?: 0}" params="${params}" />
+        </div>
     </div>
     <script>
         $(function(){
@@ -29,13 +32,6 @@
             checkedCount = 0;
             $("#checked-count").text(checkedCount);
           }});
-
-        $('#table_id').DataTable()({
-          'scrollY': '50vh',
-          'dom': 'Bfrtip',
-          'scrollCollapse': true,
-          'paging': true
-        });
       });
 
         // BugFix || git:hedgiejo || Add checkbox feature that can select and deselect all checkboxes.

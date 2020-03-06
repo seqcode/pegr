@@ -20,7 +20,7 @@ class SampleService {
     def search(QuerySampleRegistrationCommand query) {
         def c = Sample.createCriteria()
         def listParams = [
-                max: query.max ?: 1000,
+                max: query.max ?: 50,
                 sort: query.sort ?: "id",
                 order: query.order ?: "desc",
                 offset: query.offset

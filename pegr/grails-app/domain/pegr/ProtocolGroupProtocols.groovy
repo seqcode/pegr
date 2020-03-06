@@ -1,5 +1,9 @@
 package pegr
 
+/**
+ * Join table between ProtocolGroup and Protocol. 
+ * A protocolGroup comprises an ordered list of protocols.
+ */
 class ProtocolGroupProtocols {
 
 	Protocol protocol

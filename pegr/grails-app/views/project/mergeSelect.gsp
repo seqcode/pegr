@@ -20,13 +20,15 @@
     </div>
     <script>
         $("#nav-projects").addClass("active");
-
+        
         function toggleChecked(element) {
             if (element.checked) {
+                // add project ID to session when the check box is checked
                 $.ajax({url:"/pegr/project/addCheckedProjectAjax?id="+element.value, success: function(checkedCount) {
                     $("#checked-count").text(checkedCount);
                 }});
             } else {
+                // remove project ID from session when the check box is unchecked
                 $.ajax({url:"/pegr/project/removeCheckedProjectAjax?id="+element.value, success: function(checkedCount) {
                     $("#checked-count").text(checkedCount);
                     $('#selectAll').prop('checked', false);

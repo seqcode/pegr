@@ -80,14 +80,7 @@ class ApiController {
             } else {
                 data = reportService.fetchDataForSamples(sampleIds, cmd.preferredOnly)     
                 code = 200
-                message = "Success! Accepted filters:\n"
-                cmd.properties.each { prop, val ->
-                    if (!(prop in ["userEmail", "class", "metaClass", "constraintsMap"]) && val != null)
-                    message += "${prop}: ${val} \n"
-                }
-                if (cmd.id) {
-                    message += "id: ${cmd.id} \n"
-                }
+                message = "Success!"
             }
         } else {
             code = 401

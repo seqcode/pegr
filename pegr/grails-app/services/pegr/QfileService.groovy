@@ -70,26 +70,23 @@ class QfileService {
     def migrateXlsx(String sampleSheet, String laneSheet, RunStatus runStatus, int startLine, int endLine, int laneLine, boolean basicCheck) {
         getDefaultUser()     
         
-        // migrate the samples
-        def results = migrateSamples(sampleSheet, runStatus, startLine, endLine, basicCheck)
-        def messages = results.messages
-        def laneRunNum = results.laneRunNum
+        // get data from the lane sheet
+        def laneData = getLaneData(laneSheet, laneLine)
         
-        // migrate the lane
-        def laneMessages = migrateLane(laneSheet, laneLine, laneRunNum)
-        messages.addAll(laneMessages)
-
+        // migrate the samples
+        def results = migrateSamples(sampleSheet, runStatus, startLine, endLine, laneData, basicCheck)
+        def messages = results.messages
+        
         return messages
     }
     
     @NotTransactional
-	def migrateSamples(String filename, RunStatus runStatus, int startLine, int endLine, boolean basicCheck){
+	def migrateSamples(String filename, RunStatus runStatus, int startLine, int endLine, Map laneData, boolean basicCheck){
 		def lineNo = 0  
         def file = new FileReader(filename)
 		CSVReader reader = new CSVReader(file);
 		String [] rawdata;
 		def messages = []
-        def laneRunNum = 0
         
 		while ((rawdata = reader.readNext()) != null) {
 		    ++lineNo
@@ -99,7 +96,7 @@ class QfileService {
 		        break
 		    }
             try {
-                laneRunNum = Math.max(laneRunNum, migrateOneSampleRow(rawdata, runStatus, basicCheck))
+               migrateOneSampleRow(rawdata, runStatus, laneData, basicCheck)
 		 	} catch(QfileException e) {
                 messages.push("Error: Line ${lineNo}. ${e.message}")
 		        continue
@@ -110,31 +107,33 @@ class QfileService {
 		    }   
 		}
         new File(filename).delete()
-        return [messages: messages, laneRunNum: laneRunNum]
+        return [messages: messages]
 	}
     
-    def migrateLane(String filename, int laneLine, Integer laneRunNum) {
+    def getLaneData(String filename, int laneLine) {
         def lineNo = 0    
         def file = new FileReader(filename)
 		CSVReader reader = new CSVReader(file);
         String [] rawdata;
         def messages = []
+        def laneData
         while ((rawdata = reader.readNext()) != null) {
 		    ++lineNo
 		    if (lineNo < laneLine) {
 		        continue
 		    } else {
                 try {
-                    migrateOneLaneRow(rawdata, laneRunNum)
+                    cleanRawData(rawdata)
+                    laneData = getNamedLaneData(rawdata)
                     new File(filename).delete()
                 } catch(Exception e) {
                     log.error "Error: Lane Info." + e
-                    messages.push("Error: Lane Info.")
+                    throw new QfileException(message:"Error: Lane Info.")
                 }   
 		        break
 		    }
 		}
-        return messages
+        return laneData
     }
     
     def cleanRawData(String[] rawdata) {
@@ -148,7 +147,7 @@ class QfileService {
         }
     }
 	
-    def migrateOneSampleRow(String[] rawdata, RunStatus runStatus, boolean basicCheck) {
+    def migrateOneSampleRow(String[] rawdata, RunStatus runStatus, Map laneData, boolean basicCheck) {
 
         cleanRawData(rawdata)
         def data = getNamedData(rawdata)
@@ -160,7 +159,7 @@ class QfileService {
         
         def runUser = getUser(data.userStr)
 
-        def results = getSequenceRun(runStatus, data.runStr, data.laneStr, data.dateStr, data.fcidStr, data.indexIdStr, runUser)
+        def results = getSequenceRun(runStatus, data.runStr, data.laneStr, data.dateStr, data.fcidStr, data.indexIdStr, runUser, laneData)
 
         def cellProvider = getUser(data.senderNameStr, data.senderEmail, data.senderPhone)
         def dataTo = getUser(data.dataToUser, data.dataToEmail, null)
@@ -225,33 +224,6 @@ class QfileService {
         saveRequestedGenome(genomeBuilds, sample, species) 
         
         return results?.sequenceRun?.runNum
-    }
-    
-    def migrateOneLaneRow(String[] rawdata, Integer laneRunNum) {
-        cleanRawData(rawdata)
-        def data = getNamedLaneData(rawdata)
-        if(data.runNum) {
-            laneRunNum = data.runNum
-        }
-        if (!laneRunNum) {
-            throw new QfileException(message: "Run number not found!")
-        }
-        def run = SequenceRun.findByRunNum(laneRunNum)
-        if (!run) {
-            throw new QfileException(message: "Sequence run #Old${data.runNum} is not found!")
-        }
-        def runStats
-        if (run.runStats) {
-            runStats = run.runStats
-            runStats.properties = data
-        } else {
-            runStats = new RunStats(data)
-        }
-        runStats.save(flush: true, failOnError: true)
-        if (!run.runStats) {
-            run.runStats = runStats
-            run.save()
-        }
     }
     
     def addExperimentToCohort(SequencingExperiment seqExp, Project project, String service, String invoice) {
@@ -758,10 +730,9 @@ class QfileService {
         return i
     }
 	
-	def getSequenceRun(RunStatus runStatus, String runStr, String laneStr, String dateStr, String fcidStr, String indexIdStr, User user) {
-	    int runNum
-	    def platform
-	    def seqId
+	def getSequenceRun(RunStatus runStatus, String runStr, String laneStr, String dateStr, String fcidStr, String indexIdStr, User user, Map laneData) {
+	    int runNum = getInteger(runStr)
+
         if (runStr == null) {
             runStr = "00"
         } else if (runStr.length() == 1) {
@@ -776,31 +747,22 @@ class QfileService {
         } else if (indexIdStr.length() == 1) {
             indexIdStr = "0" + indexIdStr
         }
-        
-	    if (runStr.take(1) == "S") {
-	         runNum = getInteger(runStr.substring(1))
-	         platform = SequencingPlatform.findByName("SOLiD")
-	         seqId = runStr + laneStr + indexIdStr
-	    } else if (runStr.take(1) == "G") {
-	         runNum = getInteger(runStr.substring(1))
-	         platform = SequencingPlatform.findByName("Illumina GA")
-	        seqId = runStr + laneStr + indexIdStr
-	    } else {
-	         runNum = getInteger(runStr) 
-	         if (runNum < 500){
-	             platform = SequencingPlatform.findByName("HiSeq 2000")
-	             seqId = runStr + laneStr + indexIdStr
-	         } else {
-	             platform = SequencingPlatform.findByName("NextSeq 500")
-	             seqId = runStr + indexIdStr
-	         }
-	    }
+	    
+	    def seqId = runStr + indexIdStr
 	
 	    if (Sample.findBySourceId(seqId)) {
             throw new QfileException(message: "SeqId ${seqId} already exists!")
 	    }
-	
-	    def run = SequenceRun.findByPlatformAndRunNum(platform, runNum)
+
+        if (!laneData.platformStr) {
+            throw new QfileException(message: "Sequencing platform is not found in the 'Lane' sheet!")
+        }
+        def platform = SequencingPlatform.findByName(laneData.platformStr)
+        if (!platform) {
+            throw new QfileException(message: "Sequencing platform ${laneData.platformStr} does not exist. Please define it in the admin page first.")
+        }
+        
+        def run = SequenceRun.findByPlatformAndRunNum(platform, runNum)
 	    if (!run) {                 
 	         run = new SequenceRun(runNum: runNum, platform: platform, status: runStatus, user: user)
 
@@ -815,6 +777,13 @@ class QfileService {
 	
 	         run = run.save( failOnError: true)
 	    }
+
+        if (!run.runStats) {
+            def runStats = new RunStats(laneData)
+            runStats.save(flush: true, failOnError: true)
+            run.runStats = runStats
+            run.save()
+        }
 
 	    [sequenceRun: run, seqId: seqId]
 	
@@ -891,7 +860,7 @@ class QfileService {
             emptyT: "",                     //T
             emptyU: "",                    //U
             emptyV: "",                   //V
-            emptyW: "",                      //W
+            platform: run.platform.name,                      //W
             emptyX: "",                    //X
             emptyY: "",                 //Y
             emptyZ: "",          //Z
@@ -953,7 +922,7 @@ class QfileService {
                 laneStr: run.lane,      //A       
                 emptyB: "",
                 emptyC:"",
-                indexIdStr: (sample.sourceId && sample.sourceId.size() > 1) ? sample.sourceId[-2..-1] : "",     //D
+                indexIdStr: "",     //D
                 senderNameStr: sample.cellSource?.providerUser?.fullName, //E
                 senderEmail: sample.cellSource?.providerUser?.email,     //F
                 senderPhone: sample.cellSource?.providerUser?.phone,     //G
@@ -1202,7 +1171,7 @@ class QfileService {
          // data[19],//T
          // positiondata[20],//U
          //data[21],//V
-         //data[22],                      //W
+         platformStr: data[22],                      //W
          //data[23],//X
          //data[24],//Y
          //data[25],//Z

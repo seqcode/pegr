@@ -291,7 +291,7 @@ public class FetchSequenceRunDataFromPegr {
             </pre>
         </div>
         </div>
-    <div class="chapter">
+        <div class="chapter">
         <h3 id="accept">Send Analysis Results to PEGR</h3>
         <div>
             <p>PEGR accepts POST request at </p>
@@ -476,8 +476,84 @@ public class PostDataToPegr {
 
             </pre>
         </div>
-    </div>
-    </div>
+        </div>
+        <div class="chapter">
+        <h3 id="del-samples">Delete Samples</h3>
+        <div>
+            <p>Only Admins are allowed to use this API. To delete samples, format your query in a JSON dictionary as follows
+            <pre>
+{    
+    // required, combined with API key to authenticate user.
+    "userEmail": "string", 
+    
+    // required
+    "sampleIds": [123, 456]
+}
+            </pre>
+            and send a POST request to the url
+            <pre>
+https://thanos.vmhost.psu.edu/pegr/api/deleteSampleList?apiKey=
+            </pre> 
+    
+            <p>The API can be simply called through curl</p>
+            <pre>
+curl -X POST -H "Content-Type: application/json" -d '{"sampleIds": [123, 456], "userEmail": "xxxx@psu.edu"}' https://thanos.vmhost.psu.edu/pegr/api/deleteSampleList?apiKey=XXXXXXX -o output
+            </pre>
+
+            <p>The following is an example in Python.</p>
+            <pre>
+import requests
+url = "https://thanos.vmhost.psu.edu/pegr/api/deleteSampleList?apiKey=XXXXXXX"
+data = {"userEmail": "xxxx@psu.edu",
+        "sampleIds": [123, 456]
+       }
+r = requests.post(url, json=data)
+results = r.json()
+print(r.status_code)
+print(results["message"])
+            </pre>
+ 
+        </div>
+        </div>
+        <div class="chapter">
+        <h3 id="del-histories">Delete Analysis Histories</h3>
+        <div>
+            <p>Only Admins are allowed to use this API. To delete analysis histories, format your query in a JSON dictionary as follows
+            <pre>
+{    
+    // required, combined with API key to authenticate user.
+    "userEmail": "string", 
+    
+    // required
+    "historyIds": ["abc123", "def456"]
+}
+            </pre>
+            and send a POST request to the url
+            <pre>
+https://thanos.vmhost.psu.edu/pegr/api/deleteAnalysisHistories?apiKey=
+            </pre> 
+    
+            <p>The API can be simply called through curl</p>
+            <pre>
+curl -X POST -H "Content-Type: application/json" -d '{"historyIds": ["abc123", "def456"], "userEmail": "xxxx@psu.edu"}' https://thanos.vmhost.psu.edu/pegr/api/deleteAnalysisHistories?apiKey=XXXXXXX -o output
+            </pre>
+
+            <p>The following is an example in Python.</p>
+            <pre>
+import requests
+url = "https://thanos.vmhost.psu.edu/pegr/api/deleteAnalysisHistories?apiKey=XXXXXXX"
+data = {"userEmail": "xxxx@psu.edu",
+        "historyIds": ["abc123", "def456"]
+       }
+r = requests.post(url, json=data)
+results = r.json()
+print(r.status_code)
+print(results["message"])
+            </pre>
+ 
+        </div>
+        </div>
+        </div>
         <nav class="col-sm-3">
             <h4>Menu</h4>
             <ul id="menu" class="nav nav-pills nav-stacked" data-spy="affix" data-offset-top="205"></ul>

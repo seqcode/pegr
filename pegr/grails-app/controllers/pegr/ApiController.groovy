@@ -12,7 +12,8 @@ class ApiController {
     
     static allowedMethods = [stats:'POST',
                             fetchSampleData:'POST',
-                            fetchSequenceRunData: 'POST'
+                            deleteSampleList: 'POST',
+                            fetchSequenceRunData: 'POST',
                             ]
     
     def help() {
@@ -123,6 +124,52 @@ class ApiController {
         def results = [data: data, message: message] as JSON
         render text: results, contentType: "text/json", status: code
     }
+    
+    /*
+     * Accept post request, authenticate by the API Key, to delete samples
+     * @param query in the format of JSON dictionary
+     * @param apiKey API Key used to authenticate the user
+     * @return response in the format of JSON dictionary, including a response_code and a message. 
+     */
+    def deleteSampleList(DelSampleRegistrationCommand query, String apiKey) {
+        def message = ""
+        def code = 200
+        
+        // get the user
+        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+
+        // only admin is allowed to use this API
+        if (apiUser && apiUser.isAdmin()) {
+            if (!query.sampleIds) {
+                code = 500
+                message = "No sample ID provided!"
+            } else {
+                query.sampleIds.each {
+                    def sample = Sample.get(it.toLong())
+                    if (!sample) {
+                        message += "Sample ${it} not found! "
+                        code = 500
+                    } else {
+                        try {
+                            sampleService.delete(sample)
+                        } catch(SampleException e) {
+                            message += "Error deleting sample ${it}! ${e.message} "
+                            code = 500
+                        }
+                    }
+                }
+                if (message == "") {
+                    message = "Success!"
+                }
+            }
+        } else {
+            code = 401
+            message = "Not authorized!"
+        }
+        
+        def results = [message: message] as JSON
+        render text: results, contentType: "text/json", status: code
+    }
 }
 
 class ResponseMessage {
@@ -174,4 +221,8 @@ class QueryRunRegistrationCommand implements grails.validation.Validateable {
     Long runId // required
 }
 
+class DelSampleRegistrationCommand implements grails.validation.Validateable {
+    String userEmail // required
+    List sampleIds // required
+}
 

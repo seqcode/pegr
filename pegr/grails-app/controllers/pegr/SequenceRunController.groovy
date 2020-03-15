@@ -14,7 +14,7 @@ class SequenceRunController {
     def springSecurityService
     def sequenceRunService
     def qfileService
-    def walleService
+    def ngsRepoService
     def reportService
     def utilityService
     def sampleService
@@ -300,10 +300,10 @@ class SequenceRunController {
 
     def previewRun(Long runId) {
         try {
-            def previousRun = walleService.getPreviousRun()
-            def remoteFiles = walleService.getRemoteFiles()
-            def newFolders = walleService.getNewRunFolders(remoteFiles)
-            def queuedRunIds = walleService.getQueuedRunIds()
+            def previousRun = ngsRepoService.getPreviousRun()
+            def remoteFiles = ngsRepoService.getRemoteFiles()
+            def newFolders = ngsRepoService.getNewRunFolders(remoteFiles)
+            def queuedRunIds = ngsRepoService.getQueuedRunIds()
             def queuedRuns = []
             queuedRunIds.eachWithIndex { id, n ->
                  def run = SequenceRun.get(Long.parseLong(id))
@@ -324,7 +324,7 @@ class SequenceRunController {
              queuedRuns: queuedRuns,
              currentRun: currentRun,
              meetingTime: startTime]
-        } catch (WalleException e) {
+        } catch (NgsRepoException e) {
             flash.message = e.message
             redirect(action: "show", id: runId)
         } catch (Exception e) {
@@ -549,7 +549,7 @@ class SequenceRunController {
         if (!localFolder.exists()) {
             localFolder.mkdirs()
         }
-        walleService.generateRunFilesInFolder(run, remotePath, localFolder)
+        ngsRepoService.generateRunFilesInFolder(run, remotePath, localFolder)
 
         // compress the files
         def compressedFilename = "runInfo${runId}.tar.gz"
@@ -586,15 +586,15 @@ class SequenceRunController {
     }
 
     def editQueue() {
-        def queue = walleService.getQueue()
+        def queue = ngsRepoService.getQueue()
         [previousRunFolder: queue.previousRunFolder, queuedRuns: queue.queuedRuns]
     }
 
     def updateQueue(String previousRunFolder, String queuedRuns) {
         try {
-            walleService.updateQueue(previousRunFolder.trim(), queuedRuns.trim())
+            ngsRepoService.updateQueue(previousRunFolder.trim(), queuedRuns.trim())
             flash.message = "Queue has been updated!"
-        } catch (WalleException e) {
+        } catch (NgsRepoException e) {
             flash.message = e.message
         }
         redirect(action: "editQueue")

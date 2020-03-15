@@ -4,7 +4,7 @@ import grails.transaction.Transactional
 import groovy.io.FileType
 import groovy.json.*
 
-class WalleException extends RuntimeException {
+class NgsRepoException extends RuntimeException {
     String message
 }
     
@@ -12,7 +12,7 @@ class WalleException extends RuntimeException {
  * Class of service that connects and sends run information to 
  * Sequencer Wall E
  */
-class WalleService {
+class NgsRepoService {
 
     def grailsApplication
     def utilityService
@@ -32,20 +32,20 @@ class WalleService {
      * Get Wall E connection configs from grails configs
      * @return Wall E connection configs
      */
-    Map getWalle() {
-        def walle = [
+    Map getNgsRepo() {
+        def ngsRepo = [
             // username to login Wall E
-            username : grailsApplication.config.walle.username,
+            username : grailsApplication.config.ngsRepo.username,
             // rsa private file
-            keyfile : grailsApplication.config.walle.keyfile,
+            keyfile : grailsApplication.config.ngsRepo.keyfile,
             // Wall E's hostname
-            host : grailsApplication.config.walle.host,
+            host : grailsApplication.config.ngsRepo.host,
             // Wall E's open port
-            port : grailsApplication.config.walle.port,
+            port : grailsApplication.config.ngsRepo.port,
             // folder that contains all the sequence runs
-            root : grailsApplication.config.walle.root
+            root : grailsApplication.config.ngsRepo.root
         ]
-        return walle
+        return ngsRepo
     }
     
     /**
@@ -100,7 +100,7 @@ class WalleService {
      */
     void createJob() {
         // get Wall E's connection information 
-        def walle = getWalle()
+        def ngsRepo = getNgsRepo()
         
         // get sequence run IDs in the queue
         def runIds = getQueuedRunIds()
@@ -134,7 +134,7 @@ class WalleService {
         
         // get the first new folder's path on remote server
         def newFolder = newRunFolders.first()
-        def newRunRemotePath = new File(walle.root, newFolder).getPath()
+        def newRunRemotePath = new File(ngsRepo.root, newFolder).getPath()
         
         // return if the sequence run has not completed
         if (!runCompleted(newRunRemotePath)) {
@@ -158,7 +158,7 @@ class WalleService {
         removeRunFromQueue()  
         updatePriorRunFolder(newFolder)
         
-        log.warn "WallE service has sent the info of run ${run.id} to Wall E."
+        log.warn "NGS repository service has sent the info of run ${run.id} to NGS repository."
     }
     
     /**
@@ -190,13 +190,13 @@ class WalleService {
      */
     def getRemoteFiles() {
         // gather information for ssh to Wall E
-        def walle = getWalle()
+        def ngsRepo = getNgsRepo()
         
         // set timeout to 2 min
         def timeout = 1000 * 60 * 2; 
         
-        // command to list and sort all files and folder on Walle
-        def command = "ssh -i ${walle.keyfile} ${walle.username}@${walle.host} ls ${walle.root} | sort"
+        // command to list and sort all files and folder on NgsRepo
+        def command = "ssh -i ${ngsRepo.keyfile} ${ngsRepo.username}@${ngsRepo.host} ls ${ngsRepo.root} | sort"
         
         def remoteFiles
         try {
@@ -205,19 +205,19 @@ class WalleService {
             // convert the output to a list of file/folder names
             remoteFiles = output.readLines()*.trim()
         } catch (UtilityException e) {
-            throw new WalleException(message: "Error connecting to Walle!")
+            throw new NgsRepoException(message: "Error connecting to NgsRepo!")
         }
         return remoteFiles
     }
     
     def runCompleted(String newRunRemotePath) {
-        def walle = getWalle()
+        def ngsRepo = getNgsRepo()
         
         // set timeout to 2 min
         def timeout = 1000 * 60 * 2; 
         def newRunCompleteFile = new File(newRunRemotePath, RUN_COMPLETE_FILE).getPath()
-        // command to list and sort all files and folder on Walle
-        def command = "ssh -i ${walle.keyfile} ${walle.username}@${walle.host} ls ${newRunCompleteFile}"
+        // command to list and sort all files and folder on NgsRepo
+        def command = "ssh -i ${ngsRepo.keyfile} ${ngsRepo.username}@${ngsRepo.host} ls ${newRunCompleteFile}"
         def result = false
         try {
             // execute the command
@@ -326,27 +326,27 @@ class WalleService {
      */
     def moveFilesToRemote(File runInfoLocalFile, File configLocalFolder, String newRunRemotePath) {
         // get Wall E connection information
-        def walle = getWalle()
+        def ngsRepo = getNgsRepo()
         
         // scp run info file to remote server
         def runInfoLocalPath = runInfoLocalFile.getPath()
-        def command = "scp -i ${walle.keyfile} ${runInfoLocalPath} ${walle.username}@${walle.host}:${walle.root}"
+        def command = "scp -i ${ngsRepo.keyfile} ${runInfoLocalPath} ${ngsRepo.username}@${ngsRepo.host}:${ngsRepo.root}"
         def timeout = 1000 * 60 * 2 // 2 min
         try {
             utilityService.executeCommand(command, timeout)
         } catch (UtilityException e) {
-            throw new WalleException(message: "Error sending run info!")
+            throw new NgsRepoException(message: "Error sending run info!")
         }
         
         // scp config folder to remote server
         def configLocalPath = configLocalFolder.getPath()
         def configRemotePath = new File(newRunRemotePath, CONFIG_FOLDER_NAME).getPath()
-        command = "scp -i ${walle.keyfile} -r ${configLocalPath} ${walle.username}@${walle.host}:${configRemotePath}"
+        command = "scp -i ${ngsRepo.keyfile} -r ${configLocalPath} ${ngsRepo.username}@${ngsRepo.host}:${configRemotePath}"
         timeout = 1000 * 60 * 5 // 5 min
         try {
             utilityService.executeCommand(command, timeout)
         } catch (UtilityException e) {
-            throw new WalleException(message: "Error sending config files!")
+            throw new NgsRepoException(message: "Error sending config files!")
         }
         
         // cleanup the local files
@@ -432,7 +432,7 @@ class WalleService {
             queueIds.each { idRaw ->
                 def id = idRaw.trim()
                 if (!id.isInteger()) {
-                    throw new WalleException(message: "Format error in queued runs!${id}!")
+                    throw new NgsRepoException(message: "Format error in queued runs!${id}!")
                 } else {
                     ids.push(id)
                 }

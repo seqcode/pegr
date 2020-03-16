@@ -14,7 +14,7 @@ class DuplicatedSampleException extends RuntimeException {
 
 class SequenceRunService {
     def springSecurityService
-    def walleService
+    def ngsRepoService
     def utilityService
     def projectService
     
@@ -186,7 +186,7 @@ class SequenceRunService {
         run.status = RunStatus.QUEUE
         run.save()
                 
-        walleService.addToQueue(runId)
+        ngsRepoService.addToQueue(runId)
     }
     
     @Transactional

@@ -79,14 +79,16 @@ grails.config.locations = [ ...
                             "file:<FILEPATH>"]
 ```
 
-3. Run PEGR.
+3. Create a config file for the environment variables and store it in one of the filepaths indicated on the top of file pegr/grails-app/conf/application.groovy. A sample config file is inlcuded in the smple_files folder. 
+
+4. Run PEGR.
 
 ```
 $ cd pegr
 $ grails run-app
 ```
 
-4. Go to http://localhost:8080/pegr/ and you will see the login page. Login with the default user name "labadmin" and password "labadmin". Change the password right away at the user's profile page. You may also want to add sequencing platforms and sequence indexes in the Admin page. 
+5. Go to http://localhost:8080/pegr/ and you will see the login page. Login with the default user name "labadmin" and password "labadmin". Change the password right away at the user's profile page. You may also want to add sequencing platforms and sequence indexes in the Admin page. 
 
 For more information, please visit https://github.com/seqcode/pegr/wiki.
 

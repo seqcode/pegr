@@ -1,7 +1,7 @@
 package pegr
 
 class Analysis {
-    SequenceAlignment alignment
+    AnalysisWorkflowRun analysisWorkflowRun
     String category
     String tool
     String step

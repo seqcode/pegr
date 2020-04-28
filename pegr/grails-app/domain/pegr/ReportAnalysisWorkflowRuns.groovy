@@ -1,11 +1,11 @@
 package pegr
 
-class ReportAlignments {
+class ReportAnalysisWorkflowRuns {
     SummaryReport report
-    SequenceAlignment alignment
+    AnalysisWorkflowRun analysisWorkflowRun
     
     static constraints = {
-        report unique: 'alignment'
+        report unique: 'analysisWorkflowRun'
     }
     
     static mapping = {

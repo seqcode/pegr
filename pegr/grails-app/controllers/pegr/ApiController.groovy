@@ -5,7 +5,7 @@ import grails.converters.*
 import groovy.json.*
     
 class ApiController {
-    def alignmentStatsService
+    def analysisService
     def reportService
     def sampleService
     def utilityService
@@ -39,13 +39,13 @@ class ApiController {
             def apiUser = User.findByEmailAndApiKey(data.userEmail, apiKey)
             if (apiUser) {
                 try {
-                    analysis = alignmentStatsService.save(data, apiUser)
-                } catch(AlignmentStatsException e) {
+                    analysis = analysisService.save(data, apiUser)
+                } catch(AnalysisException e) {
                     code = 500
                     message = "Error: ${e.message}"
                 } catch(Exception e0) {
                     try {
-                        analysis = alignmentStatsService.save(data, apiUser)
+                        analysis = analysisService.save(data, apiUser)
                     } catch(Exception e) {
                         log.error "Error: ${e.message}", e
                         code = 500
@@ -192,7 +192,7 @@ class ApiController {
                 message = "No analysis history ID provided!"
             } else {
                 query.historyIds.each {
-                    def alignment = SequenceAlignment.findByHistoryId(it)
+                    def alignment = AnalysisWorkflowRun.findByHistoryId(it)
                     if (!alignment) {
                         message += "Analysis history ${it} not found! "
                         code = 500

@@ -5,12 +5,12 @@ class ProcessAnalysisJob {
 
     static concurrent = false
     
-    def alignmentStatsService
+    def analysisService
     
     void execute(context) {        
         def id = context.mergedJobDataMap.get('id')
         try {
-            alignmentStatsService.processAnalysis(id)
+            analysisService.processAnalysis(id)
         } catch(Exception e) {
             log.error e
         }

@@ -3,14 +3,14 @@ import grails.transaction.Transactional
 import grails.converters.*
 import groovy.json.*
 
-class AlignmentStatsException extends RuntimeException {
+class AnalysisException extends RuntimeException {
     String message
 }
 
 /**
 * A class to CRUD sequence alignment and analysis, and update the statistics in experiment.
 */
-class AlignmentStatsService {
+class AnalysisService {
     def utilityService
     
    /**
@@ -24,19 +24,14 @@ class AlignmentStatsService {
         // check required fields
         checkRequiredFields(data, ["toolCategory", "toolId", "statsToolId"])
         
-        def alignment
-        if (data.alignmentId) {
-            alignment = SequenceAlignment.get(data.alignmentId)
-            if (!alignment) {
-                throw new AlignmentStatsException(message: "Sequence alignment not found!")
-            }
-        } else if (data.historyId) {
-            alignment = getAlignment(data, apiUser)
+        def analysisWorkflowRun
+        if (data.historyId) {
+            analysisWorkflowRun = getAlignment(data, apiUser)
         } else {
-            throw new AlignmentStatsException(message: "Missing historyId or alignmentId!")
+            throw new AnalysisException(message: "Missing historyId!")
         }
 
-        def analysis = saveAnalysis(data, alignment, apiUser)
+        def analysis = saveAnalysis(data, analysisWorkflowRun, apiUser)
 
         return analysis
     }
@@ -55,25 +50,25 @@ class AlignmentStatsService {
         def pipeline = Pipeline.findByWorkflowId(data.workflowId)
         
         if (!pipeline) {
-            throw new AlignmentStatsException(message: "Pipeline not found for workflow ID ${data.workflowId}!")
+            throw new AnalysisException(message: "Pipeline not found for workflow ID ${data.workflowId}!")
         }
         
         // find the sequencing experiment by runId and sampleId
         def experiment = SequencingExperiment.where {sequenceRun.id == data.run && sample.id == data.sample}.find()
         if (!experiment) {
-            throw new AlignmentStatsException(message: "Sample ${data.sample} is not found in Run ${data.run}!")
+            throw new AnalysisException(message: "Sample ${data.sample} is not found in Run ${data.run}!")
         }
         
         // find the genome
         def genome = Genome.findByName(data.genome)
         if (!genome) {
-            throw new AlignmentStatsException(message: "Genome ${data.genome} not found!")
+            throw new AnalysisException(message: "Genome ${data.genome} not found!")
         }           
         
-        def alignment = SequenceAlignment.findByHistoryIdAndPipelineAndGenomeAndSequencingExperiment(data.historyId, pipeline, genome, experiment)
+        def alignment = AnalysisWorkflowRun.findByHistoryIdAndPipelineAndGenomeAndSequencingExperiment(data.historyId, pipeline, genome, experiment)
         if (!alignment) {
             // create a new alignment.
-            alignment = new SequenceAlignment(sequencingExperiment: experiment, 
+            alignment = new AnalysisWorkflowRun(sequencingExperiment: experiment, 
                                              genome: genome, 
                                              pipeline: pipeline,
                                              historyId: data.historyId,
@@ -88,12 +83,12 @@ class AlignmentStatsService {
     def checkRequiredFields(def data, List requiredFields) {
         requiredFields.each { field ->
             if (!data.properties[field]) {
-                throw new AlignmentStatsException(message: "Missing ${field}!")
+                throw new AnalysisException(message: "Missing ${field}!")
             }
         }
     }
     
-    def saveAnalysis(StatsRegistrationCommand data, SequenceAlignment theAlignment, User apiUser) {
+    def saveAnalysis(StatsRegistrationCommand data, AnalysisWorkflowRun theAlignment, User apiUser) {
         // convert statistics, parameter, datasets to string
         def statisticsStr = data.statistics ? JsonOutput.toJson(data.statistics) : null
         def parameterStr = data.parameters ? JsonOutput.toJson(data.parameters) : null
@@ -114,7 +109,7 @@ class AlignmentStatsService {
         if (analysis) {
             // throw an exception if a different user tries to overwrite the analysis
             if (analysis.user != apiUser) {
-                throw new AlignmentStatsException(message: "Analysis cannot be overwritten by a different user!")
+                throw new AnalysisException(message: "Analysis cannot be overwritten by a different user!")
             }
             analysis.with {
                 parameters = parameterStr
@@ -269,7 +264,7 @@ class AlignmentStatsService {
     * @param experiment the experiment to be updated
     * @param statistics the parsed statistics JSON
     */
-    def saveStatistics(SequenceAlignment alignment, SequencingExperiment experiment, List statistics) {
+    def saveStatistics(AnalysisWorkflowRun alignment, SequencingExperiment experiment, List statistics) {
         if (statistics) {
             def updatedInAlignment = copyProperties(statistics, alignment)
             if (updatedInAlignment > 0) {
@@ -289,7 +284,7 @@ class AlignmentStatsService {
     * @param experiment the experiment to be updated
     * @param statistics the parsed statistics JSON
     */
-    def saveDatasets(SequenceAlignment alignment, SequencingExperiment experiment, String category, List datasets, List statistics) {
+    def saveDatasets(AnalysisWorkflowRun alignment, SequencingExperiment experiment, String category, List datasets, List statistics) {
         try {
             def jsonSlurper = new JsonSlurper()
             switch (category) {
@@ -335,7 +330,7 @@ class AlignmentStatsService {
             }
         } catch (Exception e) {
             log.error e
-            throw new AlignmentStatsException(message: "Error saving the datasets!")
+            throw new AnalysisException(message: "Error saving the datasets!")
         }
     }
     
@@ -347,7 +342,7 @@ class AlignmentStatsService {
     * @param alignment alignment
     * @return existing analysis
     */
-    def findOldAnalysis(StatsRegistrationCommand data, SequenceAlignment alignment) {
+    def findOldAnalysis(StatsRegistrationCommand data, AnalysisWorkflowRun alignment) {
         def oldAnalysis = null
         switch (data.toolCategory) {
             case "output_tagPileup":
@@ -407,7 +402,7 @@ class AlignmentStatsService {
                         target[key] = value    
                     } catch(org.codehaus.groovy.runtime.typehandling.GroovyCastException e) {
                         log.error e
-                        throw new AlignmentStatsException(message: e.message)
+                        throw new AnalysisException(message: e.message)
                     }                
                     updatedProperties++
                 }

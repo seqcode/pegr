@@ -1,19 +1,22 @@
 package pegr
 import groovy.json.*
 
-class SequenceAlignment {
+class AnalysisWorkflowRun {
 	SequencingExperiment sequencingExperiment
-	Genome genome
+    String workflowCategory
     Pipeline pipeline
     String historyId
     String historyUrl
-	Integer readDbId
-    Aligner aligner
-	AlignType alignType
-	String params
 	Date date
 	boolean isPreferred
     
+	String params    
+    Genome genome    
+    Aligner aligner
+	AlignType alignType
+    
+    String results
+    Integer readDbId
     String bamFile
     String peHistogram
     Long mappedReads
@@ -27,7 +30,8 @@ class SequenceAlignment {
     
     static constraints = {
         historyId unique: ["sequencingExperiment", "genome", "pipeline"]
-        
+        workflowCategory nullable: true
+        results nullable: true
 		readDbId nullable: true
         aligner nullable: true
         alignType nullable: true

@@ -15,8 +15,8 @@ class SequencingExperiment {
     Integer indexMismatch
     Long adapterDimerCount
 	
-    List getAlignments() {
-        return SequenceAlignment.where{sequencingExperiment == this}.list(sort: "date")
+    List getAnalysisWorkflowRuns() {
+        return AnalysisWorkflowRun.where{sequencingExperiment == this}.list(sort: "date")
     }
     
     def getGenomes() {

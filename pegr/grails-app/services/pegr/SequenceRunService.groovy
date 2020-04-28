@@ -134,7 +134,7 @@ class SequenceRunService {
         def experiment = SequencingExperiment.get(experimentId)
         if (experiment) {
             experiment.alignments.each {alignment ->
-                ReportAlignments.executeUpdate("delete from ReportAlignments where alignment.id=:alignmentId", [alignmentId: alignment.id])
+                ReportAnalysisWorkflowRuns.executeUpdate("delete from ReportAnalysisWorkflowRuns where alignment.id=:alignmentId", [alignmentId: alignment.id])
                 Analysis.executeUpdate("delete from Analysis where alignment.id =:alignmentId", [alignmentId: alignment.id])
                 alignment.delete()
             }

@@ -13,7 +13,7 @@ class ReportService {
 
     def grailsApplication
     def utilityService
-    def alignmentStatsService
+    def analysisService
     def springSecurityService
     final Map QC_SETTINGS = ['general': "QC_SETTINGS"]
     final String DYNAMIC_ANALYSIS_STEPS = "DYNAMIC_ANALYSIS_STEPS"
@@ -29,29 +29,28 @@ class ReportService {
         def results = [:] // key: pipeline, value: runStatusDTO
         def noResultSamples = []
         run.experiments.each { experiment ->
-            if (experiment.alignments.size() == 0) {
+            if (experiment.analysisWorkflowRuns.size() == 0) {
                 noResultSamples << new SampleStatusDTO(sampleId: experiment.sample.id, 
                                                        naturalId: experiment.sample.naturalId,
                                                        cohort: experiment.cohort)
             }
-            experiment.alignments.each { alignment ->
+            experiment.analysisWorkflowRuns.each { analysisWorkflowRun ->
                 def steps
-                if (results.containsKey(alignment.pipeline)) {
-                    steps = results[alignment.pipeline].steps
+                if (results.containsKey(analysisWorkflowRun.pipeline)) {
+                    steps = results[analysisWorkflowRun.pipeline].steps
                 } else {
                     try {
                         def jsonSlurper = new JsonSlurper()
-                        steps = jsonSlurper.parseText(alignment.pipeline.steps)
-                        results[alignment.pipeline] = new RunStatusDTO (steps: steps,
+                        steps = jsonSlurper.parseText(analysisWorkflowRun.pipeline.steps)
+                        results[analysisWorkflowRun.pipeline] = new RunStatusDTO (steps: steps,
                                                                         sampleStatusList: [])
                     } catch (Exception e) {
                         throw new ReportException(message: "Pipeline steps are not properly defined!")
                     }
                 }
                     
-                // create a new alignment status                    
-                def analysis = Analysis.findAllByAlignment(alignment) 
-                def alignmentStatusDTO = getAlignmentStatusDTO(alignment, experiment, analysis)
+                // create a new analysisWorkflowRun status                    
+                def analysisStatusDTO = getAnalysisStatusDTO(analysisWorkflowRun, experiment)
                 
                 // iterate through the analysis and get each step's status  
                 def motifCount = 0
@@ -61,23 +60,23 @@ class ReportService {
                     def stepAnalysisList = analysis.findAll {it.step == step[0]}
                     
                     // get the status for this step
-                    alignmentStatusDTO.status[index] = getStepAnalysisStatus(stepAnalysisList)
+                    analysisStatusDTO.status[index] = getStepAnalysisStatus(stepAnalysisList)
                     
                     // compare the motif count
-                    if (alignmentStatusDTO.status[index].code == "OK") {
+                    if (analysisStatusDTO.status[index].code == "OK") {
                         switch (step[1]) {
                             case "meme":
                                 motifCount = utilityService.queryJson(stepAnalysisList[0].statistics, "motifCount")
                                 break
                             case "fimo":
-                                def fimoCount = alignmentStatsService.queryDatasetsUriList(stepAnalysisList[0].datasets, "gff").size()
+                                def fimoCount = analysisService.queryDatasetsUriList(stepAnalysisList[0].datasets, "gff").size()
                                 if (fimoCount != motifCount) {
-                                    alignmentStatusDTO.status[index] = [code: "Error", error: "Motif missing"]
+                                    analysisStatusDTO.status[index] = [code: "Error", error: "Motif missing"]
                                 }
                                 break
                             case "tagPileup":
                                 if (stepAnalysisList.size() != motifCount) {
-                                    alignmentStatusDTO.status[index] = [code: "Error", error: "Motif missing"]
+                                    analysisStatusDTO.status[index] = [code: "Error", error: "Motif missing"]
                                 }                         
                                 break
                         }
@@ -85,16 +84,16 @@ class ReportService {
                 }
 
                 // find the sample in that pipeline
-                def sampleStatus = results[alignment.pipeline].sampleStatusList.find {it.sampleId == experiment.sample.id}
+                def sampleStatus = results[analysisWorkflowRun.pipeline].sampleStatusList.find {it.sampleId == experiment.sample.id}
                 if (!sampleStatus) {
                     sampleStatus = new SampleStatusDTO(sampleId: experiment.sample.id,
                                                        naturalId: experiment.sample.naturalId,
                                                        target: experiment.sample.target?.name,
                                                        cohort: experiment.cohort,
-                                    alignmentStatusList: [alignmentStatusDTO])
-                    results[alignment.pipeline].sampleStatusList << sampleStatus
+                                    analysisStatusList: [analysisStatusDTO])
+                    results[analysisWorkflowRun.pipeline].sampleStatusList << sampleStatus
                 } else {    
-                    sampleStatus.alignmentStatusList << alignmentStatusDTO
+                    sampleStatus.analysisStatusList << analysisStatusDTO
                 }
             }
         }
@@ -146,28 +145,28 @@ class ReportService {
     }
     
    /**
-    * Get alignment status DTO from raw alignment and experiment
-    * @param alignment the raw sequence alignment
+    * Get analysis status DTO from raw analysis and experiment
+    * @param analysisWorkflowRun the raw analysis workflow run
     * @param experiment
-    * @return alignment status DTO
+    * @return analysis status DTO
     */
-    def getAlignmentStatusDTO(SequenceAlignment alignment, SequencingExperiment experiment, def analysis) {
+    def getAnalysisStatusDTO(AnalysisWorkflowRun analysisWorkflowRun, SequencingExperiment experiment) {
         def dto = [ 
-                    alignmentId: alignment.id,
-                    historyId: alignment.historyId,
-                    historyUrl: alignment.historyUrl,
-                    genome: alignment.genome.name,
-                    date: alignment.date,
+                    analysisWorkflowRunId: analysisWorkflowRun.id,
+                    historyId: analysisWorkflowRun.historyId,
+                    historyUrl: analysisWorkflowRun.historyUrl,
+                    date: analysisWorkflowRun.date,
+                    isPreferred: analysisWorkflowRun.isPreferred,    
                     status: [],
+                    genome: analysisWorkflowRun.genome.name,
                     totalReads: experiment.totalReads,
                     requestedTags: experiment.sample.requestedTagNumber * 1000000,
                     adapterDimerPct: utilityService.divide(experiment.adapterDimerCount, experiment.totalReads),
-                    mappedPct: utilityService.divide(alignment.mappedReads, experiment.totalReads),
-                    uniquelyMappedPct: utilityService.divide(alignment.uniquelyMappedReads, experiment.totalReads),
-                    deduplicatedPct: utilityService.divide(alignment.dedupUniquelyMappedReads, experiment.totalReads),
-                    duplicationLevel: getDuplicationLevel(alignment.dedupUniquelyMappedReads, alignment.mappedReads),
-                    isPreferred: alignment.isPreferred,            
-                    dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
+                    mappedPct: utilityService.divide(analysisWorkflowRun.mappedReads, experiment.totalReads),
+                    uniquelyMappedPct: utilityService.divide(analysisWorkflowRun.uniquelyMappedReads, experiment.totalReads),
+                    deduplicatedPct: utilityService.divide(analysisWorkflowRun.dedupUniquelyMappedReads, experiment.totalReads),
+                    duplicationLevel: getDuplicationLevel(analysisWorkflowRun.dedupUniquelyMappedReads, analysisWorkflowRun.mappedReads),    
+                    dedupUniquelyMappedReads: analysisWorkflowRun.dedupUniquelyMappedReads,
                     recommend: experiment.sample.recommend
                 ]
 
@@ -177,6 +176,7 @@ class ReportService {
             steps = utilityService.parseJson(stepsStr)
         }
         if (steps && steps.size() > 0) {
+            def analysis = Analysis.findAllByAnalysisWorkflowRun(analysisWorkflowRun)
             analysis.each {
                 if (it.step in steps) {
                     def statistics = utilityService.parseJson(it.statistics)
@@ -225,11 +225,11 @@ class ReportService {
     @Transactional
     def deleteAlignment(Long alignmentId) {
         try {
-            ReportAlignments.executeUpdate("delete from ReportAlignments where alignment.id =:alignmentId", [alignmentId: alignmentId])
+            ReportAnalysisWorkflowRuns.executeUpdate("delete from ReportAnalysisWorkflowRuns where alignment.id =:alignmentId", [alignmentId: alignmentId])
 
             Analysis.executeUpdate("delete from Analysis where alignment.id =:alignmentId", [alignmentId: alignmentId])
             
-            SequenceAlignment.executeUpdate("delete from SequenceAlignment where id =:alignmentId", [alignmentId: alignmentId])
+            AnalysisWorkflowRun.executeUpdate("delete from AnalysisWorkflowRun where id =:alignmentId", [alignmentId: alignmentId])
         } catch (Exception e) {
             log.error e
             throw new ReportException(message: "Error deleting the alignment!")
@@ -250,9 +250,9 @@ class ReportService {
             throw new ReportException(message: "Error saving the report!")
         }
         cohort.experiments.each { experiment ->
-            experiment.alignments.each { alignment ->
+            experiment.analysisWorkflowRuns.each { alignment ->
                 if (alignment.isPreferred) {
-                    new ReportAlignments(report: report, alignment: alignment).save()
+                    new ReportAnalysisWorkflowRuns(report: report, alignment: alignment).save()
                 }
             } 
         }
@@ -272,7 +272,7 @@ class ReportService {
         }
         cohort.report = null
         cohort.save()
-        ReportAlignments.executeUpdate("delete from ReportAlignments where report=:report", [report: report])
+        ReportAnalysisWorkflowRuns.executeUpdate("delete from ReportAnalysisWorkflowRuns where report=:report", [report: report])
         report.delete()
     }
     
@@ -297,9 +297,8 @@ class ReportService {
                         updateAlignmentPct(alignmentDTO, expDTO)
                         expDTO.alignments << alignmentDTO
                         sampleDTO.alignmentCount++
-                        def analysis = Analysis.findAllByAlignment(alignment)
-                        def alignmentStatusDTO = getAlignmentStatusDTO(alignment, experiment, analysis)
-                        sampleDTO.histories << alignmentStatusDTO.historyId
+                        def analysisStatusDTO = getAnalysisStatusDTO(alignment, experiment)
+                        sampleDTO.histories << analysisStatusDTO.historyId
                     }
                 }
                 sampleDTO.experiments << expDTO
@@ -353,9 +352,8 @@ class ReportService {
                     def alignmentDTO = getAlignmentDTO(alignment)
                     updateAlignmentPct(alignmentDTO, expDTO)
                     expDTO.alignments << alignmentDTO
-                    def analysis = Analysis.findAllByAlignment(alignment)
-                    def alignmentStatusDTO = getAlignmentStatusDTO(alignment, experiment, analysis)
-                    sampleDTO.histories << alignmentStatusDTO.historyId 
+                    def analysisStatusDTO = getAnalysisStatusDTO(alignment, experiment)
+                    sampleDTO.histories << analysisStatusDTO.historyId 
                     sampleDTO.alignmentCount++
                 }
             }
@@ -371,7 +369,7 @@ class ReportService {
     * @return a list of sampleDTOs
     */
     def fetchDataForReport(Long reportId) {
-        def alignments = ReportAlignments.where { report.id == reportId }.collect { it.alignment }
+        def alignments = ReportAnalysisWorkflowRuns.where { report.id == reportId }.collect { it.alignment }
 
         def sampleDTOs = []
         alignments.each { alignment ->
@@ -461,7 +459,7 @@ class ReportService {
     * @param alignment
     * @return alignmentDTO
     */
-    def getAlignmentDTO(SequenceAlignment alignment) {
+    def getAlignmentDTO(AnalysisWorkflowRun alignment) {
         def alignmentDTO = new AlignmentDTO(id: alignment.id,
                 genome: alignment.genome,
                 bam: alignment.bamFile,
@@ -476,7 +474,7 @@ class ReportService {
                 composite: []
             )
 
-	if (alignment.readDbId > 0) {
+        if (alignment.readDbId > 0) {
         	alignmentDTO.readDbId = alignment.readDbId;
         }
         def statistics
@@ -485,10 +483,10 @@ class ReportService {
         analysisList.each { analysis ->
             switch (analysis.category) {
                 case "output_markDuplicates": //bam_raw
-                    alignmentDTO.bamRaw = alignmentStatsService.queryDatasetsUri(analysis.datasets, "bam")
+                    alignmentDTO.bamRaw = analysisService.queryDatasetsUri(analysis.datasets, "bam")
                     break
                 case "output_bamToScidx": //scidx
-                    alignmentDTO.scidx = alignmentStatsService.queryDatasetsUri(analysis.datasets, "scidx")
+                    alignmentDTO.scidx = analysisService.queryDatasetsUri(analysis.datasets, "scidx")
                     break
                 case "output_genetrack": // GeneTrack
                     def params = utilityService.queryJson(analysis.parameters, ["filter", "sigma", "exclusion"])
@@ -503,19 +501,19 @@ class ReportService {
                     alignmentDTO.peakPairs = utilityService.queryJson(analysis.statistics, "peakPairWis")
                     def params = utilityService.queryJson(analysis.parameters, ["up_distance", "down_distance", "binsize"])
                     alignmentDTO.peakPairsParam = getPeakPairsParam(params.up_distance, params.down_distance, params.binsize)
-                    alignmentDTO.cwpairFile = alignmentStatsService.queryDatasetsUri(analysis.datasets, "gff")
+                    alignmentDTO.cwpairFile = analysisService.queryDatasetsUri(analysis.datasets, "gff")
                     break
                 case "output_meme": // meme
-                    alignmentDTO.memeFile = alignmentStatsService.queryDatasetsUri(analysis.datasets, "txt")
-                    alignmentDTO.memeFig = alignmentStatsService.queryDatasetsUri(analysis.datasets, "html")
+                    alignmentDTO.memeFile = analysisService.queryDatasetsUri(analysis.datasets, "txt")
+                    alignmentDTO.memeFig = analysisService.queryDatasetsUri(analysis.datasets, "html")
                     break
                 case "output_fourColorPlot": // four color plot
-                    alignmentDTO.fourColor = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "png")
+                    alignmentDTO.fourColor = analysisService.queryDatasetsUriList(analysis.datasets, "png")
                     break
                 case "output_tagPileup": //composite 
                     def motif = utilityService.queryJson(analysis.parameters, "input2X__identifier__")
                     def motifId = motif?.find( /\d+/ )?.toInteger()
-                    def tabulars = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "tabular")
+                    def tabulars = analysisService.queryDatasetsUriList(analysis.datasets, "tabular")
                     if (tabulars && tabulars.size() > 0) {
                         if (motifId && motifId > 0){
                             alignmentDTO.composite[motifId-1] = tabulars.last()
@@ -819,7 +817,7 @@ class ReportService {
     */
     @Transactional
     def togglePreferredAlignment(Long alignmentId) {
-        def alignment = SequenceAlignment.get(alignmentId)
+        def alignment = AnalysisWorkflowRun.get(alignmentId)
         alignment.isPreferred = !alignment.isPreferred
         alignment.save()
     }

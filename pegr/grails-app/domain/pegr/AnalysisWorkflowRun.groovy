@@ -12,8 +12,6 @@ class AnalysisWorkflowRun {
     
 	String params    
     Genome genome    
-    Aligner aligner
-	AlignType alignType
     
     String results
     Integer readDbId
@@ -33,8 +31,6 @@ class AnalysisWorkflowRun {
         workflowCategory nullable: true
         results nullable: true
 		readDbId nullable: true
-        aligner nullable: true
-        alignType nullable: true
         params nullable: true, blank: true, maxSize: 2000
         date nullable: true
         historyUrl nullable: true, blank: true

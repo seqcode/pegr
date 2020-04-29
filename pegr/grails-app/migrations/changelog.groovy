@@ -2489,4 +2489,5 @@ databaseChangeLog = {
     }
     include file: 'rename_alignment.groovy'
     include file: 'delete_aligner.groovy'
+    include file: 'trim_analysisWorkflowRun.groovy'
 }

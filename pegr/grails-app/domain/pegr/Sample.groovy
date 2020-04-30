@@ -22,7 +22,7 @@ class Sample {
     String source
     String sourceId
     Assay assay
-    String requestedGenomes
+    String requestedWorkflows
     String recommend
     GrowthMedia growthMedia
     String naturalId 
@@ -81,7 +81,7 @@ class Sample {
         sourceId nullable: true
         antibodyNotes nullable: true, blank: true
         assay nullable: true
-        requestedGenomes nullable: true, blank: true
+        requestedWorkflows nullable: true, blank: true
         recommend nullable: true
         growthMedia nullable: true
         naturalId nullable: true

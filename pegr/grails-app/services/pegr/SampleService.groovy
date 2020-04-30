@@ -140,8 +140,8 @@ class SampleService {
             def abNotes = JsonOutput.toJson(abnoteMap)
 
             def growthMedia = getGrowthMedia(data.growthMedia, cellSource.strain?.species)
-
-            def sample = getSample(cellSource, antibody, target, data.cellNum, data.chrom, data.volume, data.requestedTags, data.sampleNotes, sendTo, abNotes, data.genomes, assay, growthMedia)
+            
+            def sample = getSample(cellSource, antibody, target, data.cellNum, data.chrom, data.volume, data.requestedTags, data.sampleNotes, sendTo, abNotes, data.requestedWorkflows, assay, growthMedia)
 
             // add treatments to sample
             if (data.treatments) {
@@ -256,9 +256,9 @@ class SampleService {
 
 
     @Transactional
-    def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, User dataTo, String abNotes, String requestedGenomes, Assay assay, GrowthMedia growthMedia) {
+    def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, User dataTo, String abNotes, String requestedWorkflows, Assay assay, GrowthMedia growthMedia) {
         def now = new Date()
-	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: utilityService.getFloat(requestedTagNum), chromosomeAmount: utilityService.getFloat(chromAmount), cellNumber: utilityService.getFloat(cellNum), volume: utilityService.getFloat(volume), note: sampleNotes, status: SampleStatus.CREATED, date: now, sendDataTo: dataTo, antibodyNotes: abNotes, requestedGenomes: requestedGenomes, assay: assay, growthMedia: growthMedia).save(failOnError: true)
+	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: utilityService.getFloat(requestedTagNum), chromosomeAmount: utilityService.getFloat(chromAmount), cellNumber: utilityService.getFloat(cellNum), volume: utilityService.getFloat(volume), note: sampleNotes, status: SampleStatus.CREATED, date: now, sendDataTo: dataTo, antibodyNotes: abNotes, requestedWorkflows: requestedWorkflows, assay: assay, growthMedia: growthMedia).save(failOnError: true)
 	    return sample
 	}
 
@@ -403,8 +403,8 @@ class SampleService {
                 sample.naturalId = value
                 sample.save(failOnError: true)
                 break
-            case "genomes" :
-                sample.requestedGenomes = value
+            case "workflows" :
+                sample.requestedWorkflows = value
                 sample.save(failOnError: true)
                 break
             case "growthMedia" :

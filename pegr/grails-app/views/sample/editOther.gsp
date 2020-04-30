@@ -33,9 +33,8 @@
                 <input name="requestedTagNumber" class="isnumber" value="${sample.requestedTagNumber}">
             </div>
             <div>
-                <label>Reference Genomes</label>
-                <g:select multiple="multiple" name="requestedGenomes" from="${genomes}" value="${sample.requestedGenomes}" class="genomes no-tag-select2" style="width: 150px">
-                </g:select>
+                <label>Requested Workflows</label>
+                <textarea name="requestedWorkflows" cols="60" rows="2">${sample.requestedWorkflows}</textarea>
             </div>
             <div>
                 <label>Send data to</label>

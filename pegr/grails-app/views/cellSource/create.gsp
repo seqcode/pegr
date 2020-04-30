@@ -35,7 +35,6 @@
         $(".genotype").prop("disabled", true);
         $(".mutation").prop("disabled", true);
         $(".growth-media").prop("disabled", true);
-        $(".genomes").prop("disabled", true);
      </script>
 </div>
 </body>

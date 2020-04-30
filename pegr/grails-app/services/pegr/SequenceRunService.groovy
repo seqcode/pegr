@@ -146,14 +146,14 @@ class SequenceRunService {
     }
     
     @Transactional
-    void updateSample(String experimentIdStr, List genomeIds) {
+    void updateSample(String experimentIdStr, String workflows) {
         Long experimentId = Long.parseLong(experimentIdStr) 
         def experiment = SequencingExperiment.get(experimentId) 
         if (!experiment) {
             throw new SequenceRunException(message: "Experiment not found!")
         }
 
-        experiment.sample.requestedGenomes = genomeIds.join(',')
+        experiment.sample.requestedWorkflows = workflows
         experiment.sample.save()
     }
     

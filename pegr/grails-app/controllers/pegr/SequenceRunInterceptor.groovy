@@ -20,7 +20,6 @@ class SequenceRunInterceptor {
                            'addSamplesById',
                            'removeExperiment',
                            'editSamples',
-                           'updateSamples',
                            'run',
                            'fetchProjectsAjax',
                            'updateExperimentCohortAjax',

@@ -280,24 +280,6 @@ class SequenceRunController {
         redirect(action: "show", params: [id: runId])
     }
 
-    def updateSamples(Long runId) {
-        def messages = ""
-        def expIds = params.list('experimentId')
-        expIds.each{
-            def genomeIds = params.list("genomes${it}")
-            try {
-                sequenceRunService.updateSample(it, genomeIds)
-            } catch (SequenceRunException e) {
-                messages += "<p>e.message</p>"
-            }
-        }
-        if (messages == "") {
-            messages = "All genomes added successfully!"
-        }
-        flash.message = messages
-        redirect(action: "show", id: runId)
-    }
-
     def previewRun(Long runId) {
         try {
             def previousRun = ngsRepoService.getPreviousRun()

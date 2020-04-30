@@ -298,14 +298,16 @@ class NgsRepoService {
             // for each sample
             run.experiments.each { experiment -> 
                 def xmlNames = []
-                // get requested genomes for each sample
-                def genomesStr = experiment.sample.requestedGenomes
-                if (genomesStr) {
-                    def genomes = genomesStr.split(",")
-                    // write the config xml file for each genome.
-                    genomes.eachWithIndex { genome, idx ->
-                        def xmlName = generateXmlFile(genome, run.id, experiment.sample.id, idx, configLocalFolder)
-                        xmlNames.push(xmlName)
+                // get requested workflow for each sample
+                def workflowStr = experiment.sample.requestedWorkflows
+                if (workflowStr) {
+                    def workflows = utilityService.parseJson(workflowStr)
+                    // write the config xml file for each workflow.
+                    if (workflows) {
+                        workflows.eachWithIndex { workflow, idx ->
+                            def xmlName = generateXmlFile(workflow, run.id, experiment.sample.id, idx, configLocalFolder)
+                            xmlNames.push(xmlName)
+                        }
                     }
                 }
                 // write the sample's runID, sampleID, indices and config xml file names.
@@ -358,23 +360,38 @@ class NgsRepoService {
     
     /**
      * Generate config xml files
-     * @param genome the name of the genome build
+     * @param workflow a dictionary with keys "genome" and "workflow"
      * @param runId the sequence run's ID
      * @param sampleId sample Id
-     * @param idx the index of the genome build for the sample
+     * @param idx the index of the requested workflow for the sample
      * @param folder the config folder
      * @return the filename of the xml config file
      */
-    String generateXmlFile(String genome, Long runId, Long sampleId, int idx, File folder) {
+    String generateXmlFile(Map workflow, Long runId, Long sampleId, int idx, File folder) {
         // create the config xml file
         def filename = "${sampleId}_${idx}.xml"
         def file = new File(folder, filename)
         
+        def genome
+        def workflowId
+        
         // create the config object
-        def alignmentParams = new WorkFlow(dbkey: genome)
+        if (workflow.containsKey("genome")) {
+            genome = workflow["genome"]
+        }
+        
+        if (workflow.containsKey("workflow")){
+            workflowName = workflow["workflow"]
+            def pipeline = Pipeline.findByName(workflowName)
+            if (pipeline) {
+                workflowId = pipeline.workflowId
+            }
+        }
+        
+        def workflowParams = new Workflow(genome: genome, workflowId: workflowId)
         
         // convert the config object to xml
-        def converter = alignmentParams as XML
+        def converter = workflowParams as XML
         
         // write to the config xml file
         converter.render(new java.io.FileWriter(file))
@@ -452,6 +469,7 @@ class NgsRepoService {
 /**
  * Class for the config xml file. 
  */
-class WorkFlow {
-    String dbkey
+class Workflow {
+    String genome
+    String workflowId
 }

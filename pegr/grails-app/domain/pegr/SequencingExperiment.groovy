@@ -19,15 +19,6 @@ class SequencingExperiment {
         return AnalysisWorkflowRun.where{sequencingExperiment == this}.list(sort: "date")
     }
     
-    def getGenomes() {
-        def genomes = []
-        String s = sample?.requestedGenomes
-        if (s) {
-            genomes = s.split(",").toList()
-        }
-        return genomes
-    }
-    
     static constraints = {
         sequenceRun nullable: true
         cohort nullable: true

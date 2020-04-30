@@ -47,14 +47,7 @@ class SampleController {
     def editOther(Long sampleId) {
         def sample = Sample.get(sampleId)
         if (sample) {
-            def species = sample.cellSource?.strain?.species
-            def genomes
-            if (species) {
-                genomes = Genome.executeQuery("select g.name from Genome g where g.species.id = ?", [species.id])
-            } else {
-                genomes = Genome.executeQuery("select g.name from Genome g")
-            }
-            [sample: sample, genomes: genomes]
+            [sample: sample]
         } else {
             render(view: "/404")
         }

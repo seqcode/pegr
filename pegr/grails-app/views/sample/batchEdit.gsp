@@ -29,7 +29,7 @@
                     <th class="cterm">C-Term</th>
                     <th class="nterm">N-Term</th>
                     <th class="index" colspan="2">Index</th>
-                    <th class="genomes">Reference Genome(s)</th>
+                    <th class="workflows">Requested Workflow(s)</th>
                     <th class="growthMedia">Growth Media</th>
                     <th class="treatments">Treatments</th>
                     <th class="chromosomeAmount">Chrom.(ug)</th>
@@ -56,7 +56,7 @@
                         <td class="group-target nterm"><span class="value">${sample.target?.nTermTag}</span></td>
                         <td class="index index-sequence"><span class="value">${sample.sequenceIndicesString}</span></td>
                         <td class="index index-id"><span class="value">${sample.sequenceIndicesIdString}</span></td>
-                        <td class="genomes"><span class="value">${sample.requestedGenomes}</span></td>
+                        <td class="workflows"><span class="value">${sample.requestedWorkflows}</span></td>
                         <td class="growthMedia"><span class="value">${sample.growthMedia}</span></td>
                         <td class="treatments"><span class="value">${sample.treatments.join(", ")}</span></td>
                         <td class="group-input chromosomeAmount"><span class="value">${sample.chromosomeAmount}</span></td>
@@ -197,46 +197,15 @@
             });
         });
 
-        $("td.genomes").on("click", ".value", function() {
+        $("td.workflows").on("click", ".save", function() {
             var td = $(this).parent();
-            var oldValue = $(this).text();
-            var edit = "<span class='input'><select multiple='multiple' style='width:200px'>";
-            $.each(oldValue.split(","), function (index, value) {
-                if (value != "NONE") {
-                    edit += "<option selected value='" + value + "'>" + value + "</option>";
-                }
-            });
-            edit += "</select></span>";
-            appendEdit(this, edit);
-            var speciesId = $(this).closest("tr").find(".speciesId").val();
-            $.ajax({
-                url: "/pegr/cellSource/fetchGenomeAjax?speciesId="+speciesId
-            }).done(function(result){
-                td.find("select").select2({
-                    data: result,
-                    placeholder: noTagPlaceholder,
-                });
-            });
-        });
-
-        $("td.genomes").on("click", ".save", function() {
-            var td = $(this).parent();
-            var value = td.find("select").val();
-            var valueToSend = null;
-            if (value) {
-                valueToSend = value.join(",");
-            }
+            var valueToSend = td.find("input").val();;
             var sampleId = td.parent().find(".sampleId").val();
             $.ajax({
                 type: "POST",
                 url: "/pegr/sample/updateAjax",
-                data: {sampleId: sampleId, name: "genomes", value : valueToSend},
+                data: {sampleId: sampleId, name: "workflows", value : valueToSend},
                 success: function() {
-                    var s = s0;
-                    if (value) {
-                        s = value.join(",");
-                    }
-                    td.find(".value").text(s);
                     toggleTd(td);
                 },
                 error: function(xhr, ajaxOptions, thrownError) {

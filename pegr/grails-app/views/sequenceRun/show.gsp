@@ -181,7 +181,7 @@
                 <th>Antibody</th>
                 <th>Index</th>
                 <th>Index ID</th>
-                <th>Genome Build</th>
+                <th>Requested Workflows</th>
                 <th>Project</th>
             </tr>
         </thead>
@@ -197,7 +197,7 @@
                     <td>${it.sample?.antibody}</td>
                     <td>${it.sample?.sequenceIndicesString}</td>
                     <td>${it.sample?.sequenceIndicesIdString}</td>
-                    <td>${it.sample?.requestedGenomes}</td>
+                    <td>${it.sample?.requestedWorkflows}</td>
                     <td class="project"><span class="value">${it.cohort?.project ?: "NONE"}</span></td>
                 </tr>
             </g:each>              

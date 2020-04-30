@@ -64,7 +64,7 @@
                     </li>
                     <li>
                         <h4>Multiple selections</h4>
-                        <p>Some fields, such as "Treatments" and "Reference Genomes", accept multiple selections. Once you enter the first selection, that selection will be wrapped up and prefixed with a remove sign. You may continue to choose additional selections.</p>
+                        <p>Some fields, such as "Treatments", accept multiple selections. Once you enter the first selection, that selection will be wrapped up and prefixed with a remove sign. You may continue to choose additional selections.</p>
                     </li> 
                     <li>
                         <h4>Cascade select</h4>
@@ -73,7 +73,6 @@
                         <ul>
                             <li>Genus -> Species -> Parent Strain -> Strain -> Genotype -> mutation </li>
                             <li>Species -> Growth Media</li>
-                            <li>Species -> Reference Genomes</li>
                         </ul>
                         <p>Antibody</p>
                         <ul>
@@ -108,7 +107,7 @@
                         <h4>Validations</h4>
                         <p>Validations of all the fields will occur when the form is submitted (some simple input fields will be validated whenever the fields are changed). Error messages will appear in red around the corresponding fields.</p>
                         <ul>
-                            <li>Required Fields: Genus, Species, Parent Strain, Strain, Growth Media, Genomes, Catalog, Target.</li>
+                            <li>Required Fields: Genus, Species, Parent Strain, Strain, Growth Media, Catalog, Target.</li>
                             <li>Fields where only alphanumeric characers and hyphen (e.g. 0-9, a-z, A-Z and -) are accepted: Strain, Mutation, Growth Media, Treatments, Catalog, Target.</li>
                             <li>Fields that accept numbers: Chrom.(ug), Cell#(M), Volume(ul), Requested Tags(M), Conc.(ug/ul), Volume Sent(ul), Usage Per ChIP(ug), Usage Per ChIP(ul)</li>
                         </ul>

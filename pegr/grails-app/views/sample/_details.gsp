@@ -242,13 +242,13 @@
 
             <tr><td>Chromatin (ug)</td><td> <g:if test="${sample?.chromosomeAmount}">${sample.chromosomeAmount}</g:if></td></tr>
 
-            <tr><td>Avail. Cell# per aliquot (M)</td><td> <g:if test="${sample?.cellNumber}">${sample.cellNumber}</g:if></td></tr>
+            <tr><td>Avail. cell# per aliquot (M)</td><td> <g:if test="${sample?.cellNumber}">${sample.cellNumber}</g:if></td></tr>
 
             <tr><td>Volume per aliquot (ul)</td><td> <g:if test="${sample?.volume}">${sample.volume}</g:if></td></tr>
 
-            <tr><td>Requested Tags (M)</td><td> <g:if test="${sample?.requestedTagNumber}">${sample.requestedTagNumber}</g:if></td></tr>
+            <tr><td>Requested tags (M)</td><td> <g:if test="${sample?.requestedTagNumber}">${sample.requestedTagNumber}</g:if></td></tr>
 
-            <tr><td>Requested genomes</td><td> ${sample?.requestedGenomes}</td></tr>
+            <tr><td>Requested workflows</td><td> ${sample?.requestedWorkflows}</td></tr>
             
             <tr><td>Send data to</td><td> ${sample?.sendDataTo}</td></tr>
             

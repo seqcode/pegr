@@ -60,7 +60,7 @@
                     <th>Cell# (M)</th>
                     <th>Volume (ul)</th>
                     <th>Requested Tags (M)</th>
-                    <th>Reference Genome(s)</th>
+                    <th>Requested Workflows</th>
                     <th><a href="#" onclick="window.open('${g.createLink(action:'sampleSubmissionHelp', fragment:'sequence-index')}', 'Help: Sample Submission', 'width=600,height=400' )">Index <span class="glyphicon glyphicon-question-sign"></span></a></th>
                     <th>Notes</th> 
                     <th>Company</th>
@@ -143,9 +143,7 @@
                     <td><g:textField name="samples[0].volume" class="isnumber"></g:textField></td>
                     <td><g:textField name="samples[0].requestedTags" class="isnumber"></g:textField></td>
                     <td>
-                        <select multiple="multiple" name="samples[0].genomes" class="genomes no-tag-select2" style="width: 150px" required>
-                            <option></option>
-                        </select>
+                        <input name="samples[0].requestedWorkflows"/>
                     </td>
                     <td><g:textField name="samples[0].indices" style="width:200px"></g:textField></td>
                     <td><g:textField name="samples[0].sampleNotes" style="width: 300px"></g:textField></td>
@@ -326,7 +324,6 @@
     $(".genotype").prop("disabled", true);
     $(".mutation").prop("disabled", true);
     $(".growth-media").prop("disabled", true);
-    $(".genomes").prop("disabled", true);
     $(".target-type").prop("disabled", true);
     $(".target").prop("disabled", true);
     $(".cterm").prop("disabled", true);
@@ -386,17 +383,6 @@
         }});
         $growthMedia.prop("disabled", false);
         
-        var $genomes = $(this).closest("tr").find(".genomes");
-        $genomes.html('').select2({
-            data: [{id: '', text: ''}],
-        });
-        $.ajax({url: "/pegr/cellSource/fetchGenomeAjax?speciesId="+speciesId, success: function(genomes){
-            $genomes.select2({
-                data: genomes,
-                placeholder: noTagPlaceholder
-            });
-        }});
-        $genomes.prop("disabled", false);
     });
             
     $(".parent-strain").on("change", function() {

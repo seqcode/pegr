@@ -139,11 +139,6 @@ class CellSourceController {
         render utilityService.objectToSelect2Data(species) as JSON
     }
     
-    def fetchGenomeAjax(Long speciesId) {
-        def genomes = Genome.executeQuery("select g.name from Genome g where g.species.id = ?", [speciesId])
-        render utilityService.stringToSelect2Data(genomes) as JSON
-    }
-    
     def fetchParentStrainAjax(Long speciesId) {
         def strains = Strain.executeQuery("select distinct s.parent.name from Strain s where s.species.id = ?", [speciesId])
         render utilityService.stringToSelect2Data(strains) as JSON

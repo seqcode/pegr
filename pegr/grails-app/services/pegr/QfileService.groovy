@@ -206,7 +206,9 @@ class QfileService {
 
         def abNotes = JsonOutput.toJson(abnoteMap)
         
-        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes, assay, growthMedia, data.projectName)
+        checkRequestedWorkflows(data.workflows, species)
+        
+        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes, assay, growthMedia, data.projectName, data.workflows)
 
         sampleService.addTreatment(sample, data.perturbation1)
         sampleService.addTreatment(sample, data.perturbation2)
@@ -219,9 +221,6 @@ class QfileService {
         def seqExp = getSeqExperiment(sample, results.sequenceRun, data.rd1Start, data.rd1End, data.indexStart, data.indexEnd, data.rd2Start, data.rd2End)
         
         addExperimentToCohort(seqExp, project, data.service, data.invoice)
-
-        def genomeBuilds = [data.genomeBuild1, data.genomeBuild2, data.genomeBuild3]
-        saveRequestedGenome(genomeBuilds, sample, species) 
         
         return results?.sequenceRun?.runNum
     }
@@ -522,7 +521,7 @@ class QfileService {
 	    return cellSource
 	}
     
-	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId, String abNotes, Assay assay, GrowthMedia growthMedia, String projectName) {
+	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId, String abNotes, Assay assay, GrowthMedia growthMedia, String projectName, String workflows) {
 	    def note = [:]
 	    if (sampleNotes) {
 	        note['note'] = sampleNotes
@@ -556,7 +555,7 @@ class QfileService {
             }
         }
         
-	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes, assay: assay, growthMedia: growthMedia, naturalId: sampleId).save( failOnError: true)
+	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes, assay: assay, growthMedia: growthMedia, naturalId: sampleId, requestedWorkflows: workflows).save( failOnError: true)
 	    return sample
 	}
 	
@@ -676,26 +675,31 @@ class QfileService {
 	    def seqExp = new SequencingExperiment(sample: sample, sequenceRun: seqRun, readPositions: readPositions, readType: readType).save( failOnError: true)
 	    return seqExp
 	}
-	        
-	def saveRequestedGenome(List genomeBuilds, Sample sample, Species species) {
-        genomeBuilds.removeAll {it == null}
-        genomeBuilds.each { genomeBuild ->
-            getGenome(genomeBuild, species)
+	
+    def checkRequestedWorkflows(String workflowStr, Species species) {
+        if (workflowStr) {
+            def workflows = utilityService.parseJson(workflowStr)
+            if (workflows) {
+                workflows.each { workflow ->
+                    if (workflow.containsKey("genome")) {
+                        def genome = Genome.findByName(workflow["genome"])
+                        if (!genome) {
+                            new Genome(name: workflow["genome"], species: species).save(failOnError: true)
+                        }
+                    }
+                    if (workflow.containsKey("workflow")) {
+                        def pipeline = Pipeline.findByName(workflow["workflow"])
+                        if (!pipeline) {
+                            throw new QfileException(message: "Workflow ${workflow["workflow"]} is not found in database!")
+                        }
+                    }
+                }
+            } else {
+                throw new QfileException(message: "Requested workflows ${workflowStr} cannot be parsed.")
+            }
         }
-	    sample.requestedGenomes = genomeBuilds.join(",")
-	}
-	
-	def getGenome(String genomeStr, Species species) {
-	    if (genomeStr == null) {
-	        return null
-	    }
-	    def genome = Genome.findByName(genomeStr)
-	    if (!genome) {
-	        genome = new Genome(name: genomeStr, species: species).save( failOnError: true)
-	    }
-	    return genome
-	}
-	
+    }
+    
 	def getFloat(String s) {
 	    def f
 	    try {
@@ -717,8 +721,6 @@ class QfileService {
         }
 	    return clonal
 	}
-	
-
     
     def getInteger(String s) {
         def i = 0
@@ -901,8 +903,6 @@ class QfileService {
             
             def note = utilityService.parseJson(sample.note)
             
-            def genomes = sample.requestedGenomes ? sample.requestedGenomes.split(',') : []
-            
             def prtclNote = utilityService.parseJson(sample.prtclInstSummary.note)
             
             def sampleInRun = SampleInRun.findBySample(sample)
@@ -972,9 +972,7 @@ class QfileService {
                 cellNum: sample.cellNumber,        //AY    
                 volume: sample.volume,                    //AZ
                 assay: sample.assay?.name,                     //BA
-                genomeBuild1: genomes.size() > 0 ? genomes[0] : "", //BB    
-                genomeBuild2: genomes.size() > 1 ? genomes[1] : "",   //BC
-                genomeBuild3: genomes.size() > 2 ? genomes[2] : "",   //BD      
+                workflows: sample.requestedWorkflows, //BB        
                 emptyBE: "",
                 dateReceived: sample.cellSource?.inventory?.dateReceived?.format('yyMMdd'),   //BF
                 receivingUser: sample.cellSource?.inventory?.receivingUser?.fullName,   //BG    
@@ -1095,9 +1093,9 @@ class QfileService {
 	     cellNum: data[50],        //AY    
 	     volume: data[51],         //AZ
 	     assay: data[52],          //BA
-	     genomeBuild1: data[53],   //BB    
-	     genomeBuild2: data[54],   //BC
-	     genomeBuild3: data[55],   //BD    
+	     workflows: data[53],      //BB    
+	     // data[54],              //BC
+	     // data[55],              //BD
 	     // data[56],              //BE    
 	     dateReceived: data[57],   //BF
 	     receivingUser: data[58],  //BG    

@@ -405,7 +405,7 @@ class SampleCommand {
     String cellNum
     String volume
     String requestedTags
-    String genomes
+    String workflows
     String indices
     String sampleNotes
     String company

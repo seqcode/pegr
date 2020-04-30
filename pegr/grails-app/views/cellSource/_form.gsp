@@ -155,18 +155,6 @@
         }});
         $parentStrain.prop("disabled", false);
         
-        
-        var $genomes = $(".genomes");
-        $genomes.html('').select2({
-            data: [{id: '', text: ''}],
-        });
-        $.ajax({url: "/pegr/cellSource/fetchGenomeAjax?speciesId="+speciesId, success: function(genomes){
-            $genomes.select2({
-                data: genomes,
-                placeholder: noTagPlaceholder
-            });
-        }});
-        $genomes.prop("disabled", false);
     });
             
     $(".parent-strain").on("change", function() {

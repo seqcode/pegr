@@ -8,7 +8,7 @@ class AnalysisException extends RuntimeException {
 }
 
 /**
-* A class to CRUD sequence alignment and analysis, and update the statistics in experiment.
+* A class to CRUD analysis and analysis workflow run, and update the statistics in sequencing experiment.
 */
 class AnalysisService {
     def utilityService
@@ -26,7 +26,7 @@ class AnalysisService {
         
         def analysisWorkflowRun
         if (data.historyId) {
-            analysisWorkflowRun = getAlignment(data, apiUser)
+            analysisWorkflowRun = getAnalysisWorkflowRun(data, apiUser)
         } else {
             throw new AnalysisException(message: "Missing historyId!")
         }
@@ -37,12 +37,12 @@ class AnalysisService {
     }
     
    /**
-    * Create sequence alignment
+    * Create analysis workflow run
     * @param data
     * @param apiUser
-    * @return created sequence alignment
+    * @return created analysis workflow run
     */
-    def getAlignment(StatsRegistrationCommand data, User apiUser) {
+    def getAnalysisWorkflowRun(StatsRegistrationCommand data, User apiUser) {
         // check required fields
         checkRequiredFields(data, ["run", "sample", "genome", "workflowId"])
         
@@ -65,19 +65,19 @@ class AnalysisService {
             throw new AnalysisException(message: "Genome ${data.genome} not found!")
         }           
         
-        def alignment = AnalysisWorkflowRun.findByHistoryIdAndPipelineAndGenomeAndSequencingExperiment(data.historyId, pipeline, genome, experiment)
-        if (!alignment) {
-            // create a new alignment.
-            alignment = new AnalysisWorkflowRun(sequencingExperiment: experiment, 
+        def analysisWorkflowRun = AnalysisWorkflowRun.findByHistoryIdAndPipelineAndGenomeAndSequencingExperiment(data.historyId, pipeline, genome, experiment)
+        if (!analysisWorkflowRun) {
+            // create a new analysisWorkflowRun.
+             analysisWorkflowRun = new AnalysisWorkflowRun(sequencingExperiment: experiment, 
                                              genome: genome, 
                                              pipeline: pipeline,
                                              historyId: data.historyId,
                                              historyUrl: data.history_url,
                                              isPreferred: false, 
                                              date: new Date())
-            alignment.save(flush:true, failOnError: true)
+            analysisWorkflowRun.save(flush:true, failOnError: true)
         }
-        return alignment 
+        return analysisWorkflowRun 
     }
     
     def checkRequiredFields(def data, List requiredFields) {
@@ -88,7 +88,7 @@ class AnalysisService {
         }
     }
     
-    def saveAnalysis(StatsRegistrationCommand data, AnalysisWorkflowRun theAlignment, User apiUser) {
+    def saveAnalysis(StatsRegistrationCommand data, AnalysisWorkflowRun theAnalysisWorkflowRun, User apiUser) {
         // convert statistics, parameter, datasets to string
         def statisticsStr = data.statistics ? JsonOutput.toJson(data.statistics) : null
         def parameterStr = data.parameters ? JsonOutput.toJson(data.parameters) : null
@@ -105,7 +105,7 @@ class AnalysisService {
         }
 
         // save analysis. If it's a re-run inside an old history, overwrite the old analysis; else create a new analysis.
-        def analysis = findOldAnalysis(data, theAlignment)
+        def analysis = findOldAnalysis(data, theAnalysisWorkflowRun)
         if (analysis) {
             // throw an exception if a different user tries to overwrite the analysis
             if (analysis.user != apiUser) {
@@ -119,7 +119,7 @@ class AnalysisService {
                 note = err
             }
         } else {
-            analysis = new Analysis(alignment: theAlignment,
+            analysis = new Analysis(analysisWorkflowRun: theAnalysisWorkflowRun,
                                     tool: data.toolId,             
                                     category: data.toolCategory,
                                     step: data.statsToolId,
@@ -140,7 +140,7 @@ class AnalysisService {
    /**
     * Process the analysis
     * <p>
-    * Save the statistics in alignment and experiment
+    * Save the statistics in analysis workflow run and experiment
     * <p>
     * Transform the status note in analysis
     * @param analysisId the analysis ID
@@ -154,9 +154,10 @@ class AnalysisService {
         
         def statistics = utilityService.parseJson(analysis.statistics)
         def datasets = utilityService.parseJson(analysis.datasets)
+        def parameters = utilityService.parseJson(analysis.parameters)
+              
+        saveParamsAndResults(analysis.analysisWorkflowRun, analysis.analysisWorkflowRun.sequencingExperiment, analysis.category, datasets, statistics, parameters)
         
-        saveStatistics(analysis.alignment, analysis.alignment.sequencingExperiment, statistics)        
-        saveDatasets(analysis.alignment, analysis.alignment.sequencingExperiment, analysis.category, datasets, statistics)
         processAnalysisNote(analysis, statistics, datasets)
     }
    
@@ -259,39 +260,34 @@ class AnalysisService {
     }
     
    /**
-    * Save the statistics in alignment and experiment
-    * @param alignment the alignment to be updated
+    * Save the datasets in analysis workflow run and experiment
+    * @param run the analysis workflow run to be updated
     * @param experiment the experiment to be updated
+    * @param category the category of the analysis step
+    * @param datasets the parsed datasets JSON
     * @param statistics the parsed statistics JSON
     */
-    def saveStatistics(AnalysisWorkflowRun alignment, SequencingExperiment experiment, List statistics) {
-        if (statistics) {
-            def updatedInAlignment = copyProperties(statistics, alignment)
-            if (updatedInAlignment > 0) {
-                alignment.date = new Date()
-                alignment.save(failOnError: true)
-            } 
-            def updatedInExperiment = copyProperties(statistics, experiment)
-            if (updatedInExperiment > 0) {
-                experiment.save(failOnError: true)
-            } 
-        }
-    }
-    
-   /**
-    * Save the datasets in alignment and experiment
-    * @param alignment the alignment to be updated
-    * @param experiment the experiment to be updated
-    * @param statistics the parsed statistics JSON
-    */
-    def saveDatasets(AnalysisWorkflowRun alignment, SequencingExperiment experiment, String category, List datasets, List statistics) {
-        try {
-            def jsonSlurper = new JsonSlurper()
+    def saveParamsAndResults(AnalysisWorkflowRun run, SequencingExperiment experiment, String category, List datasets, List statistics, Map parameters) {
+        try { 
+            def newResults = [:]
+            def newParameters = [:]
+            
+            // copy results from statistics if any
+            if (statistics & statistics.size() > 0) {
+                statistics.each { it ->
+                    statsMap = utilityService.parseJson(it)
+                    if (statsMap & statsMap.size() > 0) {
+                        newResults << statsMap
+                    }
+                }   
+            }
+
+            // copy results from datasets and parameters. Separate code for each step category because of the current data structure from Galaxy.
             switch (category) {
                 case ["output_fastqRead1", "output_fastqRead2"]: // fastq
                     def fastq = [:]
                     if (experiment.fastqFile) {
-                        fastq = jsonSlurper.parseText(experiment.fastqFile)
+                        fastq = utilityService.parseJson(experiment.fastqFile)
                     }
                     def newFastq = queryDatasetsUri(datasets, "fastqsanger.gz")
                     if (newFastq) {
@@ -304,7 +300,7 @@ class AnalysisService {
                 case "output_fastqc": // fastqc report
                     def fastqc = [:]
                     if (experiment.fastqcReport) {
-                        fastqc = jsonSlurper.parseText(experiment.fastqcReport)
+                        fastqc = utilityService.parseJson(experiment.fastqcReport)
                     }
                     def newFastqc = queryDatasetsUriWithRead(datasets, statistics, "html")
                     if (newFastqc) {
@@ -314,20 +310,74 @@ class AnalysisService {
                     }
                     break
                 case "output_samtoolFilter": // bam
-                    def newBam = queryDatasetsUri(datasets, "bam")
-                    if (newBam) {
-                        alignment.bamFile = newBam
-                        alignment.save(failOnError: true)
-                    }         
+                    newResults["bamFile"] = queryDatasetsUri(datasets, "bam")
                     break
                 case "output_peHistogram": //pe histogram
-                    def newHistogram = queryDatasetsUri(datasets, "png")
-                    if (newHistogram) {
-                        alignment.peHistogram = newHistogram
-                        alignment.save(failOnError: true)
-                    }                    
+                    newResults["peHistogram"] = queryDatasetsUri(datasets, "png")                 
+                    break
+                case "output_markDuplicates": //bam_raw
+                    newResults["bamRaw"] = queryDatasetsUri(datasets, "bam")
+                    break
+                case "output_bamToScidx": //scidx
+                    newResults["scidx"] = queryDatasetsUri(datasets, "scidx")
+                    break
+                case "output_genetrack": // GeneTrack
+                    def params = utilityService.queryJson(parameters, ["filter", "sigma", "exclusion"])
+                    newParameters["peakCallingParam"] = getPeakCallingParam(params.filter, params.exclusion, params.sigma)
+                    break
+                case "output_bedtoolsIntersect": // GeneTrack
+                    def stats = utilityService.queryJson.statistics, ["numberOfPeaks", "singletons"])
+                    newResults["peaks"] = stats.numberOfPeaks
+                    newResults["singletons"] = stats.singletons
+                    break
+                case "output_cwpair2": // cwpair
+                    def params = utilityService.queryJson(parameters, ["up_distance", "down_distance", "binsize"])
+                    newParameters["peakPairsParam"] = getPeakPairsParam(params.up_distance, params.down_distance, params.binsize)
+                    newResults["peakPairs"] = utilityService.queryJson(statistics, "peakPairWis")
+                    newResults["cwpairFile"] = queryDatasetsUri(datasets, "gff")
+                    break
+                case "output_meme": // meme
+                    newResults["memeFile"] = queryDatasetsUri(datasets, "txt")
+                    newResults["memeFig"] = queryDatasetsUri(datasets, "html")
+                    break
+                case "output_fourColorPlot": // four color plot
+                    newResults["fourColor"] = queryDatasetsUriList(datasets, "png")
+                    break
+                case "output_tagPileup": //composite 
+                    def motif = utilityService.queryJson(parameters, "input2X__identifier__")
+                    def motifId = motif?.find( /\d+/ )?.toInteger()
+                    def tabulars = queryDatasetsUriList(datasets, "tabular")
+                    if (tabulars && tabulars.size() > 0) {
+                        if (motifId && motifId > 0){
+                            newResults["composite"][motifId-1] = tabulars.last()
+                        }                      
+                    }
                     break
             }
+            
+            // parse the existing results from run, add the new values and save.
+            if (newResults.size() > 0) {
+                def runResults = utilityService.parseJson(run.results)
+                if (!runResults) {
+                    runResults = newResults
+                } else {
+                    runResults << newResults
+                }
+                run.results = JsonOutput.toJson(runResults)
+            }
+            
+            // parse the existing parameters from run, add the new values and save.
+            if (newParameters.size() > 0) {
+                def runParameters = utilityService.parseJson(run.parameters)
+                if (!runParameters) {
+                    runParameters = newParameters
+                } else {
+                    runParameters << newParameters
+                }
+                run.parameters = JsonOutput.toJson(runParameters)
+            }
+            
+            run.save(failOnError: true)
         } catch (Exception e) {
             log.error e
             throw new AnalysisException(message: "Error saving the datasets!")
@@ -335,14 +385,14 @@ class AnalysisService {
     }
     
    /**
-    * Find the existing analysis with the same alignment and step
+    * Find the existing analysis with the same analysis workflow run and step
     * <p>
     * Special handling: tag pileup
     * @param data data received from API
-    * @param alignment alignment
+    * @param run analysis workflow run
     * @return existing analysis
     */
-    def findOldAnalysis(StatsRegistrationCommand data, AnalysisWorkflowRun alignment) {
+    def findOldAnalysis(StatsRegistrationCommand data, AnalysisWorkflowRun run) {
         def oldAnalysis = null
         switch (data.toolCategory) {
             case "output_tagPileup":
@@ -350,7 +400,7 @@ class AnalysisService {
                 def MOTIF_ID = "input2X__identifier__"
                 def newMotifId = (data.parameters && data.parameters.containsKey(MOTIF_ID)) ? data.parameters[MOTIF_ID] : null 
                 if (newMotifId) {
-                    def oldAnalysisList = Analysis.findAllByStepAndAlignment(data.statsToolId, alignment)
+                    def oldAnalysisList = Analysis.findAllByStepAndAnalysisWorkflowRun(data.statsToolId, run)
                     for (int i = 0; i< oldAnalysisList.size(); ++i) {
                         def oldMotifId = utilityService.queryJson(oldAnalysisList[i].parameters, MOTIF_ID)
                         if (oldMotifId && oldMotifId == newMotifId) {
@@ -361,54 +411,10 @@ class AnalysisService {
                 }
                 break
             default:
-                oldAnalysis = Analysis.findByStepAndAlignment(data.statsToolId, alignment)
+                oldAnalysis = Analysis.findByStepAndAnalysisWorkflowRun(data.statsToolId, run)
                 break
         }
         return oldAnalysis
-    }
-    
-   /**
-    * Copy properties from source to target
-    * @param source a list of maps or a map
-    * @param target target object
-    * return number of updated properties
-    */
-    def copyProperties(source, target) {
-        def updatedProperties = 0
-        if (source instanceof List) {
-            source.each {
-                updatedProperties += copyMap(it, target)
-            }
-        } else {
-            updatedProperties = copyMap(source, target)
-        }
-        return updatedProperties
-    }
-    
-   /**
-    * Copy properties from source map to target object.
-    * @param source source map
-    * @param target target object
-    * @return number of updated properties
-    */
-    def copyMap(source, target) {
-        def updatedProperties = 0
-        def readKey = source.containsKey("read") ? "read${source.read}" : "read"
-        source.each { key, value ->
-            if (key != "read" && target.hasProperty(key) && value != null) {
-                // skip read 2's adapter dimer count
-                if (!(key == "adapterDimerCount" && readKey == "read2")) {
-                    try {
-                        target[key] = value    
-                    } catch(org.codehaus.groovy.runtime.typehandling.GroovyCastException e) {
-                        log.error e
-                        throw new AnalysisException(message: e.message)
-                    }                
-                    updatedProperties++
-                }
-            }
-        }
-        return updatedProperties
     }
 
    /**

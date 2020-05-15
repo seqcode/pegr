@@ -22,7 +22,7 @@ class ApiController {
     
     /**
      * Accept post request, authenticate by the API Key, to save data into Analysis, 
-     * and parse data prior to and including the Alignment.
+     * and parse data based on pipeline setting.
      * @param data Input data in the format of JSON dictionary
      * @param apiKey API Key used to authenticate the user
      * @return response in the format of JSON dictionary, including a response_code and a message. 
@@ -192,13 +192,13 @@ class ApiController {
                 message = "No analysis history ID provided!"
             } else {
                 query.historyIds.each {
-                    def alignment = AnalysisWorkflowRun.findByHistoryId(it)
-                    if (!alignment) {
+                    def analysisWorkflowRun = AnalysisWorkflowRun.findByHistoryId(it)
+                    if (!analysisWorkflowRun) {
                         message += "Analysis history ${it} not found! "
                         code = 500
                     } else {
                         try {
-                            reportService.deleteAlignment(alignment.id)
+                            reportService.deleteAnalysisWorkflowRun(analysisWorkflowRun.id)
                         } catch(ReportException e) {
                             message += "Error deleting analysis history ${it}! ${e.message} "
                             code = 500
@@ -228,7 +228,6 @@ class ResponseMessage {
  * Class that defines the underlying structure of input JSON data
  */
 class StatsRegistrationCommand implements grails.validation.Validateable {
-    Long alignmentId
     Long run
     Long sample
     String genome

@@ -219,26 +219,26 @@ class ReportService {
     }
     
    /**
-    * delete a sequence alignment
-    * @param alignmentId the ID of the alignment to be deleted
+    * delete an analysis workflow run
+    * @param analysisWorkflowRunId the ID of the analysis workflow run to be deleted
     */
     @Transactional
-    def deleteAlignment(Long alignmentId) {
+    def deleteAnalysisWorkflowRun(Long analysisWorkflowRunId) {
         try {
-            ReportAnalysisWorkflowRuns.executeUpdate("delete from ReportAnalysisWorkflowRuns where alignment.id =:alignmentId", [alignmentId: alignmentId])
+            ReportAnalysisWorkflowRuns.executeUpdate("delete from ReportAnalysisWorkflowRuns where analysisWorkflowRun.id =:analysisWorkflowRunId", [analysisWorkflowRunId: analysisWorkflowRunId])
 
-            Analysis.executeUpdate("delete from Analysis where alignment.id =:alignmentId", [alignmentId: alignmentId])
+            Analysis.executeUpdate("delete from Analysis where analysisWorkflowRun.id =:analysisWorkflowRunId", [analysisWorkflowRunId: analysisWorkflowRunId])
             
-            AnalysisWorkflowRun.executeUpdate("delete from AnalysisWorkflowRun where id =:alignmentId", [alignmentId: alignmentId])
+            AnalysisWorkflowRun.executeUpdate("delete from AnalysisWorkflowRun where id =:analysisWorkflowRunId", [analysisWorkflowRunId: analysisWorkflowRunId])
         } catch (Exception e) {
             log.error e
-            throw new ReportException(message: "Error deleting the alignment!")
+            throw new ReportException(message: "Error deleting the analysis workflow run!")
         } 
     }
     
    /**
     * Create summary reports for each project linked to the samples inside the 
-    * sequence run. And link the preferred alignments to the corresponding summary reports. 
+    * sequence run. And link the preferred analysis workflow runs to the corresponding summary reports. 
     * @param cohort
     */
     @Transactional
@@ -250,9 +250,9 @@ class ReportService {
             throw new ReportException(message: "Error saving the report!")
         }
         cohort.experiments.each { experiment ->
-            experiment.analysisWorkflowRuns.each { alignment ->
-                if (alignment.isPreferred) {
-                    new ReportAnalysisWorkflowRuns(report: report, alignment: alignment).save()
+            experiment.analysisWorkflowRuns.each { analysisWorkflowRun ->
+                if (analysisWorkflowRun.isPreferred) {
+                    new ReportAnalysisWorkflowRuns(report: report, analysisWorkflowRun: analysisWorkflowRun).save()
                 }
             } 
         }
@@ -279,7 +279,7 @@ class ReportService {
    /**
     * Fetch data for a given sample to be reported
     * @param sampleId sample's ID
-    * @param preferredOnly whether to report preferred alignments only or report all alignments.
+    * @param preferredOnly whether to report preferred analysisWorkflowRuns only or report all analysisWorkflowRuns.
     * Default to be false.
     * @return a list, containing only this sample's DTO if the sample exists, 
     * or nothing if the sample is not found.
@@ -291,13 +291,12 @@ class ReportService {
             def sampleDTO = getSampleDTO(sample)
             sample.sequencingExperiments.each { experiment ->
                 def expDTO = getExperimentDTO(experiment)
-                experiment.alignments.each { alignment ->
-                    if (!preferredOnly || alignment.isPreferred) {
-                        def alignmentDTO = getAlignmentDTO(alignment)
-                        updateAlignmentPct(alignmentDTO, expDTO)
-                        expDTO.alignments << alignmentDTO
-                        sampleDTO.alignmentCount++
-                        def analysisStatusDTO = getAnalysisStatusDTO(alignment, experiment)
+                experiment.analysisWorkflowRuns.each { analysisWorkflowRun ->
+                    if (!preferredOnly || analysisWorkflowRun.isPreferred) {
+                        def analysisWorkflowRunDTO = getAnalysisWorkflowRunDTO(analysisWorkflowRun)
+                        expDTO.analysisWorkflowRuns << analysisWorkflowRunDTO
+                        sampleDTO.analysisWorkflowRunCount++
+                        def analysisStatusDTO = getAnalysisStatusDTO(analysisWorkflowRun, experiment)
                         sampleDTO.histories << analysisStatusDTO.historyId
                     }
                 }
@@ -311,7 +310,7 @@ class ReportService {
    /**
     * Fetch data for a list of samples to be reported.
     * @param sampleIds a list of sample IDs
-    * @param preferredOnly whether to report preferred alignments only or report all alignments.
+    * @param preferredOnly whether to report preferred analysis workflow runs only or report all analysis workflow runs.
     * Default to be false.
     * @return a list of sampleDTOs
     */
@@ -331,7 +330,7 @@ class ReportService {
    /**
     * Fetch data for a sequence run
     * @param runId sequence run ID
-    * @param preferredOnly whether to report preferred alignments only or report all alignments.
+    * @param preferredOnly whether to report preferred analysis workflow runs only or report all analysis workflow runs.
     * Default to be false.
     * @return a list sampleDTOs
     */
@@ -347,14 +346,13 @@ class ReportService {
         run.experiments.each { experiment ->
             def sampleDTO = getSampleDTO(experiment.sample)
             def expDTO = getExperimentDTO(experiment)
-            experiment.alignments.each { alignment ->
-                if (!preferredOnly || alignment.isPreferred) {
-                    def alignmentDTO = getAlignmentDTO(alignment)
-                    updateAlignmentPct(alignmentDTO, expDTO)
-                    expDTO.alignments << alignmentDTO
-                    def analysisStatusDTO = getAnalysisStatusDTO(alignment, experiment)
+            experiment.analysisWorkflowRuns.each { analysisWorkflowRun ->
+                if (!preferredOnly || analysisWorkflowRun.isPreferred) {
+                    def analysisWorkflowRunDTO = getAnalysisWorkflowRunDTO(AnalysisWorkflowRun)
+                    expDTO.analysisWorkflowRuns << analysisWorkflowRunDTO
+                    def analysisStatusDTO = getAnalysisStatusDTO(analysisWorkflowRun, experiment)
                     sampleDTO.histories << analysisStatusDTO.historyId 
-                    sampleDTO.alignmentCount++
+                    sampleDTO.analysisWorkflowRunCount++
                 }
             }
             sampleDTO.experiments << expDTO
@@ -369,43 +367,29 @@ class ReportService {
     * @return a list of sampleDTOs
     */
     def fetchDataForReport(Long reportId) {
-        def alignments = ReportAnalysisWorkflowRuns.where { report.id == reportId }.collect { it.alignment }
+        def analysisWorkflowRuns = ReportAnalysisWorkflowRuns.where { report.id == reportId }.collect { it.analysisWorkflowRun }
 
         def sampleDTOs = []
-        alignments.each { alignment ->
-            def alignmentDTO = getAlignmentDTO(alignment)
-            def sample = alignment.sequencingExperiment.sample
+        analysisWorkflowRuns.each { analysisWorkflowRun ->            
+            def sample = analysisWorkflowRun.sequencingExperiment.sample
             def sampleDTO = sampleDTOs.find{ it.id == sample.id}
             if (!sampleDTO) {
                 sampleDTO = getSampleDTO(sample)
                 sampleDTOs << sampleDTO
             } 
-            sampleDTO.alignmentCount++
+            sampleDTO.analysisWorkflowRunCount++
             
-            def experiment = alignment.sequencingExperiment
+            def experiment = analysisWorkflowRun.sequencingExperiment
             def experimentDTO = sampleDTO.experiments.find { it.id == experiment.id }
             if (!experimentDTO) {
                 experimentDTO = getExperimentDTO(experiment)
                 sampleDTO.experiments << experimentDTO
             }
-            
-            updateAlignmentPct(alignmentDTO, experimentDTO)
-            
-            experimentDTO.alignments << alignmentDTO
+            def analysisWorkflowRunDTO = getAnalysisWorkflowRunDTO(analysisWorkflowRun)
+            experimentDTO.analysisWorkflowRuns << analysisWorkflowRunDTO
         }
         sampleDTOs.sort { it.id }
         return sampleDTOs
-    }
-    
-   /**
-    * Update sequence alignment's percentage type of statistics.
-    * @param alignmentDTO alignmentDTO
-    * @params experimentDTO experimentDTO
-    */ 
-    def updateAlignmentPct(AlignmentDTO alignmentDTO, ExperimentDTO experimentDTO) {
-        alignmentDTO.mappedReadPct = utilityService.divide(alignmentDTO.mappedReads, experimentDTO.totalReads)
-        alignmentDTO.uniquelyMappedPct = utilityService.divide(alignmentDTO.uniquelyMappedReads, experimentDTO.totalReads)
-        alignmentDTO.deduplicatedPct = utilityService.divide(alignmentDTO.dedupUniquelyMappedReads, experimentDTO.totalReads)
     }
     
    /**
@@ -428,7 +412,7 @@ class ReportService {
           treatments: sample.treatments*.name.join(", "),
           assay: sample.assay?.name,
           experiments: [],
-          alignmentCount: 0,
+          analysisWorkflowRunCount: 0,
           note: utilityService.queryJson(sample.note, "note"), 
           recommend: sample.recommend,
           histories: []
@@ -450,86 +434,36 @@ class ReportService {
                               adapterDimerCount: experiment.adapterDimerCount,
                               fastqc: fastqc,
                               fastq: fastq,
-                              alignments: []
+                              analysisWorkflowRuns: []
                              )
     }
     
    /**
-    * Get AlignmentDTO from raw alignment
-    * @param alignment
-    * @return alignmentDTO
+    * Get analysisWorkflowRunDTO from raw analysisWorkflowRun
+    * @param analysisWorkflowRun
+    * @return analysisWorkflowRunDTO
     */
-    def getAlignmentDTO(AnalysisWorkflowRun alignment) {
-        def alignmentDTO = new AlignmentDTO(id: alignment.id,
-                genome: alignment.genome,
-                bam: alignment.bamFile,
-                mappedReads: alignment.mappedReads,
-                uniquelyMappedReads: alignment.uniquelyMappedReads,
-                dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
-                avgInsertSize: alignment.avgInsertSize,
-                stdInsertSize: alignment.stdDevInsertSize,
-                genomeCoverage: alignment.genomeCoverage,
-                peHistogram: alignment.peHistogram,
-                fourColor: [],
-                composite: []
-            )
-
-        if (alignment.readDbId > 0) {
-        	alignmentDTO.readDbId = alignment.readDbId;
+    def getAnalysisWorkflowRunDTO(AnalysisWorkflowRun analysisWorkflowRun) {
+        // parse the results
+        def analysisWorkflowRunDTO = utilityService.parseJson(analysisWorkflowRun.results)
+        
+        // derived values
+        analysisWorkflowRunDTO.nonPairedPeaks = getNonPairedPeaks(analysisWorkflowRunDTO.peaks, analysisWorkflowRunDTO.peakPairs)
+        analysisWorkflowRunDTO.mappedReadPct = utilityService.divide(analysisWorkflowRunDTO.mappedReads, analysisWorkflowRunDTO.totalReads)
+        analysisWorkflowRunDTO.uniquelyMappedPct = utilityService.divide(analysisWorkflowRunDTO.uniquelyMappedReads, analysisWorkflowRunDTO.totalReads)
+        analysisWorkflowRunDTO.deduplicatedPct = utilityService.divide(analysisWorkflowRunDTO.dedupUniquelyMappedReads, analysisWorkflowRunDTO.totalReads)
+        
+        // parse the parameters
+        def parameters = utilityService.parseJson(analysisWorkflowRun.params)
+        if (parameters) {
+            analysisWorkflowRunDTO << parameters
         }
-        def statistics
-        def parameter
-        def analysisList = Analysis.findAllByAlignment(alignment)
-        analysisList.each { analysis ->
-            switch (analysis.category) {
-                case "output_markDuplicates": //bam_raw
-                    alignmentDTO.bamRaw = analysisService.queryDatasetsUri(analysis.datasets, "bam")
-                    break
-                case "output_bamToScidx": //scidx
-                    alignmentDTO.scidx = analysisService.queryDatasetsUri(analysis.datasets, "scidx")
-                    break
-                case "output_genetrack": // GeneTrack
-                    def params = utilityService.queryJson(analysis.parameters, ["filter", "sigma", "exclusion"])
-                    alignmentDTO.peakCallingParam = getPeakCallingParam(params.filter, params.exclusion, params.sigma)
-                    break
-                case "output_bedtoolsIntersect": // GeneTrack
-                    def stats = utilityService.queryJson(analysis.statistics, ["numberOfPeaks", "singletons"])
-                    alignmentDTO.peaks = stats.numberOfPeaks
-                    alignmentDTO.singletons = stats.singletons
-                    break
-                case "output_cwpair2": // cwpair
-                    alignmentDTO.peakPairs = utilityService.queryJson(analysis.statistics, "peakPairWis")
-                    def params = utilityService.queryJson(analysis.parameters, ["up_distance", "down_distance", "binsize"])
-                    alignmentDTO.peakPairsParam = getPeakPairsParam(params.up_distance, params.down_distance, params.binsize)
-                    alignmentDTO.cwpairFile = analysisService.queryDatasetsUri(analysis.datasets, "gff")
-                    break
-                case "output_meme": // meme
-                    alignmentDTO.memeFile = analysisService.queryDatasetsUri(analysis.datasets, "txt")
-                    alignmentDTO.memeFig = analysisService.queryDatasetsUri(analysis.datasets, "html")
-                    break
-                case "output_fourColorPlot": // four color plot
-                    alignmentDTO.fourColor = analysisService.queryDatasetsUriList(analysis.datasets, "png")
-                    break
-                case "output_tagPileup": //composite 
-                    def motif = utilityService.queryJson(analysis.parameters, "input2X__identifier__")
-                    def motifId = motif?.find( /\d+/ )?.toInteger()
-                    def tabulars = analysisService.queryDatasetsUriList(analysis.datasets, "tabular")
-                    if (tabulars && tabulars.size() > 0) {
-                        if (motifId && motifId > 0){
-                            alignmentDTO.composite[motifId-1] = tabulars.last()
-                        }                      
-                    }
-                    break
-            }
-        }
-        // in case not all composite figures have been received
-        def compositeCount = alignmentDTO.composite.size()
-        def fourColorCount = alignmentDTO.fourColor.size()
-        if ( compositeCount < fourColorCount ) {
-            alignmentDTO.composite[fourColorCount - 1] = null
-        }
-        alignmentDTO.nonPairedPeaks = getNonPairedPeaks(alignmentDTO.peaks, alignmentDTO.peakPairs)
-        return alignmentDTO
+        
+        // add additional information
+        analysisWorkflowRunDTO["id"] = analysisWorkflowRun.id
+        analysisWorkflowRunDTO["genome"] = analysisWorkflowRun.genome
+        
+        return analysisWorkflowRunDTO
     }
     
    /**
@@ -810,16 +744,16 @@ class ReportService {
     }
     
    /**
-    * Toggle the "isPreferred" field of sequence alignment.
+    * Toggle the "isPreferred" field of analysis workflow run.
     * <p>
     * If the original value is false, set it to be true; otherwise, set to false.
-    * @param alignmentId alignment's ID
+    * @param analysisWorkflowRunId ID of the analysis workflow run
     */
     @Transactional
-    def togglePreferredAlignment(Long alignmentId) {
-        def alignment = AnalysisWorkflowRun.get(alignmentId)
-        alignment.isPreferred = !alignment.isPreferred
-        alignment.save()
+    def togglePreferredAnalysisWorkflowRun(Long analysisWorkflowRunId) {
+        def analysisWorkflowRun = AnalysisWorkflowRun.get(analysisWorkflowRunId)
+        analysisWorkflowRun.isPreferred = !analysisWorkflowRun.isPreferred
+        analysisWorkflowRun.save()
     }
     
    /**

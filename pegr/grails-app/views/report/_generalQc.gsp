@@ -211,9 +211,9 @@
 		{ // axa677-180306: the next ajax call sends the array as a json dictionary with the run id to a controller action
 		  // then get the results as html
 			$.ajax({
-				url:"${createLink(controller: 'report', action: 'deleteAllAlignmentAjax')}",
+				url:"${createLink(controller: 'report', action: 'deleteAllAnalysisWorkflowRunAjax')}",
 				type:"GET",
-				data: {"alignIdsList": JSON.stringify(alignmentIds), "runId": runId},
+				data: {"analysisRunIdsList": JSON.stringify(alignmentIds), "runId": runId},
 				success : function(result){
 					$("html").html(result);
 				},
@@ -251,7 +251,7 @@
                                 $checkbox.prop("checked", $res);
 				//if changing
 				if ($prev != $res) {
-            			     $.ajax({ url: "/pegr/report/togglePreferredAlignment?alignmentId=" + alignmentId,
+            			     $.ajax({ url: "/pegr/report/togglePreferredAnalysisWorkflowRun?alignmentId=" + alignmentId,
                 			     error: function(xhr, ajaxOptions, thrownError) {
                     			         $checkbox.prop("checked", $prev);
                     			         $all.prop("checked", false);

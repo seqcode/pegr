@@ -19,6 +19,10 @@ class SequencingExperiment {
         return AnalysisWorkflowRun.where{sequencingExperiment == this}.list(sort: "date")
     }
     
+    List getAlignments() {
+        return AnalysisWorkflowRun.where{sequencingExperiment == this & workflowCategory == "Sequence Alignment"}.list(sort: "date")
+    }
+    
     static constraints = {
         sequenceRun nullable: true
         cohort nullable: true

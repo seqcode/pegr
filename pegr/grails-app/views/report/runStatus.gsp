@@ -345,7 +345,7 @@
         $(".prefer").on("click", function() {
             var $td = $(this).closest("td");
             var alignmentId = $td.find(".alignmentId").text();
-            $.ajax({ url: "/pegr/report/togglePreferredAlignment?alignmentId=" + alignmentId,
+            $.ajax({ url: "/pegr/report/togglePreferredAnalysisWorkflowRun?alignmentId=" + alignmentId,
                 error: function(xhr, ajaxOptions, thrownError) {
                     var $checkbox = $td.find(".prefer");
                     if ($checkbox.is(":checked")) {

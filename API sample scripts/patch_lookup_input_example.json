@@ -1,0 +1,50 @@
+{
+    "mysql":{
+        "host":"localhost",
+        "user":"pegr",
+        "passwd":"Kenshin1",
+        "database":"pegr"
+    },
+    "changes":{
+        "assay": {
+            "XO": "ChIP-exo",
+            "MN":"MNase-ChIP-seq",
+            "CS": "ChIP-seq",
+            "InVitro-XO" : "InVitro-XO",
+            "WhIP-XO": "WhIP-XO"
+        },
+        "cell_source_treatment": {
+            "10M15S":"Normal",
+            "3M40S":"Normal",
+            "H2O2_0min":"Normal",
+            "HS0":"Normal",
+            "MHS" :"Normal",
+            "SSL":"Normal",
+            "WT":"Normal",
+            "HeatShock": "Heat Shock",
+            "Heat Shock": "Heat Shock",
+            "NoTreatmentInfo": "Normal",
+            "HS3" : "Heat Shock",
+            "HS6" : "Heat Shock",
+            "HS" : "Heat Shock",
+            "H2O2_180min": "H2O2 / 180min",
+            "H2O2_6min": "H2O2 / 6min",
+            "OX": "H2O2 / 6min",
+            "H2O2_30min": "H2O2 / 30min",
+            "AR30" : "AR30",
+            "AR0" : "AR0",
+            "TotalPure" : "Normal",
+            "1percent HCHO": "HCHO / 1%",
+            "0.5 percent HCHO": "HCHO / 0.5%",
+            "0.5percent HCHO" : "HCHO / 0.5%",
+            "0.1percent HCHO" :"HCHO / 0.1%",
+            "0.1 percent HCHO": "HCHO / 0.1%",
+            "15min-6uM-NAPP1" : "15min-6uM-NAPP1"
+        },
+        "growth_media": {
+            "YDP":"YPD",
+            "YPD":"YPD",
+            "YPDA": "YPD"
+        }
+    }
+}

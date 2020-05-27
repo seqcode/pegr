@@ -235,7 +235,7 @@
                 $('html,body').scrollTop(scrollmem);
             });
             
-            $(".confirm").confirm({text: "All data in this alignment will be deleted. Are you sure you want to delete this alignment?"});
+            $(".confirm").confirm({text: "All data in this analysis workflow run will be deleted. Are you sure you want to delete this analysis workflow run?"});
             $(".nav-status").addClass("active");
             $('[data-toggle="popover"]').popover(); 
 
@@ -344,8 +344,8 @@
         
         $(".prefer").on("click", function() {
             var $td = $(this).closest("td");
-            var alignmentId = $td.find(".alignmentId").text();
-            $.ajax({ url: "/pegr/report/togglePreferredAnalysisWorkflowRun?alignmentId=" + alignmentId,
+            var analysisWorkflowRunId = $td.find(".analysisWorkflowRunId").text();
+            $.ajax({ url: "/pegr/report/togglePreferredAnalysisWorkflowRun?analysisWorkflowRunId=" + analysisWorkflowRunId,
                 error: function(xhr, ajaxOptions, thrownError) {
                     var $checkbox = $td.find(".prefer");
                     if ($checkbox.is(":checked")) {

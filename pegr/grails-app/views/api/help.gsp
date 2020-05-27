@@ -56,7 +56,7 @@ https://thanos.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=
         "growthMedia": "string",
         "treatments": "string",
         "assay": "string",
-        "alignmentCount": integer,
+        "analysisWorkflowRunCount": integer,
         "recommend":"string",
         "histories": ["historyId", "historyId", ...],
         "experiments": [{
@@ -67,7 +67,7 @@ https://thanos.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=
                 "adapterDimerCount": long,
                 "fastqc": {"read1":"url", "read2":"url"},
                 "fastq": {"read1":"url", "read2":"url"},
-                "alignments": [{ "id": long,
+                "analysisWorkflowRuns": [{ "id": long,
                     "genome": "string",
                     "bam": "url",
                     "mappedReads": long,
@@ -93,7 +93,7 @@ https://thanos.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=
                     "fourColor": ["url", "url", ...],
                     "composite": ["url", "url", ...]
                     },
-                    // other alignments
+                    // other analysisWorkflowRuns
                 ] 
              },              
              // other sequencing experiments
@@ -304,14 +304,14 @@ https://thanos.vmhost.psu.edu/pegr/api/stats?apiKey=
     // required, combined with API key to authenticate user 
     "userEmail": "xxx@psu.edu", 
     
-    // if this is from a new alignment, "historyId" is required;
+    // if this is from a new analysisWorkflowRun, "historyId" is required;
     // else either "alingmentId" or "historyId" must be included.
-    "alignmentId": long,
+    "analysisWorkflowRunId": long,
     "historyId": "string", 
     "history_url": "string", 
     
-    // required if this is from a new alignment
-    // used to identify the sequence sample/experiment/alignment in PEGR 
+    // required if this is from a new analysisWorkflowRun
+    // used to identify the sequence sample/experiment/analysisWorkflowRun in PEGR 
     "run": long, 
     "sample": long, 
     "genome": "string",

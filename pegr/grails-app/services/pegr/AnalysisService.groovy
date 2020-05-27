@@ -326,7 +326,7 @@ class AnalysisService {
                     newParameters["peakCallingParam"] = getPeakCallingParam(params.filter, params.exclusion, params.sigma)
                     break
                 case "output_bedtoolsIntersect": // GeneTrack
-                    def stats = utilityService.queryJson.statistics, ["numberOfPeaks", "singletons"])
+                    def stats = utilityService.queryJson(statistics, ["numberOfPeaks", "singletons"])
                     newResults["peaks"] = stats.numberOfPeaks
                     newResults["singletons"] = stats.singletons
                     break

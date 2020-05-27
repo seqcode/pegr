@@ -27,7 +27,7 @@
     <tbody>
         <g:each in="${samples}" var="sample">
             <g:each in="${sample.experiments}" var="experiment">
-                <g:each in="${experiment.alignments}" var="alignment">
+                <g:each in="${experiment.analysisWorkflowRuns}" var="analysisWorkflowRun">
                     <tr>
                         <td>${sample.id} (Old ${sample.source} ${sample.sourceId})</td>
                         <td>${sample.naturalId}</td>
@@ -38,11 +38,11 @@
                         <td>${sample.growthMedia}</td>
                         <td>${sample.treatments}</td>
                         <td>${sample.assay}</td>
-                        <td>${alignment.genome}</td>
+                        <td>${analysisWorkflowRun.genome}</td>
                         <td><g:each in="${experiment.fastq}" var="fastq">${fastq.key}: <a href="${fastq.value}">${fastq.value}</a>; </g:each></td>
-                        <td><a href="${alignment.bamRaw}">${alignment.bamRaw}</a> </td>
-                        <td><a href="${alignment.bam}">${alignment.bam}</a></td>
-                        <td><a href="${alignment.scidx}">${alignment.scidx}</a></td>
+                        <td><a href="${analysisWorkflowRun.bamRaw}">${analysisWorkflowRun.bamRaw}</a> </td>
+                        <td><a href="${analysisWorkflowRun.bam}">${analysisWorkflowRun.bam}</a></td>
+                        <td><a href="${analysisWorkflowRun.scidx}">${analysisWorkflowRun.scidx}</a></td>
                     </tr>
                 </g:each>
             </g:each>

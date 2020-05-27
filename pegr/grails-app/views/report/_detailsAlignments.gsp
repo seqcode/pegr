@@ -31,14 +31,14 @@
         <h4>MEME Motifs</h4>
         <g:each in="${sampleDTOs}" var="sample">
             <g:each in="${sample.experiments}" var="experiment">
-                <g:each in="${experiment.alignments}" var="alignment">
-                    <h5>Sample <u>${sample.id} ${sample.naturalId}</u> &nbsp; Run <u>${experiment.runId}</u> &nbsp; Genome <u>${alignment.genome}</u> &nbsp; Target <u>${sample.target}</u> 
+                <g:each in="${experiment.analysisWorkflowRuns}" var="analysisWorkflowRun">
+                    <h5>Sample <u>${sample.id} ${sample.naturalId}</u> &nbsp; Run <u>${experiment.runId}</u> &nbsp; Genome <u>${analysisWorkflowRun.genome}</u> &nbsp; Target <u>${sample.target}</u> 
                     </h5>
                     <table class="table table-bordered meme-table">                        
                         <thead>
                             <tr>
                                 <th rowspan="2">ID</th>
-                                <th colspan="4" class="text-center"><a href="${alignment.memeFig}" target="_blank">Meme <span class="glyphicon glyphicon-picture"></span></a><span class="meme-url" hidden="hidden">${alignment.memeFile}</span></th>
+                                <th colspan="4" class="text-center"><a href="${analysisWorkflowRun.memeFig}" target="_blank">Meme <span class="glyphicon glyphicon-picture"></span></a><span class="meme-url" hidden="hidden">${analysisWorkflowRun.memeFile}</span></th>
                                 <th rowspan="2">Four-Color</th>
                                 <th rowspan="2">Composite</th>
                             </tr>
@@ -50,7 +50,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <g:each in="${alignment.fourColor}" var="fourColor" status="n">
+                            <g:each in="${analysisWorkflowRun.fourColor}" var="fourColor" status="n">
                                 <tr>
                                     <td class="meme-id" style="width:20px"></td>
                                     <td class="meme-fig"><i class="fa fa-spinner fa-spin"></i></td>
@@ -58,7 +58,7 @@
                                     <td class="meme-sites" style="width:100px"></td>
                                     <td class="meme-width" style="width:100px"></td>
                                     <td style="width:100px"><a href="${fourColor}" target="_blank"><span class="glyphicon glyphicon-picture" style="font-size: 2em"></span></a></td>
-                                    <td class="composite" style="width:210px"><g:link controller="report" action="composite" params="[url: alignment.composite[n]]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link><i class="fa fa-spinner fa-spin"></i><span class="composite-url" hidden="hidden">${alignment.composite[n]}</span><div class="composite-fig"></div></td>
+                                    <td class="composite" style="width:210px"><g:link controller="report" action="composite" params="[url: analysisWorkflowRun.composite[n]]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link><i class="fa fa-spinner fa-spin"></i><span class="composite-url" hidden="hidden">${analysisWorkflowRun.composite[n]}</span><div class="composite-fig"></div></td>
                                 </tr>
                             </g:each>
                         </tbody>

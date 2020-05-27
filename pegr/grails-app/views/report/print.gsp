@@ -86,20 +86,20 @@
                 <tbody>
                     <g:each in="${sampleList}" var="sample" status="n">
                         <tr>
-                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${n+1}</td>
-                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.target}</td>
-                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.antibody}</td>
-                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.strain}</td>
-                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.geneticModification}</td>
-                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.assay}</td>
+                            <td rowspan="${Math.max(1, sample.analysisWorkflowRunCount)}">${n+1}</td>
+                            <td rowspan="${Math.max(1, sample.analysisWorkflowRunCount)}">${sample.target}</td>
+                            <td rowspan="${Math.max(1, sample.analysisWorkflowRunCount)}">${sample.antibody}</td>
+                            <td rowspan="${Math.max(1, sample.analysisWorkflowRunCount)}">${sample.strain}</td>
+                            <td rowspan="${Math.max(1, sample.analysisWorkflowRunCount)}">${sample.geneticModification}</td>
+                            <td rowspan="${Math.max(1, sample.analysisWorkflowRunCount)}">${sample.assay}</td>
                             <g:each in="${sample.experiments}" var="experiment" status="nExp">
                                 <g:if test="${nExp>0}"><tr></g:if>  
-                                <g:each in="${experiment.alignments}" var="alignment" status="nAli">
+                                <g:each in="${experiment.analysisWorkflowRuns}" var="analysisWorkflowRun" status="nAli">
                                     <g:if test="${nAli>0}"><tr></g:if>
-                                    <td>${alignment.genome}</td>
+                                    <td>${analysisWorkflowRun.genome}</td>
                                     <td class="text-right"><g:formatNumber number="${experiment.totalReads}" format="###,###,###" /></td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.uniquelyMappedReads}" format="###,###,###" /></td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.uniquelyMappedPct}" format="#0.0%" /></td>
+                                    <td class="text-right"><g:formatNumber number="${analysisWorkflowRun.uniquelyMappedReads}" format="###,###,###" /></td>
+                                    <td class="text-right"><g:formatNumber number="${analysisWorkflowRun.uniquelyMappedPct}" format="#0.0%" /></td>
                                     </tr>
                                 </g:each>
                             </g:each>
@@ -122,15 +122,15 @@
                 <tbody>
                     <g:each in="${sampleList}" var="sample" status="n">
                         <tr>
-                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${n+1}</td>
+                            <td rowspan="${Math.max(1, sample.analysisWorkflowRunCount)}">${n+1}</td>
                             <g:each in="${sample.experiments}" var="experiment" status="nExp">
                                 <g:if test="${nExp>0}"><tr></g:if>
-                                <g:each in="${experiment.alignments}" var="alignment" status="nAli">
+                                <g:each in="${experiment.analysisWorkflowRuns}" var="analysisWorkflowRun" status="nAli">
                                     <g:if test="${nAli>0}"><tr></g:if>
-                                    <td class="text-right"><g:formatNumber number="${alignment.peaks}" format="###,###,###" /></td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.singletons}" format="###,###,###" /></td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.peakPairs}" format="###,###,###" /></td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.genomeCoverage}" format="#0.00%" /></td>
+                                    <td class="text-right"><g:formatNumber number="${analysisWorkflowRun.peaks}" format="###,###,###" /></td>
+                                    <td class="text-right"><g:formatNumber number="${analysisWorkflowRun.singletons}" format="###,###,###" /></td>
+                                    <td class="text-right"><g:formatNumber number="${analysisWorkflowRun.peakPairs}" format="###,###,###" /></td>
+                                    <td class="text-right"><g:formatNumber number="${analysisWorkflowRun.genomeCoverage}" format="#0.00%" /></td>
                                     </tr>
                                 </g:each>
                             </g:each>
@@ -145,8 +145,8 @@
                 <li>
                     <h4>${sample.naturalId}</h4>
                     <g:each in="${sample.experiments}" var="experiment">
-                        <g:each in="${experiment.alignments}" var="alignment">
-                            <table class="table table-bordered meme-table" data-meme-url="${alignment.memeFile}">
+                        <g:each in="${experiment.analysisWorkflowRuns}" var="analysisWorkflowRun">
+                            <table class="table table-bordered meme-table" data-meme-url="${analysisWorkflowRun.memeFile}">
                                 <tbody>
                                 </tbody>
                             </table>
@@ -163,9 +163,9 @@
                 <li>
                     <h4>${sample.naturalId}</h4>
                     <g:each in="${sample.experiments}" var="experiment">
-                        <g:each in="${experiment.alignments}" var="alignment">
+                        <g:each in="${experiment.analysisWorkflowRuns}" var="analysisWorkflowRun">
                             <div class="row">
-                            <g:each in="${alignment.composite}" var="url" status="n">
+                            <g:each in="${analysisWorkflowRun.composite}" var="url" status="n">
                                 <span>
                                     <h5>MOTIF ${n+1}</h5>
                                     <span class="composite-fig" data-composite-url="${url}"></span>

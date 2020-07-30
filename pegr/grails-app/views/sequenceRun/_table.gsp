@@ -37,6 +37,8 @@
             $(this).addClass("label-warning");
         } else if ($(this).text() == "FAILED") {
             $(this).addClass("label-danger");
+        } else if ($(this).text() == "ARCHIVE") {
+            $(this).addClass("label-archive");
         } else {
             $(this).addClass("label-default");
         }

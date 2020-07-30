@@ -36,8 +36,9 @@
                     <li title="The sample has not been submitted to bioinformatics pipeline."><g:link params="[status:'PREP']">PREP</g:link></li>
                     <li title="The sample has been submitted and is waiting in the queue to be processed by the bioinformatics pipeline."><g:link params="[status:'QUEUE']">QUEUE</g:link></li>
                     <li title="The sample is being processed by the bioinformatics pipeline."><g:link params="[status:'ANALYZING']">ANALYZING</g:link></li>
-                    <li title="The Sample has been processed by the bioinformatics pipeline and review by lab bioinformatician."><g:link params="[status:'COMPLETED']">COMPLETED</g:link></li>
-                    <li title="The Sample has been processed by the bioinformatics pipeline and review by lab bioinformatician and considered failed."><g:link params="[status:'FAILED']">FAILED</g:link></li>
+                    <li title="The Sample has been processed by the bioinformatics pipeline and reviewed by lab bioinformatician."><g:link params="[status:'COMPLETED']">COMPLETED</g:link></li>
+                    <li title="The Sample has been processed by the bioinformatics pipeline and reviewed by lab bioinformatician and considered failed."><g:link params="[status:'FAILED']">FAILED</g:link></li>
+                    <li title="The Sample has been processed by the bioinformatics pipeline and been archived."><g:link params="[status:'ARCHIVE']">ARCHIVE</g:link></li>
                   </ul>
                 </div>
                 <h4>Sample Submission</h4>

@@ -64,8 +64,6 @@ class SequenceRunController {
         def cohortUserList = []
         def isCohortUser = false
 
-        //cohortUserList += cohorts.split("-_")
-
         if (run) {
             def read = null
             if (run.experiments.size() > 0) {
@@ -75,37 +73,9 @@ class SequenceRunController {
                     read.readType = run.experiments[0].readType
                 }
             }
+            
+            def editable = sequenceRunService.checkEditable(run)
 
-            // get current user
-            def currUser = springSecurityService.currentUser
-            def currUsername = currUser.toString()
-            currUsername = currUsername.split(":")
-            currUsername = currUsername[1]
-            currUsername = currUsername.substring(0, currUsername.length() - 1);
-
-            // check if current user is a cohort user
-            if (cohorts.size() != 0){
-              cohorts.each() {
-                if (it != null){
-                  it = it.toString()
-                  it = it?.replace("_", "-")
-                  it = it?.split("-")
-                  if (it != null){
-                    cohortUserList << it[1]
-                  }
-                }
-              }
-
-              for (i in 0..(cohortUserList.size()-1)) {
-                if (currUsername in cohortUserList){
-                  isCohortUser = true
-                }
-              }
-            }
-
-            // check how to get sample users from sequence run.
-            def authorized = (isCohortUser == true || currUser.isAdmin())
-            def editable = (run?.status!=pegr.RunStatus.COMPLETED) && (authorized)
             [run: run, read: read, editable: editable]
         } else {
             flash.message = "Sequence run not found!"

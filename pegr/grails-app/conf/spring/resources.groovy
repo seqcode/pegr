@@ -11,9 +11,16 @@ beans = {
   preAuthenticatedAuthenticationProvider(org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider) {
     preAuthenticatedUserDetailsService = userDetailsByNameServiceWrapper
   }
+    
+  requestAttributeAuthenticationFilter(org.springframework.security.web.authentication.preauth.RequestAttributeAuthenticationFilter) {
+     principalEnvironmentVariable = grailsApplication.config.getProperty('sso.principle')
+     exceptionIfVariableMissing = false
+     checkForPrincipalChanges = false
+     authenticationManager = ref('authenticationManager')
+   }
 
   requestHeaderAuthenticationFilter(org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter) {
-    principalRequestHeader = 'remote_user'
+    principalRequestHeader = grailsApplication.config.getProperty('sso.principle')
     exceptionIfHeaderMissing = false
     authenticationManager = ref('authenticationManager')
   }

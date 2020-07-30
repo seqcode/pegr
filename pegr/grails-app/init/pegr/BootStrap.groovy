@@ -16,7 +16,11 @@ class BootStrap {
         
         createChoresIfRequired()
         
-        SpringSecurityUtils.clientRegisterFilter('requestHeaderAuthenticationFilter', SecurityFilterPosition.PRE_AUTH_FILTER) 
+        if (grailsApplication.config.getProperty('sso.type') == "Attribute") {
+            SpringSecurityUtils.clientRegisterFilter('requestAttributeAuthenticationFilter', SecurityFilterPosition.PRE_AUTH_FILTER) 
+        } else if (grailsApplication.config.getProperty('sso.type') == "Header") {
+            SpringSecurityUtils.clientRegisterFilter('requestHeaderAuthenticationFilter', SecurityFilterPosition.PRE_AUTH_FILTER) 
+        }
     }
 
     private createItemTypeIfRequired() {			

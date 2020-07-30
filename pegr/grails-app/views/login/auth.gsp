@@ -7,7 +7,7 @@
 	<div class="container-fluid" id="login-form">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#">PEGR Login</a></li>
-        	<li><a href="${grailsApplication.config.cosign}">PSU Web Access</a></li>
+        	<li><a href="${grailsApplication.config.getProperty('sso.url')}">Single Sign-On</a></li>
         </ul>
         <g:form uri="/login/authenticate" method="POST" role="form">
             <g:if test="${flash.message}">

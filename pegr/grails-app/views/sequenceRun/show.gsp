@@ -27,11 +27,13 @@
     <h2>Sequence Run #${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if> 
         <small>
             <span id="run-status-show" class="label label-default">${run.status}</span>
+            <sec:ifAnyGranted roles="ROLE_ADMIN">
             <span id="run-status-select" style="display:none">
                 <g:select name="runStatus" from="${pegr.RunStatus}" value="${run.status}"></g:select>
                 <button id="run-status-save" class="btn btn-primary">Save</button>
                 <button id="run-status-cancel" class="btn btn-default">Cancel</button>
             </span>
+            </sec:ifAnyGranted>
         </small></h2>
     <g:link action="downloadQueueFile" params="[runId:run.id]" class="btn btn-primary pull-right">Download Queue File</g:link>
     <a href="#" class="btn btn-primary pull-right" data-toggle="modal" data-target="#download-run-info">Download Run Info Files</a>
@@ -342,6 +344,7 @@
                 }});
         });
         
+        <sec:ifAnyGranted roles="ROLE_ADMIN">
         $("#run-status-show").click(function(){
             $("#run-status-show").hide();
             $("#run-status-select").show();
@@ -363,7 +366,8 @@
             $("#run-status-show").show();
             $("#run-status-select").hide();
         });
-		
+        </sec:ifAnyGranted>
+        
 		$('#selectAll').click(function() {
 			if (this.checked) {
 				$('input[name="delete"]').prop('checked', true);

@@ -357,4 +357,23 @@ END:VCALENDAR
 
         return ical.getBytes('UTF-8')
     }
+    
+    def checkEditable(SequenceRun run) {
+        // if the sequnece run has completed, no edit is allowed.
+        if (run.status == RunStatus.COMPLETED || 
+            run.status == RunStatus.FAILED || 
+            run.status == RunStatus.ARCHIVE) {
+            return false
+        }
+        
+        def currUser = springSecurityService.currentUser
+        
+        // admin or the user of the sequence run is allowed to edit.
+        if (currUser.isAdmin() ||
+            (run.user && run.user == currUser)) {
+            return true
+        } else {
+            return false
+        }
+    }
 }

@@ -160,11 +160,13 @@
         <g:link controller="sequenceRun" action="show" id="${run.id}">Run ${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if></g:link>
         <small>
             <span id="run-status-show" class="label label-default">${run.status}</span> 
+            <sec:ifAnyGranted roles="ROLE_ADMIN">
             <span id="run-status-select" style="display:none">
                 <g:select name="runStatus" from="${pegr.RunStatus}" value="${run.status}"></g:select>
                 <button id="run-status-save" class="btn btn-primary">Save</button>
                 <button id="run-status-cancel" class="btn btn-default">Cancel</button>
             </span>
+            </sec:ifAnyGranted>
         </small> 
         <a href="#" onclick="window.open('/pegr/help#report', 'Help: report', 'width=600,height=400' )" class="pull-right"><small><u>Help</u></small></a>
     </h3>
@@ -238,7 +240,8 @@
             $(".confirm").confirm({text: "All data in this alignment will be deleted. Are you sure you want to delete this alignment?"});
             $(".nav-status").addClass("active");
             $('[data-toggle="popover"]').popover(); 
-
+            
+            <sec:ifAnyGranted roles="ROLE_ADMIN">
             $("#run-status-show").click(function(){
                 $("#run-status-show").hide();
                 $("#run-status-select").show();
@@ -260,6 +263,7 @@
                 $("#run-status-show").show();
                 $("#run-status-select").hide();
             });
+            </sec:ifAnyGranted>
             
             $("#qc-statistics th").each(function(){
                 $(this).append(" <span class='glyphicon glyphicon-minus-sign small'></span>");

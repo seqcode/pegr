@@ -9,6 +9,10 @@ class UserController {
     def utilityService
     def emailService
 
+    def afterLogout() {
+        
+    }
+    
 	def profile(){
         def user = springSecurityService.currentUser
         if (!user) {

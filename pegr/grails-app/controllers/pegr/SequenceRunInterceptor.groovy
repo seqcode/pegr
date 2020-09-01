@@ -19,20 +19,29 @@ class SequenceRunInterceptor {
                            'removePool',
                            'addSamplesById',
                            'removeExperiment',
-                           'editSamples',
                            'updateSamples',
                            'run',
                            'fetchProjectsAjax',
                            'updateExperimentCohortAjax',
                            'addProject',
                            'removeProject',
-                           'uploadCohortImage',
-                           'removeCohortImageAjax',
                            'deleteSample',
                            'deleteProject']) {
             // get the sequence run
             def runId = params.long('runId')
             def run =  SequenceRun.get(runId)
+            
+            // check authorization
+            def editable = sequenceRunService.checkEditable(run)
+            if (!editable) {
+                render(view: '/login/denied')
+            }
+            return editable
+        } else if (actionName in ['uploadCohortImage',
+                                 'removeCohortImageAjax']) {
+            // get the sequence run
+            def cohortId = params.long('cohortId')
+            def run =  SequencingCohort.get(cohortId).run
             
             // check authorization
             def editable = sequenceRunService.checkEditable(run)

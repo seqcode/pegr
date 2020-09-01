@@ -332,16 +332,18 @@
         });
         
         $(".remove-image").on("click", function(){
-            var parent = $(this).parent();
-            var filepath = parent.find("input.filepath").val();
-            var cohortId = parent.closest("tr").find(".cohort-id").val();
-            $.ajax({
-                url:"/pegr/sequenceRun/removeCohortImageAjax",
-                type: "POST",
-                data: {cohortId: cohortId, filepath: filepath},
-                success: function(){
-                    parent.remove();
-                }});
+            if(confirm("Delete the image?")) {
+                var parent = $(this).parent();
+                var filepath = parent.find("input.filepath").val();
+                var cohortId = parent.closest("tr").find(".cohort-id").val();
+                $.ajax({
+                    url:"/pegr/sequenceRun/removeCohortImageAjax",
+                    type: "POST",
+                    data: {cohortId: cohortId, filepath: filepath},
+                    success: function(){
+                        parent.remove();
+                    }});
+            }
         });
         
         <sec:ifAnyGranted roles="ROLE_ADMIN">

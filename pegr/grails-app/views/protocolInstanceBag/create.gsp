@@ -5,7 +5,7 @@
 </head>
 <body>
     <div class="container-fluid">
-        <h3>New Protocol Instance Bag</h3>
+        <h3>New Experiment Record</h3>
         <g:if test="${flash.message}">
             <div class="message" role="status">${flash.message}</div>
         </g:if>
@@ -32,8 +32,7 @@
             </div>
             <div id="defined-protocol-group">
                 <label>Protocol Group</label>
-                <g:select name="protocolGroupId" optionKey="id" from="${protocolGroups}" noSelection="['null': '-- choose --']" 
-                onChange="${remoteFunction(controller: 'protocolInstanceBag', action: 'showProtocolsInGroupAjax', update:'protocols', params: '\'id=\'+this.value')}"/>
+                <g:select id="select-protocol-group" name="protocolGroupId" optionKey="id" from="${protocolGroups}" noSelection="['null': '-- choose --']" />
                 <div id="protocols"></div>
             </div>
             <div id="custom-protocols" class="fields well">
@@ -48,6 +47,15 @@
         $("#nav-experiments").addClass("active");
         $('#custom-protocols').hide();
         $("#projects").select2();
+        
+        // when a protocol group is selected, show the protocols in that protocol group
+        $("#select-protocol-group").change(function() {
+            $.ajax({
+                url: "showProtocolsInGroupAjax/" + this.value,
+            }).done(function(html){
+                $("#protocols").html(html);
+            });
+        });
         
         function showDefinedProtocol() {
             $('#defined-protocol-group').show();

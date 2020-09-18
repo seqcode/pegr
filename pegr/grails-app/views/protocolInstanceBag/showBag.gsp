@@ -12,6 +12,10 @@
             border-width: 2px;
             border-color: #f8edba;
         }
+        
+        th a.edit {
+            color: white;
+        }
     </style>
 </head>
 <body>                

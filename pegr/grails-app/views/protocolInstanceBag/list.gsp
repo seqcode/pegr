@@ -1,9 +1,9 @@
 <html>
 <head>
-  <title>PEGR - Work Records</title>
+  <title>PEGR - Experiment Records</title>
 </head>
 <body>
-    <h4><g:link action="list">Work Records</g:link> <g:link action='create' class="edit">New</g:link>    <a href="#" onclick="window.open('/pegr/help#bag', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><small><u>Help</u></small></a></h4>
+    <h4><g:link action="list">Experiment Records</g:link> <g:link action='create' class="edit">New</g:link>    <a href="#" onclick="window.open('/pegr/help#bag', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><small><u>Help</u></small></a></h4>
     <div class="row">
         <g:form controller="protocolInstanceBag" action="search" class="pull-right" style="padding-bottom:5px">
             <input name="str">

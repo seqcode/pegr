@@ -22,7 +22,7 @@
                 <th class="col-target group-analysis">Target</th>
                 <th class="col-cohort group-analysis">Cohort</th>
                 <th class="col-genome group-analysis">Genome</th>
-                <th class="col-history group-analysis">Galaxy History</th>
+                <th class="col-history group-analysis">History</th>
                 <th class="col-date group-analysis">Date</th>
                 <g:if test="${runStatusMap.value.steps}">
                     <g:each in="${runStatusMap.value.steps}" var="step">

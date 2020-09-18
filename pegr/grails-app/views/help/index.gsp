@@ -190,9 +190,9 @@
                     <li><span class="label label-info"> </span> Empty dataset (e.g. no peaks, no peak-pairs, no motifs, etc.)</li>
                     <li><span class="label label-default"> </span> No data received.</li>
                 </ul>
-                <p>The status is determined by the messages received from Galaxy and preliminary screening of the data.</p>
+                <p>The status is determined by the messages received from the external bioinformatics workflow and preliminary screening of the data.</p>
                 <ol>
-                    <li>The error messages from Galaxy are generally labed as <span class="label label-danger"> </span> Error message, except when the message contains "Permission denied", in which case , the step is labeled as <span class="label label-warning"> </span> Permission denied.</li>
+                    <li>The error messages from the external bioinformatics workflow are generally labed as <span class="label label-danger"> </span> Error message, except when the message contains "Permission denied", in which case , the step is labeled as <span class="label label-warning"> </span> Permission denied.</li>
                     <li>Data received from the following steps are tested for <span class="label label-info"> </span>Empty dataset
                         <ul>
                             <li>bedtoolsIntersect: no peaks</li>

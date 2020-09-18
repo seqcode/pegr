@@ -50,7 +50,7 @@ class ProtocolInstanceBagController {
     def savePrtclInstBag(Long protocolGroupId, String bagName) {        
         try {
             def projects = params.list("projects")
-            def prtclInstBag = (params.protocolInput == "defined") ? protocolInstanceBagService.savePrtclInstBagByGroup(protocolGroupId, bagName, params.startTime) : protocolInstanceBagService.savePrtclInstBagByProtocols(params.list('protocols'), bagName, params.startTime)
+            def prtclInstBag = (params.protocolInput == "defined") ? protocolInstanceBagService.savePrtclInstBagByGroup(protocolGroupId, bagName, params.startTime) : protocolInstanceBagService.savePrtclInstBagByProtocols(params.list('protocolList'), bagName, params.startTime)
             protocolInstanceBagService.addBagToProjects(prtclInstBag, projects)
             redirect(action: "showBag", id: prtclInstBag.id)
         }catch( ProtocolInstanceBagException e) {

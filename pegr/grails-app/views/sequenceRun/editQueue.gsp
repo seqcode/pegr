@@ -14,7 +14,7 @@
     <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
     </g:if>
-    <p>Sequence Runs are queued before they are sent to Wall E.</p>
+    <p>Sequence Runs are queued before they are sent to sequencer repository.</p>
     <g:form controller="sequenceRun" action="updateQueue">
         <g:hiddenField name="runId" value="${runId}"></g:hiddenField>
         <div class="form-group">

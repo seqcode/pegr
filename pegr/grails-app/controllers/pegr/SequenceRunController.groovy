@@ -496,7 +496,7 @@ class SequenceRunController {
     
     def downloadRunInfo(String remoteRoot, Long runId) {
         String RUN_INFO_TEMP = "runInfo${runId}"
-        def timeout = 60*1000
+        def timeout = 300 * 1000
 
         // generate the run info files
         def run = SequenceRun.get(runId)
@@ -516,41 +516,32 @@ class SequenceRunController {
         }
         def localRoot = utilityService.getFilesRoot()
         def localFolder = new File(localRoot, RUN_INFO_TEMP)
-        if (!localFolder.exists()) {
-            localFolder.mkdirs()
-        }
+
         ngsRepoService.generateRunFilesInFolder(run, remotePath, localFolder)
 
         // compress the files
         def compressedFilename = "runInfo${runId}.tar.gz"
         def compressedFile = new File(localRoot, compressedFilename)
-        def command = "tar -cf ${compressedFile.getPath()} ${RUN_INFO_TEMP}"
+        def command = "tar -czf ${compressedFile.getPath()} ${RUN_INFO_TEMP}"
         def envVars = []
-        def workDir = localRoot
-        def out = command.execute(envVars, workDir)
-
-        // remove the original run info files
-        command = "rm -R ${localFolder.getPath()}"
-        utilityService.executeCommand(command, timeout)
-
-        InputStream contentStream
+        def proc = command.execute(envVars, localRoot)
+        proc.waitForOrKill(timeout)
+        
         try {
             response.setContentType("application/gzip")
             response.setHeader("Content-disposition", "attachment;filename=\"${compressedFilename}\"")
-            contentStream = compressedFile.newInputStream()
-            response.outputStream << contentStream
+            response.outputStream << compressedFile.getBytes()
             // remove the compressed file
             compressedFile.delete()
+            // remove the original files
+            command = "rm -R ${localFolder.getPath()}"
+            command.execute()
             webRequest.renderView = false
-            contentStream.close()
         } catch(Exception e) {
             render "Error!"
         } finally {
             response.getOutputStream().flush()
             response.getOutputStream().close()
-            if (contentStream != null) {
-                contentStream.close()
-            }
         }
 
     }

@@ -52,8 +52,7 @@
                     <input name="remoteRoot" class="form-control">
                 </div>
                 <ul>e.g. 
-                    <li>Wall-E: /home/nextseq/NSQData_PughLab/</li>
-                    <li>gpfs: /gpfs/cyberstar/pughhpc/storage/illumina/illuminaNextSeq/NSQData_PughLab/</li>
+                    <li>Sequencer Repository: /path/to/sequencer/repository/</li>
                 </ul>
                 <g:submitButton name="submit" class="btn btn-primary" value="Download Run Info Files"></g:submitButton>
             </g:form>

@@ -18,7 +18,7 @@
     <g:form controller="sequenceRun" action="updateQueue">
         <g:hiddenField name="runId" value="${runId}"></g:hiddenField>
         <div class="form-group">
-            <label>Wall E folder for the previous run </label>
+            <label>Sequencer repository folder for the previous run </label>
             <input name="previousRunFolder" value="${previousRunFolder}" class="form-control">
         </div>
         <div class="form-group">

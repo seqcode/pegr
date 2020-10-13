@@ -10,7 +10,7 @@
         <thead>
             <tr>
                 <th width="300">Sequence Run</th>
-                <th>Wall E Folder</th>
+                <th>Sequencer Repository Folder</th>
             </tr>
         </thead>
         <tbody>
@@ -26,7 +26,7 @@
         <thead>
             <tr>
                 <th width="300">Sequence Run</th>
-                <th>Wall E Folder</th>
+                <th>Sequencer Repository Folder</th>
             </tr>
         </thead>
         <tbody>
@@ -44,7 +44,7 @@
         <thead>
             <tr>
                 <th width="300">Sequence Run</th>
-                <th>Wall E Folder</th>
+                <th>Sequencer Repository Folder</th>
             </tr>
         </thead>
         <tbody>

@@ -10,7 +10,7 @@ class NgsRepoException extends RuntimeException {
     
 /**
  * Class of service that connects and sends run information to 
- * Sequencer Wall E
+ * Sequencer repository
  */
 class NgsRepoService {
 
@@ -29,18 +29,18 @@ class NgsRepoService {
     final int MAX_QUEUE_LENGTH = 24
     
     /**
-     * Get Wall E connection configs from grails configs
-     * @return Wall E connection configs
+     * Get sequencer repository connection configs from grails configs
+     * @return sequencer repository connection configs
      */
     Map getNgsRepo() {
         def ngsRepo = [
-            // username to login Wall E
+            // username to login sequencer repository
             username : grailsApplication.config.ngsRepo.username,
             // rsa private file
             keyfile : grailsApplication.config.ngsRepo.keyfile,
-            // Wall E's hostname
+            // sequencer repository's hostname
             host : grailsApplication.config.ngsRepo.host,
-            // Wall E's open port
+            // sequencer repository's open port
             port : grailsApplication.config.ngsRepo.port,
             // folder that contains all the sequence runs
             root : grailsApplication.config.ngsRepo.root
@@ -99,7 +99,7 @@ class NgsRepoService {
      * the information of the first run in queue to remote server. 
      */
     void createJob() {
-        // get Wall E's connection information 
+        // get sequencer repository's connection information 
         def ngsRepo = getNgsRepo()
         
         // get sequence run IDs in the queue
@@ -189,7 +189,7 @@ class NgsRepoService {
      * @return a list of file and folder names
      */
     def getRemoteFiles() {
-        // gather information for ssh to Wall E
+        // gather information for ssh to sequencer repository
         def ngsRepo = getNgsRepo()
         
         // set timeout to 2 min
@@ -325,7 +325,7 @@ class NgsRepoService {
      * @param newRunRemotePath the new run's folder path on remote server
      */
     def moveFilesToRemote(File runInfoLocalFile, File configLocalFolder, String newRunRemotePath) {
-        // get Wall E connection information
+        // get sequencer repository connection information
         def ngsRepo = getNgsRepo()
         
         // scp run info file to remote server

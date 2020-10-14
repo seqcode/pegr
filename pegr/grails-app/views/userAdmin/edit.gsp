@@ -36,7 +36,7 @@
                     <label>Affiliation</label>
                   </td>
                   <td>
-                    <g:select name="affiliation" from="${pegr.Organization.list()}" optionKey="id" value="${user?.affiliation}" noSelection="['':'--Choose--']" class="select2"></g:select>
+                    <g:select name="affiliation" from="${pegr.Organization.list()}" optionKey="id" value="${user?.affiliation.id}" noSelection="['':'--Choose--']" class="select2"></g:select>
                   </td>
                 </tr>
                 <tr>
@@ -53,8 +53,8 @@
                   </td>
                   <td>
                     <select name="enabled" value="${user?.enabled}">
-                        <option value="true">Active</option>
-                        <option value="false">Inactive</option>
+                        <option value="true" <g:if test="${user?.enabled}">selected</g:if>>Active</option>
+                        <option value="false" <g:if test="${!user?.enabled}">selected</g:if>>Inactive</option>
                     </select>
                   </td>
                 </tr>

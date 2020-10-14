@@ -204,7 +204,7 @@ class ProjectService {
             sql.close()
         } catch(Exception e) {
             sql.close()
-            log.error e
+            log.error e.toString()
             throw new ProjectException(message: "Error merging project ${fromId} to project ${toProject.id}!")
         }
         

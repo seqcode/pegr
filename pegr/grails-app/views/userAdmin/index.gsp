@@ -14,6 +14,17 @@
     <body>
         <div class="container-fluid">
             <div class="col-sm-10 text-left">
+                <g:hasErrors>
+                    <div class="errors">
+                        <g:renderErrors bean="${cmd}" as="list"/>
+                    </div>
+                </g:hasErrors>
+                <g:if test="${request.message}">
+                    <div class="alert alert-info">${request.message}</div>
+                </g:if>
+                <g:if test="${flash.message}">
+                    <div class="alert alert-info">${flash.message}</div>
+                </g:if>
                 <div class="well">
                     <g:form action="search">
                         <label>Username</label>
@@ -32,15 +43,6 @@
                         <g:submitButton name="save" value="Add User" class="edit submit"></g:submitButton>
                     </g:form>
                 </div>
-                <g:hasErrors>
-                    <div class="errors">
-                        <g:renderErrors bean="${cmd}" as="list"/>
-                    </div>
-                </g:hasErrors>
-                <g:if test="${request.message}">
-                    <div class="alert alert-info">${request.message}</div>
-                </g:if>
-
                 <table id="example" class="display" style="width:100%">
                     <thead>
                         <tr>
@@ -72,6 +74,22 @@
                         </g:each>
                     </tbody>
                 </table>
+                
+                <div>
+                    <h3>Merge Users</h3>
+                    <p>Please provide usernames below. Multiple usernames can be provided in the "From" field and should be delimited by comma ",".</p>
+                    <g:form action="mergeUsers">
+                    <div class="form-group">
+                        <label>From</label>
+                        <input name="fromUsernamesStr" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>To</label>
+                        <input name="toUsername" class="form-control">
+                    </div>
+                        <g:submitButton name="submit" value="Merge" class="edit"></g:submitButton>
+                    </g:form>
+                </div>
             </div>
 
             <div class="col-sm-2 sidenav filter text-center">

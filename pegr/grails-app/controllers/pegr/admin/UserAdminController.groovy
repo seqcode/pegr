@@ -179,6 +179,20 @@ class UserAdminController {
             render(view: "index", model: [users: []])
         }
     }
+    
+    def mergeUsers(String fromUsernamesStr, String toUsername) {
+        try {
+            def fromUsernames = fromUsernamesStr.split(",").toList()
+            for (i in 0..<fromUsernames.size()) {
+                fromUsernames[i] = fromUsernames[i].trim()
+            }
+            userService.mergeUsers(fromUsernames, toUsername)
+            flash.message = "Users have been successfully merged."
+        } catch (UserException e) {
+            flash.message = e.message            
+        }
+        redirect(action:"index")
+    }
 }
 
 class CreateUserCommand implements grails.validation.Validateable {

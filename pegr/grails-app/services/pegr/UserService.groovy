@@ -1,6 +1,6 @@
 package pegr
-
 import grails.transaction.Transactional
+import groovy.sql.Sql
 
 class UserException extends RuntimeException {
     String message
@@ -13,6 +13,7 @@ class UserService {
     def mailService
     def grailsApplication
     def grailsLinkGenerator
+    def dataSource
     
     @Transactional
     User updateUser(UserInfoCommand uic, Long userId){
@@ -226,5 +227,60 @@ class UserService {
         }
         updatePassword(userToken.user, urc)
         userToken.delete()
+    }
+    
+    @Transactional
+    def mergeUsers(List fromUsernames, String toUsername) {
+        fromUsernames.each { fromUsername ->
+            mergeUser(fromUsername, toUsername)
+        }
+    }
+    
+    @Transactional
+    def mergeUser(String fromUsername, String toUsername) {
+        def fromUser = User.findByUsername(fromUsername)        
+        if (!fromUser) {
+            throw new UserException(message: "User ${fromUsername} does not exist!")
+        }
+        
+        def toUser = User.findByUsername(toUsername)
+        if (!toUser) {
+            throw new UserException(message: "User ${toUsername} does not exist!")
+        }
+        
+        def sql = new Sql(dataSource)
+        try {
+            // simple many-to-one relation
+            utilityService.updateForeignKeyInDb("cell_source", "provider_user", fromUser.id, toUser.id, sql)
+            utilityService.updateForeignKeyInDb("cell_source", "prep_user", fromUser.id, toUser.id, sql)
+            utilityService.updateForeignKeyInDb("organization", "billing_contact", fromUser.id, toUser.id, sql)
+            utilityService.updateForeignKeyInDb("organization", "pi", fromUser.id, toUser.id, sql)
+            utilityService.updateForeignKeyInDb("protocol_group", "user", fromUser.id, toUser.id, sql)
+            utilityService.updateForeignKeyInDb("sequence_run", "user", fromUser.id, toUser.id, sql)
+            utilityService.updateForeignKeyInDb("analysis", "user", fromUser.id, toUser.id, sql)
+            utilityService.updateForeignKeyInDb("item", "user", fromUser.id, toUser.id, sql)
+            utilityService.updateForeignKeyInDb("sample", "send_data_to", fromUser.id, toUser.id, sql)
+            utilityService.updateForeignKeyInDb("protocol_instance_summary", "user", fromUser.id, toUser.id, sql)
+            utilityService.updateForeignKeyInDb("history", "user", fromUser.id, toUser.id, sql)
+            utilityService.updateForeignKeyInDb("run_stats", "technician", fromUser.id, toUser.id, sql)
+            utilityService.updateForeignKeyInDb("inventory", "receiving_user", fromUser.id, toUser.id, sql)
+            utilityService.updateForeignKeyInDb("protocol_instance", "user", fromUser.id, toUser.id, sql)
+            utilityService.updateForeignKeyInDb("token", "user", fromUser.id, toUser.id, sql)
+            utilityService.updateForeignKeyInDb("cell_source_batch", "user", fromUser.id, toUser.id, sql)
+            utilityService.updateForeignKeyInDb("protocol", "user", fromUser.id, toUser.id, sql)
+            
+            // many-to-many tables
+            utilityService.updateLinksInDb("project_user", "project", 'user', fromUser.id, toUser.id, sql)            
+            sql.execute("delete from user_role where user_id = ?", [fromUser.id])
+            sql.execute("delete from user_role_group where user_id = ?", [fromUser.id])
+
+            sql.close()
+        } catch(Exception e) {
+            sql.close()
+            log.error e.toString()
+            throw new UserException(message: "Error merging user ${fromUsername} to user ${toUsername}!")
+        }
+        
+        fromUser.delete()
     }
 }

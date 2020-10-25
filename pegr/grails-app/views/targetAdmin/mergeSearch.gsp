@@ -25,7 +25,7 @@
             <g:each in="${targets}" var="target">
             <tr>
                 <td><input type="checkbox" name="checkedTarget" class="checkbox" value="${target.id}" onchange="toggleChecked(this)" ><g:if test="${target.id in session.checkedTarget}">checked</g:if></td>
-                <td class="col-sm-3"><g:link controller="target" action="show" id="${target.id}">${target.name}</g:link> </td>
+                <td class="col-sm-3"><g:link controller="targetAdmin" action="show" id="${target.id}">${target.name}</g:link> </td>
                 <td class="col-sm-3">${target.cTermTag}</td>
                 <td class="col-sm-3">${target.nTermTag}</td>
                 <td class="col-sm-3">${target.targetType}</td>

@@ -595,4 +595,15 @@ class SequenceRunController {
 		}
 		redirect(action: "show", params: [id: runId])
 	}
+
+    def delete(Long runId) {
+        try {
+            sequenceRunService.delete(runId)
+            flash.message = "Sequence Run ${runId} has been deleted!"
+        } catch(SequenceRunException e) {
+            flash.message = e.message
+        }
+        redirect(action: "index")
+    }
+
 }

@@ -306,6 +306,39 @@ class SequenceRunService {
         cohort.save()
     }
     
+    @Transactional
+    def delete(Long runId) {
+        // find the sequence run with the provided ID
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            throw new SequenceRunException(message: "Sequencing run ${runId} not found!")
+        }
+        
+        try {            
+            // delete sample_in_run
+            SampleInRun.executeUpdate("delete from SampleInRun where run.id =:runId", [runId: run.id])
+            
+            // delete sequencing_experiment
+            def experiments = run.experiments 
+            experiments.each {
+                // remove all the sequencingExperiments from the sequence run
+                removeExperiment(it.id)
+            }
+            
+            // delete sequencing_cohort
+            SequencingCohort.executeUpdate("delete from SequencingCohort where run.id =:runId", [runId: run.id])
+            
+            // delete sequence run
+            run.delete()
+            
+            // delete runStats
+            RunStats.executeUpdate("delete from RunStats where id =:runStatsId", [runStatsId: run.runStats.id])
+        } catch (Exception e) {
+            log.error "Error: ${e}"
+            throw new SequenceRunException(message: "Error deleting the sequence run!")
+        }
+    }
+    
     byte[] calendarEventAsBytes(Long runId, Date meetingTime) {        
         def now = new Date()
         def startTime = meetingTime

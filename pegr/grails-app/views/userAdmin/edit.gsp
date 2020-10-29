@@ -36,7 +36,7 @@
                     <label>Affiliation</label>
                   </td>
                   <td>
-                    <g:select name="affiliation" from="${pegr.Organization.list()}" optionKey="id" value="${user?.affiliation.id}" noSelection="['':'--Choose--']" class="select2"></g:select>
+                    <g:select name="affiliation" from="${pegr.Organization.list()}" optionKey="id" value="${user?.affiliation?.id}" noSelection="['':'--Choose--']" class="select2"></g:select>
                   </td>
                 </tr>
                 <tr>

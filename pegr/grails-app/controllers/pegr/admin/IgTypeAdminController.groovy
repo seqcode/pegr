@@ -7,7 +7,8 @@ import pegr.IgType
 
 class IgTypeAdminController {
 
-    IgTypeService igTypeService
+    def igTypeService
+    def utilityService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -113,6 +114,32 @@ class IgTypeAdminController {
             }
             '*'{ render status: NOT_FOUND }
         }
+    }
+    
+    def mergeIgTypes(String fromIgTypeNamesStr, String toIgTypeName) {
+        try {
+            def fromIgTypeNames = fromIgTypeNamesStr.split(",").toList()
+            
+            def toIgType = IgType.findByName(toIgTypeName)
+            if (!toIgType) {
+                throw new UtilityException(message: "Ig type ${toIgTypeName} does not exist!")
+            }
+            
+            fromIgTypeNames.each { it ->
+                def fromIgTypeName = it.trim()
+                def fromIgType = IgType.findByName(fromIgTypeName)
+                if(!fromIgType) {
+                    throw new UtilityException(message: "Ig type ${fromIgTypeName} does not exist!")
+                }
+
+                utilityService.mergeRowsInDb('ig_type', fromIgType.id, toIgType.id)
+            }
+            
+            flash.message = "Ig types have been successfully merged."
+        } catch(UtilityException e) {
+            flash.message = e.message
+        }
+        redirect(action: "index")
     }
     
 	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS

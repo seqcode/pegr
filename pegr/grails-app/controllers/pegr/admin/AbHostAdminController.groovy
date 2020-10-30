@@ -6,7 +6,8 @@ import static org.springframework.http.HttpStatus.*
 
 class AbHostAdminController {
 
-    AbHostService abHostService
+    AbHostService abHostServiceutility
+    def utilityService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -119,6 +120,32 @@ class AbHostAdminController {
             }
             '*'{ render status: NOT_FOUND }
         }
+    }
+    
+    def mergeAbHosts(String fromAbHostNamesStr, String toAbHostName) {
+        try {
+            def fromAbHostNames = fromAbHostNamesStr.split(",").toList()
+            
+            def toAbHost = AbHost.findByName(toAbHostName)
+            if (!toAbHost) {
+                throw new UtilityException(message: "Ab host ${toAbHostName} does not exist!")
+            }
+            
+            fromAbHostNames.each { it ->
+                def fromAbHostName = it.trim()
+                def fromAbHost = AbHost.findByName(fromAbHostName)
+                if(!fromAbHost) {
+                    throw new UtilityException(message: "Ab host ${fromAbHostName} does not exist!")
+                }
+
+                utilityService.mergeRowsInDb('ab_host', fromAbHost.id, toAbHost.id)
+            }
+            
+            flash.message = "Ab hosts have been successfully merged."
+        } catch(UtilityException e) {
+            flash.message = e.message
+        }
+        redirect(action: "index")
     }
     
 	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS

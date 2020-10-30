@@ -14,8 +14,25 @@
             <input name="str">
             <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>
         </g:form>
+        <div>                    
+            <button data-toggle="collapse" data-target="#merge"  aria-expanded="false" class="btn btn-default">Merge Ab Hosts <span class="expand_caret caret"></span></button>
+            <div id="merge" class="collapse well">
+                <p>Please provide Ab host names below. Multiple Ab host names can be provided in the "From" field and should be delimited by comma ",".</p>
+                <g:form action="mergeAbHosts">
+                <div class="form-group">
+                    <label>From</label>
+                    <input name="fromAbHostNamesStr" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>To</label>
+                    <input name="toAbHostName" class="form-control">
+                </div>
+                <g:submitButton name="submit" value="Merge" class="edit"></g:submitButton>
+                </g:form>
+            </div>
+        </div>
         <div id="list-abHost" class="content scaffold-list" role="main">
-            <h1><g:message code="default.list.label" args="[entityName]" /></h1>
+            <h3>Ab Host List</h3>
             <g:if test="${flash.message}">
                 <div class="message" role="status">${flash.message}</div>
             </g:if>

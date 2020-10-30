@@ -236,3 +236,12 @@ div.spacer
 .label-archive {
     background-color: #8A2BE2;
 }
+
+.expand_caret {
+    transform: scale(1.6);
+    margin-left: 8px;
+    margin-top: -4px;
+}
+button[aria-expanded='false'] > .expand_caret {
+    transform: scale(1.6) rotate(-90deg);
+}

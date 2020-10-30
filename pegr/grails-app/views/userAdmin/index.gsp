@@ -43,6 +43,23 @@
                         <g:submitButton name="save" value="Add User" class="edit submit"></g:submitButton>
                     </g:form>
                 </div>
+                <div style="margin-bottom: 12px">                    
+                    <button data-toggle="collapse" data-target="#merge" aria-expanded="false" class="btn btn-default">Merge Users <span class="expand_caret caret"></span></button>
+                    <div id="merge" class="collapse well">
+                        <p>Please provide usernames below. Multiple usernames can be provided in the "From" field and should be delimited by comma ",".</p>
+                        <g:form action="mergeUsers">
+                        <div class="form-group">
+                            <label>From</label>
+                            <input name="fromUsernamesStr" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>To</label>
+                            <input name="toUsername" class="form-control">
+                        </div>
+                            <g:submitButton name="submit" value="Merge" class="edit"></g:submitButton>
+                        </g:form>
+                    </div>
+                </div>
                 <table id="example" class="display" style="width:100%">
                     <thead>
                         <tr>
@@ -74,22 +91,6 @@
                         </g:each>
                     </tbody>
                 </table>
-                
-                <div>
-                    <h3>Merge Users</h3>
-                    <p>Please provide usernames below. Multiple usernames can be provided in the "From" field and should be delimited by comma ",".</p>
-                    <g:form action="mergeUsers">
-                    <div class="form-group">
-                        <label>From</label>
-                        <input name="fromUsernamesStr" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>To</label>
-                        <input name="toUsername" class="form-control">
-                    </div>
-                        <g:submitButton name="submit" value="Merge" class="edit"></g:submitButton>
-                    </g:form>
-                </div>
             </div>
 
             <div class="col-sm-2 sidenav filter text-center">

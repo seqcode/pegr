@@ -258,9 +258,10 @@ class UtilityService {
         }
         if (!toId) {
             throw new UtilityException(message: "To ID is missing!")
-        }                                                        
-        try {
-            def sql = new Sql(dataSource)
+        }                  
+        
+        def sql = new Sql(dataSource)
+        try {    
             // check if both the merge from and merge to exist
             def cmd = "select 1 from " + tableName + " where id = ?"
             [fromId, toId].each { id ->

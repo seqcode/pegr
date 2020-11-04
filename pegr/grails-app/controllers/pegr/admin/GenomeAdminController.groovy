@@ -4,10 +4,13 @@ import grails.validation.ValidationException
 import static org.springframework.http.HttpStatus.*
 import pegr.AdminCategory
 import pegr.Genome
+import groovy.sql.Sql
 
 class GenomeAdminController {
 
     GenomeService genomeService
+    def utilityService
+    def dataSource
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -114,6 +117,41 @@ class GenomeAdminController {
             }
             '*'{ render status: NOT_FOUND }
         }
+    }
+    
+    def mergeGenomes(String fromGenomeNamesStr, String toGenomeName) {
+        try {
+            def fromGenomeNames = fromGenomeNamesStr.split(",").toList()
+            
+            def toGenome = Genome.findByName(toGenomeName)
+            if (!toGenome) {
+                throw new UtilityException(message: "Genome ${toGenomeName} does not exist!")
+            }
+            
+            def sql = new Sql(dataSource)
+            
+            fromGenomeNames.each { it ->
+                def fromGenomeName = it.trim()
+                def fromGenome = Genome.findByName(fromGenomeName)
+                if(!fromGenome) {
+                    throw new UtilityException(message: "Genome ${fromGenomeName} does not exist!")
+                }
+
+                try {
+                    utilityService.updateForeignKeyInDb('chromosome', 'genome', fromGenome.id, toGenome.id, sql)
+                    utilityService.updateForeignKeyInDb('sequence_alignment', 'genome', fromGenome.id, toGenome.id, sql)
+                    fromGenome.delete()
+                } catch(Exception e) {
+                    log.error e
+                    throw new UtilityException(message: "Error merging genome ${fromGenomeName}!")
+                }
+            }
+            
+            flash.message = "Genomes have been successfully merged."
+        } catch(UtilityException e) {
+            flash.message = e.message
+        }
+        redirect(action: "index")
     }
     
 	public static AdminCategory category = AdminCategory.ALIGNMENT_ANALYSIS

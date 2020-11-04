@@ -9,6 +9,7 @@ import pegr.AdminCategory
 class GrowthMediaAdminController {
 
     GrowthMediaService growthMediaService
+    def utilityService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -115,6 +116,32 @@ class GrowthMediaAdminController {
             }
             '*'{ render status: NOT_FOUND }
         }
+    }
+    
+    def mergeGrowthMedia(String fromGrowthMediaNamesStr, String toGrowthMediaName) {
+        try {
+            def fromGrowthMediaNames = fromGrowthMediaNamesStr.split(",").toList()
+            
+            def toGrowthMedia = GrowthMedia.findByName(toGrowthMediaName)
+            if (!toGrowthMedia) {
+                throw new UtilityException(message: "Growth media ${toGrowthMediaName} does not exist!")
+            }
+            
+            fromGrowthMediaNames.each { it ->
+                def fromGrowthMediaName = it.trim()
+                def fromGrowthMedia = GrowthMedia.findByName(fromGrowthMediaName)
+                if(!fromGrowthMedia) {
+                    throw new UtilityException(message: "Growth media ${fromGrowthMediaName} does not exist!")
+                }
+
+                utilityService.mergeRowsInDb('growth_media', fromGrowthMedia.id, toGrowthMedia.id)
+            }
+            
+            flash.message = "Growth media have been successfully merged."
+        } catch(UtilityException e) {
+            flash.message = e.message
+        }
+        redirect(action: "index")
     }
     
 	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS

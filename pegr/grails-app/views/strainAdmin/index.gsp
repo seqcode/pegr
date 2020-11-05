@@ -16,6 +16,23 @@
             <input name="str">
             <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>
         </g:form>
+        <div>                    
+            <button data-toggle="collapse" data-target="#merge"  aria-expanded="false" class="btn btn-default">Merge Strain <span class="expand_caret caret"></span></button>
+            <div id="merge" class="collapse well">
+                <p>Please provide strain ID's below. Multiple strains can be provided in the "From" field and should be delimited by comma ",".</p>
+                <g:form action="mergeStrains">
+                <div class="form-group">
+                    <label>From</label>
+                    <input name="fromStrainIdsStr" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>To</label>
+                    <input name="toStrainId" class="form-control">
+                </div>
+                <g:submitButton name="submit" value="Merge" class="edit"></g:submitButton>
+                </g:form>
+            </div>
+        </div>
 		<div id="list-strain" class="content scaffold-list" role="main">
 			<h3><g:message code="default.list.label" args="[entityName]" /></h3>
 			<g:if test="${flash.message}">
@@ -25,6 +42,7 @@
 			<table class="table">
 			<thead>
 					<tr>
+                        <g:sortableColumn property="id" title="ID" />
 						<g:sortableColumn property="name" title="Name" />
                         <g:sortableColumn property="species.genusName" title="Species" />
                         <g:sortableColumn property="parent" title="Parent" />
@@ -36,7 +54,8 @@
 				<tbody>
 				<g:each in="${strainInstanceList}" status="i" var="strain">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-						<td><g:link action="show" id="${strain.id}">${fieldValue(bean: strain, field: "name")}</g:link></td>					
+                        <td><g:link action="show" id="${strain.id}">${fieldValue(bean: strain, field: "id")}</g:link></td>
+                        <td>${fieldValue(bean: strain, field: "name")}</td>
                         <td>${fieldValue(bean: strain, field: "species")}</td>
 						<td>${fieldValue(bean: strain, field: "parent")}</td>
 				        <td>${fieldValue(bean: strain, field: "genotype")}</td>

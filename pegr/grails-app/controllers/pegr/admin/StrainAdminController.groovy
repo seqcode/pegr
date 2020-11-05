@@ -1,4 +1,4 @@
-package pegr.admin
+package pegr
 import pegr.AdminCategory
 import pegr.Strain
 import pegr.StrainException
@@ -8,6 +8,7 @@ class StrainAdminController {
 	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS
     
     def strainService
+    def utilityService
     
     def index(Integer max, String str) {
         if (str && Strain.hasProperty("name")) {
@@ -94,6 +95,32 @@ class StrainAdminController {
             flash.message = e.message
             redirect(action: "show", id: id)
         }
+    }
+    
+    def mergeStrains(String fromStrainIdsStr, String toStrainId) {
+        try {
+            def fromStrainIds = fromStrainIdsStr.split(",").toList()
+            
+            def toStrain = Strain.get(toStrainId)
+            if (!toStrain) {
+                throw new UtilityException(message: "Strain ${toStrainId} does not exist!")
+            }
+            
+            fromStrainIds.each { it ->
+                def fromStrainId = it.trim()
+                def fromStrain = Strain.get(fromStrainId)
+                if(!fromStrain) {
+                    throw new UtilityException(message: "Strain ${fromStrainId} does not exist!")
+                }
+
+                utilityService.mergeRowsInDb('strain', fromStrain.id, toStrain.id)
+            }
+            
+            flash.message = "Strains have been successfully merged."
+        } catch(UtilityException e) {
+            flash.message = e.message
+        }
+        redirect(action: "index")
     }
     
 }

@@ -4,10 +4,13 @@ import grails.validation.ValidationException
 import static org.springframework.http.HttpStatus.*
 import pegr.AdminCategory
 import pegr.CellSourceTreatment
+import groovy.sql.Sql
 
 class CellSourceTreatmentAdminController {
 
     CellSourceTreatmentService cellSourceTreatmentService
+    def dataSource
+    def utilityService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -114,6 +117,38 @@ class CellSourceTreatmentAdminController {
             }
             '*'{ render status: NOT_FOUND }
         }
+    }
+    
+    def mergeCellSourceTreatments(String fromCellSourceTreatmentNamesStr, String toCellSourceTreatmentName) {
+        try {
+            def fromCellSourceTreatmentNames = fromCellSourceTreatmentNamesStr.split(",").toList()
+            
+            def toCellSourceTreatment = CellSourceTreatment.findByName(toCellSourceTreatmentName)
+            if (!toCellSourceTreatment) {
+                throw new UtilityException(message: "Cell source treatment ${toCellSourceTreatmentName} does not exist!")
+            }
+            
+            def sql = new Sql(dataSource)
+            fromCellSourceTreatmentNames.each { it ->
+                def fromCellSourceTreatmentName = it.trim()
+                def fromCellSourceTreatment = CellSourceTreatment.findByName(fromCellSourceTreatmentName)
+                if(!fromCellSourceTreatment) {
+                    throw new UtilityException(message: "Cell source treatment ${fromCellSourceTreatmentName} does not exist!")
+                }
+                try {
+                    utilityService.updateLinksInDb('sample_treatments', 'sample', 'treatment', fromCellSourceTreatment.id, toCellSourceTreatment.id, sql)
+                    fromCellSourceTreatment.delete()
+                } catch(Exception e) {
+                    log.error e
+                    throw new UtilityException(message: "Error merging cell source treatment ${fromCellSourceTreatmentName}!")
+                }
+            }
+
+            flash.message = "Cell source treatments have been successfully merged."
+        } catch(UtilityException e) {
+            flash.message = e.message
+        }
+        redirect(action: "index")
     }
 
 	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS

@@ -8,6 +8,7 @@ import pegr.AdminCategory
 class TissueAdminController {
 
     TissueService tissueService
+    def utilityService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -114,6 +115,32 @@ class TissueAdminController {
             }
             '*'{ render status: NOT_FOUND }
         }
+    }
+    
+    def mergeTissues(String fromTissueNamesStr, String toTissueName) {
+        try {
+            def fromTissueNames = fromTissueNamesStr.split(",").toList()
+            
+            def toTissue = Tissue.findByName(toTissueName)
+            if (!toTissue) {
+                throw new UtilityException(message: "Tissue ${toTissueName} does not exist!")
+            }
+            
+            fromTissueNames.each { it ->
+                def fromTissueName = it.trim()
+                def fromTissue = Tissue.findByName(fromTissueName)
+                if(!fromTissue) {
+                    throw new UtilityException(message: "Tissue ${fromTissueName} does not exist!")
+                }
+
+                utilityService.mergeRowsInDb('tissue', fromTissue.id, toTissue.id)
+            }
+            
+            flash.message = "Tissues have been successfully merged."
+        } catch(UtilityException e) {
+            flash.message = e.message
+        }
+        redirect(action: "index")
     }
     
 	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS

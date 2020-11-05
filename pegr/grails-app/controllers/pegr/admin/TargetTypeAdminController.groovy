@@ -8,6 +8,7 @@ import pegr.TargetType
 class TargetTypeAdminController {
 
     TargetTypeService targetTypeService
+    def utilityService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -114,6 +115,32 @@ class TargetTypeAdminController {
             }
             '*'{ render status: NOT_FOUND }
         }
+    }
+    
+    def mergeTargetTypes(String fromTargetTypeNamesStr, String toTargetTypeName) {
+        try {
+            def fromTargetTypeNames = fromTargetTypeNamesStr.split(",").toList()
+            
+            def toTargetType = TargetType.findByName(toTargetTypeName)
+            if (!toTargetType) {
+                throw new UtilityException(message: "Target type ${toTargetTypeName} does not exist!")
+            }
+            
+            fromTargetTypeNames.each { it ->
+                def fromTargetTypeName = it.trim()
+                def fromTargetType = TargetType.findByName(fromTargetTypeName)
+                if(!fromTargetType) {
+                    throw new UtilityException(message: "Target type ${fromTargetTypeName} does not exist!")
+                }
+
+                utilityService.mergeRowsInDb('target_type', fromTargetType.id, toTargetType.id)
+            }
+            
+            flash.message = "Target types have been successfully merged."
+        } catch(UtilityException e) {
+            flash.message = e.message
+        }
+        redirect(action: "index")
     }
     
 	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS

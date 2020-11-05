@@ -14,6 +14,23 @@
             <input name="str">
             <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>
         </g:form>
+        <div>                    
+            <button data-toggle="collapse" data-target="#merge"  aria-expanded="false" class="btn btn-default">Merge Target Type <span class="expand_caret caret"></span></button>
+            <div id="merge" class="collapse well">
+                <p>Please provide target type names below. Multiple target types can be provided in the "From" field and should be delimited by comma ",".</p>
+                <g:form action="mergeTargetTypes">
+                <div class="form-group">
+                    <label>From</label>
+                    <input name="fromTargetTypeNamesStr" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>To</label>
+                    <input name="toTargetTypeName" class="form-control">
+                </div>
+                <g:submitButton name="submit" value="Merge" class="edit"></g:submitButton>
+                </g:form>
+            </div>
+        </div>
         <div id="list-targetType" class="content scaffold-list" role="main">
             <h1><g:message code="default.list.label" args="[entityName]" /></h1>
             <g:if test="${flash.message}">

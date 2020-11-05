@@ -8,6 +8,7 @@ import pegr.Species
 class SpeciesAdminController {
 
     SpeciesService speciesService
+    def utilityService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -114,6 +115,32 @@ class SpeciesAdminController {
             }
             '*'{ render status: NOT_FOUND }
         }
+    }
+    
+    def mergeSpecies(String fromSpeciesIdsStr, String toSpeciesId) {
+        try {
+            def fromSpeciesIds = fromSpeciesIdsStr.split(",").toList()
+            
+            def toSpecies = Species.get(toSpeciesId)
+            if (!toSpecies) {
+                throw new UtilityException(message: "Species ${toSpeciesId} does not exist!")
+            }
+            
+            fromSpeciesIds.each { it ->
+                def fromSpeciesId = it.trim()
+                def fromSpecies = Species.get(fromSpeciesId)
+                if(!fromSpecies) {
+                    throw new UtilityException(message: "Species ${fromSpeciesId} does not exist!")
+                }
+
+                utilityService.mergeRowsInDb('species', fromSpecies.id, toSpecies.id)
+            }
+            
+            flash.message = "Speciess have been successfully merged."
+        } catch(UtilityException e) {
+            flash.message = e.message
+        }
+        redirect(action: "index")
     }
     
 	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS

@@ -7,7 +7,7 @@ class ProtocolItemTypes {
     ProtocolItemFunction function
     
     static constraints = {
-        protocol unique: 'itemType'
+        protocol unique: ['itemType', 'function']
     }
         
     static mapping = {

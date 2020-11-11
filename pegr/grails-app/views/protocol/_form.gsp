@@ -16,17 +16,24 @@
 <div class=" ${hasErrors(bean: protocol, field: 'description', 'error')} ">
 	<label for="description">Description</label>
 	<g:textArea name="description" value="${protocol?.description}"/>
-
 </div>
 
 <div>
     <label for="sharedItem">Shared Item Types (multi-select)</label>
-    <g:select name="sharedItemTypeIds" class="sharedItem" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.OTHER}.list(sort:'name')}" optionKey="id" value="${sharedItemTypeIds}" multiple="multiple" size="10" style="width: 200px"/>
+    <select name="sharedItemTypeIds" class="other-type" multiple="multiple">
+        <g:each var="sharedItemType" in="${sharedItemTypes}">
+        <option value="${sharedItemType?.id}" selected>${sharedItemType?.name}</option>
+        </g:each>
+    </select>
 </div>
 
 <div>
     <label for="endProduct">End Product Type (multi-select)</label>
-    <g:select name="endProductTypeIds" class="sharedItem" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.OTHER}.list(sort:'name')}" optionKey="id" value="${endProductTypeIds}" multiple="multiple" size="10" style="width: 200px"/>
+    <select name="endProductTypeIds" class="other-type" multiple="multiple">
+        <g:each var="endProductType" in="${endProductTypes}">
+        <option value="${endProductType?.id}" selected>${endProductType?.name}</option>
+        </g:each>
+    </select>
 </div>
 
 <div>
@@ -38,11 +45,15 @@
 <h4>Traced Samples</h4>
 <div>
     <label for="startItem">Start State</label>
-    <g:select name="startItemTypeId" id="startItem" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.TRACED_SAMPLE}.list(sort:'name')}" optionKey="id" value="${startItemTypeId}" noSelection="['null':'N/A']"/>
+    <select name="startItemTypeId" class="traced-sample" id="startItem">
+        <option value="${startItemType?.id}">${startItemType?.name}</option>
+    </select>
 </div>
 <div>
     <label for="endItem">End State</label>
-    <g:select name="endItemTypeId" id="endItem" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.TRACED_SAMPLE}.list(sort:'name')}" optionKey="id" value="${endItemTypeId}" noSelection="['null':'N/A']"/>
+    <select name="endItemTypeId" class="traced-sample" id="endItem">
+        <option value="${endItemType?.id}">${endItemType?.name}</option>
+    </select>
 </div>
 
 <div>    
@@ -54,10 +65,18 @@
 <h4>Sample Pool</h4>
 <div>
     <label for="startPool"><abbr title="A pre-existing pool that has been generated in the previous protocol.">Import Pool</abbr></label>
-    <g:select name="startPoolTypeId" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.SAMPLE_POOL}.list(sort:'name')}" optionKey="id" value="${startPoolTypeId}" noSelection="['null':'N/A']"/>
-    
+    <select name="startPoolTypeId" class="sample-pool" id="startPool">
+        <option value="${startPoolType?.id}">${startPoolType?.name}</option>
+    </select>    
     <label for="endPool"><abbr title="A new pool that will be generated at the end of this protocol.">Create Pool</abbr></label>
-    <g:select name="endPoolTypeId" from="${pegr.ItemType.where{category.superCategory==pegr.ItemTypeSuperCategory.SAMPLE_POOL}.list(sort:'name')}" optionKey="id" value="${endPoolTypeId}" noSelection="['null':'N/A']"/>
+    <select name="endPoolTypeId" class="sample-pool" id="endPool">
+        <option value="${endPoolType?.id}">${endPoolType?.name}</option>
+    </select>
+</div>
+
+<div class=" ${hasErrors(bean: protocol, field: 'url', 'error')} ">
+	<label for="url">URL</label>
+	<g:textField name="url" value="${protocol?.url}"/>
 </div>
 
 <sec:ifAllGranted roles="ROLE_ADMIN">
@@ -66,4 +85,29 @@
 
 <script>
     $(".sharedItem").select2();
+    
+    var noTagPlaceholder = "Select...";
+    
+    $.ajax({url: "/pegr/itemType/fetchItemTypesAjax?superCatalog=TRACED_SAMPLE", success: function(result){
+        $(".traced-sample").select2({
+            data: result,
+            placeholder: noTagPlaceholder
+        });
+       
+    }});
+    
+    $.ajax({url: "/pegr/itemType/fetchItemTypesAjax?superCatalog=SAMPLE_POOL", success: function(result){
+        $(".sample-pool").select2({
+            data: result,
+            placeholder: noTagPlaceholder
+        });
+       
+    }});
+    
+    $.ajax({url: "/pegr/itemType/fetchItemTypesAjax?superCatalog=OTHER", success: function(result){
+        $(".other-type").select2({
+            data: result,
+            placeholder: noTagPlaceholder
+        });       
+    }});
 </script>

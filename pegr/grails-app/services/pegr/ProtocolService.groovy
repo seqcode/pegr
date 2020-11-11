@@ -21,12 +21,10 @@ class ProtocolService {
 
             protocolItemTypeIds.each{ itemFunction, typeIds ->
                 typeIds.each { id ->
-                    try {
-                        def itemType = ItemType.get(id)
-                        if (itemType) {
-                            newTypes.push(new ProtocolItemTypes(protocol: protocol, itemType: itemType, function: itemFunction))
-                        }
-                    } catch(Exception e) {}
+                    def itemType = ItemType.get(id)
+                    if (itemType) {
+                        newTypes.push(new ProtocolItemTypes(protocol: protocol, itemType: itemType, function: itemFunction))
+                    }
                 }
             }
             
@@ -35,13 +33,15 @@ class ProtocolService {
                 if (oldType) {
                     toDelete.remove(oldType)
                 } else {
-                    t.save()
+                    t.save(flush: true, failOnError: true)
                 }
             }
+            
             toDelete.each { 
                 it.delete()
             }
         } catch(Exception e) {
+            log.error "Error: ${e.message}", e
             throw new ProtocolException(message: "Invalid inputs!")
         }
     }

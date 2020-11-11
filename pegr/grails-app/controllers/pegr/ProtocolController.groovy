@@ -62,13 +62,13 @@ class ProtocolController {
                     protocolService.save(protocol, protocolItemTypeIds)
                 } catch (ProtocolException e) {
                     request.message = e.message
-                    render(view: "create", model: [protocol: protocol, 
-                        startItemTypeId:params.startItemTypeId,
-                        endItemTypeId:params.endItemTypeId,
-                        endProductTypeIds:params.endProductTypeIds,
-                        sharedItemTypeIds:params.sharedItemTypeIds,
-                        startPoolTypeId:params.startPoolTypeId,
-                        endPoolTypeId:params.endPoolTypeId])
+                    render(view: "create", model: [protocol: protocol,
+                        startItemType: protocol?.startItemType,
+                        endItemType: protocol?.endItemType,
+                        sharedItemTypes: protocol?.sharedItemTypes,
+                        endProductTypes: protocol?.endProductTypes,
+                        startPoolType: protocol?.startPoolType,
+                        endPoolType: protocol?.endPoolType])
                     return
                 }
                 try {
@@ -107,22 +107,22 @@ class ProtocolController {
                 }catch(ProtocolException e) {
                     request.message = e.message
                     render(view: "edit", model: [protocol: protocol,
-                        startItemTypeId:params.startItemTypeId,
-                        endItemTypeId:params.endItemTypeId,
-                        sharedItemTypeIds:params.sharedItemTypeIds,
-                        endProductTypeIds:params.endProductTypeIds,
-                        startPoolTypeId:params.startPoolTypeId,
-                        endPoolTypeId:params.endPoolTypeId])
+                        startItemType: protocol?.startItemType,
+                        endItemType: protocol?.endItemType,
+                        sharedItemTypes: protocol?.sharedItemTypes,
+                        endProductTypes: protocol?.endProductTypes,
+                        startPoolType: protocol?.startPoolType,
+                        endPoolType: protocol?.endPoolType])
                 }
             }
-        }else {
+        } else {
             [protocol: protocol,
-            startItemTypeId:protocol?.startItemType?.id,
-            endItemTypeId:protocol?.endItemType?.id,
-            sharedItemTypeIds:protocol?.sharedItemTypes*.id,
-            endProductTypeIds:protocol?.endProductTypes*.id,
-            startPoolTypeId:protocol?.startPoolType?.id,
-            endPoolTypeId:protocol?.endPoolType?.id]
+            startItemType: protocol?.startItemType,
+            endItemType: protocol?.endItemType,
+            sharedItemTypes: protocol?.sharedItemTypes,
+            endProductTypes: protocol?.endProductTypes,
+            startPoolType: protocol?.startPoolType,
+            endPoolType: protocol?.endPoolType]
         }
     }
     

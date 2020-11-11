@@ -2487,4 +2487,5 @@ databaseChangeLog = {
     changeSet(author: "danyingshao (generated)", id: "1580764544352-239") {
         addForeignKeyConstraint(baseColumnNames: "species_id", baseTableName: "growth_media", constraintName: "FKte5f01yhaud29abdr878pjgsi", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "species", validate: "true")
     }
+    include file: 'updateProtocol.groovy'
 }

@@ -44,7 +44,7 @@
             </ul>
             
             <h4>Required Images</h4>
-            <ul>${protocol.images}</ul>
+            <ul>${protocol?.images}</ul>
             
             <h4>Traced Sample</h4>
             <ul>
@@ -61,6 +61,10 @@
                 <li>Import Pool: ${protocol?.startPoolType}</li>
                 <li>Create Pool: ${protocol?.endPoolType}</li>
             </ul>
+             <g:if test="${protocol?.url}">
+                <h4>URL</h4>
+                <a href="${protocol?.url}">${protocol?.url}</a>
+            </g:if>
             <h4>Protocol File</h4>
             <g:if test="${file}">
                 <g:link action="renderFile" params="[protocolId: protocol?.id]" target="_blank">${file.getName()}</g:link>

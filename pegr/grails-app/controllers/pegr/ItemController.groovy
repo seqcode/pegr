@@ -101,7 +101,7 @@ class ItemController {
                             flash.message = "The item with barcode ${barcode} has type ${item.type.name}, which does not match the input type ${itemType.name}!"
                             redirect(action: "list", params: [typeId: typeId])
                         }                        
-                    }else {
+                    } else {
                         item = new Item(type: itemType, barcode: barcode)
                         switch (itemType.category.superCategory) {
                             case ItemTypeSuperCategory.ANTIBODY:
@@ -114,11 +114,11 @@ class ItemController {
                                 render(view: "create", model: [item: item])
                         }
                     }
-                }else {
+                } else {
                     flash.message = "Item type not found!"
                     redirect(action: "list", params: [typeId: typeId])
                 }
-            }else {
+            } else {
                 flash.message = "Barcode cannot be empty!"
                 redirect(action: "list", params: [typeId: typeId])
             }

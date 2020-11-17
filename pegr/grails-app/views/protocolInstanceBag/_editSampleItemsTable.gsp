@@ -8,7 +8,7 @@
         <thead>
             <g:if test="${children}">
                 <th>Start State:<br>${protocolInstance?.protocol?.startItemType}</th>
-                <th>End State:<g:if test="${!children.any { it }}"><g:link action="addAllChildren" params="[instanceId: protocolInstance.id]" class="edit">+All</g:link></g:if><br>${protocolInstance?.protocol?.endItemType}</th>  
+                <th>End State:<g:if test="${!children.any { it }}"><g:link action="addAllChildren" params="[instanceId: protocolInstance.id]" class="edit" style="color:white">+All</g:link></g:if><br>${protocolInstance?.protocol?.endItemType}</th>  
             </g:if>
             <g:else>
                 <th>Sample</th>

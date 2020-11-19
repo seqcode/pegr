@@ -47,7 +47,12 @@ class ItemService {
                 }
                 def sample = Sample.findByItem(item) 
                 if (sample) {
-                    throw new ItemException(message: "This traced sample cannot be deleted because it has been attached to a sample!")
+                    try {
+                        sample.delete(flush: true)
+                    } catch (Exception e) {
+                        log.error "Error: ${e.message}", e
+                        throw new ItemException(message: "This traced sample cannot be deleted because the associated sample cannot be deleted!")
+                    }
                 }
                 // delete cell source
                 def cellSource = CellSource.findByItem(item)

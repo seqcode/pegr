@@ -14,7 +14,11 @@ class ProtocolInstance {
     String images
 	
     def getImageMap() {
-        return utilityService.parseJson(this.images)
+        if (this.images) {
+            return utilityService.parseJson(this.images)
+        } else {
+            return null
+        }
     }
     
     static constraints = {

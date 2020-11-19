@@ -23,27 +23,27 @@
     </g:if>
     
     <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#split">Split and Add Sample(s)</a></li>
-        <li><a data-toggle="tab" href="#import-sample">Import Sample(s)</a></li>
-        <g:if test="${priorInstance}"><li><a data-toggle="tab" href="#import-bag">Import Entire Bag</a></li>
+        <li class="active"><a data-toggle="tab" href="#import-sample">Import Sample(s)</a></li>
+        <g:if test="${priorInstance}"><li><a data-toggle="tab" href="#import-bag">Import All Samples from Work Record</a></li>
         </g:if>
+        <li><a data-toggle="tab" href="#split">Split and Add Sample(s)</a></li>
     </ul>
 
     <div class="tab-content">
-        <div id="split" class="tab-pane fade in active">
-            <p>You will take a portion of the above sample and work only on that portion.</p>
-            <g:submitButton class="btn btn-primary" name="split" value="Submit"></g:submitButton>
-        </div>
-        <div id="import-sample" class="tab-pane fade">
+        <div id="import-sample" class="tab-pane fade in active">
             <p>You will continue working on the above sample.</p>
             <g:submitButton class="btn btn-primary" name="add" value="Submit">Import Sample</g:submitButton>
         </div>
         <g:if test="${priorInstance}">
         <div id="import-bag" class="tab-pane fade">
-            <p>You will continue working on all the samples in the above protocol instance.</p>
+            <p>You will continue working on all the samples in the above experiment record.</p>
             <g:link action="addSubBagToBag" params="[instanceId: priorInstance.id, bagId: bagId]" class="btn btn-primary">Import Entire Bag</g:link>
         </div>
         </g:if>
+        <div id="split" class="tab-pane fade">
+            <p>You will take a portion of the above sample and work only on that portion.</p>
+            <g:submitButton class="btn btn-primary" name="split" value="Submit"></g:submitButton>
+        </div>
     </div>
     </g:form>
     <script>

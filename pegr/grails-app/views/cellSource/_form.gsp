@@ -114,7 +114,52 @@
                 tags: true,
                 placeholder: tagPlaceholder
             });
-        }})
+        }});
+        
+        var genus = $(".genus").val();
+        $.ajax({url: "/pegr/cellSource/fetchSpeciesAjax?genus="+genus, success: function(result){
+            $(".species").select2({
+                data: result,
+                tags: true,
+                placeholder: tagPlaceholder
+            });
+        }});
+        
+        var speciesId = $(".species").val();
+        $.ajax({url: "/pegr/cellSource/fetchParentStrainAjax?speciesId="+speciesId, success:   function(parents){
+            $(".parent-strain").select2({
+                data: parents,
+                tags: true,
+                placeholder: tagPlaceholder
+            });
+        }});
+        
+        var parentStrain = $(".parent-strain").val();
+        $.ajax({url: "/pegr/cellSource/fetchStrainNameAjax?parentStrain="+parentStrain+"&speciesId="+speciesId, success: function(result){
+            $(".strain").select2({
+                data: result,
+                tags: true,
+                placeholder: tagPlaceholder
+            });
+        }});
+        
+        var strainName = $(".strain").val();
+        $.ajax({url: "/pegr/cellSource/fetchGenotypeAjax?strainName="+strainName, success: function(result){
+            $(".genotype").select2({
+                data: result,
+                tags: true,
+                placeholder: tagPlaceholder
+            });
+        }});
+        
+        var genometype = $(".genotype").val();
+        $.ajax({url: "/pegr/cellSource/fetchMutationAjax?strainName="+strainName+"&genotype="+genotype, success: function(result){
+            $(".mutation").select2({
+                data: result,
+                tags: true,
+                placeholder: tagPlaceholder
+            });
+        }});
     }
     
     // ajax calls in cascade selections
@@ -154,19 +199,6 @@
             });
         }});
         $parentStrain.prop("disabled", false);
-        
-        
-        var $genomes = $(".genomes");
-        $genomes.html('').select2({
-            data: [{id: '', text: ''}],
-        });
-        $.ajax({url: "/pegr/cellSource/fetchGenomeAjax?speciesId="+speciesId, success: function(genomes){
-            $genomes.select2({
-                data: genomes,
-                placeholder: noTagPlaceholder
-            });
-        }});
-        $genomes.prop("disabled", false);
     });
             
     $(".parent-strain").on("change", function() {

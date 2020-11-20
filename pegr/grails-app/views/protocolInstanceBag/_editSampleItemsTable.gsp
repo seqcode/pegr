@@ -38,6 +38,7 @@
                     </g:if>
                     <g:if test="${protocolInstance?.protocol?.addAntibody}">
                         <td>
+                          <g:if test="${children}">
                             <g:if test="${children[n]?.antibody}">
                                 <g:link controller="antibody" action="show" id="${children[n].antibody.id}" target="_blank">${children[n].antibody}</g:link>
                                 <g:link action="removeAntibodyFromTracedSample" params="[itemId: children[n].id, instanceId: instanceId]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link>
@@ -45,15 +46,34 @@
                             <g:elseif test="${children[n]}">
                                 <g:link action="searchAntibody" params="[itemId:children[n].id, instanceId:instanceId]"><span class="glyphicon glyphicon-plus"></span></g:link>
                             </g:elseif>
+                          </g:if>
+                          <g:else>
+                              <g:if test="${parents[n]?.antibody}">
+                                <g:link controller="antibody" action="show" id="${parents[n].antibody.id}" target="_blank">${parents[n].antibody}</g:link>
+                                <g:link action="removeAntibodyFromTracedSample" params="[itemId: parents[n].id, instanceId: instanceId]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link>
+                            </g:if>
+                            <g:elseif test="${parents[n]}">
+                                <g:link action="searchAntibody" params="[itemId:parents[n].id, instanceId:instanceId]"><span class="glyphicon glyphicon-plus"></span></g:link>
+                            </g:elseif>
+                          </g:else>  
                         </td> 
                     </g:if>
                     <g:if test="${protocolInstance?.protocol?.addIndex}">
                         <td>
-                            <g:if test="${children[n]}">
+                          <g:if test="${children}">
+                              <g:if test="${children[n]}">
                                 <g:hiddenField name="itemId" value="${children[n].id}"/>
-                                <g:textField name="indexId" value="${children[n].sequenceIndicesString}" size="50"/>
-                                ${children[n].sequenceIndicesIdString}
+                                <g:textField name="indexId" value="${children[n].sequenceIndicesIdString}" size="50"/>
+                                ${children[n].sequenceIndicesString}
                             </g:if>
+                          </g:if>    
+                          <g:else>
+                              <g:if test="${parents[n]}">
+                                <g:hiddenField name="itemId" value="${parents[n].id}"/>
+                                <g:textField name="indexId" value="${parents[n].sequenceIndicesIdString}" size="50"/>
+                                ${parents[n].sequenceIndicesString}
+                            </g:if>
+                          </g:else>
                         </td>
                     </g:if>
                 </tr>
@@ -61,8 +81,8 @@
         </tbody>
     </table>
     <g:if test="${protocolInstance?.protocol?.addIndex}">
-    <div class="row">
-        <g:submitButton name="save" class="btn btn-primary pull-right" value="Save Index"></g:submitButton>
+    <div class="text-center" style="margin:12px">
+        <g:submitButton name="save" class="btn btn-primary" value="Save Index"></g:submitButton>
     </div>
     </g:if>
 </g:form>

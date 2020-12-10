@@ -16,6 +16,7 @@ class QfileException extends RuntimeException {
 class QfileService {
     def cellSourceService
     def sampleService
+    def springSecurityService
     def antibodyService
     def utilityService
     final int timeout = 1000 * 60 * 2; 
@@ -67,9 +68,7 @@ class QfileService {
     } 
     
     @NotTransactional
-    def migrateXlsx(String sampleSheet, String laneSheet, RunStatus runStatus, int startLine, int endLine, int laneLine, boolean basicCheck) {
-        getDefaultUser()     
-        
+    def migrateXlsx(String sampleSheet, String laneSheet, RunStatus runStatus, int startLine, int endLine, int laneLine, boolean basicCheck) {   
         // get data from the lane sheet
         def laneData = getLaneData(laneSheet, laneLine)
         
@@ -274,12 +273,13 @@ class QfileService {
         def username = null
 		
 		// try to get username from email
-		if (emailStr && emailStr != 'bfp2@psu.edu') {
-			def at = emailStr.indexOf('@')
-			if (at > 0) {
-				username = emailStr[0..<at]
-			}
-		}
+        if (emailStr) {
+            def at = emailStr.indexOf('@')
+            if (at > 0) {
+                username = emailStr[0..<at]
+            }
+        }
+
 		// try to get fullname
 		if(userStrRaw.contains(",")) {
 			fullname = userStrRaw.split(",")*.trim()*.toLowerCase()*.capitalize().join(', ')
@@ -309,12 +309,12 @@ class QfileService {
 	        }
 	        
 	        def admin = User.get(1)	        
-	        def password = admin.password
+	        def password = springSecurityService.encodePassword(utilityService.getRandomString(15))
 
 	        user = new User(username: username, password: password, fullName: fullname, email: emailStr, phone: phoneStr).save( failOnError: true)
         } else {
 			def flag = 0
-            if (user.email == null && emailStr && emailStr != 'bfp2@psu.edu') {
+            if (user.email == null && emailStr) {
                 user.email = emailStr
 				flag = 1
 				
@@ -812,21 +812,6 @@ class QfileService {
         }
 	    return date
 	}
-    
-    def getDefaultUser() {
-		def admin = User.get(1)
-		def password = admin.password
-		
-        def user = User.findByUsername("bfp2")
-        if (!user) {    
-            new User(username: "bfp2", email: "bfp2@psu.edu", fullName: "Pugh, Frank", password: password).save( failOnError:true) 
-        }
-		
-		if (!User.findByUsername("npf5017")) {
-			new User(username: "npf5017", email: "npf5017@psu.edu", fullName: "Farrell, Nina", password: password, phone: "8148638594").save( failOnError:true) 
-		}
-		
-    }
     
     /**
      * Given a sequence run's ID, export the Qfile of the sequence run, 

@@ -333,9 +333,20 @@ class SequenceRunController {
                 
                 def filepath = fileDest.getPath()
                 def startLine = params.int("startLine")
+                if (!startLine) {
+                    throw new QfileException(message: "Please enter the start line of the sample sheet!")
+                }
+                
                 def endLine = params.int("endLine")
+                if (!endLine) {
+                    throw new QfileException(message: "Please enter the end line of the sample sheet!")
+                }
+                
                 def laneLine = params.int("laneLine")
-
+                if (!laneLine) {
+                    throw new QfileException(message: "Please enter the line of the lane sheet!")
+                }
+                
                 def csvNames = qfileService.convertXlsxToCsv(folder, filepath, params.sampleSheet, params.laneSheet)
                 
                 // check file for potential errors, e.g. unreasonal number of new projects
@@ -369,7 +380,7 @@ class SequenceRunController {
             }
         } catch(Exception e) {
             log.error "Error: ${e.message}", e
-            flash.messageList = ["Error uploading the file!"]
+            flash.messageList = ["Error uploading the file! ${e.message}"]
         }
 
         redirect(action: "index")

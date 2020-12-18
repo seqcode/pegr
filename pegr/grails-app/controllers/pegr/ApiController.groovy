@@ -17,9 +17,6 @@ class ApiController {
                             deleteAnalysisHistories: 'POST'
                             ]
     
-    def help() {
-    }
-    
     /**
      * Accept post request, authenticate by the API Key, to save data into Analysis, 
      * and parse data prior to and including the Alignment.

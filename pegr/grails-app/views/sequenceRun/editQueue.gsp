@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>Workbench</title> 
-    <meta name="layout" content="analysis"/>
+    <meta name="layout" content="sequencing"/>
     <style>
         form {
             max-width: 50em;

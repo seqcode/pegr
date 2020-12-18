@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>My Reports</title> 
-    <meta name="layout" content="analysis"/>
+    <meta name="layout" content="sequencing"/>
     <asset:javascript src="meme.js"/>
     <asset:stylesheet href="meme.css"/>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>

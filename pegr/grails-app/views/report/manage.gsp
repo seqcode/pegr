@@ -1,7 +1,7 @@
 <html>
     <head>
         <title>PEGR - Analysis Status</title> 
-        <meta name="layout" content="analysis"/>
+        <meta name="layout" content="sequencing"/>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
         <style>
             .fa {

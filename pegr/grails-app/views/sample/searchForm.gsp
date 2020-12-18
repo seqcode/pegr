@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="layout" content="analysis">
+    <meta name="layout" content="main">
     <title>Sample-Search</title>
 </head>
 <body>
@@ -41,6 +41,6 @@
         </g:form>
     </div>
     <script>
-    $(".nav-search-sample").addClass("active");
+    $("#nav-samples").addClass("active");
     </script>
 </body>

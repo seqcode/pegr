@@ -1,7 +1,6 @@
 <html>
     <head>
-        <title>PEGR Help</title>
-        <asset:stylesheet href="application.css"/>
+        <meta name="layout" content="help">
     </head>
     <body>
         <div class="container-fluid">
@@ -207,5 +206,8 @@
                 <p>You can learn more about a step with data received by clicking the colored label. A snippet will pop over, including the step's name, error message and notes. An admin can change the step's status by clicking the <span class="glyphicon glyphicon-pencil"></span> inside the snippet and following the instructions.</p>
             </div>
         </div>
+         <script>
+            $(".help-experiments").addClass("active");
+         </script>
     </body>
 </html>

@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>Sequencing Records</title>
-    <meta name="layout" content="analysis"/>
+    <meta name="layout" content="sequencing"/>
 </head>
 <body>
 <div class="container-fluid">

@@ -22,9 +22,9 @@
                         <li id="nav-inventory"><g:link controller="item">Inventory</g:link></li>
                         <li id="nav-protocols"><g:link controller="protocol" action="labProtocols">Protocols</g:link></li>
                         <li id="nav-experiments"><g:link controller="protocolInstanceBag" action="list">Experiments</g:link></li>
-                        <li id="nav-analysis"><g:link controller="sequenceRun" action="index">Sequencing Reports</g:link></li>
-                        <!-- pjchaffin | Pierce Chaffin : Fixes redirect for Bioinformatics Btn from linking to Genome Build to API help page -->
-                        <li id="nav-bioinformatics"><g:link controller="api" action="help">Bioinformatics</g:link></li>
+                        <li id="nav-sequencing"><g:link controller="sequenceRun" action="index">Sequencing Reports</g:link></li>
+                        <li id="nav-samples"><g:link controller="sample" action="all">Samples</g:link></li>
+                        <li id="nav-guide"><g:link controller="help" action="index">Guide</g:link></li>
                     </sec:ifAnyGranted>
                     <sec:ifAnyGranted roles="ROLE_ADMIN">
                         <li id="nav-admin"><g:link controller="admin" action="index">Admin</g:link></li>

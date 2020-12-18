@@ -1,7 +1,6 @@
 <html>
 <head>
-    <title>Workbench</title> 
-    <meta name="layout" content="main"/>
+    <meta name="layout" content="sequencing"/>
 </head>
 <body>
     <div class="container-fluid">
@@ -31,8 +30,5 @@
             </div>
         </g:form>
     </div>
-    <script>
-        $("#nav-bench").addClass("active");
-     </script>
 </body>
 </html>

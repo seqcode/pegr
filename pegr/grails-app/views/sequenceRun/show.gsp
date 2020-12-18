@@ -1,7 +1,6 @@
 <html>
 <head>
-    <title>Workbench</title> 
-    <meta name="layout" content="main"/>
+    <meta name="layout" content="sequencing"/>
     <style>
         .btn {
             padding: 0 5px;
@@ -264,7 +263,7 @@
         </g:else>
     </div>
     <script>
-        $("#nav-analysis").addClass("active");
+        $("#nav-sequencing").addClass("active");
         
         $(".confirm").confirm();
         $(".confirm-remove-sample").confirm({text: "Remove the sample from this sequence run. All the analysis data will be removed, but the sample itself remains."});

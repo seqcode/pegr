@@ -1,6 +1,6 @@
 <html>
 <head>
-    <meta name="layout" content="bioinformatics">
+    <meta name="layout" content="help">
 </head>
 <body>
     <div class="row">
@@ -561,7 +561,7 @@ print(results["message"])
     </div>
     <script>
         $(function(){
-            $(".api").addClass("active");
+            $(".help-api").addClass("active");
             
             $(".chapter").each(function(){
                 var h3 = $(this).find("h3");

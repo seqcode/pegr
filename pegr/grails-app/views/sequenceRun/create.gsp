@@ -1,7 +1,6 @@
 <html>
 <head>
-    <title>Workbench</title> 
-    <meta name="layout" content="analysis"/>
+    <meta name="layout" content="sequencing"/>
 </head>
 <body>
 <div class="container-fluid">
@@ -21,9 +20,6 @@
             <g:link action="index" class="btn btn-default">Cancel</g:link>
         </div>
     </g:form>
-    <script>
-        $("#nav-bench").addClass("active");
-     </script>
 </div>
 </body>
 </html>

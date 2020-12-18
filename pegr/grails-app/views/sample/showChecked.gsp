@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>Samples</title> 
-    <meta name="layout" content="analysis"/>
+    <meta name="layout" content="main"/>
     <asset:javascript src="meme.js"/>
     <asset:stylesheet href="meme.css"/>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -25,7 +25,7 @@
 
     <script>
         $(function(){
-            $(".nav-datasets").addClass("active");       
+            $("#nav-samples").addClass("active");       
             $.ajax({url: "/pegr/sample/fetchDataForCheckedSamplesAjax", success: function(result) {
                 $("#details").html(result);
             }});

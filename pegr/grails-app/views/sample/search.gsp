@@ -1,7 +1,7 @@
 <html>
 <head>
     <title>Samples</title>
-    <meta name="layout" content="analysis"/>
+    <meta name="layout" content="main"/>
     <asset:javascript src="cookie.js"/>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
@@ -21,7 +21,7 @@
     </div>
     <script>
         $(function(){
-            $("#nav-datasets").addClass("active");
+            $("#nav-samples").addClass("active");
         });
 
         $(document).ready(function(){

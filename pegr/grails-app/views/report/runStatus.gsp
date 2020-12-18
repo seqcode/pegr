@@ -2,7 +2,7 @@
 <head>
     <title>PEGR - Analysis Status</title> 
     <g:set var="isAdmin" value="${isAdmin}" scope="request"/>
-    <meta name="layout" content="analysis"/>
+    <meta name="layout" content="sequencing"/>
     <asset:javascript src="meme.js"/>
     <asset:stylesheet href="meme.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">

@@ -23,15 +23,66 @@
                 </g:eachError>
             </ul>
             </g:hasErrors>
-            <g:form action="update" id="${this.organizationInstance.id}" method="PUT">
+            <g:form action="update" id="${this.organizationInstance?.id}" method="PUT">
                 <g:hiddenField name="version" value="${this.organizationInstance?.version}" />
                 <fieldset class="form">
-                    <f:all bean="organizationInstance"/>
+                    <div class="fieldcontain">
+                      <label for="parent">Parent</label>
+                      <g:select id="parent" name="parent.id" from="${pegr.Organization.list()}" optionKey="id" value="${this.organizationInstance?.parent?.id}" noSelection="['null': '']"/>
+                    </div>
+                    <div class="fieldcontain required">
+                      <label for="name">Name<span class="required-indicator">*</span></label>
+                      <input type="text" name="name" value="${this.organizationInstance?.name}" required="" id="name">
+                    </div>
+                    <div class="fieldcontain">
+                      <label for="note">Note</label>
+                      <input type="text" name="note" value="${this.organizationInstance?.note}" id="note">
+                    </div>
+                    <div class="fieldcontain">
+                        <label>
+                        <input type="checkbox" id="add-address" name="addAddress" value="yes" checked> Add address</label> <br>
+                    </div>
+                    <div id="address-fields">
+                    <div class="fieldcontain">
+                        <label for="line1">Line 1</label>
+                        <input id="line1" type="text" name="address.line1" value="${this.organizationInstance?.address?.line1}">
+                    </div>
+                    <div class="fieldcontain">
+                        <label for="line2">Line 2</label>
+                        <input id="line2" type="text" name="address.line2" value="${this.organizationInstance?.address?.line2}">
+                    </div>
+                    <div class="fieldcontain">
+                        <label for="city">City</label>
+                        <input id="city" type="text" name="address.city" value="${this.organizationInstance?.address?.city}">
+                    </div>
+                    <div class="fieldcontain">
+                        <label for="state">State</label>
+                        <input id="state" type="text" name="address.state" value="${this.organizationInstance?.address?.state}">
+                    </div>
+                    <div class="fieldcontain">
+                        <label for="postalCode">Postal Code</label>
+                        <input id="postalCode" type="text" name="address.postalCode" value="${this.organizationInstance?.address?.postalCode}">
+                    </div>
+                    <div class="fieldcontain">
+                        <label for="country">Country</label>
+                        <input id="country" type="text" name="address.country" value="${this.organizationInstance?.address?.country}">
+                    </div>
+                    </div>
+                    <div class="fieldcontain">
+                      <label for="website">Website</label>
+                      <input type="url" name="website" value="${this.organizationInstance?.website}" id="website">
+                    </div>
+                    <f:field bean="organizationInstance" property="status"></f:field> 
                 </fieldset>
                 <fieldset class="buttons">
                     <input class="save" type="submit" value="${message(code: 'default.button.update.label', default: 'Update')}" />
                 </fieldset>
             </g:form>
         </div>
+        <script>
+            $("#add-address").click(function() {
+                $("#address-fields").toggle();
+            });
+        </script>
     </body>
 </html>

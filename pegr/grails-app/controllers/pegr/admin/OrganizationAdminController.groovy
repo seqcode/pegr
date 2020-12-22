@@ -41,13 +41,16 @@ class OrganizationAdminController {
         [organizationInstance: new Organization(params)]
     }
 
-    def save(Organization organization) {
+    def save(Organization organization, Boolean addAddress) {
         if (organization == null) {
             notFound()
             return
         }
 
         try {
+            if (!addAddress) {
+                organization.address = null
+            }
             organizationService.save(organization)
         } catch (ValidationException e) {
             respond organization.errors, view:'create'
@@ -67,16 +70,19 @@ class OrganizationAdminController {
         [organizationInstance: organizationService.get(id)]
     }
 
-    def update(Organization organization) {
+    def update(Organization organization, Boolean addAddress) {
         if (organization == null) {
             notFound()
             return
         }
 
         try {
+            if (!addAddress) {
+                organization.address = null
+            }
             organizationService.save(organization)
         } catch (ValidationException e) {
-            respond organization.errors, view:'edit'
+            render(view: "edit", model: [organizationInstance: organization])
             return
         }
 

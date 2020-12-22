@@ -11,6 +11,10 @@ class Organization {
 	String toString() {
 		name
 	}
+    
+    static mapping = {
+        address cascade: 'all-delete-orphan'
+    }
 	
     static constraints = {
 		parent nullable: true

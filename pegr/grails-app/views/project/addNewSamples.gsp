@@ -61,7 +61,7 @@
                     <th>Volume (ul)</th>
                     <th>Requested Tags (M)</th>
                     <th>Reference Genome(s)</th>
-                    <th><a href="#" onclick="window.open('${g.createLink(action:'sampleSubmissionHelp', fragment:'sequence-index')}', 'Help: Sample Submission', 'width=600,height=400' )">Index <span class="glyphicon glyphicon-question-sign"></span></a></th>
+                    <th><a href="#" onclick="window.open('${g.createLink(controller: 'help', action:'sequenceIndexHelp', fragment:'sequence-index')}', 'Help: Sequence Index', 'width=600,height=400' )">Index <span class="glyphicon glyphicon-question-sign"></span></a></th>
                     <th>Notes</th> 
                     <th>Company</th>
                     <th>Catalog</th>

@@ -3,6 +3,7 @@ package pegr
 class Assay {
 
     String name
+    String description
     
 	String toString() {
 		name
@@ -10,5 +11,6 @@ class Assay {
     
     static constraints = {
         name unique: true, matches: '^[0-9A-Za-z -]+$'
+        description blank: true, nullable: true
     }
 }

@@ -2,8 +2,17 @@ package pegr
 
 class HelpController {
     def index() {
+        
+    }
+    
+    def sequenceIndexHelp() {
         def allIndices = SequenceIndex.findAllByStatus(DictionaryStatus.Y).groupBy({ it -> it.indexVersion })
         [allIndices: allIndices]
+    }
+    
+    def assayHelp() {
+        def assays = Assay.findAll().sort { it.name }
+        [assays: assays]
     }
     
     def genomesHelp() {

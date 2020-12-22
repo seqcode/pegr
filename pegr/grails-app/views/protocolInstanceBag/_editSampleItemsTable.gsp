@@ -17,7 +17,7 @@
                 <th>Antibody</th>
             </g:if>
             <g:if test="${protocolInstance.protocol.addIndex}">
-                <th><a href="#" onclick="window.open('/pegr/help#sequence-index', 'Help: Sample Submission', 'width=600,height=400' )">Index <span class="glyphicon glyphicon-question-sign"></span></a> </th>
+                <th><a href="#" onclick="window.open('/pegr/help/sequenceIndexHelp#sequence-index', 'Help: Sample Submission', 'width=600,height=400' )">Index <span class="glyphicon glyphicon-question-sign"></span></a> </th>
             </g:if>    
         </thead>
         <tbody>            

@@ -62,6 +62,15 @@ class SampleService {
                         ilike "name", "%${query.target}%"
                     }
                 }
+                if (query.assay) {
+                    prtclInstSummary {
+                        protocol {
+                            assay {
+                                eq "name", query.assay
+                            }
+                        }
+                    }
+                }
             }
         }
         return samples

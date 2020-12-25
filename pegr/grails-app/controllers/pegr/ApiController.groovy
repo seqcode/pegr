@@ -257,6 +257,7 @@ class QuerySampleRegistrationCommand implements grails.validation.Validateable {
     String source
     String sourceId
     String target
+    String assay
 }
 
 class QueryRunRegistrationCommand implements grails.validation.Validateable {

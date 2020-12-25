@@ -17,6 +17,7 @@
     </style>
 </head>
 <body>
+    <g:link action="all"><span class="glyphicon glyphicon-home"></span> Sample List</g:link> 
     <div id="details">
         <div class="text-center">
             <i class="fa fa-spinner fa-spin"></i>

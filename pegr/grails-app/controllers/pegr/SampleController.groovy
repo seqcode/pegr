@@ -23,6 +23,17 @@ class SampleController {
         def samples = Sample.list(params)        
         [sampleList: samples]
     }
+    
+    def search(QuerySampleRegistrationCommand cmd) {
+        // cmd.max = cmd.max ?: 15
+        def samples = sampleService.search(cmd)
+
+        def checkedCount = 0;
+        if (session.checkedSample) {
+            checkedCount = session.checkedSample.size()
+        }
+        [sampleList: samples, checkedCount: checkedCount, searchParams: cmd]
+    }
 
 	def show(Long id) {
         def sample = Sample.get(id)
@@ -351,20 +362,6 @@ class SampleController {
 
     }
 
-    def searchForm() {
-
-    }
-
-    def search(QuerySampleRegistrationCommand cmd) {
-        // cmd.max = cmd.max ?: 15
-        def samples = sampleService.search(cmd)
-
-        def checkedCount = 0;
-        if (session.checkedSample) {
-            checkedCount = session.checkedSample.size()
-        }
-        [sampleList: samples, checkedCount: checkedCount, searchParams: cmd]
-    }
 
     def fetchDataForCheckedSamplesAjax() {
         def sampleIds = session.checkedSample

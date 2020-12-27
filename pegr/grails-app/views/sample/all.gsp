@@ -32,7 +32,7 @@
             </div>
             <div class="form-group">
                 <label>Species</label>
-                <g:textField name="species" class="form-control" value="${searchParams.species}"/>
+                <g:select id="species" name="speciesId" from="${pegr.Species.list()}" optionKey="id" value="${searchParams.speciesId}" noSelection="['null': '']" class="select"/>
             </div>
             <div class="form-group">
                 <label>Strain</label>
@@ -48,7 +48,7 @@
             </div>
             <div class="form-group">
                 <label>Assay <a href="#" onclick="window.open('/pegr/help/assayHelp', 'Help: Assay', 'width=600,height=400' )"><span class="glyphicon glyphicon-question-sign"></span></a></label>
-                <g:textField name="assay" class="form-control" value="${searchParams.assay}"/>
+                <g:select id="assay" name="assayId" from="${pegr.Assay.list()}" optionKey="id" value="${searchParams.assayId}" noSelection="['null': '']" class="select"/>
             </div>
             <div class="form-group">
                 <label>Source</label>
@@ -69,6 +69,9 @@
   <script>
       $(function(){
         $("#nav-samples").addClass("active");
+        $(".select").select2({
+            width: '100%',
+            tags: false});
       });
       
       $('#selectAll').click(function(checkedCount) {

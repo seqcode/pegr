@@ -27,7 +27,15 @@ class SampleService {
             ]
         def samples = c.list(listParams) {
             and {
-               if (query.species) {
+                if (query.speciesId) {
+                    cellSource {
+                        strain {
+                            species {
+                                eq "id", query.speciesId
+                            }
+                        }
+                    }
+                } else if (query.species) {
                     cellSource {
                         strain {
                             species {
@@ -62,11 +70,19 @@ class SampleService {
                         ilike "name", "%${query.target}%"
                     }
                 }
-                if (query.assay) {
+                if (query.assayId) {
                     prtclInstSummary {
                         protocol {
                             assay {
-                                eq "name", query.assay
+                                eq "id", query.assayId
+                            }
+                        }
+                    }
+                } else if (query.assay) {
+                    prtclInstSummary {
+                        protocol {
+                            assay {
+                                ilike "name", "%${query.assay}%"
                             }
                         }
                     }

@@ -14,26 +14,17 @@ class SampleController {
     def reportService
     def protocolInstanceBagService
 
-    def all(Integer max) {
-        params.max = Math.min(max ?: 50, 100)
-        if (!params.sort) {
-            params.sort = "id"
-            params.order = "desc"
-        }
-        def samples = Sample.list(params)        
-        [sampleList: samples]
-    }
-    
-    def search(QuerySampleRegistrationCommand cmd) {
-        // cmd.max = cmd.max ?: 15
+    def all(QuerySampleRegistrationCommand cmd) {        
         def samples = sampleService.search(cmd)
 
         def checkedCount = 0;
         if (session.checkedSample) {
             checkedCount = session.checkedSample.size()
         }
+        
         [sampleList: samples, checkedCount: checkedCount, searchParams: cmd]
     }
+
 
 	def show(Long id) {
         def sample = Sample.get(id)
@@ -379,8 +370,9 @@ class SampleController {
     // add all checked sample ids to the current session
     def addAllCheckedSampleAjax() {
         def sampleList = JSON.parse(params.sampleIdsList)
-        session.checkedSample = []
-
+        if (!session.checkedSample) {
+            session.checkedSample = []
+        }
         sampleList.each{
           session.checkedSample.push(it.toLong())
         }
@@ -403,6 +395,19 @@ class SampleController {
         }
         render session.checkedSample.size()
     }
+    
+    def removeCheckedSamplesAjax() {
+        def sampleList = JSON.parse(params.sampleIdsList)
+        sampleList.each { it ->
+            def id = it.toLong()
+            if (id in session.checkedSample) {
+                session.checkedSample.remove(id)
+            }
+        }
+        
+        render session.checkedSample.size()
+    }
+
 
     def fetchGrowthMediaAjax(Long speciesId) {
         def selectedSpecies = Species.get(speciesId)

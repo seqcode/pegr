@@ -9,10 +9,12 @@
 <body>
   <div class="container-fluid">
     <h2>Samples</h2>
+    <p><span id="checked-count">${checkedCount}</span> sample(s) selected</p>
     <div style="padding:6px">
         <input type="checkbox" id="selectAll" value="selectAll">
-        <g:link action="showChecked" class="btn btn-default">View Checked Samples (<span id="checked-count">${checkedCount}</span>)</g:link>
-        <g:link action="showFilesForCheckedSamples" class="btn btn-default">Files</g:link>
+        <g:link action="showChecked" class="btn btn-default">View Samples Details</g:link>
+        <g:link action="showFilesForCheckedSamples" class="btn btn-default">View Sample Files</g:link>
+        <button id="clear-all-checked" class="btn btn-default">Clear Selection</button>
     </div>
     <div class="row">
       <div class="col-sm-10">
@@ -23,38 +25,38 @@
       </div>
       <div id="filter" class="well col-sm-2">
           <h4>Filters</h4>
-          <g:form action="search">
+          <g:form action="all">
             <div class="form-group">
                 <label>Sample ID</label>
-                <g:textField name="id" class="form-control"/>
+                <g:textField name="id" class="form-control" value="${searchParams.id}"/>
             </div>
             <div class="form-group">
                 <label>Species</label>
-                <g:textField name="species" class="form-control"/>
+                <g:textField name="species" class="form-control" value="${searchParams.species}"/>
             </div>
             <div class="form-group">
                 <label>Strain</label>
-                <g:textField name="strain" class="form-control"/>
+                <g:textField name="strain" class="form-control" value="${searchParams.strain}"/>
             </div>
             <div class="form-group">
                 <label>Antibody</label>
-                <g:textField name="antibody" class="form-control"/>
+                <g:textField name="antibody" class="form-control" value="${searchParams.antibody}"/>
             </div>               
             <div class="form-group">
                 <label>Target</label>
-                <g:textField name="target" class="form-control"/>
+                <g:textField name="target" class="form-control" value="${searchParams.target}"/>
             </div>
             <div class="form-group">
                 <label>Assay <a href="#" onclick="window.open('/pegr/help/assayHelp', 'Help: Assay', 'width=600,height=400' )"><span class="glyphicon glyphicon-question-sign"></span></a></label>
-                <g:textField name="assay" class="form-control"/>
+                <g:textField name="assay" class="form-control" value="${searchParams.assay}"/>
             </div>
             <div class="form-group">
                 <label>Source</label>
-                <g:textField name="source" class="form-control"/>
+                <g:textField name="source" class="form-control" value="${searchParams.source}"/>
             </div>
             <div class="form-group">
                 <label>Source ID</label>
-                <g:textField name="sourceId" class="form-control"/>
+                <g:textField name="sourceId" class="form-control" value="${searchParams.sourceId}"/>
             </div>
             <div>
                 <g:submitButton name="search" value="Apply" class="btn btn-primary"/>
@@ -69,18 +71,55 @@
         $("#nav-samples").addClass("active");
       });
       
+      $('#selectAll').click(function(checkedCount) {
+          var sampleIds = [];
+          $('.checkbox').each(function(){
+              sampleIds.push(this.value);
+          })
+
+          if (this.checked) {
+              $('.checkbox').prop('checked', true);
+              $.ajax({
+                  url:"/pegr/sample/addAllCheckedSampleAjax",
+                  data: {"sampleIdsList":JSON.stringify(sampleIds)},
+                  success : function(checkedCount){
+                      $("#checked-count").text(checkedCount);
+                  }});
+          } else {
+              $('.checkbox').prop('checked', false);
+              $.ajax({
+                  url:"/pegr/sample/removeCheckedSamplesAjax", 
+                  data: {"sampleIdsList":JSON.stringify(sampleIds)},
+                  success: function(checkedCount) {
+                      $("#checked-count").text(checkedCount);
+                  }});
+          }
+      });
+      
       function toggleChecked(element) {
         if (element.checked) {
-            $.ajax({url:"/pegr/sample/addCheckedSampleAjax?id="+element.value, success: function(checkedCount) {
-                $("#checked-count").text(checkedCount);
-            }});
+            $.ajax({
+                url:"/pegr/sample/addCheckedSampleAjax?id="+element.value, 
+                success: function(checkedCount) {
+                    $("#checked-count").text(checkedCount);
+                }});
         } else {
-            $.ajax({url:"/pegr/sample/removeCheckedSampleAjax?id="+element.value, success: function(checkedCount) {
-                $("#checked-count").text(checkedCount);
-                $('#selectAll').prop('checked', false);
-            }});
+            $.ajax({
+                url:"/pegr/sample/removeCheckedSampleAjax?id="+element.value, 
+                success: function(checkedCount) {
+                    $("#checked-count").text(checkedCount);
+                }});
         }
       }
+      
+      $('#clear-all-checked').click(function(){
+          $.ajax({
+              url:"/pegr/sample/clearCheckedSampleAjax", 
+              success: function(checkedCount) {
+                  $("#checked-count").text(0);
+                  $('.checkbox').prop('checked', false);
+              }});
+      });
   </script>
 </body>
 </html>

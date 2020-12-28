@@ -217,7 +217,17 @@ class SequenceRunService {
         } 
         experiment.cohort = cohort
         experiment.save(failOnError:true, flush: true)
-        new ProjectSamples(sample:experiment.sample, project:project).save()
+        // update report-alignments
+        if(cohort.report) {
+            experiment.alignments.each {
+                def ra = ReportAlignments.findByAlignment(it)
+                if (ra) {
+                    ra.report = cohort.report
+                    ra.save()
+                }
+            }
+        }
+        new ProjectSamples(sample:experiment.sample, project:project).save(flush: true)
     }
     
     @Transactional

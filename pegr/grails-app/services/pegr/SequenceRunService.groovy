@@ -249,8 +249,11 @@ class SequenceRunService {
         if (!cohort) {
             throw new SequenceRunException(message: "Sequencing cohort not found!")
         }
-        SequencingExperiment.executeUpdate("update SequencingExperiment set cohort = null where cohort=?", [cohort])
-        cohort.delete()
+        try {
+            cohort.delete()
+        } catch(Exception e) {
+            throw new SequenceRunException(message: "There are samples in this sequence run that belong to the project and thus the project cannot be removed from the sequence run.")
+        }
     }
     
     @Transactional

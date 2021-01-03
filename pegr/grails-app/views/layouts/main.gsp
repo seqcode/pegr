@@ -22,7 +22,7 @@
                         <li id="nav-inventory"><g:link controller="item">Inventory</g:link></li>
                         <li id="nav-protocols"><g:link controller="protocol" action="labProtocols">Protocols</g:link></li>
                         <li id="nav-experiments"><g:link controller="protocolInstanceBag" action="list">Experiments</g:link></li>
-                        <li id="nav-sequencing"><g:link controller="sequenceRun" action="index">Sequencing Reports</g:link></li>
+                        <li id="nav-sequencing"><g:link controller="sequenceRun" action="index">Sequencing Runs</g:link></li>
                         <li id="nav-samples"><g:link controller="sample" action="all">Samples</g:link></li>
                         <li id="nav-guide"><g:link controller="help" action="index">Guide</g:link></li>
                     </sec:ifAnyGranted>

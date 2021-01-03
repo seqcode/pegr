@@ -8,7 +8,7 @@
 </head>
 <body  onhashchange="getHash()">
 <div class="container-fluid">
-    <g:link action="searchItemForBag" params="[bagId:bagId]"><span class="glyphicon glyphicon-chevron-left"></span> Back</g:link>
+    <g:link action="showBag" params="[id:bagId]"><span class="glyphicon glyphicon-chevron-left"></span> Back</g:link>
     <a href="#" onclick="window.open('/pegr/help#addSampleToBag', 'Help: Work Bench', 'width=600,height=400' )" class="pull-right"><u>Help</u></a>
     <h4>Add Traced Sample(s)</h4>
     <g:form action="addItemsToBag">

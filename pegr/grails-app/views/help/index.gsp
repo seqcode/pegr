@@ -1,6 +1,14 @@
 <html>
     <head>
         <meta name="layout" content="help">
+        <style>
+            img {
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+                margin-bottom: 18px;
+                max-width: 95%;
+                height: auto;
+            }
+        </style>
     </head>
     <body>
         <div class="container-fluid">
@@ -47,114 +55,52 @@
                     </tbody>
                 </table>
             </div>
-            
+            <div id="barcode-inventory">
+                <h3>Inventory Tracking</h3>
+                <p>The inventory has many types, including antibody, chemical, enzyme, reagent, cell stock, biosample, sample pool and others. In PEGR, barcodes are used to track the inventory. Note that the barcodes have to be UNIQUE for each item type. To use the barcode tracking system in PEGR, you need an android phone or tablet with the "Barcode Scanner" app (based on zxing) installed from the Play Store. From PEGR webpages, click on the <span class="glyphicon glyphicon-qrcode"></span> symbol, the barcode sanner will open up automatically. Then scan the barcode on the inventory, and then you will be taken back to the original PEGR webpage with the barcode filled.</p>
+                <p>To create a new inventory item in PEGR, first go to the “Inventory” tab.</p>
+                <img src="/pegr/assets/barcode_inventory.png" alt="Inventory" style="width:1050px">
+                <p>If the item does not have a barcode yet, you can create a barcode for it in PEGR. Select “Type” and the click “Generate Barcode”. You will see a page showing the item type and barcode. </p>
+                <img src="/pegr/assets/barcode_item.png" alt="Item" style="width:400px">
+                <p>Click “Create” and there is a page for you to fill in more information, e.g. name, location and notes.</p>
+                <img src="/pegr/assets/barcode_item_create.png" alt="Create Item" style="width:350px">
+                <p>After filling in the information, hit the button “Save” and you will be taken to the page showing the item.</p>
+                <img src="/pegr/assets/barcode_item_show.png" alt="Create Item" style="width:550px">
+                <p>You can upload images and print the barcode here. </p>
+                <p>If the item already has an attached barcode, you can scan the barcode into PEGR on your mobile device. Select “Type” and then click the barcode icon, you will be taken to the barcode scanner app. Scan the barcode and you will be taken back to the PEGR page. Click the “Search/Create” button, and you will see the page to add information (e. g. name, location and notes) to the item.</p>
+              </div>
+              <div id="barcode-protocol">
+                <h3>Protocol and Protocol Group</h3>
+                <p>A protocol is the standard for one experiment step. For example, some chemicals are mixed to create an end product, a cell stock is processed to another state, or a batch of biosamples are pooled. To create a protocol, go to the tab “Protocols” and then “My Protocols”. Click the button “New”.</p>
+                <img src="/pegr/assets/barcode_protocol.png" alt="Protocol" style="width:1050px">
+                <p>On the “Create Protocol” page, you can fill in the information about the protocol. The share item types and end product types could be certain types of chemicals and reagents, and you want to barcode and track those items during the experiment. The traced sample may change from one state to another state during an experiment step. Sometimes the sample is transferred from one container to another container, or a partial portion of the sample goes to the next state. In these situations, you might want to have different barcodes for different state of the sample, and you can specify the “Start State” and “End State” of the traced sample. If a pool is created in the step, you can specify “Create Pool” type. And if a pool is processed and transforms to another state, you can specify both “Import Pool” and “Create Pool” types. The “URL” field allows you to link to another webpage, and you can also upload a PDF file of the protocol.</p>
+                <img src="/pegr/assets/barcode_protocol_create.png" alt="CreateProtocol" style="width:500px">
+                <p>Users can see the protocols that they created in the “My Protocols” tab. Protocols that are “approved” (often by the lab admin) will also be listed in the “Lab Protocols” tab. In addition, lab admin can view all the protocols in the “All Protocols” tab. </p>
+                <p>There is also a tab named “lab Protocol Groups”. A protocol group is an ordered list of protocols that happen in sequence. In practice, some protocols often go together and the protocol group is a convenient tool of creating experiment records. </p>
+                <img src="/pegr/assets/barcode_protocol_group.png" alt="Protocol Group" style="width:550px">
+                <p>The protocol group is created in the Admin dashboard. Go to “Admin” tab and find “Protocol Group” in the “Protocol” section.</p>
+                <img src="/pegr/assets/barcode_protocol_group_create.png" alt="Create Protocol Group" style="width:1050px">
+            </div>      
+            <div id="barcode-experiment">
+                <h3>Experiment Tracking</h3>
+                <p>An experiment record is a record of one or more steps of experiment. It records the protocols followed and the barcoded items (chemicals, reagents, samples, pools) used during the experiment.</p>
+                <p>To create an experiment record, go to the “Experiment” tab and click the “New” button at the top, and you will be taken to the following page. Here you can either select a protocol group or a list of protocols. You can select one or more projects here, and then on the view page of the experiment record, you can further assign each sample to a project.</p>
+                <img src="/pegr/assets/barcode_experiment_create.png" alt="Create Experiment" style="width:350px">
+                <p>Once the experiment record is saved, you will be taken to the view page of the record. The left panel lists the protocols as you defined before and the right panel is for you to add samples to the experimennt. Note that on a smaller screen, e.g. on a mobile device, the right panel will be stacked below the left panel.</p>
+                <img src="/pegr/assets/barcode_experiment_summary.png" alt="Create Experiment">
+                <p>You will notice that there is a "Start" button next to the first protocol on the left panel. That will take you to the details of that experiment step. But before clicking the “Start” button, you need to add all the samples in the experiment and you will be reminded by a warning message. There are two ways to add samples. The first is to  need to add all the samples before starting the experiment. If not, clicking click the <span class="glyphicon glyphicon-qrcode"></span> symbol and scan the sample's barcode using your mobile device. The other is to click the <span class="glyphicon glyphicon-list-alt"></span> symbol and search by typing the related information, e.g. sample type, name, barcode or location. Once you find your sample in PEGR's database through either method, you will be asked to confirm if you want to "Import Sample(s)" or "Split and Add Sample(s)". The second option applies if you only want to take part of the existing sample for processing and the rest part will be kept for future use.</p>
+                <p>Once you have added all the samples to the experiment, click the “Start” button next to the first protocol, and you will see the following page.</p>
+                <img src="/pegr/assets/barcode_experiment_edit.png" alt="Edit Experiment">
+                <p>If the protocol has defined types for the shared items, end product, samples' start and end state, and imported or created pool, each of these types will be expanded as a table for you to track the respective items. For example, if the protocol requires a shared item with the type "YPD Media", there will be a "Shared Items" table with a row for the type "YPD Media". You then scan the corresponding item to that row by following the "+" sign. </p>
+            </div>
             <div id="sample-submission">
                 <h3>Sample Submission</h3>
-                <ol>
-                    <li>
-                        <h4>Assay</h4>
-                        <p>Each assay has a pre-defined template. All samples in the sample submission form have the same assay. Samples using different assays should be submitted in separate forms.</p>
-                    </li>
-                    <li>
-                        <h4>Sections</h4>
-                        <p>The sample submission form is separated into three sections: "Sample", "Antibody" and "Target". The header buttons will help you to navigate to the corresponding sections.</p>
-                    </li>
-                    <li>
-                        <h4>Select and Type</h4>
-                        <p>Click on the fields with placeholder "Select...", a drop-down menu will show up. You may select a choice directly, or type in some characters to narrow down the selections. Fields with placeholder "Select or type..." will allow you to type in new words in addition to the provided selections. Fields without placeholder accept free text. </p>
-                    </li>
-                    <li>
-                        <h4>Multiple selections</h4>
-                        <p>Some fields, such as "Treatments" and "Reference Genomes", accept multiple selections. Once you enter the first selection, that selection will be wrapped up and prefixed with a remove sign. You may continue to choose additional selections.</p>
-                    </li> 
-                    <li>
-                        <h4>Cascade select</h4>
-                        <p>When you open up a sample submission form, some fields are disabled (grey) temporarilly. These fields often depend on previous fields. For example, the selection of "Genus" will narrow down the range of "Species". When "Genus" is selected, the field "Species" will be active and a list of species in that Genus will be provided. Likewise, "Species" narrows down "Parent Strain", and then "Strain". The dependencies are list below.</p>
-                        <p>Sample</p>
-                        <ul>
-                            <li>Genus -> Species -> Parent Strain -> Strain -> Genotype -> mutation </li>
-                            <li>Species -> Growth Media</li>
-                            <li>Species -> Reference Genomes</li>
-                        </ul>
-                        <p>Antibody</p>
-                        <ul>
-                            <li>Catalog -> Host, Immunogene, Clonal, Ig Type and Concentration. </li>
-                            <li>Catalog -> Target Type, Target, C-Term and N-Term</li>
-                        </ul>
-                    </li>            
-                    <li>
-                        <h4>Keyboard navigation</h4>
-                        <p>When drop-down menu is closed</p>
-                        <ul>
-                            <li><button>Tab</button>: navigate to the next field.</li>
-                            <li><button>Shift</button> + <button>Tab</button>: navigate to the previous field.</li>
-                            <li><button>&darr;</button>: open drop-down menu.</li>
-                        </ul>
-                        <p>When drop-down menu is open</p>
-                        <ul>
-                            <li><button>&uarr;</button>, <button>&darr;</button>: navigate the list of choices.</li>
-                            <li><button>Enter</button>: select.</li>
-                            <li><button>Esc</button>: close the drop-down menu.</li>
-                        </ul>
-                    </li>            
-                    <li>
-                        <h4>Add Row</h4>
-                        <p>Click the <button>Add Row</button> button, a clone (including all the data and selections) of the last row will be appended to the bottom of the form. Then you may make changes to the new row.</p>
-                    </li>            
-                    <li>
-                        <h4>Remove</h4>
-                        <p>A row may be removed by clicking the <span class="glyphicon glyphicon-trash"></span> symbol at the beginning of that row.</p>
-                    </li>            
-                    <li>
-                        <h4>Validations</h4>
-                        <p>Validations of all the fields will occur when the form is submitted (some simple input fields will be validated whenever the fields are changed). Error messages will appear in red around the corresponding fields.</p>
-                        <ul>
-                            <li>Required Fields: Genus, Species, Parent Strain, Strain, Growth Media, Genomes, Catalog, Target.</li>
-                            <li>Fields where only alphanumeric characers and hyphen (e.g. 0-9, a-z, A-Z and -) are accepted: Strain, Mutation, Growth Media, Treatments, Catalog, Target.</li>
-                            <li>Fields that accept numbers: Chrom.(ug), Cell#(M), Volume(ul), Requested Tags(M), Conc.(ug/ul), Volume Sent(ul), Usage Per ChIP(ug), Usage Per ChIP(ul)</li>
-                        </ul>
-                    </li>    
-                </ol>
-            </div>
-            <div id="bag">
-                <h3>Work Bench</h3>
-                <ol>
-                    <li>
-                        <h4>Barcode</h4>
-                        <p>Barcodes are used to trace samples, antibodies and other items used during the process. The Barcodes have to be UNIQUE for each item type.</p>
-                        <p>You may use mobile devices to scan the barcode. PEGR is very easy to use on android phones and tablets. The Android devices need to have the "Barcode Scanner" app (based on zxing) installed from the Play Store. From PEGR webpages, click on the <span class="glyphicon glyphic-qrcode"></span> symbol next to the barcode input fields. The barcode sanner will open up automatically. Then scan the barcode, and you will be taken back to the original PEGR webpage with the barcode filled. If you are using iPhone/iPad, you may download  "Qrafter" from the App Store. Scan the barcode, click "Copy to clipboard", and paste the barcode text back to the PEGR webpage. </p>
-                    </li>
-                    <li>
-                        <h4>Protocol Instance Bag</h4>
-                        The "Bag" is defined by a set of samples and a list of protocols to be performed on these samples.
-                        <asset:image src="bag.png" height="400px"/>
-                    </li>
-                    <li id="addSampleToBag">
-                        <h4>Import bag</h4>
-                        <p>Scan any sample in the previouly finished bag. You will be asked whether you want to add only that particular sample or the entire bag. If you choose to import the entire bag, all samples in that bag will be added to the new bag.</p>
-                    </li>
-                    <li>
-                        <h4>Split the sample</h4>
-                        <asset:image src="split-sample.png" height="400px"/>
-                        <h5>Import vs. Split and Add</h5>
-                        <p>If the traced sample is linked to other bags, you can choose to either "Import" or "Split and Add". "Import" means that you will continue working on the sample(s). For example, the traced sample has been through the protocols in the latest bag, and will continue being processed in this bag. "Split and Add" means that you will create a new sample off the scaned traced sample. You may choose this option when you find out that the traced sample has been associated with another bag. </p>
-                    </li>
-                    <li>
-                        <h4>Sample Pool</h4>
-                        <ul>
-                            <li>
-                                <h5>Create a pool from a set of samples</h5>
-                                <p><i>Admin:</i> in the Admin page, define the "Item Type" for the pool and choose "Sample Pool" as the category. When creating the protocol that creates the sample pool, select the type for "End Pool". </p>
-                                <p><i>Lab member:</i>in the related protocol instances, create and barcode the new pool as an end pool.</p>
-                            </li>
-                            <li>
-                                <h5>Merge pools</h5>
-                                <p><i>Admin:</i> in the Admin page, define the "Item Type" for the starting pool and ending pool if they have not been created. Make sure to choose "Sample Pool" as the category. When creating the protocol that creates the sample pool, select the types for "Start Pool" and "End Pool". </p>
-                                <p><i>Lab member:</i> inside the related protocol instances, scan the starting pools' barcode to import them. And after the new pool is created, barcode the new pool as an end pool.</p>
-                            </li>
-                        </ul>
-                    </li>
-                </ol>
+                <p>To submit samples to a sequencing run, go the "Sequencing Runs" tab and find the "Sample Submission" section. </p>
+                <img src="/pegr/assets/sample_submission.png" alt="Sample Submission">
+                <p>There are two ways to submit samples to a sequencing run (see the two links ). One way is to upload an excel file. A template sample submission form is provided <a href="https://github.com/seqcode/pegr/tree/master/sample_files">here</a>. Another way is to follow the "Create Wizard" button and create a sequencing run. </p>
+                <img src="/pegr/assets/sequence_run_create.png" alt="Create Sequence Run" style="width:350px">
+                <p>When a sequencing run has just been created, it's in the "PREP" status. And you can edit the information about the sequencinbg run. To add samples to the sequencing run, you can click the "Add Master Pool" button and import samples from that pool. Or you can click the "Add Sample" button and import samples by ID. </p>                
+                <img src="/pegr/assets/sequence_run_edit.png" alt="Edit Sequence Run">
             </div>
             <div id="pipeline-status">
                 <h3>Pipeline Status</h3>
@@ -182,13 +128,22 @@
                 </ol>
                 <p>You can learn more about a step with data received by clicking the colored label. A snippet will pop over, including the step's name, error message and notes. An admin can change the step's status by clicking the <span class="glyphicon glyphicon-pencil"></span> inside the snippet and following the instructions.</p>
             </div>
+            <div id="search-samples">
+                <h3>Search Samples</h3>
+                <p>Under the "Samples" tab, you can view all samples and search sampels by ID, species, strain, antibody, etc. You can click an individual sample and view the details for that sample. In adddition, you can select multiple samples, and view the selected sample together and compare.</p>
+                <img src="/pegr/assets/search_sample.png" alt="Search Samples">
+            </div>
           </div>
           <nav class="col-sm-3">
             <h4>Menu</h4>
             <ul id="menu" data-spy="affix" data-offset-top="205">
               <li><a href="#project-role">Project Role</a></li>
+              <li><a href="#barcode-inventory">Inventory Tracking</a></li>
+              <li><a href="#barcode-protocol">Protocol and Protocol Group</a></li>
+              <li><a href="#barcode-experiment">Experiment Tracking</a></li>
+              <li><a href="#sample-submission">Sample Submission</a></li>
               <li><a href="#pipeline-status">Pipeline Status</a></li>
-              <li></li>
+              <li><a href="#search-samples">Search Samples</a></li>
               <li></li>
               <li></li>
             </ul>

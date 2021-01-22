@@ -20,7 +20,7 @@
       <div class="col-sm-10">
           <g:render template="table" model="['sampleList':sampleList, 'checkbox':true]"></g:render>
           <div class="pagination">
-                <g:paginate next="Next" prev="Prev" controller="sample" action="all" max="50" total="${sampleList.totalCount ?: 0}" />
+                <g:paginate next="Next" prev="Prev" controller="sample" action="all" max="50" total="${sampleList.totalCount ?: 0}" params="${params}"/>
           </div>
       </div>
       <div id="filter" class="well col-sm-2">

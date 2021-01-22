@@ -19,11 +19,11 @@
                 <tr>
                     <td><g:if test="${checkbox}"><input type="checkbox" name="checkedSample" class="checkbox" value="${sample.id}" onchange="toggleChecked(this)" <g:if test="${sample.id in session.checkedSample}">checked</g:if>></g:if></td>
                     <td><g:link controller="sample" action="show" id="${sample.id}">${sample.id}</g:link> ${sample.naturalId}</td>
-                    <td>${sample.cellSource.strain.species} </td>
-                    <td>${sample.cellSource.strain} </td>
+                    <td>${sample.cellSource?.strain?.species} </td>
+                    <td>${sample.cellSource?.strain} </td>
                     <td>${sample.antibody}</td>
                     <td>${sample.target}</td>
-                    <td>${sample.prtclInstSummary.protocol.assay}</td>
+                    <td>${sample.prtclInstSummary?.protocol?.assay}</td>
                     <td>${sample.source} </td>
                     <td>${sample.sourceId} </td>
                     <td><g:formatDate format="yyyy-MM-dd" date="${sample.date}"/></td>

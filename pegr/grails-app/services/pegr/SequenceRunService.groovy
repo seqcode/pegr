@@ -66,7 +66,7 @@ class SequenceRunService {
                 // find the cohort
                 cohort = SequencingCohort.findByProjectAndRun(projectSample.project, run)
                 if (!cohort) {
-                    cohort = new SequencingCohort(project: projectSample.project, run: run)
+                    cohort = new SequencingCohort(project: projectSample.project, run: run, name: "${run.id}_${projectSample.project.name}")
                     cohort.save()
                 }
             }        
@@ -205,7 +205,7 @@ class SequenceRunService {
         }
         def cohort = SequencingCohort.findByProjectAndRun(project, run)
         if (!cohort) {
-            cohort = new SequencingCohort(project: project, run: run)
+            cohort = new SequencingCohort(project: project, run: run, name: "${runId}_${projectName}")
             cohort.save()
         } 
         def oldProject = experiment.cohort?.project
@@ -240,7 +240,7 @@ class SequenceRunService {
         if (!project) {
             throw new SequenceRunException(message: "Project not found!")
         }
-        new SequencingCohort(run:run, project:project).save()
+        new SequencingCohort(run:run, project:project, name: "${runId}_${project.name}").save()
     }
     
     @Transactional
@@ -250,6 +250,21 @@ class SequenceRunService {
             throw new SequenceRunException(message: "Sequencing cohort not found!")
         }
         try {
+            // delete the images
+            def imageMap = utilityService.parseJson(cohort.images)
+            imageMap.each { key, val ->
+                val.each { filepath ->
+                    def file = new File(utilityService.getFilesRoot(), filepath)
+                    if (file.exists()) {
+                        file.delete()
+                    }
+                }                
+            }            
+            
+            // delete the summary report
+            cohort.report.delete()
+            
+            // delete the cohort
             cohort.delete()
         } catch(Exception e) {
             throw new SequenceRunException(message: "There are samples in this sequence run that belong to the project and thus the project cannot be removed from the sequence run.")

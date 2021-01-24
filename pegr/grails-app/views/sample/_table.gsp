@@ -4,11 +4,11 @@
             <tr>
                 <th></th>
                 <g:sortableColumn property="id" defaultOrder="desc" title="ID" id="sample-id" params="${searchParams}"></g:sortableColumn>
-                <g:sortableColumn property="cellSource.strain.species" title="Species" params="${searchParams}"></g:sortableColumn>
-                <g:sortableColumn property="cellSource.strain" title="Strain" params="${searchParams}"></g:sortableColumn>
+                <th>Species</th>
+                <g:sortableColumn property="cellSource?.strain" title="Strain" params="${searchParams}"></g:sortableColumn>
                 <g:sortableColumn property="antibody" title="Antibody" params="${searchParams}"></g:sortableColumn>
                 <g:sortableColumn property="target" title="Target" params="${searchParams}"></g:sortableColumn>
-                <g:sortableColumn property="prtclInstSummary.protocol.assay" title="Assay" params="${searchParams}"></g:sortableColumn>
+                <th>Assay</th>
                 <g:sortableColumn property="source" title="Source" params="${searchParams}"></g:sortableColumn>
                 <g:sortableColumn property="sourceId" title="Source ID" params="${searchParams}"></g:sortableColumn>
                 <g:sortableColumn property="date" defaultOrder="desc" title="Date" params="${searchParams}"></g:sortableColumn>

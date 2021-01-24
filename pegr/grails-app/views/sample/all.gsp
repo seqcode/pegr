@@ -18,7 +18,7 @@
     </div>
     <div class="row">
       <div class="col-sm-10">
-          <g:render template="table" model="['sampleList':sampleList, 'checkbox':true]"></g:render>
+          <g:render template="table" model="['sampleList':sampleList, 'checkbox':true, 'searchParams':params]"></g:render>
           <div class="pagination">
                 <g:paginate next="Next" prev="Prev" controller="sample" action="all" max="50" total="${sampleList.totalCount ?: 0}" params="${params}"/>
           </div>
@@ -32,7 +32,7 @@
             </div>
             <div class="form-group">
                 <label>Species</label>
-                <g:select id="species" name="speciesId" from="${pegr.Species.list()}" optionKey="id" value="${searchParams.speciesId}" noSelection="['null': '']" class="select"/>
+                <g:select id="species" name="speciesId" from="${pegr.Species.list().sort {it.genusName.toLowerCase()+it.name.toLowerCase()}}" optionKey="id" value="${searchParams.speciesId}" noSelection="['null': '']" class="select"/>
             </div>
             <div class="form-group">
                 <label>Strain</label>
@@ -48,7 +48,7 @@
             </div>
             <div class="form-group">
                 <label>Assay <a href="#" onclick="window.open('/pegr/help/assayHelp', 'Help: Assay', 'width=600,height=400' )"><span class="glyphicon glyphicon-question-sign"></span></a></label>
-                <g:select id="assay" name="assayId" from="${pegr.Assay.list()}" optionKey="id" value="${searchParams.assayId}" noSelection="['null': '']" class="select"/>
+                <g:select id="assay" name="assayId" from="${pegr.Assay.list(sort:'name')}" optionKey="id" value="${searchParams.assayId}" noSelection="['null': '']" class="select"/>
             </div>
             <div class="form-group">
                 <label>Source</label>

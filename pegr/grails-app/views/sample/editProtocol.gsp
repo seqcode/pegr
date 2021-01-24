@@ -17,7 +17,7 @@
             </div>
             <div>
                 <label>Growth Media</label>
-                <select name="growthMedia" class="growth-media tag-select2 textcontrol" style="width: 150px" required>
+                <select name="growthMedia" class="growth-media tag-select2 textcontrol" style="width: 150px">
                     <option value="${sample.growthMedia}" selected>${sample.growthMedia}</option>
                 </select>
             </div>

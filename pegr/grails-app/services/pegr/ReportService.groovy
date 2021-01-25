@@ -447,7 +447,7 @@ class ReportService {
         def fastq = utilityService.parseJson(experiment.fastqFile)
         return new ExperimentDTO(id: experiment.id,
                               runId: experiment.sequenceRun?.id,
-                              oldRunNum: experiment.sequenceRun?.runNum,
+                              runName: experiment.sequenceRun?.runName,
                               totalReads: experiment.totalReads,
                               adapterDimerCount: experiment.adapterDimerCount,
                               fastqc: fastqc,

@@ -7,8 +7,8 @@
     <g:datePicker name="date" value="${run?.date ?: new Date()}"/>
 </div>
 <div>
-    <label>Old Run No.</label>
-    <g:textField name="runNum" value="${run?.runNum?:defaultRunNum}"></g:textField>
+    <label>Run Name</label>
+    <g:textField name="runName" value="${run?.runName}"></g:textField>
 </div>
 <div>
     <label>Directory Name</label>

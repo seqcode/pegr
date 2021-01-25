@@ -222,7 +222,7 @@ class QfileService {
         def genomeBuilds = [data.genomeBuild1, data.genomeBuild2, data.genomeBuild3]
         saveRequestedGenome(genomeBuilds, sample, species) 
         
-        return results?.sequenceRun?.runNum
+        return results?.sequenceRun?.runName
     }
     
     def addExperimentToCohort(SequencingExperiment seqExp, Project project, String service, String invoice) {
@@ -731,13 +731,6 @@ class QfileService {
     }
 	
 	def getSequenceRun(RunStatus runStatus, String runStr, String laneStr, String dateStr, String fcidStr, String indexIdStr, User user, Map laneData) {
-	    int runNum = getInteger(runStr)
-
-        if (runStr == null) {
-            runStr = "00"
-        } else if (runStr.length() == 1) {
-            runStr = "0" + runStr
-        }
         if (laneStr == null || laneStr == "unk") {
             laneStr = "0"
         }
@@ -762,9 +755,9 @@ class QfileService {
             throw new QfileException(message: "Sequencing platform ${laneData.platformStr} does not exist. Please define it in the admin page first.")
         }
         
-        def run = SequenceRun.findByPlatformAndRunNum(platform, runNum)
+        def run = SequenceRun.findByPlatformAndRunName(platform, runStr)
 	    if (!run) {                 
-	         run = new SequenceRun(runNum: runNum, platform: platform, status: runStatus, user: user)
+	         run = new SequenceRun(runName: runStr, platform: platform, status: runStatus, user: user)
 
 	         // lane
 	         run.lane = getInteger(laneStr)
@@ -841,7 +834,7 @@ class QfileService {
             phiXLoaded: run.runStats?.phiXLoaded,                   //P
             libraryLoadedFmol: run.runStats?.libraryLoadedFmol,           //Q
             notes: run.runStats?.notes,                      //R
-            runNum: run.runNum,                         //S
+            runName: run.runName,                         //S
             emptyT: "",                     //T
             emptyU: "",                    //U
             emptyV: "",                   //V
@@ -895,13 +888,6 @@ class QfileService {
             
             def seqExperiment = SequencingExperiment.findBySampleAndSequenceRun(sample, run)
             def readPositions = utilityService.parseJson(seqExperiment.readPositions)
-            
-            def platform = ""
-            if (run.platform?.name == "SOLiD") {
-                platform = "S"
-            } else if (run.platform?.name == "Illumina GA") {
-                platform = "G"
-            }
             
             sampleExports << [
                 laneStr: run.lane,      //A       
@@ -998,7 +984,7 @@ class QfileService {
                 rd2Start: (readPositions && readPositions.containsKey("rd2")) ? readPositions.rd2[0] : "",       //CN
                 rd2End: (readPositions && readPositions.containsKey("rd2")) ? readPositions.rd2[1] : "",         //CO
                 emptyCP: "",              //CP
-                runStr: platform + run.runNum,         //CQ
+                runStr: run.runName,         //CQ
                 emptyCR: "",
                 emptyCS: "",
                 emptyCT: "",
@@ -1152,7 +1138,7 @@ class QfileService {
          phiXLoaded: getFloat(data[15]),                   //P
          libraryLoadedFmol: getFloat(data[16]),           //Q
          notes: data[17],                       //R
-         runNum: getInteger(data[18]),                         //S
+         runName: data[18],                         //S
          // data[19],//T
          // positiondata[20],//U
          //data[21],//V

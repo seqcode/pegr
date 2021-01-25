@@ -157,7 +157,7 @@
         <div class="message" role="status">${flash.message}</div>
     </g:if>
     <h3>
-        <g:link controller="sequenceRun" action="show" id="${run.id}">Run ${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if></g:link>
+        <g:link controller="sequenceRun" action="show" id="${run.id}">Run ${run.id} <g:if test="${run.runName}">(Run Name: ${run.runName})</g:if></g:link>
         <small>
             <span id="run-status-show" class="label label-default">${run.status}</span> 
             <sec:ifAnyGranted roles="ROLE_ADMIN">

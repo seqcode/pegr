@@ -23,7 +23,7 @@
             </div>
         </g:if>
     </div>
-    <h2>Sequence Run #${run.id} <g:if test="${run.runNum}">(Old No.${run.runNum})</g:if> 
+    <h2>Sequence Run #${run.id} <g:if test="${run.runName}">(Run Name: ${run.runName})</g:if> 
         <small>
             <span id="run-status-show" class="label label-default">${run.status}</span>
             <sec:ifAnyGranted roles="ROLE_ADMIN">

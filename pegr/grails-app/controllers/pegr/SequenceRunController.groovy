@@ -24,7 +24,7 @@ class SequenceRunController {
         def c = SequenceRun.createCriteria()
         def listParams = [
                 max: params.max ?: 50,
-                sort: params.sort ?: "id", //if you would like to sort based on the runNum, just remeber it's basically for the old run number.
+                sort: params.sort ?: "id",
                 order: params.order ?: "desc",
                 offset: params.offset ?: 0
             ]
@@ -38,9 +38,10 @@ class SequenceRunController {
                 or {
                     if (str.isInteger()) {
                         eq "id", Long.parseLong(str)
-                        eq "runNum", str.toInteger()
                     }
 
+                    ilike "runName", "%${str}%"
+                    
                     ilike "fcId", "%${str}%"
 
                     ilike "directoryName", "%${str}%"
@@ -129,12 +130,7 @@ class SequenceRunController {
     }
 
     def create() {
-        def largestRunNum = SequenceRun.createCriteria().get {
-            projections {
-                max "runNum"
-            }
-        } as Long
-        [defaultRunNum: largestRunNum + 1]
+
     }
 
     def save() {
@@ -145,12 +141,7 @@ class SequenceRunController {
             redirect(action: "show", params: [id: run.id])
         }catch(SequenceRunException e) {
             request.message = e.message
-            def largestRunNum = SequenceRun.createCriteria().get {
-                projections {
-                    max "runNum"
-                }
-            } as Long
-            render(view: "create", model: [run:run, defaultRunNum: largestRunNum + 1])
+            render(view: "create", model: [run:run])
         }
     }
 
@@ -278,12 +269,12 @@ class SequenceRunController {
             queuedRunIds.eachWithIndex { id, n ->
                  def run = SequenceRun.get(Long.parseLong(id))
                 queuedRuns.push([id: id,
-                                 runNum: run?.runNum,
+                                 runName: run?.runName,
                                  directoryName: n < newFolders.size() ? newFolders[n] : null])
 
             }
             def currentRun = [id: runId,
-                              runNum: SequenceRun.get(runId)?.runNum,
+                              runName: SequenceRun.get(runId)?.runName,
                               directoryName: queuedRunIds.size() < newFolders.size() ? newFolders[queuedRunIds.size()] : null]
             def startTime
             use(TimeCategory) {

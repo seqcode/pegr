@@ -2489,4 +2489,5 @@ databaseChangeLog = {
     }
     include file: 'updateProtocol.groovy'
     include file: 'assay_description.groovy'
+    include file: 'run_name.groovy'
 }

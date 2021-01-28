@@ -619,5 +619,16 @@ class SequenceRunController {
         }
         redirect(action: "index")
     }
+    
+    def updateRunNameAjax(Long runId, String name) {
+        def result
+        try {
+            sequenceRunService.updateRunName(runId, name)
+            result = [data: name]
+        }  catch(SequenceRunException e) {
+            result = [error: e.message]
+        }
+        render result as JSON
+    }
 
 }

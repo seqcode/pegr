@@ -23,7 +23,17 @@
             </div>
         </g:if>
     </div>
-    <h2>Sequence Run #${run.id} <g:if test="${run.runName}">(Run Name: ${run.runName})</g:if> 
+    <h2>Sequence Run #${run.id} (Run Name: <span id="run-name-show">${run.runName}</span>
+        <g:if test="${editable}"> 
+            <small>
+                <a id="run-name-edit-symbol" href="#" class="glyphicon glyphicon-pencil"></a>
+                <span id="run-name-edit" style="display:none">
+                    <input id="run-name-input" name="runName" value="${run.runName}" style="width:10em">
+                    <button id="run-name-save" class="btn btn-primary">Save</button>
+                    <button id="run-name-cancel" class="btn btn-default">Cancel</button>    
+                </span>
+            </small>
+        </g:if>)
         <small>
             <span id="run-status-show" class="label label-default">${run.status}</span>
             <sec:ifAnyGranted roles="ROLE_ADMIN">
@@ -413,6 +423,36 @@
 				})
 			}
 		});
+        
+        // edit sequence run name
+        $("#run-name-edit-symbol").click(function(){
+            $("#run-name-show").hide();
+            $("#run-name-edit-symbol").hide();
+            $("#run-name-edit").show();
+        });
+
+        $("#run-name-save").click(function(){
+            var name = $("#run-name-input").val();
+            $.ajax({ url: "/pegr/sequenceRun/updateRunNameAjax?runId=${run.id}&name=" + name,
+                success: function(result) {
+                    if (result.error) {
+                        alert(result.error)
+                    } else {
+                        $("#run-name-show").text(result.data);
+                        $("#run-name-input").val(result.data);
+                        $("#run-name-show").show();
+                        $("#run-name-edit-symbol").show();
+                        $("#run-name-edit").hide();
+                    }
+                }                
+            });
+        });
+
+        $("#run-name-cancel").click(function(){
+            $("#run-name-show").show();
+            $("#run-name-edit-symbol").show();
+            $("#run-name-edit").hide();
+        });
             
      </script>
 </div>

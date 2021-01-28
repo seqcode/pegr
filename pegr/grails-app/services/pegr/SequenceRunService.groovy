@@ -437,4 +437,23 @@ END:VCALENDAR
             return false
         }
     }
+    
+    def updateRunName(Long runId, String name) {
+        def run = SequenceRun.get(runId)
+        if (!run) {
+            throw new SequenceRunException(message: "Sequence run not found!")
+        }
+
+        if (SequenceRun.findByRunName(name)) {
+            throw new SequenceRunException(message: "Sequence run with the same name has existed!")
+        }
+        
+        try {
+            run.runName = name
+            run.save()
+        } catch(Exception e) {
+            log.error "Error: ${e}"
+            throw new SequenceRunException(message: "Sequence run name cannot be saved!")
+        }
+    }
 }

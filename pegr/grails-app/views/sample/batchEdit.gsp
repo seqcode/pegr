@@ -208,9 +208,8 @@
             });
             edit += "</select></span>";
             appendEdit(this, edit);
-            var speciesId = $(this).closest("tr").find(".speciesId").val();
             $.ajax({
-                url: "/pegr/cellSource/fetchGenomeAjax?speciesId="+speciesId
+                url: "/pegr/cellSource/fetchGenomeAjax"
             }).done(function(result){
                 td.find("select").select2({
                     data: result,

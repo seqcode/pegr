@@ -317,6 +317,13 @@
                 placeholder: tagPlaceholder
             });
         }});
+        
+        $.ajax({url: "/pegr/cellSource/fetchGenomeAjax", success: function(genomes){
+            $("#tr"+count+" .genomes").select2({
+                data: genomes,
+                placeholder: noTagPlaceholder
+            });
+        }});
     }
     
     // disable the dependent fields in cascade selections
@@ -326,7 +333,6 @@
     $(".genotype").prop("disabled", true);
     $(".mutation").prop("disabled", true);
     $(".growth-media").prop("disabled", true);
-    $(".genomes").prop("disabled", true);
     $(".target-type").prop("disabled", true);
     $(".target").prop("disabled", true);
     $(".cterm").prop("disabled", true);
@@ -386,17 +392,6 @@
         }});
         $growthMedia.prop("disabled", false);
         
-        var $genomes = $(this).closest("tr").find(".genomes");
-        $genomes.html('').select2({
-            data: [{id: '', text: ''}],
-        });
-        $.ajax({url: "/pegr/cellSource/fetchGenomeAjax?speciesId="+speciesId, success: function(genomes){
-            $genomes.select2({
-                data: genomes,
-                placeholder: noTagPlaceholder
-            });
-        }});
-        $genomes.prop("disabled", false);
     });
             
     $(".parent-strain").on("change", function() {

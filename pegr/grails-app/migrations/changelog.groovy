@@ -2491,4 +2491,5 @@ databaseChangeLog = {
     include file: 'assay_description.groovy'
     include file: 'run_name.groovy'
     include file: 'delete_run_num.groovy'
+    include file: 'add_feature.groovy'
 }

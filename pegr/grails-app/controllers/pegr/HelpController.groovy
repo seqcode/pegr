@@ -25,7 +25,12 @@ class HelpController {
     }
     
     def featuresHelp() {
-        render "Comming soon..."
+        if (!params.sort) {
+            params.sort = "filename"
+            params.order = "asc"
+        }
+        def features = ReferenceFeature.list(params)
+        [referenceFeatures: features]
     }
     
     def bioinformaticsApiHelp() {

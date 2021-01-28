@@ -162,7 +162,7 @@
             <span id="run-status-show" class="label label-default">${run.status}</span> 
             <sec:ifAnyGranted roles="ROLE_ADMIN">
             <span id="run-status-select" style="display:none">
-                <g:select name="runStatus" from="${pegr.RunStatus}" value="${run.status}"></g:select>
+                <g:select name="runStatus" from="${pegr.RunStatus}" value="${run.status}" style="width:10em"></g:select>
                 <button id="run-status-save" class="btn btn-primary">Save</button>
                 <button id="run-status-cancel" class="btn btn-default">Cancel</button>
             </span>

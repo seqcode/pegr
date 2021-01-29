@@ -243,15 +243,8 @@ class SequenceRunService {
         new SequencingCohort(run:run, project:project, name: "${runId}_${project.name}").save()
     }
     
-    @Transactional
-    void removeProject(Long cohortId) {
-        def cohort = SequencingCohort.get(cohortId)
-        if (!cohort) {
-            throw new SequenceRunException(message: "Sequencing cohort not found!")
-        }
-        try {
-            // delete the images
-            def imageMap = utilityService.parseJson(cohort.images)
+    void deleteImages (def imageMap) {
+        if (imageMap) {
             imageMap.each { key, val ->
                 val.each { filepath ->
                     def file = new File(utilityService.getFilesRoot(), filepath)
@@ -259,16 +252,35 @@ class SequenceRunService {
                         file.delete()
                     }
                 }                
-            }            
-            
-            // delete the summary report
-            cohort.report.delete()
-            
-            // delete the cohort
+            }    
+        }
+    }
+    
+    @Transactional
+    void removeProject(Long cohortId) {
+        def cohort = SequencingCohort.get(cohortId)
+        if (!cohort) {
+            throw new SequenceRunException(message: "Sequencing cohort not found!")
+        }
+        
+        // get the image paths from the cohort
+        def imageMap = utilityService.parseJson(cohort.images)
+        
+        // get the cohort report
+        def report = cohort.report
+        
+        try {    
+            // delete the cohort and its report
             cohort.delete()
+            if (report) {
+                report.delete()
+            }            
         } catch(Exception e) {
             throw new SequenceRunException(message: "There are samples in this sequence run that belong to the project and thus the project cannot be removed from the sequence run.")
         }
+        
+        // delete the images
+        deleteImages(imageMap)            
     }
     
     @Transactional
@@ -277,15 +289,37 @@ class SequenceRunService {
         if (!cohort) {
             throw new SequenceRunException(message: "Sequencing cohort not found!")
         }
+        
+        // get the project
         def project = cohort.project
-        SequencingExperiment.executeUpdate("update SequencingExperiment set cohort = null where cohort=?", [cohort])
-        cohort.delete()
+        
+        // get the image paths from the cohort
+        def imageMap = utilityService.parseJson(cohort.images)
+        
+        // get the cohort report
+        def report = cohort.report
+        
+        try {    
+            // delete the cohort and its report
+            cohort.delete()  
+            if (report) {
+                report.delete()
+            }
+        } catch(Exception e) {
+            throw new SequenceRunException(message: "There are samples in this sequence run that belong to the project and thus the project cannot be removed from the sequence run.")
+        }
+
         try {
+            // delete the project
             projectService.delete(project)
         } catch(Exception e) {
             throw new SequenceRunException(message: "The Project is not empty and cannot be deleted.")
         }
+        
+        // delete the images
+        deleteImages(imageMap)   
     }
+        
     
     def getCalendarTimeString(Date time) {
         return time.format("yyyyMMdd'T'HHmmss'Z'")

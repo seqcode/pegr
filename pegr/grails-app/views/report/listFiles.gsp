@@ -29,7 +29,7 @@
             <g:each in="${sample.experiments}" var="experiment">
                 <g:each in="${experiment.alignments}" var="alignment">
                     <tr>
-                        <td>${sample.id} (Old ${sample.source} ${sample.sourceId})</td>
+                        <td>${sample.id} (Source ${sample.source} ${sample.sourceId})</td>
                         <td>${sample.naturalId}</td>
                         <td>${sample.target}</td>
                         <td>${sample.antibody}</td>

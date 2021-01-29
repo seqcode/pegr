@@ -62,7 +62,7 @@ https://thanos.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=
         "experiments": [{
                 "id": long,
                 "runId": integer,
-                "oldRunNum": integer,
+                "runName": "string",
                 "totalReads": long,
                 "adapterDimerCount": long,
                 "fastqc": {"read1":"url", "read2":"url"},

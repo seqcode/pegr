@@ -19,7 +19,8 @@ class ProjectInterceptor {
                 return false
             }
             return false 
-        } else if (actionName in ['edit|addUserAjax',
+        } else if (actionName in ['edit',
+                                  'addUserAjax',
                                   'removeUserAjax',
                                   'editUserRoleAjax']) {
             // admin and project owners are allowed to edit the project

@@ -160,10 +160,6 @@ grails.plugin.springsecurity.interceptUrlMap = [
     [pattern: '/protocolInstanceBag/reopenBag/**',    access: ['ROLE_ADMIN']],
     [pattern: '/protocolInstanceBag/deleteBag/**',    access: ['ROLE_ADMIN']],
     [pattern: '/protocolInstanceBag/**',    access: ['ROLE_MEMBER', 'ROLE_ADMIN']],
-    [pattern: '/item/**',                   access: ['ROLE_MEMBER', 'ROLE_ADMIN']],
-    [pattern: '/antibody/**',               access: ['ROLE_MEMBER', 'ROLE_ADMIN']],
-    [pattern: '/cellSource/**',             access: ['ROLE_MEMBER', 'ROLE_ADMIN']],
-    [pattern: '/protocol/**',               access: ['ROLE_MEMBER', 'ROLE_ADMIN']],
     [pattern: '/sample/saveBarcode/**',     access: ['ROLE_MEMBER', 'ROLE_ADMIN']],
     [pattern: '/sample/all/**',             access: ['ROLE_MEMBER', 'ROLE_ADMIN']],
     [pattern: '/sample/search/**',          access: ['ROLE_MEMBER', 'ROLE_ADMIN']],
@@ -176,7 +172,6 @@ grails.plugin.springsecurity.interceptUrlMap = [
     [pattern: '/sequenceRun/create/**',     access: ['ROLE_ADMIN']],
     [pattern: '/sequenceRun/save/**',       access: ['ROLE_ADMIN']],
     [pattern: '/sequenceRun/delete/**',     access: ['ROLE_ADMIN']],
-    [pattern: '/sequenceRun/**',            access: ['ROLE_MEMBER', 'ROLE_ADMIN']],
     [pattern: '/**',             access:  ['isAuthenticated()']] // everything else requires authenticated user
 ]
 

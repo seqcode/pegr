@@ -145,11 +145,48 @@ class QfileService {
             }
         }
     }
+    
+    def checkMissingValueInSampleRow(def data) {
+        def requiredFields = [
+	     'senderNameStr',   //E
+	     'senderEmail',     //F
+	     'senderPhone',     //G
+	     'dataToUser',      //H
+	     'dataToEmail',     //I
+	     'projectName',     //J
+	     'projectUser',    //K
+	     'projectUserEmail',  //L   
+	     'service',        //M
+	     'invoice',        //N
+	     'abCompName',     //O
+	     'abCatNum',       //P
+	     'abLotNum',       //Q
+	     'samplePrepUser', //AD
+	     'genus',          //AE
+	     'species',        //AF
+	     'strain',         //AG
+	     'target',         //AV
+	     'assay',          //BA
+	     'genomeBuild1',   //BB    
+	     'chipUser',       //BK	    
+	     'chipDate',       //BM
+         'protocolVersion',//BO
+	     'runStr',         //CQ
+         'indexStr'     //DJ
+	    ]
+        
+        requiredFields.each { field ->
+            if (data[field] == null) {
+                throw new QfileException(message: "Field ${field} is missing!")
+            }
+        }
+    }
 	
     def migrateOneSampleRow(String[] rawdata, RunStatus runStatus, Map laneData, boolean basicCheck) {
 
         cleanRawData(rawdata)
         def data = getNamedData(rawdata)
+        checkMissingValueInSampleRow(data)
         
         // stop if basiceCheck is true and this row does not have a run number
         if (basicCheck && (!data.runStr || data.runStr == "Run #")) {

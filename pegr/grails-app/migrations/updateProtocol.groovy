@@ -11,7 +11,7 @@ databaseChangeLog = {
     }
 
     changeSet(author: "danyingshao (generated)", id: "1605124372433-49") {
-        dropUniqueConstraint(constraintName: "unique_protocol_id", tableName: "protocol_item_types")
+        dropUniqueConstraint(constraintName: "UK69c2d8246f1bc2e5e8d02ada96db", tableName: "protocol_item_types")
     }
 
 }

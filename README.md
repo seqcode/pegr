@@ -7,10 +7,8 @@ Platform for Epigenomic and Genomic Research (PEGR) is a web service platform th
 A tested stack of versions is listed below.
 
 1. OpenJDK 1.8.0_212
-2. Groovy 2.4.17
-3. Grails 3.3.10
-4. MariaDB 10.4.6
-5. xlsx2csv 0.7.2 (You can download the executable xlsx2csv from https://github.com/seqcode/pegr/releases and put it in /usr/local/bin)
+2. MariaDB 10.4.6
+3. python and xlsx2csv 0.7.2 (You can download the executable xlsx2csv from https://github.com/seqcode/pegr/releases and put it in /usr/local/bin)
 
 ### Quick start
 

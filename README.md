@@ -10,18 +10,11 @@ A tested stack of versions is listed below.
 2. Groovy 2.4.17
 3. Grails 3.3.10
 4. MariaDB 10.4.6
-5. xlsx2csv 0.7.2
+5. xlsx2csv 0.7.2 (You can download the executable xlsx2csv from https://github.com/seqcode/pegr/releases and put it in /usr/local/bin)
 
 ### Quick start
 
-1. Clone the codes.
-
-```
-$ git clone https://github.com/seqcode/pegr.git 
-$ cd pegr
-```
-
-2. Set up database. First, create an empty database with utf8 coding and assign privileges.
+1. Set up database. First, create an empty database with utf8 coding and assign privileges.
 
 ```
 CREATE DATABASE <DB_NAME> CHARACTER SET utf8 COLLATE utf8_general_ci;
@@ -79,13 +72,12 @@ grails.config.locations = [ ...
                             "file:<FILEPATH>"]
 ```
 
-3. Create a config file for the environment variables and store it in one of the filepaths indicated on the top of file pegr/grails-app/conf/application.groovy. A sample config file is inlcuded in the smple_files folder. 
+2. Create a config file for the environment variables and store it in one of the filepaths indicated on the top of file pegr/grails-app/conf/application.groovy. A sample config file is inlcuded in the smple_files folder. 
 
-4. Run PEGR.
+3. Run PEGR.
 
 ```
-$ cd pegr
-$ grails run-app
+$ java -Dgrails.env=dev -jar pegr.war
 ```
 
 5. Go to http://localhost:8080/pegr/ and you will see the login page. Login with the default user name "labadmin" and password "labadmin". Change the password right away at the user's profile page. You may also want to add sequencing platforms and sequence indexes in the Admin page. 

@@ -8,7 +8,9 @@ A tested stack of versions is listed below.
 
 1. OpenJDK 1.8.0_212
 2. MariaDB 10.4.6
-3. python and xlsx2csv 0.7.2 (You can download the executable xlsx2csv from https://github.com/seqcode/pegr/releases and put it in /usr/local/bin)
+3. python and xlsx2csv 0.7.2 
+   - You can download the executable xlsx2csv from https://github.com/seqcode/pegr/releases and put it in /usr/local/bin.
+   - xlsx2csv works with both python 2 and python 3
 
 ### Quick start
 
@@ -33,51 +35,7 @@ Then import the baseline database.
 $ mysql -u <USER_NAME> -p <DB_NAME> < sample_files/pegr_baseline.sql 
 ```
 
-And configure the database connection in PEGR. There are two places that you can put the database connection settings. One is in the pegr/grails-app/conf/application.yml file. You can have different connection settings for development, test and production environments.
-     
-```
-environments:
-    development:
-        dataSource:
-            dbCreate: none
-            url: jdbc:mysql://localhost/<DB_NAME>?useUnicode=true&characterEncoding=UTF-8
-            username: <USER_NAME>
-            password: <PASSWORD>
-    test:
-        ...
-    production:
-        ...
-        
-```  
-
-The other way is to create a config file and let PEGR know the config file's location. For example, you can create a groovy file as below. 
-
-```
-environments {
-    development {
-        dataSource {
-            url = "jdbc:mysql://localhost/<DB_name>?useUnicode=true&characterEncoding=UTF-8"
-            username="USER_NAME"
-            password="PASSWORD"
-        }
-    }
-    test {
-        ...
-    }
-    production {
-        ...
-    }
-}
-```
-
-And add the file's path to the file pegr/grails/conf/application.groovy.
-
-```
-grails.config.locations = [ ...
-                            "file:<FILEPATH>"]
-```
-
-2. Create a config file for the environment variables and store it in one of the filepaths indicated on the top of file pegr/grails-app/conf/application.groovy. A sample config file is inlcuded in the smple_files folder. 
+2. Create a config file 'pegr-config.properties' in the folder {userHome}/.grails/ for the environment variables, e.g. the information on database connection, NGS repository connection, email connection and Single Sign On. A sample config file 'pegr-config.properties' is inlcuded in the sample_files folder. 
 
 3. Run PEGR.
 

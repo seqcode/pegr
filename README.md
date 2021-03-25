@@ -16,6 +16,13 @@ A tested stack of versions is listed below.
 
 ```
 CREATE DATABASE <DB_NAME> CHARACTER SET utf8 COLLATE utf8_general_ci;
+```
+And optionally, you can create a database user specifically for the PEGR database. Alternatively, you can choose to use an existing database user.
+```
+CREATE USER 'some_user'@'localhost' IDENTIFIED BY 'some_pass';
+```
+And then grant the database access.
+```
 GRANT ALL PRIVILEGES ON <DB_NAME>.* TO '<USER_NAME>'@'localhost' with grant option;
 FLUSH PRIVILEGES;
 ```

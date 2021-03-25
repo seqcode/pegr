@@ -35,7 +35,7 @@ Then import the baseline database.
 $ mysql -u <USER_NAME> -p <DB_NAME> < sample_files/pegr_baseline.sql 
 ```
 
-2. Create a config file 'pegr-config.properties' in the folder {userHome}/.grails/ for the environment variables, e.g. the information on database connection, NGS repository connection, email connection and Single Sign On. A sample config file 'pegr-config.properties' is inlcuded in the sample_files folder. 
+2. Create a config file 'pegr-config.properties' in the folder {userHome}/.grails/ for the environment variables, e.g. the information on database connection, NGS repository connection, email connection and Single Sign On. A sample config file 'pegr-config.properties' is inlcuded in the sample_files folder https://github.com/seqcode/pegr/tree/master/sample_files. 
 
 3. Run PEGR.
 

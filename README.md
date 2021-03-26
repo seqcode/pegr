@@ -7,43 +7,113 @@ Platform for Epigenomic and Genomic Research (PEGR) is a web service platform th
 A tested stack of versions is listed below.
 
 1. OpenJDK 1.8.0_212
-2. MariaDB 10.4.6
-3. python and xlsx2csv 0.7.2 
+   - https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html
+   - PEGR is not currently compatible with Java 11+
+3. MariaDB 10.4.6
+   - Linux: https://mariadb.org/download/
+   - MacOS: We recommend Hombrew to install and manage MariaDB
+   - https://mariadb.com/kb/en/installing-mariadb-on-macos-using-homebrew/
+   ```
+   $ brew install mariadb
+   ```
+5. python and xlsx2csv 0.7.2 
    - You can download the executable xlsx2csv from https://github.com/seqcode/pegr/releases and put it in /usr/local/bin.
-   - xlsx2csv works with both python 2 and python 3
+   - xlsx2csv works with Python 2 and 3
+   ```
+   $ chmod 771 xlsx2csv
+   $ cp xlsx2csv /usr/local/bin
+   ```
 
 ### Quick start
 
-1. Set up database. First, create an empty database with utf8 coding and assign privileges.
+1. Download the latest releasse of PEGR
+   - https://github.com/seqcode/pegr/releases/tag/v0.1-beta
 
+1.1 (MacOS only) Turn on MariaDB server
+   ```
+   $ mysql.server start
+   ``` 
+
+   (Optional) To make MariaDB start automatically on system startup 
+   ```
+   $ brew services start mariadb
+   ```
+
+2. Set up database. Create an empty database with utf8 coding, a database user, and assigning privileges.
 ```
-CREATE DATABASE <DB_NAME> CHARACTER SET utf8 COLLATE utf8_general_ci;
+$ mysql
+> CREATE DATABASE <DB_NAME> CHARACTER SET utf8 COLLATE utf8_general_ci;
+> CREATE USER '<USER_NAME>'@'localhost' IDENTIFIED BY '<USER_PASS>';
+> GRANT ALL PRIVILEGES ON <DB_NAME>.* TO '<USER_NAME>'@'localhost' with grant option;
+> FLUSH PRIVILEGES;
+> exit
 ```
-And optionally, you can create a database user specifically for the PEGR database. Alternatively, you can choose to use an existing database user.
+<DB_NAME> : Name assigned to PEGR database
+
+<USER_NAME> : User ID that will access PEGR database
+
+<USER_PASS> : Password used by User ID to access PEGR database
+
+
+Example mySQL code provided here:
 ```
-CREATE USER 'some_user'@'localhost' IDENTIFIED BY 'some_pass';
-```
-And then grant the database access.
-```
-GRANT ALL PRIVILEGES ON <DB_NAME>.* TO '<USER_NAME>'@'localhost' with grant option;
-FLUSH PRIVILEGES;
+$ mysql
+> CREATE DATABASE pegrDB CHARACTER SET utf8 COLLATE utf8_general_ci;
+> CREATE USER 'pegruser'@'localhost' IDENTIFIED BY 'password';
+> GRANT ALL PRIVILEGES ON pegrDB.* TO 'pegruser'@'localhost' with grant option;
+> FLUSH PRIVILEGES;
+> exit
 ```
 
-Then import the baseline database.
+3. Import the baseline database.
    
+Generic code:
 ```
 $ mysql -u <USER_NAME> -p <DB_NAME> < sample_files/pegr_baseline.sql 
 ```
-
-2. Create a config file 'pegr-config.properties' in the folder {userHome}/.grails/ for the environment variables, e.g. the information on database connection, NGS repository connection, email connection and Single Sign On. A sample config file 'pegr-config.properties' is inlcuded in the sample_files folder https://github.com/seqcode/pegr/tree/master/sample_files. 
-
-3. Run PEGR.
-
+Code following example above:
 ```
-$ java -Dgrails.env=dev -jar pegr.war
+$ mysql -u pegruser -p pegrDB < sample_files/pegr_baseline.sql
 ```
 
-5. Go to http://localhost:8080/pegr/ and you will see the login page. Login with the default user name "labadmin" and password "labadmin". Change the password right away at the user's profile page. You may also want to add sequencing platforms and sequence indexes in the Admin page. 
+4. Create a config file 'pegr-config.properties' in the folder {userHome}/.grails/ for the environment variables, e.g. the information on database connection, NGS repository connection, email connection and Single Sign On.
+
+A sample config file 'pegr-config.properties' is inlcuded in the sample_files folder https://github.com/seqcode/pegr/tree/master/sample_files. 
+```
+$ mkdir ~/.grails/
+$ cp pegr-config.properties ~/.grails/
+```
+
+Not all pegr-config.properites need to be filled out for PEGR to function. Below are the minimum properties needed to be set.
+Generic 'pegr-config.properties':
+```
+dataSource.url= jdbc:mysql://localhost/<DB_NAME>?useUnicode=true&characterEncoding=UTF-8
+dataSource.username=<USER_NAME>
+dataSource.password=<USER_PASS>
+sso.url=none
+sso.type=none
+sso.principle=none
+```
+
+Sample 'pegr-config.properties' following example above:
+```
+dataSource.url= jdbc:mysql://localhost/pegrDB?useUnicode=true&characterEncoding=UTF-8
+dataSource.username=pegruser
+dataSource.password=password
+sso.url=none
+sso.type=none
+sso.principle=none
+```
+
+5. Start PEGR.
+
+```
+$ java -Dgrails.env=dev -jar pegr-0.1.war
+```
+
+6. Go to http://localhost:8080/pegr/ in your browser to see the PEGR login page.
+
+Default login is user name "labadmin" and password "labadmin". **Change the password right away at the user's profile page.**
 
 For more information, please visit https://github.com/seqcode/pegr/wiki.
 

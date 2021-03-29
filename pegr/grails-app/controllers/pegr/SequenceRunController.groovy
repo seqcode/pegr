@@ -61,11 +61,11 @@ class SequenceRunController {
 
     def show(Long id) {
         def run = SequenceRun.get(id)
-        def cohorts = run.cohorts
-        def cohortUserList = []
-        def isCohortUser = false
 
         if (run) {
+            def cohorts = run.cohorts
+            def cohortUserList = []
+            def isCohortUser = false
             def read = null
             if (run.experiments.size() > 0) {
                 def jsonSlurper = new JsonSlurper()

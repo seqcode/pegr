@@ -21,7 +21,7 @@
             </div>
             <div>
                 <label>Projects</label>
-                <g:select name="projects" id="projects" optionKey="id" from="${pegr.Project.list()}" multiple="multiple"></g:select>
+                <g:select name="projects" id="projects" optionKey="id" from="${pegr.Project.list()}" multiple="multiple" style="min-width:20em;"></g:select>
             </div>
             <h4>Protocols</h4>
             <div class="radio">

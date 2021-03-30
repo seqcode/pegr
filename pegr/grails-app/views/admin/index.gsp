@@ -23,9 +23,12 @@
 			           <g:link controller="${it.key}" class="btn btn-default" role="button">${it.value}</g:link>
 			        </g:each>
 			        </div>
-					</div>
+				</div>
 		    </g:each>
-			</div>
+            <div class="well">
+                <h3>Service Report <g:link action="serviceReport"><span class="glyphicon glyphicon-file"></span></g:link></h3>
+            </div>            
+        </div>
     </div>
 </body>
 </html>

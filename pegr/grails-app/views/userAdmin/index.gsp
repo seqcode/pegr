@@ -65,6 +65,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Username</th>
+                            <th>Email</th>
                             <th>Affiliation</th>
                             <th>Group</th>
                             <th>Status</th>
@@ -76,6 +77,7 @@
                             <tr>
                                 <td>${it.fullName}</td>
                                 <td>${it.username}</td>
+                                <td>${it.email}</td>
                                 <td>${it.affiliation}</td>
                                 <td>${it.authorities*.name.join(", ")}</td>
                                 <td>

@@ -25,6 +25,14 @@
                 </tr>
                 <tr>
                   <td>
+                    <label>Email</label>
+                  </td>
+                  <td>
+                    <g:textField name="email"  value="${user?.email}"/>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
                     <label>Full Name</label>
                   </td>
                   <td>

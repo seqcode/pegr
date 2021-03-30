@@ -22,7 +22,8 @@
                     </g:if>
                 </td>
                 <g:if test="${projectEditAuth}">
-                <td><a href="#" onclick="removeUser(${projectUser.user.id}, ${projectUser.project.id})"><span class="glyphicon glyphicon-remove"></span></a></td>
+                <td><g:link onclick="confirm('Are you sure?')" controller="project" action="removeUser" params="[projectId:projectUser.project.id,userId:projectUser.user.id]"><span class="glyphicon glyphicon-remove"></span></g:link></td>
+                
                 </g:if>
             </tr>
             </g:each>

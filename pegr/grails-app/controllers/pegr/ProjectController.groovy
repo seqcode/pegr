@@ -129,18 +129,17 @@ class ProjectController {
             message = "Error adding the user!"
         }
         def projectUsers = ProjectUser.where { project.id==projectId}.list()
-        render template:"userTable", model: [projectUsers: projectUsers, message: message, authorized: true]
+        render template:"userTable", model: [projectUsers: projectUsers, message: message, projectEditAuth: true]
 	}
-
-	def removeUserAjax(Long projectId, Long userId) {
-        def message = null
+    
+    def removeUser(Long projectId, Long userId) {
 		try {
 			projectService.removeUser(projectId, userId)
-		}catch(Exception e) {
-			message = "Error removing the user!"
+		} catch(Exception e) {
+			flash.message = "Error removing the user!"
 		}				
         def projectUsers = ProjectUser.where { project.id==projectId}.list()
-        render template:"userTable", model: [projectUsers: projectUsers, message: message, authorized: true]
+        redirect(action: "show", id: projectId)
 	}
     
     def editUserRoleAjax(Long projectId, Long userId, String projectRole) {
@@ -153,7 +152,7 @@ class ProjectController {
             message = "User not found in this project!"
         }
         def projectUsers = ProjectUser.where { project.id==projectId}.list()
-        render template:"userTable", model: [projectUsers: projectUsers, message: message, authorized: true]
+        render template:"userTable", model: [projectUsers: projectUsers, message: message, projectEditAuth: true]
     }
     
     def searchSample(Long projectId) {

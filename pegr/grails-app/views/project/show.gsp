@@ -178,19 +178,6 @@
             $("#nav-projects").addClass("active");
             $("#userId").select2();
         });
-
-        function removeUser(userId, projectId) {
-            if(confirm('Are you sure?')) {
-                jQuery.ajax({
-                    type:'POST',
-                    data:{'userId': userId,'projectId': projectId}, 
-                    url:'/pegr/project/removeUserAjax',
-                    success:function(data,textStatus){
-                                jQuery('#project-users').html(data);
-                            }
-                });
-            }
-        }
         
         function showEditRole(userId) {
             $(".modal-body #hiddenUserId").val(userId);

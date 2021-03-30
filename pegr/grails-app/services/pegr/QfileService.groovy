@@ -158,9 +158,6 @@ class QfileService {
 	     'projectUserEmail',  //L   
 	     'service',        //M
 	     'invoice',        //N
-	     'abCompName',     //O
-	     'abCatNum',       //P
-	     'abLotNum',       //Q
 	     'samplePrepUser', //AD
 	     'genus',          //AE
 	     'species',        //AF

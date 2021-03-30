@@ -32,10 +32,13 @@ class ItemController {
                 break
             default:
                 def items = Item.where { type.category.id == categoryId }
+                def orderLink = utilityService.getInventoryExternalLink()
                 [itemList: items.list(params), 
                  itemCount: items.count(), 
                  currentCategory: category,
-                itemTypes: itemTypes]
+                 itemTypes: itemTypes,
+                 orderLink: orderLink
+                ]
         }
     }
     

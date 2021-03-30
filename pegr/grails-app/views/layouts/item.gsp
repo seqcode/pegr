@@ -17,7 +17,9 @@
                 <g:link controller="item" action="list" params="[categoryId: category.id]" class="btn btn-info item-${category.id}">${category.name}</g:link> 
             </g:each>
             <g:link controller="sequenceIndex" class="btn btn-info item-index">Index</g:link>
-            <a href="https://www.quartzy.com/e/groups/108111/order-requests" class="btn btn-info external" target="_blank">Order</a>
+            <g:if test="${orderLink}">
+                <a href="${orderLink}" class="btn btn-info external" target="_blank">Order</a>
+            </g:if>            
             <g:form controller="item" action="search" class="pull-right" style="padding:3px 0px">
                 <input name="str" value="${str}">
                 <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>

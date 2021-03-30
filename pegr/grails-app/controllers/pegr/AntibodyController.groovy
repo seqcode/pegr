@@ -13,11 +13,13 @@ class AntibodyController {
     def list(Integer max) {
         params.max = Math.min(max ?: 15, 100)
         def category = ItemTypeCategory.findBySuperCategory(ItemTypeSuperCategory.ANTIBODY)
+        def orderLink = utilityService.getInventoryExternalLink()
         def itemTypes = ItemType.list(sort: "name")
         [objectList: Antibody.list(params),
          objectCount: Antibody.count(),
          currentCategory: category,
-         itemTypes: itemTypes
+         itemTypes: itemTypes,
+         orderLink: orderLink
         ]
     }
 

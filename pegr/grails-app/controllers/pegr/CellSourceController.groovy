@@ -30,8 +30,9 @@ class CellSourceController {
             }
         }
         def category = ItemTypeCategory.findByName(CELL_STOCK)
+        def orderLink = utilityService.getInventoryExternalLink()
 
-        [cellSources: cellSources, categoryId: category.id, itemTypes: itemTypes, strains: strains]
+        [cellSources: cellSources, categoryId: category.id, itemTypes: itemTypes, strains: strains, orderLink: orderLink]
     }
     
     def show(Integer id) {

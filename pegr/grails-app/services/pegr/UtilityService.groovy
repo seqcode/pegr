@@ -15,6 +15,13 @@ class UtilityException extends RuntimeException {
 class UtilityService {
     def dataSource
     def grailsApplication
+    
+    def getInventoryExternalLink() {
+        def link = grailsApplication.config.inventory.order.link        
+        return link
+    }
+    
+    
    /** 
     * Helper method for Select2. It converts a collection of strings to a collection 
     * of maps with both id and text to be the string.

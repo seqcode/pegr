@@ -20,7 +20,7 @@
 
 <div>
     <label for="sharedItem">Shared Item Types (multi-select)</label>
-    <select name="sharedItemTypeIds" class="other-type" multiple="multiple">
+    <select name="sharedItemTypeIds" class="other-type" multiple="multiple" style="min-width:20em;">
         <g:each var="sharedItemType" in="${sharedItemTypes}">
         <option value="${sharedItemType?.id}" selected>${sharedItemType?.name}</option>
         </g:each>
@@ -29,7 +29,7 @@
 
 <div>
     <label for="endProduct">End Product Type (multi-select)</label>
-    <select name="endProductTypeIds" class="other-type" multiple="multiple">
+    <select name="endProductTypeIds" class="other-type" multiple="multiple" style="min-width:20em;">
         <g:each var="endProductType" in="${endProductTypes}">
         <option value="${endProductType?.id}" selected>${endProductType?.name}</option>
         </g:each>
@@ -45,13 +45,13 @@
 <h4>Traced Samples</h4>
 <div>
     <label for="startItem">Start State</label>
-    <select name="startItemTypeId" class="traced-sample" id="startItem">
+    <select name="startItemTypeId" class="traced-sample" id="startItem" style="min-width:20em;">
         <option value="${startItemType?.id}">${startItemType?.name}</option>
     </select>
 </div>
 <div>
     <label for="endItem">End State</label>
-    <select name="endItemTypeId" class="traced-sample" id="endItem">
+    <select name="endItemTypeId" class="traced-sample" id="endItem" style="min-width:20em;">
         <option value="${endItemType?.id}">${endItemType?.name}</option>
     </select>
 </div>
@@ -65,11 +65,11 @@
 <h4>Sample Pool</h4>
 <div>
     <label for="startPool"><abbr title="A pre-existing pool that has been generated in the previous protocol.">Import Pool</abbr></label>
-    <select name="startPoolTypeId" class="sample-pool" id="startPool">
+    <select name="startPoolTypeId" class="sample-pool" id="startPool" style="min-width:20em;">
         <option value="${startPoolType?.id}">${startPoolType?.name}</option>
     </select>    
     <label for="endPool"><abbr title="A new pool that will be generated at the end of this protocol.">Create Pool</abbr></label>
-    <select name="endPoolTypeId" class="sample-pool" id="endPool">
+    <select name="endPoolTypeId" class="sample-pool" id="endPool" style="min-width:20em;">
         <option value="${endPoolType?.id}">${endPoolType?.name}</option>
     </select>
 </div>

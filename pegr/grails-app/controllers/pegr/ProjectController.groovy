@@ -45,20 +45,25 @@ class ProjectController {
             withForm{                
                 // create new project
                 def project = new Project(params)
-                def user = springSecurityService.currentUser
-                try {
-                    def fundings = params.list("funding")
-                    projectService.saveWithUser(project, user, fundings)
-                    flash.message = "Successfully  created project ${project.name}"
-                    redirect(action:"show", id:"${project.id}")
-                } catch (ProjectException e) {
-                    request.message = e.message
-                    render(view:'create', model:[project: project])
-                } catch (Exception e) {
-                    log.error "Error: ${e.message}", e
-                    request.message ="Oops! Please try again."
-                    render(view:'create', model:[project: project])
-                }
+                if (Project.findByName(project.name)) {
+                    request.message = "Project with the same name already exists! Please choose a different project name."
+                    render(view:'create')
+                } else {
+                    def user = springSecurityService.currentUser
+                    try {
+                        def fundings = params.list("funding")
+                        projectService.saveWithUser(project, user, fundings)
+                        flash.message = "Successfully  created project ${project.name}"
+                        redirect(action:"show", id:"${project.id}")
+                    } catch (ProjectException e) {
+                        request.message = e.message
+                        render(view:'create', model:[project: project])
+                    } catch (Exception e) {
+                        log.error "Error: ${e.message}", e
+                        request.message ="Oops! Please try again."
+                        render(view:'create', model:[project: project])
+                    }
+                }            
             }        
         }
     }

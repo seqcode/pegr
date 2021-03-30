@@ -12,6 +12,12 @@ class ItemService {
 
     def utilityService
     def springSecurityService
+    
+    def getCategorizedItemTypes() {
+        def itemTypes = ItemType.list().collect {it -> return [id: it.id, label: "${it.category} - ${it.name}"]}
+        itemTypes.sort {it.label}
+        return itemTypes
+    }
 
     @Transactional
     def save(Item item){

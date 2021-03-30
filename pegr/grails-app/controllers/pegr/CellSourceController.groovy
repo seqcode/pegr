@@ -14,7 +14,7 @@ class CellSourceController {
     final String CELL_STOCK = "Cell Stock"
     
     def list(Integer max) {
-        def itemTypes = ItemType.list(sort: "name")
+        def itemTypes = itemService.getCategorizedItemTypes()
         def strains = Strain.executeQuery("select distinct name from Strain where name is not null order by name")
         params.max = Math.min(max ?: 15, 100)
         def strainName = params.strain

@@ -20,7 +20,8 @@ class ItemController {
             categoryId = 1
         }
         def category = ItemTypeCategory.get(categoryId)
-        def itemTypes = ItemType.list(sort: "name")
+        def itemTypes = itemService.getCategorizedItemTypes()
+        
         switch (category.name) {
             case "Antibody":
                 flash.message = flash.message

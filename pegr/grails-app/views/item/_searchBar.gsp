@@ -2,7 +2,7 @@
     <div class="form-group">
         <label for="type">Type</label>
         <g:if test="${itemTypes}">
-            <g:select id="type" name="typeId" optionKey="id" from="${itemTypes}" noSelection="['null': '-- choose --']" style="width:250px"/>
+            <g:select id="type" name="typeId" optionKey="id" optionValue="label" from="${itemTypes}" noSelection="['null': '-- choose --']" style="width:250px"/>
         </g:if>
         <g:else>
             <g:select id="type" name="typeId" optionKey="id" from="${pegr.ItemType.list()}" noSelection="['null': '-- choose --']" style="width:250px"/>

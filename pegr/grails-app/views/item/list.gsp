@@ -16,10 +16,10 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <g:sortableColumn property="type" title="Type"></g:sortableColumn>
-                    <g:sortableColumn property="name" title="Name"></g:sortableColumn>
-                    <g:sortableColumn property="barcode" title="Barcode"></g:sortableColumn>
-                    <g:sortableColumn property="location" title="Location"></g:sortableColumn>
+                    <g:sortableColumn property="type" title="Type" params="[categoryId:currentCategory.id]"></g:sortableColumn>
+                    <g:sortableColumn property="name" title="Name" params="[categoryId:currentCategory.id]"></g:sortableColumn>
+                    <g:sortableColumn property="barcode" title="Barcode" params="[categoryId:currentCategory.id]"></g:sortableColumn>
+                    <g:sortableColumn property="location" title="Location" params="[categoryId:currentCategory.id]"></g:sortableColumn>
                     <th>Notes</th>
                 </tr>
             </thead>

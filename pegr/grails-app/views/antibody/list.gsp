@@ -16,13 +16,13 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <g:sortableColumn property="id" title="ID"></g:sortableColumn>
-                    <g:sortableColumn property="catalogNumber" title="Catalog"></g:sortableColumn>
-                    <g:sortableColumn property="lotNumber" title="Lot"></g:sortableColumn>
-                    <g:sortableColumn property="abHost" title="Host"></g:sortableColumn>
-                    <g:sortableColumn property="immunogene" title="Immunogene"></g:sortableColumn>
-                    <g:sortableColumn property="clonal" title="Clonal"></g:sortableColumn>
-                    <g:sortableColumn property="igType" title="Ig Type"></g:sortableColumn>
+                    <g:sortableColumn property="id" title="ID" params="[categoryId:currentCategory.id]"></g:sortableColumn>
+                    <g:sortableColumn property="catalogNumber" title="Catalog" params="[categoryId:currentCategory.id]"></g:sortableColumn>
+                    <g:sortableColumn property="lotNumber" title="Lot" params="[categoryId:currentCategory.id]"></g:sortableColumn>
+                    <g:sortableColumn property="abHost" title="Host" params="[categoryId:currentCategory.id]"></g:sortableColumn>
+                    <g:sortableColumn property="immunogene" title="Immunogene" params="[categoryId:currentCategory.id]"></g:sortableColumn>
+                    <g:sortableColumn property="clonal" title="Clonal" params="[categoryId:currentCategory.id]"></g:sortableColumn>
+                    <g:sortableColumn property="igType" title="Ig Type" params="[categoryId:currentCategory.id]"></g:sortableColumn>
                 </tr>
             </thead>
             <tbody>

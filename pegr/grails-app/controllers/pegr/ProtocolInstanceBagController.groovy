@@ -13,30 +13,53 @@ class ProtocolInstanceBagController {
         redirect(action: "list", params: params )
     } 
     
-    def list(int max, int offset, Long projectId, String status) {
+    def list(int max, int offset, Long projectId, String status, String nameSub) {
         max = Math.min(max ?: 25, 100)
+        offset = offset ?: 0
+        
+        def c, bags, totalCount
 
-        def bags, totalCount
-        if (projectId) { // project from filter box
+        if (status == "null") {
+            status = null
+        }        
+        
+        if (projectId) {
             def projectBags = ProjectBags.createCriteria().list(max: max, offset: offset) {
-                project {
-                    eq("id", projectId)
-                }
-                bag {
-                    order("startTime", "desc")
+                and {
+                    project {
+                        eq("id", projectId)
+                    }
+                    bag {
+                        and {
+                            if (nameSub) {
+                                ilike "name", "%${nameSub}%"   
+                            }
+                            if (status) {
+                                eq("status", status as ProtocolStatus)
+                            }
+                        }
+                        order("id", "desc")
+                    }
                 }
             }
-            totalCount = projectBags.totalCount
             bags = projectBags.collect { it.bag }
-        } else if (status) {  // filtering status options
-            bags = ProtocolInstanceBag.where {status == status}.list(max: max, offset: offset, sort: "startTime", order: "desc")
-            totalCount = ProtocolInstanceBag.where {status == status}.count()
+            totalCount = projectBags.totalCount
         } else {
-            bags = ProtocolInstanceBag.list(max: max, offset: offset, sort: "startTime", order: "desc")
-            totalCount = ProtocolInstanceBag.count()
+            c = ProtocolInstanceBag.createCriteria()
+            bags = c.list(max: max, offset: offset, sort: "id", order: "desc") {
+                and {
+                    if (nameSub) {
+                        ilike "name", "%${nameSub}%"   
+                    }
+                    if (status) {
+                        eq("status", status as ProtocolStatus)
+                    }
+                }
+            }
+            totalCount = bags.totalCount
         }
         
-        [bags: bags, totalCount: totalCount]
+        [bags: bags, totalCount: totalCount, status: status, nameSub: nameSub, projectId: projectId]
     }
         
     def create() {
@@ -488,23 +511,6 @@ class ProtocolInstanceBagController {
             items.push(item)
         }
         render(view:"/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])        
-    }
-    
-    def search(String str) {
-        def c = ProtocolInstanceBag.createCriteria()
-        def listParams = [
-                max: params.max ?: 25,
-                sort: params.sort ?: "id",
-                order: params.order ?: "desc",
-                offset: params.offset
-            ]
-        def bags = c.list(listParams) {
-            or {
-                ilike "name", "%${str}%"
-            }
-        }
-            
-        render(view: "list", model: [bags: bags, totalCount: bags.totalCount, str: str])   
     }
     
     def uploadImage(Long instanceId, String type) {

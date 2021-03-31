@@ -4,13 +4,6 @@
 </head>
 <body>
     <h4><g:link action="list">Experiment Records</g:link> <g:link action='create' class="edit">New</g:link>    <a href="#" onclick="window.open('/pegr/help#bag', 'Help: Sample Submission', 'width=600,height=400' )" class="pull-right"><small><u>Help</u></small></a></h4>
-    <div class="row">
-        <g:form controller="protocolInstanceBag" action="search" class="pull-right" style="padding-bottom:5px">
-            <input name="str">
-            <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>
-	    <br>Search experiment name
-        </g:form>
-    </div>
     <div id="message" >
         <g:if test="${flash.message}">
              <div class="message" role="status">
@@ -44,21 +37,21 @@
             </table>
         </div>
         <div class="col-sm-2 well">
-            <div class="dropdown">
-              <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Filter by Status
-              <span class="caret"></span></button>
-              <ul class="dropdown-menu">
-                <li><g:link >ALL</g:link></li>
-                <li><g:link params="[status:'INACTIVE']">INACTIVE</g:link></li>
-                <li><g:link params="[status:'PROCESSING']">PROCESSING</g:link></li>
-                <li><g:link params="[status:'COMPLETED']">COMPLETED</g:link></li>
-              </ul>
-            </div>
-            <h5>Project</h5>
-            <form action="list">
-                <g:select name="projectId" optionKey="id" from="${pegr.Project.list(sort: 'name')}" noSelection="${['null':'Select...']}"></g:select>
-                <g:submitButton name="submit" value="Search" class="btn btn-default"></g:submitButton>
-            </form>
+            <g:form action="list" method="post">
+                <div class="form-group">
+                    <label>Name includes</label>
+                    <input name="nameSub" value="${nameSub}" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <g:select name="status" value="${status}" from="${pegr.ProtocolStatus.values()}" keys="${pegr.ProtocolStatus.values()*.name()}" noSelection="${['null':'Select...']}" class="form-control"></g:select>
+                </div>
+                <div class="form-group">
+                    <label>Project</label>
+                    <g:select name="projectId" value="${projectId}" optionKey="id" from="${pegr.Project.list(sort: 'name')}" noSelection="${['null':'Select...']}" class="form-control"></g:select>
+                </div>
+                <g:submitButton name="submit" value="Search" class="btn btn-primary"></g:submitButton>
+            </g:form>
         </div>
     </div>
     <div class="pagination">

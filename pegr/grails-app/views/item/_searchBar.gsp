@@ -6,14 +6,14 @@
         </g:if>
         <g:else>
             <g:select id="type" name="typeId" optionKey="id" from="${pegr.ItemType.list()}" noSelection="['null': '-- choose --']" style="width:250px"/>
-        </g:else>        
+        </g:else>
+        <g:submitButton class="btn btn-primary btn-sm" name="generate" value="New instance with PEGR generated barcode"/>
     </div>        
-    <div class="form-group">
+    <div class="form-group pull-right">
         <label for="barcode">Barcode</label>
         <g:textField id="barcode" name="barcode" />
         <button type="button" onclick="getScan();"><span class="glyphicon glyphicon-qrcode"></span></button>
         <a href="#" onclick="refreshHash();"><span class="glyphicon glyphicon-refresh"></span></a>
+        <g:submitButton class="btn btn-primary btn-sm" name="search" value="Search/Create instance with existing barcode"/>
     </div>
-    <g:submitButton class="btn btn-primary btn-sm" name="search" value="Search/Create"/>
-    <g:submitButton class="btn btn-primary btn-sm" name="generate" value="Generate Barcode"/>
 </g:form> 

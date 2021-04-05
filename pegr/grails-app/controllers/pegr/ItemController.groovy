@@ -78,8 +78,8 @@ class ItemController {
     }
   
     def preview(Long typeId, String barcode) {
-        def itemType = typeId ? ItemType.get(typeId):null
         if (params.generate) {
+            def itemType = typeId ? ItemType.get(typeId):null
             try {
                 barcode = barcodeService.generateBarcode()
                 render(view: "/item/generateBarcode", model: [itemType: itemType, barcode: barcode])
@@ -87,44 +87,37 @@ class ItemController {
                 flash.message = e.message
                 redirect(action: "list", params: [typeId: typeId])
             }
-        } else {
+        } else if (params.search) {            
             if (barcode?.trim()){
-                if (itemType) { 
-                    def item = Item.findByBarcode(barcode)
-                    if (item) {
-                        if (item.type == itemType) {
-                            switch (itemType.category.superCategory) {
-                                case ItemTypeSuperCategory.ANTIBODY:
-                                    def antibody = Antibody.findByItem(item)
-                                    redirect(controller: "antibody", action: "show", id: antibody?.id)
-                                    break
-                                default:
-                                    redirect(action: "show", id: item.id)
-                            }
-                        } else {
-                            flash.message = "The item with barcode ${barcode} has type ${item.type.name}, which does not match the input type ${itemType.name}!"
-                            redirect(action: "list", params: [typeId: typeId])
-                        }                        
-                    } else {
-                        item = new Item(type: itemType, barcode: barcode)
-                        switch (itemType.category.superCategory) {
-                            case ItemTypeSuperCategory.ANTIBODY:
-                                render(view: "/antibody/create", model: [item:item])
-                                break
-                            case ItemTypeSuperCategory.TRACED_SAMPLE:
-                                render(view: "/cellSource/create", model: [item: item])
-                                break
-                            default:
-                                render(view: "create", model: [item: item])
-                        }
-                    }
+                def item = Item.findByBarcode(barcode)
+                if (item) {
+                    switch (item.type.category.superCategory) {
+                        case ItemTypeSuperCategory.ANTIBODY:
+                            def antibody = Antibody.findByItem(item)
+                            redirect(controller: "antibody", action: "show", id: antibody?.id)
+                            break
+                        default:
+                            redirect(action: "show", id: item.id)
+                    }     
                 } else {
-                    flash.message = "Item type not found!"
-                    redirect(action: "list", params: [typeId: typeId])
-                }
+                    render(view: "previewCreate", model: [barcode: barcode])
+                }                
             } else {
                 flash.message = "Barcode cannot be empty!"
                 redirect(action: "list", params: [typeId: typeId])
+            }
+        } else {
+            def itemType = typeId ? ItemType.get(typeId):null
+            def item = new Item(type: itemType, barcode: barcode)
+            switch (itemType.category.superCategory) {
+                case ItemTypeSuperCategory.ANTIBODY:
+                    render(view: "/antibody/create", model: [item:item])
+                    break
+                case ItemTypeSuperCategory.TRACED_SAMPLE:
+                    render(view: "/cellSource/create", model: [item: item])
+                    break
+                default:
+                    render(view: "create", model: [item: item])
             }
         }
     }

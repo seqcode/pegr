@@ -7,7 +7,7 @@ class ItemType {
 	String fields
 	
 	String toString() {
-		name
+        "${category} - ${name}"
 	}
     
     List getFieldList() {

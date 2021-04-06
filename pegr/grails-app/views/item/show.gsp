@@ -17,6 +17,7 @@
         <div class="col-sm-6">
             <ul>
                 <g:render template="/item/status" model="[item: item]"></g:render>
+                <li>Active: ${item.active}</li>
                 <g:if test="${item?.name}">
                 <li>Name: ${item.name}</li>
                 </g:if>

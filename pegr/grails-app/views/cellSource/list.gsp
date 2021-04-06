@@ -30,6 +30,7 @@
                     <th>Barcode</th>
                     <th>Type</th>
                     <th>Location</th>
+                    <th>Active</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,6 +45,7 @@
                         <td class="barcode item"><span class="value">${cellSource.item?.barcode}</span></td>
                         <td class="type item"><span class="value">${cellSource.item?.type}</span></td>
                         <td class="location item"><span class="value">${cellSource.item?.location}</span></td>
+                        <td>${cellSource.item?.active}</td>
                     </tr>
                 </g:each>
             </tbody>

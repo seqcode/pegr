@@ -12,6 +12,7 @@
         <div class="message" role="status">${flash.message}</div>
     </g:if>
     <h4>${currentCategory?.name}</h4>
+    <div class="col-sm-10 text-left">
     <div class="table-responsive">
         <table class="table table-bordered">
             <thead>
@@ -21,6 +22,7 @@
                     <g:sortableColumn property="barcode" title="Barcode" params="[categoryId:currentCategory.id]"></g:sortableColumn>
                     <g:sortableColumn property="location" title="Location" params="[categoryId:currentCategory.id]"></g:sortableColumn>
                     <th>Notes</th>
+                    <th>Active</th>
                 </tr>
             </thead>
             <tbody>
@@ -31,13 +33,26 @@
                         <td>${item.barcode}</td>
                         <td >${item.location}</td>
                         <td>${item.notes}</td>
+                        <td>${item.active}</td>
                     </tr>
                 </g:each>
             </tbody>
           </table>
     </div>
     <div class="pagination">
-        <g:paginate next="Next" prev="Prev" action="list" params="[categoryId:currentCategory.id]" total="${itemCount ?: 0}" />
+        <g:paginate next="Next" prev="Prev" action="list" params="[categoryId:currentCategory.id, active:active, inactive:inactive]" total="${itemCount ?: 0}" />
+    </div>
+    </div>
+    <div class="col-sm-2 well text-center">
+        <g:form action="list" params="[categoryId:currentCategory.id]" method="post">
+            <div class="form-group">
+                <input type="checkbox" name="active" <g:if test="${active}">checked</g:if>> Active items
+            </div>
+            <div class="form-group">
+                <input type="checkbox" name="inactive" <g:if test="${inactive}">checked</g:if>> Inactive items
+            </div>
+            <g:submitButton class="btn btn-primary" name="submit" value="Filter"></g:submitButton>
+        </g:form>
     </div>
     <script>
         $("select").select2();

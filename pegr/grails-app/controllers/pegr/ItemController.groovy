@@ -14,13 +14,17 @@ class ItemController {
         redirect(action: "list", params: [categoryId: 1])
     }
     
-    def list(Integer max, Long categoryId) {
-        params.max = Math.min(max ?: 15, 100)
+    def list(Integer max, Long categoryId, boolean active, boolean inactive) {
+        params.max = Math.min(max ?: 50, 100)
         if(!categoryId) {
             categoryId = 1
         }
         def category = ItemTypeCategory.get(categoryId)
         def itemTypes = itemService.getCategorizedItemTypes()
+        if(active == false && inactive == false) {
+            active = true
+            inactive = true
+        }
         
         switch (category.name) {
             case "Antibody":
@@ -32,13 +36,23 @@ class ItemController {
                 redirect(controller: "cellSource", action: "list", params: params)
                 break
             default:
-                def items = Item.where { type.category.id == categoryId }
+                def items
+                if (active == true && inactive == true) {
+                    items = Item.where { type.category.id == categoryId }
+                } else if (active == true) {
+                    items = Item.where { type.category.id == categoryId && active == true}
+                } else if (inactive == true) {
+                    items = Item.where { type.category.id == categoryId && active == false}
+                } 
+                
                 def orderLink = utilityService.getInventoryExternalLink()
                 [itemList: items.list(params), 
                  itemCount: items.count(), 
                  currentCategory: category,
                  itemTypes: itemTypes,
-                 orderLink: orderLink
+                 orderLink: orderLink,
+                 active: active,
+                 inactive: inactive
                 ]
         }
     }

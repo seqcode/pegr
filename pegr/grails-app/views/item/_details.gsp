@@ -3,6 +3,7 @@
 </g:if>
 <g:render template="/item/status" model="[item: item]"></g:render>
 <ul>
+    <li>Active: ${item.active}</li>
     <g:if test="${item?.type}">
     <li>Type: ${item.type}</li>
     </g:if>

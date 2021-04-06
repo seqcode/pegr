@@ -15,6 +15,7 @@ class Item {
     Project project
     String status
     Date lastUpdated
+    boolean active = true
 
     List getSamplesInPool() {
         return PoolSamples.where{pool == this}.collect{it.sample}

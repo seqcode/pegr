@@ -19,6 +19,7 @@
                 <div class="col-sm-6">
                     <ul>
                         <g:render template="/item/status" model="[item: antibody.item]"></g:render>
+                        <li>Active: ${antibody.item.active}</li>
                         <g:if test="${antibody.item?.name}">
                         <li>Name: ${antibody.item.name}</li>
                         </g:if>

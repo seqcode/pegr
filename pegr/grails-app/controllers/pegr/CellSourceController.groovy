@@ -27,12 +27,21 @@ class CellSourceController {
                     }
                 }
                 eq "status", DictionaryStatus.Y
+                if (params.active == "active") {
+                    item {
+                        eq "active", true
+                    }
+                } else if (params.active == "inactive") {
+                    item {
+                        eq "active", false
+                    }
+                }
             }
         }
         def category = ItemTypeCategory.findByName(CELL_STOCK)
         def orderLink = utilityService.getInventoryExternalLink()
 
-        [cellSources: cellSources, categoryId: category.id, itemTypes: itemTypes, strains: strains, orderLink: orderLink]
+        [cellSources: cellSources, categoryId: category.id, itemTypes: itemTypes, strains: strains, orderLink: orderLink, strainName: strainName, active: params.active]
     }
     
     def show(Integer id) {

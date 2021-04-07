@@ -15,11 +15,25 @@ class AntibodyController {
         def category = ItemTypeCategory.findBySuperCategory(ItemTypeSuperCategory.ANTIBODY)
         def orderLink = utilityService.getInventoryExternalLink()
         def itemTypes = itemService.getCategorizedItemTypes()
-        [objectList: Antibody.list(params),
-         objectCount: Antibody.count(),
+        
+        def objects
+        
+        if (params.active == "noBarcode") {
+            objects = Antibody.where { item == null}
+        } else if (params.active == "active") {
+            objects = Antibody.where {item.active == true}            
+        } else if (params.active == "inactive") {
+            objects = Antibody.where {item.active == false}
+        } else {
+            objects = Antibody.where {}
+        }
+        
+        [objectList: objects.list(params),
+         objectCount: objects.count(),
          currentCategory: category,
          itemTypes: itemTypes,
-         orderLink: orderLink
+         orderLink: orderLink,
+         active: params.active,
         ]
     }
 

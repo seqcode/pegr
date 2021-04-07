@@ -17,3 +17,12 @@
         <g:submitButton class="btn btn-primary btn-sm" name="search" value="Search/Create instance with existing barcode"/>
     </div>
 </g:form> 
+<div class="row">
+    <g:each in="${pegr.ItemTypeCategory.list(sort:'id')}" var="category">
+        <g:link controller="item" action="list" params="[categoryId: category.id]" class="btn btn-info item-${category.id}">${category.name}</g:link> 
+    </g:each>
+    <g:link controller="sequenceIndex" class="btn btn-info item-index">Index</g:link>
+    <g:if test="${orderLink}">
+        <a href="${orderLink}" class="btn btn-info external" target="_blank">Order</a>
+    </g:if>
+</div>

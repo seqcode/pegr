@@ -13,6 +13,7 @@
     </g:if>
     <h4>Antibody</h4>
     <div class="table-responsive">
+        <div class="col-sm-10 text-left">
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -23,6 +24,9 @@
                     <g:sortableColumn property="immunogene" title="Immunogene" params="[categoryId:currentCategory.id]"></g:sortableColumn>
                     <g:sortableColumn property="clonal" title="Clonal" params="[categoryId:currentCategory.id]"></g:sortableColumn>
                     <g:sortableColumn property="igType" title="Ig Type" params="[categoryId:currentCategory.id]"></g:sortableColumn>
+                    <th>Barcode</th>
+                    <th>Location</th>
+                    <th>Active</th>
                 </tr>
             </thead>
             <tbody>
@@ -35,14 +39,32 @@
                         <td>${object.immunogene}</td>
                         <td>${object.clonal}</td>
                         <td>${object?.igType}</td>
+                        <td>${object?.item?.barcode}</td>
+                        <td>${object?.item?.location}</td>
+                        <td>${object?.item?.active}</td>
                     </tr>
                 </g:each>
             </tbody>
           </table>
-    </div>
-
-    <div class="pagination">
-        <g:paginate next="Next" prev="Prev" action="list" total="${objectCount ?: 0}" />
+          <div class="pagination">
+            <g:paginate next="Next" prev="Prev" action="list" params="[active:active]" total="${objectCount ?: 0}" />
+          </div>
+        </div>
+        <div class="col-sm-2 well text-center">
+        <g:form action="list" params="[categoryId:currentCategory.id]" method="post">
+            <div class="form-group">
+                <input type="radio" name="active" value="active" <g:if test="${active=='active'}">checked</g:if>> Active items
+            </div>
+            <div class="form-group">
+                <input type="radio" name="active" value="inactive" <g:if test="${active=='inactive'}">checked</g:if>> Inactive items
+            </div>
+            <div class="form-group">
+                <input type="radio" name="active" value="noBarcode" <g:if test="${active=='noBarcode'}">checked</g:if>> No barcode
+            </div>
+            <g:submitButton class="btn btn-primary" name="submit" value="Filter"></g:submitButton>
+            <button onclick="$('input:radio').prop('checked', false);" class="btn btn-default">Clear</button>
+        </g:form>
+        </div>
     </div>
     <script>
         $("select").select2();

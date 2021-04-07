@@ -40,18 +40,19 @@
           </table>
     </div>
     <div class="pagination">
-        <g:paginate next="Next" prev="Prev" action="list" params="[categoryId:currentCategory.id, active:active, inactive:inactive]" total="${itemCount ?: 0}" />
+        <g:paginate next="Next" prev="Prev" action="list" params="[categoryId:currentCategory.id, active:active]" total="${itemCount ?: 0}" />
     </div>
     </div>
     <div class="col-sm-2 well text-center">
         <g:form action="list" params="[categoryId:currentCategory.id]" method="post">
             <div class="form-group">
-                <input type="checkbox" name="active" <g:if test="${active}">checked</g:if>> Active items
+                <input type="radio" name="active" value="active" <g:if test="${active=='active'}">checked</g:if>> Active items
             </div>
             <div class="form-group">
-                <input type="checkbox" name="inactive" <g:if test="${inactive}">checked</g:if>> Inactive items
+                <input type="radio" name="active" value="inactive" <g:if test="${active=='inactive'}">checked</g:if>> Inactive items
             </div>
             <g:submitButton class="btn btn-primary" name="submit" value="Filter"></g:submitButton>
+            <button onclick="$('input:radio').prop('checked', false);" class="btn btn-default">Clear</button>
         </g:form>
     </div>
     <script>

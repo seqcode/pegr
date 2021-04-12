@@ -21,6 +21,10 @@ class UserController {
             [user:user]
         }
 	}
+    
+    def show(Long id) {
+        redirect(controller: "userAdmin", action: "edit", params: [userId: id])
+    }
 
     def editInfo(UserInfoCommand uic) {
         if(request.method=='POST'){

@@ -50,7 +50,7 @@
 			</table>
 			</div>
 			<div class="pagination">
-				<g:paginate total="${itemTypeInstanceCount ?: 0}" params="[str:str]" max="25"/>
+				<g:paginate total="${itemTypeCount ?: 0}" params="[str:str]" max="25"/>
 			</div>
             <span class="pagination pull-right">
                 <g:link params="[max:25]">25</g:link>

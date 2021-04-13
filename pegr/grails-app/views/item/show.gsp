@@ -16,8 +16,8 @@
     <div class="row">
         <div class="col-sm-6">
             <ul>
-                <g:render template="/item/status" model="[item: item]"></g:render>
-                <li>Active: ${item.active}</li>
+                <li><g:render template="/item/active" model="[item: item]"></g:render></li>
+                <li><g:render template="/item/status" model="[item: item]"></g:render></li>
                 <g:if test="${item?.name}">
                 <li>Name: ${item.name}</li>
                 </g:if>

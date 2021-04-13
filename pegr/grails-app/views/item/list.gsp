@@ -33,7 +33,7 @@
                         <td>${item.barcode}</td>
                         <td >${item.location}</td>
                         <td>${item.notes}</td>
-                        <td>${item.active}</td>
+                        <td><g:if test="${item.active}">ACTIVE</g:if><g:elseif test="${item.active != null}">INACTIVE</g:elseif></td>
                     </tr>
                 </g:each>
             </tbody>

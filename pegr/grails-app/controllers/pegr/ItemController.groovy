@@ -269,6 +269,27 @@ class ItemController {
         return
     }
     
+    def updateActiveAjax(Long itemId, boolean active) {
+        print(active)
+        def item = Item.get(itemId)
+        item.active = active
+        itemService.save(item)
+        def label
+        switch (active) {
+            case true:
+                label = "label label-success"
+                break
+            case false:
+                label = "label label-danger"
+                break
+            default:
+                label = "label label-warning"
+        }
+        def result = [active: active, label: label] as JSON
+        render result
+        return
+    }
+    
     def search(String str) {
         def c = Item.createCriteria()
         def listParams = [

@@ -1,8 +1,4 @@
 <%@ page import="pegr.Item" %>
-<div class=" ${hasErrors(bean: item, field: 'active', 'error')} ">
-    <label>Active</label>
-    <g:formatBoolean name="active" value="${item?.active}"/>
-</div>
 
 <div class=" ${hasErrors(bean: item, field: 'name', 'error')} ">
     <label>Name</label>

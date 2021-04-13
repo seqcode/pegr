@@ -46,7 +46,7 @@
                         <td class="barcode item"><span class="value">${cellSource.item?.barcode}</span></td>
                         <td class="type item"><span class="value">${cellSource.item?.type}</span></td>
                         <td class="location item"><span class="value">${cellSource.item?.location}</span></td>
-                        <td>${cellSource.item?.active}</td>
+                        <td><g:if test="${cellSource.item?.active}">ACTIVE</g:if><g:elseif test="${cellSource.item?.active != null}">INACTIVE</g:elseif></td>
                     </tr>
                 </g:each>
             </tbody>
@@ -62,6 +62,9 @@
             </div>
             <div class="form-group">
                 <input type="radio" name="active" value="inactive" <g:if test="${active=='inactive'}">checked</g:if>> Inactive items
+            </div>
+            <div class="form-group">
+                <input type="radio" name="active" value="noBarcode" <g:if test="${active=='noBarcode'}">checked</g:if>> No barcode
             </div>
             <g:submitButton class="btn btn-primary" name="submit" value="Filter"></g:submitButton>
             <button onclick="$('input:radio').prop('checked', false);" class="btn btn-default">Clear</button>

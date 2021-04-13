@@ -1,4 +1,4 @@
-<g:if test="${item?.status=='GOOD'}"><span id="item-status-show" class="label label-success">${item?.status}</span></g:if>
+Item quality: <g:if test="${item?.status=='GOOD'}"><span id="item-status-show" class="label label-success">${item?.status}</span></g:if>
 <g:elseif test="${item?.status=='BAD'}"><span id="item-status-show" class="label label-danger">${item?.status}</span></g:elseif>
 <span id="item-status-select" style="display:none">
     <g:select name="status" from="${pegr.ItemStatus}" value="${item?.status}"></g:select>

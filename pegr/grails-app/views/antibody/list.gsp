@@ -41,7 +41,7 @@
                         <td>${object?.igType}</td>
                         <td>${object?.item?.barcode}</td>
                         <td>${object?.item?.location}</td>
-                        <td>${object?.item?.active}</td>
+                        <td><g:if test="${object?.item?.active}">ACTIVE</g:if><g:elseif test="${object?.item?.active != null}">INACTIVE</g:elseif></td>
                     </tr>
                 </g:each>
             </tbody>

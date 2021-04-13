@@ -35,6 +35,8 @@ class CellSourceController {
                     item {
                         eq "active", false
                     }
+                } else if (params.active == 'noBarcode') {
+                    isNull "item"
                 }
             }
         }

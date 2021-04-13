@@ -164,7 +164,7 @@ class SampleService {
 
             def abNotes = JsonOutput.toJson(abnoteMap)
 
-            def growthMedia = getGrowthMedia(data.growthMedia, cellSource.strain?.species)
+            def growthMedia = getGrowthMedia(data.growthMedia)
 
             def sample = getSample(cellSource, antibody, target, data.cellNum, data.chrom, data.volume, data.requestedTags, data.sampleNotes, sendTo, abNotes, data.genomes, assay, growthMedia)
 
@@ -232,7 +232,7 @@ class SampleService {
         def note = ['Resin':resin, 'PCR Cycle': pcr]
         sample.prtclInstSummary.note = JsonOutput.toJson(note)
         sample.prtclInstSummary.save()
-        sample.growthMedia = getGrowthMedia(growthMedia, sample.cellSource?.strain?.species)
+        sample.growthMedia = getGrowthMedia(growthMedia)
         sample.save()
 
         // save cell source's treatments
@@ -326,19 +326,14 @@ class SampleService {
     }
 
     @Transactional
-	def getGrowthMedia(String _mediaStr, Species species) {
+	def getGrowthMedia(String _mediaStr) {
         def mediaStr = utilityService.cleanString(_mediaStr)
 	    if(mediaStr == null) {
 	        return null
 	    }
 	    def media = GrowthMedia.findByName(mediaStr)
 	    if(!media) {
-	        media = new GrowthMedia(name: mediaStr, species: species).save( failOnError: true)
-	    } else {
-	        if(media.species != species) {
-	            media.species = null
-				media.save( failOnError: true)
-	        }
+	        media = new GrowthMedia(name: mediaStr).save( failOnError: true)
 	    }
 	    return media
 	}
@@ -433,7 +428,7 @@ class SampleService {
                 sample.save(failOnError: true)
                 break
             case "growthMedia" :
-                sample.growthMedia = getGrowthMedia(value, sample.cellSource?.strain?.species)
+                sample.growthMedia = getGrowthMedia(value)
                 sample.save(failOnError: true)
                 break
             case "treatments" :

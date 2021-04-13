@@ -324,6 +324,14 @@
                 placeholder: noTagPlaceholder
             });
         }});
+        
+        $.ajax({url: "/pegr/sample/fetchGrowthMediaAjax", success: function(medias){
+            $("#tr"+count+" .growth-media").select2({
+                data: medias,
+                tags: true,
+                placeholder: tagPlaceholder
+            });
+        }});
     }
     
     // disable the dependent fields in cascade selections
@@ -332,7 +340,6 @@
     $(".strain").prop("disabled", true);
     $(".genotype").prop("disabled", true);
     $(".mutation").prop("disabled", true);
-    $(".growth-media").prop("disabled", true);
     $(".target-type").prop("disabled", true);
     $(".target").prop("disabled", true);
     $(".cterm").prop("disabled", true);
@@ -374,24 +381,7 @@
                 placeholder: tagPlaceholder
             });
         }});
-        $parentStrain.prop("disabled", false);
-        
-        var $growthMedia = $(this).closest("tr").find(".growth-media");
-        $growthMedia.html('').select2({
-            data: [{id: '', text: ''}],
-            tags: true,
-            placeholder: tagPlaceholder
-        });
-        
-        $.ajax({url: "/pegr/sample/fetchGrowthMediaAjax?speciesId="+speciesId, success: function(medias){
-            $growthMedia.select2({
-                data: medias,
-                tags: true,
-                placeholder: tagPlaceholder
-            });
-        }});
-        $growthMedia.prop("disabled", false);
-        
+        $parentStrain.prop("disabled", false);        
     });
             
     $(".parent-strain").on("change", function() {

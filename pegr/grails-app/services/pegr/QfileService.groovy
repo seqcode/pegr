@@ -216,7 +216,7 @@ class QfileService {
         def strain = strainAndTissue.strain
         def tissue = strainAndTissue.tissue
 
-        def growthMedia = sampleService.getGrowthMedia(data.growthMedia, species)
+        def growthMedia = sampleService.getGrowthMedia(data.growthMedia)
 
         def inventory = getInventory(data.dateReceived, data.receivingUser, data.inOrExternal, data.inventoryNotes)
         def prepUser = getUser(data.samplePrepUser)

@@ -249,9 +249,8 @@
             var oldValue = $(this).text();
             var edit = "<span class='input'><select style='width:200px; display:none'><option selected value='" + oldValue + "'>" + oldValue + "</option></select></span>";
             appendEdit(this, edit);
-            var speciesId = $(this).closest("tr").find(".speciesId").val();
             $.ajax({
-                url: "/pegr/sample/fetchGrowthMediaAjax?speciesId="+speciesId
+                url: "/pegr/sample/fetchGrowthMediaAjax"
             }).done(function(result){
                 td.find("select").select2({
                     data: result,

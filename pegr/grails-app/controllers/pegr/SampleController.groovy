@@ -403,9 +403,8 @@ class SampleController {
     }
 
 
-    def fetchGrowthMediaAjax(Long speciesId) {
-        def selectedSpecies = Species.get(speciesId)
-        def growthMedias = GrowthMedia.where { (species == null) || (species == selectedSpecies) }.collect{it.name}
+    def fetchGrowthMediaAjax() {
+        def growthMedias = GrowthMedia.list().collect{it.name}
         render utilityService.stringToSelect2Data(growthMedias) as JSON
     }
 

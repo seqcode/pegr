@@ -64,7 +64,7 @@
                 placeholder: noTagPlaceholder
             }); 
 
-            $.ajax({url: "/pegr/sample/fetchGrowthMediaAjax?speciesId=${sample?.cellSource?.strain?.species?.id}", success: function(medias){
+            $.ajax({url: "/pegr/sample/fetchGrowthMediaAjax", success: function(medias){
                 $(".growth-media").select2({
                     data: medias,
                     tags: true,

@@ -6,7 +6,7 @@ import static org.springframework.http.HttpStatus.*
 
 class AbHostAdminController {
 
-    AbHostService abHostServiceutility
+    AbHostService abHostService
     def utilityService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]

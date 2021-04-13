@@ -9,17 +9,16 @@
     <g:form action="serviceReport">
         <label>Sequence Runs: </label>
         From
-        <input name="fromId" value="${fromId}">
+        <input name="fromId" value="${fromId}" placeholder="Starting Run ID">
         To
-        <input name="toId" value="${toId}">
-        <label>Source (optional)</label>
-        <input name="source" value="${source}">
+        <input name="toId" value="${toId}" placeholder="Ending Run ID">
         <input type="submit" name="submit" value="Query" class="btn btn-primary">
     </g:form>
 	<div>
         <g:if test="${samples_per_run && samples_per_run.size()}">
-        <h4>Total samples: ${sample_count[0].total_sample_count}</h4>		
-        <h4>Average samples per sequence run: ${avg_samples_per_run[0].average_sample_per_run}</h4>
+        <h4>Total samples: ${sample_count[0].total_sample_count}</h4>	
+            
+        <h4>Average samples per sequence run: <g:formatNumber number="${avg_samples_per_run[0].average_sample_per_run}" type="number" maxFractionDigits="1" /></h4>
         <h4>Samples per sequence run:</h4>
         <table class="table table-bordered">
             <thead>

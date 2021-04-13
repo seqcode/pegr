@@ -93,6 +93,7 @@ dataSource.password=<USER_PASS>
 sso.url=none
 sso.type=none
 sso.principle=none
+filesroot=/path/to/store/uploaded/data
 ```
 
 Sample 'pegr-config.properties' following example above:
@@ -103,6 +104,7 @@ dataSource.password=password
 sso.url=none
 sso.type=none
 sso.principle=none
+filesroot=~/tmp
 ```
 
 5. Start PEGR.

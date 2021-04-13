@@ -22,8 +22,8 @@ class NgsRepoService {
     final String PRIOR_RUN_FOLDER = "PriorRunFolder"
     // File and folder path
     final String LOCAL_FOLDER = "runInfos"
-    final String RUN_INFO_FILE_NAME = "cegr_run_info.txt"
-    final String CONFIG_FOLDER_NAME = "cegr_config"
+    final String RUN_INFO_FILE_NAME = "pegr_run_info.txt"
+    final String CONFIG_FOLDER_NAME = "pegr_config"
     final String RUN_COMPLETE_FILE = "RunCompletionStatus.xml"
     // max queue length, error will be logged if it is exceeded.
     final int MAX_QUEUE_LENGTH = 24

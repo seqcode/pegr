@@ -8,7 +8,7 @@
 </div>
 
 <div class=" ${hasErrors(bean: strain, field: 'name', 'error')} required">
-	<label for="name">Strain</label>
+	<label for="name">Name</label>
 	<g:textField name="name" value="${strain?.name}"/>
     (use only alphanumeric characters and "-")
 </div>
@@ -37,6 +37,12 @@
 <div class=" ${hasErrors(bean: strain, field: 'note', 'error')} ">
 	<label for="note">Note</label>
 	<g:textArea name="note" value="${strain?.note}"/>
+
+</div>
+
+<div class=" ${hasErrors(bean: strain, field: 'status', 'error')} ">
+	<label for="status">Status</label>
+	<g:select name="status" from="${pegr.DictionaryStatus.values()}" keys="${pegr.DictionaryStatus.values()*.name()}"  value="${strain?.status}" noSelection="${['':'Select...']}"/>
 
 </div>
 

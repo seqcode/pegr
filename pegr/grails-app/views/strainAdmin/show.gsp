@@ -53,7 +53,7 @@
 				</li>
 				</g:if>
                 
-                <li>Status: ${strain?.status?: "Not Approved"}</li>
+                <li>Status: ${strain?.status}</li>
 			</ul>
 			
 			<g:form  action='delete' method="DELETE" useToken="true">

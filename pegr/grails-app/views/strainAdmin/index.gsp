@@ -60,7 +60,7 @@
 						<td>${fieldValue(bean: strain, field: "parent")}</td>
 				        <td>${fieldValue(bean: strain, field: "genotype")}</td>
 						<td>${fieldValue(bean: strain, field: "sourceLab")}</td>
-						<td>${strain.status?: "Not Approved"}</td>
+						<td>${strain.status}</td>
 					</tr>
 				</g:each>
 				</tbody>

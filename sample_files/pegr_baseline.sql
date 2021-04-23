@@ -946,7 +946,7 @@ CREATE TABLE `item_type_category` (
   `super_category` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name_uniq_1472352933587` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -955,7 +955,7 @@ CREATE TABLE `item_type_category` (
 
 LOCK TABLES `item_type_category` WRITE;
 /*!40000 ALTER TABLE `item_type_category` DISABLE KEYS */;
-INSERT INTO `item_type_category` VALUES (1,0,'Antibody','ANTIBODY'),(2,0,'Chemical','OTHER'),(3,0,'Enzyme','OTHER'),(4,0,'Reagent','OTHER'),(5,0,'Equipment','OTHER'),(6,0,'General Supply','OTHER'),(7,0,'Cell Stock','TRACED_SAMPLE'),(8,0,'Biosample','TRACED_SAMPLE'),(9,0,'Sample Pool','SAMPLE_POOL'),(10,0,'Adapter','OTHER');
+INSERT INTO `item_type_category` VALUES (1,0,'Antibody','ANTIBODY'),(2,0,'Chemical','OTHER'),(3,0,'Enzyme','OTHER'),(4,0,'Reagent','OTHER'),(5,0,'Equipment','OTHER'),(6,0,'General Supply','OTHER'),(7,0,'Cell Stock','TRACED_SAMPLE'),(8,0,'Biosample','TRACED_SAMPLE'),(9,0,'Sample Pool','SAMPLE_POOL'),(10,0,'Oligos','OTHER'),(11,0,'Buffer','OTHER'),(12,0,'Media','OTHER'),(13,0,'Plasmid','OTHER');
 /*!40000 ALTER TABLE `item_type_category` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2470,4 +2470,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-04-22 22:35:13
+-- Dump completed on 2021-04-23 16:48:40

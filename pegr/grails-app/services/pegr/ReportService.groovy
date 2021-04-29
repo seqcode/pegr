@@ -830,15 +830,11 @@ class ReportService {
     * @return the unknown index file's path
     */
     def getUnknownIndex(SequenceRun run) {
-        final String localFolder = "Bcl2FastqUnknownIndex"
+        final String localFolder = "UnknownIndex"
         def localRoot = utilityService.getFilesRoot()
         File localPath = new File(localRoot, localFolder)
-        if (!localPath.exists()) { 
-            localPath.mkdirs() 
-        } 
-        def localFile = new File(localPath, "${run.directoryName}_unknownIndex.html")
+        def localFile = new File(localPath, run.id.toString() + '_unknown_index.html')
         def filepath = localFile.getPath()
-
         return filepath
     }
     

@@ -168,6 +168,7 @@ class ReportController {
                 def htmlContent = new File(file).text
                 render text: htmlContent, contentType:"text/html", encoding:"UTF-8"
             } catch (Exception e) {
+                log.error "${e}"
                 render(view: "/404")
             }
         }

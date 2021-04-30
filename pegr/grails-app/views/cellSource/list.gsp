@@ -11,11 +11,19 @@
         <li class="active"><g:link action="list">Cell Stock</g:link></li>
         <li><g:link action="listBatches">Batches</g:link></li>
     </ul>
-    <div>
+    <div class="row">
         <g:form controller="cellSource" action="list">
+        <div class="col-sm-3">        
             <label>Strain</label> 
-            <g:select name="strain" from="${strains}" style="width:200px" value="${strainName}"></g:select>
+            <g:select name="strain" from="${strains}" style="width:200px" value="${strainName}" noSelection="${['null': '-- Choose --']}"></g:select>
+        </div>
+        <div class="col-sm-3">
+            <label>Species</label> 
+            <g:select name="speciesId" from="${pegr.Species.list()}" optionKey="id" style="width:200px" value="${speciesId}" noSelection="${['null': '-- Choose --']}"></g:select>
+        </div>
+        <div class="col-sm-3">
             <g:submitButton name="submit" value="Search" class="btn btn-primary"></g:submitButton>
+        </div>
         </g:form>
     </div>
     <div class="container-fluid">
@@ -52,7 +60,7 @@
             </tbody>
           </table>
         <div class="pagination">
-            <g:paginate next="Next" prev="Prev" action="list" params="[categoryId:categoryId, active:active]" total="${cellSources.totalCount ?: 0}" />
+            <g:paginate next="Next" prev="Prev" action="list" params="[categoryId:categoryId, active:active, strain: strainName, speciesId: speciesId]" total="${cellSources.totalCount ?: 0}" />
         </div>
         </div>
         <div class="col-sm-2 well text-center">

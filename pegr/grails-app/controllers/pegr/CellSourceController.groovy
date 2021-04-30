@@ -14,16 +14,33 @@ class CellSourceController {
     final String CELL_STOCK = "Cell Stock"
     
     def list(Integer max) {
+        params.max = Math.min(max ?: 50, 100)
         def itemTypes = itemService.getCategorizedItemTypes()
+        
         def strains = Strain.executeQuery("select distinct name from Strain where name is not null order by name")
-        params.max = Math.min(max ?: 15, 100)
         def strainName = params.strain
+        if (strainName == "null") {
+            strainName = null
+        }
+        
+        def speciesId = null
+        if (params.speciesId && params.speciesId.isInteger()) {
+            speciesId = params.speciesId as Long
+        }
+        
         def c = CellSource.createCriteria()
         def cellSources = c.list(params) {
             and {
                 if (strainName) {
                     strain {
                         eq "name", strainName
+                    }
+                }
+                if (speciesId) {
+                    strain {
+                        species {
+                            eq "id", speciesId
+                        }
                     }
                 }
                 eq "status", DictionaryStatus.Y
@@ -43,7 +60,7 @@ class CellSourceController {
         def category = ItemTypeCategory.findByName(CELL_STOCK)
         def orderLink = utilityService.getInventoryExternalLink()
 
-        [cellSources: cellSources, categoryId: category.id, itemTypes: itemTypes, strains: strains, orderLink: orderLink, strainName: strainName, active: params.active]
+        [cellSources: cellSources, categoryId: category.id, itemTypes: itemTypes, strains: strains, orderLink: orderLink, strainName: strainName, speciesId: speciesId, active: params.active]
     }
     
     def show(Integer id) {

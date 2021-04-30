@@ -15,4 +15,8 @@ class Species {
 		note nullable: true, blank: true
         status nullable: true
     }
+    
+    static mapping = {
+        sort([genusName: 'asc', name: 'asc'])
+    }
 }

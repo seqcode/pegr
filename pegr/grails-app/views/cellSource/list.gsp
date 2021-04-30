@@ -31,6 +31,7 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
+                    <th>ID</th>
                     <th>Species</th>
                     <th>Parent</th>
                     <th>Strain</th>
@@ -45,10 +46,11 @@
             <tbody>
                 <g:each in="${cellSources}" var="cellSource">
                     <tr>
+                        <td><g:link controller="cellSource" action="show" params="[id:cellSource.id]">${cellSource.id}</g:link></td>
                         <input type="hidden" name="cellSourceId" value="${cellSource.id}" class="cellSourceId">
                         <td>${cellSource.strain?.species}</td>
                         <td>${cellSource.strain?.parent}</td>
-                        <td><g:link controller="cellSource" action="show" params="[id:cellSource.id]">${cellSource.strain}</g:link></td>
+                        <td>${cellSource.strain}</td>
                         <td>${cellSource.strain?.geneticModification}</td>
                         <td>${cellSource.biologicalSourceId}</td>
                         <td class="barcode item"><span class="value">${cellSource.item?.barcode}</span></td>

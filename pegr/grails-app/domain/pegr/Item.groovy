@@ -59,9 +59,8 @@ class Item {
     }
     
     static constraints = {
-        name nullable: true, blank: true
 		location nullable: true, blank: true
-		barcode unique: true, nullable: true, blank: true
+		barcode unique: true
 		user nullable: true
 		notes nullable: true, blank: true
         parent nullable: true

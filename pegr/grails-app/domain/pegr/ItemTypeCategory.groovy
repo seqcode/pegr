@@ -11,4 +11,8 @@ class ItemTypeCategory {
     static constraints = {
         name unique: true
     }
+    
+    static mapping = {
+        sort([name: 'asc'])
+    }
 }

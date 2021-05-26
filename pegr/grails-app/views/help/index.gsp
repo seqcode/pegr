@@ -13,47 +13,66 @@
     <body>
         <div class="container-fluid">
           <div class="col-sm-9">
+            <div id="what">
+              <h3>What is PEGR</h3>  
+              <p>Platform for Epigenomic and Genomic Research (PEGR) is a web service platform that logs metadata for samples and sequencing experiment, manages the data processing workflows, and provides reporting and visualization. PEGR links together people, samples, protocols, sequencer and bioinformatics computation. The development home of PEGR is at <a href="https://github.com/seqcode/pegr">https://github.com/seqcode/pegr</a>, where you can find a quick-start guide and more information at <a href="https://github.com/seqcode/pegr/wiki">wiki</a>.</p>
+            </div>
+            <div id="role">
+                <h3>Platform-wide Roles</h3>
+                <p>There are three platform-wide roles.</p>
+                <ol>
+                    <li>Admin: admins have almost all the authorizations (read and write access) except for the access to personal password and API keys.</li>
+                    <li>Member: members have read access to all the projects, inventory, lab protocols, experiment records, sequencing run reports and samples. They will have additional write access based on their <a href="#project-role">project roles</a> and their ownership to specific inventory, protocols and experiment records. </li>
+                    <li>Guest: guests are only able to see their personal information and the projects they have been assigned to (see <a href="#project-role">Project Roles</a>).</li>
+                </ol>
+            </div>
             <div id="project-role">
-                <h3>Project Role</h3>
+                <h3>Project Roles</h3>
                 <table class="table-bordered">
                     <thead>
-                        <th></th>
-                        <th>Owner</th>
-                        <th>Participant</th>
-                        <th>Guest</th>
-                        <th>None</th>
+                        <th>Project Role</th>
+                        <th>View</th>
+                        <th>Add/remove/edit samples</th>
+                        <th>Edit project name, description, funding</th>
+                        <th>Add/remove user, edit role</th>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>View</td>
+                            <td>Owner</td>
                             <td>&#10003;</td>
                             <td>&#10003;</td>
                             <td>&#10003;</td>
-                            <td></td>
+                            <td>&#10003;</td>
                         </tr>                
                         <tr>
-                            <td>Add/remove/edit samples</td>
+                            <td>Participant</td>
                             <td>&#10003;</td>
                             <td>&#10003;</td>
                             <td></td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td>Edit project name, description, funding</td>
+                            <td>Guest</td>
                             <td>&#10003;</td>
                             <td></td>
                             <td></td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td>Add/remove user, edit role</td>
-                            <td>&#10003;</td>
+                            <td>None</td>
+                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
                         </tr>
                     </tbody>
                 </table>
+                <p>Note that: </p>
+                <ol>
+                    <li>These permissions are per project, i.e. an "Owner" in one project may be a participant in another.</li>
+                    <li>Platform-wide admins also have all the authorizations to any project (the same access level as a project owner), and platform-wide members have all the read access to any project (the same access level as a project guest).</li>
+                </ol>
+                    
             </div>
             <div id="barcode-inventory">
                 <h3>Inventory Tracking</h3>
@@ -137,7 +156,9 @@
           <nav class="col-sm-3">
             <h4>Menu</h4>
             <ul id="menu" data-spy="affix" data-offset-top="205">
-              <li><a href="#project-role">Project Role</a></li>
+              <li><a href="#what">What is PEGR</a></li>
+              <li><a href="#role">Platform-wide Roles</a></li>
+              <li><a href="#project-role">Project Roles</a></li>
               <li><a href="#barcode-inventory">Inventory Tracking</a></li>
               <li><a href="#barcode-protocol">Protocol and Protocol Group</a></li>
               <li><a href="#barcode-experiment">Experiment Tracking</a></li>

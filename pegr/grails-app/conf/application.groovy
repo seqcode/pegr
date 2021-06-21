@@ -141,6 +141,7 @@ grails.plugin.springsecurity.interceptUrlMap = [
     [pattern: '/project/all/**',                access: ['ROLE_MEMBER', 'ROLE_ADMIN']],
     [pattern: '/project/search/**',             access:  ['ROLE_MEMBER', 'ROLE_ADMIN']],
     [pattern: '/project/create/**',             access: ['ROLE_MEMBER', 'ROLE_ADMIN']],
+    [pattern: '/protocol/importCSV/**',    access: ['ROLE_ADMIN']],
     [pattern: '/report/unknownIndex/**',        access: ['ROLE_MEMBER', 'ROLE_ADMIN']],
     [pattern: '/report/analysisStatus/**',      access: ['ROLE_MEMBER', 'ROLE_ADMIN']],
     [pattern: '/report/saveNotesAjax/**',       access: ['ROLE_MEMBER', 'ROLE_ADMIN']],

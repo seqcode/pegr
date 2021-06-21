@@ -1,9 +1,12 @@
 package pegr
 import org.springframework.web.multipart.MultipartHttpServletRequest 
+import com.opencsv.CSVParser
+import com.opencsv.CSVReader
 
 class ProtocolController {
     def springSecurityService
     def protocolService
+    def utilityService
             
     def index(Integer max) {
         def currentUser = springSecurityService.currentUser
@@ -190,5 +193,140 @@ class ProtocolController {
             }
         }
         [protocolList: protocols, protocolCount: protocols.totalCount, str: str]        
+    }
+    
+    def getNamedData(String[] rawdata) {
+        rawdata.eachWithIndex{ d, idx -> 
+            def td = d.trim()
+            if(td == "") {
+                rawdata[idx] = null
+            } else {
+                rawdata[idx] = td
+            }
+        }
+        [name: rawdata[0],               // A
+         protocolVersion: rawdata[1],    // B
+         assay: rawdata[2],              // C
+         description: rawdata[3],        // D
+         sharedItemTypes: rawdata[4],    // E
+         endProductTypes: rawdata[5],    // F
+         images: rawdata[6],             // G
+         startSampleType: rawdata[7],    // H
+         endSampleType: rawdata[8],      // I
+         addAntibody: rawdata[9],        // J
+         addIndex: rawdata[10],          // K
+         startPoolType: rawdata[11],     // L
+         endPoolType: rawdata[12],       // M
+         url: rawdata[13],               // N
+         status: rawdata[14],            // O
+         file: rawdata[15]               // P
+        ]
+    }
+    
+    
+    def importCSV() {
+        def currentUser = springSecurityService.currentUser
+        def filesroot = utilityService.getFilesRoot()
+        try {
+            def mpf = request.getFile( "file" )
+            String filename = mpf.getOriginalFilename();
+            if(!mpf?.empty && filename[-4..-1] == ".csv") {
+                File fileDest = new File(filesroot, filename)
+                mpf.transferTo(fileDest)
+                
+                def file = new FileReader(fileDest)
+                CSVReader reader = new CSVReader(file)
+                String [] rawdata
+                def lineNo = 0
+                def messages = []
+                while ((rawdata = reader.readNext()) != null) {
+                    ++lineNo
+                    if (lineNo == 1) {
+                        continue
+                    }
+                    
+                    def data = getNamedData(rawdata)
+                    
+                    if (data.name == null) {
+                        messages.push("Line ${lineNo} is skipped: no name!")
+                    } else if ((data.protocolVersion == null && Prtocol.findByName(data.name) != null) || (data.protocolVersion != null && Protocol.findByNameAndProtocolVersion(data.name, data.protocolVersion) != null)) {
+                        messages.push("Line ${lineNo} is skipped: a protocol with the same name and version already exists!")
+                    } else {
+                        def assay = null
+                        if (data.assay != null) {
+                            assay = Assay.findByName(data.assay)
+                            if (!assay) {
+                                messages.push("Line ${lineNo} is skipped: assay not found!")
+                                continue
+                            }
+                        }
+                        
+                        def addAntibody = (data.addAntibody?.toLowerCase() == "yes") ? true : false
+                        def addIndex = (data.addIndex?.toLowerCase() == "yes") ? true : false
+                        def status = null
+                        if (data.status && data.status.toLowerCase() == "yes") {
+                            status = DictionaryStatus.Y
+                        }
+
+                        try {
+                            def protocol = new Protocol(name: data.name, 
+                                         protocolVersion: data.protocolVersion,
+                                         assay: assay,
+                                         description: data.description,
+                                         images: data.images,
+                                         addAntibody: addAntibody,
+                                         addIndex: addIndex,
+                                         url: data.url,
+                                         file: "protocols/${data.file}",
+                                         user: currentUser,
+                                         status: status
+                                        )
+                            protocol.save(failOnError: true)
+                            
+                            def dict = [(pegr.ProtocolItemFunction.SHARED) : data.sharedItemTypes,
+                                 (pegr.ProtocolItemFunction.END_PRODUCT) : data.endProductTypes,   
+                                 (pegr.ProtocolItemFunction.PARENT) : data.startSampleType,
+                                 (pegr.ProtocolItemFunction.CHILD) : data.endSampleType,
+                                 (pegr.ProtocolItemFunction.START_POOL) : data.startPoolType,
+                                 (pegr.ProtocolItemFunction.END_POOL) : data.endPoolType]
+                                
+                            dict.each { itemFunction, typesStr ->
+                                if (typesStr) {
+                                    typesStr.split(",").each { str ->
+                                        def s = str.trim().split(":")
+                                        if (s.size() != 2) {
+                                            messages.push("Line ${lineNo}: the format of item type ${str} is not correct!")
+                                        } else {
+                                            def category = ItemTypeCategory.findByName(s[0].trim())
+                                            if (category == null) {
+                                                messages.push("Line ${lineNo}: item type category ${s[0]} not found!")
+                                            } else {
+                                                def itemType = ItemType.findByNameAndCategory(s[1].trim(), category)
+                                                if (!itemType) {
+                                                    messages.push("Line ${lineNo}: item type ${str} not found!")
+                                                } else {
+                                                    new ProtocolItemTypes(protocol: protocol, itemType: itemType, function: itemFunction).save(failOnError: true)
+                                                }
+                                            }                                            
+                                        }                                        
+                                    }
+                                }
+                            }                     
+                        } catch(Exception e) {
+                            log.error "Error: line ${lineNo}. " + e
+                            messages.push("Line ${lineNo} is not imported: an error occurred!")
+                        }
+                    }
+                }
+                flash.messageList = messages
+                fileDest.delete()
+            } else {
+                flash.messageList = ["Only CSV files are accepted!"]
+            }
+        } catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            flash.messageList = ["Error uploading the file! Please make sure the CSV file follows the template!"]
+        }
+        redirect(action: "index")
     }
 }

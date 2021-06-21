@@ -4,10 +4,13 @@ import grails.validation.ValidationException
 import static org.springframework.http.HttpStatus.*
 import pegr.AdminCategory
 import pegr.ItemType
+import com.opencsv.CSVParser
+import com.opencsv.CSVReader
 
 class ItemTypeAdminController {
 
     ItemTypeService itemTypeService
+    def utilityService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -104,6 +107,76 @@ class ItemTypeAdminController {
             }
             '*'{ render status: NO_CONTENT }
         }
+    }
+    
+    def getNamedData(String[] rawdata) {
+        rawdata.eachWithIndex{ d, idx -> 
+            def td = d.trim()
+            if(td == "") {
+                rawdata[idx] = null
+            }else {
+                rawdata[idx] = td
+            }
+        }
+        [name: rawdata[0],
+         fields: rawdata[1],
+         category: rawdata[2]
+        ]
+    }
+    
+    
+    def importCSV() {
+        def filesroot = utilityService.getFilesRoot()
+        try {
+            def mpf = request.getFile( "file" )
+            String filename = mpf.getOriginalFilename();
+            if(!mpf?.empty && filename[-4..-1] == ".csv") {
+                File fileDest = new File(filesroot, filename)
+                mpf.transferTo(fileDest)
+                
+                def file = new FileReader(fileDest)
+                CSVReader reader = new CSVReader(file)
+                String [] rawdata
+                def lineNo = 0
+                def messages = []
+                while ((rawdata = reader.readNext()) != null) {
+                    ++lineNo
+                    if (lineNo == 1) {
+                        continue
+                    }
+                    
+                    def data = getNamedData(rawdata)
+                    
+                    if (data.name == null) {
+                        messages.push("Line ${lineNo} is skipped: no name!")
+                    } else if (data.category == null) {
+                        messages.push("Line ${lineNo} is skipped: no category!")
+                    } else if (ItemType.findByName(data.name) != null) {
+                        messages.push("Line ${lineNo} is skipped: item type name already exists!")
+                    } else {
+                        def category = ItemTypeCategory.findByName(data.category)
+                        if (!category) {
+                            messages.push("Line ${lineNo} is skipped: category does not exist!")
+                        } else {
+                            try {
+                                new ItemType(name: data.name, category: category, fields: data.fields).save(failOnError: true)
+                            } catch(Exception e) {
+                                log.error "Error: line ${lineNo}. " + e
+                                messages.push("Line ${lineNo} is not imported: an error occurred!")
+                            }
+                        }
+                    }
+                }
+                flash.messageList = messages
+                fileDest.delete()
+            } else {
+                flash.messageList = ["Only CSV files are accepted!"]
+            }
+        } catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            flash.messageList = ["Error uploading the file! Please make sure the CSV file follows the template!"]
+        }
+        redirect(action: "index")
     }
 
     protected void notFound() {

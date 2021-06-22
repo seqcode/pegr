@@ -77,8 +77,13 @@ $ mysql -u pegruser -p pegrDB < sample_files/pegr_baseline.sql
 ```
 The baseline database has pre-defined item types and protocols. The PDF files for the  pre-defined protocols are provided in the folder "sample_files/protocols". Copy the "protocols" folder into your selected folder that stores uploaded data:
 
+Generic code:
 ```
 $ cp -r sample_files/protocols /path/to/store/uploaded/data
+```
+Code following example above:
+```
+$ cp -r sample_files/protocols ~/tmp/
 ```
 
 4. Create a config file 'pegr-config.properties' in the folder {userHome}/.grails/ for the environment variables, e.g. the information on database connection, NGS repository connection, email connection and Single Sign On.

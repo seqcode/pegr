@@ -75,7 +75,7 @@ Code following example above:
 ```
 $ mysql -u pegruser -p pegrDB < sample_files/pegr_baseline.sql
 ```
-The baseline database has pre-defined item types and protocols. The PDF files for the  pre-defined protocols are provided in the folder "sample_files". Copy those files to your selected folder that stores uploaded data:
+The baseline database has pre-defined item types and protocols. The PDF files for the  pre-defined protocols are provided in the folder "sample_files/protocols". Copy the "protocols" folder into your selected folder that stores uploaded data:
 
 ```
 $ cp -r sample_files/protocols /path/to/store/uploaded/data

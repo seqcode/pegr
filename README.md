@@ -9,6 +9,16 @@ A tested stack of versions is listed below.
 1. OpenJDK 1.8.0_212
    - https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html
    - PEGR is not currently compatible with Java 11+
+   - MacOS: We recommend Homebrew to install and manage Java 8
+      - Homebrew command to install and use Java 8:
+      ```
+      brew tap adoptopenjdk/openjdk
+      brew install --cask adoptopenjdk8
+      ```
+      - Java 8 executable is now located here:
+      ```
+      /Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home/bin/java
+      ```
 3. MariaDB 10.4.6
    - Linux: https://mariadb.org/download/
    - MacOS: We recommend Hombrew to install and manage MariaDB
@@ -91,7 +101,7 @@ $ cp -r sample_files/protocols ~/tmp/
 A sample config file 'pegr-config.properties' is inlcuded in the sample_files folder https://github.com/seqcode/pegr/tree/master/sample_files. 
 ```
 $ mkdir ~/.grails/
-$ cp pegr-config.properties ~/.grails/
+$ cp sample_files/pegr-config.properties ~/.grails/
 ```
 
 Not all pegr-config.properites need to be filled out for PEGR to function. Below are the minimum properties needed to be set.
@@ -120,7 +130,7 @@ filesroot=~/tmp
 5. Start PEGR.
 
 ```
-$ java -Dgrails.env=dev -jar pegr-0.1.war
+$ java -Dgrails.env=dev -jar pegr.war
 ```
 
 6. Go to http://localhost:8080/pegr/ in your browser to see the PEGR login page.

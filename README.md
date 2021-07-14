@@ -93,7 +93,7 @@ $ cp -r sample_files/protocols /path/to/store/uploaded/data
 ```
 Code following example above:
 ```
-$ cp -r sample_files/protocols ~/tmp/
+$ cp -r sample_files/protocols /tmp/
 ```
 
 4. Create a config file 'pegr-config.properties' in the folder {userHome}/.grails/ for the environment variables, e.g. the information on database connection, NGS repository connection, email connection and Single Sign On.

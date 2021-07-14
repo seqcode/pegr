@@ -124,7 +124,7 @@ dataSource.password=password
 sso.url=none
 sso.type=none
 sso.principle=none
-filesroot=~/tmp
+filesroot=/tmp
 ```
 
 5. Start PEGR.

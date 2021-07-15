@@ -14,7 +14,9 @@ class ItemInterceptor {
                            'upload',
                            'deleteImage',
                            'delete',
-                           'updateStatusAjax']) {
+                           'updateStatusAjax',
+                           'updateActiveAjax'
+                          ]) {
             def itemId = params.long('itemId')
             def item = Item.get(itemId)
             def currUser = springSecurityService.currentUser

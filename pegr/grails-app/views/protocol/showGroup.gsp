@@ -25,7 +25,7 @@
 					<h4>Protocols</h4>
 					<ol>
 						<g:each in="${protocolGroup.protocols}" var="p">
-						<li><span class="property-value" aria-labelledby="protocols-label"><g:link controller="protocolAdmin" action="show" id="${p.id}">${p?.encodeAsHTML()}</g:link></span></li>
+						<li><span class="property-value" aria-labelledby="protocols-label"><g:link controller="protocol" action="show" id="${p.id}">${p?.encodeAsHTML()}</g:link></span></li>
 						</g:each>
 					</ol>
 			</g:if>

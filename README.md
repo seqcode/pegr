@@ -126,7 +126,7 @@ sso.type=none
 sso.principle=none
 filesroot=/tmp
 ```
-More detailed instructions on the config file is provided at https://github.com/seqcode/pegr/wiki/Configurations.
+More detailed instructions on the config file are provided at https://github.com/seqcode/pegr/wiki/Configurations.
 
 5. Start PEGR.
 

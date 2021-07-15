@@ -105,6 +105,16 @@ class UserController {
         }
     }
 
+    def selfRegister(User user) {
+        try {
+            userService.create(user.email, [], false, user.fullName)
+            flash.message = "You have registered with PEGR. Please login."
+        } catch (UserException e) {
+            flash.error = e.message            
+        }
+        redirect(url: '/login/auth')
+    }
+    
     def generateApiKey() {
         try {
             userService.generateApiKey()

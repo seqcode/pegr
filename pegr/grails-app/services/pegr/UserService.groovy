@@ -56,30 +56,15 @@ class UserService {
     }
     
     @Transactional
-    def create(String email, List groupIds, Boolean sendEmail){
-        def username, locked, text
+    def create(String email, List groupIds, Boolean sendEmail, String fullName=null){
         if(User.findByEmail(email)) {
             throw new UserException(message: "Email has already been used!")
         }
         
-        // parse the email
-        def emailParts = email.split('@')
-        def emailServer = emailParts[1]
-        if (emailServer == "psu.edu") {
-            username = emailParts[0]
-            if (User.findByUsername(username)) {
-                throw new UserException(message: "Username ${username} has already been registered with PEGR!")
-            }
-            locked = false
-            def url = grailsLinkGenerator.link(controller: 'login', action: 'auth', absolute: true)
-            text = "You can now login to PEGR ${url} with PSU Web Access."
-        } else {
-            username = email
-            if (User.findByUsername(username)) {
-                throw new UserException(message: "Username ${username} has already been registered with PEGR!")
-            }
-            locked = true
-        }
+        def username = email
+        if (User.findByUsername(username)) {
+            throw new UserException(message: "Username ${username} has already been registered with PEGR!")
+        }   
         
         // assign a random password
         def password = springSecurityService.encodePassword(utilityService.getRandomString(15))
@@ -87,8 +72,9 @@ class UserService {
         def user = new User(username: username, 
                             email: email, 
                             password: password,
-                            accountLocked: locked,
-                            enabled: true
+                            accountLocked: false,
+                            enabled: true,
+                            fullName: fullName
                            )        
         user.save(flush: true, failOnError: true)
         
@@ -100,22 +86,23 @@ class UserService {
             }
         }
 
-        // create token
-        if (emailServer != "psu.edu") {
+        // send email
+        if (sendEmail) {
             def length = 32
             def token = utilityService.getRandomString(length)
             new Token(token: token, user: user, date: new Date()).save()
             
             def url = grailsLinkGenerator.link(controller: 'user', action: 'register', params: [token:token], absolute: true)
-            text = "Your account has been created in PEGR. Please follow the link ${url} to set up your username and password."
-        }
-        
-        // send email
-        if (sendEmail) {
-            mailService.sendMail {
-               to email
-               subject "[PEGR] Account Information"
-               body text
+            def text = "Your account has been created in PEGR. Please follow the link ${url} to set up your username and password."
+            
+            try {
+                mailService.sendMail {
+                   to email
+                   subject "[PEGR] Account Information"
+                   body text
+                }
+            } catch (Exception e) {
+                throw new UserException(message: "Error sending the email!")
             }
         }        
         return user

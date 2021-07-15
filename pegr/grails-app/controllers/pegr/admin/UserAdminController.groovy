@@ -162,7 +162,7 @@ class UserAdminController {
         if (params.groupIds) {
             groupIds = params.list("groupIds")
         }
-
+        
         if (cmd.hasErrors()) {
             render(view: "index", model: [users: [], cmd: cmd])
             return
@@ -201,5 +201,6 @@ class CreateUserCommand implements grails.validation.Validateable {
 
     static constraints = {
         email email: true, nullable: false, blank: false
+        sendEmail nullable: true, blank: true
     }
 }

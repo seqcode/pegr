@@ -7,7 +7,14 @@
     <h2>Profile</h2>
     <div class="profile">
         <h3>Change Password</h3>  
-        <p>The password should have 5-20 characters.</p>
+        <p>The password should have</p>
+        <ol>
+            <li>minimum eight characters</li>
+            <li>at least one upper case English letter</li>
+            <li>at least one lower case English letter</li>
+            <li>at least one digit</li>
+            <li>at least one special character, such as #?!@$%^&*-</li>
+        </ol>        
         <g:hasErrors bean="${user}">
             <div class="errors">
                 <g:renderErrors bean="${user}" as="list"/>

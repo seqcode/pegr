@@ -7,6 +7,14 @@
             <g:if test="${request.message}">
                 <div class="alert alert-danger">${request.message}</div>
             </g:if>
+            <p>The password should have</p>
+            <ol>
+                <li>minimum eight characters</li>
+                <li>at least one upper case English letter</li>
+                <li>at least one lower case English letter</li>
+                <li>at least one digit</li>
+                <li>at least one special character, such as #?!@$%^&*-_</li>
+            </ol>  
             <g:form controller="user" action="resetPassword" class="fields">
                 <input type="hidden" name="token" value="${token}">
                 <div>

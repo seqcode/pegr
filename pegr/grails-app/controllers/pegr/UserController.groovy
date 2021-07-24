@@ -186,7 +186,7 @@ class PasswordRegistrationCommand implements grails.validation.Validateable {
 	String passwordRepeat
 
 	static constraints = {
-		password(size: 5..20, blank: false)
+		password(blank: false, matches: '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-_]).{8,}$')
 		passwordRepeat nullable: false,
 		   validator: { passwd2, urc ->
 			   return passwd2 == urc.password ?: 'validation.reenterSamePassword'

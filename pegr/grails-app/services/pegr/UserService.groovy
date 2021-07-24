@@ -56,12 +56,11 @@ class UserService {
     }
     
     @Transactional
-    def create(String email, List groupIds, Boolean sendEmail, String fullName=null){
+    def create(String username, String email, List groupIds, Boolean sendEmail, String fullName=null){
         if(User.findByEmail(email)) {
             throw new UserException(message: "Email has already been used!")
         }
-        
-        def username = email
+
         if (User.findByUsername(username)) {
             throw new UserException(message: "Username ${username} has already been registered with PEGR!")
         }   

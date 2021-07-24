@@ -47,6 +47,8 @@
                     <div class="form-group">
                         <label for="fullName">Full Name </label> 
                         <g:textField class="form-control" name="fullName" value="${fullName}" placeholder="Enter Full Name"/>
+                        <label for="username">Username </label> 
+                        <g:textField class="form-control" name="username" value="${username}" placeholder="Enter Username"/>
                         <label for="email">Email </label> 
                         <g:textField class="form-control" name="email" value="${email}" placeholder="Enter Email"/>
                     </div>

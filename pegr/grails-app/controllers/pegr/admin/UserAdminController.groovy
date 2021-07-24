@@ -168,7 +168,9 @@ class UserAdminController {
             return
         }
         try {
-            def user = userService.create(cmd.email,
+            def user = userService.create(
+                            cmd.email,
+                            cmd.email,
                             groupIds,
                             cmd.sendEmail
                             )

@@ -13,7 +13,7 @@
             <li>at least one upper case English letter</li>
             <li>at least one lower case English letter</li>
             <li>at least one digit</li>
-            <li>at least one special character, such as #?!@$%^&*-</li>
+            <li>at least one special character, such as #?!@$%^&*-_</li>
         </ol>        
         <g:hasErrors bean="${user}">
             <div class="errors">

@@ -1,5 +1,5 @@
 package pegr
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.time.TimeCategory
 import org.springframework.web.multipart.MultipartHttpServletRequest 
 import groovy.json.*

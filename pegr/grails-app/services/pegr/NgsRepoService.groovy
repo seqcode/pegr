@@ -1,6 +1,6 @@
 package pegr
 import grails.converters.XML
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.io.FileType
 import groovy.json.*
 

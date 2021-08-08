@@ -19,12 +19,12 @@ spring:
     groovy:
         template:
             check-template-location: false
-
-# Spring Actuator Endpoints are Disabled by Default
-endpoints:
-    enabled: false
-    jmx:
-        enabled: true
+    devtools:
+        restart:
+            exclude:
+                - grails-app/views/**
+                - grails-app/i18n/**
+                - grails-app/conf/**
 
 ---
 grails:
@@ -81,9 +81,12 @@ grails:
                 scriptlets: html
                 taglib: none
                 staticparts: none
-endpoints:
+spring:
     jmx:
         unique-names: true
+management:
+    endpoints:
+        enabled-by-default: false
 
 ---
 hibernate:
@@ -91,8 +94,8 @@ hibernate:
         queries: false
         use_second_level_cache: true
         use_query_cache: false
-        # region:
-            # factory_class: 'org.hibernate.cache.ehcache.EhCacheRegionFactory' # Hibernate 4
+        region:
+            factory_class: 'org.hibernate.cache.ehcache.EhCacheRegionFactory' # Hibernate 4
     flush.mode: AUTO # OSIV session flush mode outside of transactional context
 dataSource:
     pooled: true

@@ -1,6 +1,6 @@
 package pegr
 import groovy.json.*
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 class ReportException extends RuntimeException {
     String message

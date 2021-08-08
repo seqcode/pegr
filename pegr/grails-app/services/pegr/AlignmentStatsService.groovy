@@ -1,5 +1,5 @@
 package pegr
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import grails.converters.*
 import groovy.json.*
 

@@ -5,7 +5,7 @@ import static org.springframework.http.HttpStatus.*
 import pegr.AdminCategory
 import pegr.ProtocolGroup
 import pegr.ProtocolGroupException
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import com.opencsv.CSVParser
 import com.opencsv.CSVReader
 

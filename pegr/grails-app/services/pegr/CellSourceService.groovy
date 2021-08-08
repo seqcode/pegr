@@ -2,7 +2,7 @@ package pegr
 
 import com.opencsv.CSVParser
 import com.opencsv.CSVReader
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 class CellSourceException extends RuntimeException {
     String message

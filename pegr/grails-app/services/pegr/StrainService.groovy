@@ -1,6 +1,6 @@
 package pegr
 
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 class StrainException extends RuntimeException {
     String message

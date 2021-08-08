@@ -1,6 +1,6 @@
 package pegr
 import groovy.sql.Sql
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 class ProjectException extends RuntimeException {
     String message

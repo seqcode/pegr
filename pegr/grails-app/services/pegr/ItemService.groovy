@@ -1,6 +1,6 @@
 package pegr
 import grails.web.servlet.mvc.GrailsParameterMap
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.json.*
 
 class ItemException extends RuntimeException {

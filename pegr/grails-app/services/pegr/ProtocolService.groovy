@@ -1,6 +1,6 @@
 package pegr
 
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import org.springframework.web.multipart.MultipartHttpServletRequest 
 
 class ProtocolException extends RuntimeException {

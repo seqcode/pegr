@@ -1,5 +1,5 @@
 package pegr
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 class AntibodyException extends RuntimeException {
     String message

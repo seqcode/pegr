@@ -97,6 +97,7 @@ hibernate:
         region:
             factory_class: 'org.hibernate.cache.ehcache.EhCacheRegionFactory' # Hibernate 4
     flush.mode: AUTO # OSIV session flush mode outside of transactional context
+    allow_update_outside_transaction: true
 dataSource:
     pooled: true
     jmxExport: true

@@ -4,6 +4,7 @@ import com.opencsv.CSVParser
 import com.opencsv.CSVReader
 import groovy.json.*
 import groovy.time.*
+import java.text.SimpleDateFormat
 
 class QfileException extends RuntimeException {
     String message
@@ -847,7 +848,7 @@ class QfileService {
      */
     def exportRun(Long runId) {
         def run = SequenceRun.get(runId)
-        
+        def sdf = new SimpleDateFormat("yyMMdd")
         def laneExports = []
         laneExports << [
             libraryPoolArchiveId: run.runStats?.libraryPoolArchiveId,          //A       
@@ -855,7 +856,7 @@ class QfileService {
             libraryStock: run.runStats?.libraryStock,                 //C
             libraryStdDev: run.runStats?.libraryStdDev,               //D
             pctLibraryStdDev: run.runStats?.pctLibraryStdDev,             //E
-            qPcrDate: run.runStats?.qPcrDate?.format("yyMMdd"),                    //F
+            qPcrDate: run.runStats?.qPcrDate == null ? null : sdf.format(run.runStats?.qPcrDate),                    //F
             technicianName: run.runStats?.technician?.username,                  //G
             emptyH: "", //H
             cycles: run.runStats?.cycles,                      //I
@@ -981,14 +982,14 @@ class QfileService {
                 genomeBuild2: genomes.size() > 1 ? genomes[1] : "",   //BC
                 genomeBuild3: genomes.size() > 2 ? genomes[2] : "",   //BD      
                 emptyBE: "",
-                dateReceived: sample.cellSource?.inventory?.dateReceived?.format('yyMMdd'),   //BF
+                dateReceived: sample.cellSource?.inventory?.dateReceived == null ? null : sdf.format(sample.cellSource?.inventory?.dateReceived),   //BF
                 receivingUser: sample.cellSource?.inventory?.receivingUser?.fullName,   //BG    
-                inOrExternal: sample.cellSource?.inventory?.sourceType?.name()?.take(1),          //BH
+                inOrExternal: sample.cellSource?.inventory?.sourceType?.name()?.take(1),      //BH
                 emptyBI: "",
                 inventoryNotes: sample.cellSource?.inventory?.notes,      //BJ
                 chipUser: sample.prtclInstSummary?.user?.username,             //BK
                 emptyBL: "",              //BL
-                chipDate: sample.prtclInstSummary?.startTime?.format('yyMMdd'),               //BM
+                chipDate: sample.prtclInstSummary?.startTime == null ? null : sdf.format(sample.prtclInstSummary?.startTime),               //BM
                 emptyBN: "",
                 protocolVersion: sample.prtclInstSummary?.protocol?.protocolVersion,       //BO
                 emptyBP: "",                 //BP
@@ -1002,7 +1003,7 @@ class QfileService {
                 resin: (prtclNote && prtclNote.containsKey("Resin")) ? prtclNote.Resin : "",          //BX
                 pool: sampleInRun?.pool,           //BY
                 volToPool: sampleInRun?.volumeToPool,     //BZ
-                poolDate: sampleInRun?.poolDate?.format('yyMMdd'),       //CA
+                poolDate: sampleInRun?.poolDate == null ? null : sdf.format(sampleInRun?.poolDate),       //CA
                 PCRCycle: (prtclNote && prtclNote.containsKey("PCR Cycle")) ? prtclNote["PCR Cycle"] : "",        //CB
                 quibitReading: (poolNote && poolNote.containsKey("quibitReading")) ? poolNote["quibitReading"] : "",  //CC
                 quibitDilution: (poolNote && poolNote.containsKey("quibitDilution")) ? poolNote["quibitDilution"] : "", //CD
@@ -1024,7 +1025,7 @@ class QfileService {
                 emptyCT: "",
                 emptyCU: "",
                 userStr: run.user?.username,        //CV
-                dateStr: sample.date?.format('yyMMdd'),       //CW
+                dateStr: sample.date == null ? null : sdf.format(sample.date),       //CW
                 fcidStr: run.fcId,       //CX
                 emptyCY: "",
                 emptyCZ: "",
@@ -1040,7 +1041,7 @@ class QfileService {
                 indexStr: sample.sequenceIndicesIdString    //DJ
             ]
         }
-        def filename = sprintf('Run%d-%s-%s.xlsx', [runId, run.directoryName, new Date().format('yyyyMMdd')])
+        def filename = sprintf('Run%d-%s-%s.xlsx', [runId, run.directoryName, sdf.format(new Date())])
         return [sampleExports: sampleExports, laneExports: laneExports, filename: filename]
         
     }

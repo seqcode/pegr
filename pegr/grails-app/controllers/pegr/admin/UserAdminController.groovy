@@ -127,7 +127,7 @@ class UserAdminController {
         } else if (email && email != "") {
             users = User.findAllByEmail(email)
         }
-        render(view: "index", model: [users: users])
+        redirect(action: "index")
     }
 
     def edit(Long userId) {
@@ -164,7 +164,7 @@ class UserAdminController {
         }
         
         if (cmd.hasErrors()) {
-            render(view: "index", model: [users: [], cmd: cmd])
+            redirect(action: "index")
             return
         }
         try {
@@ -175,10 +175,10 @@ class UserAdminController {
                             cmd.sendEmail
                             )
             request.message = "Success creating the user!"
-            render(view: "index", model: [users: [user]])
+            redirect(action: "index")
         } catch (UserException e) {
             request.message = e.message
-            render(view: "index", model: [users: []])
+            redirect(action: "index")
         }
     }
     

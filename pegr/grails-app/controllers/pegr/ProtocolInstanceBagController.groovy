@@ -1,5 +1,6 @@
 package pegr
 import org.springframework.web.multipart.MultipartHttpServletRequest 
+import java.text.SimpleDateFormat
 
 class ProtocolInstanceBagController {
 
@@ -65,7 +66,8 @@ class ProtocolInstanceBagController {
     def create() {
         def user = springSecurityService.currentUser
         def protocolGroups = ProtocolGroup.list()
-        def date = new Date().format("yyMMdd")
+        def sdf = new SimpleDateFormat("yyMMdd")
+        def date = sdf.format(new Date())
         def name = "${date}_${user.username}_"
         [protocolGroups: protocolGroups, user: user, name: name]
     }

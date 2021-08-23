@@ -3,6 +3,7 @@ import grails.gorm.transactions.Transactional
 import groovy.time.TimeCategory
 import org.springframework.web.multipart.MultipartHttpServletRequest 
 import groovy.json.*
+import java.text.SimpleDateFormat
 
 class SequenceRunException extends RuntimeException {
     String message
@@ -322,7 +323,11 @@ class SequenceRunService {
         
     
     def getCalendarTimeString(Date time) {
-        return time.format("yyyyMMdd'T'HHmmss'Z'")
+        if (!time) {
+            return null
+        }
+        def sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'")
+        return sdf.format(time)
     }
     
     @Transactional

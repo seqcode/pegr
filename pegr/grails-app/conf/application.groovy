@@ -86,21 +86,11 @@ grails.hibernate.osiv.readonly = false
 environments {
     development {
         grails.logging.jul.usebridge = true
-		// axa677-20180306: If you are running pegr locally in development mode, you need the following line (ajax calls might work without it)
-		// if you want to add this config in the external file "pegr-config.properties", go to .grails folder and edit that file if
-		// it exists.
-		// note: you should have only this line in either development or production (having this line in both might generate some conflict/errors)
-		//grails.serverURL ="http://localhost:8080/${appName}"
+        grails.serverURL = "http://localhost:8080/${appName}"
     }
     production {
         grails.logging.jul.usebridge = false
-		// axa677-20180306: This is important for the ajax calls to the controller actions with redirect to another action.
-		// Without this line the ajax call will redirect over http by defualt and the call will be blocked because
-		// grails security. To make the ajax call identified and coming from the app context we added this line.
-		// This line will be commented if we already have it in the external config file "pegr-config.properties"
-	    	// Important Note: if you add this line externally, make sure to remove the quotation marks.
-		//grails.serverURL ="https://shaunline.vmhost.psu.edu/pegr"
-
+		
     }
 }
 

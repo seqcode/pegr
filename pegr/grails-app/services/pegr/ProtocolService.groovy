@@ -29,7 +29,7 @@ class ProtocolService {
             }
             
             newTypes.each { t ->
-                def oldType = toDelete.find{it.itemType == t.itemType && it.function == t.function}
+                def oldType = toDelete.find{it.itemType.id == t.itemType.id && it.function == t.function}
                 if (oldType) {
                     toDelete.remove(oldType)
                 } else {

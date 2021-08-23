@@ -138,4 +138,5 @@ environments:
                 defaultTransactionIsolation: 2 # java.sql.Connection.TRANSACTION_READ_COMMITTED# TRANSACTION_READ_COMMITTED
 ---
 server:
-    contextPath: '/pegr'
+    servlet:
+        context-path: /pegr

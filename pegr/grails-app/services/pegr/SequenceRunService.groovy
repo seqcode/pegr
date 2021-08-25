@@ -333,7 +333,7 @@ class SequenceRunService {
     @Transactional
     def uploadCohortImage(MultipartHttpServletRequest mpr, SequencingCohort cohort, String type, String fieldName) {
         def maxByte = 5 * 1024 * 1024 
-        def allowedFileTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif']
+        def allowedFileTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/tiff']
         try {
             def filepath = utilityService.upload(mpr,fieldName, allowedFileTypes, type, maxByte) 
             def imageMap = utilityService.parseJson(cohort.images)

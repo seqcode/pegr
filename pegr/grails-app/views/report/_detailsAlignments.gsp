@@ -53,7 +53,7 @@
                             <g:each in="${(0..<alignment.motifCount)}" var="n">
                                 <tr>
                                     <td class="meme-id" style="width:20px"></td>
-                                    <td class="meme-fig"><i class="fa fa-spinner fa-spin"></i></td>
+                                    <td class="meme-fig" style="width:450px"><i class="fa fa-spinner fa-spin"></i></td>
                                     <td class="meme-evalue" style="width:100px"></td>
                                     <td class="meme-sites" style="width:100px"></td>
                                     <td class="meme-width" style="width:100px"></td>

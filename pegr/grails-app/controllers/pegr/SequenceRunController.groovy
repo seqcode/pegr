@@ -338,7 +338,7 @@ class SequenceRunController {
                     throw new QfileException(message: "Please enter the line of the lane sheet!")
                 }
                 
-                def csvNames = qfileService.convertXlsxToCsv(folder, filepath, params.sampleSheet, params.laneSheet)
+                def csvNames = qfileService.convertXlsxToCsv(folder, fileDest, params.sampleSheet, params.laneSheet)
                 
                 // check file for potential errors, e.g. unreasonal number of new projects
                 def warnings = qfileService.checkFile(csvNames[params.sampleSheet],

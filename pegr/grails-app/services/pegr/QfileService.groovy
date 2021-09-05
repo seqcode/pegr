@@ -57,13 +57,12 @@ class QfileService {
         return warnings
     }
     
-    def convertXlsxToCsv(File folder, String filename, String sampleSheetName, String laneSheetName) {
+    def convertXlsxToCsv(File folder, File xlsxFile, String sampleSheetName, String laneSheetName) {        
         def csvNames = [:]
-        // convert xsxl to csv
+        // convert xlsx to csv
         [sampleSheetName, laneSheetName].each { sheet ->
             csvNames[sheet] = new File(folder, sheet + ".csv").getPath()
-            def command = "xlsx2csv -n ${sheet} ${filename} ${csvNames[sheet]}"
-            utilityService.executeCommand(command, timeout)
+            utilityService.convertSelectedSheetInXLXSFileToCSV(xlsxFile, sheet, csvNames[sheet])
         }
         return csvNames
     } 

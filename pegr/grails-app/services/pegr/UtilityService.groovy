@@ -4,6 +4,16 @@ import groovy.json.*
 import groovy.sql.Sql
 import org.springframework.web.multipart.MultipartHttpServletRequest 
 import org.apache.commons.lang.RandomStringUtils
+
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileWriter
+import java.util.Iterator
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.CellType
+import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.xssf.usermodel.XSSFSheet
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
     
 class UtilityException extends RuntimeException {
     String message
@@ -359,5 +369,65 @@ class UtilityService {
     def getRandomString(int length) {
         String charset = (('A'..'Z') + ('a'..'z') + ('0'..'9')).join()
         return RandomStringUtils.random(length, charset.toCharArray())
+    }
+    
+    def convertSelectedSheetInXLXSFileToCSV(File xlsxFile, String sheetName, String csvFilepath) { 
+        FileInputStream fileInStream = new FileInputStream(xlsxFile)
+        FileWriter csvWriter = new FileWriter(csvFilepath)
+ 
+        // Open the xlsx and get the requested sheet from the workbook
+        XSSFWorkbook workBook = new XSSFWorkbook(fileInStream)
+        XSSFSheet selSheet = workBook.getSheet(sheetName)
+ 
+        // Iterate through all the rows in the selected sheet
+        Iterator<Row> rowIterator = selSheet.iterator()
+        def total_columns = 0
+        while (rowIterator.hasNext()) { 
+            Row row = rowIterator.next();
+ 
+            // Iterate through all the columns in the row and build "," separated string
+            Iterator<Cell> cellIterator = row.cellIterator();
+            StringBuffer sb = new StringBuffer();
+            def column_count = 0
+            def patched_count = 0
+            while (cellIterator.hasNext()) {
+                column_count++
+                Cell cell = cellIterator.next();
+                def missed_columns = cell.getColumnIndex() + 1 - column_count - patched_count
+                for (int i=0; i <missed_columns; i++) {
+                    sb.append(",")
+                    patched_count++
+                }
+                
+                switch (cell.getCellType()) {
+                    case CellType.STRING:
+                        sb.append('"' + cell.getStringCellValue() + '",');
+                        break;
+                    case CellType.NUMERIC:
+                        sb.append(cell.getNumericCellValue() + ",");
+                        break;
+                    case CellType.BOOLEAN:
+                        sb.append(cell.getBooleanCellValue() + ",");
+                        break;
+                    default:
+                        sb.append(",");
+                        break;
+                }
+            }
+            
+            def row_total_columns = column_count + patched_count
+            if (row_total_columns > total_columns) {
+                total_columns = row_total_columns
+            } else if (row_total_columns < total_columns) {
+                for (int i=row_total_columns; i<total_columns; i++) {
+                    sb.append(",")
+                }
+            }
+            
+            csvWriter.write(sb.toString());
+            csvWriter.write(System.lineSeparator());
+        }
+        workBook.close()
+        csvWriter.close()
     }
 }

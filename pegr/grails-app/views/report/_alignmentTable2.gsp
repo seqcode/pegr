@@ -21,7 +21,7 @@
                         <g:each in="${experiment.alignments}" var="alignment" status="nAli">
                             <g:if test="${nAli>0}"><tr></g:if>
                             <td>${alignment.genome}</td>
-                            <td class="text-right">100%</td>
+                            <td class="text-right"><g:formatNumber number="${experiment.totalReads}" format="###,###,###" /></td>
                             <td class="text-right"><g:formatNumber number="${alignment.mappedReadPct}" format="##.#%" /></td>
                             <td class="text-right"><g:formatNumber number="${alignment.uniquelyMappedPct}" format="##.#%" /></td>
                             <td class="text-right"><g:formatNumber number="${alignment.deduplicatedPct}" format="##.#%" /></td>

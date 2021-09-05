@@ -508,6 +508,7 @@ class ReportService {
                 case "output_meme": // meme
                     alignmentDTO.memeFile = alignmentStatsService.queryDatasetsUri(analysis.datasets, "txt")
                     alignmentDTO.memeFig = alignmentStatsService.queryDatasetsUri(analysis.datasets, "html")
+                    alignmentDTO.motifCount = utilityService.queryJson(analysis.statistics, "motifCount")
                     break
                 case "output_fourColorPlot": // four color plot
                     alignmentDTO.fourColor = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "png")

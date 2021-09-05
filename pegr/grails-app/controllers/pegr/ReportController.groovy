@@ -287,6 +287,7 @@ class AlignmentDTO {
     List composite
     String scidx
     Integer readDbId
+    Integer motifCount
 }
 
 class RunStatusDTO {

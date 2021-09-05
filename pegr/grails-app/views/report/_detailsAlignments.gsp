@@ -50,14 +50,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <g:each in="${alignment.fourColor}" var="fourColor" status="n">
+                            <g:each in="${(0..<alignment.motifCount)}" var="n">
                                 <tr>
                                     <td class="meme-id" style="width:20px"></td>
                                     <td class="meme-fig"><i class="fa fa-spinner fa-spin"></i></td>
                                     <td class="meme-evalue" style="width:100px"></td>
                                     <td class="meme-sites" style="width:100px"></td>
                                     <td class="meme-width" style="width:100px"></td>
-                                    <td style="width:100px"><a href="${fourColor}" target="_blank"><span class="glyphicon glyphicon-picture" style="font-size: 2em"></span></a></td>
+                                    <td style="width:100px"><a href="${alignment.fourColor[n]}" target="_blank"><span class="glyphicon glyphicon-picture" style="font-size: 2em"></span></a></td>
                                     <td class="composite" style="width:210px"><g:link controller="report" action="composite" params="[url: alignment.composite[n]]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link><i class="fa fa-spinner fa-spin"></i><span class="composite-url" hidden="hidden">${alignment.composite[n]}</span><div class="composite-fig"></div></td>
                                 </tr>
                             </g:each>

@@ -39,7 +39,7 @@ class Sample {
         def indexDict = SampleSequenceIndices.where{sample == this}.groupBy({it -> it.setId})
         def indexList = []
         indexDict.each{ key, value ->
-            indexList.push(value.sort{it.indexInSet}*.index*.sequence.join("-"))
+            indexList << value.sort{it.indexInSet}*.index*.sequence.join("-")
         }
         return indexList.join(",")
     }
@@ -48,7 +48,7 @@ class Sample {
         def indexDict = SampleSequenceIndices.where{sample == this}.groupBy({it -> it.setId})
         def indexList = []
         indexDict.each{ key, value ->
-            indexList.push(value.sort{it.indexInSet}*.index*.indexId.join("-"))
+            indexList << value.sort{it.indexInSet}*.index*.indexId.join("-")
         }
         return indexList.join(",")
     }

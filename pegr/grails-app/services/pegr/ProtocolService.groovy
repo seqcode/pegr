@@ -23,7 +23,7 @@ class ProtocolService {
                 typeIds.each { id ->
                     def itemType = ItemType.get(id)
                     if (itemType) {
-                        newTypes.push(new ProtocolItemTypes(protocol: protocol, itemType: itemType, function: itemFunction))
+                        newTypes << new ProtocolItemTypes(protocol: protocol, itemType: itemType, function: itemFunction)
                     }
                 }
             }

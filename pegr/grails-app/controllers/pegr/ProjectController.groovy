@@ -109,7 +109,7 @@ class ProjectController {
             def cohortSamples = currentProject.cohorts*.samples.flatten()
             currentProject.samples.each {
                 if (!(it in cohortSamples)) {
-                    otherSamples.push(it)
+                    otherSamples << it
                 }
             }
             [project: currentProject, 
@@ -324,7 +324,7 @@ class ProjectController {
             session.checkedProject.each {
                 def project = Project.get(it)
                 if (project) {
-                    projects.push(Project.get(it))
+                    projects << Project.get(it)
                 }
             }
         }
@@ -343,7 +343,7 @@ class ProjectController {
             session.checkedProject.each {
                 def project = Project.get(it)
                 if (project) {
-                    mergeFromProjects.push(Project.get(it))
+                    mergeFromProjects << Project.get(it)
                 }
             }
         }
@@ -366,7 +366,7 @@ class ProjectController {
             if (oldProjectUsers && oldProjectUsers.size() > 0) {
                 oldProjectUsers.each { pu ->
                     if (!projectUsers.collect { it.user }.contains(pu.user)) {
-                        projectUsers.push(pu)
+                        projectUsers << pu
                     }
                 }
             }
@@ -375,8 +375,8 @@ class ProjectController {
         // add current user
         def currUser = springSecurityService.currentUser
         if (!projectUsers.collect { it.user }.contains(currUser)) {
-            projectUsers.push(new ProjectUser(user:currUser, 
-                                              projectRole: ProjectRole.OWNER))
+            projectUsers << new ProjectUser(user:currUser, 
+                                              projectRole: ProjectRole.OWNER)
         }
         [projectName: projectName, mergeFromProjects: mergeFromProjects, projectUsers: projectUsers, mergeToProject: mergeToProject]
     }

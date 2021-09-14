@@ -368,7 +368,7 @@ class SampleController {
             session.checkedSample = []
         }
         sampleList.each{
-          session.checkedSample.push(it.toLong())
+          session.checkedSample << it.toLong()
         }
         render session.checkedSample.size()
     }
@@ -432,7 +432,7 @@ class SampleController {
             items.each { item ->
                 def sample = Sample.findByItem(item)
                 if (sample) {
-                    samples.push(sample)
+                    samples << sample
                 }
             }
         }

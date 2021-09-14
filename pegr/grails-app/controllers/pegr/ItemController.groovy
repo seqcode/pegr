@@ -75,7 +75,7 @@ class ItemController {
                 def traces = []
                 def tmp = item
                 while(tmp.parent) {
-                    traces.push(tmp.parent)
+                    traces << tmp.parent
                     tmp = tmp.parent
                 }
                 cellSource = CellSource.findByItem(tmp)
@@ -323,10 +323,10 @@ class ItemController {
         def items = []
         def nullCount = 5 * (row - 1) + col - 1
         for (int i = 0; i < nullCount; ++i) {
-            items.push(null)
+            items << null
         }
         for (int i = 0; i < copies; ++i) {
-            items.push(item) 
+            items << item 
         }        
         render(view: "/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])
     }
@@ -378,7 +378,7 @@ class ItemController {
         }
         def itemsArray = []
         items.each {item->
-            itemsArray.push([item.id, item.type.name, item.name, item.barcode, item.location, item.user.username, item.status])
+            itemsArray << [item.id, item.type.name, item.name, item.barcode, item.location, item.user.username, item.status]
         }
         render itemsArray as JSON
         return

@@ -405,7 +405,7 @@
 			var runId = 0;
 			$('input[name="delete"]').each(function(){
 				if (this.checked) {
-					sampleIds.push(this.value);
+					sampleIds << this.value;
 					runId = this.getAttribute("data-runId");
 				}
 			});

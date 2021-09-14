@@ -156,7 +156,7 @@ class TargetAdminController {
             session.checkedTarget.each {
                 def target = Target.get(it)
                 if (target) {
-                    targets.push(Target.get(it))
+                    targets << Target.get(it)
                 }
             }
         }

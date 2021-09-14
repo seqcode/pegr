@@ -555,21 +555,21 @@ class ReportService {
             data.eachLine {
                 if (inBlock) {
                     if (it.startsWith("----------------")) {
-                        results.push([db: 0, 
+                        results << [db: 0, 
                                 id: count, 
                                 alt: "MEME", 
                                 len: len, 
                                 nsites: nsites, 
                                 evalue: evalue, 
-                                pwm: pwm])
+                                pwm: pwm]
                         inBlock = false
                     } else {
                         def numbers = it.tokenize()
                         def a = []
                         numbers.each { n ->
-                            a.push(utilityService.getFloat(n))
+                            a << utilityService.getFloat(n)
                         }
-                        pwm.push(a)
+                        pwm << a
                     }
                 } else {
                     if (it.startsWith("letter-probability matrix")) {
@@ -630,7 +630,7 @@ class ReportService {
             def numbers = line.tokenize()
             if (lineNum == 0) {
                 numbers.each { n ->
-                    results.push([n])
+                    results << [n]
                 } 
             } else {
                 numbers.eachWithIndex { n, c ->
@@ -783,7 +783,7 @@ class ReportService {
         def lists = []
         
         fields.each { field ->
-             lists.push(params.list(field))
+             lists << params.list(field)
         }
         def settings = []
         int count = lists[0].size()

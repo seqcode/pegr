@@ -343,7 +343,7 @@ class SequenceRunService {
             if (!imageMap[type]) {
                 imageMap[type] = []
             }
-            imageMap[type].push(filepath)
+            imageMap[type] << filepath
             cohort.images = JsonOutput.toJson(imageMap)
             cohort.save()
         } catch (UtilityException e) {

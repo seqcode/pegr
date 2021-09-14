@@ -149,7 +149,7 @@ class ProtocolInstanceBagController {
             if (id.isLong()) {
                 def item = Item.get(id)
                 if (item) {
-                    items.push(item)
+                    items << item
                 }
             }
         }
@@ -506,11 +506,11 @@ class ProtocolInstanceBagController {
         def items = []
         def priorCount = 5 * (row - 1) + column - 1
         for (int i = 0; i < priorCount; ++i) {
-            items.push(null)
+            items << null
         }
         def tracedSamples = (type == "Parents") ? results.parents : results.children  
         tracedSamples.each { item ->
-            items.push(item)
+            items << item
         }
         render(view:"/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])        
     }

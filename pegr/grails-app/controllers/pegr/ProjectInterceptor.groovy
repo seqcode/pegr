@@ -53,7 +53,7 @@ class ProjectInterceptor {
                 if (params.projectName) {
                     def mergeToProject = Project.where {name == params.projectName}.get(max:1)
                     if (mergeToProject) {
-                        projects.push(mergeToProject.id)    
+                        projects << mergeToProject.id    
                     }    
                 }
                 projects.each { projectId ->

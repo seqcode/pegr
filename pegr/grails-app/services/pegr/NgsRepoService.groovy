@@ -245,7 +245,7 @@ class NgsRepoService {
             if (it != RUN_INFO_FILE_NAME 
                 && ( priorRunFolder == null || it > priorRunFolder)) {
                 // put the new folder path to the list
-                newPaths.push(it)
+                newPaths << it
             }
         }
         return newPaths
@@ -305,7 +305,7 @@ class NgsRepoService {
                     // write the config xml file for each genome.
                     genomes.eachWithIndex { genome, idx ->
                         def xmlName = generateXmlFile(genome, run.id, experiment.sample.id, idx, configLocalFolder)
-                        xmlNames.push(xmlName)
+                        xmlNames << xmlName
                     }
                 }
                 // write the sample's runID, sampleID, indices and config xml file names.
@@ -434,7 +434,7 @@ class NgsRepoService {
                 if (!id.isInteger()) {
                     throw new NgsRepoException(message: "Format error in queued runs!${id}!")
                 } else {
-                    ids.push(id)
+                    ids << id
                 }
             }
             queuedRuns = ids.join(",")

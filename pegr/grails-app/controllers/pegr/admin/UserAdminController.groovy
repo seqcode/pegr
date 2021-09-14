@@ -122,7 +122,7 @@ class UserAdminController {
         if (username && username != "") {
             def user = User.findByUsername(username)
             if (user) {
-                users.push(user)
+                users << user
             }
         } else if (email && email != "") {
             users = User.findAllByEmail(email)

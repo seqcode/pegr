@@ -238,7 +238,7 @@ class CellSourceService {
             def cellSource = getCellSource(cmd)
             cellSource.status = DictionaryStatus.Y
             cellSource.save()
-            cellSources.push(cellSource)
+            cellSources << cellSource
         }
         def batch = createBatch(cellSources)
         return batch
@@ -313,7 +313,7 @@ class CellSourceService {
                                         parent: parent).save( failOnError: true)
                 }
                 def cellSource = new CellSource(strain: strain, status: DictionaryStatus.Y).save()
-                cellSources.push(cellSource)
+                cellSources << cellSource
             }catch(Exception e) {
                 log.error "Error: line ${lineNo}. " + e
                 throw new CellSourceException(message: "Error: line ${lineNo}.")

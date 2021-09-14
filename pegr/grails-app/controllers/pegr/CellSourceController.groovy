@@ -297,10 +297,10 @@ class CellSourceController {
         def items = []
         def nullCount = 5 * (row - 1) + col - 1
         for (int i = 0; i < nullCount; ++i) {
-            items.push(null)
+            items << null
         }
         batch.cellSources.each { it ->
-            items.push(it.item) 
+            items << it.item 
         }
         render(view: "/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name, date: new Date()])
     }

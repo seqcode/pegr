@@ -43,7 +43,7 @@ class QfileService {
             def data = getNamedData(rawdata)
             def projectName = getProjectName(data.projectName, data.service, data.invoice)
             if (!projectNames.contains(projectName)) {
-                projectNames.push(projectName)
+                projectNames << projectName
             
                 def project = Project.findByName(projectName)
                 if (!project) {

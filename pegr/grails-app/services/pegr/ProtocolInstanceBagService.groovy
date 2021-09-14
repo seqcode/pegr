@@ -185,7 +185,7 @@ class ProtocolInstanceBagService {
             items.each { tracedSample ->
                 // check if the traced sample is already in the bag
                 if (ProtocolInstanceItems.findByProtocolInstanceAndItem(instance, tracedSample)) {
-                    duplicateItems.push(tracedSample.name)
+                    duplicateItems << tracedSample.name
                 } else {
                     // add the item to the bag
                     importItemToBag(tracedSample, bagId, instance)
@@ -696,7 +696,7 @@ class ProtocolInstanceBagService {
         if (!imageMap[type]) {
             imageMap[type] = []
         }
-        imageMap[type].push(filepath)
+        imageMap[type] << filepath
         instance.images = JsonOutput.toJson(imageMap)
         instance.save()      
     }

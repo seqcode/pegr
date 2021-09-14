@@ -110,7 +110,7 @@ class SampleService {
         while (item) {
             def instances = ProtocolInstanceItems.findAllByItem(item).sort{ -it.id }.collect { it.protocolInstance}
             if (instances.size()>0) {
-                protocols.push([item: item, protocolList: instances])
+                protocols << [item: item, protocolList: instances]
             }
             item = item.parent
         }

@@ -268,9 +268,9 @@ class SequenceRunController {
             def queuedRuns = []
             queuedRunIds.eachWithIndex { id, n ->
                  def run = SequenceRun.get(Long.parseLong(id))
-                queuedRuns.push([id: id,
+                queuedRuns << [id: id,
                                  runName: run?.runName,
-                                 directoryName: n < newFolders.size() ? newFolders[n] : null])
+                                 directoryName: n < newFolders.size() ? newFolders[n] : null]
 
             }
             def currentRun = [id: runId,

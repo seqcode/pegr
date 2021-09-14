@@ -334,7 +334,7 @@ class UtilityService {
             if (!newLink || newLink.size() == 0) {
                 sql.execute("update " + linkTable + " set " + fieldToMerge + "_id = ? where id = ?", [toId, row[0]])
             } else {
-                toDelete.push(row[0])
+                toDelete << row[0]
             }
         }
  

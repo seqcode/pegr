@@ -53,12 +53,12 @@
                             <g:each in="${(0..<alignment.motifCount)}" var="n">
                                 <tr>
                                     <td class="meme-id" style="width:20px"></td>
-                                    <td class="meme-fig" style="width:450px"><i class="fa fa-spinner fa-spin"></i></td>
+                                    <td class="meme-fig" style="width:350px"><i class="fa fa-spinner fa-spin"></i></td>
                                     <td class="meme-evalue" style="width:100px"></td>
                                     <td class="meme-sites" style="width:100px"></td>
                                     <td class="meme-width" style="width:100px"></td>
                                     <td style="width:100px"><a href="${alignment.fourColor[n]}" target="_blank"><span class="glyphicon glyphicon-picture" style="font-size: 2em"></span></a></td>
-                                    <td class="composite" style="width:210px"><g:link controller="report" action="composite" params="[url: alignment.composite[n]]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link><i class="fa fa-spinner fa-spin"></i><span class="composite-url" hidden="hidden">${alignment.composite[n]}</span><div class="composite-fig"></div></td>
+                                    <td class="composite" style="width:320px"><g:link controller="report" action="composite" params="[url: alignment.composite[n]]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link><i class="fa fa-spinner fa-spin"></i><span class="composite-url" hidden="hidden">${alignment.composite[n]}</span><div class="composite-fig"></div></td>
                                 </tr>
                             </g:each>
                         </tbody>
@@ -135,8 +135,8 @@
 
                             // Instantiate and draw our chart, passing in some options.
                             var chart = new google.visualization.LineChart(container);
-                            var options = { width: 200, 
-                                           height: 100, 
+                            var options = { width: 300, 
+                                           height: 150, 
                                            legend: { position: 'none'}, 
                                            vAxis: { gridlines: {count: 3 } },
                                            hAxis: { gridlines: {count: 3 } },

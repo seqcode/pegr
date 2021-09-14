@@ -50,6 +50,7 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <g:if test="${alignment.motifCount}">
                             <g:each in="${(0..<alignment.motifCount)}" var="n">
                                 <tr>
                                     <td class="meme-id" style="width:20px"></td>
@@ -61,6 +62,7 @@
                                     <td class="composite" style="width:320px"><g:link controller="report" action="composite" params="[url: alignment.composite[n]]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link><i class="fa fa-spinner fa-spin"></i><span class="composite-url" hidden="hidden">${alignment.composite[n]}</span><div class="composite-fig"></div></td>
                                 </tr>
                             </g:each>
+                            </g:if>
                         </tbody>
                     </table>                        
                 </g:each>

@@ -1,4 +1,5 @@
 package pegr
+import groovy.json.*
 import groovy.sql.Sql
 import grails.gorm.transactions.Transactional
 
@@ -162,14 +163,62 @@ class ProjectService {
             }
         }
         
-        // merge
+        // merge project one at a time
         mergeFromProjectIds.each { fromId ->
             if (fromId != mergeToProject.id) {
                 mergeProject(fromId, mergeToProject) 
             }
         }
         
-        ProjectUser.executeUpdate("delete ProjectUser where project.id=?", [mergeToProject.id])
+        // merge cohorts
+        def cohortGroups = SequencingCohort.findAllByProject(mergeToProject).groupBy({cohort -> cohort.run})
+        
+        for (entry in cohortGroups) {
+            def run = entry.key 
+            def cohorts = entry.value
+            
+            def mergeToCohort = cohorts[0]
+            def cohortName = "${run.id}_${mergeToProject.name}"
+            if (mergeToCohort.name != cohortName) {
+                mergeToCohort.name = cohortName
+            }
+            
+            if (cohorts.size() > 1) {                
+                def mergedImageMap = [:]
+                def mergedNotes = ''
+                for (cohort in cohorts) {
+                    // get all images
+                    def imageMap = utilityService.parseJson(cohort.images)
+                    if (imageMap) {
+                        imageMap.each { type, filepaths ->
+                            if (!mergedImageMap[type]) {
+                                mergedImageMap[type] = []
+                            }
+                            filepaths.each { filepath ->
+                                mergedImageMap[type] << filepath
+                            }                        
+                        }
+                    }
+                
+                    // get all notes
+                    if (cohort.notes != null && cohort.notes != '') {
+                        mergedNotes += ' ' + cohort.notes
+                    }
+                    
+                    // update all sequencing_experiemnts
+                    if (mergeToCohort.id != cohort.id) {
+                        SequencingExperiment.executeUpdate("update SequencingExperiment set cohort.id=:mergeId where cohort.id=:thisId", [mergeId: mergeToCohort.id, thisId: cohort.id])
+                        cohort.delete()
+                    }   
+                }
+                mergeToCohort.images = JsonOutput.toJson(mergedImageMap)
+                mergeToCohort.notes = mergedNotes
+            }
+            mergeToCohort.save()
+        }    
+        
+        // merge project users
+        ProjectUser.executeUpdate("delete ProjectUser where project.id=:projectId", [projectId: mergeToProject.id])
         userRoles.each {userRole ->
             def userToAdd = User.get(userRole.userId)
 
@@ -200,7 +249,7 @@ class ProjectService {
             utilityService.updateLinksInDb("project_funding", "funding", 'project', fromId, toId, sql)
             utilityService.updateLinksInDb("project_bags", "bag", 'project', fromId, toId, sql)
 
-            sql.execute("delete from project_user where project_id = ?", [fromId])
+            sql.execute("delete from project_user where project_id =:projectId", [projectId: fromId])
             sql.close()
         } catch(Exception e) {
             sql.close()

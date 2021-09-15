@@ -257,8 +257,8 @@ class UserService {
             
             // many-to-many tables
             utilityService.updateLinksInDb("project_user", "project", 'user', fromUser.id, toUser.id, sql)            
-            sql.execute("delete from user_role where user_id = ?", [fromUser.id])
-            sql.execute("delete from user_role_group where user_id = ?", [fromUser.id])
+            sql.execute("delete from user_role where user_id =:userId", [userId: fromUser.id])
+            sql.execute("delete from user_role_group where user_id =:userId", [userId: fromUser.id])
             fromUser.delete()
             sql.close()
         } catch(Exception e) {

@@ -174,22 +174,22 @@ class CellSourceController {
     }
     
     def fetchParentStrainAjax(Long speciesId) {
-        def strains = Strain.executeQuery("select distinct s.parent.name from Strain s where s.species.id = ?", [speciesId])
+        def strains = Strain.executeQuery("select distinct s.parent.name from Strain s where s.species.id=:id", [id: speciesId])
         render utilityService.stringToSelect2Data(strains) as JSON
     }
     
     def fetchStrainNameAjax(String parentStrain, Long speciesId) {
-        def strains = Strain.executeQuery("select distinct s.name from Strain s where s.parent.name = ? and s.species.id = ?", [parentStrain, speciesId])
+        def strains = Strain.executeQuery("select distinct s.name from Strain s where s.parent.name=:parent and s.species.id=:id", [parent: parentStrain, id: speciesId])
         render utilityService.stringToSelect2Data(strains) as JSON
     }
     
     def fetchGenotypeAjax(String strainName) {
-        def genotypes = Strain.executeQuery("select distinct s.genotype from Strain s where s.name = ?", [strainName])
+        def genotypes = Strain.executeQuery("select distinct s.genotype from Strain s where s.name=:strain", [strain: strainName])
         render utilityService.stringToSelect2Data(genotypes) as JSON
     }
     
     def fetchMutationAjax(String strainName, String genotype) {
-        def mutations = Strain.executeQuery("select distinct s.geneticModification from Strain s where s.name = ? and s.genotype = ?", [strainName, genotype])
+        def mutations = Strain.executeQuery("select distinct s.geneticModification from Strain s where s.name=:strain and s.genotype=:genotype", [strain: strainName, genotype: genotype])
         render utilityService.stringToSelect2Data(mutations) as JSON
     }
     

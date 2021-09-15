@@ -280,34 +280,34 @@ class UtilityService {
         def sql = new Sql(dataSource)
         try {    
             // check if both the merge from and merge to exist
-            def cmd = "select 1 from " + tableName + " where id = ?"
+            def cmd = "select 1 from " + tableName + " where id=:id"
             [fromId, toId].each { id ->
-                def objs = sql.rows(cmd, [id])
+                def objs = sql.rows(cmd, [id: id])
                 if (!objs || objs.size() == 0) {
                     throw new UtilityException(message: "The ${tableName} with ID#${id} is not found!")
                 }
             } 
             
             // fetch the tables that have a foreign key to the requested table
-            cmd = "select kcu.table_name, kcu.column_name from information_schema.referential_constraints rc inner join information_schema.key_column_usage kcu on rc.constraint_name = kcu.constraint_name and rc.constraint_schema = kcu.constraint_schema where kcu.constraint_schema = 'pegr' AND kcu.REFERENCED_TABLE_NAME = ?"
-            def affectedTables = sql.rows(cmd, [tableName]) 
+            cmd = "select kcu.table_name, kcu.column_name from information_schema.referential_constraints rc inner join information_schema.key_column_usage kcu on rc.constraint_name = kcu.constraint_name and rc.constraint_schema = kcu.constraint_schema where kcu.constraint_schema = 'pegr' AND kcu.REFERENCED_TABLE_NAME=:tableName"
+            def affectedTables = sql.rows(cmd, [tableName: tableName]) 
 
             affectedTables.each { table ->
                 // check unique constraints
-                cmd = "select 1 from information_schema.key_column_usage kcu inner join information_schema.TABLE_CONSTRAINTS tc on kcu.constraint_name = tc.constraint_name and kcu.table_name = tc.table_name and kcu.table_schema = tc.table_schema where kcu.constraint_schema = 'pegr' and kcu.table_name = ? and kcu.column_name= ? and tc.constraint_type='UNIQUE' and kcu.constraint_schema = 'pegr'"
-                def constraints = sql.rows(cmd, [table.table_name, table.column_name])
+                cmd = "select 1 from information_schema.key_column_usage kcu inner join information_schema.TABLE_CONSTRAINTS tc on kcu.constraint_name = tc.constraint_name and kcu.table_name = tc.table_name and kcu.table_schema = tc.table_schema where kcu.constraint_schema = 'pegr' and kcu.table_name=:tableName and kcu.column_name=:columnName and tc.constraint_type='UNIQUE' and kcu.constraint_schema = 'pegr'"
+                def constraints = sql.rows(cmd, [tableName: table.table_name, columnName: table.column_name])
                 if (constraints && constraints.size() > 0 ) {
                     // if there is UNIQUE constraint that prevent changing reference key, throw an error.
                     throw new UtilityException(message:"Database UNIQUE contraint!")
                 } else {
                     // change reference key from the fromId to the toId   
-                    cmd = "update " + table.table_name + " set " + table.column_name + "= ? where " + table.column_name + " = ?"
-                    sql.execute(cmd, [toId, fromId]) 
+                    cmd = "update " + table.table_name + " set " + table.column_name + "=:toId where " + table.column_name + " =:fromId"
+                    sql.execute(cmd, [toId: toId, fromId: fromId]) 
                 }             
             }
             // delete the merge-from row
-            cmd = "delete from " + tableName + " where id = ?"
-            sql.execute(cmd, [fromId])
+            cmd = "delete from " + tableName + " where id=:fromId"
+            sql.execute(cmd, [fromId: fromId])
             sql.close()
         } catch(UtilityException e) {
             sql.close()
@@ -321,25 +321,25 @@ class UtilityService {
     
     @Transactional
     def updateForeignKeyInDb(String table, String field, Long fromId, Long toId, Sql sql) {
-        def cmd = "update " + table + " set " + field +"_id = ? where " + field + "_id = ?"
-        sql.execute(cmd, [toId, fromId])
+        def cmd = "update " + table + " set " + field +"_id=:toId where " + field + "_id=:fromId"
+        sql.execute(cmd, [toId: toId, fromId: fromId])
     }
     
     @Transactional
     def updateLinksInDb(String linkTable, String fieldConstraint, String fieldToMerge, Long fromId, Long toId, Sql sql) {
         def toDelete = []
 
-        sql.eachRow("select id, " + fieldConstraint + "_id from " + linkTable + " where " + fieldToMerge + "_id = ?", [fromId]) { row ->
-            def newLink = sql.rows("select 1 from " + linkTable + " where " + fieldConstraint + "_id = ? and " + fieldToMerge + "_id = ?", [row[1],  toId])
+        sql.eachRow("select id, " + fieldConstraint + "_id from " + linkTable + " where " + fieldToMerge + "_id=:fromId", [fromId: fromId]) { row ->
+            def newLink = sql.rows("select 1 from " + linkTable + " where " + fieldConstraint + "_id=:id and " + fieldToMerge + "_id=:toId", [id: row[1], toId: toId])
             if (!newLink || newLink.size() == 0) {
-                sql.execute("update " + linkTable + " set " + fieldToMerge + "_id = ? where id = ?", [toId, row[0]])
+                sql.execute("update " + linkTable + " set " + fieldToMerge + "_id=:toId where id=:id", [toId: toId, id: row[0]])
             } else {
                 toDelete << row[0]
             }
         }
  
         toDelete.each {id -> 
-            sql.execute("delete from " + linkTable + " where id = ?", [id] )
+            sql.execute("delete from " + linkTable + " where id=:id", [id: id] )
         }
     }
     

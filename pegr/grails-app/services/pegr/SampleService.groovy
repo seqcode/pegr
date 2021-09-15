@@ -269,7 +269,7 @@ class SampleService {
     }
 
     def cleanIndices(Sample sample) {
-        SampleSequenceIndices.executeUpdate("delete from SampleSequenceIndices where sample.id=?", [sample.id])
+        SampleSequenceIndices.executeUpdate("delete from SampleSequenceIndices where sample.id=:sampleId", [sampleId: sample.id])
     }
 
     @Transactional

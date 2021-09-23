@@ -10,6 +10,7 @@
                 <th>Growth Media</th>
                 <th>Treatments</th>
                 <th>Assay</th>
+                <th>Note</th>
             </tr>
         </thead>
         <tbody>
@@ -23,6 +24,7 @@
                     <td>${sample.growthMedia}</td>
                     <td>${sample.treatments}</td>
                     <td>${sample.assay}</td>
+                    <td>${sample.note}</td>
                 </tr>
             </g:each>              
         </tbody>

@@ -222,13 +222,15 @@ class SampleService {
     }
 
     @Transactional
-    def updateProtocol(Sample sample, Long assayId, String resin, Integer pcr, Long userId, String endTime, String growthMedia, List treatments) {
+    def updateProtocol(Sample sample, Long assayId, String resin, Integer pcr, Long userId, int endTime_year, int endTime_month, int endTime_day, String growthMedia, List treatments) {
         sample.assay = Assay.get(assayId)
         if (!sample.prtclInstSummary) {
             sample.prtclInstSummary = new ProtocolInstanceSummary()
         }
         sample.prtclInstSummary.user = User.get(userId)
-        sample.prtclInstSummary.endTime = Date.parse("E MMM dd H:m:s z yyyy", endTime)
+        
+        sample.prtclInstSummary.endTime = new Date(endTime_year-1900, endTime_month-1, endTime_day)
+        
         def note = ['Resin':resin, 'PCR Cycle': pcr]
         sample.prtclInstSummary.note = JsonOutput.toJson(note)
         sample.prtclInstSummary.save()

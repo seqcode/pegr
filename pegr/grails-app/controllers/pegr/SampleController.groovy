@@ -89,12 +89,12 @@ class SampleController {
         }
     }
 
-    def updateProtocol(Long sampleId, Long assayId, String resin, Integer pcr, Long userId, String endTime, String growthMedia) {
+    def updateProtocol(Long sampleId, Long assayId, String resin, Integer pcr, Long userId, int endTime_year, int endTime_month, int endTime_day, String growthMedia) {        
         def sample = Sample.get(sampleId)
         if (sample) {
             try {
                 def treatments = params.list("treatments")
-                sampleService.updateProtocol(sample, assayId, resin, pcr, userId, endTime, growthMedia, treatments)
+                sampleService.updateProtocol(sample, assayId, resin, pcr, userId, endTime_year, endTime_month, endTime_day, growthMedia, treatments)
                 redirect(action: "edit", params: [sampleId: sampleId])
             } catch(SampleException e) {
                 flash.message = e.message

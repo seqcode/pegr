@@ -67,7 +67,6 @@ class QfileService {
         return csvNames
     } 
     
-    @NotTransactional
     def migrateXlsx(String sampleSheet, String laneSheet, RunStatus runStatus, int startLine, int endLine, int laneLine, boolean basicCheck) {   
         // get data from the lane sheet
         def laneData = getLaneData(laneSheet, laneLine)
@@ -79,7 +78,6 @@ class QfileService {
         return messages
     }
     
-    @NotTransactional
 	def migrateSamples(String filename, RunStatus runStatus, int startLine, int endLine, Map laneData, boolean basicCheck){
 		def lineNo = 0  
         def file = new FileReader(filename)

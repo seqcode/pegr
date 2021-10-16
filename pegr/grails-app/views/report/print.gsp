@@ -86,7 +86,7 @@
                 <tbody>
                     <g:each in="${sampleList}" var="sample" status="n">
                         <tr>
-                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${n+1}</td>
+                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.id}</td>
                             <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.target}</td>
                             <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.antibody}</td>
                             <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.strain}</td>
@@ -122,7 +122,7 @@
                 <tbody>
                     <g:each in="${sampleList}" var="sample" status="n">
                         <tr>
-                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${n+1}</td>
+                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.id}</td>
                             <g:each in="${sample.experiments}" var="experiment" status="nExp">
                                 <g:if test="${nExp>0}"><tr></g:if>
                                 <g:each in="${experiment.alignments}" var="alignment" status="nAli">
@@ -140,10 +140,10 @@
     </section>
     <section>
         <h4>MEME Motifs</h4>
-        <ol>
+        <ul>
             <g:each in="${sampleList}" var="sample" status="n">
                 <li>
-                    <h4>${sample.naturalId}</h4>
+                    <h4>${sample.id} ${sample.naturalId}</h4>
                     <g:each in="${sample.experiments}" var="experiment">
                         <g:each in="${experiment.alignments}" var="alignment">
                             <table class="table table-bordered meme-table" data-meme-url="${alignment.memeFile}">
@@ -154,14 +154,14 @@
                     </g:each>
                 </li>
             </g:each>
-        </ol>
+        </ul>
     </section>
     <section>
         <h4>Tag PileUp</h4>
-        <ol>
+        <ul>
             <g:each in="${sampleList}" var="sample">
                 <li>
-                    <h4>${sample.naturalId}</h4>
+                    <h4>${sample.id} ${sample.naturalId}</h4>
                     <g:each in="${sample.experiments}" var="experiment">
                         <g:each in="${experiment.alignments}" var="alignment">
                             <div class="row">
@@ -176,7 +176,7 @@
                     </g:each>
                 </li>
             </g:each>
-        </ol>
+        </ul>
     </section>
 </main>
 <script>

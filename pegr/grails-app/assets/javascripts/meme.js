@@ -3286,7 +3286,7 @@ this.make_motif = function(container, motif) {
     draw_on_screen();
 }
 
-function make_motif_static(container_plus, container_minus, motif) {
+this.make_motif_static = function(container_plus, container_minus, motif) {
     "use strict";
     var pspm, preview, preview_rc;
     var box, btn_box, logo_box, btn_plus, btn_minus;

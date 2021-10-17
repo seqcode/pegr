@@ -194,7 +194,8 @@
                             memeTable.append("<tr><td style='min-width:6em;line-height:1em'><p>MOTIF " + result[index].id + "</p><p>E-value: " + result[index].evalue + "</p><p>Sites: " + result[index].nsites + "</p><p>Width: " + result[index].len + "</p></td><td class='meme-fig1'></td><td class='meme-fig2'></td></tr>");
                             var plus = memeTable.find(".meme-fig1");
                             var minus = memeTable.find(".meme-fig2");
-                            make_motif_static(plus, minus, result[index]);
+                            const memeDrawer = new MemeDrawer();
+                            memeDrawer.make_motif_static(plus, minus, result[index]);
                         });
                     },
             });  

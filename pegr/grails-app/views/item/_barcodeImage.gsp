@@ -2,9 +2,20 @@
 <g:form controller="item" action="printBarcode">
     <g:hiddenField name="itemId" value="${item?.id}"></g:hiddenField>
     <g:submitButton name="print" value="Print" class="btn btn-primary"></g:submitButton>
-    Start Row<input name="row" value="1" size="2">
-    Column<input name="col" value="1" size="2">
-    Copies<input name="copies" value="1" size="2">
+    <div>
+        <label>Template</label>
+        <select name="template">
+            <option value="1">Rectangular Cryotags LCRY-1700</option>
+            <option value="2">Circular Spot5000</option>
+            <option value="3">Rectangular DYMO</option>
+            <option value="4">Circular DYMO</option>
+        </select>
+    </div>
+    <div>
+        Start Row<input name="row" value="1" size="2">
+        Column<input name="col" value="1" size="2">
+        Copies<input name="copies" value="1" size="2">
+    </div>
 </g:form>
 <div class="fields">
     <div>

@@ -3,36 +3,18 @@
         <meta name="layout" content="none"/>
         <style>
             body {
-                width: 182.5mm;
-                padding-top: 5mm;
-                padding-left: 19mm;
+                width: 202mm;
+                padding-top: 13mm;
+                padding-left: 15mm;
                 margin-top: 0px;
                 margin-left: 0px;
             }
             .barcode {
                 display: block;
                 float: left;
-                width: 36.5mm;
-                height: 16mm;
+                width: 14.5mm;
+                height: 14.5mm;
                 font-size: 10;
-            }
-            
-            .date {
-                position: relative;
-                left: 0mm;
-                top: -7.5mm;
-            }
-            
-            .label {
-                position: relative;
-                left: -8mm;
-                top: -5mm;
-            }
-            
-            .name {
-                position: relative;
-                left: 11.5mm;
-                top: -5mm;
             }
             
             @media print {  
@@ -50,11 +32,6 @@
         <div class="barcode">
             <g:if test="${barcode}">
                 <img src='${createLink(controller:"item", action:"displayBarcode", params:[barcode:barcode, width:60, height:60, formatStr:"QR"])}' width="40" height="40"/>
-                <span class="date"><g:formatDate format="yyMMdd" date="${date}"/></span>
-                <span class="label">${barcode}</span>
-                <g:if test="${nameList}">
-                    <div class="name">${nameList[n]}</div>
-                </g:if>
             </g:if>
         </div>
         </g:each>

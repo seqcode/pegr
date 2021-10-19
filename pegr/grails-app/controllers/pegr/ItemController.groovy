@@ -314,21 +314,34 @@ class ItemController {
         [itemList: items, itemCount: items.totalCount, str: str]
     }
     
-    def printBarcode(Long itemId, int row, int col, int copies) {
+    def printBarcode(Long itemId, int row, int col, int copies, int template) {
         def item = Item.get(itemId)
         if (!item) {
             render(view: "/404")
             return
         }
         def items = []
-        def nullCount = 5 * (row - 1) + col - 1
+        
+        def col_per_row
+        switch (template) {
+            case 1:
+                col_per_row = 5
+            case 2:
+                col_per_row = 13
+            case 3:
+                col_per_row = 1
+            case 4:
+                col_per_row = 2
+        }
+        
+        def nullCount = col_per_row * (row - 1) + col - 1
         for (int i = 0; i < nullCount; ++i) {
             items << null
         }
         for (int i = 0; i < copies; ++i) {
             items << item 
         }        
-        render(view: "/item/generateBarcodeList", model: [barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])
+        render(view: "/item/generateBarcodeList"+template, model: [barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])
     }
     
     def batchEdit(Long instanceId) {

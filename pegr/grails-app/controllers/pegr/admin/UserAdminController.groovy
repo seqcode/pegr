@@ -15,17 +15,41 @@ class UserAdminController {
 
     def userService
 
-	def index(Long affiliationId, Long groupId, String isEnabled) {
+	def index() {
         def query
         def users
         def affiliations = User.where{}.collect { it.affiliation }.unique()
 
-        if (params.groupLoad != null && params.affiliateLoad != null && params.activityLoad != null){
-            def groupList = JSON.parse(params.groupLoad)
-            def affiliateList = JSON.parse(params.affiliateLoad)
-            def activityList = JSON.parse(params.activityLoad)
-            def c
-            if (groupList.size() != 0 || affiliateList.size() != 0 || activityList.size() != 0){
+        def groupList = []
+        def affiliateList = []
+        def activityList = []
+        def c
+    
+        if (params.groupLoad != null) {
+            if (params.groupLoad instanceof String) {
+                groupList = [params.groupLoad]
+            } else {
+                groupList = params.groupLoad
+            }            
+        } 
+        
+        if (params.affiliateLoad != null) {
+            if (params.affiliateLoad instanceof String) {
+                affiliateList = [params.affiliateLoad]
+            } else {
+                affiliateList = params.affiliateLoad
+            }            
+        } 
+        
+        if (params.activityLoad != null) {
+            if (params.activityLoad instanceof String) {
+                activityList = [params.activityLoad]
+            } else {
+                activityList = params.activityLoad
+            }
+        }
+            
+        if (groupList.size() != 0 || affiliateList.size() != 0 || activityList.size() != 0){
             // def a = RoleGroup.where{name == "Admin"}.collect { it.id }.unique()
 
             // groupList start
@@ -80,7 +104,7 @@ class UserAdminController {
             }.collect { it.id }
 
             // get members by status
-            def f = User.createCriteria().list{
+            users = User.createCriteria().list{
                 if (groupList.size() != 0){
                     or{
                         for (i=0; i<c.size(); i++){
@@ -102,9 +126,7 @@ class UserAdminController {
                         }
                     }
                 }
-            }
-                users = f
-            }
+            }            
         } else {
             query = User.where{}
             users = query.list(params)
@@ -112,9 +134,9 @@ class UserAdminController {
         
         [users: users,
          affiliations: affiliations,
-         affiliationId: affiliationId,
-         groupId: groupId,
-         isEnabled: isEnabled]
+         selectedGroupList: groupList,
+         selectedAffiliateList: affiliateList,
+         selectedActivityList: activityList]
 	}
 
     def search(String username, String email) {

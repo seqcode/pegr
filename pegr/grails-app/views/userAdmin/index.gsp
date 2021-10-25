@@ -97,6 +97,7 @@
 
             <div class="col-sm-2 sidenav filter text-center">
                 <h5 id="all"><g:link controller="userAdmin" action="index">All</g:link></h5>
+                <g:form action="index">
                 <h4>Group</h4>
                   <table>
                     <g:each var="group" in="${pegr.RoleGroup.list()}">
@@ -105,7 +106,7 @@
                             ${group.name}
                           </td>
                           <td>
-                            <input type="checkbox" id="group" value="${group.name}">
+                            <input type="checkbox" id="group" name="groupLoad" value="${group.name}" <g:if test="${selectedGroupList.contains(group.name)}">checked</g:if>>
                           </td>
                         </tr>
                     </g:each>
@@ -119,7 +120,7 @@
                             ${aff?.name}
                           </td>
                           <td>
-                            <input type="checkbox" id="affiliation" value="${aff?.name}">
+                            <input type="checkbox" id="affiliation" name="affiliateLoad" value="${aff?.name}" <g:if test="${selectedAffiliateList.contains(aff.name)}">checked</g:if>>
                           </td>
                         </tr>
                       </g:if>
@@ -132,7 +133,7 @@
                         Active
                       </td>
                       <td>
-                        <input type="checkbox" id="activity" value="Active">
+                        <input type="checkbox" id="activity" name="activityLoad" value="Active" <g:if test="${selectedActivityList.contains('Active')}">checked</g:if>>
                       </td>
                     </tr>
                     <tr>
@@ -140,17 +141,17 @@
                         Inactive
                       </td>
                       <td>
-                        <input type="checkbox" id="activity" value="Inactive">
+                        <input type="checkbox" id="activity" name="activityLoad" value="Inactive" <g:if test="${selectedActivityList.contains('Inactive')}">checked</g:if>>
                       </td>
                     </tr>
                 </table>
-                <button type="button" id="filter" class="btn btn-warning btn-lg"><i class="fab fa-empire"></i>  Filter Table   <i class="fab fa-empire"></i></button>
+                <g:submitButton name="submit" value="Filter"  class="btn btn-warning btn-lg">></g:submitButton>
                 <div class="spacer"></div>
+                </g:form>
             </div>
             <br/>
         </div>
         <script>
-
           $(document).ready(function() {
               $('#example').DataTable({
                 scrollY: '50vh',
@@ -158,52 +159,6 @@
                 paging: true
               });
           });
-
-
-          // User Filter JQuery and AJAX | git:pjchaffin
-          $('#filter').click(function(){
-
-              // initialize 3 lists for groups, activities, and affiliations
-              let groups = [];
-              let activities = [];
-              let affiliations = [];
-
-              // loop through all group id checkboxes and logic for checked, push to list if so
-              $('input[id="group"]').each(function(){
-                if (this.checked){
-                  groups.push(this.value);
-                 }
-              });
-
-              // loop through all activity id checkboxes and logic for checked, push to list if so
-              $('input[id="activity"]').each(function(){
-                if (this.checked){
-                  activities.push(this.value);
-                 }
-              });
-
-              // loop through all affiliation id checkboxes and logic for checked, push to list if so
-              $('input[id="affiliation"]').each(function(){
-                if (this.checked){
-                  affiliations.push(this.value);
-                 }
-              });
-
-              // action redirect pushing these lists to page logic
-              // redirect(controller: "userAdmin", action: "index", params: [groupLoad: groups, activityLoad: activities, affiliateLoad: affliatiations]);
-              $.ajax({
-                url:"${createLink(controller: 'UserAdmin', action: 'index')}",
-                type:"GET",
-                data: {"groupLoad": JSON.stringify(groups), "affiliateLoad": JSON.stringify(affiliations), "activityLoad": JSON.stringify(activities)},
-                success : function(result){
-                  $("html").html(result);
-                },
-                error : function(e) {
-                  console.info("Error" + e);
-                }
-              });
-          });
-
         </script>
     </body>
 </html>

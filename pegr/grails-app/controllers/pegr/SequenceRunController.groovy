@@ -587,28 +587,39 @@ class SequenceRunController {
         redirect(action: "show", params: [id: runId])
     }
 
+    
+    def deleteSamples() {    
+        def runId = params.long('runId')
+        def sampleIds = params.list('sampleId')
+        def action = params.actionType
+        
+        if (action == "delete") {
+            try {
+                sampleIds.each {
+                    def sample = Sample.get(it.toLong())
+                    sampleService.delete(sample)
+                }
+                flash.message = "Selected samples deleted!"
+            } catch (SequenceRunException e) {
+                flash.message = e.message
+            }
+        } else if (action == "remove") {
+            try {
+                sampleIds.each { sampleId ->
+                    def experiment = SequencingExperiment.where {sequenceRun.id == runId && sample.id == sampleId.toLong()}.get()
+                    if (experiment) {
+                        sequenceRunService.removeExperiment(experiment.id)
+                    }                    
+                }                
+                flash.message = "Selected samples removed!"
+            } catch (SequenceRunException e) {
+                flash.message = e.message
+            }
+        }
+        
+        redirect(action: "show", params: [id: runId])
+    }
 
-	// axa677-180306: Added this function to handle the deletion of selected (multiple) samples
-	// This function is called in view sequenceRun/show.gsp
-	// it receives a list of samples ids and run id in a json dictionary and iterates over the ids
-	// to send a request to sampleService.delete(sample) to delete each selected sample
-	// Then, it redirects to another action that already exists.
-    def deleteAllSampleAjax() {
-
-		def listSampleIds= JSON.parse(params.sampleIdsList)
-		def runId= params.runId
-		try {
-			listSampleIds.each {
-				def sample = Sample.get(it.toLong())
-				sampleService.delete(sample)
-				}
-			flash.message = "Selected samples deleted!"
-		}
-		catch(SequenceRunException e) {
-			flash.message = e.message
-		}
-		redirect(action: "show", params: [id: runId])
-	}
 
     def delete(Long runId) {
         try {

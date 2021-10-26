@@ -41,16 +41,16 @@
                     <li title="The Sample has been processed by the bioinformatics pipeline and been archived."><g:link params="[status:'ARCHIVE']">ARCHIVE</g:link></li>
                   </ul>
                 </div>
-                <h4>Sample Submission</h4>
+                <h4>Initialize Sequencing Run</h4>
                 <ul>
-                    <li><g:link action="upload">Upload</g:link></li>
+                    <li><g:link action="upload">Upload Run File</g:link></li>
                     <li><g:link action="create">Create Wizard</g:link></li>
                 </ul>
                 <sec:ifAnyGranted roles="ROLE_ADMIN">
 
-                        <h4>Manage</h4>
+                        <h4>Manage Sequencing Runs</h4>
                         <ul>
-                            <li><g:link controller="report" action="manage">Sequence QC</g:link></li>
+                            <li><g:link controller="report" action="manage">Edit Sequence QC</g:link></li>
                             <li><a href="#" onclick="window.open('${g.createLink(controller:'sequenceRun',action:'editQueue')}', 'Edit Queue for Sample Submission', 'width=600,height=400' )" >Edit Queue</a></li>
                         </ul>
                     

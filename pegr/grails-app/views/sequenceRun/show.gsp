@@ -186,8 +186,8 @@
                 <g:if test="${editable}">				
 				<th>
 					<input type="checkbox" id="selectAll" value="selectAll">
-                    <button title="Remove the sample from the sequence run." type="submit" name="actionType" value="remove"><span class="glyphicon glyphicon-remove"></span></button>
-                    <button title="Delete the sample and all the related data." type="submit" name="actionType" value="delete"><span class="glyphicon glyphicon-trash"></span></button>
+                    <button title="Remove the sample from the sequence run." type="submit" name="actionType" value="remove" onClick="return confirmRemove()"><span class="glyphicon glyphicon-remove"></span></button>
+                    <button title="Delete the sample and all the related data." type="submit" name="actionType" value="delete" onClick="return confirmDelete()"><span class="glyphicon glyphicon-trash"></span></button>
                 </th>
                 </g:if>
                 <th>Sample ID</th>
@@ -430,6 +430,21 @@
             $("#run-name-edit").hide();
         });
             
+        function confirmRemove(){
+            var agree=confirm("Are you sure you wish to remove the sample(s)?");
+            if (agree)
+             return true ;
+            else
+             return false ;
+        }
+        
+        function confirmDelete(){
+            var agree=confirm("Are you sure you wish to delete the sample(s)?");
+            if (agree)
+             return true ;
+            else
+             return false ;
+        }
      </script>
 </div>
 </body>

@@ -270,7 +270,6 @@ class ItemController {
     }
     
     def updateActiveAjax(Long itemId, boolean active) {
-        print(active)
         def item = Item.get(itemId)
         item.active = active
         itemService.save(item)
@@ -314,7 +313,7 @@ class ItemController {
         [itemList: items, itemCount: items.totalCount, str: str]
     }
     
-    def printBarcode(Long itemId, int row, int col, int copies, int template) {
+    def printBarcode(Long itemId, String template_src, int row, int col, int copies, int col_per_row, int template, float marginTop, float marginLeft, float blockWidth, float blockHeight, float barcodeSize, float pageWidth, float pageHeight, String printText) {
         def item = Item.get(itemId)
         if (!item) {
             render(view: "/404")
@@ -322,16 +321,17 @@ class ItemController {
         }
         def items = []
         
-        def col_per_row
-        switch (template) {
-            case 1:
-                col_per_row = 5
-            case 2:
-                col_per_row = 13
-            case 3:
-                col_per_row = 1
-            case 4:
-                col_per_row = 2
+        if (template_src == "select") {
+            switch (template) {
+                case 1:
+                    col_per_row = 5
+                case 2:
+                    col_per_row = 13
+                case 3:
+                    col_per_row = 1
+                case 4:
+                    col_per_row = 2
+            }
         }
         
         def nullCount = col_per_row * (row - 1) + col - 1
@@ -340,8 +340,13 @@ class ItemController {
         }
         for (int i = 0; i < copies; ++i) {
             items << item 
-        }        
-        render(view: "/item/generateBarcodeList"+template, model: [barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])
+        }
+        
+        if (template_src == "select") {
+            render(view: "/item/generateBarcodeList"+template, model: [barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])
+        } else {
+            render(view: "/item/generateBarcodeList", model: [marginTop: marginTop, marginLeft: marginLeft, blockWidth: blockWidth, blockHeight: blockHeight, barcodeSize: barcodeSize, pageWidth: pageWidth, pageHeight: pageHeight, printText: printText, barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])
+        }
     }
     
     def batchEdit(Long instanceId) {

@@ -9,12 +9,14 @@ class ApiController {
     def reportService
     def sampleService
     def utilityService
+    def ngsRepoService
     
     static allowedMethods = [stats:'POST',
                             fetchSampleData:'POST',
                             deleteSampleList: 'POST',
                             fetchSequenceRunData: 'POST',
-                            deleteAnalysisHistories: 'POST'
+                            deleteAnalysisHistories: 'POST',
+                            fetchSequenceRunInfo: 'POST'
                             ]
     
     /**
@@ -213,8 +215,79 @@ class ApiController {
         
         def results = [message: message] as JSON
         render text: results, contentType: "text/json", status: code
+    }    
+    
+    def fetchSequenceRunInfo(SequenceRunInfoCmd query, String apiKey) {
+        def message = ""
+        def code = 200
+         def timeout = 300 * 1000
+        
+        // get the user
+        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        def runId = query.runId
+        
+        if (apiUser) {
+            String RUN_INFO_TEMP = "runInfo${runId}"           
+
+            try {
+                // generate the run info files
+                def run = SequenceRun.get(runId)
+
+                // clean path
+                def remoteRoot = query.remoteRoot.trim()
+
+                def remotePath
+
+                if (!run.directoryName) {
+                    message = "Error! Please check the directory name of Run #${runId}!"
+                    code = 500
+                    def results = [message: message] as JSON
+                    render text: results, contentType: "text/json", status: code
+                } else {
+                    remotePath = new File(remoteRoot, run.directoryName).getPath()
+                
+                    def localRoot = utilityService.getFilesRoot()
+                    def localFolder = new File(localRoot, RUN_INFO_TEMP)
+
+                    ngsRepoService.generateRunFilesInFolder(run, remotePath, localFolder)
+
+                    // compress the files
+                    def compressedFilename = "runInfo${runId}.tar.gz"
+                    def compressedFile = new File(localRoot, compressedFilename)
+                    def command = "tar -czf ${compressedFile.getPath()} ${RUN_INFO_TEMP}"
+                    def envVars = []
+                    def proc = command.execute(envVars, localRoot)
+                    proc.waitForOrKill(timeout)
+
+                    response.setContentType("application/gzip")
+                    response.setHeader("Content-disposition", "attachment;filename=\"${compressedFilename}\"")
+                    response.outputStream << compressedFile.getBytes()
+                    // remove the compressed file
+                    compressedFile.delete()
+                    // remove the original files
+                    command = "rm -R ${localFolder.getPath()}"
+                    command.execute()
+                    webRequest.renderView = false
+                }
+            } catch(Exception e) {
+                message = "Error! ${e.message}"
+                code = 500
+                def results = [message: message] as JSON
+                render text: results, contentType: "text/json", status: code
+            } finally {
+                response.getOutputStream().flush()
+                response.getOutputStream().close()
+            }
+        } else {
+            def results = [message: "Not authorized!"] as JSON
+            code = 401
+            render text: results, contentType: "text/json", status: code
+        }
+ 
     }
+    
 }
+
 
 class ResponseMessage {
     String response_code
@@ -277,3 +350,10 @@ class DelAnalysisHistoryCmd implements grails.validation.Validateable {
     String userEmail // required
     List historyIds // required
 }
+
+class SequenceRunInfoCmd implements grails.validation.Validateable {
+    String userEmail // required
+    Long runId // required
+    String remoteRoot // required
+}
+

@@ -553,6 +553,51 @@ print(results["message"])
  
         </div>
         </div>
+        <div class="chapter">
+        <h3 id="fetch-run-info">Fetch Sequence Run Info Files</h3>
+        <div>
+            <p>To delete analysis histories, format your query in a JSON dictionary as follows
+            <pre>
+{    
+    // required, combined with API key to authenticate user.
+    "userEmail": "string", 
+    
+    // required
+    "runId": 518,
+    
+    // required
+    "remoteRoot": "/some/path/"
+}
+            </pre>
+            and send a POST request to the url
+            <pre>
+https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunInfo?apiKey=
+            </pre> 
+    
+            <p>The API can be simply called through curl</p>
+            <pre>
+curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "remoteRoot":"/some/path/", "userEmail": "xxx@xxx.xxx"}' --output FILENAME https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunInfo?apiKey=XXXXXXX
+            </pre>
+
+            <p>The following is an example in Python.</p>
+            <pre>
+import requests
+url = "https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunInfo?apiKey=XXXXXXX"
+data = {
+        "runId": 518, 
+        "remoteRoot":"/some/path/", 
+        "userEmail": "xxx@xxx.xxx"
+       }
+r = requests.post(url, json=data)
+f = open('file.tar.gz', 'wb')
+for chunk in r.iter_content(chunk_size=512 * 1024): 
+    if chunk: # filter out keep-alive new chunks
+        f.write(chunk)
+f.close()
+            </pre>
+ 
+        </div>
+        </div>
         </div>
         <nav class="col-sm-3">
             <h4>Menu</h4>

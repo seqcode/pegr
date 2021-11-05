@@ -598,6 +598,84 @@ f.close()
  
         </div>
         </div>
+        <div class="chapter">
+        <h3 id="get-run-status">Get Sequence Run Status</h3>
+        <div>
+            <p>To get a sequence run's status, format your query in a JSON dictionary as follows
+            <pre>
+{    
+    // required, combined with API key to authenticate user.
+    "userEmail": "string", 
+    
+    // required
+    "runId": 518
+}
+            </pre>
+            and send a POST request to the url
+            <pre>
+https://thanos.vmhost.psu.edu/pegr/api/getSequenceRunStatus?apiKey=
+            </pre> 
+    
+            <p>The API can be simply called through curl</p>
+            <pre>
+curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "userEmail": "xxx@xxx.xxx"}' https://thanos.vmhost.psu.edu/pegr/api/getSequenceRunStatus?apiKey=XXXXXXX
+            </pre>
+
+            <p>The following is an example in Python.</p>
+            <pre>
+import requests
+url = "https://thanos.vmhost.psu.edu/pegr/api/getSequenceRunStatus?apiKey=XXXXXXX"
+data = {
+        "runId": 518, 
+        "userEmail": "xxx@xxx.xxx"
+       }
+r = requests.post(url, json=data)
+results = r.json()
+print(results["status"])
+            </pre>
+        </div>
+        </div>
+        <div class="chapter">
+        <h3 id="set-run-status">Set Sequence Run Status</h3>
+        <div>
+            <p>To set a sequence run's status, format your query in a JSON dictionary as follows
+            <pre>
+{    
+    // required, combined with API key to authenticate user.
+    "userEmail": "string", 
+    
+    // required
+    "runId": 518,
+    
+    // required
+    "status": "string"
+}
+            </pre>
+            and send a POST request to the url
+            <pre>
+https://thanos.vmhost.psu.edu/pegr/api/setSequenceRunStatus?apiKey=
+            </pre> 
+    
+            <p>The API can be simply called through curl</p>
+            <pre>
+curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "userEmail": "xxx@xxx.xxx", "status": "COMPLETED"}' https://thanos.vmhost.psu.edu/pegr/api/setSequenceRunStatus?apiKey=XXXXXXX
+            </pre>
+
+            <p>The following is an example in Python.</p>
+            <pre>
+import requests
+url = "https://thanos.vmhost.psu.edu/pegr/api/setSequenceRunStatus?apiKey=XXXXXXX"
+data = {
+        "runId": 518, 
+        "userEmail": "xxx@xxx.xxx",
+        "status": "COMPLETED"
+       }
+r = requests.post(url, json=data)
+results = r.json()
+print(results["message"])
+            </pre>
+        </div>
+        </div>
         </div>
         <nav class="col-sm-3">
             <h4>Menu</h4>

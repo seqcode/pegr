@@ -16,7 +16,9 @@ class ApiController {
                             deleteSampleList: 'POST',
                             fetchSequenceRunData: 'POST',
                             deleteAnalysisHistories: 'POST',
-                            fetchSequenceRunInfo: 'POST'
+                            fetchSequenceRunInfo: 'POST',
+                            getSequenceRunStatus: 'POST',
+                            setSequenceRunStatus: 'POST'
                             ]
     
     /**
@@ -220,7 +222,7 @@ class ApiController {
     def fetchSequenceRunInfo(SequenceRunInfoCmd query, String apiKey) {
         def message = ""
         def code = 200
-         def timeout = 300 * 1000
+        def timeout = 300 * 1000
         
         // get the user
         def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
@@ -286,6 +288,51 @@ class ApiController {
  
     }
     
+    def getSequenceRunStatus(GetSequenceRunStatusCmd query, String apiKey) {
+        // get the user
+        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+
+        // only admin is allowed to use this API
+        if (apiUser) {
+            try {
+                def code = 200
+                def run = SequenceRun.get(query.runId)
+                def results = [status: run.status.name(), message: "Success!"] as JSON
+                render text: results, contentType: "text/json", status: code
+            } catch(Exception e) {
+                def code = 500
+                def results = [message: "Error! ${e.message}"] as JSON
+                render text: results, contentType: "text/json", status: code
+            }
+        } else {
+            def code = 401
+            def results = [message: "Not authorized!"] as JSON
+            render text: results, contentType: "text/json", status: code
+        }
+    }   
+    
+    def setSequenceRunStatus(SetSequenceRunStatusCmd query, String apiKey) {
+        // get the user
+        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+
+        // only admin is allowed to use this API
+        if (apiUser && apiUser.isAdmin()) {
+            try {
+                def code = 200
+                reportService.updateRunStatus(query.runId, query.status)
+                def results = [message: "Success!"] as JSON
+                render text: results, contentType: "text/json", status: code
+            } catch(Exception e) {
+                def code = 500
+                def results = [message: "Error! ${e.message}"] as JSON
+                render text: results, contentType: "text/json", status: code
+            }
+        } else {
+            def code = 401
+            def results = [message: "Not authorized!"] as JSON
+            render text: results, contentType: "text/json", status: code
+        }
+    }
 }
 
 
@@ -357,3 +404,13 @@ class SequenceRunInfoCmd implements grails.validation.Validateable {
     String remoteRoot // required
 }
 
+class GetSequenceRunStatusCmd implements grails.validation.Validateable {
+    String userEmail // required
+    Long runId // required
+}
+
+class SetSequenceRunStatusCmd implements grails.validation.Validateable {
+    String userEmail // required
+    Long runId // required
+    String status // required
+}

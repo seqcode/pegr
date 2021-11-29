@@ -4,6 +4,10 @@ import static org.springframework.http.HttpMethod.*
 import grails.converters.*
 import groovy.json.*
     
+class ApiException extends RuntimeException {
+    String message
+}
+    
 class ApiController {
     def alignmentStatsService
     def reportService
@@ -219,6 +223,48 @@ class ApiController {
         render text: results, contentType: "text/json", status: code
     }    
     
+    
+    def getRunFromIdOrDirectory(Long runId, String directory) {
+        def run_from_id = null
+        def run_from_dir = null
+        def run = null
+        
+        if (runId == null && directory == null) {
+            throw new ApiException(message: "Please provide either the sequence run's ID or directory!")
+        }
+        
+        if (runId) {
+            try {
+                run_from_id = SequenceRun.get(runId)
+            } catch (Exception e) {
+                throw new ApiException(message: "The sequence run cannot be found based on the provided sequence run ID!")
+            }
+            run = run_from_id
+        }
+        
+        if (directory) {
+            run_from_dir = SequenceRun.findByDirectoryName(directory)
+            if (run_from_dir) {
+                run = run_from_dir
+            } else {
+                throw new ApiException(message: "The sequence run cannot be found based on the provided directory!")
+            }
+        }
+        
+        if (run_from_id && run_from_dir) {
+            if (run_from_id != run_from_dir) {
+                throw new ApiException(message: "The provided sequence run ID and directory point to different sequence runs!")
+            }
+        }
+        
+        if (run == null) {
+            throw new ApiException(message: "Sequence run cannot be found!")
+        }
+        
+        return run
+    }
+    
+    
     def fetchSequenceRunInfo(SequenceRunInfoCmd query, String apiKey) {
         def message = ""
         def code = 200
@@ -233,7 +279,7 @@ class ApiController {
 
             try {
                 // generate the run info files
-                def run = SequenceRun.get(runId)
+                def run = getRunFromIdOrDirectory(runId, query.directory)
 
                 // clean path
                 def remoteRoot = query.remoteRoot.trim()
@@ -296,7 +342,7 @@ class ApiController {
         if (apiUser) {
             try {
                 def code = 200
-                def run = SequenceRun.get(query.runId)
+                def run = getRunFromIdOrDirectory(query.runId, query.directory)
                 def results = [status: run.status.name(), message: "Success!"] as JSON
                 render text: results, contentType: "text/json", status: code
             } catch(Exception e) {
@@ -319,7 +365,8 @@ class ApiController {
         if (apiUser && apiUser.isAdmin()) {
             try {
                 def code = 200
-                reportService.updateRunStatus(query.runId, query.status)
+                def run = getRunFromIdOrDirectory(query.runId, query.directory)
+                reportService.updateRunStatus(run.id, query.status)
                 def results = [message: "Success!"] as JSON
                 render text: results, contentType: "text/json", status: code
             } catch(Exception e) {
@@ -400,17 +447,20 @@ class DelAnalysisHistoryCmd implements grails.validation.Validateable {
 
 class SequenceRunInfoCmd implements grails.validation.Validateable {
     String userEmail // required
-    Long runId // required
+    Long runId // either runId or directory needs to be provided
+    String directory 
     String remoteRoot // required
 }
 
 class GetSequenceRunStatusCmd implements grails.validation.Validateable {
     String userEmail // required
-    Long runId // required
+    Long runId // either runId or directory needs to be provided
+    String directory 
 }
 
 class SetSequenceRunStatusCmd implements grails.validation.Validateable {
     String userEmail // required
-    Long runId // required
+    Long runId // either runId or directory needs to be provided
+    String directory 
     String status // required
 }

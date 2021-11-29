@@ -556,14 +556,15 @@ print(results["message"])
         <div class="chapter">
         <h3 id="fetch-run-info">Fetch Sequence Run Info Files</h3>
         <div>
-            <p>To delete analysis histories, format your query in a JSON dictionary as follows
+            <p>To fetch the sequence run info files, format your query in a JSON dictionary as follows
             <pre>
 {    
     // required, combined with API key to authenticate user.
     "userEmail": "string", 
     
-    // required
+    // either runId or directory needs to be provided
     "runId": 518,
+    "directory": "xxxxxx", 
     
     // required
     "remoteRoot": "/some/path/"
@@ -576,7 +577,7 @@ https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunInfo?apiKey=
     
             <p>The API can be simply called through curl</p>
             <pre>
-curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "remoteRoot":"/some/path/", "userEmail": "xxx@xxx.xxx"}' --output FILENAME https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunInfo?apiKey=XXXXXXX
+curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "directory": "xxxxxx", "remoteRoot":"/some/path/", "userEmail": "xxx@xxx.xxx"}' --output FILENAME https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunInfo?apiKey=XXXXXXX
             </pre>
 
             <p>The following is an example in Python.</p>
@@ -585,6 +586,7 @@ import requests
 url = "https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunInfo?apiKey=XXXXXXX"
 data = {
         "runId": 518, 
+        "directory": "xxxxxx",
         "remoteRoot":"/some/path/", 
         "userEmail": "xxx@xxx.xxx"
        }
@@ -607,8 +609,9 @@ f.close()
     // required, combined with API key to authenticate user.
     "userEmail": "string", 
     
-    // required
-    "runId": 518
+    // either runId or directory needs to be provided
+    "runId": 518,
+    "directory": "xxxxxx", 
 }
             </pre>
             and send a POST request to the url
@@ -618,7 +621,7 @@ https://thanos.vmhost.psu.edu/pegr/api/getSequenceRunStatus?apiKey=
     
             <p>The API can be simply called through curl</p>
             <pre>
-curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "userEmail": "xxx@xxx.xxx"}' https://thanos.vmhost.psu.edu/pegr/api/getSequenceRunStatus?apiKey=XXXXXXX
+curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "directory": "xxxxxx", "userEmail": "xxx@xxx.xxx"}' https://thanos.vmhost.psu.edu/pegr/api/getSequenceRunStatus?apiKey=XXXXXXX
             </pre>
 
             <p>The following is an example in Python.</p>
@@ -627,6 +630,7 @@ import requests
 url = "https://thanos.vmhost.psu.edu/pegr/api/getSequenceRunStatus?apiKey=XXXXXXX"
 data = {
         "runId": 518, 
+        "directory": "xxxxxx",
         "userEmail": "xxx@xxx.xxx"
        }
 r = requests.post(url, json=data)
@@ -644,8 +648,9 @@ print(results["status"])
     // required, combined with API key to authenticate user.
     "userEmail": "string", 
     
-    // required
+    // either runId or directory needs to be provided
     "runId": 518,
+    "directory": "xxxxxx", 
     
     // required
     "status": "string"
@@ -658,7 +663,7 @@ https://thanos.vmhost.psu.edu/pegr/api/setSequenceRunStatus?apiKey=
     
             <p>The API can be simply called through curl</p>
             <pre>
-curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "userEmail": "xxx@xxx.xxx", "status": "COMPLETED"}' https://thanos.vmhost.psu.edu/pegr/api/setSequenceRunStatus?apiKey=XXXXXXX
+curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "directory": "xxxxxx", "userEmail": "xxx@xxx.xxx", "status": "COMPLETED"}' https://thanos.vmhost.psu.edu/pegr/api/setSequenceRunStatus?apiKey=XXXXXXX
             </pre>
 
             <p>The following is an example in Python.</p>
@@ -667,6 +672,7 @@ import requests
 url = "https://thanos.vmhost.psu.edu/pegr/api/setSequenceRunStatus?apiKey=XXXXXXX"
 data = {
         "runId": 518, 
+        "directory": "xxxxxx", 
         "userEmail": "xxx@xxx.xxx",
         "status": "COMPLETED"
        }

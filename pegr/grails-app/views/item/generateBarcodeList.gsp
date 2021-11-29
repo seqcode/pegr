@@ -3,6 +3,7 @@
         <meta name="layout" content="none"/>
         <style>
             body {
+                width: ${bodyWidth}mm;
                 padding-top: ${marginTop}mm;
                 padding-left: ${marginLeft}mm;
                 margin-top: 0px;

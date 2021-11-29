@@ -345,7 +345,7 @@ class ItemController {
         if (template_src == "select") {
             render(view: "/item/generateBarcodeList"+template, model: [barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])
         } else {
-            render(view: "/item/generateBarcodeList", model: [marginTop: marginTop, marginLeft: marginLeft, blockWidth: blockWidth, blockHeight: blockHeight, barcodeSize: barcodeSize, pageWidth: pageWidth, pageHeight: pageHeight, printText: printText, barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])
+            render(view: "/item/generateBarcodeList", model: [bodywidth: pageWidth-marginLeft , marginTop: marginTop, marginLeft: marginLeft, blockWidth: blockWidth, blockHeight: blockHeight, barcodeSize: barcodeSize, pageWidth: pageWidth, pageHeight: pageHeight, printText: printText, barcodeList: items*.barcode, nameList: items*.name*.take(20), date: new Date()])
         }
     }
     

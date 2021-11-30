@@ -3,6 +3,7 @@ import static org.springframework.http.HttpStatus.*
 import static org.springframework.http.HttpMethod.*
 import grails.converters.*
 import groovy.json.*
+import java.text.SimpleDateFormat
     
 class ApiException extends RuntimeException {
     String message
@@ -14,6 +15,7 @@ class ApiController {
     def sampleService
     def utilityService
     def ngsRepoService
+    def sequenceRunService
     
     static allowedMethods = [stats:'POST',
                             fetchSampleData:'POST',
@@ -22,7 +24,9 @@ class ApiController {
                             deleteAnalysisHistories: 'POST',
                             fetchSequenceRunInfo: 'POST',
                             getSequenceRunStatus: 'POST',
-                            setSequenceRunStatus: 'POST'
+                            setSequenceRunStatus: 'POST',
+                            fetchSequenceRunSummary: 'POST',
+                            updateSequenceRunSummary: 'POST'
                             ]
     
     /**
@@ -334,11 +338,10 @@ class ApiController {
  
     }
     
-    def getSequenceRunStatus(GetSequenceRunStatusCmd query, String apiKey) {
+    def getSequenceRunStatus(GetSequenceRunInfoCmd query, String apiKey) {
         // get the user
         def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
 
-        // only admin is allowed to use this API
         if (apiUser) {
             try {
                 def code = 200
@@ -377,6 +380,104 @@ class ApiController {
         } else {
             def code = 401
             def results = [message: "Not authorized!"] as JSON
+            render text: results, contentType: "text/json", status: code
+        }
+    }
+    
+    
+    def fetchSequenceRunSummary(GetSequenceRunInfoCmd query, String apiKey) {
+        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+
+        if (apiUser) {
+            try {
+                def code = 200
+                def run = getRunFromIdOrDirectory(query.runId, query.directory)
+                def data = ["runId": run.id,
+                            "platformName": run.platform?.name,
+                            "date": run.date?new SimpleDateFormat("yyyy-MM-dd").format(run.date):null,
+                            "runName": run.runName,
+                            "directoryName": run.directoryName,
+                            "fcId": run.fcId,
+                            "lane": run.lane,
+                            "note": run.note,
+                            "libraryVolume": run.runStats?.libraryVolume,
+                            "libraryStock": run.runStats?.libraryStock,
+                            "libraryStdDev": run.runStats?.libraryStdDev,
+                            "pctLibraryStdDev": run.runStats?.pctLibraryStdDev,
+                            "cycles": run.runStats?.cycles,
+                            "srOrPe": run.runStats?.srOrPe,
+                            "seqCtrl": run.runStats?.seqCtrl,
+                            "pcrCycles": run.runStats?.pcrCycles,
+                            "qubitConc": run.runStats?.qubitConc,
+                            "qPcrConc": run.runStats?.qPcrConc,
+                            "libraryLoadedPm": run.runStats?.libraryLoadedPm,
+                            "phiXLoaded": run.runStats?.phiXLoaded,
+                            "libraryLoadedFmol": run.runStats?.libraryLoadedFmol,
+                            "clusterNum": run.runStats?.clusterNum,
+                            "readPf": run.runStats?.readPf,
+                            "pctPf": run.runStats?.pctPf,
+                            "pctQ30": run.runStats?.pctQ30,
+                            "qidx": run.runStats?.qidx,
+                            "totalReads": run.runStats?.totalReads,
+                            "unmatchedIndices": run.runStats?.unmatchedIndices,
+                            "pctUnmatchedIndices": run.runStats?.pctUnmatchedIndices,
+                            "pctAlignedToPhiX": run.runStats?.pctAlignedToPhiX]
+                def results = [data: data, message: "Success!"] as JSON
+                render text: results, contentType: "text/json", status: code
+            } catch(Exception e) {
+                def code = 500
+                def results = [message: "Error! ${e.message}"] as JSON
+                render text: results, contentType: "text/json", status: code
+            }
+        } else {
+            def code = 401
+            def results = [message: "Not authorized!"] as JSON
+            render text: results, contentType: "text/json", status: code
+        }
+    }
+    
+    
+    def updateSequenceRunSummary(String apiKey) {        
+        def query = request.JSON
+        
+        // get the user
+        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+
+        // only admin is allowed to use this API
+        if (apiUser && apiUser.isAdmin()) {
+            try {
+                def code = 200
+                def run = SequenceRun.get(query.runId)
+                
+                run.properties = query
+                
+                // update platform if its name is sent
+                if (query.containsKey("platformName")) {
+                    def platform = SequencingPlatform.findByName(query.platformName)
+                    if (platform) {
+                        run.platform = platform
+                    } else {
+                        throw new ApiException(message: "Sequencing platform ${query.platform} cannot be found!")
+                    }
+                }
+                
+                if (run.runStats) {
+                    run.runStats.properties = query
+                } else {
+                    run.runStats = new RunStats(query)
+                }
+                
+                sequenceRunService.save(run)
+                def results = [message: "Success!"] as JSON
+                render text: results, contentType: "text/json", status: code
+            } catch(Exception e) {
+                def code = 500
+                def results = [message: "Error! ${e.message}"] as JSON
+                render text: results, contentType: "text/json", status: code
+            }
+        } else {
+            def code = 401
+            def results = [message: "Not authorized! Only admin is allowed to use this API!"] as JSON
             render text: results, contentType: "text/json", status: code
         }
     }
@@ -452,7 +553,7 @@ class SequenceRunInfoCmd implements grails.validation.Validateable {
     String remoteRoot // required
 }
 
-class GetSequenceRunStatusCmd implements grails.validation.Validateable {
+class GetSequenceRunInfoCmd implements grails.validation.Validateable {
     String userEmail // required
     Long runId // either runId or directory needs to be provided
     String directory 

@@ -478,7 +478,7 @@ public class PostDataToPegr {
         </div>
         </div>
         <div class="chapter">
-        <h3 id="del-samples">Delete Samples</h3>
+        <h3 id="del-samples">Delete Samples (Admin Only)</h3>
         <div>
             <p>Only Admins are allowed to use this API. To delete samples, format your query in a JSON dictionary as follows
             <pre>
@@ -516,7 +516,7 @@ print(results["message"])
         </div>
         </div>
         <div class="chapter">
-        <h3 id="del-histories">Delete Analysis Histories</h3>
+        <h3 id="del-histories">Delete Analysis Histories (Admin Only)</h3>
         <div>
             <p>Only Admins are allowed to use this API. To delete analysis histories, format your query in a JSON dictionary as follows
             <pre>
@@ -640,7 +640,7 @@ print(results["status"])
         </div>
         </div>
         <div class="chapter">
-        <h3 id="set-run-status">Set Sequence Run Status</h3>
+        <h3 id="set-run-status">Set Sequence Run Status (Admin Only)</h3>
         <div>
             <p>To set a sequence run's status, format your query in a JSON dictionary as follows
             <pre>
@@ -675,6 +675,113 @@ data = {
         "directory": "xxxxxx", 
         "userEmail": "xxx@xxx.xxx",
         "status": "COMPLETED"
+       }
+r = requests.post(url, json=data)
+results = r.json()
+print(results["message"])
+            </pre>
+        </div>
+        </div>
+        <div class="chapter">
+        <h3 id="fetch-run-summary">Fetch Sequence Run Summary Information</h3>
+        <div>
+            <p>To get a sequence run's summary information, format your query in a JSON dictionary as follows
+            <pre>
+{    
+    // required, combined with API key to authenticate user.
+    "userEmail": "string", 
+    
+    // either runId or directory needs to be provided
+    "runId": 518,
+    "directory": "xxxxxx", 
+}
+            </pre>
+            and send a POST request to the url
+            <pre>
+https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunSummary?apiKey=
+            </pre> 
+    
+            <p>The API can be simply called through curl</p>
+            <pre>
+curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "directory": "xxxxxx", "userEmail": "xxx@xxx.xxx"}' https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunSummary?apiKey=XXXXXXX
+            </pre>
+
+            <p>The following is an example in Python.</p>
+            <pre>
+import requests
+url = "https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunSummary?apiKey=XXXXXXX"
+data = {
+        "runId": 518, 
+        "directory": "xxxxxx",
+        "userEmail": "xxx@xxx.xxx"
+       }
+r = requests.post(url, json=data)
+results = r.json()
+            </pre>
+        </div>
+        </div>
+        <div class="chapter">
+        <h3 id="update-run-summary">Update Sequence Run Summary Information (Admin Only)</h3>
+        <div>
+            <p>To update a sequence run's summary information, format your query in a JSON dictionary as follows
+            <pre>
+{    
+    // required, combined with API key to authenticate user.
+    "userEmail": "string", 
+    
+    // required
+    "runId": 518,
+    
+    // the following fields are optional
+    "platformName": "string",
+    "date": "2021-10-10",
+    "runName": "string",
+    "directoryName": "string",
+    "fcId": "string",
+    "lane": 1,
+    "note": "string",
+    "libraryVolume": 1.2,
+    "libraryStock": 1.2,
+    "libraryStdDev": 0.3,
+    "pctLibraryStdDev": 0.1,
+    "cycles": "string",
+    "srOrPe": "string",
+    "seqCtrl": "string",
+    "pcrCycles": 1,
+    "qubitConc": 1.2,
+    "qPcrConc": 1.2,
+    "libraryLoadedPm": 1.2,
+    "phiXLoaded": 1.2,
+    "libraryLoadedFmol": 1.2,
+    "clusterNum": 1.2,
+    "readPf": 1.2,
+    "pctPf": 1.2,
+    "pctQ30": 1.2,
+    "qidx": 1.2,
+    "totalReads": 1.2,
+    "unmatchedIndices": 1.2,
+    "pctUnmatchedIndices": 1.2,
+    "pctAlignedToPhiX": 1.2,
+}
+            </pre>
+            and send a POST request to the url
+            <pre>
+https://thanos.vmhost.psu.edu/pegr/api/updateSequenceRunSummary?apiKey=
+            </pre> 
+    
+            <p>The API can be simply called through curl</p>
+            <pre>
+curl -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxx@xxx.xxx", "runId": 518, "directoryName": "xxxxxx", "fcId": "xxx"}' https://thanos.vmhost.psu.edu/pegr/api/updateSequenceRunSummary?apiKey=XXXXXXX
+            </pre>
+
+            <p>The following is an example in Python.</p>
+            <pre>
+import requests
+url = "https://thanos.vmhost.psu.edu/pegr/api/updateSequenceRunSummary?apiKey=XXXXXXX"
+data = {"userEmail": "xxx@xxx.xxx",
+        "runId": 518, 
+        "directoryName": "xxxxxx", 
+        "fcId": "xxx"
        }
 r = requests.post(url, json=data)
 results = r.json()

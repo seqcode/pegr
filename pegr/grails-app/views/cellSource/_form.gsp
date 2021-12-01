@@ -21,7 +21,7 @@
 
 <div>
 	<label>Strain</label>
-    <select name="strain" class="strain tag-select2 textcontrol" style="width: 150px" required>
+    <select name="strain" class="strain tag-select2 textcontrol" style="width: 150px">
         <option value="${cellSource?.strain}" selected>${cellSource?.strain}</option>
     </select>
 </div>

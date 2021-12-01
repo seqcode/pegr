@@ -129,12 +129,13 @@ class CellSourceService {
         def mutationStr = utilityService.cleanString(_mutationStr)
         
         // get the parent strain        
-        def parentStrain = Strain.findByName(parentStrainStr)
+        def parentStrain = Strain.findBySpeciesAndName(species, parentStrainStr)
         if (!parentStrain) {
                 parentStrain = new Strain(name: parentStrainStr, species: species).save(failOnError: true) 
         }
+        
         // get strain    
-        def strain = Strain.findByNameAndParentAndGenotypeAndGeneticModification(strainStr, parentStrain, genotypeStr, mutationStr)
+        def strain = Strain.findBySpeciesAndNameAndParentAndGenotypeAndGeneticModification(species, strainStr, parentStrain, genotypeStr, mutationStr)
         if (!strain) {
             strain = new Strain(name: strainStr, 
                                 species: species, 
@@ -142,6 +143,7 @@ class CellSourceService {
                                 parent: parentStrain, 
                                 geneticModification: mutationStr).save( failOnError: true)
         }
+
         return strain
 	}
 	

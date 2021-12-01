@@ -279,7 +279,7 @@ class ProtocolInstanceBagController {
         } else {
             def item = Item.findByBarcode(barcode)
             if (item && item.type != itemType) {
-                flash.message = "The item with barcode ${barcode} has type ${item.type}, which does not match the input type ${itemType}!"
+                flash.message = "The item with barcode ${barcode} has type ${item.type.name}, which does not match the input type ${itemType.name}!"
                 redirect(action: "showInstance", id: instanceId)
                 return
             }

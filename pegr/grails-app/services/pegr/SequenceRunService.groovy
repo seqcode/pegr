@@ -29,7 +29,7 @@ class SequenceRunService {
                 throw new SequenceRunException(message: "Invalid inputs for stats!")
             }
         }
-        if(!run.save(flush: true, failOnError: true)) {
+        if(!run.save(flush: true)) {
             throw new SequenceRunException(message: "Invalid inputs for basic information!")
         }
     }

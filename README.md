@@ -6,32 +6,23 @@ Platform for Epigenomic and Genomic Research (PEGR) is a web service platform th
 
 A tested stack of versions is listed below.
 
-1. OpenJDK 1.8.0_212
-   - https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html
-   - PEGR is not currently compatible with Java 11+
-   - MacOS: We recommend Homebrew to install and manage Java 8
-      - Homebrew command to install and use Java 8:
+1. OpenJDK 11.0.12
+   - MacOS: We recommend Homebrew to install and manage Java 11
+      - Homebrew command to install and use Java 11:
       ```
       brew tap adoptopenjdk/openjdk
       brew install --cask adoptopenjdk8
       ```
-      - Java 8 executable is now located here:
+      - Java 11 executable is now located here:
       ```
-      /Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home/bin/java
+      /Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home/bin/java
       ```
-3. MariaDB 10.4.6
+2. MariaDB 10.5.5
    - Linux: https://mariadb.org/download/
    - MacOS: We recommend Hombrew to install and manage MariaDB
    - https://mariadb.com/kb/en/installing-mariadb-on-macos-using-homebrew/
    ```
    $ brew install mariadb
-   ```
-5. python and xlsx2csv 0.7.2 
-   - You can download the executable xlsx2csv from https://github.com/seqcode/pegr/releases and put it in /usr/local/bin.
-   - xlsx2csv works with Python 2 and 3
-   ```
-   $ chmod 771 xlsx2csv
-   $ cp xlsx2csv /usr/local/bin
    ```
 
 ### Quick start
@@ -131,7 +122,7 @@ More detailed instructions on the config file are provided at https://github.com
 5. Start PEGR.
 
 ```
-$ java -Dgrails.env=dev -jar pegr.war
+$ java -Dgrails.env=prod -jar pegr.war
 ```
 
 6. Go to http://localhost:8080/pegr/ in your browser to see the PEGR login page.

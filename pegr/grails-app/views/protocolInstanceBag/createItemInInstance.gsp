@@ -21,6 +21,7 @@
 
     <script>
         $("#nav-experiments").addClass("active");
+        $("input[name=barcode]").removeAttr("readonly"); 
         $("form").hide();
      </script>
 </div>

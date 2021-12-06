@@ -133,4 +133,5 @@ For more information, please visit https://github.com/seqcode/pegr/wiki.
 
 ### Reference
 
-[1] Danying Shao, Gretta Kellogg, Shaun Mahony, William Lai, and B. Franklin Pugh. 2020. PEGR: a management platform for ChIP-based next generation sequencing pipelines. In preparation.
+[1] Danying Shao, Gretta Kellogg, Shaun Mahony, William Lai, and B. Franklin Pugh. 2020. PEGR: a management platform for ChIP-based next generation sequencing pipelines. In preparation. doi: https://doi.org/10.1101/2021.07.26.453821
+

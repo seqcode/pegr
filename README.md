@@ -30,7 +30,7 @@ A tested stack of versions is listed below.
 1. Download the latest releasse of PEGR
    - https://github.com/seqcode/pegr/releases/tag/v0.1-beta
 
-1.1 (MacOS only) Turn on MariaDB server
+   1.1 (MacOS only) Turn on MariaDB server
    ```
    $ mysql.server start
    ``` 
@@ -86,6 +86,29 @@ Code following example above:
 ```
 $ cp -r sample_files/protocols /tmp/
 ```
+
+<details close>
+<summary>pegrDB MariaDB Schema</summary>
+<br>
+
+   Alignment schema:
+   ![AlignmentTables](https://user-images.githubusercontent.com/18726510/145878749-9148ea49-2ef5-4276-a666-74d76abc8cca.png)
+   
+   Authorization schema:
+   
+   ![AuthorizationTables](https://user-images.githubusercontent.com/18726510/145878772-fe397589-9d7c-4700-bfca-9c172f3d9c35.png)
+   
+   Experiment schema:
+   ![ExperimentTables](https://user-images.githubusercontent.com/18726510/145878780-4fe88a96-a141-47be-a0a7-44837fa7da45.png)
+   
+   Sample schema:
+   ![SampleTables](https://user-images.githubusercontent.com/18726510/145878795-2cb55ba7-462e-4ea9-818c-c96f4818a3a2.png)
+   
+   Sequencing schema:
+   ![SequencingTables](https://user-images.githubusercontent.com/18726510/145878801-26749c48-8298-46c9-ac08-62fd4fab9a17.png)
+   
+
+</details>
 
 4. Create a config file 'pegr-config.properties' in the folder {userHome}/.grails/ for the environment variables, e.g. the information on database connection, NGS repository connection, email connection and Single Sign On.
 

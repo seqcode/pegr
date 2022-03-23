@@ -50,6 +50,12 @@ class TargetAdminController {
         }
 
         try {
+            if (target.cTermTag == null) {
+                target.cTermTag = ''
+            }
+            if (target.nTermTag == null) {
+                target.nTermTag = ''
+            }
             targetService.save(target)
         } catch (ValidationException e) {
             respond target.errors, view:'create'

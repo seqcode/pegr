@@ -27,7 +27,7 @@ A tested stack of versions is listed below.
 
 ### Quick start
 
-1. Download the latest releasse of PEGR
+1. Download the latest release of PEGR
 
    - https://github.com/seqcode/pegr/releases
 

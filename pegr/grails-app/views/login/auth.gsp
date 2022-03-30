@@ -5,6 +5,8 @@
 </head>
 <body>    
 	<div class="container-fluid" id="login-form">
+        <div class="text-center"><img src="/pegr/assets/PEGR_Logo.png" height="100%"/></div>
+        <br>
         <g:if test="${flash.error}">
             <div class="alert alert-danger">${flash.error}</div>
         </g:if>

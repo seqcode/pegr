@@ -28,7 +28,8 @@ A tested stack of versions is listed below.
 ### Quick start
 
 1. Download the latest releasse of PEGR
-   - https://github.com/seqcode/pegr/releases/tag/v0.3.0
+
+   - https://github.com/seqcode/pegr/releases
 
    1.1 (MacOS only) Turn on MariaDB server
    ```

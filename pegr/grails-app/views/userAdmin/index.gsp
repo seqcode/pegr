@@ -26,13 +26,6 @@
                     <div class="alert alert-info">${flash.message}</div>
                 </g:if>
                 <div class="well">
-                    <g:form action="search">
-                        <label>Username</label>
-                        <input name="username">
-                        <label>or Email</label>
-                        <input name="email">
-                        <g:submitButton name="submit" value="Search" class="edit"></g:submitButton>
-                    </g:form>
                     <g:form action="createUser">
                         <label>Email</label>
                         <input id="email" name="email">

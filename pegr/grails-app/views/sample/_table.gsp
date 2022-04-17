@@ -11,6 +11,7 @@
                 <th>Assay</th>
                 <g:sortableColumn property="source" title="Source" params="${searchParams}"></g:sortableColumn>
                 <g:sortableColumn property="sourceId" title="Source ID" params="${searchParams}"></g:sortableColumn>
+                <g:sortableColumn property="sendDataTo" title="Send data to" params="${searchParams}"></g:sortableColumn>
                 <g:sortableColumn property="date" defaultOrder="desc" title="Date" params="${searchParams}"></g:sortableColumn>
             </tr>
         </thead>
@@ -26,6 +27,7 @@
                     <td>${sample.prtclInstSummary?.protocol?.assay}</td>
                     <td>${sample.source} </td>
                     <td>${sample.sourceId} </td>
+                    <td>${sample.sendDataTo} </td>
                     <td><g:formatDate format="yyyy-MM-dd" date="${sample.date}"/></td>
                 </tr>
             </g:each>

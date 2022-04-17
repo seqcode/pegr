@@ -65,6 +65,11 @@ class SampleService {
                 if (query.source) {
                     ilike "source", "%${query.source}%"
                 }
+                if (query.sendDataTo) {
+                    sendDataTo {
+                        eq "username", query.sendDataTo
+                    }                    
+                }
                 if (query.target) {
                     target {
                         ilike "name", "%${query.target}%"

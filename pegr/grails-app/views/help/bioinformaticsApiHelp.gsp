@@ -26,14 +26,16 @@
     "sort": "string",
     "order": "string",
     
-    // optional, property values to query. "AND".
+    // optional, property values to query.
     "id": long,
     "source": "string",
     "sourceId": "string",
     "species": "string",
     "strain": "string",
     "antibody": "string",    
-    "target": "string"
+    "target": "string",
+    "assay": "string",
+    "sendDataTo": "string"
 }
             </pre>
             and send a POST request to the url

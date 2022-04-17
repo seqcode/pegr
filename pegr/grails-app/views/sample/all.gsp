@@ -58,6 +58,10 @@
                 <label>Source ID</label>
                 <g:textField name="sourceId" class="form-control" value="${searchParams.sourceId}"/>
             </div>
+            <div class="form-group">
+                <label>Username (send data to)</label>
+                <g:textField name="sendDataTo" class="form-control" value="${searchParams.sendDataTo}"/>
+            </div>
             <div>
                 <g:submitButton name="search" value="Apply" class="btn btn-primary"/>
                 <g:link action="all" class="btn btn-default">Clear</g:link>

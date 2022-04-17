@@ -528,6 +528,7 @@ class QuerySampleRegistrationCommand implements grails.validation.Validateable {
     String assay
     Long speciesId
     Long assayId
+    String sendDataTo
 }
 
 class QueryRunRegistrationCommand implements grails.validation.Validateable {

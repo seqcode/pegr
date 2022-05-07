@@ -52,6 +52,7 @@
                         <ul>
                             <li><g:link controller="report" action="manage">Edit Sequence QC</g:link></li>
                             <li><a href="#" onclick="window.open('${g.createLink(controller:'sequenceRun',action:'editQueue')}', 'Edit Queue for Sample Submission', 'width=600,height=400' )" >Edit Queue</a></li>
+                            <li><g:link action="submitSequencingRequest">Submit Sequencing Request</g:link></li>
                         </ul>
                     
                 </sec:ifAnyGranted>

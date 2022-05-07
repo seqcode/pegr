@@ -164,6 +164,7 @@ grails.plugin.springsecurity.interceptUrlMap = [
     [pattern: '/sequenceRun/create/**',     access: ['ROLE_ADMIN']],
     [pattern: '/sequenceRun/save/**',       access: ['ROLE_ADMIN']],
     [pattern: '/sequenceRun/delete/**',     access: ['ROLE_ADMIN']],
+    [pattern: '/sequenceRun/submitSequencingRequest/**',     access: ['ROLE_ADMIN']],
     [pattern: '/**',             access:  ['isAuthenticated()']] // everything else requires authenticated user
 ]
 

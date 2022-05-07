@@ -641,5 +641,20 @@ class SequenceRunController {
         }
         render result as JSON
     }
+    
+    def submitSequencingRequest() {
+        if (request.method == "POST") {
+            def timeout = 1000 * 60 * 2 // 2 min
+            def command = params.command
+            try {
+                // execute the command
+                utilityService.executeCommand(command, timeout)
+                request.message = "Sequencing request has been submitted successfully!"
+            } catch (Exception e) {
+                request.message = "Error submitting the sequencing request! ${e.message}"
+            }            
+        }
+        render(view: "submitSequencingRequest")
+    }
 
 }

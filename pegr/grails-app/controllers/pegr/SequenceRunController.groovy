@@ -645,7 +645,8 @@ class SequenceRunController {
     def submitSequencingRequest() {
         if (request.method == "POST") {
             def timeout = 1000 * 60 * 2 // 2 min
-            def command = params.command
+            def filesroot = utilityService.getFilesRoot()
+            def command = "cd ${filesroot} & ${params.command}"
             try {
                 // execute the command
                 utilityService.executeCommand(command, timeout)

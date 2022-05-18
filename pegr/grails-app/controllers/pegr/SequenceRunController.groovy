@@ -10,6 +10,10 @@ import grails.util.Holders
 import pl.touk.excel.export.WebXlsxExporter
 import pl.touk.excel.export.XlsxExporter
 
+import java.net.HttpURLConnection
+import java.net.URL
+import java.io.IOException
+
 class SequenceRunController {
     def springSecurityService
     def sequenceRunService
@@ -644,16 +648,34 @@ class SequenceRunController {
     
     def submitSequencingRequest() {
         if (request.method == "POST") {
-            def timeout = 1000 * 60 * 2 // 2 min
-            def filesroot = utilityService.getFilesRoot()
-            def command = "cd ${filesroot} & ${params.command}"
+            URL url = new URL (params.url)
+            HttpURLConnection con = (HttpURLConnection)url.openConnection()
+            
+            con.setRequestMethod("POST")
+            con.setRequestProperty("Content-Type", "application/json; utf-8")
+            con.setRequestProperty("Accept", "application/json")
+            con.setDoOutput(true)
+            
+            String jsonInputString = params.json
+            
             try {
-                // execute the command
-                utilityService.executeCommand(command, timeout)
-                request.message = "Sequencing request has been submitted successfully!"
-            } catch (Exception e) {
-                request.message = "Error submitting the sequencing request! ${e.message}"
-            }            
+                OutputStream os = con.getOutputStream()
+       
+                byte[] input = jsonInputString.getBytes("utf-8");
+                os.write(input, 0, input.length)
+            
+                BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"))
+                StringBuilder response = new StringBuilder()
+                String responseLine = null;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                request.message = response.toString()
+            } catch(IOException ioe) {
+                request.message = ioe.toString()
+            } catch(Exception e) {
+                request.message = e.toString()
+            }
         }
         render(view: "submitSequencingRequest")
     }

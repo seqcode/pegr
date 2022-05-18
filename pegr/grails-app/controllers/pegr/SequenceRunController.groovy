@@ -653,7 +653,6 @@ class SequenceRunController {
             
             con.setRequestMethod("POST")
             con.setRequestProperty("Content-Type", "application/json; utf-8")
-            con.setRequestProperty("Accept", "application/json")
             con.setDoOutput(true)
             
             String jsonInputString = params.json

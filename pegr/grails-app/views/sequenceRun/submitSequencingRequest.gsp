@@ -13,11 +13,11 @@
     <g:form action="submitSequencingRequest">
         <div>
             <label>Destination URL</label>
-            <input type="url" name="url" style="width:50em">
+            <input type="url" name="url" class="form-control" style="width:50em">
         </div>
         <div class="form-group">
             <label>JSON payload</label>
-            <textarea name="json" style="width:50em;height:10em"></textarea>
+            <textarea name="json" class="form-control" style="width:50em;height:10em"></textarea>
         </div>
         <div class="form-group">
             <g:submitButton name="submit" value="Submit" class="btn btn-primary"/>

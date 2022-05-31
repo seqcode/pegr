@@ -22,14 +22,18 @@
         <h4>Samples per sequence run:</h4>
         <table class="table table-bordered">
             <thead>
-                <th>Sequence Run ID</th>
-                <th>Sample Count</th>
+                <th>Run Name</th>
+                <th>Total Samples</th>
+                <th>Run ID</th>
+                <th>Date</th>
             </thead>
             <tbody>
                 <g:each in="${samples_per_run}">
                 <tr>
-                    <td>${it.id}</td>
+                    <td>${it.run_name}</td>
                     <td>${it.sample_count}</td>
+                    <td>${it.id}</td>
+                    <td>${it.date.toString().split(" ")[0]}</td>
                 </tr>
                 </g:each> 
             </tbody>

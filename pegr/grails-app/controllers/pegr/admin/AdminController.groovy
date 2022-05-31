@@ -75,7 +75,7 @@ class AdminController {
 
                         sample_count = sql.rows(cmd)
 
-                        cmd = "select r.id, count(*) as sample_count from sequencing_experiment e join sequence_run r on e.sequence_run_id = r.id join sample s on e.sample_id = s.id where r.id between ${fromId} and ${toId} and source =" + '"' + source + '" group by r.id'
+                        cmd = "select r.id, r.run_name, r.date, count(*) as sample_count from sequencing_experiment e join sequence_run r on e.sequence_run_id = r.id join sample s on e.sample_id = s.id where r.id between ${fromId} and ${toId} and source =" + '"' + source + '" group by r.id'
 
                         samples_per_run = sql.rows(cmd)
 
@@ -87,7 +87,7 @@ class AdminController {
 
                         sample_count = sql.rows(cmd)
 
-                        cmd = "select r.id, count(*) as sample_count from sequencing_experiment e join sequence_run r on e.sequence_run_id = r.id where r.id between ${fromId} and ${toId} group by r.id"
+                        cmd = "select r.id, r.run_name, r.date, count(*) as sample_count from sequencing_experiment e join sequence_run r on e.sequence_run_id = r.id where r.id between ${fromId} and ${toId} group by r.id"
 
                         samples_per_run = sql.rows(cmd)
 

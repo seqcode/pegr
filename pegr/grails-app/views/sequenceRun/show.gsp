@@ -202,6 +202,7 @@
         <tbody>
             <g:each in="${run.experiments}">
                 <tr>
+                    <input class="experiment-id" value="${it.id}" type="hidden">
                     <g:if test="${editable}">
                         <td><input type="checkbox" name="sampleId" value="${it.sample.id}"></td> 
                     </g:if>
@@ -324,7 +325,7 @@
         $(".project").on("click", ".save", function(){
             var td = $(this).parent();
             var tr = $(this).closest("tr");
-            var experimentId = tr.find("input").val();
+            var experimentId = tr.find(".experiment-id").val();
             var projectName = td.find("select").val();
             var s = projectName;
             if (s == "") {

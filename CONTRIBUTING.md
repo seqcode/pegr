@@ -57,17 +57,10 @@ https://help.github.com/en/github/getting-started-with-github/git-and-github-lea
    * Serious security problems should not be fixed via pull request.
 
 4. If your changes modify code please ensure the resulting files conform to
-   the code conventions for the Groovy and JAVA programming languages [Google Style Guide](https://google.github.io/styleguide/javaguide.html).
+   the code conventions [Google Style Guide](https://google.github.io/styleguide/javaguide.html)
+   for Groovy, JAVA and JavaScript respectively.
 
-   If you are working on the PEGR user interface (i.e. JavaScript,
-   styles, etc.), see more information in the [client README](client/README.md).
-
-5. PEGR contains hundreds of tests of different types and complexity and
-   running each is difficult and probably not reasonable on your workstation. So
-   please review the [running tests documentation](test/TESTING.md) and run any
-   that seem relevant.
-
-   If possible, also try to add new tests for the features added or bugs fixed
+5. Please run any existing tests that seem relevant. And if possible, also try to add new tests for the features added or bugs fixed
    by your pull request.
 
    Developers reviewing your pull request will be happy to help you add or run
@@ -100,10 +93,7 @@ https://help.github.com/en/github/getting-started-with-github/git-and-github-lea
 9. The pull request should pass all the continuous integration tests which are
    automatically started by GitHub using e.g. Travis CI.
 
-10. Your pull request will be handled according to [some
-    rules](doc/source/project/organization.rst#handling-pull-requests).
-
-11. If, before your pull request is merged, conflicts arise between your branch
+10. If, before your pull request is merged, conflicts arise between your branch
     and the target branch (because other commits were pushed to the target
     branch), you need to either:
 

@@ -521,7 +521,7 @@ class QuerySampleRegistrationCommand implements grails.validation.Validateable {
     String species
     String strain
     String antibody
-    Long id
+    String id
     String source
     String sourceId
     String target

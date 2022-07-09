@@ -25,6 +25,7 @@
       </div>
       <div id="filter" class="well col-sm-2">
           <h4>Filters</h4>
+          <p>You cann use wildcard % in any of the fields. % represents zero or more characters. </p>
           <g:form action="all">
             <div class="form-group">
                 <label>Sample ID</label>

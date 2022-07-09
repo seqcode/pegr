@@ -39,7 +39,7 @@ class SampleService {
                     cellSource {
                         strain {
                             species {
-                                ilike "name", "%${query.species}%"
+                                ilike "name", query.species
                             }
                         }
                     }
@@ -47,32 +47,32 @@ class SampleService {
                 if (query.strain) {
                     cellSource {
                         strain {
-                            ilike "name", "%${query.strain}%"
+                            ilike "name", query.strain
                         }
                     }
                 }
                 if (query.antibody) {
                     antibody {
-                        ilike "catalogNumber", "%${query.antibody}%"
+                        ilike "catalogNumber", query.antibody
                     }
                 }
                 if (query.id) {
-                    eq "id", query.id
+                    sqlRestriction "cast({alias}.id AS char(256)) like '${query.id}'"
                 }
                 if (query.sourceId) {
-                    eq "sourceId", query.sourceId
+                    ilike "sourceId", query.sourceId
                 }
                 if (query.source) {
-                    ilike "source", "%${query.source}%"
+                    ilike "source", query.source
                 }
                 if (query.sendDataTo) {
                     sendDataTo {
-                        eq "username", query.sendDataTo
+                        ilike "username", query.sendDataTo
                     }                    
                 }
                 if (query.target) {
                     target {
-                        ilike "name", "%${query.target}%"
+                        ilike "name", query.target
                     }
                 }
                 if (query.assayId) {
@@ -87,7 +87,7 @@ class SampleService {
                     prtclInstSummary {
                         protocol {
                             assay {
-                                ilike "name", "%${query.assay}%"
+                                ilike "name", query.assay
                             }
                         }
                     }

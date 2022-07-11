@@ -12,4 +12,8 @@ class Aligner {
 		software unique: 'alignerVersion'
 		alignerVersion nullable: true, blank: false, maxSize:10
     }
+    
+    static mapping = {
+        sort "software"
+    }
 }

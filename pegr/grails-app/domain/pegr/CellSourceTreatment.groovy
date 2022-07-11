@@ -17,5 +17,6 @@ class CellSourceTreatment {
     
     static mapping = {
 		note sqlType: 'longtext'
+        sort "name"
     }
 }

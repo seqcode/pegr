@@ -12,4 +12,8 @@ class TargetType {
 		name unique: true
 		description nullable: true, blank: true
     }
+    
+    static mapping = {
+        sort "name"
+    }
 }

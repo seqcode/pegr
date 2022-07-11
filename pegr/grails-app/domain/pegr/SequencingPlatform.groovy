@@ -11,4 +11,8 @@ class SequencingPlatform {
     static constraints = {
     	name unique: true
 	}
+    
+    static mapping = {
+        sort "name"
+    }
 }

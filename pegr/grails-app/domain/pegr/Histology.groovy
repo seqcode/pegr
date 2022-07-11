@@ -15,4 +15,8 @@ class Histology {
         parent nullable: true
         status nullable: true
     }
+    
+    static mapping = {
+        sort "name"
+    }
 }

@@ -14,4 +14,8 @@ class ReadType {
 		shortName size: 2..10, unique: true
 		note nullable: true, blank: true
 	}
+    
+    static mapping = {
+        sort "shortName"
+    }
 }

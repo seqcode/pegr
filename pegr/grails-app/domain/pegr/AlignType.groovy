@@ -12,4 +12,8 @@ class AlignType {
 		name unique: true
 		shortName nullable: true, blank: true, maxSize:20, unique: true
     }
+    
+    static mapping = {
+        sort "shortName"
+    }
 }

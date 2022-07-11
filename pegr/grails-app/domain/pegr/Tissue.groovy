@@ -13,4 +13,8 @@ class Tissue {
 		name unique: true
         status nullable: true
     }
+    
+    static mapping = {
+        sort "name"
+    }
 }

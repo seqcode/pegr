@@ -13,4 +13,8 @@ class Chromosome {
 		name unique: true
 		note nullable: true, blank: true
     }
+    
+    static mapping = {
+        sort "name"
+    }
 }

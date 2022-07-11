@@ -20,5 +20,6 @@ class Pipeline {
         steps sqlType: 'longtext'
         workflowId defaultValue: "N/A"
         pipelineVersion defaultValue: "'0.0.0'"
+        sort "name"
     }
 }

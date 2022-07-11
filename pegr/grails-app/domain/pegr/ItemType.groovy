@@ -19,4 +19,8 @@ class ItemType {
 		name unique: true
 		fields nullable: true, blank: true
     }
+    
+    static mapping = {
+        sort "name"
+    }
 }

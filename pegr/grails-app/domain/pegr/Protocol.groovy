@@ -64,5 +64,9 @@ class Protocol {
         url nullable: true, blank: true
         images nullable: true
 	}
+    
+    static mapping = {
+        sort "name"
+    }
 
 }

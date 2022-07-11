@@ -24,7 +24,14 @@
             </g:hasErrors>
             <g:form action="save" method="POST">
                 <fieldset class="form">
-                    <f:all bean="genomeInstance"/>
+                    <f:field bean="genomeInstance" property="name"/>
+                    <div class="fieldcontain">
+                      <label for="species">Species</label>
+                      <g:select name="species.id" id="species" from="${pegr.Species.list().sort { a,b ->
+a.genusName.toLowerCase() <=> b.genusName.toLowerCase() ?: a.name.toLowerCase() <=> b.name.toLowerCase() }}" noSelection="['null':'']" optionKey="id"></g:select>
+                    </div>
+                    <f:field bean="genomeInstance" property="url"/>
+                    <f:field bean="genomeInstance" property="status"/>
                 </fieldset>
                 <fieldset class="buttons">
                     <g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />

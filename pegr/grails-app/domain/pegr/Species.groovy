@@ -9,7 +9,7 @@ class Species {
 	String toString() {
         "${genusName} ${name}"
 	}
-	
+    
     static constraints = {
 		name unique: "genusName"
 		note nullable: true, blank: true
@@ -17,6 +17,6 @@ class Species {
     }
     
     static mapping = {
-        sort([genusName: 'asc', name: 'asc'])
+        sort "genusName"
     }
 }

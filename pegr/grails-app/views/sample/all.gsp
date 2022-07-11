@@ -25,7 +25,6 @@
       </div>
       <div id="filter" class="well col-sm-2">
           <h4>Filters</h4>
-          <p>You cann use wildcard % in any of the fields. % represents zero or more characters. </p>
           <g:form action="all">
             <div class="form-group">
                 <label>Sample ID</label>
@@ -68,6 +67,7 @@
                 <g:link action="all" class="btn btn-default">Clear</g:link>
             </div>            
           </g:form>
+          <p><i>You cann use wildcard %, which represents zero or more characters, in any of the fields, e.g. input "3011%" in the "Sample ID" field will return samples with ID's such as 3011, 30110, 30111, etc.  </i></p>
       </div>
     </div>
   </div>

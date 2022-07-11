@@ -26,7 +26,14 @@
             <g:form action="update" id="${this.genomeInstance.id}" method="PUT">
                 <g:hiddenField name="version" value="${this.genomeInstance?.version}" />
                 <fieldset class="form">
-                    <f:all bean="genomeInstance"/>
+                    <f:field bean="genomeInstance" property="name"/>
+                    <div class="fieldcontain">
+                      <label for="species">Species</label>
+                      <g:select name="species.id" id="species" from="${pegr.Species.list().sort { a,b ->
+a.genusName.toLowerCase() <=> b.genusName.toLowerCase() ?: a.name.toLowerCase() <=> b.name.toLowerCase() }}" noSelection="['null':'']" optionKey="id" value="${this.genomeInstance?.species?.id}"></g:select>
+                    </div>
+                    <f:field bean="genomeInstance" property="url"/>
+                    <f:field bean="genomeInstance" property="status"/>
                 </fieldset>
                 <fieldset class="buttons">
                     <input class="save" type="submit" value="${message(code: 'default.button.update.label', default: 'Update')}" />

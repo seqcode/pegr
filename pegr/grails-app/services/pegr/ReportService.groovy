@@ -472,11 +472,12 @@ class ReportService {
                 stdInsertSize: alignment.stdDevInsertSize,
                 genomeCoverage: alignment.genomeCoverage,
                 peHistogram: alignment.peHistogram,
+                motifCount: 0,
                 fourColor: [],
                 composite: []
             )
 
-	if (alignment.readDbId > 0) {
+        if (alignment.readDbId > 0) {
         	alignmentDTO.readDbId = alignment.readDbId;
         }
         def statistics
@@ -519,17 +520,19 @@ class ReportService {
                     def tabulars = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "tabular")
                     if (tabulars && tabulars.size() > 0) {
                         if (motifId && motifId > 0){
-                            alignmentDTO.composite[motifId-1] = tabulars.last()
+                            if (!alignmentDTO.composite[motifId-1]) {
+                                alignmentDTO.composite[motifId-1] = []
+                            } 
+                            alignmentDTO.composite[motifId-1].add(tabulars.last()) 
                         }                      
                     }
                     break
             }
         }
+        
         // in case not all composite figures have been received
-        def compositeCount = alignmentDTO.composite.size()
-        def fourColorCount = alignmentDTO.fourColor.size()
-        if ( compositeCount < fourColorCount ) {
-            alignmentDTO.composite[fourColorCount - 1] = null
+        for (int i = alignmentDTO.composite.size(); i < alignmentDTO.motifCount; ++i) {
+            alignmentDTO.composite[i] = []
         }
         alignmentDTO.nonPairedPeaks = getNonPairedPeaks(alignmentDTO.peaks, alignmentDTO.peakPairs)
         return alignmentDTO

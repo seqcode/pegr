@@ -59,7 +59,23 @@
                                     <td class="meme-sites" style="width:100px"></td>
                                     <td class="meme-width" style="width:100px"></td>
                                     <td style="width:100px"><a href="${alignment.fourColor[n]}" target="_blank"><span class="glyphicon glyphicon-picture" style="font-size: 2em"></span></a></td>
-                                    <td class="composite" style="width:320px"><g:link controller="report" action="composite" params="[url: alignment.composite[n]]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link><i class="fa fa-spinner fa-spin"></i><span class="composite-url" hidden="hidden">${alignment.composite[n]}</span><div class="composite-fig"></div></td>
+                                    <td style="width:320px">
+                                      <ul class="nav nav-tabs">
+                                        <g:each in="${0..<alignment.composite[n].size()}" var="m">
+                                          <li <g:if test="${m==0}">class="active"</g:if>><a data-toggle="tab" href="#composite${n}-${m}">${m+1}</a></li>
+                                        </g:each>
+                                      </ul>
+                                      <div class="tab-content">
+                                        <g:each in="${0..<alignment.composite[n].size()}" var="m">
+                                        <div id="composite${n}-${m}" class="composite tab-pane <g:if test='${m==0}'>in active</g:if><g:else>fade</g:else>">
+                                          <g:link controller="report" action="composite" params="[url: alignment.composite[n][m]]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link>
+                                          <i class="fa fa-spinner fa-spin"></i>
+                                          <span class="composite-url" hidden="hidden">${alignment.composite[n][m]}</span>
+                                          <div class="composite-fig"></div>
+                                        </div>
+                                        </g:each>
+                                      </div>
+                                    </td>
                                 </tr>
                             </g:each>
                             </g:if>

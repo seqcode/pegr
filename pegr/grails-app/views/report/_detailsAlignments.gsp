@@ -43,7 +43,7 @@
                 </g:each>
               </ul>
               <div class="tab-content">
-                <div id="${alignment.id}-meme-table" class="composite tab-pane in active"> 
+                <div id="${alignment.id}-meme-table" class="tab-pane in active"> 
                   <table class="table table-bordered meme-table">
                     <thead>
                         <tr>

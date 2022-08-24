@@ -78,10 +78,9 @@
                   <g:if test="${alignment.composite[m]}">
                     <div id="${alignment.id}-composite${m}" class="composite tab-pane fade">
                       <h6>${alignment.composite[m]?.title}</h6>
-                      <g:link controller="report" action="composite" params="[url: alignment.composite[m].tabular]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link>
                       <i class="fa fa-spinner fa-spin"></i>
                       <span class="composite-url" hidden="hidden">${alignment.composite[m].tabular}</span>
-                      <div class="composite-fig"></div>
+                      <div class="composite-fig" style="width: 512px; height: 300px"></div>
                     </div>
                   </g:if>
                 </g:each>
@@ -158,15 +157,20 @@
 
                             // Instantiate and draw our chart, passing in some options.
                             var chart = new google.visualization.LineChart(container);
-                            var options = { width: 300, 
-                                           height: 150, 
-                                           legend: { position: 'none'}, 
-                                           vAxis: { gridlines: {count: 3 } },
-                                           hAxis: { gridlines: {count: 3 } },
-                                          };
-                            google.visualization.events.addListener(chart, 'ready', function () {
-                                container.innerHTML = '<img src="' + chart.getImageURI() + '">';
-                            });
+                            var options = { width: 512, 
+                                            height: 300, 
+                                            hAxis: { title: 'Distance from MEME motif (bp)', 
+                                                   titleTextStyle: {fontSize:14,italic:false},
+                                                   gridlines: { color: '#DDDDDD', count:8 },
+                                            },
+                                            vAxis: { title: 'Tag frequency', 
+                                                   titleTextStyle: {fontSize:14,italic:false},
+                                                   gridlines: { color: '#DDDDDD', count:7 },
+                                                    format: '#.##'
+                                            },
+                                            curveType: 'function',
+                                            legend: { position: 'right' }
+                                          };                            
                             chart.draw(data, options);   
                             $(spinner).remove();
                         }

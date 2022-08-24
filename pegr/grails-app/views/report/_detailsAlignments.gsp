@@ -28,61 +28,66 @@
 </div>
 <ul>
     <li>
-        <h4>MEME Motifs</h4>
+        <h4>Quality Control Analysis</h4>
         <g:each in="${sampleDTOs}" var="sample">
-            <g:each in="${sample.experiments}" var="experiment">
-                <g:each in="${experiment.alignments}" var="alignment">
-                    <h5>Sample <u>${sample.id} ${sample.naturalId}</u> &nbsp; Run <u>${experiment.runId}</u> &nbsp; Genome <u>${alignment.genome}</u> &nbsp; Target <u>${sample.target}</u> 
-                    </h5>
-                    <table class="table table-bordered meme-table">                        
-                        <thead>
-                            <tr>
-                                <th rowspan="2">ID</th>
-                                <th colspan="4" class="text-center"><a href="${alignment.memeFig}" target="_blank">Meme <span class="glyphicon glyphicon-picture"></span></a><span class="meme-url" hidden="hidden">${alignment.memeFile}</span></th>
-                                <th rowspan="2">Four-Color</th>
-                                <th rowspan="2">Composite</th>
-                            </tr>
-                            <tr>
-                                <th>Logo</th>
-                                <th>E-value</th>
-                                <th>Sites</th>
-                                <th>Width</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <g:if test="${alignment.motifCount}">
-                            <g:each in="${(0..<alignment.motifCount)}" var="n">
-                                <tr>
-                                    <td class="meme-id" style="width:20px"></td>
-                                    <td class="meme-fig" style="width:350px"><i class="fa fa-spinner fa-spin"></i></td>
-                                    <td class="meme-evalue" style="width:100px"></td>
-                                    <td class="meme-sites" style="width:100px"></td>
-                                    <td class="meme-width" style="width:100px"></td>
-                                    <td style="width:100px"><a href="${alignment.fourColor[n]}" target="_blank"><span class="glyphicon glyphicon-picture" style="font-size: 2em"></span></a></td>
-                                    <td style="width:320px">
-                                      <ul class="nav nav-tabs">
-                                        <g:each in="${0..<alignment.composite[n].size()}" var="m">
-                                          <li <g:if test="${m==0}">class="active"</g:if>><a data-toggle="tab" href="#composite${n}-${m}">${m+1}</a></li>
-                                        </g:each>
-                                      </ul>
-                                      <div class="tab-content">
-                                        <g:each in="${0..<alignment.composite[n].size()}" var="m">
-                                        <div id="composite${n}-${m}" class="composite tab-pane <g:if test='${m==0}'>in active</g:if><g:else>fade</g:else>">
-                                          <g:link controller="report" action="composite" params="[url: alignment.composite[n][m]]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link>
-                                          <i class="fa fa-spinner fa-spin"></i>
-                                          <span class="composite-url" hidden="hidden">${alignment.composite[n][m]}</span>
-                                          <div class="composite-fig"></div>
-                                        </div>
-                                        </g:each>
-                                      </div>
-                                    </td>
-                                </tr>
-                            </g:each>
-                            </g:if>
-                        </tbody>
-                    </table>                        
+          <g:each in="${sample.experiments}" var="experiment">
+            <g:each in="${experiment.alignments}" var="alignment">
+              <h5>Sample <u>${sample.id} ${sample.naturalId}</u> &nbsp; Run <u>${experiment.runId}</u> &nbsp; Genome <u>${alignment.genome}</u> &nbsp; Target <u>${sample.target}</u> 
+              </h5>
+              <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#meme-table">MEME Motifs</a></li>
+                <g:each in="${0..<alignment.composite.size()}" var="m">
+                  <g:if test="${alignment.composite[m]}">
+                  <li><a data-toggle="tab" href="#composite${m}">Feature Analysis ${m+1}</a></li>
+                  </g:if>
                 </g:each>
+              </ul>
+              <div class="tab-content">
+                <div id="meme-table" class="composite tab-pane in active"> 
+                  <table class="table table-bordered meme-table">                        
+                    <thead>
+                        <tr>
+                            <th rowspan="2">ID</th>
+                            <th colspan="4" class="text-center"><a href="${alignment.memeFig}" target="_blank">Meme <span class="glyphicon glyphicon-picture"></span></a><span class="meme-url" hidden="hidden">${alignment.memeFile}</span></th>
+                            <th rowspan="2">Four-Color</th>
+                        </tr>
+                        <tr>
+                            <th>Logo</th>
+                            <th>E-value</th>
+                            <th>Sites</th>
+                            <th>Width</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <g:if test="${alignment.motifCount}">
+                        <g:each in="${(0..<alignment.motifCount)}" var="n">
+                            <tr>
+                                <td class="meme-id" style="width:20px"></td>
+                                <td class="meme-fig" style="width:350px"><i class="fa fa-spinner fa-spin"></i></td>
+                                <td class="meme-evalue" style="width:100px"></td>
+                                <td class="meme-sites" style="width:100px"></td>
+                                <td class="meme-width" style="width:100px"></td>
+                                <td style="width:100px"><a href="${alignment.fourColor[n]}" target="_blank"><span class="glyphicon glyphicon-picture" style="font-size: 2em"></span></a></td>
+                            </tr>
+                        </g:each>
+                        </g:if>
+                    </tbody>
+                  </table> 
+                </div>
+                <g:each in="${0..<alignment.composite.size()}" var="m">
+                  <g:if test="${alignment.composite[m]}">
+                    <div id="composite${m}" class="composite tab-pane fade">
+                      <h6>${alignment.composite[m]?.title}</h6>
+                      <g:link controller="report" action="composite" params="[url: alignment.composite[m].tabular]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link>
+                      <i class="fa fa-spinner fa-spin"></i>
+                      <span class="composite-url" hidden="hidden">${alignment.composite[m].tabular}</span>
+                      <div class="composite-fig"></div>
+                    </div>
+                  </g:if>
+                </g:each>
+              </div>
             </g:each>
+          </g:each>
         </g:each>
     </li>
 </ul>

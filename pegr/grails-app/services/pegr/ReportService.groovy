@@ -515,15 +515,13 @@ class ReportService {
                     alignmentDTO.fourColor = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "png")
                     break
                 case "output_tagPileup": //composite 
-                    def motif = utilityService.queryJson(analysis.parameters, "input2X__identifier__")
-                    def motifId = motif?.find( /\d+/ )?.toInteger()
+                    def compositeId = utilityService.queryJson(analysis.parameters, "input2X__identifier__")
+                    compositeId = compositeId?.find( /\d+/ )?.toInteger()
+                    def compositeTitle = utilityService.queryJson(analysis.parameters, "title")
                     def tabulars = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "tabular")
                     if (tabulars && tabulars.size() > 0) {
-                        if (motifId && motifId > 0){
-                            if (!alignmentDTO.composite[motifId-1]) {
-                                alignmentDTO.composite[motifId-1] = []
-                            } 
-                            alignmentDTO.composite[motifId-1].add(tabulars.last()) 
+                        if (compositeId && compositeId > 0){
+                            alignmentDTO.composite[compositeId-1] = ['title': compositeTitle, 'tabular': tabulars.last()]
                         }                      
                     }
                     break

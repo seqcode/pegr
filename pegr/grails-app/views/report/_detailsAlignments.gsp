@@ -35,16 +35,16 @@
               <h5>Sample <u>${sample.id} ${sample.naturalId}</u> &nbsp; Run <u>${experiment.runId}</u> &nbsp; Genome <u>${alignment.genome}</u> &nbsp; Target <u>${sample.target}</u> 
               </h5>
               <ul class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" href="#meme-table">MEME Motifs</a></li>
+                <li class="active"><a data-toggle="tab" href="#${sample.id}-meme-table">MEME Motifs</a></li>
                 <g:each in="${0..<alignment.composite.size()}" var="m">
                   <g:if test="${alignment.composite[m]}">
-                  <li><a data-toggle="tab" href="#composite${m}">Feature Analysis ${m+1}</a></li>
+                  <li><a data-toggle="tab" href="#${sample.id}-composite${m}">Feature Analysis ${m+1}</a></li>
                   </g:if>
                 </g:each>
               </ul>
               <div class="tab-content">
-                <div id="meme-table" class="composite tab-pane in active"> 
-                  <table class="table table-bordered meme-table">                        
+                <div id="${sample.id}-meme-table" class="composite tab-pane in active"> 
+                  <table class="table table-bordered meme-table">
                     <thead>
                         <tr>
                             <th rowspan="2">ID</th>
@@ -76,7 +76,7 @@
                 </div>
                 <g:each in="${0..<alignment.composite.size()}" var="m">
                   <g:if test="${alignment.composite[m]}">
-                    <div id="composite${m}" class="composite tab-pane fade">
+                    <div id="${sample.id}-composite${m}" class="composite tab-pane fade">
                       <h6>${alignment.composite[m]?.title}</h6>
                       <g:link controller="report" action="composite" params="[url: alignment.composite[m].tabular]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link>
                       <i class="fa fa-spinner fa-spin"></i>

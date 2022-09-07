@@ -284,10 +284,12 @@ class AlignmentDTO {
     String memeFig
     String peHistogram
     List fourColor
-    List composite
     String scidx
     Integer readDbId
+    
     Integer motifCount
+    List composite
+    List featureAnalysis
 }
 
 class RunStatusDTO {

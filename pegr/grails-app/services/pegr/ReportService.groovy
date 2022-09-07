@@ -474,7 +474,8 @@ class ReportService {
                 peHistogram: alignment.peHistogram,
                 motifCount: 0,
                 fourColor: [],
-                composite: []
+                composite: [],
+                featureAnalysis: []
             )
 
         if (alignment.readDbId > 0) {
@@ -515,14 +516,26 @@ class ReportService {
                     alignmentDTO.fourColor = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "png")
                     break
                 case "output_tagPileup": //composite 
-                    def compositeId = utilityService.queryJson(analysis.parameters, "input2X__identifier__")
-                    compositeId = compositeId?.find( /\d+/ )?.toInteger()
-                    def compositeTitle = utilityService.queryJson(analysis.parameters, "title")
-                    def tabulars = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "tabular")
+                    def tabulars = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "tabular")                
                     if (tabulars && tabulars.size() > 0) {
-                        if (compositeId && compositeId > 0){
-                            alignmentDTO.composite[compositeId-1] = ['title': compositeTitle, 'tabular': tabulars.last()]
-                        }                      
+                        def identifier = utilityService.queryJson(analysis.parameters, "input2X__identifier__")
+                        def id = identifier?.find( /\d+/ )?.toInteger()
+                        if (id && id > 0){
+                            if (identifier.contains("MOTIF")) {
+                                alignmentDTO.composite[id-1] = tabulars.last()
+                            } else {
+                                print("composite-id:${id}\n")
+                                def title = utilityService.queryJson(analysis.parameters, "title")
+                                if (!title) {
+                                    title = "Feature Analysis ${id}" 
+                                }
+                                def xlabel = utilityService.queryJson(analysis.parameters, "xlabel")
+                                if (!xlabel) {
+                                    xlabel = "Distance from MEME motif (bp)"
+                                }
+                                alignmentDTO.featureAnalysis[id-1] = ['title': title, 'xlabel': xlabel, 'tabular': tabulars.last()]
+                            }   
+                        }                           
                     }
                     break
             }
@@ -530,7 +543,7 @@ class ReportService {
         
         // in case not all composite figures have been received
         for (int i = alignmentDTO.composite.size(); i < alignmentDTO.motifCount; ++i) {
-            alignmentDTO.composite[i] = []
+            alignmentDTO.composite[i] = null
         }
         alignmentDTO.nonPairedPeaks = getNonPairedPeaks(alignmentDTO.peaks, alignmentDTO.peakPairs)
         return alignmentDTO

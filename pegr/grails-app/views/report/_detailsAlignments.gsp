@@ -36,9 +36,9 @@
               </h5>
               <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#${alignment.id}-meme-table">MEME Motifs</a></li>
-                <g:each in="${0..<alignment.composite.size()}" var="m">
-                  <g:if test="${alignment.composite[m]}">
-                  <li><a data-toggle="tab" href="#${alignment.id}-composite${m}">Feature Analysis ${m+1}</a></li>
+                <g:each in="${0..<alignment.featureAnalysis.size()}" var="m">
+                  <g:if test="${alignment.featureAnalysis[m]}">
+                  <li><a data-toggle="tab" href="#${alignment.id}-composite${m}">${alignment.featureAnalysis[m].title}</a></li>
                   </g:if>
                 </g:each>
               </ul>
@@ -50,6 +50,7 @@
                             <th rowspan="2">ID</th>
                             <th colspan="4" class="text-center"><a href="${alignment.memeFig}" target="_blank">Meme <span class="glyphicon glyphicon-picture"></span></a><span class="meme-url" hidden="hidden">${alignment.memeFile}</span></th>
                             <th rowspan="2">Four-Color</th>
+                            <th rowspan="2">Composite</th>
                         </tr>
                         <tr>
                             <th>Logo</th>
@@ -68,18 +69,26 @@
                                 <td class="meme-sites" style="width:100px"></td>
                                 <td class="meme-width" style="width:100px"></td>
                                 <td style="width:100px"><a href="${alignment.fourColor[n]}" target="_blank"><span class="glyphicon glyphicon-picture" style="font-size: 2em"></span></a></td>
+                                <td class="composite" style="width:320px">
+                                  <g:if test="${alignment.composite[n]}">
+                                    <g:link controller="report" action="composite" params="[url: alignment.composite[n]]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link>
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                    <span class="composite-url" hidden="hidden">${alignment.composite[n]}</span>
+                                    <div class="composite-fig"></div>
+                                  </g:if>
+                                </td>
                             </tr>
                         </g:each>
                         </g:if>
                     </tbody>
                   </table> 
                 </div>
-                <g:each in="${0..<alignment.composite.size()}" var="m">
-                  <g:if test="${alignment.composite[m]}">
-                    <div id="${alignment.id}-composite${m}" class="composite tab-pane fade">
-                      <h6>${alignment.composite[m]?.title}</h6>
+                <g:each in="${0..<alignment.featureAnalysis.size()}" var="m">
+                  <g:if test="${alignment.featureAnalysis[m]}">
+                    <div id="${alignment.id}-composite${m}" class="featureAnalysis tab-pane fade">
                       <i class="fa fa-spinner fa-spin"></i>
-                      <span class="composite-url" hidden="hidden">${alignment.composite[m].tabular}</span>
+                      <span class="composite-url" hidden="hidden">${alignment.featureAnalysis[m].tabular}</span>
+                      <span class="composite-xlabel" hidden="hidden">${alignment.featureAnalysis[m].xlabel}</span>
                       <div class="composite-fig" style="width: 512px; height: 300px"></div>
                     </div>
                   </g:if>
@@ -157,9 +166,48 @@
 
                             // Instantiate and draw our chart, passing in some options.
                             var chart = new google.visualization.LineChart(container);
+                            var options = { width: 300, 
+                                           height: 150, 
+                                           legend: { position: 'none'}, 
+                                           vAxis: { gridlines: {count: 3 } },
+                                           hAxis: { gridlines: {count: 3 } },
+                                          };
+                            google.visualization.events.addListener(chart, 'ready', function () {
+                                container.innerHTML = '<img src="' + chart.getImageURI() + '">';
+                            });                 
+                            chart.draw(data, options);   
+                            $(spinner).remove();
+                        }
+                    });
+                });
+            }, t);
+        });   
+        
+        $(".featureAnalysis").each(function(){
+            t += 200;
+            var compositeTd = $(this);
+            var spinner = $(this).find("i");
+            var compositeUrl = $(this).find(".composite-url").text();
+            var xlabel = $(this).find(".composite-xlabel").text();
+            var container = $(this).find(".composite-fig")[0];
+            setTimeout(function(){
+                google.charts.setOnLoadCallback(function(){
+                    $.ajax({
+                        url: "/pegr/report/fetchCompositeDataAjax?url=" + compositeUrl,
+                        dataType: "json"
+                    }).done(function(jsonData){
+                        if (jsonData["error"]) {
+                            $(compositeTd).empty();
+                            $(compositeTd).html(jsonData["error"]);
+                        } else {
+                            // Create our data table out of JSON data loaded from server.
+                            var data = new google.visualization.arrayToDataTable(jsonData);
+
+                            // Instantiate and draw our chart, passing in some options.
+                            var chart = new google.visualization.LineChart(container);
                             var options = { width: 512, 
                                             height: 300, 
-                                            hAxis: { title: 'Distance from MEME motif (bp)', 
+                                            hAxis: { title: xlabel, 
                                                    titleTextStyle: {fontSize:14,italic:false},
                                                    gridlines: { color: '#DDDDDD', count:8 },
                                             },
@@ -177,6 +225,6 @@
                     });
                 });
             }, t);
-        });    
+        });   
     });
 </script>

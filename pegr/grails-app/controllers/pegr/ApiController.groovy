@@ -10,9 +10,11 @@ class ApiException extends RuntimeException {
 }
     
 class ApiController {
+    def antibodyService
     def alignmentStatsService
     def reportService
     def sampleService
+    def cellSourceService
     def utilityService
     def ngsRepoService
     def sequenceRunService
@@ -481,8 +483,70 @@ class ApiController {
             render text: results, contentType: "text/json", status: code
         }
     }
-}
 
+    def updateSampleData(String apiKey) {        
+        def query = request.JSON
+        // get the user
+        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        if (apiUser) {          
+            def messages = []
+            for (def sampleDict in query.sampleList) {
+                try {
+                    // get the sample
+                    def sample = Sample.get(sampleDict.sampleID)
+                
+                    if (!sampleService.editAuth(sample, apiUser)) {
+                        messages.push("Error: sample ${sample.id}. The user is not authorized to edit this sample.")
+                        continue
+                    }
+                    
+                    switch (sampleDict.field) {
+                        // cellsource
+                        case "geneticModification":
+                            def oldStrain = sample.cellSource.strain
+                            sample.cellSource.strain = cellSourceService.getStrain(oldStrain.species, oldStrain.name, oldStrain.parent?.name, oldStrain.genotype, sampleDict.newValue)
+                            sample.cellSource.save()
+                            break
+                        case "antibodyCatalog":
+                            def oldAntibody = sample.antibody
+                            sample.antibody = antibodyService.getAntibody(oldAntibody.company?.name, sampleDict.newValue, oldAntibody.lotNumber, oldAntibody.note, oldAntibody.clonal.toString(), oldAntibody.abHost?.name, oldAntibody.igType?.name, oldAntibody.immunogene, oldAntibody.concentration?.toString())
+                            sample.save()
+                            break
+                        // target
+                        case "target":
+                            def oldTarget = sample.target
+                            sample.target = antibodyService.getTarget(sampleDict.newValue, oldTarget.targetType?.name, oldTarget.nTermTag, oldTarget.cTermTag)
+                            sample.save()
+                            break
+                        // cell source
+                        case "strain":
+                            def oldStrain = sample.cellSource.strain
+                            sample.cellSource.strain = cellSourceService.getStrain(oldStrain.species, sampleDict.newValue, oldStrain.parent?.name, oldStrain.genotype, oldStrain.geneticModification)
+                            sample.cellSource.save()
+                            break
+                        default:
+                            messages.push("Error: Sample ${sample.id}. Field ${sampleDict.field} cannot be edited.")
+                            break
+                    }
+                } catch(Exception e) {
+                    messages.push("Error: sample=${sampleDict.sampleID} and field=${sampleDict.field}. ${e.message}")
+                }
+            }    
+               
+            if (messages.size() > 0) {
+                def results = [message: messages] as JSON
+                render text: results, contentType: "text/json", status: 500
+            } else {
+                def results = [message: "Success!"] as JSON
+                render text: results, contentType: "text/json", status: 200
+            }
+        } else {
+            def code = 401
+            def results = [message: "Not authorized!"] as JSON
+            render text: results, contentType: "text/json", status: code
+        }
+    }
+}
 
 class ResponseMessage {
     String response_code

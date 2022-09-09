@@ -8,7 +8,7 @@
         <h2>PEGR API</h2>
         To use PEGR APIs, you need a registered email and API key at PEGR. Please set up the information in your <g:link controller="user" action="profile">Profile</g:link>.
         <div class="chapter">
-        <h3 id="query">Query Data from PEGR</h3>
+        <h3 id="query">Query Sample Metadata from PEGR</h3>
         <h4 id="query-sample">Query Data by Sample Properties</h4>
         <div>
             <p>If you want to query data by sample properties, e.g. ID, source and source ID, species, strain, antibody, target, format your query in a JSON dictionary as follows
@@ -292,6 +292,75 @@ public class FetchSequenceRunDataFromPegr {
 }
             </pre>
         </div>
+        </div>
+        <div class="chapter">
+          <h3 id="update-sample">Update Sample Metadata in PEGR</h3>
+          <div>
+            <p>PEGR accepts POST request at </p>
+            <pre>
+https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=
+            </pre>
+            <p>The data sent to PEGR should be in the following JSON format:</p>
+            <pre>
+{
+    // required, combined with API key to authenticate user 
+    "userEmail": "xxx@psu.edu", 
+    // a list of samples to update
+    "sampleList":[
+        {
+            "sampleID": long,
+            "field": "string",
+            "oldValue": "string",
+            "newValue": "string",
+            "deleteOldValue": True or False,
+        },
+        ......
+    ]
+}
+            </pre>
+            <p>After a request is posted, PEGR will return the status code and a message as below</p>
+            <pre>
+{
+    // "Success!" or error message
+    "message":"string",
+    
+    // HTTP status code, e.g. 200 for success, 401 not authorized, 500 server side error.
+    "response_code":"200"
+}
+            </pre>
+            <p>The API can be simply called through curl</p>
+            <pre>
+curl  -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxxx@psu.edu", "sampleList":[{"sampleID":31308,"field":"geneticModification","oldValue":"Spt20-D-tag","newValue":"Gcn5-Dtag","deleteOldValue":False},{"sampleID": 31309,"field":"geneticModification","oldValue":"Gcn5-Dtag","newValue":"Spt20-D-tag","deleteOldValue":False}]}' https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=XXXXXX
+            </pre>
+            <p>Here is a Python example</p>
+            <pre>
+import requests
+
+url = "https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=XXXXXX"
+data = {
+            "userEmail": "xxxx@psu.edu", 
+            "sampleList":[
+                {
+                    "sampleID": 31308,
+                    "field": "geneticModification",
+                    "oldValue": "Spt20-D-tag",
+                    "newValue": "Gcn5-Dtag",
+                    "deleteOldValue": False,
+                },{
+                    "sampleID": 31309,
+                    "field": "geneticModification",
+                    "oldValue": "Gcn5-Dtag",
+                    "newValue": "Spt20-D-tag",
+                    "deleteOldValue": False,
+                }
+            ]
+       }
+r = requests.post(url, json=data)
+results = r.json()
+print(r.status_code)
+print(results["message"])
+            </pre>
+          </div>
         </div>
         <div class="chapter">
         <h3 id="accept">Send Analysis Results to PEGR</h3>

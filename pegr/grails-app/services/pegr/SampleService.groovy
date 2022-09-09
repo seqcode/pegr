@@ -381,6 +381,16 @@ class SampleService {
      **/
     def editAuth(Sample sample) {
         def user = springSecurityService.currentUser
+        return editAuth(sample, user)
+    }
+    
+    /**
+     * Authorization to edit the given sample: Admin or
+     * the owner or participant in the project which the sample belongs to
+     * @param sample the given sample
+     * @param user the given user
+     **/
+    def editAuth(Sample sample, User user) {
         if (user.isAdmin()) {
             return true
         } else {

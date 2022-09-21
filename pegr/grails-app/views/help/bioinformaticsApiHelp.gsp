@@ -312,13 +312,12 @@ https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=
             "field": "string",
             "oldValue": "string",
             "newValue": "string",
-            "deleteOldValue": True or False,
         },
         ......
     ]
 }
             </pre>
-            <p>After a request is posted, PEGR will return the status code and a message as below</p>
+            <p>Current accepted fields include "geneticModification", "antibodyCatalog", "target" and "strain". After a request is posted, PEGR will return the status code and a message as below</p>
             <pre>
 {
     // "Success!" or error message
@@ -330,7 +329,7 @@ https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=
             </pre>
             <p>The API can be simply called through curl</p>
             <pre>
-curl  -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxxx@psu.edu", "sampleList":[{"sampleID":31308,"field":"geneticModification","oldValue":"Spt20-D-tag","newValue":"Gcn5-Dtag","deleteOldValue":False},{"sampleID": 31309,"field":"geneticModification","oldValue":"Gcn5-Dtag","newValue":"Spt20-D-tag","deleteOldValue":False}]}' https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=XXXXXX
+curl  -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxxx@psu.edu", "sampleList":[{"sampleID":31308,"field":"geneticModification","oldValue":"Spt20-D-tag","newValue":"Gcn5-Dtag"},{"sampleID": 31309,"field":"geneticModification","oldValue":"Gcn5-Dtag","newValue":"Spt20-D-tag"}]}' https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=XXXXXX
             </pre>
             <p>Here is a Python example</p>
             <pre>
@@ -344,14 +343,12 @@ data = {
                     "sampleID": 31308,
                     "field": "geneticModification",
                     "oldValue": "Spt20-D-tag",
-                    "newValue": "Gcn5-Dtag",
-                    "deleteOldValue": False,
+                    "newValue": "Gcn5-Dtag"
                 },{
                     "sampleID": 31309,
                     "field": "geneticModification",
                     "oldValue": "Gcn5-Dtag",
-                    "newValue": "Spt20-D-tag",
-                    "deleteOldValue": False,
+                    "newValue": "Spt20-D-tag"
                 }
             ]
        }
@@ -359,6 +356,100 @@ r = requests.post(url, json=data)
 results = r.json()
 print(r.status_code)
 print(results["message"])
+            </pre>
+          </div>
+        </div>
+        <div class="chapter">
+          <h3 id="sample-note">Sample's Note</h3>
+          <h4 id="get-sample-note">Retrieve Sample's Note</h4>
+          <div>
+            <p>PEGR accepts GET request at </p>
+            <pre>
+https://thanos.vmhost.psu.edu/pegr/api/getSampleNote?apiKey=
+            </pre>
+            <p>The data sent to PEGR should be in the following JSON format:</p>
+            <pre>
+{
+    // required, combined with API key to authenticate user 
+    "userEmail": "xxx@psu.edu", 
+    // sample ID
+    "sampleID": integer
+}
+            </pre>
+            <p>After a request is posted, PEGR will return the result on success</p>
+            <pre>
+{
+    "id": integer,
+    "note": "string"
+}
+            </pre>
+            <p>It the request failed, PEGR will return the error message</p>
+            <pre>
+{
+    "message": "string"
+}
+            </pre>
+            <p>The API can be simply called through curl</p>
+            <pre>
+curl  -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxxx@psu.edu", "sampleID":321}' https://thanos.vmhost.psu.edu/pegr/api/getSampleNote?apiKey=XXXXXX
+            </pre>
+            <p>Here is a Python example</p>
+            <pre>
+import requests
+
+url = "https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=XXXXXX"
+data = {
+            "userEmail": "xxxx@psu.edu", 
+            "sampleID": 321
+       }
+r = requests.post(url, json=data)
+results = r.json()
+print(r.status_code)
+print(results)
+            </pre>
+          </div>
+          <h4 id="update-sample-note">Update Sample's Note</h4>
+          <div>
+            <p>PEGR accepts POST request at </p>
+            <pre>
+https://thanos.vmhost.psu.edu/pegr/api/updateSampleNote?apiKey=
+            </pre>
+            <p>The data sent to PEGR should be in the following JSON format:</p>
+            <pre>
+{
+    // required, combined with API key to authenticate user 
+    "userEmail": "xxx@psu.edu", 
+    // sample ID
+    "sampleID": integer,
+    // new sample's note
+    "note": "string"
+}
+            </pre>
+            <p>After a request is posted, PEGR will return the status code and a message as below</p>
+            <pre>
+{
+    // "Success!" or error message
+    "message":"string",
+}
+            </pre>
+            <p>The API can be simply called through curl</p>
+            <pre>
+curl  -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxxx@psu.edu", "sampleID": 321, "note: "string"}' https://thanos.vmhost.psu.edu/pegr/api/updateSampleNote?apiKey=XXXXXX
+            </pre>
+            <p>Here is a Python example</p>
+            <pre>
+import requests
+
+url = "https://thanos.vmhost.psu.edu/pegr/api/updateSampleNote?apiKey=XXXXXX"
+data = {
+            "userEmail": "xxxx@psu.edu", 
+            "sampleID": 321
+            "note": "string"
+       }
+r = requests.post(url, json=data)
+results = r.json()
+print(r.status_code)
+print(results)
             </pre>
           </div>
         </div>

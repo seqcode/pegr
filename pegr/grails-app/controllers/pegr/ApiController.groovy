@@ -484,6 +484,79 @@ class ApiController {
         }
     }
 
+    
+    def getSampleNote(String apiKey) {   
+        def sample, result
+        
+        try {
+            def query = request.JSON   
+            
+            // get the user
+            def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+            if (apiUser) {
+                // get the sample
+                sample = Sample.get(query.sampleID)
+                if (sample) {
+                    if (sampleService.editAuth(sample, apiUser)) {
+                        result = [id: sample.id, note: sample.note] as JSON
+                        render text: result, contentType: "text/json", status: 200
+                    }else {
+                        result = [message: "Error: sample ${sample.id}. The user is not authorized to edit this sample."] as JSON
+                        render text: result, contentType: "text/json", status: 401
+                    }
+                } else {
+                    result = [message: "Sample not found!"] as JSON
+                    render text: result, contentType: "text/json", status: 500
+                }
+            } else {
+                result = [message: "Not authorized!"] as JSON
+                render text: result, contentType: "text/json", status: 401
+            }
+        } catch(Exception e) {
+            result = [message: "Error: ${e.message}"] as JSON
+            render text: result, contentType: "text/json", status: 500
+            return
+        }
+    }
+    
+    
+    def updateSampleNote(String apiKey) {   
+        def sample, result
+        
+        try {
+            def query = request.JSON   
+            
+            // get the user
+            def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+            if (apiUser) {
+                // get the sample
+                sample = Sample.get(query.sampleID)
+                if (sample) {
+                    if (sampleService.editAuth(sample, apiUser)) {
+                        sample.note = query.note
+                        sample.save()
+                        result = [message: "Success!"] as JSON
+                        render text: result, contentType: "text/json", status: 200
+                    }else {
+                        result = [message: "Error: sample ${sample.id}. The user is not authorized to edit this sample."] as JSON
+                        render text: result, contentType: "text/json", status: 401
+                    }
+                } else {
+                    result = [message: "Sample not found!"] as JSON
+                    render text: result, contentType: "text/json", status: 500
+                }
+            } else {
+                result = [message: "Not authorized!"] as JSON
+                render text: result, contentType: "text/json", status: 401
+            }
+        } catch(Exception e) {
+            result = [message: "Error: ${e.message}"] as JSON
+            render text: result, contentType: "text/json", status: 500
+            return
+        }
+    }
+
+    
     def updateSampleData(String apiKey) {        
         def query = request.JSON
         // get the user

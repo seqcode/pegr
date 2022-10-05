@@ -112,6 +112,9 @@ class ProjectService {
     }
     
     def sampleEditAuth(Project project) {
+        if (!project) {
+            return true
+        }
         def authorized = false
         def currUser = springSecurityService.currentUser
         if (currUser.isAdmin()) {

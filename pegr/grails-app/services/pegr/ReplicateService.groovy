@@ -9,92 +9,74 @@ class ReplicateService {
     def utilityService
     
     @Transactional
-    def save(String sampleIds, String type, Project project) {
+    def save(String sampleIds, String type) {
         def ids
         try {
             ids = utilityService.parseSetOfNumbers(sampleIds)
         } catch (UtilityException e) {
             throw new ReplicateException(message: e.message)
         }
-        def set = new ReplicateSet(type: type, project: project)
-        set.save(flush: true, failOnError: true)
-        def unknownIds = []
-        ids.each { id ->
-            def sample = Sample.get(id)
-            if (sample && ProjectSamples.findBySampleAndProject(sample, project)) {                
-                new ReplicateSamples(set: set, sample: sample).save()
-            } else {
-                unknownIds << id
-            }
+        
+        def c = ReplicateSamples.createCriteria()
+        def rs = c.list {
+            and {
+                sample {
+                    'in' "id", ids
+                }
+                set {
+                    eq "type", ReplicateType.valueOf(type.toUpperCase())
+                }
+            }                      
+            maxResults(1)
         }
-        return [setId: set.id, unknownIds: unknownIds]
-    }
-    
-    @Transactional
-    def addSamples(Long setId, String sampleIds) {
-        def set = ReplicateSet.get(setId)
-        def unknownIds = []
-        if (!set) {
-            throw new ReplicateException(message: "Replicate set not found!")
-        }
-        if (sampleIds == null || sampleIds == "") {
-            throw new ReplicateException(message: "Empty input!")
-        }
-        def ids
-        try {
-            ids = utilityService.parseSetOfNumbers(sampleIds)
-        } catch (UtilityException e) {
-            throw new ReplicateException(message: e.message)
-        }
-        ids.each { id ->
-            def sample = Sample.get(id)
-            if (sample && ProjectSamples.findBySampleAndProject(sample, set.project)) {
-                new ReplicateSamples(set: set, sample: sample).save()
-            } else {
-                unknownIds << id
-            }
-        }
-        return unknownIds
-    }
-    
-    @Transactional
-    def removeSample(Long setId, Long sampleId) {
-        def repSample = ReplicateSamples.where {set.id == setId && sample.id == sampleId}.find()
-        if (repSample) {
-            repSample.delete()
-            return true
+        
+        def set
+        if (rs.size() > 0) {
+            set = rs.first().set
         } else {
-            return false
+            set = new ReplicateSet(type: ReplicateType.valueOf(type.toUpperCase()))
+            set.save(flush: true, failOnError: true)
         }
-    }
-    
-    @Transactional
-    def delete(Long id) {
-        def set = ReplicateSet.get(id)
-        if (!set) {
-            throw new ReplicateException(message: "Replicate not found!")
-        } else {
-            def projectId = set.project?.id
-            def repSamples = ReplicateSamples.findAllBySet(set)
-            repSamples.each {
+        
+        def old_rs = ReplicateSamples.findAllBySet(set)
+        old_rs.each { 
+            if (!ids.contains(it.sample.id)) {
                 it.delete()
             }
-            set.delete()
-            return projectId
-        }        
+        }
+        
+        ids.each { id ->
+            def sample = Sample.get(id)
+            if (sample) {      
+                if (!ReplicateSamples.findBySetAndSample(set, sample)) {
+                    new ReplicateSamples(set: set, sample: sample).save()
+                }                
+            } else {
+                throw new ReplicateException(message: "Sample ${id} not found!")
+            }
+        }
     }
     
     def getReplicates(Sample sample) {
         def replicateSets = ReplicateSamples.findAllBySample(sample).collect{it.set}
-        def bioReps = replicateSets.findAll {it.type == ReplicateType.BIOLOGICAL}
-        def techReps = replicateSets.findAll {it.type == ReplicateType.TECHNICAL}
-        [Biological: bioReps, Technical: techReps]
+        def result = [:]
+        [ReplicateType.BIOLOGICAL, ReplicateType.TECHNICAL, ReplicateType.SEQUENCING].each { type ->
+            def set = replicateSets.find {it.type == type}
+            result[type] = ReplicateSamples.findAllBySetAndSampleNotEqual(set, sample).collect{it.sample.id}
+        }        
+        return result
     }
     
-    def getReplicates(Project project) {
-        def replicateSets = ReplicateSet.findAllByProject(project)
-        def bioReps = replicateSets.findAll {it.type == ReplicateType.BIOLOGICAL}
-        def techReps = replicateSets.findAll {it.type == ReplicateType.TECHNICAL}
-        [Biological: bioReps, Technical: techReps]
+    def getReplicates(Sample sample, String type) {
+        def replicateSets = ReplicateSamples.findAllBySample(sample).collect{it.set}
+        def set = replicateSets.find {it.type == ReplicateType.valueOf(type.toUpperCase())}
+        
+        def result = []
+        if (set) {
+            result = ReplicateSamples.findAllBySetAndSampleNotEqual(set, sample).collect{it.sample.id}
+        }
+        
+        return result
     }
+    
 }

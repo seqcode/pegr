@@ -27,7 +27,7 @@ class ReplicateInterceptor {
             }
         } else if (actionName in ['addSamples',
                                   'removeSample']) {
-           def replicateId = params.long('setId')
+            def replicateId = params.long('setId')
             def project = ReplicateSet.get(replicateId)?.project
             if (projectService.sampleEditAuth(project)) {
                 return true

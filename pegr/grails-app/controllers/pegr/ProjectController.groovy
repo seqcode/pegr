@@ -5,7 +5,6 @@ class ProjectController {
 	def springSecurityService
     def projectService
     def sampleService
-    def replicateService
 	
     def index(int max, int offset) {
         max = Math.min(max ?:15, 100)
@@ -103,7 +102,6 @@ class ProjectController {
             def projectUsers = ProjectUser.where { project==currentProject}.list()
             def projectEditAuth = projectService.projectEditAuth(currentProject)
             def sampleEditAuth = projectService.sampleEditAuth(currentProject)
-            def replicates = replicateService.getReplicates(currentProject)
             def otherSamples = [] 
             
             def cohortSamples = currentProject.cohorts*.samples.flatten()
@@ -112,9 +110,9 @@ class ProjectController {
                     otherSamples << it
                 }
             }
+            
             [project: currentProject, 
              projectUsers: projectUsers, 
-             replicates: replicates, 
              projectEditAuth: projectEditAuth, 
              sampleEditAuth: sampleEditAuth,
              otherSamples: otherSamples

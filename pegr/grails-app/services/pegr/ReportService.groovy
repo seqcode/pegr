@@ -431,7 +431,7 @@ class ReportService {
           assay: sample.assay?.name,
           experiments: [],
           alignmentCount: 0,
-          note: utilityService.queryJson(sample.note, "note"), 
+          note: sample.note, 
           recommend: sample.recommend,
           histories: []
          )

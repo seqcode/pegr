@@ -2495,4 +2495,5 @@ databaseChangeLog = {
     include file: 'item_active.groovy'
     include file: 'growth_media_species.groovy'
     include file: 'update_item.groovy'
+    include file: 'rm_replicate_project.groovy'
 }

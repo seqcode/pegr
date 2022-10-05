@@ -71,12 +71,7 @@
                 <button data-toggle="modal" data-target="#selectAssay" class="btn btn-info">Create New Samples</button>
                 <g:link action="searchSample" params="[projectId: project?.id]" class="btn btn-info">Add Existing Sample</g:link>
             </div>
-        </g:if>            
-            
-        <h3>Replicates <g:if test="${sampleEditAuth}"><button data-toggle="modal" data-target="#addReplicate" class="edit">Add</button></g:if></h3>
-        <div id="replicates">
-            <g:render template="/replicate/list" model="['replicates':replicates]"></g:render>
-        </div>
+        </g:if>
     </div>
     <br/>         
     
@@ -144,28 +139,6 @@
                             <input onclick="jQuery.ajax({type:'POST',data:jQuery(this).parents('form:first').serialize(), url:'/pegr/project/editUserRoleAjax',success:function(data,textStatus){jQuery('#project-users').html(data);},error:function(XMLHttpRequest,textStatus,errorThrown){},complete:function(XMLHttpRequest,textStatus){closeModal()}});return false" type="button" value="Save" class="btn btn-primary">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                         </form>                    
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div id="addReplicate" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Add Replicate Set</h3>
-                    </div>
-                    <div class="modal-body">
-                        <form role="form" method="post" class="fields">
-                            <div>
-                                <label>Type</label>
-                                <g:select id="replicateType" name="type" from="${pegr.ReplicateType.values()}" keys="${pegr.ReplicateType.values()*.name()}"></g:select>
-                            </div>
-                            <g:render template="/sample/inputSampleIds"></g:render>
-                            <g:hiddenField name="projectId" value="${project.id}"></g:hiddenField>
-                            <input onclick="jQuery.ajax({type:'POST',data:jQuery(this).parents('form:first').serialize(), url:'/pegr/replicate/saveAjax',success:function(data,textStatus){jQuery('#replicates').html(data);},error:function(XMLHttpRequest,textStatus,errorThrown){},complete:function(XMLHttpRequest,textStatus){closeModal()}});return false" type="button" name="save" value="Save" class="btn btn-primary">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        </form>
                     </div>
                 </div>
             </div>

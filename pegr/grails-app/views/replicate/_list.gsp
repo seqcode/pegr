@@ -4,17 +4,15 @@
 <ul>
     <g:each in="${replicates}">
         <li>
-            <h5>${it.key} Replicate Sets</h5>
-            <ul>
-                <g:if test="${it.value.size()}">                
+            <h5>${it.key} Replicates <g:link class="edit" controller="replicate" action="edit" params="[sampleId:sample.id,type:it.key]">Edit</g:link></h5>
+            <p>
+                <g:if test="${it.value.size()}"> 
                     <g:each in="${it.value}">
-                        <li>
-                            <g:link controller="replicate" action="show" id="${it.id}">Set ${it.id}</g:link>
-                        </li>
+                        <g:link controller="sample" action="show" id="${it}">${it} </g:link>
                     </g:each>
                 </g:if>
                 <g:else>None</g:else>
-            </ul>            
+            </p>            
         </li>
     </g:each>
 </ul>

@@ -20,6 +20,7 @@ class QfileService {
     def springSecurityService
     def antibodyService
     def utilityService
+    def replicateService
     final int timeout = 1000 * 60 * 2; 
 	
     def checkFile(String filepath, int startLine, int endLine) {
@@ -237,7 +238,7 @@ class QfileService {
 
         def abNotes = JsonOutput.toJson(abnoteMap)
         
-        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes, assay, growthMedia, data.projectName)
+        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, data.techRepId, data.seqRepId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes, assay, growthMedia, data.projectName)
 
         sampleService.addTreatment(sample, data.perturbation1)
         sampleService.addTreatment(sample, data.perturbation2)
@@ -554,22 +555,13 @@ class QfileService {
 	    return cellSource
 	}
     
-	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, String bioRep1SampleId, String bioRep2SampleId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId, String abNotes, Assay assay, GrowthMedia growthMedia, String projectName) {
-	    def note = [:]
-	    if (sampleNotes) {
-	        note['note'] = sampleNotes
-	    }
-	    if (bioRep1SampleId) {
-	        note['bioRep1'] = bioRep1SampleId
-	    }
-	    if (bioRep2SampleId) {
-	        note['bioRep2'] = bioRep2SampleId
-	    }
+	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, Long bioRep1SampleId, Long bioRep2SampleId, Long techRepId, Long seqRepId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId, String abNotes, Assay assay, GrowthMedia growthMedia, String projectName) {        
         if (projectName) {
-            if (note['note']) {
-                note['note'] += ". " + projectName
+            def note = sampleNotes
+            if (note) {
+                note += ". " + projectName
             } else {
-                note['note'] = projectName
+                note = projectName
             }            
         }
 	    def date = getDate(dateStr)
@@ -588,44 +580,33 @@ class QfileService {
             }
         }
         
-	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: JsonOutput.toJson(note), status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes, assay: assay, growthMedia: growthMedia, naturalId: sampleId).save( failOnError: true)
-	    return sample
-	}
-	
-    def getAllBioReplicate() {		
-        Sample.list().each {
-            getBioReplicate(it)
+	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: note, status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes, assay: assay, growthMedia: growthMedia, naturalId: sampleId).save( failOnError: true)
+        
+        // replicates
+        [
+            [ReplicateType.BIOLOGICAL, bioRep1SampleId],
+            [ReplicateType.BIOLOGICAL, bioRep2SampleId],
+            [ReplicateType.TECHNICAL, techRepId],
+            [ReplicateType.SEQUENCING, seqRepId]
+        ].each{ type, id ->
+            if (id) {
+                def repSample = Sample.get(id)
+                if (!repSample) {
+                    throw new QfileException(message: "Error: Replicate sample ${id} is not found!")
+                }
+                def set = ReplicateSamples.findBySample(repSample)?.set
+                if (set) {
+                    new ReplicateSamples(set: set, sample: sample).save()
+                } else {
+                    set = new ReplicateSet(type: type, project: project)
+                    set.save(flush: true, failOnError: true)
+                    [sample, repSample].each { s ->
+                        new ReplicateSamples(set: set, sample: s).save()  
+                    }
+                }
+            }
         }
-    }
-    
-	def getBioReplicate(Sample sample) {    
-	    if(sample) {
-	        def jsonSlurper = new JsonSlurper()
-			try {
-				def note = jsonSlurper.parseText(sample.note)
-	
-		        def sample2 = getSampleFromSampleId(note.bioRep2)
-		        def sample1 = getSampleFromSampleId(note.bioRep1)
-		        if (sample2 || sample1) {
-		            def sets = ReplicateSamples.findAllBySample(sample)*.set  
-                    def set = sets.find {it.type == ReplicateType.BIOLOGICAL}
-		            if (!set) {
-		                set = new ReplicateSet(type: ReplicateType.BIOLOGICAL).save( failOnError: true)
-		                new ReplicateSamples(set: set, sample: sample).save( failOnError: true)
-		            }
-		            if (set && sample2) {
-		                new ReplicateSamples(set: set, sample: sample2).save()
-		            }
-		            if (set && sample1) {
-		                new ReplicateSamples(set: set, sample: sample1).save()
-		            }
-		        }
-		        sample.note = note.note
-		        sample.save( failOnError: true)
-			}catch(Exception e) {
-				return
-		    }
-	    }
+	    return sample
 	}
 	
 	def getSampleFromSampleId(String sampleId) {
@@ -909,8 +890,6 @@ class QfileService {
             def perturbation1 = perturbations.size() > 0 ? perturbations[0].treatment.name : ""
             def perturbation2 = perturbations.size() > 1 ? perturbations[1].treatment.name : ""
             
-            def note = utilityService.parseJson(sample.note)
-            
             def genomes = sample.requestedGenomes ? sample.requestedGenomes.split(',') : []
             
             def prtclNote = utilityService.parseJson(sample.prtclInstSummary.note)
@@ -920,6 +899,31 @@ class QfileService {
             
             def seqExperiment = SequencingExperiment.findBySampleAndSequenceRun(sample, run)
             def readPositions = utilityService.parseJson(seqExperiment.readPositions)
+            
+            def replicateSets = ReplicateSamples.findAllBySample(sample).collect{it.set}
+            
+            def repIds = [:]
+            
+            replicateSets.each { set ->
+                repIds[it.type] = ReplicateSamples.findAllBySet(set).collect{ it.sample.id }.findAll{ it != sample.id }
+            }
+            
+            def bioRep1SampleId
+            def bioRep2SampleId
+            def techRepId
+            def seqRepId
+            
+            if (repIds.containsKey(ReplicateType.BIOLOGICAL) && repIds[ReplicateType.BIOLOGICAL].size() > 0) {
+                bioRep1SampleId = repIds[ReplicateType.BIOLOGICAL].join(',')
+            }
+            
+            if (repIds.containsKey(ReplicateType.TECHNICAL) && repIds[ReplicateType.TECHNICAL].size() > 0) {
+                techRepId = repIds[ReplicateType.TECHNICAL].join(',')
+            }
+                
+            if (repIds.containsKey(ReplicateType.SEQUENCING) && repIds[ReplicateType.SEQUENCING].size() > 0) {                
+                techRepId = repIds[ReplicateType.SEQUENCING].join(',')
+            }
             
             sampleExports << [
                 laneStr: run.lane,      //A       
@@ -965,9 +969,9 @@ class QfileService {
                 emptyAO: "",            //AO
                 emptyAP: "",           //AP
                 sampleId: sample.naturalId,       //AQ
-                bioRep1SampleId: (note && note.containsKey("bioRep1")) ? note.bioRep1: "",            //AR
-                bioRep2SampleId: (note && note.containsKey("bioRep2")) ? note.bioRep2: "",             //AS
-                sampleNotes:  (note && note.containsKey("note")) ? note.note: "",      //AT
+                bioRep1SampleId: bioRep1SampleId,            //AR
+                bioRep2SampleId: bioRep2SampleId,            //AS
+                sampleNotes: sample.note,      //AT
                 nTag: sample.target?.nTermTag,          //AU    
                 target: sample.target?.name,         //AV
                 cTag: sample.target?.cTermTag,           //AW
@@ -989,7 +993,7 @@ class QfileService {
                 chipDate: sample.prtclInstSummary?.startTime == null ? null : sdf.format(sample.prtclInstSummary?.startTime),               //BM
                 emptyBN: "",
                 protocolVersion: sample.prtclInstSummary?.protocol?.protocolVersion,       //BO
-                emptyBP: "",                 //BP
+                emptyBP: techRepId,                 //BP
                 requestedTagNum: sample.requestedTagNumber,         //BQ
                 emptyBR: "",
                 emptyBS: "",
@@ -1008,7 +1012,7 @@ class QfileService {
                 emptyCF: "",   //CF
                 emptyCG: "",
                 emptyCH: "",      //CH
-                emptyCI: "",       //CI
+                sequencingReplicate: seqRepId,       //CI
                 rd1Start: (readPositions && readPositions.containsKey("rd1")) ? readPositions.rd1[0] : "",       //CJ
                 rd1End: (readPositions && readPositions.containsKey("rd1")) ? readPositions.rd1[1] : "",         //CK
                 indexStart: (readPositions && readPositions.containsKey("index1")) ? readPositions.index1.join(",") : "",     //CL
@@ -1088,8 +1092,8 @@ class QfileService {
 	     // data[40],              //AO
 	     //bioRep: data[41],       //AP
 	     sampleId: data[42],       //AQ
-	     bioRep1SampleId: data[43],//AR
-	     bioRep2SampleId: data[44],//AS
+	     bioRep1SampleId: getInteger(data[43]),//AR
+	     bioRep2SampleId: getInteger(data[44]),//AS
 	     sampleNotes: data[45],    //AT
 	     nTag: data[46],           //AU    
 	     target: data[47],         //AV
@@ -1112,7 +1116,7 @@ class QfileService {
 	     chipDate: data[64],       //BM
 	     // data[65],              //BN
 	     protocolVersion: data[66],//BO
-	     techRep: data[67],        //BP
+	     techRepId: getInteger(data[67]),        //BP
 	     requestedTagNum: data[68],//BQ
 	     // cellNum: data[69],     //BR
 	     // data[70],              //BS
@@ -1131,7 +1135,7 @@ class QfileService {
 	     poolDilution: data[83],   //CF
 	     // data[84],              //CG
 	     seqRepNum: data[85],      //CH
-	     seqRepId: data[86],       //CI
+	     seqRepId: getInteger(data[86]),       //CI
 	     rd1Start: data[87],       //CJ
 	     rd1End: data[88],         //CK
 	     indexStart: data[89],     //CL

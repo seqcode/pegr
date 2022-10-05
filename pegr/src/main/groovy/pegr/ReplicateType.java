@@ -2,7 +2,8 @@ package pegr;
 
 public enum ReplicateType {
     BIOLOGICAL("Biological"), 
-    TECHNICAL("Technical")
+    TECHNICAL("Technical"),
+    SEQUENCING("Sequencing")
 	;
     
     private final String value;

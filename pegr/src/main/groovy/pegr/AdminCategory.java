@@ -3,6 +3,7 @@ package pegr;
 public enum AdminCategory {
 	BIO_SPECIFICATIONS("Biological Specifications"),
 	PROTOCOLS("Protocol"),
+    REPLICATES("Replicates"),
 	ALIGNMENT_ANALYSIS("Alignment and Analysis"),
 	OTHER("Other")
 	;

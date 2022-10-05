@@ -55,7 +55,7 @@
         </div>
       </div>
     </div>
-
+    
     <script>
         $(function(){
             $("#nav-metadata").addClass("active");

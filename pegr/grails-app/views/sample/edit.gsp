@@ -40,7 +40,6 @@
             </ol>
         </div>
     </div>
-    
     <script>
         $("#nav-metadata").addClass("active");     
     </script>

@@ -238,7 +238,7 @@ class QfileService {
 
         def abNotes = JsonOutput.toJson(abnoteMap)
         
-        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRep1SampleId, data.bioRep2SampleId, data.techRepId, data.seqRepId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes, assay, growthMedia, data.projectName)
+        def sample = getSample(cellSource, antibody, target, data.cellNum, data.chromAmount, data.volume, data.requestedTagNum, data.sampleNotes, data.sampleId, data.bioRepId, data.techRepId, data.seqRepId, invoice, dataTo, data.dateStr, prtcl, results.seqId, abNotes, assay, growthMedia)
 
         sampleService.addTreatment(sample, data.perturbation1)
         sampleService.addTreatment(sample, data.perturbation2)
@@ -555,15 +555,7 @@ class QfileService {
 	    return cellSource
 	}
     
-	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, Long bioRep1SampleId, Long bioRep2SampleId, Long techRepId, Long seqRepId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId, String abNotes, Assay assay, GrowthMedia growthMedia, String projectName) {        
-        if (projectName) {
-            def note = sampleNotes
-            if (note) {
-                note += ". " + projectName
-            } else {
-                note = projectName
-            }            
-        }
+	def getSample(CellSource cellSource, Antibody antibody, Target target, String cellNum, String chromAmount, String volume, String requestedTagNum, String sampleNotes, String sampleId, Long bioRepId, Long techRepId, Long seqRepId, Invoice invoice, User dataTo, String dateStr, ProtocolInstanceSummary prtcl, String seqId, String abNotes, Assay assay, GrowthMedia growthMedia) {        
 	    def date = getDate(dateStr)
         def source = "PughLab"
         if (invoice?.invoiceNum && invoice.invoiceNum.size() >= 4 && invoice.invoiceNum[1..3] ==~ /\d+/ ) {
@@ -580,33 +572,48 @@ class QfileService {
             }
         }
         
-	    def sample = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: note, status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes, assay: assay, growthMedia: growthMedia, naturalId: sampleId).save( failOnError: true)
+	    def s = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: sampleNotes, status: SampleStatus.COMPLETED, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes, assay: assay, growthMedia: growthMedia, naturalId: sampleId)
+        
+        s.save(flush: true, failOnError: true)
         
         // replicates
         [
-            [ReplicateType.BIOLOGICAL, bioRep1SampleId],
-            [ReplicateType.BIOLOGICAL, bioRep2SampleId],
+            [ReplicateType.BIOLOGICAL, bioRepId],
             [ReplicateType.TECHNICAL, techRepId],
             [ReplicateType.SEQUENCING, seqRepId]
         ].each{ type, id ->
-            if (id) {
+            if (id) {                 
                 def repSample = Sample.get(id)
                 if (!repSample) {
                     throw new QfileException(message: "Error: Replicate sample ${id} is not found!")
                 }
-                def set = ReplicateSamples.findBySample(repSample)?.set
-                if (set) {
-                    new ReplicateSamples(set: set, sample: sample).save()
-                } else {
-                    set = new ReplicateSet(type: type, project: project)
-                    set.save(flush: true, failOnError: true)
-                    [sample, repSample].each { s ->
-                        new ReplicateSamples(set: set, sample: s).save()  
-                    }
+                
+                def c = ReplicateSamples.createCriteria()
+                def rs = c.list {
+                    and {
+                        sample {
+                            eq "id", id
+                        }
+                        set {
+                            eq "type", type
+                        }
+                    }                      
+                    maxResults(1)
                 }
+                
+                def set
+                if (rs.size() > 0) {
+                    set = rs.first().set
+                } else {
+                    set = new ReplicateSet(type: type)
+                    set.save(flush: true, failOnError: true)
+                    new ReplicateSamples(set: set, sample: repSample).save()  
+                }
+                
+                new ReplicateSamples(set: set, sample: s).save()
             }
         }
-	    return sample
+	    return s
 	}
 	
 	def getSampleFromSampleId(String sampleId) {
@@ -732,14 +739,14 @@ class QfileService {
 	}
 	
 
-    
     def getInteger(String s) {
-        def i = 0
-        try {
-            i = s.toInteger()
-        }catch(Exception e) {
-            
-        }
+        def i = Math.round(getFloat(s))
+        return i
+    }
+    
+    
+    def getLong(String s) {
+        def i = Math.round(getFloat(s))
         return i
     }
 	
@@ -905,16 +912,15 @@ class QfileService {
             def repIds = [:]
             
             replicateSets.each { set ->
-                repIds[it.type] = ReplicateSamples.findAllBySet(set).collect{ it.sample.id }.findAll{ it != sample.id }
+                repIds[set.type] = ReplicateSamples.findAllBySet(set).collect{ it.sample.id }.findAll{ it != sample.id }
             }
             
-            def bioRep1SampleId
-            def bioRep2SampleId
+            def bioRepId
             def techRepId
             def seqRepId
             
             if (repIds.containsKey(ReplicateType.BIOLOGICAL) && repIds[ReplicateType.BIOLOGICAL].size() > 0) {
-                bioRep1SampleId = repIds[ReplicateType.BIOLOGICAL].join(',')
+                bioRepId = repIds[ReplicateType.BIOLOGICAL].join(',')
             }
             
             if (repIds.containsKey(ReplicateType.TECHNICAL) && repIds[ReplicateType.TECHNICAL].size() > 0) {
@@ -922,7 +928,7 @@ class QfileService {
             }
                 
             if (repIds.containsKey(ReplicateType.SEQUENCING) && repIds[ReplicateType.SEQUENCING].size() > 0) {                
-                techRepId = repIds[ReplicateType.SEQUENCING].join(',')
+                seqRepId = repIds[ReplicateType.SEQUENCING].join(',')
             }
             
             sampleExports << [
@@ -969,8 +975,8 @@ class QfileService {
                 emptyAO: "",            //AO
                 emptyAP: "",           //AP
                 sampleId: sample.naturalId,       //AQ
-                bioRep1SampleId: bioRep1SampleId,            //AR
-                bioRep2SampleId: bioRep2SampleId,            //AS
+                bioRepId: bioRepId,            //AR
+                emptyAs: "",            //AS
                 sampleNotes: sample.note,      //AT
                 nTag: sample.target?.nTermTag,          //AU    
                 target: sample.target?.name,         //AV
@@ -1090,10 +1096,10 @@ class QfileService {
 	     perturbation2: data[38],  //AM
 	     targetType: data[39], // changed  //AN
 	     // data[40],              //AO
-	     //bioRep: data[41],       //AP
+	     // data[41],              //AP
 	     sampleId: data[42],       //AQ
-	     bioRep1SampleId: getInteger(data[43]),//AR
-	     bioRep2SampleId: getInteger(data[44]),//AS
+	     bioRepId: getLong(data[43]),       //AR
+	     //bioRep2SampleId: data[44],//AS
 	     sampleNotes: data[45],    //AT
 	     nTag: data[46],           //AU    
 	     target: data[47],         //AV
@@ -1116,7 +1122,7 @@ class QfileService {
 	     chipDate: data[64],       //BM
 	     // data[65],              //BN
 	     protocolVersion: data[66],//BO
-	     techRepId: getInteger(data[67]),        //BP
+	     techRepId: getLong(data[67]),      //BP
 	     requestedTagNum: data[68],//BQ
 	     // cellNum: data[69],     //BR
 	     // data[70],              //BS
@@ -1135,7 +1141,7 @@ class QfileService {
 	     poolDilution: data[83],   //CF
 	     // data[84],              //CG
 	     seqRepNum: data[85],      //CH
-	     seqRepId: getInteger(data[86]),       //CI
+	     seqRepId: getLong(data[86]),       //CI
 	     rd1Start: data[87],       //CJ
 	     rd1End: data[88],         //CK
 	     indexStart: data[89],     //CL

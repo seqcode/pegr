@@ -16,7 +16,7 @@ class ReplicateController {
             log.error e.toString()
             flash.message = "Error saving the replicate samples!"
         }        
-        redirect(action: "edit", params: [sampleId: sampleId, type: type])
+        redirect(controller: "sample", action: "edit", params: [sampleId: sampleId])
     }
     
     def edit(String type, Long sampleId) {

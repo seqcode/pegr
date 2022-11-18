@@ -26,14 +26,6 @@
     <main class="container">
     <h2>${report.name}</h2>
     <section>
-        <h4>List of Samples</h4>
-        <ol>
-            <g:each in="${sampleDTOs}" var="sample">
-                <li>${sample.natural_id}</li>
-            </g:each>
-        </ol>
-    </section>
-    <section>
         <h4>Images</h4>
         <table class="table table-bordered" id="project-table">
             <thead>
@@ -67,120 +59,116 @@
         </table>
     </section>
     <section>
-        <h4>Mapping Statistics</h4>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Target</th>
-                        <th>Antibody</th>
-                        <th>Celltype</th>
-                        <th>Mutation</th>
-                        <th>Assay</th>
-                        <th>Genome</th>
-                        <th class="text-right">Index count</th>
-                        <th class="text-right">Uniquely mapped tags</th>
-                        <th class="text-right">Uniquely mapped percentage</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <g:each in="${sampleList}" var="sample" status="n">
-                        <tr>
-                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.id}</td>
-                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.target}</td>
-                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.antibody}</td>
-                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.strain}</td>
-                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.geneticModification}</td>
-                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.assay}</td>
-                            <g:each in="${sample.experiments}" var="experiment" status="nExp">
-                                <g:if test="${nExp>0}"><tr></g:if>  
-                                <g:each in="${experiment.alignments}" var="alignment" status="nAli">
-                                    <g:if test="${nAli>0}"><tr></g:if>
-                                    <td>${alignment.genome}</td>
-                                    <td class="text-right"><g:formatNumber number="${experiment.totalReads}" format="###,###,###" /></td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.uniquelyMappedReads}" format="###,###,###" /></td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.uniquelyMappedPct}" format="#0.0%" /></td>
-                                    </tr>
-                                </g:each>
-                            </g:each>
-                    </g:each>              
-                </tbody>
-              </table>
+        <h4>Samples</h4>
+        <p>The number of samples: ${sampleList.size()}</p>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Sample ID</th>
+                    <th>Target</th>
+                    <th>Antibody</th>
+                    <th>Celltype/Strain</th>
+                    <th>Mutation</th>
+                    <th>Growth Media</th>
+                    <th>Treatments</th>
+                    <th>Assay</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody>
+                <g:each in="${sampleList}" var="sample" status="n">
+                <tr>
+                    <td>${sample.id}</td>
+                    <td>${sample.target}</td>
+                    <td>${sample.antibody}</td>
+                    <td>${sample.strain}</td>
+                    <td>${sample.geneticModification}</td>
+                    <td>${sample.growthMedia}</td>
+                    <td>${sample.treatments}</td>
+                    <td>${sample.assay}</td>
+                    <td>${sample.note}</td>
+                </tr>
+                </g:each>
+            </tbody>
+        </table>
     </section>
     <section>
-        <h4>Peak and Peak-pair Statistics</h4>
-            <table class="table table-bordered">
-                <thead>
+        <h4>Mapping Statistics</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Sequence Run</th>
+                    <th>Genome</th>
+                    <th class="text-right">Read Count</th>
+                    <th class="text-right">Uniquely Mapped Count</th>
+                    <th class="text-right">% Uniquely Mapped Count</th>
+                    <th class="text-right">Deduplicated Count</th>
+                    <th class="text-right">% Deduplicated Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                <g:each in="${sampleList}" var="sample" status="n">
                     <tr>
-                        <th>ID</th>
-                        <th class="text-right">Peaks</th>
-                        <th class="text-right">Singletons</th>
-                        <th class="text-right">Peak-pairs (noS)</th>
-                        <th class="text-right">Genome coverage (Tag)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <g:each in="${sampleList}" var="sample" status="n">
-                        <tr>
-                            <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.id}</td>
-                            <g:each in="${sample.experiments}" var="experiment" status="nExp">
-                                <g:if test="${nExp>0}"><tr></g:if>
-                                <g:each in="${experiment.alignments}" var="alignment" status="nAli">
-                                    <g:if test="${nAli>0}"><tr></g:if>
-                                    <td class="text-right"><g:formatNumber number="${alignment.peaks}" format="###,###,###" /></td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.singletons}" format="###,###,###" /></td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.peakPairs}" format="###,###,###" /></td>
-                                    <td class="text-right"><g:formatNumber number="${alignment.genomeCoverage}" format="#0.00%" /></td>
-                                    </tr>
-                                </g:each>
+                        <td rowspan="${Math.max(1, sample.alignmentCount)}">${sample.id}</td>
+                        <g:each in="${sample.experiments}" var="experiment" status="nExp">
+                            <g:if test="${nExp>0}"><tr></g:if>  
+                            <g:each in="${experiment.alignments}" var="alignment" status="nAli">
+                                <g:if test="${nAli>0}"><tr></g:if>
+                                <td>${experiment?.runId} (Run Name ${experiment?.runName})</td>
+                                <td>${alignment.genome}</td>
+                                <td class="text-right"><g:formatNumber number="${experiment.totalReads}" format="###,###,###" /></td>
+                                <td class="text-right"><g:formatNumber number="${alignment.uniquelyMappedReads}" format="###,###,###" /></td>
+                                <td class="text-right"><g:formatNumber number="${alignment.uniquelyMappedPct}" format="#0.0%" /></td>
+                                <td class="text-right"><g:formatNumber number="${alignment.dedupUniquelyMappedReads}" format="###,###,###" /></td>
+                                <td class="text-right"><g:formatNumber number="${alignment.deduplicatedPct}" format="#0.0%" /></td>
+                                </tr>
                             </g:each>
-                    </g:each>      
-                </tbody>
-              </table>
+                        </g:each>
+                </g:each>              
+            </tbody>
+        </table>
     </section>
     <section>
         <h4>MEME Motifs</h4>
         <ul>
-            <g:each in="${sampleList}" var="sample" status="n">
-                <li>
-                    <h4>${sample.id} ${sample.naturalId}</h4>
-                    <g:each in="${sample.experiments}" var="experiment">
-                        <g:each in="${experiment.alignments}" var="alignment">
-                            <table class="table table-bordered meme-table" data-meme-url="${alignment.memeFile}">
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </g:each>
-                    </g:each>
-                </li>
-            </g:each>
-        </ul>
-    </section>
-    <section>
-        <h4>Tag PileUp</h4>
-        <ul>
             <g:each in="${sampleList}" var="sample">
-                <li>
-                    <h4>${sample.id} ${sample.naturalId}</h4>
-                    <g:each in="${sample.experiments}" var="experiment">
-                        <g:each in="${experiment.alignments}" var="alignment">
-                            <div class="row">
-                            <g:each in="${alignment.composite}" var="url" status="n">
-                                <span>
-                                    <h5>MOTIF ${n+1}</h5>
-                                    <span class="composite-fig" data-composite-url="${url}"></span>
-                                </span>                                
-                            </g:each>  
-                            </div>
-                        </g:each>
+            <li>
+                <h4>${sample.id} ${sample.naturalId}</h4>
+                <g:each in="${sample.experiments}" var="experiment">
+                <g:each in="${experiment.alignments}" var="alignment">
+                <table class="table table-bordered meme-table" data-meme-url="${alignment.memeFile}">
+                    <tbody>
+                    <g:if test="${alignment.motifCount}">
+                    <g:each in="${(0..<alignment.motifCount)}" var="n">
+                        <tr>
+                            <td style='min-width:6em;line-height:1em' class="meme-id" style="width:20px"></td>
+                            <td class="meme-fig" style="width:350px"><i class="fa fa-spinner fa-spin"></i></td>
+                            <td class="composite" style="width:320px">
+                              <g:if test="${alignment.composite[n]}">
+                                <span class="composite-fig" data-composite-url="${alignment.composite[n]}"><i class="fa fa-spinner fa-spin"></i></span>
+                              </g:if>
+                            </td>
+                        </tr>
                     </g:each>
-                </li>
+                    </g:if>
+                    </tbody>
+                </table>
+                </g:each>
+                </g:each>
+            </li>
             </g:each>
         </ul>
     </section>
 </main>
 <script>
     $(function() {
+        // plot composites
+        google.charts.load('current', {'packages':['corechart']});
+        
+        // time delayed to draw composite figs
+        var t = 0;
+        
         // plot meme
         $(".meme-table").each(function(){
             var memeTable = $(this);
@@ -188,23 +176,27 @@
             $.ajax({ 
                 url: "/pegr/report/fetchMemeDataAjax?url=" + memeUrl,
                 success: 
-                    function(result) {
-                        $.each(result, function(index, value){
-                            //make_motif(memeFig, result[index]);
-                            memeTable.append("<tr><td style='min-width:6em;line-height:1em'><p>MOTIF " + result[index].id + "</p><p>E-value: " + result[index].evalue + "</p><p>Sites: " + result[index].nsites + "</p><p>Width: " + result[index].len + "</p></td><td class='meme-fig1'></td><td class='meme-fig2'></td></tr>");
-                            var plus = memeTable.find(".meme-fig1");
-                            var minus = memeTable.find(".meme-fig2");
-                            const memeDrawer = new MemeDrawer();
-                            memeDrawer.make_motif_static(plus, minus, result[index]);
+                    function(result) {                        
+                        memeTable.find(".meme-id").each(function(index, memeId) {
+                            if (index < result.length) {
+                                $(memeId).html("<p>MOTIF " + result[index].id + "</p><p>E-value: " + result[index].evalue + "</p><p>Sites: " + result[index].nsites + "</p><p>Width: " + result[index].len + "</p>");
+                            }
+                        });
+                        memeTable.find(".meme-fig").each(function(index, memeFig){
+                            $(memeFig).find("i").remove();
+                            if (index < result.length) {
+                                const memeDrawer = new MemeDrawer();
+                                memeDrawer.make_motif(memeFig, result[index]);
+                            } else {
+                                $(memeFig).html("No MEME data found!");
+                            }  
                         });
                     },
             });  
         });
         
-        // plot composites
-        google.charts.load('current', {'packages':['corechart']});
-        var t = 0;
         $(".composite-fig").each(function(){
+            t += 10;
             var container = $(this);
             var compositeUrl = $(this).attr("data-composite-url");
             setTimeout(function(){
@@ -239,6 +231,7 @@
                                 container.innerHTML = '<img src="' + chart.getImageURI() + '">';
                             });
                             chart.draw(data, options);
+                            $(this).find("i").remove();
                         }
                     });
                 });

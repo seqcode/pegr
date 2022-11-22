@@ -115,7 +115,7 @@
                             <g:if test="${nExp>0}"><tr></g:if>  
                             <g:each in="${experiment.alignments}" var="alignment" status="nAli">
                                 <g:if test="${nAli>0}"><tr></g:if>
-                                <td>${experiment?.runId} (Run Name ${experiment?.runName})</td>
+                                <td>${experiment?.runId}</td>
                                 <td>${alignment.genome}</td>
                                 <td class="text-right"><g:formatNumber number="${experiment.totalReads}" format="###,###,###" /></td>
                                 <td class="text-right"><g:formatNumber number="${alignment.uniquelyMappedReads}" format="###,###,###" /></td>

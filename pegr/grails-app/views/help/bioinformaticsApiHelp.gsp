@@ -292,6 +292,101 @@ public class FetchSequenceRunDataFromPegr {
 }
             </pre>
         </div>
+            
+        <h4 id="query-project">Query Data by Project</h4>
+        <div>
+            <p>You can also query data from PEGR by the project ID. The request JSON should be in the following format</p>
+            <pre>
+{
+    // required, combined with API key to authenticate user.
+    "userEmail": "string", 
+    
+    // optional, default is false
+    "preferredOnly": "true/false", 
+    
+    // required
+    "projectId": long
+}
+            </pre>
+            <p>PEGR will return the results in the same format as above.</p>
+            <p>The API can be simply called through curl</p>
+            <pre>
+curl  -X POST -H "Content-Type: application/json" -d '{"projectId": 215, "userEmail": "xxxx@psu.edu"}' https://thanos.vmhost.psu.edu/pegr/api/fetchProjectData?apiKey=XXXXXXX -o output
+            </pre>
+            <p>The following is an example in Python.</p>
+            <pre>
+import requests
+url = "https://thanos.vmhost.psu.edu/pegr/api/fetchProjectData?apiKey=XXXXXXX"
+query = {"userEmail": "xxxxx@psu.edu", "projectId": 212, "preferredOnly": "true"}
+r = requests.post(url, json=query)
+results = r.json()
+            </pre>
+            <p>And here is a Java example</p>
+            <pre>
+package apacheHppt;
+
+import java.io.StringReader;
+
+import javax.json.*;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+
+public class FetchProjectDataFromPegr {
+	public static void main(String[] args) throws Exception {
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        try {
+            // create a http post request
+            HttpPost httpPost = new HttpPost("https://thanos.vmhost.psu.edu/pegr/api/fetchProjectData?apiKey=XXXXXXX");
+                        
+            // construct the data in JSON format 
+            JsonObject object = Json.createObjectBuilder()
+                    .add("userEmail", "xxxx@psu.edu")
+                    .add("projectId", 212)
+                    .build();
+
+            System.out.println(object.toString());
+            StringEntity params = new StringEntity(object.toString(),"UTF-8");
+
+            // specify json type in header
+            httpPost.addHeader("content-type", "application/json");
+
+            // add data to http post request
+            httpPost.setEntity(params);
+
+            // send the http post request
+            CloseableHttpResponse response = httpclient.execute(httpPost);
+
+            try {
+            	// consume the results
+                System.out.println(response.getStatusLine());
+                
+                HttpEntity entity = response.getEntity();
+                String content = EntityUtils.toString(entity);
+                
+                // parse json
+                JsonReader reader = Json.createReader(new StringReader(content));
+                JsonObject returnObject = reader.readObject();
+                 
+                System.out.println("message: " + returnObject.getString("message"));
+                System.out.println("data: " + returnObject.getJsonArray("data"));
+                reader.close();
+            } finally {
+                response.close();
+            }
+        } finally {
+            httpclient.close();
+        }
+    }
+}
+            </pre>
+        </div>
         </div>
         <div class="chapter">
           <h3 id="update-sample">Update Sample Metadata in PEGR</h3>

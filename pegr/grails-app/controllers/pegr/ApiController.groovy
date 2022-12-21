@@ -28,7 +28,8 @@ class ApiController {
                             getSequenceRunStatus: 'POST',
                             setSequenceRunStatus: 'POST',
                             fetchSequenceRunSummary: 'POST',
-                            updateSequenceRunSummary: 'POST'
+                            updateSequenceRunSummary: 'POST',
+                            fetchProjectData: 'POST',
                             ]
     
     /**
@@ -128,6 +129,46 @@ class ApiController {
             } else {
                 code = 404
                 message = "Sequence Run ID is missing!"
+            }
+        } else {
+            code = 401
+            message = "Not authorized!" 
+        }   
+        def results = [data: data, message: message] as JSON
+        render text: results, contentType: "text/json", status: code
+    }
+    
+    /*
+     * Accept post request, authenticate by the API Key, to query sample
+     * data in a project.
+     * @param query in the format of JSON dictionary
+     * @param apiKey API Key used to authenticate the user
+     * @return response in the format of JSON dictionary, including a response_code and a message. 
+     * @return status code
+     */
+    def fetchProjectData(QueryProjectRegistrationCommand query, String apiKey) {
+        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        def message, data, code
+        if (apiUser) {
+            if (query.projectId) {
+                try {   
+                    def auth = apiUser.isAdmin() || apiUser.isMember() || (ProjectUser.where {project.id == projectId && user == apiUser}.get(max: 1))
+                    if (auth) {
+                        def preferredOnly = query.preferredOnly
+                        data = reportService.fetchDataForProject(query.projectId, preferredOnly)       
+                        code = 200
+                        message = "Success fetching data from Project ${query.projectId}!"
+                    } else {
+                        code = 401
+                        message = "Not authorized!"
+                    }
+                } catch (ReportException e) {
+                    code = 500
+                    message = e.message
+                }
+            } else {
+                code = 404
+                message = "Project ID is missing!"
             }
         } else {
             code = 401
@@ -702,4 +743,10 @@ class SetSequenceRunStatusCmd implements grails.validation.Validateable {
     Long runId // either runId or directory needs to be provided
     String directory 
     String status // required
+}
+
+class QueryProjectRegistrationCommand implements grails.validation.Validateable {
+    String userEmail // required
+    Boolean preferredOnly
+    Long projectId // required
 }

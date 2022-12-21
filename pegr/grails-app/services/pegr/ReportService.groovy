@@ -365,6 +365,46 @@ class ReportService {
         return sampleDTOs
     }
     
+    
+    /**
+    * Fetch data for a project
+    * @param projectId project ID
+    * @param preferredOnly whether to report preferred alignments only or report all alignments.
+    * Default to be false.
+    * @return a list sampleDTOs
+    */
+    def fetchDataForProject(Long projectId, Boolean preferredOnly=false) {
+        if (!projectId) {
+            throw new ReportException(message: "Project ID is missing!")
+        }
+        def project = Project.get(projectId)
+        if (!project) {
+            throw new ReportException(message: "Project not found!")
+        }
+        def sampleDTOs = []
+        project.samples.each { sample ->
+            def sampleDTO = getSampleDTO(sample)
+            sample.sequencingExperiments.each { experiment ->
+                def expDTO = getExperimentDTO(experiment)
+                experiment.alignments.each { alignment ->
+                    if (!preferredOnly || alignment.isPreferred) {
+                        def alignmentDTO = getAlignmentDTO(alignment)
+                        updateAlignmentPct(alignmentDTO, expDTO)
+                        expDTO.alignments << alignmentDTO
+                        def analysis = Analysis.findAllByAlignment(alignment)
+                        def alignmentStatusDTO = getAlignmentStatusDTO(alignment, experiment, analysis)
+                        sampleDTO.histories << alignmentStatusDTO.historyId 
+                        sampleDTO.alignmentCount++
+                    }
+                }
+                sampleDTO.experiments << expDTO  
+            }
+            sampleDTOs << sampleDTO        
+        }
+        return sampleDTOs
+    }
+    
+    
    /**
     * Fetch data for a report.
     * @param reportId report's ID

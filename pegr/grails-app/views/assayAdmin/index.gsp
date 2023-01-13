@@ -39,7 +39,7 @@
                             <p>Notes:</p>
                             <ol>
                                 <li>The first row lists the headers.</li>
-                                <li>The sequence of the columns should be exactly the same as follows. </li>
+                                <li>The sequence of the columns should be exactly the same as above. </li>
                             </ol>
                         </div>
                     </div>

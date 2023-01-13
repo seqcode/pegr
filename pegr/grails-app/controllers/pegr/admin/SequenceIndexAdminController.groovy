@@ -4,10 +4,13 @@ import grails.validation.ValidationException
 import static org.springframework.http.HttpStatus.*
 import pegr.SequenceIndex
 import pegr.AdminCategory
+import com.opencsv.CSVParser
+import com.opencsv.CSVReader
 
 class SequenceIndexAdminController {
 
     SequenceIndexService sequenceIndexService
+    UtilityService utilityService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -106,6 +109,79 @@ class SequenceIndexAdminController {
         }
     }
 
+    
+    def getNamedData(String[] rawdata) {
+        rawdata.eachWithIndex{ d, idx -> 
+            def td = d.trim()
+            if(td == "") {
+                rawdata[idx] = null
+            }else {
+                rawdata[idx] = td
+            }
+        }
+        [indexId: rawdata[0],
+         indexVersion: rawdata[1],
+         sequence: rawdata[2],
+         oligo: rawdata[3],
+        ]
+    }
+    
+    
+    def importCSV() {
+        def filesroot = utilityService.getFilesRoot()
+        try {
+            def mpf = request.getFile( "file" )
+            String filename = mpf.getOriginalFilename();
+            if(!mpf?.empty && filename[-4..-1] == ".csv") {
+                File fileDest = new File(filesroot, filename)
+                mpf.transferTo(fileDest)
+                
+                def file = new FileReader(fileDest)
+                CSVReader reader = new CSVReader(file)
+                String [] rawdata
+                def lineNo = 0
+                def messages = []
+                while ((rawdata = reader.readNext()) != null) {
+                    ++lineNo
+                    if (lineNo == 1) {
+                        continue
+                    }
+                    
+                    def data = getNamedData(rawdata)
+                    
+                    if (data.indexId == null) {
+                        messages.push("Line ${lineNo} is skipped: no index ID!")
+                    } else if (data.indexVersion == null) {
+                        messages.push("Line ${lineNo} is skipped: no index version!")
+                    } else if (data.sequence == null) {
+                        messages.push("Line ${lineNo} is skipped: no sequence!")
+                    } else {
+                        try {
+                            new SequenceIndex(indexVersion: data.indexVersion, 
+                                              indexId: data.indexId, 
+                                              sequence: data.sequence,
+                                              oligo: data.oligo,
+                                              status: DictionaryStatus.Y
+                                             ).save(failOnError: true)
+                        } catch(Exception e) {
+                            log.error "Error: line ${lineNo}. " + e
+                            messages.push("Line ${lineNo} is not imported: an error occurred!")
+                        }
+                    }
+                }
+                flash.messageList = messages
+                fileDest.delete()
+            } else {
+                flash.messageList = ["Only CSV files are accepted!"]
+            }
+        } catch(Exception e) {
+            log.error "Error: ${e.message}", e
+            flash.messageList = ["Error uploading the file! Please make sure the CSV file follows the template!"]
+        }
+        redirect(action: "index")
+    }
+    
+    
     protected void notFound() {
         request.withFormat {
             form multipartForm {

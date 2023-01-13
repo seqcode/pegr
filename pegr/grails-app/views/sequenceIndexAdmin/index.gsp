@@ -57,11 +57,11 @@
             </g:if>
             <table class="table-bordered">
                 <thead>
-                    <th>Index ID</th>
-                    <th>Index Version</th>
+                    <g:sortableColumn property="indexId" title="Index ID"></g:sortableColumn>
+                    <g:sortableColumn property="indexVersion" title="Index Version"></g:sortableColumn>
                     <th>Sequence</th>
                     <th>Oligo</th>
-                    <th>Status</th>
+                    <g:sortableColumn property="status" title="Status"></g:sortableColumn>
                 </thead>
                 <tbody>                        
                     <g:each in="${sequenceIndexInstanceList}">

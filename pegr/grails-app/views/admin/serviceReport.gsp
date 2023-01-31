@@ -15,25 +15,29 @@
         <input type="submit" name="submit" value="Query" class="btn btn-primary">
     </g:form>
 	<div>
-        <g:if test="${samples_per_run && samples_per_run.size()}">
+        <g:if test="${cohort_count && cohort_count.size()}">
         <h4>Total samples: ${sample_count[0].total_sample_count}</h4>	
             
-        <h4>Average samples per sequence run: <g:formatNumber number="${avg_samples_per_run[0].average_sample_per_run}" type="number" maxFractionDigits="1" /></h4>
+        <h4>Average samples per sequence run and project: <g:formatNumber number="${avg_samples_per_run[0].average_sample_per_run}" type="number" maxFractionDigits="1" /></h4>
         <h4>Samples per sequence run:</h4>
         <table class="table table-bordered">
             <thead>
+                <th>Run ID</th>                
                 <th>Run Name</th>
-                <th>Total Samples</th>
-                <th>Run ID</th>
                 <th>Date</th>
+                <th>Samples in Run</th>
+                <th>Project</th>
+                <th>Samples in Run and Project</th>
             </thead>
             <tbody>
-                <g:each in="${samples_per_run}">
+                <g:each in="${cohort_count}">
                 <tr>
+                    <td>${it.run_id}</td>
                     <td>${it.run_name}</td>
-                    <td>${it.sample_count}</td>
-                    <td>${it.id}</td>
                     <td>${it.date.toString().split(" ")[0]}</td>
+                    <td>${it.samples_in_run}</td>
+                    <td>${it.project_name}</td>
+                    <td>${it.samples_in_project}</td>
                 </tr>
                 </g:each> 
             </tbody>

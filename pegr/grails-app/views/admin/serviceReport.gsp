@@ -32,11 +32,11 @@
             <tbody>
                 <g:each in="${cohort_count}">
                 <tr>
-                    <td>${it.run_id}</td>
+                    <td><g:link controller="sequenceRun" action="show" id="${it.run_id}">${it.run_id}</g:link></td>
                     <td>${it.run_name}</td>
                     <td>${it.date.toString().split(" ")[0]}</td>
                     <td>${it.samples_in_run}</td>
-                    <td>${it.project_name}</td>
+                    <td><g:link controller="project" action="show" id="${it.project_id}">${it.project_name}</g:link></td>
                     <td>${it.samples_in_project}</td>
                 </tr>
                 </g:each> 

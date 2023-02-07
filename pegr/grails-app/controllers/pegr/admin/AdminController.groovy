@@ -92,7 +92,7 @@ class AdminController {
 
                         sample_count = sql.rows(cmd)
 
-                        cmd = "select c.run_id, r.run_name, r.date, rc.samples_in_run, p.name as project_name, e.samples_in_project from (" +
+                        cmd = "select c.run_id, r.run_name, r.date, rc.samples_in_run, p.id as project_id, p.name as project_name, e.samples_in_project from (" +
                             "select cohort_id, count(*) as samples_in_project from sequencing_experiment where sequence_run_id between ${fromId} and ${toId} group by cohort_id) e " +
                             "left join sequencing_cohort c on e.cohort_id = c.id " +
                             "left join sequence_run r on c.run_id = r.id " +

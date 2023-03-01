@@ -638,6 +638,26 @@ class ApiController {
                             sample.cellSource.strain = cellSourceService.getStrain(oldStrain.species, sampleDict.newValue, oldStrain.parent?.name, oldStrain.genotype, oldStrain.geneticModification)
                             sample.cellSource.save()
                             break
+                        // growthMedia
+                        case "growthMedia":
+                            sample.growthMedia = sampleService.getGrowthMedia(sampleDict.newValue)
+                            sample.save()
+                            break
+                        case "treatments":
+                            SampleTreatments.executeUpdate("delete from SampleTreatments where sample.id =:sampleId", [sampleId: sampleId])
+                            def treatments = utilityService.parseJson(value)
+                            treatments.each { treatment ->
+                                addTreatment(sample, treatment)
+                            }
+                            break
+                        case "assay":
+                            sample.assay = sampleService.getAssay(sampleDict.newValue)
+                            sample.save()
+                            break
+                        case "naturalId":
+                            sample.naturalId = utilityService.cleanString(naturalId)
+                            sample.save()
+                            break
                         default:
                             messages.push("Error: Sample ${sample.id}. Field ${sampleDict.field} cannot be edited.")
                             break

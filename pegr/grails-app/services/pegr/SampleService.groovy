@@ -344,6 +344,20 @@ class SampleService {
 	    }
 	    return media
 	}
+    
+    @Transactional
+    def getAssay(String _assayStr) {
+        def assayStr = utilityService.cleanString(_assayStr)
+	    if(assayStr == null) {
+	        return null
+	    }
+	    
+	    def assay= Assay.findByName(assayStr)
+	    if(!assay) {
+	        assay = new Assay(name: assayStr).save( failOnError: true)
+	    }
+	    return assay
+	}
 
     def copyIndexToItem(Sample sample) {
         def item = sample.item

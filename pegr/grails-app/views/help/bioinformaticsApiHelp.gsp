@@ -405,14 +405,24 @@ https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=
         {
             "sampleID": long,
             "field": "string",
-            "oldValue": "string",
             "newValue": "string",
         },
         ......
     ]
 }
             </pre>
-            <p>Current accepted fields include "geneticModification", "antibodyCatalog", "target" and "strain". After a request is posted, PEGR will return the status code and a message as below</p>
+            <p>Current accepted fields include </p>
+            <ul>
+              <li>geneticModification</li>
+              <li>antibodyCatalog</li>
+              <li>target</li>
+              <li>strain</li>
+              <li>growthMedia</li>
+              <li>treatments</li>
+              <li>assay</li>
+              <li>naturalId</li>
+            </ul>
+            <p>After a request is posted, PEGR will return the status code and a message as below</p>
             <pre>
 {
     // "Success!" or error message
@@ -424,7 +434,7 @@ https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=
             </pre>
             <p>The API can be simply called through curl</p>
             <pre>
-curl  -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxxx@psu.edu", "sampleList":[{"sampleID":31308,"field":"geneticModification","oldValue":"Spt20-D-tag","newValue":"Gcn5-Dtag"},{"sampleID": 31309,"field":"geneticModification","oldValue":"Gcn5-Dtag","newValue":"Spt20-D-tag"}]}' https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=XXXXXX
+curl  -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxxx@psu.edu", "sampleList":[{"sampleID":31308,"field":"geneticModification","oldValue":"Spt20-D-tag","newValue":"Gcn5-Dtag"},{"sampleID": 31309,"field":"geneticModification","newValue":"Spt20-D-tag"}]}' https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=XXXXXX
             </pre>
             <p>Here is a Python example</p>
             <pre>
@@ -437,12 +447,10 @@ data = {
                 {
                     "sampleID": 31308,
                     "field": "geneticModification",
-                    "oldValue": "Spt20-D-tag",
                     "newValue": "Gcn5-Dtag"
                 },{
                     "sampleID": 31309,
                     "field": "geneticModification",
-                    "oldValue": "Gcn5-Dtag",
                     "newValue": "Spt20-D-tag"
                 }
             ]

@@ -54,7 +54,7 @@
 				<tbody>
 				<g:each in="${strainInstanceList}" status="i" var="strain">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-                        <td><g:link action="show" id="${strain.id}">${fieldValue(bean: strain, field: "id")}</g:link></td>
+                        <td><g:link action="show" id="${strain.id}">${strain.id}</g:link></td>
                         <td>${fieldValue(bean: strain, field: "name")}</td>
                         <td>${fieldValue(bean: strain, field: "species")}</td>
 						<td>${fieldValue(bean: strain, field: "parent")}</td>

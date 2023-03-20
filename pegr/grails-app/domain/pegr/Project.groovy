@@ -7,6 +7,7 @@ class Project {
 	Date dateCreated
 	Date lastUpdated
     String notes
+    String links
     
 	String toString() {
 		name
@@ -28,10 +29,12 @@ class Project {
 		name unique: true
 		description nullable: true, blank: true, maxSize: 1000
         notes nullable: true, blank: true
+        links nullable: true, blank: true
     }
     
     static mapping = {
         dynamicUpdate: true
         notes sqlType: "longtext"
+        links sqlType: "longtext"
     }
 }

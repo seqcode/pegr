@@ -9,6 +9,7 @@
         <ul class="nav nav-pills">
 			<li><a class="home" href="${createLink(uri: '/admin/')}"><g:message code="default.home.label"/></a></li>
 			<li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
+            <li><g:link action="exportCsv">Export CSV</g:link></li>
 		</ul>
         <g:form action="mergeSearch" class="pull-right" style="padding:3px 0px">
             <input name="str">
@@ -45,7 +46,6 @@
               </g:each>    
               </tbody>
             </table>
-
             <div class="pagination">
                 <g:paginate total="${targetCount ?: 0}" params="${params}"/>
             </div>

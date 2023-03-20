@@ -250,5 +250,36 @@ class TargetAdminController {
         }
         render session.checkedTarget.size()
     }
+    
+    /**
+     * Export CSV 
+     */
+    def exportCsv() {
+        final String filename = 'Targets.csv'
+        def lines = Target.findAll().collect { [
+            it.id, 
+            it.name?it.name:"", 
+            it.nTermTag?it.nTermTag:"", 
+            it.cTermTag?it.cTermTag:"", 
+            it.note?it.note:"", 
+            it.targetType?.name?it.targetType.name:"", 
+            it.status?it.status:""
+        ].join(',') } as List<String>;
+        
+        def outs = response.outputStream
+        
+        response.status = 200
+        response.contentType = "text/csv;charset=UTF-8";
+        response.setHeader "Content-disposition", "attachment; filename=${filename}"
+        
+        outs << "ID, Name, N Term Tag, C Term Tag, Note, Target Type, Status\n"
+        lines.each { String line ->
+            outs << "${line}\n"
+        }
+
+        outs.flush()
+        outs.close()
+
+    }
 
 }

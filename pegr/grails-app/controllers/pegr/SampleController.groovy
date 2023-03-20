@@ -442,6 +442,9 @@ class SampleController {
 
     def updateAjax(Long sampleId, String name, String value) {
         try {
+            if (!editAuth(sample)) {
+                throw new SampleException(message: "Not authorized!")
+            }
             def result = sampleService.update(sampleId, name, value)
             if (result) {
                 render result as JSON
@@ -458,6 +461,9 @@ class SampleController {
         def slurper = new JsonSlurper()
         def samples = slurper.parseText(sampleList)
         samples.each { sample ->
+            if (!editAuth(sample)) {
+                throw new SampleException(message: "Not authorized!")
+            }
             sampleService.update(sample.sampleId, sample.name, sample.value)
         }
 

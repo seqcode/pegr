@@ -412,16 +412,17 @@ https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=
 }
             </pre>
             <p>Current accepted fields include </p>
-            <ul>
+            <ol>
               <li>geneticModification</li>
               <li>antibodyCatalog</li>
               <li>target</li>
               <li>strain</li>
               <li>growthMedia</li>
-              <li>treatments</li>
+              <li>treatments (the "newValue" can take in multiple treatments, and it should be in the format of a list of strings enclosed in single quotation marks, e.g. '["treatment1", "treatment2"]')</li>
               <li>assay</li>
               <li>naturalId</li>
-            </ul>
+            </ol>
+              
             <p>After a request is posted, PEGR will return the status code and a message as below</p>
             <pre>
 {
@@ -434,7 +435,7 @@ https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=
             </pre>
             <p>The API can be simply called through curl</p>
             <pre>
-curl  -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxxx@psu.edu", "sampleList":[{"sampleID":31308,"field":"geneticModification","oldValue":"Spt20-D-tag","newValue":"Gcn5-Dtag"},{"sampleID": 31309,"field":"geneticModification","newValue":"Spt20-D-tag"}]}' https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=XXXXXX
+curl  -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxxx@psu.edu", "sampleList":[{"sampleID":31308,"field":"geneticModification","newValue":"Gcn5-Dtag"},{"sampleID": 31309,"field":"geneticModification","newValue":"Spt20-D-tag"}]}' https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=XXXXXX
             </pre>
             <p>Here is a Python example</p>
             <pre>

@@ -640,23 +640,16 @@ class ApiController {
                             break
                         // growthMedia
                         case "growthMedia":
-                            sample.growthMedia = sampleService.getGrowthMedia(sampleDict.newValue)
-                            sample.save()
+                            sampleService.update(sample.id, "growthMedia", sampleDict.newValue)
                             break
                         case "treatments":
-                            SampleTreatments.executeUpdate("delete from SampleTreatments where sample.id =:sampleId", [sampleId: sampleId])
-                            def treatments = utilityService.parseJson(value)
-                            treatments.each { treatment ->
-                                addTreatment(sample, treatment)
-                            }
+                            sampleService.update(sample.id, "treatments", sampleDict.newValue)
                             break
                         case "assay":
-                            sample.assay = sampleService.getAssay(sampleDict.newValue)
-                            sample.save()
+                            sampleService.update(sample.id, "assay", sampleDict.newValue)
                             break
                         case "naturalId":
-                            sample.naturalId = utilityService.cleanString(naturalId)
-                            sample.save()
+                            sampleService.update(sample.id, "naturalId", sampleDict.newValue)
                             break
                         default:
                             messages.push("Error: Sample ${sample.id}. Field ${sampleDict.field} cannot be edited.")

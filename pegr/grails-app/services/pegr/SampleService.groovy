@@ -430,9 +430,7 @@ class SampleService {
         if (!sample) {
             throw new SampleException(message: "Sample not found!")
         }
-        if (!editAuth(sample)) {
-             throw new SampleException(message: "Not authorized!")
-        }
+        
         switch (field) {
             case "target" :
                 def data = utilityService.parseJson(value)
@@ -475,6 +473,10 @@ class SampleService {
                 sample.save(failOnError: true)
             case "recommend" :
                 sample.recommend = value
+                sample.save(faileOnError: true)
+                break
+            case "assay" :
+                sample.assay = getAssay(value)
                 sample.save(faileOnError: true)
                 break
             default:

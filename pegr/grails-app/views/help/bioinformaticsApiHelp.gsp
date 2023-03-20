@@ -28,6 +28,7 @@
     
     // optional, property values to query.
     "id": long,
+    "ids": [long, long, ...],  // if this field is provided, no other filter criteria will be applied
     "source": "string",
     "sourceId": "string",
     "species": "string",

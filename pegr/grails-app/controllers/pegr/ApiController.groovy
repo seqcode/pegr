@@ -87,7 +87,12 @@ class ApiController {
         def apiUser = User.findByEmailAndApiKey(cmd.userEmail, apiKey)
         def message, data, code
         if (apiUser) {
-            def sampleIds = sampleService.search(cmd).collect {it.id}.toList()
+            def sampleIds = []
+            if (cmd.ids && cmd.ids.size() > 0) {
+                sampleIds = cmd.ids
+            } else {
+                sampleIds = sampleService.search(cmd).collect {it.id}.toList()
+            }
             if (sampleIds.size() == 0) {
                 code = 404
                 message = "No sample has been found!"
@@ -713,6 +718,7 @@ class QuerySampleRegistrationCommand implements grails.validation.Validateable {
     String strain
     String antibody
     String id
+    List ids
     String source
     String sourceId
     String target

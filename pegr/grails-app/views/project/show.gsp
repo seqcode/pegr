@@ -54,7 +54,8 @@
                         <div class="panel-heading">
                             <h4 class="panel-title"><a data-toggle="collapse" href="#collapse${n}">${cohort}</a> 
                                 <g:if test="${cohort.report && cohort.report.status == pegr.ReportStatus.PUBLISH}"><g:link controller="report" action="show" id="${cohort.report?.id}">Report: ${cohort.report?.name}</g:link> 
-                                </g:if>
+                                </g:if> 
+                                (${cohort.samples.size()} samples)
                             </h4>
                         </div>
                     </div>
@@ -76,7 +77,7 @@
                 </div>  
             </g:each>
         </ul>
-        <h4>Other Samples</h4>
+        <h4>Other Samples (${otherSamples.size()} samples)</h4>
         <g:render template="/project/sampleTable" model="['sampleList':otherSamples, 'project':project, 'removable':true]" />
         <g:if test="${sampleEditAuth}">
             <div>

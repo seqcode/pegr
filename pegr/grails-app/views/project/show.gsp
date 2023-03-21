@@ -24,6 +24,18 @@
 		<p>Created: ${project?.dateCreated}, updated: ${project?.lastUpdated}</p>
 		<p>Description: ${project?.description}</p>
         <p>Funding: ${project?.fundings.join(', ')}</p>
+        <div id="showLinks">
+          <strong>Linkouts: </strong>
+          <g:each in="${links}" var="link">
+          <g:if test="${link.url}">
+            <a href="${link.url}" class="btn btn-primary">${link.name}</a>
+          </g:if>
+          <g:else>
+            <a href="${link.url}" class="btn btn-default">${link.name}</a>
+          </g:else>
+          </g:each>
+          <g:link action="editLinks" params="[projectId:project?.id]" class="btn btn-link" >Edit</g:link>
+        </div>
         <h3>Users <g:if test="${projectEditAuth}"><button class="edit" data-toggle="modal" data-target="#addUser">Add</button></g:if></h3>
         <div id="project-users">
             <g:render template="userTable"/>

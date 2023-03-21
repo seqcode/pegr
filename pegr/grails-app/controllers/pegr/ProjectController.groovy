@@ -5,6 +5,7 @@ class ProjectController {
 	def springSecurityService
     def projectService
     def sampleService
+    def utilityService
 	
     def index(int max, int offset) {
         max = Math.min(max ?:15, 100)
@@ -112,6 +113,7 @@ class ProjectController {
             }
             
             [project: currentProject, 
+             links: utilityService.parseJson(currentProject.links),
              projectUsers: projectUsers, 
              projectEditAuth: projectEditAuth, 
              sampleEditAuth: sampleEditAuth,
@@ -382,6 +384,43 @@ class ProjectController {
     def updateCohortNotesAjax(Long cohortId, String notes) {
         projectService.updateCohortNotes(cohortId, notes)
         render notes
+    }
+    
+    def editLinks(Long projectId) {
+        def project = Project.get(projectId)
+        if (project) {
+            def projectEditAuth = projectService.projectEditAuth(project)
+            if (projectEditAuth) {
+                def links = utilityService.parseJson(project.links)
+                if (links == null) {
+                    links = [[name: "DOI", url: ""], 
+                             [name: "GEO", url: ""], 
+                             [name: "Github", url: ""], 
+                             [name: "PMID", url: ""]]
+                }
+                [project: project, links: links]
+            } else {
+                render(view: "/403")
+            }            
+        } else {
+            render(view: "/404")
+        }
+    }
+        
+    def updateLinks() {
+        def project = Project.get(params["projectId"])
+        if (project) {
+            def projectEditAuth = projectService.projectEditAuth(project)
+            if (projectEditAuth) {  
+                project.links = params["links"]
+                project.save()
+                redirect(action: "show", id: params["projectId"])
+            } else {
+                render(view: "/403")
+            }
+        } else {
+            render(view: "/404")
+        }
     }
 }
 

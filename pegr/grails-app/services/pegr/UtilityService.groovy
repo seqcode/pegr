@@ -288,13 +288,15 @@ class UtilityService {
                 }
             } 
             
+            def schema = grailsApplication.config
             // fetch the tables that have a foreign key to the requested table
-            cmd = "select kcu.table_name, kcu.column_name from information_schema.referential_constraints rc inner join information_schema.key_column_usage kcu on rc.constraint_name = kcu.constraint_name and rc.constraint_schema = kcu.constraint_schema where kcu.constraint_schema = 'pegr' AND kcu.REFERENCED_TABLE_NAME=:tableName"
+            cmd = "select kcu.table_name, kcu.column_name from information_schema.referential_constraints rc inner join information_schema.key_column_usage kcu on rc.constraint_name = kcu.constraint_name and rc.constraint_schema = kcu.constraint_schema where kcu.constraint_schema like 'pegr%' AND kcu.REFERENCED_TABLE_NAME=:tableName"
             def affectedTables = sql.rows(cmd, [tableName: tableName]) 
 
             affectedTables.each { table ->
                 // check unique constraints
-                cmd = "select 1 from information_schema.key_column_usage kcu inner join information_schema.TABLE_CONSTRAINTS tc on kcu.constraint_name = tc.constraint_name and kcu.table_name = tc.table_name and kcu.table_schema = tc.table_schema where kcu.constraint_schema = 'pegr' and kcu.table_name=:tableName and kcu.column_name=:columnName and tc.constraint_type='UNIQUE' and kcu.constraint_schema = 'pegr'"
+                cmd = "select 1 from information_schema.key_column_usage kcu inner join information_schema.TABLE_CONSTRAINTS tc on kcu.constraint_name = tc.constraint_name and kcu.table_name = tc.table_name and kcu.table_schema = tc.table_schema where kcu.constraint_schema like 'pegr%' and kcu.table_name=:tableName and kcu.column_name=:columnName and tc.constraint_type='UNIQUE' and kcu.constraint_schema like 'pegr%'"
+                
                 def constraints = sql.rows(cmd, [tableName: table.table_name, columnName: table.column_name])
                 if (constraints && constraints.size() > 0 ) {
                     // if there is UNIQUE constraint that prevent changing reference key, throw an error.
@@ -302,11 +304,13 @@ class UtilityService {
                 } else {
                     // change reference key from the fromId to the toId   
                     cmd = "update " + table.table_name + " set " + table.column_name + "=:toId where " + table.column_name + " =:fromId"
+                    
                     sql.execute(cmd, [toId: toId, fromId: fromId]) 
                 }             
             }
             // delete the merge-from row
             cmd = "delete from " + tableName + " where id=:fromId"
+            
             sql.execute(cmd, [fromId: fromId])
             sql.close()
         } catch(UtilityException e) {

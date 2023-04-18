@@ -15,7 +15,7 @@
             <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>
         </g:form>
         <div>                    
-            <button data-toggle="collapse" data-target="#merge"  aria-expanded="false" class="btn btn-default">Merge Tissue <span class="expand_caret caret"></span></button>
+            <button data-toggle="collapse" data-target="#merge"  aria-expanded="false" class="btn btn-default">Merge Tissues <span class="expand_caret caret"></span></button>
             <div id="merge" class="collapse well">
                 <p>Please provide tissue names below. Multiple tissues can be provided in the "From" field and should be delimited by comma ",".</p>
                 <g:form action="mergeTissues">

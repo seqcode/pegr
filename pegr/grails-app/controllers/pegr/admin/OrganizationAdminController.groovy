@@ -1,6 +1,7 @@
 package pegr
 
 import grails.validation.ValidationException
+import groovy.sql.Sql
 import static org.springframework.http.HttpStatus.*
 import pegr.AdminCategory
 import pegr.Organization
@@ -8,6 +9,8 @@ import pegr.Organization
 class OrganizationAdminController {
 
     OrganizationService organizationService
+    def utilityService
+    def dataSource
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -110,6 +113,52 @@ class OrganizationAdminController {
             }
             '*'{ render status: NO_CONTENT }
         }
+    }
+    
+    def mergeOrganization(fromOrganization, toOrganization) {
+        def sql = new Sql(dataSource)
+        try {
+            // simple many-to-one relation
+            utilityService.updateForeignKeyInDb("cell_source", "provider_lab", fromOrganization.id, toOrganization.id, sql)
+            utilityService.updateForeignKeyInDb("organization", "parent", fromOrganization.id, toOrganization.id, sql)
+            utilityService.updateForeignKeyInDb("strain", "source_lab", fromOrganization.id, toOrganization.id, sql)
+            utilityService.updateForeignKeyInDb("user", "affiliation", fromOrganization.id, toOrganization.id, sql)
+            utilityService.updateForeignKeyInDb("antibody", "company", fromOrganization.id, toOrganization.id, sql)
+            
+            fromOrganization.delete()
+            sql.close()
+        } catch(Exception e) {
+            sql.close()
+            log.error e.toString()
+            throw new UserException(message: "Error merging organization ${fromOrganization.name} to organization ${toOrganization.name}!")
+        }
+    }
+    
+    def mergeOrganizations(String fromOrganizationNamesStr, String toOrganizationName) {
+        try {
+            def fromOrganizationNames = fromOrganizationNamesStr.split(";").toList()
+            
+            def toOrganization = Organization.findByName(toOrganizationName)
+            if (!toOrganization) {
+                throw new UtilityException(message: "Organization ${toOrganizationName} does not exist!")
+            }
+            
+            fromOrganizationNames.each { it ->
+                def fromOrganizationName = it.trim()
+                def fromOrganization = Organization.findByName(fromOrganizationName)
+                if(!fromOrganization) {
+                    throw new UtilityException(message: "Organization ${fromOrganizationName} does not exist!")
+                } 
+                if (fromOrganization != toOrganization) {
+                    mergeOrganization(fromOrganization, toOrganization)
+                }
+            }
+            
+            flash.message = "Organizations have been successfully merged."
+        } catch(UtilityException e) {
+            flash.message = e.message
+        }
+        redirect(action: "index")
     }
 
     protected void notFound() {

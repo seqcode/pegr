@@ -44,7 +44,9 @@
             </span>
             </sec:ifAnyGranted>
         </small>
-        <g:link action="delete" params="[runId:run.id]" onclick="return confirm('Do you want to delete the sequence run?')" class="btn btn-warning pull-right">Delete Sequence Run</g:link>
+        <sec:ifAnyGranted roles="ROLE_ADMIN">
+          <g:link action="delete" params="[runId:run.id]" onclick="return confirm('Do you want to delete the sequence run?')" class="btn btn-warning pull-right">Delete Sequence Run</g:link>
+        </sec:ifAnyGranted>
     </h2>
     <g:link action="downloadQueueFile" params="[runId:run.id]" class="btn btn-primary pull-right">Download Queue File</g:link>
     <a href="#" class="btn btn-primary pull-right" data-toggle="modal" data-target="#download-run-info">Download Run Info Files</a>

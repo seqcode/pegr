@@ -442,7 +442,8 @@ class SampleController {
 
     def updateAjax(Long sampleId, String name, String value) {
         try {
-            if (!editAuth(sample)) {
+            def sample = Sample.get(sampleId)
+            if (!sampleService.editAuth(sample)) {
                 throw new SampleException(message: "Not authorized!")
             }
             def result = sampleService.update(sampleId, name, value)

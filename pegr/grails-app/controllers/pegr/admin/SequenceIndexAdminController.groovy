@@ -155,8 +155,11 @@ class SequenceIndexAdminController {
                         messages.push("Line ${lineNo} is skipped: no index version!")
                     } else if (data.sequence == null) {
                         messages.push("Line ${lineNo} is skipped: no sequence!")
+                    } else if (SequenceIndex.findByIndexId(data.indexId)) {
+                        // check if the indexId already exists
+                        messages.push("Line ${lineNo} indexId ${data.indexId} already exists!")
                     } else {
-                        try {
+                        try {       
                             new SequenceIndex(indexVersion: data.indexVersion, 
                                               indexId: data.indexId, 
                                               sequence: data.sequence,

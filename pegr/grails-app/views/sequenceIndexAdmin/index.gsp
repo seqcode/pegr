@@ -52,8 +52,12 @@
 		</ul>
         <div id="list-sequenceIndex" class="content scaffold-list" role="main">
             <h1><g:message code="default.list.label" args="[entityName]" /></h1>
-            <g:if test="${flash.message}">
-                <div class="message" role="status">${flash.message}</div>
+            <g:if test="${flash.messageList}">
+                <div class="message" role="status">
+                <g:each in="${flash.messageList}">
+                  <p>${it}</p>
+                </g:each>
+                </div>
             </g:if>
             <table class="table-bordered">
                 <thead>
@@ -66,7 +70,7 @@
                 <tbody>                        
                     <g:each in="${sequenceIndexInstanceList}">
                         <tr>
-                            <td><g:link action="edit" id="${it.id}">${it.indexId}</g:link></td>
+                            <td><g:link action="show" id="${it.id}">${it.indexId}</g:link></td>
                             <td>${it.indexVersion}</td>
                             <td>${it.sequence}</td>
                             <td>${it.oligo}</td>

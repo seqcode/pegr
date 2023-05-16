@@ -123,4 +123,36 @@ class StrainAdminController {
         redirect(action: "index")
     }
     
+    /**
+     * Export CSV 
+     */
+    def exportCsv() {
+        final String filename = 'Strain.csv'
+        def lines = Strain.findAll().collect { [
+            it.id, 
+            it.name?it.name:"",
+            it.species?it.species:"",
+            it.parent?it.parent:"",
+            it.genotype?it.genotype:"",
+            it.geneticModification?it.geneticModification:"",
+            it.sourceLab?it.sourceLab:"",
+            it.status?it.status:""
+        ].join(',') } as List<String>;
+        
+        def outs = response.outputStream
+        
+        response.status = 200
+        response.contentType = "text/csv;charset=UTF-8";
+        response.setHeader "Content-disposition", "attachment; filename=${filename}"
+        
+        outs << "ID, Name, Species, Parent, Genotype, Genetic Modification, Source Lab, Status\n"
+        lines.each { String line ->
+            outs << "${line}\n"
+        }
+
+        outs.flush()
+        outs.close()
+
+    }
+    
 }

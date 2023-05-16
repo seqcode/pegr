@@ -11,6 +11,7 @@
 		<ul class="nav nav-pills">
 			<li><a class="home" href="${createLink(uri: '/admin/')}"><g:message code="default.home.label"/></a></li>
 			<li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
+            <li><g:link action="exportCsv">Export CSV</g:link></li>
 		</ul>
         <g:form class="pull-right" style="padding:3px 0px">
             <input name="str">
@@ -47,6 +48,7 @@
                         <g:sortableColumn property="species.genusName" title="Species" />
                         <g:sortableColumn property="parent" title="Parent" />
                         <g:sortableColumn property="genotype" title="Genotype" />
+                        <g:sortableColumn property="geneticModification" title="Genetic Modification" />
                         <g:sortableColumn property="sourceLab" title="Source Lab" />
 						<th>Status</th>
 					</tr>
@@ -59,6 +61,7 @@
                         <td>${fieldValue(bean: strain, field: "species")}</td>
 						<td>${fieldValue(bean: strain, field: "parent")}</td>
 				        <td>${fieldValue(bean: strain, field: "genotype")}</td>
+                        <td>${fieldValue(bean: strain, field: "geneticModification")}</td>
 						<td>${fieldValue(bean: strain, field: "sourceLab")}</td>
 						<td>${strain.status}</td>
 					</tr>

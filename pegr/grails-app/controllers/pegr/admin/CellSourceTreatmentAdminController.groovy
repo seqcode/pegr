@@ -150,6 +150,34 @@ class CellSourceTreatmentAdminController {
         }
         redirect(action: "index")
     }
+    
+    /**
+     * Export CSV 
+     */
+    def exportCsv() {
+        final String filename = 'CellSourceTreatment.csv'
+        def lines = CellSourceTreatment.findAll().collect { [
+            it.id, 
+            it.name?it.name:"",
+            it.note?it.note:"",
+            it.status?it.status:""
+        ].join(',') } as List<String>;
+        
+        def outs = response.outputStream
+        
+        response.status = 200
+        response.contentType = "text/csv;charset=UTF-8";
+        response.setHeader "Content-disposition", "attachment; filename=${filename}"
+        
+        outs << "ID, Name, Note, Status\n"
+        lines.each { String line ->
+            outs << "${line}\n"
+        }
+
+        outs.flush()
+        outs.close()
+
+    }
 
 	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS
 }

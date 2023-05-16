@@ -147,7 +147,7 @@ class IgTypeAdminController {
      */
     def exportCsv() {
         final String filename = 'IgTypes.csv'
-        def lines = Species.findAll().collect { [
+        def lines = IgType.findAll().collect { [
             it.id, 
             it.name?it.name:"",
             it.status?it.status:""

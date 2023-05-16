@@ -116,5 +116,32 @@ class HistologyAdminController {
         }
     }
     
+    /**
+     * Export CSV 
+     */
+    def exportCsv() {
+        final String filename = 'Histology.csv'
+        def lines = Histology.findAll().collect { [
+            it.id, 
+            it.name?it.name:"",
+            it.status?it.status:""
+        ].join(',') } as List<String>;
+        
+        def outs = response.outputStream
+        
+        response.status = 200
+        response.contentType = "text/csv;charset=UTF-8";
+        response.setHeader "Content-disposition", "attachment; filename=${filename}"
+        
+        outs << "ID, Name, Status\n"
+        lines.each { String line ->
+            outs << "${line}\n"
+        }
+
+        outs.flush()
+        outs.close()
+
+    }
+    
 	public static AdminCategory category = AdminCategory.BIO_SPECIFICATIONS
 }

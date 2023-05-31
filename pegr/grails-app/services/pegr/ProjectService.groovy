@@ -244,7 +244,7 @@ class ProjectService {
         def toId = toProject.id
         def sql = new Sql(dataSource)
         try {
-            ["history", "item", "replicate_set", "sequencing_cohort"].each { table ->
+            ["history", "item", "sequencing_cohort"].each { table ->
                 utilityService.updateForeignKeyInDb(table, "project", fromId, toId, sql)
             }
 

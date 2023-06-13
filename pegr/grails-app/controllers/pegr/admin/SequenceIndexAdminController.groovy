@@ -186,6 +186,36 @@ class SequenceIndexAdminController {
         redirect(action: "index")
     }
     
+    /**
+     * Export CSV 
+     */
+    def exportCsv() {
+        final String filename = 'SequenceIndex.csv'
+        def lines = SequenceIndex.findAll().collect { [
+            it.id, 
+            it.indexVersion?it.indexVersion:"", 
+            it.indexId?it.indexId:"", 
+            it.sequence?it.sequence:"", 
+            it.oligo?it.oligo:"", 
+            it.status?it.status:""
+        ].join(',') } as List<String>;
+        
+        def outs = response.outputStream
+        
+        response.status = 200
+        response.contentType = "text/csv;charset=UTF-8";
+        response.setHeader "Content-disposition", "attachment; filename=${filename}"
+        
+        outs << "ID, Index Version, Index ID, Sequence, Oligo, Status\n"
+        lines.each { String line ->
+            outs << "${line}\n"
+        }
+
+        outs.flush()
+        outs.close()
+
+    }
+    
     protected void notFound() {
         request.withFormat {
             form multipartForm {

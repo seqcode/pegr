@@ -15,7 +15,7 @@ class SequenceIndexAdminController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max, String str) {
-        if (str && SequenceIndex.hasProperty("name")) {
+        if (str) {
             def c = SequenceIndex.createCriteria()
             def listParams = [
                     max: max ?: 25,
@@ -23,13 +23,15 @@ class SequenceIndexAdminController {
                     order: params.order ?: "desc",
                     offset: params.offset
                 ]
-            def likeStr = "%" + str + "%"
-            def items = c.list(listParams) {
-                or {
-                    ilike "name", likeStr
+            def indexes = c.list(listParams) {
+                    or {
+                        ilike "indexVersion", "%${str}%"
+                        ilike "sequence", "%${str}%"
+                        ilike "indexId", "%${str}%"
+                    }
                 }
-            }
-            respond items, model:[sequenceIndexCount: items.totalCount, str: str]
+            
+            respond indexes, model:[sequenceIndexCount: indexes.totalCount, str: str]
         } else {       
             params.max = Math.min(max ?: 25, 100)
             respond SequenceIndex.list(params), model:[sequenceIndexCount: SequenceIndex.count()]
@@ -183,7 +185,6 @@ class SequenceIndexAdminController {
         }
         redirect(action: "index")
     }
-    
     
     protected void notFound() {
         request.withFormat {

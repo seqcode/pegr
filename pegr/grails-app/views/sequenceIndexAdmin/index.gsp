@@ -50,6 +50,10 @@
               </div>
             </div>
 		</ul>
+        <g:form class="pull-right" style="padding:3px 0px">
+            <input name="str" value="${str}">
+            <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>
+        </g:form>
         <div id="list-sequenceIndex" class="content scaffold-list" role="main">
             <h1><g:message code="default.list.label" args="[entityName]" /></h1>
             <g:if test="${flash.messageList}">

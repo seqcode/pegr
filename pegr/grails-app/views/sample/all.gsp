@@ -55,12 +55,8 @@
                 <g:textField name="source" class="form-control" value="${searchParams.source}"/>
             </div>
             <div class="form-group">
-                <label>Source ID</label>
-                <g:textField name="sourceId" class="form-control" value="${searchParams.sourceId}"/>
-            </div>
-            <div class="form-group">
-                <label>Username (send data to)</label>
-                <g:textField name="sendDataTo" class="form-control" value="${searchParams.sendDataTo}"/>
+                <label>Treatment</label>
+                <g:textField name="treatment" class="form-control" value="${searchParams.treatment}"/>
             </div>
             <div>
                 <g:submitButton name="search" value="Apply" class="btn btn-primary"/>

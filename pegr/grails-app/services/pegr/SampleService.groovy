@@ -18,6 +18,19 @@ class SampleService {
     def sequenceRunService
 
     def search(QuerySampleRegistrationCommand query) {
+        def sample_ids = null
+        if (query.treatment) {
+            def t = SampleTreatments.createCriteria()
+            sample_ids = t.list {
+                treatment {
+                    ilike "name", query.treatment
+                }
+                projections {
+                    distinct("sample.id")
+                }
+            }
+        }
+        
         def c = Sample.createCriteria()
         def listParams = [
                 max: query.max ?: 50,
@@ -92,8 +105,12 @@ class SampleService {
                         }
                     }
                 }
+                if (query.treatment) {
+                    'in' "id", sample_ids
+                }
             }
         }
+        
         return samples
     }
 

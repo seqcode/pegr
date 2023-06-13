@@ -36,7 +36,8 @@
     "antibody": "string",    
     "target": "string",
     "assay": "string",
-    "sendDataTo": "string"
+    "sendDataTo": "string",
+    "treatment": "string"
 }
             </pre>
             and send a POST request to the url

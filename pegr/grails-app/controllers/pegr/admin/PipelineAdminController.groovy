@@ -105,6 +105,39 @@ class PipelineAdminController {
             '*'{ render status: NO_CONTENT }
         }
     }
+    
+    
+    /**
+     * Export CSV 
+     */
+    def exportCsv() {
+        final String filename = 'Pipeline.csv'
+        def lines = Pipeline.findAll().collect { [
+            it.id, 
+            it.workflowId?it.workflowId:"", 
+            it.name?it.name:"", 
+            it.pipelineVersion?it.pipelineVersion:"", 
+            it.note?it.note:"", 
+            it.steps?'"'+it.steps.replace('"', '""')+'"':"",
+            it.workflowUrl?it.workflowUrl:""
+        ].join(',') } as List<String>;
+        
+        def outs = response.outputStream
+        
+        response.status = 200
+        response.contentType = "text/csv;charset=UTF-8";
+        response.setHeader "Content-disposition", "attachment; filename=${filename}"
+        
+        outs << "ID, Workflow ID, Name, Pipeline Version, Note, Steps, Workflow URL\n"
+        lines.each { String line ->
+            outs << "${line}\n"
+        }
+
+        outs.flush()
+        outs.close()
+
+    }
+    
 
     protected void notFound() {
         request.withFormat {

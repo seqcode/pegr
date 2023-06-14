@@ -105,6 +105,35 @@ class ItemTypeCategoryAdminController {
             '*'{ render status: NO_CONTENT }
         }
     }
+    
+    
+    /**
+     * Export CSV 
+     */
+    def exportCsv() {
+        final String filename = 'ItemTypeCategory.csv'
+        def lines = ItemTypeCategory.findAll().collect { [
+            it.id, 
+            it.name?it.name:"", 
+            it.superCategory?it.superCategory:"", 
+        ].join(',') } as List<String>;
+        
+        def outs = response.outputStream
+        
+        response.status = 200
+        response.contentType = "text/csv;charset=UTF-8";
+        response.setHeader "Content-disposition", "attachment; filename=${filename}"
+        
+        outs << "ID, Name, Super Category\n"
+        lines.each { String line ->
+            outs << "${line}\n"
+        }
+
+        outs.flush()
+        outs.close()
+
+    }
+    
 
     protected void notFound() {
         request.withFormat {

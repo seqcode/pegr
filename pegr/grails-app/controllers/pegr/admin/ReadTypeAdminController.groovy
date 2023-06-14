@@ -105,6 +105,36 @@ class ReadTypeAdminController {
             '*'{ render status: NO_CONTENT }
         }
     }
+    
+    
+    /**
+     * Export CSV 
+     */
+    def exportCsv() {
+        final String filename = 'ReadType.csv'
+        def lines = ReadType.findAll().collect { [
+            it.id, 
+            it.name?it.name:"", 
+            it.shortName?it.shortName:"", 
+            it.note?it.note:"", 
+        ].join(',') } as List<String>;
+        
+        def outs = response.outputStream
+        
+        response.status = 200
+        response.contentType = "text/csv;charset=UTF-8";
+        response.setHeader "Content-disposition", "attachment; filename=${filename}"
+        
+        outs << "ID, Name, Short Name, Note\n"
+        lines.each { String line ->
+            outs << "${line}\n"
+        }
+
+        outs.flush()
+        outs.close()
+
+    }
+    
 
     protected void notFound() {
         request.withFormat {

@@ -49,6 +49,7 @@
                     </div>
               </div>
             </div>
+            <li><g:link action="exportCsv">Export CSV</g:link></li>
 		</ul>
         <g:form class="pull-right" style="padding:3px 0px">
             <input name="str">

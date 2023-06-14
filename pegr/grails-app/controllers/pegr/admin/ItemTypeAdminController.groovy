@@ -178,6 +178,36 @@ class ItemTypeAdminController {
         }
         redirect(action: "index")
     }
+    
+    
+    /**
+     * Export CSV 
+     */
+    def exportCsv() {
+        final String filename = 'ItemType.csv'
+        def lines = ItemType.findAll().collect { [
+            it.id, 
+            it.name?'"'+it.name+'"':"", 
+            it.category?it.category:"", 
+            it.fields?'"'+it.fields+'"':"", 
+        ].join(',') } as List<String>;
+        
+        def outs = response.outputStream
+        
+        response.status = 200
+        response.contentType = "text/csv;charset=UTF-8";
+        response.setHeader "Content-disposition", "attachment; filename=${filename}"
+        
+        outs << "ID, Name, Category, Fields\n"
+        lines.each { String line ->
+            outs << "${line}\n"
+        }
+
+        outs.flush()
+        outs.close()
+
+    }
+    
 
     protected void notFound() {
         request.withFormat {

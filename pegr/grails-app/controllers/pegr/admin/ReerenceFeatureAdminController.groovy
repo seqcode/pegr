@@ -113,6 +113,35 @@ class ReferenceFeatureAdminController {
             '*'{ render status: NO_CONTENT }
         }
     }
+    
+    /**
+     * Export CSV 
+     */
+    def exportCsv() {
+        final String filename = 'ReferenceFeature.csv'
+        def lines = ReferenceFeature.findAll().collect { [
+            it.id, 
+            it.filename?it.filename:"", 
+            it.genome?it.genome:"", 
+            it.summary?it.summary:"", 
+            it.url?it.url:"", 
+        ].join(',') } as List<String>;
+        
+        def outs = response.outputStream
+        
+        response.status = 200
+        response.contentType = "text/csv;charset=UTF-8";
+        response.setHeader "Content-disposition", "attachment; filename=${filename}"
+        
+        outs << "ID, Filename, Genome, Summary, URL\n"
+        lines.each { String line ->
+            outs << "${line}\n"
+        }
+
+        outs.flush()
+        outs.close()
+
+    }
 
     protected void notFound() {
         request.withFormat {

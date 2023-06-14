@@ -109,6 +109,33 @@ class AlignerAdminController {
             '*'{ render status: NO_CONTENT }
         }
     }
+    
+    /**
+     * Export CSV 
+     */
+    def exportCsv() {
+        final String filename = 'Aligner.csv'
+        def lines = Aligner.findAll().collect { [
+            it.id, 
+            it.software?it.software:"", 
+            it.alignerVersion?it.alignerVersion:""
+        ].join(',') } as List<String>;
+        
+        def outs = response.outputStream
+        
+        response.status = 200
+        response.contentType = "text/csv;charset=UTF-8";
+        response.setHeader "Content-disposition", "attachment; filename=${filename}"
+        
+        outs << "ID, Software, Aligner Version\n"
+        lines.each { String line ->
+            outs << "${line}\n"
+        }
+
+        outs.flush()
+        outs.close()
+
+    }
 
     protected void notFound() {
         request.withFormat {

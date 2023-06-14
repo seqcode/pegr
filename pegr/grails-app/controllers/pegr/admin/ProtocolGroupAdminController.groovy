@@ -186,4 +186,34 @@ class ProtocolGroupAdminController {
         redirect(action: "index")
     }
     
+    
+    /**
+     * Export CSV 
+     */
+    def exportCsv() {
+        final String filename = 'ProtocolGroup.csv'
+        def lines = ProtocolGroup.findAll().collect { [
+            it.id, 
+            it.name?'"'+it.name+'"':"", 
+            it.dateCreated?it.dateCreated:"", 
+            it.user?'"'+it.user+'"':"", 
+            it.protocols?'"'+it.protocols+'"':"", 
+        ].join(',') } as List<String>;
+        
+        def outs = response.outputStream
+        
+        response.status = 200
+        response.contentType = "text/csv;charset=UTF-8";
+        response.setHeader "Content-disposition", "attachment; filename=${filename}"
+        
+        outs << "ID, Name, Date Created, User, Protocols\n"
+        lines.each { String line ->
+            outs << "${line}\n"
+        }
+
+        outs.flush()
+        outs.close()
+
+    }
+    
 }

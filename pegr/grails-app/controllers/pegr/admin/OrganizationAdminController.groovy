@@ -160,6 +160,36 @@ class OrganizationAdminController {
         }
         redirect(action: "index")
     }
+    
+    /**
+     * Export CSV 
+     */
+    def exportCsv() {
+        final String filename = 'Organization.csv'
+        def lines = Organization.findAll().collect { [
+            it.id, 
+            it.name?'"'+it.name+'"':"", 
+            it.address?'"'+it.address+'"':"", 
+            it.note?'"'+it.note+'"':"", 
+            it.website?it.website:"", 
+            it.status?it.status:""
+        ].join(',') } as List<String>;
+        
+        def outs = response.outputStream
+        
+        response.status = 200
+        response.contentType = "text/csv;charset=UTF-8";
+        response.setHeader "Content-disposition", "attachment; filename=${filename}"
+        
+        outs << "ID, Name, Address, Note, Website, Status\n"
+        lines.each { String line ->
+            outs << "${line}\n"
+        }
+
+        outs.flush()
+        outs.close()
+
+    }
 
     protected void notFound() {
         request.withFormat {

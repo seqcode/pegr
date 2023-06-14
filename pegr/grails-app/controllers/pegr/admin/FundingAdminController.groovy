@@ -105,6 +105,33 @@ class FundingAdminController {
             '*'{ render status: NO_CONTENT }
         }
     }
+    
+    /**
+     * Export CSV 
+     */
+    def exportCsv() {
+        final String filename = 'Funding.csv'
+        def lines = Funding.findAll().collect { [
+            it.id, 
+            it.number?it.number:"", 
+            it.name?it.name:"", 
+        ].join(',') } as List<String>;
+        
+        def outs = response.outputStream
+        
+        response.status = 200
+        response.contentType = "text/csv;charset=UTF-8";
+        response.setHeader "Content-disposition", "attachment; filename=${filename}"
+        
+        outs << "ID, Number, Name\n"
+        lines.each { String line ->
+            outs << "${line}\n"
+        }
+
+        outs.flush()
+        outs.close()
+
+    }
 
     protected void notFound() {
         request.withFormat {

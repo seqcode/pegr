@@ -105,6 +105,32 @@ class RoleAdminController {
             '*'{ render status: NO_CONTENT }
         }
     }
+    
+    /**
+     * Export CSV 
+     */
+    def exportCsv() {
+        final String filename = 'Role.csv'
+        def lines = Role.findAll().collect { [
+            it.id, 
+            it.authority?it.authority:"", 
+        ].join(',') } as List<String>;
+        
+        def outs = response.outputStream
+        
+        response.status = 200
+        response.contentType = "text/csv;charset=UTF-8";
+        response.setHeader "Content-disposition", "attachment; filename=${filename}"
+        
+        outs << "ID, Authority\n"
+        lines.each { String line ->
+            outs << "${line}\n"
+        }
+
+        outs.flush()
+        outs.close()
+
+    }
 
     protected void notFound() {
         request.withFormat {

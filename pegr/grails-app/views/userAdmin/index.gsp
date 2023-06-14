@@ -13,6 +13,9 @@
     </head>
     <body>
         <div class="container-fluid">
+            <ul class="nav nav-pills">
+                <li><g:link action="exportCsv">Export CSV</g:link></li>
+		    </ul>
             <div class="col-sm-10 text-left">
                 <g:hasErrors>
                     <div class="errors">

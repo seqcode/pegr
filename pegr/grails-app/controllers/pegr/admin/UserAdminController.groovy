@@ -217,6 +217,44 @@ class UserAdminController {
         }
         redirect(action:"index")
     }
+    
+    /**
+     * Export CSV 
+     */
+    def exportCsv() {
+        final String filename = 'User.csv'
+        def lines = User.findAll().collect { [
+            it.id, 
+            it.username?it.username:"", 
+            it.fullName?'"' + it.fullName + '"':"", 
+            it.email?it.email:"", 
+            it.affiliation?it.affiliation:"", 
+            it.address? '"' + it.address + '"':"",
+            it.enabled?it.enabled:"",
+            it.accountExpired?it.accountExpired:"",
+            it.accountLocked?it.accountLocked:"",
+            it.passwordExpired?it.passwordExpired:"",
+            it.authorities?'"'+it.authorities+'"':"",
+            it.roles?'"'+it.roles+'"':"",
+            it.admin?it.admin:"",
+            it.member?it.member:""
+        ].join(',') } as List<String>;
+        
+        def outs = response.outputStream
+        
+        response.status = 200
+        response.contentType = "text/csv;charset=UTF-8";
+        response.setHeader "Content-disposition", "attachment; filename=${filename}"
+        
+        outs << "ID, Username, Full Name, Email, Affiliation, Address, enabled, Account Expired, Account Locked, Password Expired, Groups, Roles, Is Admin, Is Member\n"
+        lines.each { String line ->
+            outs << "${line}\n"
+        }
+
+        outs.flush()
+        outs.close()
+
+    }
 }
 
 class CreateUserCommand implements grails.validation.Validateable {

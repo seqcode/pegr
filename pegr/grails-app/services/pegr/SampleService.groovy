@@ -23,13 +23,16 @@ class SampleService {
             def t = SampleTreatments.createCriteria()
             sample_ids = t.list {
                 treatment {
-                    ilike "name", query.treatment
+                    ilike "name", "%" + query.treatment + "%"
                 }
                 projections {
                     distinct("sample.id")
                 }
             }
-        }
+            if (sample_ids.size() == 0) {
+                return []
+            }
+        } 
         
         def c = Sample.createCriteria()
         def listParams = [
@@ -105,7 +108,7 @@ class SampleService {
                         }
                     }
                 }
-                if (query.treatment) {
+                if (sample_ids && sample_ids.size() > 0) {
                     'in' "id", sample_ids
                 }
             }

@@ -92,20 +92,12 @@ class SampleService {
                     }
                 }
                 if (query.assayId) {
-                    prtclInstSummary {
-                        protocol {
-                            assay {
-                                eq "id", query.assayId
-                            }
-                        }
+                    assay {
+                        eq "id", query.assayId
                     }
                 } else if (query.assay) {
-                    prtclInstSummary {
-                        protocol {
-                            assay {
-                                ilike "name", query.assay
-                            }
-                        }
+                    assay {
+                        ilike "name", query.assay
                     }
                 }
                 if (sample_ids && sample_ids.size() > 0) {

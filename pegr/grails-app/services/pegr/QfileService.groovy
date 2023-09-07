@@ -307,10 +307,7 @@ class QfileService {
 		
 		// try to get username from email
         if (emailStr) {
-            def at = emailStr.indexOf('@')
-            if (at > 0) {
-                username = emailStr[0..<at]
-            }
+            username = emailStr
         }
 
 		// try to get fullname
@@ -358,10 +355,6 @@ class QfileService {
 			}
 			if (user.phone == null && phoneStr) {
 				user.phone = phoneStr
-				flag = 1
-			}
-			if (username && user.username != username ) {
-				user.username = username
 				flag = 1
 			}
 			if (flag == 1) {

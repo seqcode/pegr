@@ -326,7 +326,7 @@ class AlignmentStatsService {
                     }         
                     break
                 case "output_peHistogram": //pe histogram
-                    def newHistogram = queryDatasetsUri(datasets, "png")
+                    def newHistogram = queryDatasetsUri(datasets, "tabular")
                     if (newHistogram) {
                         alignment.peHistogram = newHistogram
                         alignment.save(failOnError: true)

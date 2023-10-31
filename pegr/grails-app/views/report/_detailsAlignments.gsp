@@ -2,9 +2,7 @@
 <ul class="nav nav-tabs">
     <li class="active"><a data-toggle="tab" href="#alignment"> Number of Tags</a></li>
     <li><a data-toggle="tab" href="#alignment2"> Percentage of Tags</a></li>
-    <li><a data-toggle="tab" href="#alignment3"> Additional Information</a></li>
 </ul>
-
 <div class="tab-content">
     <div id="alignment" class="tab-pane in active">
         <g:render template="/report/alignmentTable" model="['sampleList':sampleDTOs]" />
@@ -12,10 +10,10 @@
     <div id="alignment2" class="tab-pane fade">
         <g:render template="/report/alignmentTable2" model="['sampleList':sampleDTOs]" />
     </div>
-    <div id="alignment3" class="tab-pane fade">
-        <g:render template="/report/alignmentTable3" model="['sampleList':sampleDTOs]" />
-    </div>
 </div>
+<h3>Paired-end statistics</h3>
+<g:render template="/report/alignmentTable3" model="['sampleList':sampleDTOs]" />
+
 <h3>Downstream Analysis</h3>
 <ul class="nav nav-tabs">
     <li class="active"><a data-toggle="tab" href="#peak">Peak Statistics</a></li>
@@ -141,6 +139,49 @@
                     },
             });  
         });
+        
+        
+        // plot peHistogram
+        google.charts.load('current', {'packages':['corechart']});
+        var t = 0;
+        $(".peHistogram").each(function(){
+            t += 200;
+            var peTd = $(this);
+            var spinner = $(this).find("i");
+            var peHistogramUrl = $(this).find(".peHistogram-url").text();
+            var container = $(this).find(".peHistogram-fig")[0];
+            setTimeout(function(){
+                google.charts.setOnLoadCallback(function(){
+                    $.ajax({
+                        url: "/pegr/report/fetchPeHistogramDataAjax?url=" + peHistogramUrl,
+                        dataType: "json"
+                    }).done(function(jsonData){
+                        if (jsonData["error"]) {
+                            $(peHistogramTd).empty();
+                            $(peHistogramTd).html(jsonData["error"]);
+                        } else {
+                            // Create our data table out of JSON data loaded from server.
+                            var data = new google.visualization.arrayToDataTable(jsonData);
+
+                            // Instantiate and draw our chart, passing in some options.
+                            var chart = new google.visualization.ColumnChart(container);
+                            var options = {
+                                title: 'Paired-End Insert Size Frequency Histogram',
+                                width: 300, 
+                                height: 150, 
+                                legend: { position: 'none'}, 
+                                vAxis: { title: 'Insert Size (bp)', gridlines: {count: 3 } },
+                                hAxis: { title: 'Frequency', gridlines: {count: 3 } },};
+                            google.visualization.events.addListener(chart, 'ready', function () {
+                                container.innerHTML = '<img src="' + chart.getImageURI() + '">';
+                            });                 
+                            chart.draw(data, options);   
+                            $(spinner).remove();
+                        }
+                    });
+                });
+            }, t);
+        });   
         
         // plot composites
         google.charts.load('current', {'packages':['corechart']});

@@ -7,8 +7,7 @@
                 <th>Genome</th>
                 <th class="text-right">Adapter Dimer Count</th>
                 <th class="text-right">Average Insertion Size (PE)</th>
-                <th class="text-right">Standard Dev (PE)</th>
-                <th class="text-right">Genome Coverage</th>
+                <th>Insert Size Histogram (PE)</th>
             </tr>
         </thead>
         <tbody>
@@ -22,10 +21,15 @@
                             <g:if test="${nAli>0}"><tr></g:if>
                             <td>${alignment.genome}</td>
                             <td class="text-right"><g:formatNumber number="${experiment.adapterDimerCount}" format="###,###,###" /></td>
-                            <td class="text-right">${alignment.avgInsertSize}
-                                <g:if test="${alignment.peHistogram}"><a href="${alignment.peHistogram}" target="_blank"><span class="glyphicon glyphicon-picture"></span></a></g:if></td>
-                            <td class="text-right">${alignment.stdInsertSize}</td>
-                            <td class="text-right"><g:formatNumber number="${alignment.genomeCoverage}" format="##.#%" /></td>
+                            <td class="text-right">${alignment.avgInsertSize}</td>
+                            <td class="peHistogram" style="width:320px">
+                                <g:if test="${alignment.peHistogram}">
+                                <g:link controller="report" action="peHistogram" params="[url: alignment.peHistogram]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link>
+                                <i class="fa fa-spinner fa-spin"></i>
+                                <span class="peHistogram-url" hidden="hidden">${alignment.peHistogram}</span>
+                                <div class="peHistogram-fig"></div>
+                                </g:if>
+                            </td>
                             </tr>
                         </g:each>
                     </g:each>

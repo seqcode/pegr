@@ -38,6 +38,7 @@
         <th>Fastqc Reports</th>
         <th>Genome</th>
         <th>Bam Files</th>
+        <th>BigWig Files</th>
     </thead>
     <tbody>
     <g:each in="${sampleDTOs}" var="sample">
@@ -78,6 +79,21 @@
                 <g:if test="${nAli>0}"><tr></g:if>
                 <td>${alignment.genome}</td>
                 <td><a href="${alignment.bam}">Bam</a></td>
+                <td>
+                <g:if test="${alignment.bigwigForwardFile}">
+                    <a href="${alignment.bigwigForwardFile}">Forward</a>
+                </g:if>
+                <g:else>
+                    NONE&nbsp;
+                </g:else>
+                 | 
+                <g:if test="${alignment.bigwigReverseFile}">
+                    <a href="${alignment.bigwigReverseFile}">Reverse</a>
+                </g:if>
+                <g:else>
+                    NONE&nbsp;
+                </g:else>
+                </td>
                 </tr>
                 </g:each>
         </g:each>

@@ -74,6 +74,8 @@ https://thanos.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=
                 "alignments": [{ "id": long,
                     "genome": "string",
                     "bam": "url",
+                    "bigwigForwardFile": "url",
+                    "bigwigReverseFile": "url",
                     "mappedReads": long,
                     "uniquelyMappedReads": long,
                     "dedupUniquelyMappedReads": long,

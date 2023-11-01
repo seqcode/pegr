@@ -505,6 +505,8 @@ class ReportService {
         def alignmentDTO = new AlignmentDTO(id: alignment.id,
                 genome: alignment.genome,
                 bam: alignment.bamFile,
+                bigwigForwardFile: alignment.bigwigForwardFile,
+                bigwigReverseFile: alignment.bigwigReverseFile,
                 mappedReads: alignment.mappedReads,
                 uniquelyMappedReads: alignment.uniquelyMappedReads,
                 dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,

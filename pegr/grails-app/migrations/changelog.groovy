@@ -2498,4 +2498,5 @@ databaseChangeLog = {
     include file: 'rm_replicate_project.groovy'
     include file: 'add_project_links.groovy'
     include file: 'add_sex_notes.groovy'
+    include file: 'add_bigwig.groovy'
 }

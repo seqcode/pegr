@@ -281,6 +281,8 @@ class AlignmentDTO {
     String genome
     String bamRaw
     String bam
+    String bigwigForwardFile
+    String bigwigReverseFile
     Long mappedReads
     Long uniquelyMappedReads
     Long dedupUniquelyMappedReads

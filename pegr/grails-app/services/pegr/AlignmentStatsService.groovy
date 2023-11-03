@@ -325,8 +325,22 @@ class AlignmentStatsService {
                         alignment.save(failOnError: true)
                     }         
                     break
+                case "output_bigwigForward": // bigwig_forward
+                    def bigwig = queryDatasetsUri(datasets, "bigwig")
+                    if (bigwig) {
+                        alignment.bigwigForwardFile = bigwig
+                        alignment.save(failOnError: true)
+                    }
+                    break
+                case "output_bigwigReverse": // bigwig_reverse
+                    def bigwig = queryDatasetsUri(datasets, "bigwig")
+                    if (bigwig) {
+                        alignment.bigwigReverseFile = bigwig
+                        alignment.save(failOnError: true)
+                    }
+                    break
                 case "output_peHistogram": //pe histogram
-                    def newHistogram = queryDatasetsUri(datasets, "png")
+                    def newHistogram = queryDatasetsUri(datasets, "tabular")
                     if (newHistogram) {
                         alignment.peHistogram = newHistogram
                         alignment.save(failOnError: true)

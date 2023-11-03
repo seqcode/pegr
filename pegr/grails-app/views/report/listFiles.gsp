@@ -21,6 +21,7 @@
             <th>Fastq</th>
             <th>Raw Bam</th>
             <th>Filtered Bam</th>
+            <th>BigWig</th>
             <th>Scidx</th>
         </tr>
     </thead>
@@ -42,6 +43,14 @@
                         <td><g:each in="${experiment.fastq}" var="fastq">${fastq.key}: <a href="${fastq.value}">${fastq.value}</a>; </g:each></td>
                         <td><a href="${alignment.bamRaw}">${alignment.bamRaw}</a> </td>
                         <td><a href="${alignment.bam}">${alignment.bam}</a></td>
+                        <td>
+                          <g:if test="${alignment.bigwigForwardFile}">
+                            Forward: <a href="${alignment.bigwigForwardFile}">${alignment.bigwigForwardFile}</a> <br> 
+                          </g:if>
+                          <g:if test="${alignment.bigwigReverseFile}">
+                            Reverse: <a href="${alignment.bigwigReverseFile}">${alignment.bigwigReverseFile}</a>
+                          </g:if>
+                        </td>
                         <td><a href="${alignment.scidx}">${alignment.scidx}</a></td>
                     </tr>
                 </g:each>

@@ -15,6 +15,8 @@ class SequenceAlignment {
 	boolean isPreferred
     
     String bamFile
+    String bigwigForwardFile
+    String bigwigReverseFile
     String peHistogram
     Long mappedReads
     Long uniquelyMappedReads
@@ -35,6 +37,8 @@ class SequenceAlignment {
         date nullable: true
         historyUrl nullable: true, blank: true
         bamFile nullable: true, blank: true, maxSize: 1000
+        bigwigForwardFile nullable: true, blank: true
+        bigwigReverseFile nullable: true, blank: true
         peHistogram nullable: true, blank: true, maxSize: 1000
         mappedReads nullable: true
         uniquelyMappedReads nullable: true

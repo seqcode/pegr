@@ -505,6 +505,8 @@ class ReportService {
         def alignmentDTO = new AlignmentDTO(id: alignment.id,
                 genome: alignment.genome,
                 bam: alignment.bamFile,
+                bigwigForwardFile: alignment.bigwigForwardFile,
+                bigwigReverseFile: alignment.bigwigReverseFile,
                 mappedReads: alignment.mappedReads,
                 uniquelyMappedReads: alignment.uniquelyMappedReads,
                 dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
@@ -663,6 +665,37 @@ class ReportService {
         def value = s[valueStart..valueEnd-1]
         return value
     }
+    
+   /**
+    * Fetch peHistogram.
+    * @param url of the peHistogram file
+    * @return peHistogram data
+    */
+    def fetchPeHistogram(String url) {        
+        if (url == null || url == "") {
+            return null
+        }
+        def results = []
+        def data
+        try {
+            data = new URL(url).getText()
+        } catch(Exception e) {
+            throw new ReportException(message: "Error fetching the data!")
+        }
+        data.eachLine { line, lineNum ->
+            if (line[0] != "#") {
+                results << line.tokenize()
+            }
+        }
+        String s = '[["Position", "Frequency"]'
+        results.each {
+            def a = it.join(",")
+            s += ",[${a}]"
+        }
+        s += "]"
+        return s
+    }
+        
     
    /**
     * Fetch composite from Composite file.

@@ -136,6 +136,26 @@ class ReportController {
         }
         render result
     }
+    
+    
+    def peHistogram(String url) {
+        [url: url]
+    }
+    
+    def fetchPeHistogramDataAjax(String url) {
+        def result
+        try {
+            result = reportService.fetchPeHistogram(url)
+            if (!result) {
+                result = [error: "No peHistogram data found!"] as JSON
+            }
+        } catch(ReportException e) {
+            result = [error: e.message] as JSON
+        }
+        render result
+    }
+    
+    
 
     def manage() {
         // get QC settings
@@ -261,6 +281,8 @@ class AlignmentDTO {
     String genome
     String bamRaw
     String bam
+    String bigwigForwardFile
+    String bigwigReverseFile
     Long mappedReads
     Long uniquelyMappedReads
     Long dedupUniquelyMappedReads

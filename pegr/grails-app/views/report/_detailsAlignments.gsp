@@ -94,6 +94,7 @@
                     <div id="${alignment.id}-composite${m}" class="featureAnalysis tab-pane fade">
                       <i class="fa fa-spinner fa-spin"></i>
                       <span class="composite-url" hidden="hidden">${alignment.featureAnalysis[m].tabular}</span>
+                      <span class="composite-plot-title" hidden="hidden">${alignment.featureAnalysis[m].plot_title}</span>
                       <span class="composite-xlabel" hidden="hidden">${alignment.featureAnalysis[m].xlabel}</span>
                       <div class="composite-fig" style="width: 512px; height: 300px"></div>
                     </div>
@@ -237,6 +238,7 @@
             var compositeTd = $(this);
             var spinner = $(this).find("i");
             var compositeUrl = $(this).find(".composite-url").text();
+            var plot_title = $(this).find(".composite-plot-title").text();
             var xlabel = $(this).find(".composite-xlabel").text();
             var container = $(this).find(".composite-fig")[0];
             setTimeout(function(){
@@ -256,6 +258,7 @@
                             var chart = new google.visualization.LineChart(container);
                             var options = { width: 512, 
                                             height: 300, 
+                                            title: plot_title,
                                             hAxis: { title: xlabel, 
                                                    titleTextStyle: {fontSize:14,italic:false},
                                                    gridlines: { color: '#DDDDDD', count:8 },

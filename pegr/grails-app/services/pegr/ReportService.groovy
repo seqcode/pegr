@@ -581,6 +581,7 @@ class ReportService {
                                 if (!title) {
                                     title = "Feature Analysis ${id}" 
                                 }
+                                def plot_title = utilityService.queryJson(analysis.parameters, "plot_title")
                                 def xlabel = utilityService.queryJson(analysis.parameters, "xlabel")
                                 if (!xlabel) {
                                     xlabel = "Distance from MEME motif (bp)"

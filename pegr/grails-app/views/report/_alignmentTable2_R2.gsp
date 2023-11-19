@@ -5,10 +5,10 @@
                 <th>Sample ID</th>
                 <th>Sequence Run</th>
                 <th>Genome</th>
-                <th class="text-right">Read Count</th>
-                <th class="text-right">Mapped Read Count</th>
-                <th class="text-right">Uniquely Mapped Count</th>
-                <th class="text-right">Deduplicated Count</th>
+                <th class="text-right">Read Count (R2)</th>
+                <th class="text-right">Mapped Read Count (R2)</th>
+                <th class="text-right">Uniquely Mapped Count (R2)</th>
+                <th class="text-right">Deduplicated Count (R2)</th>
             </tr>
         </thead>
         <tbody>
@@ -21,10 +21,10 @@
                         <g:each in="${experiment.alignments}" var="alignment" status="nAli">
                             <g:if test="${nAli>0}"><tr></g:if>
                             <td>${alignment.genome}</td>
-                            <td class="text-right"><g:formatNumber number="${experiment.totalReads}" format="###,###,###" /></td>
-                            <td class="text-right"><g:formatNumber number="${alignment.mappedReadPct}" format="##.#%" /></td>
-                            <td class="text-right"><g:formatNumber number="${alignment.uniquelyMappedPct}" format="##.#%" /></td>
-                            <td class="text-right"><g:formatNumber number="${alignment.deduplicatedPct}" format="##.#%" /></td>
+                            <td class="text-right"><g:formatNumber number="${experiment.totalReadsR2}" format="###,###,###" /></td>
+                            <td class="text-right"><g:formatNumber number="${alignment.mappedReadPct2}" format="##.#%" /></td>
+                            <td class="text-right"><g:formatNumber number="${alignment.uniquelyMappedPct2}" format="##.#%" /></td>
+                            <td class="text-right"><g:formatNumber number="${alignment.deduplicatedPct2}" format="##.#%" /></td>
                             </tr>
                         </g:each>                    
                     </g:each>                    

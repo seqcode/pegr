@@ -161,14 +161,14 @@ class ReportService {
                     status: [],
                     totalReads: experiment.totalReads,
                     requestedTags: experiment.sample.requestedTagNumber * 1000000,
-                    adapterDimerPct: utilityService.divide(experiment.adapterDimerCount, experiment.totalReads),
                     mappedPct: utilityService.divide(alignment.mappedReads, experiment.totalReads),
                     uniquelyMappedPct: utilityService.divide(alignment.uniquelyMappedReads, experiment.totalReads),
                     deduplicatedPct: utilityService.divide(alignment.dedupUniquelyMappedReads, experiment.totalReads),
                     duplicationLevel: getDuplicationLevel(alignment.dedupUniquelyMappedReads, alignment.mappedReads),
                     isPreferred: alignment.isPreferred,            
                     dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
-                    recommend: experiment.sample.recommend
+                    recommend: experiment.sample.recommend,
+                    dedupUniquelyMappedReadsR2: alignment.dedupUniquelyMappedReadsR2,
                 ]
 
         def stepsStr = Chores.findByName(DYNAMIC_ANALYSIS_STEPS)?.value
@@ -448,6 +448,9 @@ class ReportService {
         alignmentDTO.mappedReadPct = utilityService.divide(alignmentDTO.mappedReads, experimentDTO.totalReads)
         alignmentDTO.uniquelyMappedPct = utilityService.divide(alignmentDTO.uniquelyMappedReads, experimentDTO.totalReads)
         alignmentDTO.deduplicatedPct = utilityService.divide(alignmentDTO.dedupUniquelyMappedReads, experimentDTO.totalReads)
+        alignmentDTO.mappedReadPct2 = utilityService.divide(alignmentDTO.mappedReadsR2, experimentDTO.totalReadsR2)
+        alignmentDTO.uniquelyMappedPct2 = utilityService.divide(alignmentDTO.uniquelyMappedReadsR2, experimentDTO.totalReadsR2)
+        alignmentDTO.deduplicatedPct2 = utilityService.divide(alignmentDTO.dedupUniquelyMappedReadsR2, experimentDTO.totalReadsR2)
     }
     
    /**
@@ -490,6 +493,8 @@ class ReportService {
                               runName: experiment.sequenceRun?.runName,
                               totalReads: experiment.totalReads,
                               adapterDimerCount: experiment.adapterDimerCount,
+                              totalReadsR2: experiment.totalReadsR2,
+                              adapterDimerCountR2: experiment.adapterDimerCountR2,
                               fastqc: fastqc,
                               fastq: fastq,
                               alignments: []
@@ -510,8 +515,13 @@ class ReportService {
                 mappedReads: alignment.mappedReads,
                 uniquelyMappedReads: alignment.uniquelyMappedReads,
                 dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
+                mappedReadsR2: alignment.mappedReadsR2,
+                uniquelyMappedReadsR2: alignment.uniquelyMappedReadsR2,
+                dedupUniquelyMappedReadsR2: alignment.dedupUniquelyMappedReadsR2,
                 avgInsertSize: alignment.avgInsertSize,
-                stdInsertSize: alignment.stdDevInsertSize,
+                stdDevInsertSize: alignment.stdDevInsertSize,
+                medianInsertSize: alignment.medianInsertSize,
+                modeInsertSize: alignment.modeInsertSize,
                 genomeCoverage: alignment.genomeCoverage,
                 peHistogram: alignment.peHistogram,
                 motifCount: 0,

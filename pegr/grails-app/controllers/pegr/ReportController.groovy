@@ -271,6 +271,8 @@ class ExperimentDTO {
     String RunName
     Long totalReads
     Long adapterDimerCount
+    Long totalReadsR2
+    Long adapterDimerCountR2
     Map fastqc
     Map fastq
     List alignments
@@ -286,13 +288,21 @@ class AlignmentDTO {
     Long mappedReads
     Long uniquelyMappedReads
     Long dedupUniquelyMappedReads
+    Long mappedReadsR2
+    Long uniquelyMappedReadsR2
+    Long dedupUniquelyMappedReadsR2
 
     Float mappedReadPct
     Float uniquelyMappedPct
     Float deduplicatedPct
+    Float mappedReadPct2
+    Float uniquelyMappedPct2
+    Float deduplicatedPct2
 
     Integer avgInsertSize
-    Float stdInsertSize
+    Float stdDevInsertSize
+    Float medianInsertSize
+    Float modeInsertSize
     Float genomeCoverage
 
     String peakCallingParam

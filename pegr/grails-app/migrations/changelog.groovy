@@ -2499,4 +2499,5 @@ databaseChangeLog = {
     include file: 'add_project_links.groovy'
     include file: 'add_sex_notes.groovy'
     include file: 'add_bigwig.groovy'
+    include file: 'add_read2.groovy'
 }

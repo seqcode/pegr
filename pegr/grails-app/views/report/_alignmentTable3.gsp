@@ -5,8 +5,10 @@
                 <th>Sample ID</th>
                 <th>Sequence Run</th>
                 <th>Genome</th>
-                <th class="text-right">Adapter Dimer Count</th>
                 <th class="text-right">Average Insertion Size (PE)</th>
+                <th class="text-right">StdDev Insertion Size (PE)</th>
+                <th class="text-right">Median Insertion Size (PE)</th>
+                <th class="text-right">Mode Insertion Size (PE)</th>
                 <th>Insert Size Histogram (PE)</th>
             </tr>
         </thead>
@@ -20,8 +22,10 @@
                         <g:each in="${experiment.alignments}" var="alignment" status="nAli">
                             <g:if test="${nAli>0}"><tr></g:if>
                             <td>${alignment.genome}</td>
-                            <td class="text-right"><g:formatNumber number="${experiment.adapterDimerCount}" format="###,###,###" /></td>
                             <td class="text-right">${alignment.avgInsertSize}</td>
+                            <td class="text-right">${alignment.stdDevInsertSize}</td>
+                            <td class="text-right">${alignment.medianInsertSize}</td>
+                            <td class="text-right">${alignment.modeInsertSize}</td>
                             <td class="peHistogram" style="width:320px">
                                 <g:if test="${alignment.peHistogram}">
                                 <g:link controller="report" action="peHistogram" params="[url: alignment.peHistogram]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link>

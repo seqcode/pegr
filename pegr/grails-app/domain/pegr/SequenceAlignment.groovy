@@ -21,9 +21,14 @@ class SequenceAlignment {
     Long mappedReads
     Long uniquelyMappedReads
     Long dedupUniquelyMappedReads
+    Long mappedReadsR2
+    Long uniquelyMappedReadsR2
+    Long dedupUniquelyMappedReadsR2
     Float seqDuplicationLevel
 	Float avgInsertSize
     Float stdDevInsertSize
+    Float medianInsertSize
+    Float modeInsertSize
     Float genomeCoverage
     String notes
     
@@ -43,9 +48,14 @@ class SequenceAlignment {
         mappedReads nullable: true
         uniquelyMappedReads nullable: true
         dedupUniquelyMappedReads nullable: true
+        mappedReadsR2 nullable: true
+        uniquelyMappedReadsR2 nullable: true
+        dedupUniquelyMappedReadsR2 nullable: true
         seqDuplicationLevel nullable: true
         avgInsertSize nullable: true
         stdDevInsertSize nullable: true
+        medianInsertSize nullable: true
+        modeInsertSize nullable: true
         genomeCoverage nullable: true
         notes nullable: true, blank: true
     }

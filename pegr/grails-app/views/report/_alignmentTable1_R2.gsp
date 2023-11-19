@@ -5,10 +5,11 @@
                 <th>Sample ID</th>
                 <th>Sequence Run</th>
                 <th>Genome</th>
-                <th class="text-right">Read Count</th>
-                <th class="text-right">Mapped Read Count</th>
-                <th class="text-right">Uniquely Mapped Count</th>
-                <th class="text-right">Deduplicated Count</th>
+                <th class="text-right">Read Count (R2)</th>
+                <th class="text-right">Adapter Dimer Count (R2)</th>
+                <th class="text-right">Mapped Read Count (R2)</th>
+                <th class="text-right">Uniquely Mapped Count (R2)</th>
+                <th class="text-right">Deduplicated Count (R2)</th>
             </tr>
         </thead>
         <tbody>
@@ -21,10 +22,11 @@
                         <g:each in="${experiment.alignments}" var="alignment" status="nAli">
                             <g:if test="${nAli>0}"><tr></g:if>
                             <td>${alignment.genome}</td>
-                            <td class="text-right"><g:formatNumber number="${experiment.totalReads}" format="###,###,###" /></td>
-                            <td class="text-right"><g:formatNumber number="${alignment.mappedReads}" format="###,###,###" /></td>
-                            <td class="text-right"><g:formatNumber number="${alignment.uniquelyMappedReads}" format="###,###,###" /></td>
-                            <td class="text-right"><g:formatNumber number="${alignment.dedupUniquelyMappedReads}" format="###,###,###" /></td>
+                            <td class="text-right"><g:formatNumber number="${experiment.totalReadsR2}" format="###,###,###" /></td>
+                            <td class="text-right"><g:formatNumber number="${experiment.adapterDimerCountR2}" format="###,###,###" /></td>
+                            <td class="text-right"><g:formatNumber number="${alignment.mappedReadsR2}" format="###,###,###" /></td>
+                            <td class="text-right"><g:formatNumber number="${alignment.uniquelyMappedReadsR2}" format="###,###,###" /></td>
+                            <td class="text-right"><g:formatNumber number="${alignment.dedupUniquelyMappedReadsR2}" format="###,###,###" /></td>
                             </tr>
                         </g:each>
                     </g:each>

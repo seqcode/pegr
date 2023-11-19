@@ -12,8 +12,10 @@ class SequencingExperiment {
     String fastqFile
     String fastqcReport
     Long totalReads
+    Long totalReadsR2
     Integer indexMismatch
     Long adapterDimerCount
+    Long adapterDimerCountR2
 	
     List getAlignments() {
         return SequenceAlignment.where{sequencingExperiment == this}.list(sort: "date")
@@ -39,7 +41,9 @@ class SequencingExperiment {
         fastqFile nullable: true, blank: true, maxSize: 1000
         fastqcReport nullable: true, blank: true, maxSize: 1000
         totalReads nullable: true
+        totalReadsR2 nullable: true
         indexMismatch nullable: true
         adapterDimerCount nullable: true
+        adapterDimerCountR2 nullable: true
 	}
 }

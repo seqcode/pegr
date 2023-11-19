@@ -125,3 +125,7 @@ assets {
     minifyJs = true
     minifyCss = true
 }
+
+springBoot {
+    mainClassName = 'pegr.Application'
+}

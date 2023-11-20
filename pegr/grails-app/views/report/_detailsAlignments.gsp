@@ -70,7 +70,28 @@
                         <g:each in="${(0..<alignment.motifCount)}" var="n">
                             <tr>
                                 <td class="meme-id" style="width:20px"></td>
-                                <td class="meme-fig" style="width:350px"><i class="fa fa-spinner fa-spin"></i></td>
+                                <g:if test="${alignment.memeSvgForward}">
+                                <td class="meme-fig" style="width:350px">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                    <div class="preview_box">
+                                        <div class="preview_btn_box">
+                                            <div class="preview_btn plus active" tabindex="0">+</div>
+                                            <div class="preview_btn minus" tabindex="0">-</div>
+                                        </div>
+                                        <div class="preview_logo_box">
+                                            <div style="width:250px;height:50px" class="meme-svg meme-svg-forward">
+                                                <span class="meme-fig-url-forward" hidden="hidden">${alignment.memeSvgForward[n]}</span>
+                                            </div>
+                                            <div style="width:250px;height:50px;display:none" class="meme-svg meme-svg-reverse">
+                                                <span class="meme-fig-url-reverse" hidden="hidden">${alignment.memeSvgReverse[n]}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                </g:if>
+                                <g:else>
+                                <td style="width:350px">
+                                </g:else>
                                 <td class="meme-evalue" style="width:100px"></td>
                                 <td class="meme-sites" style="width:100px"></td>
                                 <td class="meme-width" style="width:100px"></td>
@@ -109,6 +130,39 @@
 <script>
     $(function() {
         // plot meme
+        $(".preview_btn").on("click", function(){
+            $(this).addClass("active");
+            var logo = $(this).parent().next();
+            if ($(this).hasClass("plus")) {
+                $(this).next().removeClass("active");
+                logo.find(".meme-svg-forward").show();
+                logo.find(".meme-svg-reverse").hide();
+            } else {
+                $(this).prev().removeClass("active");
+                logo.find(".meme-svg-forward").hide();
+                logo.find(".meme-svg-reverse").show();
+            }            
+        });
+        $(".meme-fig").each(function(index, memeFig) {
+            $(memeFig).find("i").remove();
+            var memeUrlForward = $(this).find(".meme-fig-url-forward").text();
+            $.ajax({ 
+                url: "/pegr/report/fetchMemeFigAjax?url=" + memeUrlForward,
+                success: 
+                    function(result) {
+                        $(memeFig).find(".meme-svg-forward").append(result);
+                    }
+            });  
+            var memeUrlReverse = $(this).find(".meme-fig-url-reverse").text();
+            $.ajax({ 
+                url: "/pegr/report/fetchMemeFigAjax?url=" + memeUrlReverse,
+                success: 
+                    function(result) {
+                        $(memeFig).find(".meme-svg-reverse").append(result);
+                    }
+            });  
+        });
+        
         $(".meme-table").each(function(){
             var memeTable = $(this);
             var memeUrl = $(this).find(".meme-url").text();
@@ -120,15 +174,6 @@
                             if (index < result.length) {
                                 $(memeId).html(result[index].id);
                             }
-                        });
-                        memeTable.find(".meme-fig").each(function(index, memeFig) {
-                            $(memeFig).find("i").remove();
-                            if (index < result.length) {
-                                const memeDrawer = new MemeDrawer();
-                                memeDrawer.make_motif(memeFig, result[index]);
-                            } else {
-                                $(memeFig).html("No MEME data found!");
-                            }                            
                         });
                         memeTable.find(".meme-evalue").each(function(index, memeEvalue) {
                             if (index < result.length) {
@@ -148,7 +193,6 @@
                     },
             });  
         });
-        
         
         // plot peHistogram
         google.charts.load('current', {'packages':['corechart']});

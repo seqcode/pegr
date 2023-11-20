@@ -119,6 +119,11 @@ class ReportController {
         def results = reportService.fetchMemeMotif(url) as JSON
         render results
     }
+    
+    def fetchMemeFigAjax(String url) {
+        def result = new URL(url).getText() 
+        render result
+    }
 
     def composite(String url) {
         [url: url]
@@ -314,6 +319,8 @@ class AlignmentDTO {
     Long nonPairedPeaks
     String memeFile
     String memeFig
+    List memeSvgForward
+    List memeSvgReverse
     String peHistogram
     List fourColor
     String scidx

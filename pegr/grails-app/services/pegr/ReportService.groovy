@@ -161,6 +161,7 @@ class ReportService {
                     status: [],
                     totalReads: experiment.totalReads,
                     requestedTags: experiment.sample.requestedTagNumber * 1000000,
+                    adapterDimerPct: utilityService.divide(experiment.adapterDimerCount, experiment.totalReads),
                     mappedPct: utilityService.divide(alignment.mappedReads, experiment.totalReads),
                     uniquelyMappedPct: utilityService.divide(alignment.uniquelyMappedReads, experiment.totalReads),
                     deduplicatedPct: utilityService.divide(alignment.dedupUniquelyMappedReads, experiment.totalReads),

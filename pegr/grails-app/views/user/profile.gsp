@@ -56,7 +56,7 @@
         <g:link action='updatePassword' class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil">Change</span></g:link>
         </ul>
         <h3>API Key</h3>
-        <g:if test="${user?.apiKey}">${user.apiKey}</g:if>
+        <g:if test="${user?.apiKey}">${user.apiKey} <g:link onclick='return confirm("Re-generate your API key?")' controller="user" action="generateApiKey" class="btn btn-primary">Re-generate</g:link></g:if>
         <g:else><g:link controller="user" action="generateApiKey" class="btn btn-primary">Generate</g:link></g:else>
     </div>
 </body>

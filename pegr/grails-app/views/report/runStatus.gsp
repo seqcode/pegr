@@ -265,7 +265,7 @@
             });
             </sec:ifAnyGranted>
             
-            $("#qc-statistics th").each(function(){
+            $(".qc-statistics th").each(function(){
                 $(this).append(" <span class='glyphicon glyphicon-minus-sign small'></span>");
             });
             
@@ -381,6 +381,107 @@
             parent.find(".notes").val(origNotes);
         });
 
-    </script>
+    var codes = {"OK":"OK",
+                 "Error":"Error",
+                 "Permission":"Permission denied",
+                 "Zero":"Empty datasets"};
+    var codeClasses = {
+        "OK":"label-success",
+         "Error":"label-danger",
+         "Permission":"label-warning",
+         "Zero":"label-info"
+    }
+
+    $(".edit-code").on("click", function(){
+        var $root = $(this).closest(".popover-content");
+        var $selectCode = "<label>Code</label><select>";
+        for (var code in codes) {
+            $selectCode += '<option value="' + code + '">'+ codes[code] + '</option>';
+        }
+        $selectCode += "</select>";
+        var message = $root.find(".status-message").text()
+        var $inputMessage = "<input class='input-message' name='message' value='"+message+"'>";
+        var $save = "<button class='btn btn-primary save'>Save</button>";
+        var $cancel = "<button class='btn btn-default cancel'>Cancel</button>";
+        $root.append("<div class='edit-code'>" +$selectCode + $inputMessage + $save + $cancel + "</div>");
+    });
+
+    $(".popover-wrapper").on("click", ".cancel", function(){
+        $(this).closest("div.edit-code").remove();
+    });
+
+    $(".popover-wrapper").on("click", ".save", function(){
+        var $td = $(this).closest("td");
+        var analysisId = $td.find(".analysisId").val();
+        var code = $td.find("select").val();
+        var message = $td.find(".input-message").val();
+        $.ajax({
+            url:"/pegr/report/updateAnalysisCodeAjax",
+            type:"POST",
+            data:{analysisId: analysisId, code: code, message: message},
+            success:function(){
+                $td.find(".code").removeClass("label-default label-danger label-warning label-info").addClass(codeClasses[code]);
+                $td.find(".status-message").text(message);
+                $td.find("div.edit-code").remove();
+            }
+        })
+    });
+        
+	$('.selectAll').click(function() {
+        let checkboxes = $(this).closest("table").find("input[name=delete]");
+		if (this.checked) {
+			checkboxes.prop('checked', true);
+		}
+		else {
+			checkboxes.prop('checked', false);
+		}
+	});
+
+	$('input[name="delete"]').click(function(){
+		if (!this.checked) {
+			$(this).closest('.selectAll').prop('checked', false);
+		}
+	});
+
+	// axa677-180306: added the following jQuery function so when the button(link): ajaxDeletAll clicked,
+	// it scans the checkboxes, retrieves their names, and stores them in an array
+	$(".ajaxDeleteAll").click(function() {
+		var alignmentIds = [];
+		var runId = 0;
+        let checkboxes = $(this).closest("table").find("input[name=delete]");
+		checkboxes.each(function(){
+			if (this.checked) {
+				alignmentIds.push(this.value);
+				runId = this.getAttribute("data-runId");
+			}
+		});
+		if (confirm('All data in the selected alignment(s) will be deleted. Are you sure you want to delete the following alignment(s): ' + alignmentIds + ' for run number: ' + runId + '?'))
+		{ // axa677-180306: the next ajax call sends the array as a json dictionary with the run id to a controller action
+		  // then get the results as html
+			$.ajax({
+				url:"${createLink(controller: 'report', action: 'deleteAllAlignmentAjax')}",
+				type:"GET",
+				data: {"alignIdsList": JSON.stringify(alignmentIds), "runId": runId},
+				success : function(result){
+					$("html").html(result);
+				},
+				error : function(e) {
+					console.info("Error" + e);
+				}
+			});
+		}
+	});
+
+    $(".verifyAll").click(function() {
+        let verify_all = $(this).prop("checked");
+        let checkboxes = $(this).closest("table").find(".prefer");
+        checkboxes.each(function(){
+			if ($(this).prop("checked") != verify_all) {
+                $(this).click();
+			}
+		});
+	});
+</script>
+
 </body>
 </html>

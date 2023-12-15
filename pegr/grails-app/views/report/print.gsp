@@ -276,10 +276,10 @@
         
         // time delayed to draw composite figs
         var t = 0;
-        $(".composite-fig").each(function(){
-            t += 10;
-            var container = $(this);
-            var compositeUrl = $(this).attr("data-composite-url");
+        $(".composite").each(function(){
+            t += 100;
+            var container = $(this).find(".composite-fig")[0];
+            var compositeUrl = $(container).attr("data-composite-url");
             setTimeout(function(){
                 google.charts.setOnLoadCallback(function(){
                     $.ajax({
@@ -293,7 +293,7 @@
                             var data = new google.visualization.arrayToDataTable(jsonData);
 
                             // Instantiate and draw our chart, passing in some options.
-                            var chart = new google.visualization.LineChart(container[0]);
+                            var chart = new google.visualization.LineChart(container);
                             var options = { width: 400, 
                                            height: 200, 
                                            hAxis: { title: 'Distance from MEME motif (bp)', 

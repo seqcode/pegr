@@ -2,14 +2,17 @@
     <table class="table  table-bordered">
         <thead>
             <tr>
-                <th>Sample ID</th>
-                <th>Sequence Run</th>
-                <th>Genome</th>
-                <th class="text-right">Average Insertion Size (PE)</th>
-                <th class="text-right">StdDev Insertion Size (PE)</th>
-                <th class="text-right">Median Insertion Size (PE)</th>
-                <th class="text-right">Mode Insertion Size (PE)</th>
-                <th>Insert Size Histogram (PE)</th>
+                <th rowspan="2">Sample ID</th>
+                <th rowspan="2">Sequence Run</th>
+                <th rowspan="2">Genome</th>
+                <th colspan="4">Insertion Size (PE)</th>
+                <th rowspan="2">Insert Size Histogram (PE)</th>
+            </tr>
+            <tr>
+                <th class="text-right">Average</th>
+                <th class="text-right">StdDev</th>
+                <th class="text-right">Median</th>
+                <th class="text-right">Mode</th>
             </tr>
         </thead>
         <tbody>
@@ -26,7 +29,7 @@
                             <td class="text-right">${alignment.stdDevInsertSize}</td>
                             <td class="text-right">${alignment.medianInsertSize}</td>
                             <td class="text-right">${alignment.modeInsertSize}</td>
-                            <td class="peHistogram" style="width:320px">
+                            <td class="peHistogram" style="width:500px">
                                 <g:if test="${alignment.peHistogram}">
                                 <g:link controller="report" action="peHistogram" params="[url: alignment.peHistogram]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link>
                                 <i class="fa fa-spinner fa-spin"></i>

@@ -79,10 +79,10 @@
                                             <div class="preview_btn minus" tabindex="0">-</div>
                                         </div>
                                         <div class="preview_logo_box">
-                                            <div style="width:250px;height:50px" class="meme-svg meme-svg-forward">
+                                            <div style="height:50px" class="meme-svg meme-svg-forward">
                                                 <span class="meme-fig-url-forward" hidden="hidden">${alignment.memeSvgForward[n]}</span>
                                             </div>
-                                            <div style="width:250px;height:50px;display:none" class="meme-svg meme-svg-reverse">
+                                            <div style="height:50px;display:none" class="meme-svg meme-svg-reverse">
                                                 <span class="meme-fig-url-reverse" hidden="hidden">${alignment.memeSvgReverse[n]}</span>
                                             </div>
                                         </div>
@@ -220,8 +220,8 @@
                             var chart = new google.visualization.ColumnChart(container);
                             var options = {
                                 title: 'Paired-End Insert Size Frequency Histogram',
-                                width: 300, 
-                                height: 150, 
+                                width: 450, 
+                                height: 225, 
                                 legend: { position: 'none'}, 
                                 vAxis: { title: 'Insert Size (bp)', gridlines: {count: 3 } },
                                 hAxis: { title: 'Frequency', gridlines: {count: 3 } },};

@@ -167,13 +167,14 @@
         </table>
     </section>
     <section>
-        <h4>MEME Motifs</h4>
+        <h4>Advanced Analysis</h4>
         <ul>
             <g:each in="${sampleList}" var="sample">
             <li>
                 <h4>${sample.id} ${sample.naturalId}</h4>
                 <g:each in="${sample.experiments}" var="experiment">
                 <g:each in="${experiment.alignments}" var="alignment">
+                <h5>MEME Motifs</h5>
                 <table class="table table-bordered meme-table" data-meme-url="${alignment.memeFile}">
                     <tbody>
                     <g:if test="${alignment.motifCount}">
@@ -191,6 +192,18 @@
                     </g:if>
                     </tbody>
                 </table>
+                <g:each in="${0..<alignment.featureAnalysis.size()}" var="m">
+                  <g:if test="${alignment.featureAnalysis[m]}">
+                    <h5>${alignment.featureAnalysis[m].title}</h5>
+                    <div id="${alignment.id}-composite${m}" class="featureAnalysis">
+                      <i class="fa fa-spinner fa-spin"></i>
+                      <span class="composite-url" hidden="hidden">${alignment.featureAnalysis[m].tabular}</span>
+                      <span class="composite-plot-title" hidden="hidden">${alignment.featureAnalysis[m].plot_title}</span>
+                      <span class="composite-xlabel" hidden="hidden">${alignment.featureAnalysis[m].xlabel}</span>
+                      <div class="composite-fig" style="width: 512px; height: 300px"></div>
+                    </div>
+                  </g:if>
+                </g:each>
                 </g:each>
                 </g:each>
             </li>
@@ -273,7 +286,53 @@
                     });
                 });
             }, t);
-        });    
+        });
+        
+        $(".featureAnalysis").each(function(){
+            t += 200;
+            var compositeTd = $(this);
+            var spinner = $(this).find("i");
+            var compositeUrl = $(this).find(".composite-url").text();
+            var plot_title = $(this).find(".composite-plot-title").text();
+            var xlabel = $(this).find(".composite-xlabel").text();
+            var container = $(this).find(".composite-fig")[0];
+            setTimeout(function(){
+                google.charts.setOnLoadCallback(function(){
+                    $.ajax({
+                        url: "/pegr/report/fetchCompositeDataAjax?url=" + compositeUrl,
+                        dataType: "json"
+                    }).done(function(jsonData){
+                        if (jsonData["error"]) {
+                            $(compositeTd).empty();
+                            $(compositeTd).html(jsonData["error"]);
+                        } else {
+                            // Create our data table out of JSON data loaded from server.
+                            var data = new google.visualization.arrayToDataTable(jsonData);
+
+                            // Instantiate and draw our chart, passing in some options.
+                            var chart = new google.visualization.LineChart(container);
+                            var options = { width: 512, 
+                                            height: 300, 
+                                            title: plot_title,
+                                            hAxis: { title: xlabel, 
+                                                   titleTextStyle: {fontSize:14,italic:false},
+                                                   gridlines: { color: '#DDDDDD', count:8 },
+                                            },
+                                            vAxis: { title: 'Tag frequency', 
+                                                   titleTextStyle: {fontSize:14,italic:false},
+                                                   gridlines: { color: '#DDDDDD', count:7 },
+                                                    format: '#.##'
+                                            },
+                                            curveType: 'function',
+                                            legend: { position: 'right' }
+                                          };                            
+                            chart.draw(data, options);   
+                            $(spinner).remove();
+                        }
+                    });
+                });
+            }, t);
+        }); 
     });
 </script>
 </body>

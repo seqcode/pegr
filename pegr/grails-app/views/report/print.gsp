@@ -180,8 +180,29 @@
                     <g:if test="${alignment.motifCount}">
                     <g:each in="${(0..<alignment.motifCount)}" var="n">
                         <tr>
-                            <td style='min-width:6em;line-height:1em' class="meme-id" style="width:20px"></td>
-                            <td class="meme-fig" style="width:350px"><i class="fa fa-spinner fa-spin"></i></td>
+                            <td style='min-width:6em;line-height:1em' class="meme-id"></td>
+                            <g:if test="${alignment.memeSvgForward}">
+                            <td class="meme-fig" style="width:350px">
+                                <i class="fa fa-spinner fa-spin"></i>
+                                <div class="preview_box">
+                                    <div class="preview_btn_box">
+                                        <div class="preview_btn plus active" tabindex="0">+</div>
+                                        <div class="preview_btn minus" tabindex="0">-</div>
+                                    </div>
+                                    <div class="preview_logo_box">
+                                        <div class="meme-svg meme-svg-forward">
+                                            <span class="meme-fig-url-forward" hidden="hidden">${alignment.memeSvgForward[n]}</span>
+                                        </div>
+                                        <div style="display:none" class="meme-svg meme-svg-reverse">
+                                            <span class="meme-fig-url-reverse" hidden="hidden">${alignment.memeSvgReverse[n]}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            </g:if>
+                            <g:else>
+                            <td style="width:350px">
+                            </g:else>
                             <td class="composite" style="width:320px">
                               <g:if test="${alignment.composite[n]}">
                                 <span class="composite-fig" data-composite-url="${alignment.composite[n]}"><i class="fa fa-spinner fa-spin"></i></span>
@@ -213,13 +234,27 @@
 </main>
 <script>
     $(function() {
-        // plot composites
-        google.charts.load('current', {'packages':['corechart']});
-        
-        // time delayed to draw composite figs
-        var t = 0;
-        
         // plot meme
+        $(".meme-fig").each(function(index, memeFig) {
+            $(memeFig).find("i").remove();
+            var memeUrlForward = $(this).find(".meme-fig-url-forward").text();
+            $.ajax({ 
+                url: "/pegr/report/fetchMemeFigAjax?url=" + memeUrlForward,
+                success: 
+                    function(result) {
+                        $(memeFig).find(".meme-svg-forward").append(result);
+                    }
+            });  
+            var memeUrlReverse = $(this).find(".meme-fig-url-reverse").text();
+            $.ajax({ 
+                url: "/pegr/report/fetchMemeFigAjax?url=" + memeUrlReverse,
+                success: 
+                    function(result) {
+                        $(memeFig).find(".meme-svg-reverse").append(result);
+                    }
+            });  
+        });
+        
         $(".meme-table").each(function(){
             var memeTable = $(this);
             var memeUrl = $(this).attr("data-meme-url");
@@ -232,19 +267,15 @@
                                 $(memeId).html("<p>MOTIF " + result[index].id + "</p><p>E-value: " + result[index].evalue + "</p><p>Sites: " + result[index].nsites + "</p><p>Width: " + result[index].len + "</p>");
                             }
                         });
-                        memeTable.find(".meme-fig").each(function(index, memeFig){
-                            $(memeFig).find("i").remove();
-                            if (index < result.length) {
-                                const memeDrawer = new MemeDrawer();
-                                memeDrawer.make_motif(memeFig, result[index]);
-                            } else {
-                                $(memeFig).html("No MEME data found!");
-                            }  
-                        });
                     },
             });  
         });
         
+        // plot composites
+        google.charts.load('current', {'packages':['corechart']});
+        
+        // time delayed to draw composite figs
+        var t = 0;
         $(".composite-fig").each(function(){
             t += 10;
             var container = $(this);

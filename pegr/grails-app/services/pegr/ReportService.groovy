@@ -160,12 +160,18 @@ class ReportService {
                     date: alignment.date,
                     status: [],
                     totalReads: experiment.totalReads,
+                    totalReadsR2: experiment.totalReadsR2,
                     requestedTags: experiment.sample.requestedTagNumber * 1000000,
                     adapterDimerPct: utilityService.divide(experiment.adapterDimerCount, experiment.totalReads),
+                    adapterDimerPctR2: utilityService.divide(experiment.adapterDimerCountR2, experiment.totalReadsR2),
                     mappedPct: utilityService.divide(alignment.mappedReads, experiment.totalReads),
+                    mappedPctR2: utilityService.divide(alignment.mappedReadsR2, experiment.totalReadsR2),
                     uniquelyMappedPct: utilityService.divide(alignment.uniquelyMappedReads, experiment.totalReads),
+                    uniquelyMappedPctR2: utilityService.divide(alignment.uniquelyMappedReadsR2, experiment.totalReadsR2),
                     deduplicatedPct: utilityService.divide(alignment.dedupUniquelyMappedReads, experiment.totalReads),
+                    deduplicatedPctR2: utilityService.divide(alignment.dedupUniquelyMappedReadsR2, experiment.totalReadsR2),
                     duplicationLevel: getDuplicationLevel(alignment.dedupUniquelyMappedReads, alignment.mappedReads),
+                    duplicationLevelR2: getDuplicationLevel(alignment.dedupUniquelyMappedReadsR2, alignment.mappedReadsR2),
                     isPreferred: alignment.isPreferred,            
                     dedupUniquelyMappedReads: alignment.dedupUniquelyMappedReads,
                     recommend: experiment.sample.recommend,
@@ -579,7 +585,6 @@ class ReportService {
                             if (identifier.contains("MOTIF")) {
                                 alignmentDTO.composite[id-1] = tabulars.last()
                             } else {
-                                print("composite-id:${id}\n")
                                 def title = utilityService.queryJson(analysis.parameters, "title")
                                 if (!title) {
                                     title = "Feature Analysis ${id}" 

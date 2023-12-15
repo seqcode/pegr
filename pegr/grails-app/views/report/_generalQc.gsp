@@ -104,7 +104,6 @@
 
                     <td class="text-right col-tags group-qc"><g:formatNumber number="${alignment.requestedTags}" format="###,###,###" /></td>
                     <g:each in="${qcSettings.general}" var="setting">
-                      <g:if test="${setting.name != "Deduplicated"}">
                         <td class="text-right col-${setting.key} group-qc <g:if test='${
                                    (setting.min != null && alignment[setting.key] < setting.min)
                                    || (setting.max != null && alignment[setting.key] > setting.max)
@@ -113,7 +112,6 @@
                                    }'>bg-danger</g:if>">
                         <g:formatNumber number="${alignment[setting.key]}" format="${setting.numFormat}" />
                         </td>
-                      </g:if>
                     </g:each>
                     <td class="col-prefer group-operation">
                         <span class="alignmentId" style="display:none">${alignment.alignmentId}</span>

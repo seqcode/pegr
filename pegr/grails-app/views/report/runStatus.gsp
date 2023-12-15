@@ -170,7 +170,7 @@
         </small> 
         <a href="#" onclick="window.open('/pegr/help#report', 'Help: report', 'width=600,height=400' )" class="pull-right"><small><u>Help</u></small></a>
     </h3>
-    <g:link controller="report" action="unknownIndex" params="[runId: run.id]">Demultiplexing Report</g:link>
+    <div style="font-size:1.5em;padding-bottom:0.5em;"><g:link controller="report" action="unknownIndex" params="[runId: run.id]">Demultiplexing Report</g:link></div>
     <div>
         <ul class="nav nav-tabs">
             <g:each in="${runStatus}" var="it" status="i">

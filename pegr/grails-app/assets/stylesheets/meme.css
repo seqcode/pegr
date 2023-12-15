@@ -813,7 +813,7 @@ div.preview_btn_box {
 
 div.preview_logo_box {
   height: 50px;
-  overflow-y: hidden;
+  overflow-y: visible;
 }
 
 div.preview_btn_box + div.preview_logo_box {

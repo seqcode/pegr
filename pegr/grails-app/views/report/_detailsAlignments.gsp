@@ -71,7 +71,7 @@
                             <tr>
                                 <td class="meme-id" style="width:20px"></td>
                                 <g:if test="${alignment.memeSvgForward}">
-                                <td class="meme-fig" style="width:350px">
+                                <td class="meme-fig" style="width:450px">
                                     <i class="fa fa-spinner fa-spin"></i>
                                     <div class="preview_box">
                                         <div class="preview_btn_box">
@@ -79,10 +79,10 @@
                                             <div class="preview_btn minus" tabindex="0">-</div>
                                         </div>
                                         <div class="preview_logo_box">
-                                            <div style="height:50px" class="meme-svg meme-svg-forward">
+                                            <div class="meme-svg meme-svg-forward">
                                                 <span class="meme-fig-url-forward" hidden="hidden">${alignment.memeSvgForward[n]}</span>
                                             </div>
-                                            <div style="height:50px;display:none" class="meme-svg meme-svg-reverse">
+                                            <div style="display:none" class="meme-svg meme-svg-reverse">
                                                 <span class="meme-fig-url-reverse" hidden="hidden">${alignment.memeSvgReverse[n]}</span>
                                             </div>
                                         </div>
@@ -90,7 +90,7 @@
                                 </td>
                                 </g:if>
                                 <g:else>
-                                <td style="width:350px">
+                                <td style="width:450px">
                                 </g:else>
                                 <td class="meme-evalue" style="width:100px"></td>
                                 <td class="meme-sites" style="width:100px"></td>

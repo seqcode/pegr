@@ -14,6 +14,9 @@
         h5 {
             padding-top: 10px;
         }
+        svg {
+            max-height: 50px;
+        }
     </style>
 </head>
 <body>

@@ -20,6 +20,9 @@
         thead {
             display: table-row-group;
         }
+        svg {
+            max-height: 50px;
+        }
     </style>
 </head>
 <body>

@@ -14,7 +14,7 @@
             <tr>
                 <th colspan="6" class="text-center group group-analysis">Analysis</th>
                 <th colspan="${runStatusMap.value.steps.size()-1}" class="text-center group group-pipeline">Pipeline</th>
-                <th colspan="${qcSettings.general?.size()}" class="text-center group group-qc">Quality Control</th>
+                <th colspan="${qcSettings.general?.size() + 1}" class="text-center group group-qc">Quality Control</th>
                 <th colspan="2" class="text-center group group-operation">Operation</th>
             </tr>
             <tr>
@@ -33,7 +33,6 @@
                 </g:if>
                 <th class="text-right col-tags group-qc">Requested Tags</th>
                 <g:each in="${qcSettings.general}" var="setting">
-                  <g:if test="${setting.name != 'Deduplicated'}">
                     <th class="text-right col-${setting.key} group-qc">
                         ${setting.name}
                         <ul style="font-weight: normal">
@@ -43,10 +42,11 @@
                             <g:if test="${setting.reference_max}"><li>min: ${setting.reference_max}</li></g:if>
                         </ul>
                     </th>
-                  </g:if>
                 </g:each>
-                <th class="col-prefer group-operation"><label class="switch"><input class="prefer2 verifyAll" type="checkbox"><div class="slider round"></div></label><span class="isAdmin" style="display:none">${isAdmin}</span>
-					<br/>Verified</th>
+                <th class="col-prefer group-operation">
+                    <label class="switch"><input class="prefer2 verifyAll" type="checkbox"><div class="slider round"></div></label>
+                    <br/>Verified
+                </th>
                 <th class="col-delete group-operation"><input type="checkbox" class="selectAll" value="selectAll">
                     <a class="ajaxDeleteAll" type="button"><span class="glyphicon glyphicon-trash"></span></a>
 					<br/>Delete

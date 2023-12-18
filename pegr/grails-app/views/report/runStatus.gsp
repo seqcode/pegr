@@ -227,6 +227,14 @@
     <br>
     <script>        
         $(function(){  
+            $(".verifyAll").each(function() {
+                let checkboxes = $(this).closest("table").find(".prefer:checkbox:not(:checked)");
+                
+                if (checkboxes.length == 0) {
+                    $(this).prop("checked", true);
+                } 
+            });
+            
             var hash = window.location.hash;
             hash && $('ul.nav a[href="' + hash + '"]').tab('show');
 
@@ -473,13 +481,38 @@
 	});
 
     $(".verifyAll").click(function() {
-        let verify_all = $(this).prop("checked");
+        let new_status = $(this).prop("checked");
+        
+        // a flag for whether any switch is prevented by unsuccessful steps
+        let flag = false; 
+        
         let checkboxes = $(this).closest("table").find(".prefer");
         checkboxes.each(function(){
-			if ($(this).prop("checked") != verify_all) {
-                $(this).click();
-			}
-		});
+            if ($(this).prop("checked") != new_status) {
+                let switching = true;
+                
+                // check if all the steps are successful before switching to verified
+                if (new_status) {
+                    let steps = $(this).closest("tr").find("td.analysis-status");
+                    steps.each(function() {
+                        let success = $(this).find("span.label-success").length;
+                        if (success == 0) {
+                            switching = false;
+                            flag = true;
+                        }
+                    });
+                }
+                
+                if ( switching ) {
+                    $(this).click();
+                }                    
+            }
+        });
+        
+        if (flag) {
+            $(this).prop("checked", false);
+            alert("Some runs are NOT verified because unsuccessful steps are found in those runs!");
+        }              
 	});
 </script>
 

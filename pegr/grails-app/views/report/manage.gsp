@@ -16,7 +16,7 @@
         </ul>
         <div class="tab-content">
         <div id="qc-settings" class="tab-pane fade in active">     
-            <p style="padding:10px 0 0 16px;">Available keys: totalReads,  dedupUniquelyMappedReads, adapterDimerPct, MappedPct, uniquelyMappedPct, deduplicatePct, duplicationLevel, totalReadsR2, dedupUniquelyMappedReadsR2, adapterDimerPctR2, MappedPctR2, uniquelyMappedPctR2, deduplicatePctR2, duplicationLevelR2.</p>
+            <p style="padding:10px 0 0 16px;">Available keys: totalReads, dedupUniquelyMappedReads, adapterDimerPct, mappedPct, uniquelyMappedPct, deduplicatedPct, duplicationLevel, totalReadsR2, dedupUniquelyMappedReadsR2, adapterDimerPctR2, MappedPctR2, uniquelyMappedPctR2, deduplicatedPctR2, duplicationLevelR2.</p>
             <button class="add pull-right edit">Add Row</button>
             <g:if test="${flash.message}">
                 <div class="message">${flash.message}</div>

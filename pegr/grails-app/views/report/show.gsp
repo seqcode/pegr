@@ -14,7 +14,7 @@
         h5 {
             padding-top: 10px;
         }
-        svg {
+        .meme-fig svg {
             max-height: 50px;
         }
     </style>

@@ -198,7 +198,7 @@
         google.charts.load('current', {'packages':['corechart']});
         var t = 0;
         $(".peHistogram").each(function(){
-            t += 200;
+            t += 20;
             var peTd = $(this);
             var spinner = $(this).find("i");
             var peHistogramUrl = $(this).find(".peHistogram-url").text();
@@ -237,10 +237,8 @@
         });   
         
         // plot composites
-        google.charts.load('current', {'packages':['corechart']});
-        var t = 0;
         $(".composite").each(function(){
-            t += 200;
+            t += 20;
             var compositeTd = $(this);
             var spinner = $(this).find("i");
             var compositeUrl = $(this).find(".composite-url").text();
@@ -278,7 +276,7 @@
         });   
         
         $(".featureAnalysis").each(function(){
-            t += 200;
+            t += 20;
             var compositeTd = $(this);
             var spinner = $(this).find("i");
             var compositeUrl = $(this).find(".composite-url").text();

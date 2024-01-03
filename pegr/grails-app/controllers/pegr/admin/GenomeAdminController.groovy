@@ -140,6 +140,7 @@ class GenomeAdminController {
                 try {
                     utilityService.updateForeignKeyInDb('chromosome', 'genome', fromGenome.id, toGenome.id, sql)
                     utilityService.updateForeignKeyInDb('sequence_alignment', 'genome', fromGenome.id, toGenome.id, sql)
+                    sql.execute("delete from reference_feature where genome_id =:genomeId", [genomeId: fromGenome.id])
                     fromGenome.delete()
                 } catch(Exception e) {
                     log.error e

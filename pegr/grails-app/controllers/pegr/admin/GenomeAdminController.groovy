@@ -142,6 +142,26 @@ class GenomeAdminController {
                     utilityService.updateForeignKeyInDb('sequence_alignment', 'genome', fromGenome.id, toGenome.id, sql)
                     sql.execute("delete from reference_feature where genome_id =:genomeId", [genomeId: fromGenome.id])
                     fromGenome.delete()
+                    
+                    def samples =  Sample.findAllByRequestedGenomesLike("%${fromGenomeName}%")
+                    
+                    samples.each { sample ->
+                        def flag = false
+                        def newGenomes = []
+                        def genomes = sample.requestedGenomes.split(",").toList()
+                        genomes.each { genome ->
+                            if (genome == fromGenomeName) {
+                                flag = true
+                                newGenomes.push(toGenomeName)
+                            } else {
+                                newGenomes.push(genome)
+                            }
+                        }
+                        if (flag) {
+                            sample.requestedGenomes = newGenomes.join(',')
+                            sample.save()
+                        }
+                    }                    
                 } catch(Exception e) {
                     log.error e
                     throw new UtilityException(message: "Error merging genome ${fromGenomeName}!")

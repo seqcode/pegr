@@ -45,7 +45,7 @@
                         <td><a href="${alignment.bam}">${alignment.bam}</a></td>
                         <td>
                           <g:if test="${alignment.bigwigForwardFile}">
-                            Forward: <a href="${alignment.bigwigForwardFile}">${alignment.bigwigForwardFile}</a> <br> 
+                            Forward: <a href="${alignment.bigwigForwardFile}">${alignment.bigwigForwardFile}</a>; 
                           </g:if>
                           <g:if test="${alignment.bigwigReverseFile}">
                             Reverse: <a href="${alignment.bigwigReverseFile}">${alignment.bigwigReverseFile}</a>

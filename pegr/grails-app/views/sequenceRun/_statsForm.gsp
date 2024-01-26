@@ -61,16 +61,12 @@
     <div class="col-sm-4 fields">
         <h4>Sequencing Run</h4>
         <div>
-            <label>Cluster # (K/mm<sup>2</sup>)</label>
-            <g:textField name="clusterNum" value="${run?.runStats?.clusterNum}"></g:textField>
+            <label>Cluster Density (K/mm<sup>2</sup>)</label>
+            <g:textField name="clusterDensity" value="${run?.runStats?.clusterDensity}"></g:textField>
         </div>
         <div>
-            <label># Read PF (M)</label>
-            <g:textField name="readPf" value="${run?.runStats?.readPf}"></g:textField>
-        </div>
-        <div>
-            <label>% PF</label>
-            <g:textField name="pctPf" value="${run?.runStats?.pctPf}"></g:textField>%
+            <label>% Clusters Pass Filter</label>
+            <g:textField name="pctClustersPassFilter" value="${run?.runStats?.pctClustersPassFilter}"></g:textField>%
         </div>
         <div>
             <label>% >= Q30</label>
@@ -87,12 +83,16 @@
             <g:textField name="totalReads" value="${run?.runStats?.totalReads}"></g:textField>
         </div>
         <div>
-            <label>Unmatched Indices</label>
-            <g:textField name="unmatchedIndices" value="${run?.runStats?.unmatchedIndices}"></g:textField>
+            <label># Reads Pass Filter</label>
+            <g:textField name="readsPassFilter" value="${run?.runStats?.readsPassFilter}"></g:textField>
         </div>
         <div>
-            <label>% Unmatched Indices</label>
-            <g:textField name="pctUnmatchedIndices" value="${run?.runStats?.pctUnmatchedIndices}"></g:textField>%
+            <label># Reads Failed Demultiplex</label>
+            <g:textField name="readsFailedDemultiplex" value="${run?.runStats?.readsFailedDemultiplex}"></g:textField>
+        </div>
+        <div>
+            <label>% Reads Failed Demultiplex</label>
+            <g:textField name="pctReadsFailedDemultiplex" value="${run?.runStats?.pctReadsFailedDemultiplex}"></g:textField>%
         </div>
         <div>
             <label>% Aligned To PhiX</label>

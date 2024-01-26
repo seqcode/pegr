@@ -461,14 +461,14 @@ class ApiController {
                             "libraryLoadedPm": run.runStats?.libraryLoadedPm,
                             "phiXLoaded": run.runStats?.phiXLoaded,
                             "libraryLoadedFmol": run.runStats?.libraryLoadedFmol,
-                            "clusterNum": run.runStats?.clusterNum,
-                            "readPf": run.runStats?.readPf,
-                            "pctPf": run.runStats?.pctPf,
+                            "clusterDensity": run.runStats?.clusterDensity,
+                            "readsPassFilter": run.runStats?.readsPassFilter,
+                            "pctClustersPassFilter": run.runStats?.pctClustersPassFilter,
                             "pctQ30": run.runStats?.pctQ30,
                             "qidx": run.runStats?.qidx,
                             "totalReads": run.runStats?.totalReads,
-                            "unmatchedIndices": run.runStats?.unmatchedIndices,
-                            "pctUnmatchedIndices": run.runStats?.pctUnmatchedIndices,
+                            "readsFailedDemultiplex": run.runStats?.readsFailedDemultiplex,
+                            "pctReadsFailedDemultiplex": run.runStats?.pctReadsFailedDemultiplex,
                             "pctAlignedToPhiX": run.runStats?.pctAlignedToPhiX]
                 def results = [data: data, message: "Success!"] as JSON
                 render text: results, contentType: "text/json", status: code

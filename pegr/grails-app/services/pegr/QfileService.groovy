@@ -855,14 +855,14 @@ class QfileService {
             emptyX: "",                    //X
             emptyY: "",                 //Y
             emptyZ: "",          //Z
-            clusterNum: run.runStats?.clusterNum,                  //AA
-            readPf: run.runStats?.readPf,                      //AB
-            pctPf: run.runStats?.pctPf,                       //AC
+            clusterDensity: run.runStats?.clusterDensity,                  //AA
+            readsPassFilter: run.runStats?.readsPassFilter,                      //AB
+            pctClustersPassFilter: run.runStats?.pctClustersPassFilter,                       //AC
             pctQ30: run.runStats?.pctQ30,                      //AD
             qidx: run.runStats?.qidx,                        //AE
             totalReads: run.runStats?.totalReads,                  //AF
-            unmatchedIndices: run.runStats?.unmatchedIndices,           //AG
-            pctUnmatchedIndices: run.runStats?.pctUnmatchedIndices,       //AH
+            readsFailedDemultiplex: run.runStats?.readsFailedDemultiplex,           //AG
+            pctReadsFailedDemultiplex: run.runStats?.pctReadsFailedDemultiplex,       //AH
             pctAlignedToPhiX: run.runStats?.pctAlignedToPhiX        //AI
         ]
         
@@ -1181,14 +1181,14 @@ class QfileService {
          //data[23],//X
          //data[24],//Y
          //data[25],//Z
-         clusterNum: getFloat(data[26]),                  //AA
-         readPf: getFloat(data[27]),                      //AB
-         pctPf: getFloat(data[28]),                       //AC
+         clusterDensity: getFloat(data[26]),                  //AA
+         readsPassFilter: getFloat(data[27]),                      //AB
+         pctClustersPassFilter: getFloat(data[28]),                       //AC
          pctQ30: getFloat(data[29]),                      //AD
          qidx: getFloat(data[30]),                        //AE
          totalReads: getFloat(data[31]),                  //AF
-         unmatchedIndices: getFloat(data[32]),            //AG
-         pctUnmatchedIndices: getFloat(data[33]),         //AH
+         readsFailedDemultiplex: getFloat(data[32]),            //AG
+         pctReadsFailedDemultiplex: getFloat(data[33]),         //AH
          pctAlignedToPhiX: getFloat(data[34]),            //AI
          //data[35],//AJ
          ]

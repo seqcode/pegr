@@ -5,6 +5,7 @@ public enum SampleStatus {
 	PREP,
 	READY,
     SEQUENCING,
+    PENDING,
     COMPLETED,
     FAILED
 	;

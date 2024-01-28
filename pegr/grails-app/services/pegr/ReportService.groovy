@@ -929,6 +929,29 @@ class ReportService {
         def alignment = SequenceAlignment.get(alignmentId)
         alignment.isPreferred = !alignment.isPreferred
         alignment.save()
+        
+        def sample = alignment.sequencingExperiment.sample
+        if (alignment.isPreferred) {
+            if (sample.status != SampleStatus.COMPLETED) {
+                sample.status = SampleStatus.COMPLETED
+                sample.save()
+            }                
+        } else {
+            // flag indicates that at least one alignment is verified for the sample
+            def flag = false
+            
+            sample.sequencingExperiments.each { experiment ->
+                if (SequenceAlignment.findBySequencingExperimentAndIsPreferred(experiment, true)) {
+                    flag = true
+                }
+            } 
+            
+            if (!flag) {
+                sample.status = SampleStatus.PENDING
+                sample.save()
+            }            
+        }
+        
     }
     
    /**

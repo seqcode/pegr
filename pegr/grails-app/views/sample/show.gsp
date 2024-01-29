@@ -26,7 +26,8 @@
 
         <!-- pjchaffin | Adds Hyperlink Functionality to the Run# and also depricates the old Run Number -->
         <g:if test="${sample?.runs.id[0]}">
-            <p><g:link controller="report" action="runStatus" params="[runId: sample.runs.id]"><b>Run:${sample.runs.id[0]}</b></g:link></p>
+            <p><g:link controller="sequenceRun" action="show" id="${sample.runs.id[0]}"><b>Sequence Run ${sample.runs.id[0]} Metadata</b></g:link></p>
+            <p><g:link controller="report" action="runStatus" params="[runId: sample.runs.id]"><b>Sequence Run ${sample.runs.id[0]} Analysis</b></g:link></p>
         </g:if>
 
 

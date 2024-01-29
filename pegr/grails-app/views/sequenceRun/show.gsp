@@ -43,10 +43,11 @@
                 <button id="run-status-cancel" class="btn btn-default">Cancel</button>
             </span>
             </sec:ifAnyGranted>
-        </small>
+        </small>      
         <sec:ifAnyGranted roles="ROLE_ADMIN">
           <g:link action="delete" params="[runId:run.id]" onclick="return confirm('Do you want to delete the sequence run?')" class="btn btn-warning pull-right">Delete Sequence Run</g:link>
         </sec:ifAnyGranted>
+        <g:link controller="report" action="runStatus" params="[runId: run.id]" class="btn btn-primary pull-right">Sequence Run Analysis</g:link>
     </h2>
     <g:link action="downloadQueueFile" params="[runId:run.id]" class="btn btn-primary pull-right">Download Queue File</g:link>
     <a href="#" class="btn btn-primary pull-right" data-toggle="modal" data-target="#download-run-info">Download Run Info Files</a>

@@ -2500,4 +2500,5 @@ databaseChangeLog = {
     include file: 'add_sex_notes.groovy'
     include file: 'add_bigwig.groovy'
     include file: 'add_read2.groovy'
+    include file: 'rename_run_stats.groovy'
 }

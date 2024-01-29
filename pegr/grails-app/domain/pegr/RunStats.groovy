@@ -14,14 +14,14 @@ class RunStats {
     Float libraryLoadedPm
     Float phiXLoaded
     Float libraryLoadedFmol
-    Float clusterNum
-    Float readPf
-    Float pctPf
+    Float clusterDensity
+    Float readsPassFilter
+    Float pctClustersPassFilter
     Float pctQ30
     Float qidx
     Float totalReads
-    Float unmatchedIndices
-    Float pctUnmatchedIndices
+    Float readsFailedDemultiplex
+    Float pctReadsFailedDemultiplex
     Float pctAlignedToPhiX    
     String libraryPoolArchiveId
     Date qPcrDate
@@ -42,14 +42,14 @@ class RunStats {
         libraryLoadedPm nullable: true
         phiXLoaded nullable: true
         libraryLoadedFmol nullable: true
-        clusterNum nullable: true
-        readPf nullable: true
-        pctPf nullable: true
+        clusterDensity nullable: true
+        readsPassFilter nullable: true
+        pctClustersPassFilter nullable: true
         pctQ30 nullable: true
         qidx nullable: true
         totalReads nullable: true
-        unmatchedIndices nullable: true
-        pctUnmatchedIndices nullable: true
+        readsFailedDemultiplex nullable: true
+        pctReadsFailedDemultiplex nullable: true
         pctAlignedToPhiX nullable: true
         libraryPoolArchiveId nullable: true
         qPcrDate nullable: true

@@ -35,9 +35,8 @@
         <h4>Sequencing Run</h4>
         <table class="table table-bordered">
             <tbody>
-            <tr><td>Cluster # (K/mm<sup>2</sup>)</td><td> ${run.runStats?.clusterNum}</td></tr> 
-            <tr><td># Read PF (M)</td><td> ${run.runStats?.readPf}</td></tr>
-            <tr><td>% PF</td><td> <g:if test="${run.runStats?.pctPf}">${run.runStats?.pctPf}%</g:if></td></tr>
+            <tr><td>Cluster Density (K/mm<sup>2</sup>)</td><td> ${run.runStats?.clusterDensity}</td></tr> 
+            <tr><td>% Clusters Pass Filter</td><td> <g:if test="${run.runStats?.pctClustersPassFilter}">${run.runStats?.pctClustersPassFilter}%</g:if></td></tr>
             <tr><td>% >= Q30</td><td> <g:if test="${run.runStats?.pctQ30}">${run.runStats?.pctQ30}%</g:if></td></tr>
             <tr><td>Qidx</td><td> ${run.runStats?.qidx}</td></tr>
             </tbody></table>
@@ -47,8 +46,9 @@
         <table class="table table-bordered">
             <tbody>
             <tr><td>Total Reads</td><td> <g:formatNumber number="${run.runStats?.totalReads}" format="###,###,##0" /> </td></tr>
-            <tr><td>Unmatched Indices</td><td>  <g:formatNumber number="${run.runStats?.unmatchedIndices}" format="###,###,##0"></g:formatNumber></td></tr>
-            <tr><td>Unmatched Indices</td><td>  <g:formatNumber number="${run.runStats?.pctUnmatchedIndices}" format="#0.##%"></g:formatNumber></td></tr>
+            <tr><td># Reads Pass Filter</td><td> ${run.runStats?.readsPassFilter}</td></tr>
+            <tr><td># Reads Failed Demultiplex</td><td>  <g:formatNumber number="${run.runStats?.readsFailedDemultiplex}" format="###,###,##0"></g:formatNumber></td></tr>
+            <tr><td>% Reads Failed Demultiplex</td><td> ${run.runStats?.pctReadsFailedDemultiplex} %</td></tr>
             <tr><td>Aligned To PhiX</td><td> <g:if test="${run.runStats?.pctAlignedToPhiX}">${run.runStats?.pctAlignedToPhiX}</g:if></td></tr>    
             </tbody></table>
     </div>

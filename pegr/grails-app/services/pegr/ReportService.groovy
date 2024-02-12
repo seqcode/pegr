@@ -621,7 +621,7 @@ class ReportService {
             return results
         }
         try {
-            def data = new URL(url).getText()
+            def data = new URL(url).getText([connectTimeout: 6000, readTimeout: 2000])
             def inBlock = false
             def count = 0
             def len, nsites, evalue
@@ -697,7 +697,7 @@ class ReportService {
         def results = []
         def data
         try {
-            data = new URL(url).getText()
+            data = new URL(url).getText([connectTimeout: 6000, readTimeout: 2000])
         } catch(Exception e) {
             throw new ReportException(message: "Error fetching the data!")
         }
@@ -728,7 +728,7 @@ class ReportService {
         def results = []
         def data
         try {
-            data = new URL(url).getText()
+            data = new URL(url).getText([connectTimeout: 6000, readTimeout: 2000])
         } catch(Exception e) {
             throw new ReportException(message: "Error fetching the data!")
         }

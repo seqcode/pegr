@@ -116,12 +116,18 @@ class ReportController {
     }
 
     def fetchMemeDataAjax(String url) {
-        def results = reportService.fetchMemeMotif(url) as JSON
-        render results
+        def result
+        try {
+            result = reportService.fetchMemeMotif(url) as JSON
+        } catch(ReportException e) {
+            result = [error: e.message] as JSON
+        }
+        render result
     }
     
     def fetchMemeFigAjax(String url) {
-        def result = new URL(url).getText() 
+        def result = new URL(url).getText([connectTimeout: 6000, readTimeout: 2000]) 
+            
         render result
     }
 

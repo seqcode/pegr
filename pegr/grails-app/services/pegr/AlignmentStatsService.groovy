@@ -221,7 +221,7 @@ class AlignmentStatsService {
                 // check repeat masker fasta
                 def url = queryDatasetsUri(datasets, "fasta")
                 if (url) {
-                    def data = new URL(url).getText()
+                    def data = new URL(url).getText([connectTimeout: 6000, readTimeout: 2000])
                     if(data == "") {
                         note.code = "Zero"
                         note.message = "No sequences."
@@ -256,7 +256,7 @@ class AlignmentStatsService {
         def motifCount = 0
         def memeFile = queryDatasetsUri(datasets, "txt")
         if (memeFile) {
-            def data = new URL(memeFile).getText()
+            def data = new URL(memeFile).getText([connectTimeout: 6000, readTimeout: 2000])
             // count the number of motifs
             motifCount = (data =~ /letter-probability matrix/).count
         }

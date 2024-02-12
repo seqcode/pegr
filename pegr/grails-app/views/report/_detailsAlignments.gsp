@@ -143,62 +143,13 @@
                 logo.find(".meme-svg-reverse").show();
             }            
         });
-        $(".meme-fig").each(function(index, memeFig) {
-            $(memeFig).find("i").remove();
-            var memeUrlForward = $(this).find(".meme-fig-url-forward").text();
-            $.ajax({ 
-                url: "/pegr/report/fetchMemeFigAjax?url=" + memeUrlForward,
-                success: 
-                    function(result) {
-                        $(memeFig).find(".meme-svg-forward").append(result);
-                    }
-            });  
-            var memeUrlReverse = $(this).find(".meme-fig-url-reverse").text();
-            $.ajax({ 
-                url: "/pegr/report/fetchMemeFigAjax?url=" + memeUrlReverse,
-                success: 
-                    function(result) {
-                        $(memeFig).find(".meme-svg-reverse").append(result);
-                    }
-            });  
-        });
         
-        $(".meme-table").each(function(){
-            var memeTable = $(this);
-            var memeUrl = $(this).find(".meme-url").text();
-            $.ajax({ 
-                url: "/pegr/report/fetchMemeDataAjax?url=" + memeUrl,
-                success: 
-                    function(result) {
-                        memeTable.find(".meme-id").each(function(index, memeId) {
-                            if (index < result.length) {
-                                $(memeId).html(result[index].id);
-                            }
-                        });
-                        memeTable.find(".meme-evalue").each(function(index, memeEvalue) {
-                            if (index < result.length) {
-                                $(memeEvalue).html(result[index].evalue);
-                            }
-                        });
-                        memeTable.find(".meme-sites").each(function(index, memeSites) {
-                            if (index < result.length) {
-                                $(memeSites).html(result[index].nsites);
-                            }
-                        });
-                        memeTable.find(".meme-width").each(function(index, memeWidth) {
-                            if (index < result.length) {
-                                $(memeWidth).html(result[index].len);
-                            }
-                        });
-                    },
-            });  
-        });
-        
+        // time delay
+        var t = 0;
         // plot peHistogram
         google.charts.load('current', {'packages':['corechart']});
-        var t = 0;
         $(".peHistogram").each(function(){
-            t += 20;
+            t += 2000;
             var peTd = $(this);
             var spinner = $(this).find("i");
             var peHistogramUrl = $(this).find(".peHistogram-url").text();
@@ -207,11 +158,12 @@
                 google.charts.setOnLoadCallback(function(){
                     $.ajax({
                         url: "/pegr/report/fetchPeHistogramDataAjax?url=" + peHistogramUrl,
-                        dataType: "json"
+                        dataType: "json",
+                        timeout: 10000 // sets timeout to 10 seconds
                     }).done(function(jsonData){
                         if (jsonData["error"]) {
-                            $(peHistogramTd).empty();
-                            $(peHistogramTd).html(jsonData["error"]);
+                            $(peTd).empty();
+                            $(peTd).html(jsonData["error"]);
                         } else {
                             // Create our data table out of JSON data loaded from server.
                             var data = new google.visualization.arrayToDataTable(jsonData);
@@ -236,9 +188,76 @@
             }, t);
         });   
         
+        t=0;
+        $(".meme-fig").each(function(index, memeFig) {
+            t += 2000; // increase time delay by 1 sec
+            $(memeFig).find("i").remove();
+            
+            var memeUrlForward = $(this).find(".meme-fig-url-forward").text();
+            setTimeout(function(){
+              $.ajax({ 
+                url: "/pegr/report/fetchMemeFigAjax?url=" + memeUrlForward,
+                success: 
+                    function(result) {
+                        $(memeFig).find(".meme-svg-forward").append(result);
+                    },
+                timeout: 10000 // time out after 10 seconds
+              });
+            }, t+300);
+            
+            var memeUrlReverse = $(this).find(".meme-fig-url-reverse").text();
+            setTimeout(function(){
+              $.ajax({ 
+                url: "/pegr/report/fetchMemeFigAjax?url=" + memeUrlReverse,
+                success: 
+                    function(result) {
+                        $(memeFig).find(".meme-svg-reverse").append(result);
+                    },
+                timeout: 10000 // time out after 10 seconds
+              });  
+            }, t+600);
+        });
+        
+        t=0;
+        $(".meme-table").each(function(){
+            t += 2000;
+            var memeTable = $(this);
+            var memeUrl = $(this).find(".meme-url").text();
+            setTimeout(function(){
+              $.ajax({ 
+                url: "/pegr/report/fetchMemeDataAjax?url=" + memeUrl,
+                timeout: 12000, // time out after 12 seconds
+                success: 
+                    function(result) {
+                        memeTable.find(".meme-id").each(function(index, memeId) {
+                            if (index < result.length) {
+                                $(memeId).html(result[index].id);
+                            }
+                        });
+                        memeTable.find(".meme-evalue").each(function(index, memeEvalue) {
+                            if (index < result.length) {
+                                $(memeEvalue).html(result[index].evalue);
+                            }
+                        });
+                        memeTable.find(".meme-sites").each(function(index, memeSites) {
+                            if (index < result.length) {
+                                $(memeSites).html(result[index].nsites);
+                            }
+                        });
+                        memeTable.find(".meme-width").each(function(index, memeWidth) {
+                            if (index < result.length) {
+                                $(memeWidth).html(result[index].len);
+                            }
+                        });
+                    },
+              }); 
+            }, t+900);
+        });
+        
         // plot composites
+        t=0;
         $(".composite").each(function(){
-            t += 20;
+            t += 2000;
             var compositeTd = $(this);
             var spinner = $(this).find("i");
             var compositeUrl = $(this).find(".composite-url").text();
@@ -247,7 +266,8 @@
                 google.charts.setOnLoadCallback(function(){
                     $.ajax({
                         url: "/pegr/report/fetchCompositeDataAjax?url=" + compositeUrl,
-                        dataType: "json"
+                        dataType: "json",
+                        timeout: 10000 // sets timeout to 10 seconds
                     }).done(function(jsonData){
                         if (jsonData["error"]) {
                             $(compositeTd).empty();
@@ -272,11 +292,12 @@
                         }
                     });
                 });
-            }, t);
+            }, t+1200);
         });   
         
+        t=0;
         $(".featureAnalysis").each(function(){
-            t += 20;
+            t += 2000;
             var compositeTd = $(this);
             var spinner = $(this).find("i");
             var compositeUrl = $(this).find(".composite-url").text();
@@ -287,7 +308,8 @@
                 google.charts.setOnLoadCallback(function(){
                     $.ajax({
                         url: "/pegr/report/fetchCompositeDataAjax?url=" + compositeUrl,
-                        dataType: "json"
+                        dataType: "json",
+                        timeout: 10000 // sets timeout to 10 seconds
                     }).done(function(jsonData){
                         if (jsonData["error"]) {
                             $(compositeTd).empty();
@@ -318,7 +340,7 @@
                         }
                     });
                 });
-            }, t);
+            }, t+1500);
         });   
     });
 </script>

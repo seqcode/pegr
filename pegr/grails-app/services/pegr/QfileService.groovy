@@ -773,7 +773,7 @@ class QfileService {
 	         run = new SequenceRun(runName: runStr, platform: platform, status: runStatus, user: user)
 
 	         // lane
-	         run.lane = getInteger(laneStr)
+	         run.lane = laneStr
 	
 	         // date
 	         run.date = getDate(dateStr)

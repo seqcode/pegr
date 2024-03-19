@@ -1,7 +1,7 @@
 package pegr
 
 class SequenceRun {
-	Integer lane	
+	String lane	
 	SequencingPlatform platform
 	String fcId
 	User user

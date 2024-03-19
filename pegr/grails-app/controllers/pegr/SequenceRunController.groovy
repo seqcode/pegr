@@ -500,6 +500,50 @@ class SequenceRunController {
             
     }
     
+    /**
+     * download AVITI run manifest for the sequence run, 
+     * including information about lane and indexes.
+     * run.id, index1, index2, lane
+     * @param runId ID of the seuqnce run
+     */
+    def downloadAvitiRunManifest(Long runId) {
+        def run = SequenceRun.get(runId)
+        def data = ["run_id, index1, index2, lane"]
+        
+        run.experiments.each { experiment ->
+            def sample = experiment.sample
+            
+            def indexDict = SampleSequenceIndices.where{ sample == sample }.groupBy({ it -> it.setId })
+            
+            indexDict.each{ key, value ->
+                def indexList = value.sort{it.indexInSet}*.index*.sequence
+                
+                if (indexList.size() > 1) {
+                    data.add([run.id, indexList[0], indexList[1], run.lane].join(','))
+                } else if (indexList.size() > 0) {
+                    data.add([run.id, indexList[0], "", run.lane].join(','))
+                }                
+            }        
+        }
+        
+        File file = File.createTempFile("AVITI_manifest", ".csv")
+        file.deleteOnExit()
+        file.text= data.join(System.lineSeparator())
+        
+        try {
+            response.setContentType("application/csv")
+            response.setHeader("Content-disposition", "attachment;filename=\"AVITI_manifest.csv\"")
+            response.outputStream <<  file.getBytes()
+            webRequest.renderView = false
+        } catch(Exception e) {
+            render "Error!"
+        } finally {
+            response.getOutputStream().flush()
+            response.getOutputStream().close()
+        }
+        
+    }
+    
     def downloadRunInfo(String remoteRoot, Long runId) {
         String RUN_INFO_TEMP = "runInfo${runId}"
         def timeout = 300 * 1000

@@ -6,9 +6,9 @@
         var changingHash=false;
     </script>
 </head>
-<body  onhashchange="getHash()">
+<body onhashchange="getHash()">
 <div>
-    <h4>Add Antibody</h4>
+    <h4>Search Cell Source</h4>
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>

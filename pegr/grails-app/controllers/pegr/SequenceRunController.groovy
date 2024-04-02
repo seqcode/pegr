@@ -547,9 +547,8 @@ class SequenceRunController {
             "Adept_CB1,ATGTCGCT,CTAGCTCG,1+2",
             "Adept_CB2,CACAGATC,ACGAGAGT,1+2",
             "Adept_CB3,GCACATAG,GACTACTA,1+2",
-            "Adept_CB4,TGTGTCGA,TGTCTGAC,1+2", 
-            ",,,,",        
-            "run#-sample#, index1, index2, lane"]
+            "Adept_CB4,TGTGTCGA,TGTCTGAC,1+2"
+           ]
         
         run.experiments.each { experiment ->
             def sample = experiment.sample
@@ -560,7 +559,7 @@ class SequenceRunController {
                 def indexList = value.sort{it.indexInSet}*.index*.sequence
                 
                 if (indexList.size() > 1) {
-                    // reverse index2
+                    // reverse complement index2
                     def reversedSequence = indexList[1].reverse().collect { nucleotide -> complementMap[nucleotide] 
                     }.join()
                     

@@ -507,8 +507,49 @@ class SequenceRunController {
      * @param runId ID of the seuqnce run
      */
     def downloadAvitiRunManifest(Long runId) {
+        def complementMap = [A: 'T', T: 'A', C: 'G', G: 'C']
+        
         def run = SequenceRun.get(runId)
-        def data = ["run_id, index1, index2, lane"]
+        def data = ["[SETTINGS],,,,",
+            "SettingName,Value,Lane,,",
+            "SpikeInAsUnassigned,FALSE,,,",
+            "# Lines can be commented out with a leading # sign. ,,,,",
+            "# Read mask is set to all cycles less the last imaged (which is used for calculations),,,,",
+            "R1FastQMask,R1:Y*,1+2,,",
+            "R2FastQMask,R2:Y*,1+2,,",
+            ",,,,",
+            "# Index mask is set to default and FASTQ  not generated for Lanes 1 and 2.,,,,",
+            "I1Fastq,FALSE,1+2,,",
+            "I1Mask,I1:Y8N*,1+2,,",
+            "I1MismatchThreshold,1,1+2,,",
+            "I2Fastq,FALSE,1+2,,",
+            "I2MismatchThreshold,1,1+2,,",
+            "I2Mask,I2:Y8N*,1+2,,",
+            ",,,,",
+            "# UMI mask is set to nothing with no FASTQ generated for Lanes 1 and 2.,,,,",
+            "UmiMask,I1:N*, 1+2,,",
+            "UmiFastQ,FALSE,1+2,,",
+            ",,,,",
+            "# You can optionally trim adapters. The Elevate adapter is known so no need to specify.  In this template adapter trimming is turned off. ,,,,",
+            "AdapterTrimType, Paired-End, 1+2,,",
+            "R1AdapterTrim,FALSE,1+2,,",
+            "R1AdapterNMask,FALSE,1+2,,",
+            "R2AdapterTrim,FALSE,1+2,,",
+            "R2AdapterNMask,FALSE,1+2,,",
+            ",,,,",
+            "[RunValues],,,,",
+            "Keyname, Value,,,",
+            "Example-Custom-Key,Additional metadata can be added as a key-value pair.,,,",
+            ",,,,",
+            "[SAMPLES],,,,",
+            "SampleName,Index1,Index2,Lane,Project",
+            "# Make sure that in the Index1 and Index2 columns the index sequences for each library is in the same orientation (samples and PhiX controls).,,,,",
+            "Adept_CB1,ATGTCGCT,CTAGCTCG,1+2",
+            "Adept_CB2,CACAGATC,ACGAGAGT,1+2",
+            "Adept_CB3,GCACATAG,GACTACTA,1+2",
+            "Adept_CB4,TGTGTCGA,TGTCTGAC,1+2", 
+            ",,,,",        
+            "run#-sample#, index1, index2, lane"]
         
         run.experiments.each { experiment ->
             def sample = experiment.sample
@@ -519,9 +560,13 @@ class SequenceRunController {
                 def indexList = value.sort{it.indexInSet}*.index*.sequence
                 
                 if (indexList.size() > 1) {
-                    data.add([run.id, indexList[0], indexList[1], run.lane].join(','))
+                    // reverse index2
+                    def reversedSequence = indexList[1].reverse().collect { nucleotide -> complementMap[nucleotide] 
+                    }.join()
+                    
+                    data.add(["${run.id}-${sample.id}", indexList[0], reversedSequence, run.lane].join(','))
                 } else if (indexList.size() > 0) {
-                    data.add([run.id, indexList[0], "", run.lane].join(','))
+                    data.add(["${run.id}-${sample.id}", indexList[0], "", run.lane].join(','))
                 }                
             }        
         }

@@ -44,7 +44,7 @@
         <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MEMBER">
         <h3>Experiments <g:link class="edit" controller="protocolInstanceBag" action="list" params="[projectId:project.id]">link</g:link></h3>
         </sec:ifAnyGranted>
-        
+        <g:link controller="project" action="exportProjectSamples" params="[projectId:project?.id]" class="pull-right btn btn-primary">Export Samples to CSV</g:link>
         <h3>Sequencing Runs</h3>
         <p>Click each run to see the list of samples</p>
         <ul>

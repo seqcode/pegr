@@ -422,6 +422,35 @@ class ProjectController {
             render(view: "/404")
         }
     }
+    
+    
+    def exportProjectSamples(Long projectId) {
+        def data = ["SampleID,Description,Strain,Antibody,Target,Assay"]
+        
+        def project = Project.get(projectId)
+        
+        project.samples.each { sample ->
+            data.add([sample.id, sample.naturalId, sample.cellSource, sample.antibody, sample.target, sample.assay].join(','))    
+        }        
+        
+        def today = new Date()
+        def filename = "ProjectID${projectId}_${today.year}-${today.month}-${today.day}"
+        File file = File.createTempFile(filename, ".csv")
+        file.deleteOnExit()
+        file.text= data.join(System.lineSeparator())
+        
+        try {
+            response.setContentType("application/csv")
+            response.setHeader("Content-disposition", "attachment;filename=\"${filename}.csv\"")
+            response.outputStream <<  file.getBytes()
+            webRequest.renderView = false
+        } catch(Exception e) {
+            render "Error!"
+        } finally {
+            response.getOutputStream().flush()
+            response.getOutputStream().close()
+        }
+    }
 }
 
 

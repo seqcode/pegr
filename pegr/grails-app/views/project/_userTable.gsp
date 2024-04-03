@@ -22,8 +22,13 @@
                     </g:if>
                 </td>
                 <g:if test="${projectEditAuth}">
-                <td><g:link onclick="confirm('Are you sure?')" controller="project" action="removeUser" params="[projectId:projectUser.project.id,userId:projectUser.user.id]"><span class="glyphicon glyphicon-remove"></span></g:link></td>
-                
+                <td>
+                    <g:form controller="project" action="removeUser" class="remove-user-form" method="post">
+                        <input type="hidden" name="projectId" value="${projectUser.project.id}">
+                        <input type="hidden" name="userId" value="${projectUser.user.id}">
+                        <button type="submit" class="btn btn-link"><span class="glyphicon glyphicon-remove"></span></button>
+                    </g:form>                    
+                </td>                
                 </g:if>
             </tr>
             </g:each>
@@ -31,3 +36,10 @@
         </tbody>
     </table>
 </div>
+<script type="application/javascript">
+  $(".remove-user-form").submit(function(e){
+      if(!confirm("Are you sure?")) {
+          e.preventDefault();
+      }
+  });
+</script>

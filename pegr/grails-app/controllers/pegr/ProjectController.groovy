@@ -137,14 +137,14 @@ class ProjectController {
         render template:"userTable", model: [projectUsers: projectUsers, message: message, projectEditAuth: true]
 	}
     
-    def removeUser(Long projectId, Long userId) {
-		try {
-			projectService.removeUser(projectId, userId)
-		} catch(Exception e) {
-			flash.message = "Error removing the user!"
-		}				
-        def projectUsers = ProjectUser.where { project.id==projectId}.list()
-        redirect(action: "show", id: projectId)
+    def removeUser() {
+        if (request.method == 'POST') {
+            def projectId = params.projectId as Long 
+            def userId = params.userId as Long
+
+            projectService.removeUser(projectId, userId)
+            redirect(action: "show", id:projectId)
+        }
 	}
     
     def editUserRoleAjax(Long projectId, Long userId, String projectRole) {

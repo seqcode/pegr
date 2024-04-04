@@ -515,7 +515,7 @@ class ApiController {
                     run.runStats = new RunStats(query)
                 }
                 
-                sequenceRunService.save(run)
+                sequenceRunService.update(run)
                 def results = [message: "Success!"] as JSON
                 render text: results, contentType: "text/json", status: code
             } catch(Exception e) {

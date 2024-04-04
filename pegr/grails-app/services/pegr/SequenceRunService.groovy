@@ -21,9 +21,33 @@ class SequenceRunService {
     
     @Transactional
     void save(SequenceRun run) {
-        run.lane = 0
+        if (run.runName) {
+            if (SequenceRun.findByRunName(run.runName)) {
+                throw new SequenceRunException(message: "Sequence run with the same name has existed!")
+            }
+        }
+        
         run.user = springSecurityService.currentUser
         run.status = RunStatus.PREP
+        if (run.runStats) {
+            if (!run.runStats.save(flush: true)) {
+                throw new SequenceRunException(message: "Invalid inputs for stats!")
+            }
+        }
+        if(!run.save(flush: true)) {
+            throw new SequenceRunException(message: "Invalid inputs for basic information!")
+        }
+    }
+    
+    @Transactional
+    void update(SequenceRun run) {
+        if (run.runName) {
+            def runWithRunName = SequenceRun.findByRunName(run.runName)
+            if (runWithRunName != null && runWithRunName.id != run.id) {                
+                throw new SequenceRunException(message: "Sequence run with the same name has existed!")
+            }
+        }
+        
         if (run.runStats) {
             if (!run.runStats.save(flush: true)) {
                 throw new SequenceRunException(message: "Invalid inputs for stats!")

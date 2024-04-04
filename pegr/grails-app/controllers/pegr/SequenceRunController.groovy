@@ -169,7 +169,7 @@ class SequenceRunController {
                 } else {
                     run.runStats = new RunStats(params)
                 }
-                sequenceRunService.save(run)
+                sequenceRunService.update(run)
                 redirect(action: "show", id:runId)
             } catch(SequenceRunException e) {
                 request.message = e.message

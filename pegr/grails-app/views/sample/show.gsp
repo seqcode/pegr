@@ -18,7 +18,16 @@
         </g:if>
         <h3>
             Sample ${sample.id} ${sample.naturalId} <g:if test="${sample.sourceId}">(${sample.source}#${sample.sourceId})</g:if><g:if test="${editAuth && sample.item}"><g:link controller="sample" action="showItem" params="[sampleId:sample?.id]"><span class="glyphicon glyphicon-qrcode"></span></g:link></g:if>
-            <small><span class="label label-default">${sample.status}</span></small>
+            <small>
+                <span id="sample-status-show" class="label label-default">${sample.status}</span>
+                <g:if test="${editAuth}">
+                <span id="sample-status-select" style="display:none">
+                    <g:select name="sampleStatus" from="${pegr.SampleStatus}" value="${sample.status}" style="width:10em"></g:select>
+                    <button id="sample-status-save" class="btn btn-primary">Save</button>
+                    <button id="sample-status-cancel" class="btn btn-default">Cancel</button>
+                </span>
+                </g:if>
+            </small>
             <g:if test="${editAuth}">
                 <g:link action="edit" params="[sampleId:sample?.id]" class="edit pull-right">Edit</g:link>
             </g:if>
@@ -63,6 +72,31 @@
             $.ajax({url: "/pegr/sample/fetchDataForSampleAjax/${sample.id}", success: function(result) {
                 $("#details").html(result)
             }})
+            
+            <g:if test="${editAuth}">
+            $("#sample-status-show").click(function(){
+                $("#sample-status-show").hide();
+                $("#sample-status-select").show();
+            });
+
+            $("#sample-status-save").click(function(){
+                var status = $("#sample-status-select option:selected").text();
+                $.ajax({ url: "/pegr/sample/updateSampleStatusAjax?sampleId=${sample.id}&status=" + status,
+                    success: function(result) {
+                        $("#sample-status-show").text(result);
+                        $("#sample-status-select").val(result);
+                        $("#sample-status-show").show();
+                        $("#sample-status-select").hide();
+                    }                
+                });
+            });
+
+            $("#sample-status-cancel").click(function(){
+                $("#sample-status-show").show();
+                $("#sample-status-select").hide();
+            });
+            </g:if>
+            
         });
     </script>
 </body>

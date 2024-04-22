@@ -498,4 +498,26 @@ class SampleService {
         }
         return result
     }
+    
+    /**
+    * Update sample's status.
+    * @param sampleId the sample's ID
+    * @param statusStr the new status string
+    */
+    @Transactional
+    def updateSampleStatus(Long sampleId, String statusStr) {
+        def sample = Sample.get(sampleId)
+        if (!sample) {
+            throw new SampleException(message: "Sample not found!")
+        }
+
+        try {
+            SampleStatus status = statusStr as SampleStatus
+            sample.status = status
+            sample.save()
+        } catch(Exception e) {
+            throw new SampleException(message: "Wrong sample status!")
+        }
+
+    } 
 }

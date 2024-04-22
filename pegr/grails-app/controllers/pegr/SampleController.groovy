@@ -477,4 +477,9 @@ class SampleController {
         def samples = reportService.fetchDataForSamples(sampleIds)
         render(view: "/report/listFiles", model: [samples: samples])
     }
+    
+    def updateSampleStatusAjax(Long sampleId, String status) {
+        sampleService.updateSampleStatus(sampleId, status)
+        render status
+    }
 }

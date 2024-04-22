@@ -580,22 +580,23 @@ class ReportService {
                     def tabulars = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "tabular")                
                     if (tabulars && tabulars.size() > 0) {
                         def identifier = utilityService.queryJson(analysis.parameters, "input2X__identifier__")
-                        def id = identifier?.find( /\d+/ )?.toInteger()
-                        if (id && id > 0){
-                            if (identifier.contains("MOTIF")) {
+                        
+                        if (identifier.contains("MOTIF")) {
+                            def id = identifier?.find( /\d+/ )?.toInteger()
+                            if (id && id > 0){
                                 alignmentDTO.composite[id-1] = tabulars.last()
-                            } else {
-                                def title = utilityService.queryJson(analysis.parameters, "title")
-                                if (!title) {
-                                    title = "Feature Analysis ${id}" 
-                                }
-                                def plot_title = utilityService.queryJson(analysis.parameters, "plot_title")
-                                def xlabel = utilityService.queryJson(analysis.parameters, "xlabel")
-                                if (!xlabel) {
-                                    xlabel = "Distance from MEME motif (bp)"
-                                }
-                                alignmentDTO.featureAnalysis[id-1] = ['title': title, 'xlabel': xlabel, 'tabular': tabulars.last()]
-                            }   
+                            }
+                        } else {
+                            def title = utilityService.queryJson(analysis.parameters, "title")
+                            if (!title) {
+                                title = "Feature Analysis" 
+                            }
+                            def plot_title = utilityService.queryJson(analysis.parameters, "plot_title")
+                            def xlabel = utilityService.queryJson(analysis.parameters, "xlabel")
+                            if (!xlabel) {
+                                xlabel = "Distance from MEME motif (bp)"
+                            }
+                            alignmentDTO.featureAnalysis << ['title': title, 'xlabel': xlabel, 'tabular': tabulars.last()]
                         }                           
                     }
                     break

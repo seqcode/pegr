@@ -58,6 +58,10 @@
                 <label>Treatment</label>
                 <g:textField name="treatment" class="form-control" value="${searchParams.treatment}"/>
             </div>
+            <div class="form-group">
+                <label>Status</label>
+                <g:select name="status" from="${pegr.SampleStatus}" value="${searchParams.status}" noSelection="['null': '']" class="select"></g:select>
+            </div>
             <div>
                 <g:submitButton name="search" value="Apply" class="btn btn-primary"/>
                 <g:link action="all" class="btn btn-default">Clear</g:link>

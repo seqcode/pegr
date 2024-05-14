@@ -103,6 +103,9 @@ class SampleService {
                 if (sample_ids && sample_ids.size() > 0) {
                     'in' "id", sample_ids
                 }
+                if (query.status) {
+                    eq "status", query.status
+                }
             }
         }
         

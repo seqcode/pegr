@@ -727,6 +727,7 @@ class QuerySampleRegistrationCommand implements grails.validation.Validateable {
     Long assayId
     String sendDataTo
     String treatment
+    SampleStatus status
 }
 
 class QueryRunRegistrationCommand implements grails.validation.Validateable {

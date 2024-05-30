@@ -2,6 +2,7 @@ package pegr
 import groovy.json.*
 import grails.converters.*
 import grails.util.Holders
+import java.text.SimpleDateFormat
 
 class SampleController {
 
@@ -481,5 +482,40 @@ class SampleController {
     def updateSampleStatusAjax(Long sampleId, String status) {
         sampleService.updateSampleStatus(sampleId, status)
         render status
+    }
+    
+    def exportSamplesMetadata() {
+        def now = new Date()
+        def sdf = new SimpleDateFormat("yyyy-MM-dd")
+        def filename = "SampleSearch_${sdf.format(now)}"
+        
+        def data = ["SampleID,Target,Antibody,Strain,Mutation,GrowthMedia,Treatments,Assay,Note"]
+            
+        def sampleIds = session.checkedSample
+        
+        sampleIds.each { sampleId ->
+            def sample = Sample.get(sampleId)
+            if (sample) {
+                def sampleDTO = reportService.getSampleDTO(sample)
+                
+                data.add(["\"${sampleDTO.id} ${sampleDTO.naturalId}\"", "\"${sampleDTO.target}\"", "\"${sampleDTO.antibody}\"", "\"${sampleDTO.strain}\"", "\"${sampleDTO.geneticModification}\"", "\"${sampleDTO.growthMedia}\"", "\"${sampleDTO.treatments}\"", "\"${sampleDTO.assay}\"", "\"${sampleDTO.note}\""].join(','))
+            }
+        }
+        
+        File file = File.createTempFile(filename, ".csv")
+        file.deleteOnExit()
+        file.text= data.join(System.lineSeparator())
+        
+        try {
+            response.setContentType("application/csv")
+            response.setHeader("Content-disposition", "attachment;filename=\"${filename}.csv\"")
+            response.outputStream <<  file.getBytes()
+            webRequest.renderView = false
+        } catch(Exception e) {
+            render "Error!"
+        } finally {
+            response.getOutputStream().flush()
+            response.getOutputStream().close()
+        }
     }
 }

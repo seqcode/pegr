@@ -18,6 +18,10 @@
 </head>
 <body>
     <g:link action="all"><span class="glyphicon glyphicon-home"></span> Sample List</g:link> 
+    <div class="pull-right">
+        <g:link action="exportSamplesMetadata" class="btn btn-primary"> Export Sample Metadata</g:link> 
+        <g:link action="all" class="btn btn-primary"> Generate PDF Report</g:link> 
+    </div>
     <div id="details">
         <div class="text-center">
             <i class="fa fa-spinner fa-spin"></i>

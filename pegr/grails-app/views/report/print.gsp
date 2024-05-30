@@ -339,7 +339,7 @@
                         if (jsonData["error"]) {
                             $(compositeTd).empty();
                             $(compositeTd).html(jsonData["error"]);
-                        } else {
+                        } else {                   
                             // Create our data table out of JSON data loaded from server.
                             var data = new google.visualization.arrayToDataTable(jsonData);
 
@@ -359,7 +359,10 @@
                                             },
                                             curveType: 'function',
                                             legend: { position: 'right' }
-                                          };                            
+                                          };                 
+                            google.visualization.events.addListener(chart, 'ready', function () {
+                                container.innerHTML = '<img src="' + chart.getImageURI() + '">';
+                            });
                             chart.draw(data, options);   
                             $(spinner).remove();
                         }

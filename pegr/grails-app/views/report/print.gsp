@@ -27,6 +27,7 @@
 </head>
 <body>
     <main class="container">
+    <g:if test="${!samplesOnly}">
     <h2>${report.name}</h2>
     <section>
         <h4>Images</h4>
@@ -61,7 +62,8 @@
             </tbody>
         </table>
     </section>
-    <section>
+    </g:if>
+    <section>        
         <h4>Samples</h4>
         <p>The number of samples: ${sampleList.size()}</p>
         <table class="table table-bordered">

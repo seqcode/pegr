@@ -518,4 +518,12 @@ class SampleController {
             response.getOutputStream().close()
         }
     }
+    
+    def printChecked() {
+        def sampleIds = session.checkedSample
+        
+        def samples = reportService.fetchDataForSamples(sampleIds)
+        
+        render(view: '/report/print', model: [ sampleList: samples, samplesOnly: true])
+    }
 }

@@ -9,11 +9,12 @@ class Pipeline {
     String workflowUrl
     
     static constraints = {
-        workflowId unique: true
         name unique: "pipelineVersion"
-        note nullable: true, blank: true
-        steps nullabel: true, blank: true
+        pipelineVersion nullable: false
+        workflowId unique: true
         workflowUrl nullable: true, blank: true
+        steps nullabel: true, blank: true
+        note nullable: true, blank: true
     }
     
     static mapping = {
@@ -22,4 +23,8 @@ class Pipeline {
         pipelineVersion defaultValue: "'0.0.0'"
         sort "name"
     }
+    
+    String toString() {
+        "${name}-${pipelineVersion}"
+	}
 }

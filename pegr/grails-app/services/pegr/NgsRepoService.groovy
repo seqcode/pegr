@@ -303,16 +303,27 @@ class NgsRepoService {
                 if (genomesStr) {
                     def genomes = genomesStr.split(",")
                     // write the config xml file for each genome.
-                    genomes.eachWithIndex { genome, idx ->
-                        def xmlName = generateXmlFile(genome, run.id, experiment.sample.id, idx, configLocalFolder)
-                        xmlNames << xmlName
+                    def idx = 1
+                    genomes.each { genome ->
+                        def pipelines = [""]
+                        if (experiment.sample.requestedPipelines) {
+                            pipelines = experiment.sample.requestedPipelines.split(",")
+                        }
+                        
+                        pipelines.each { pipeline ->
+                            def xmlName = generateXmlFile(genome, pipeline, run.id, experiment.sample.id, idx, configLocalFolder)
+                        
+                            def indicesString = experiment.sample?.sequenceIndicesString
+
+                            // write the sample's runID, sampleID, indices and config xml file name.
+                            def data = "${run.id} ; ${experiment.sample?.id} ; ${indicesString} ; ${xmlName}"
+
+                            it.println data
+                            idx = idx + 1
+                        }
+                        
                     }
-                }
-                // write the sample's runID, sampleID, indices and config xml file names.
-                def indicesString = experiment.sample?.sequenceIndicesString
-                def xmlNamesString= xmlNames.join(",")
-                def data = "${run.id} ; ${experiment.sample?.id} ; ${indicesString} ; ${xmlNamesString}"           
-                it.println data
+                }                
             }
         }
         return [runInfoLocalFile: runInfoLocalFile, configLocalFolder: configLocalFolder]
@@ -359,19 +370,20 @@ class NgsRepoService {
     /**
      * Generate config xml files
      * @param genome the name of the genome build
+     * @param pipeline the name of the pipeline to run
      * @param runId the sequence run's ID
      * @param sampleId sample Id
      * @param idx the index of the genome build for the sample
      * @param folder the config folder
      * @return the filename of the xml config file
      */
-    String generateXmlFile(String genome, Long runId, Long sampleId, int idx, File folder) {
+    String generateXmlFile(String genome, String pipeline, Long runId, Long sampleId, int idx, File folder) {
         // create the config xml file
         def filename = "${sampleId}_${idx}.xml"
         def file = new File(folder, filename)
         
         // create the config object
-        def alignmentParams = new WorkFlow(dbkey: genome)
+        def alignmentParams = new WorkFlow(dbkey: genome, pipeline:pipeline)
         
         // convert the config object to xml
         def converter = alignmentParams as XML
@@ -454,4 +466,5 @@ class NgsRepoService {
  */
 class WorkFlow {
     String dbkey
+    String pipeline
 }

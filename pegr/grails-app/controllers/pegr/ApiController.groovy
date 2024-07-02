@@ -655,6 +655,8 @@ class ApiController {
                             break
                         case "naturalId":
                             sampleService.update(sample.id, "naturalId", sampleDict.newValue)
+                        case "requestedGenomes":
+                            sampleService.update(sample.id, "genomes", sampleDict.newValue)
                             break
                         default:
                             messages.push("Error: Sample ${sample.id}. Field ${sampleDict.field} cannot be edited.")

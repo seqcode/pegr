@@ -200,6 +200,7 @@
                 <th>Index</th>
                 <th>Index ID</th>
                 <th>Genome Build</th>
+                <th>Pipeline</th>
                 <th>Project</th>
             </tr>
         </thead>
@@ -216,6 +217,7 @@
                     <td>${it.sample?.sequenceIndicesString}</td>
                     <td>${it.sample?.sequenceIndicesIdString}</td>
                     <td>${it.sample?.requestedGenomes}</td>
+                    <td>${it.sample?.requestedPipelines}</td>
                     <td class="project"><span class="value">${it.cohort?.project ?: "NONE"}</span></td>
                 </tr>
             </g:each>              

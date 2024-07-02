@@ -2502,4 +2502,5 @@ databaseChangeLog = {
     include file: 'add_read2.groovy'
     include file: 'rename_run_stats.groovy'
     inlcude file: 'change_lane_to_str.groovy'
+    include file: 'add_requested_pipelines.groovy'
 }

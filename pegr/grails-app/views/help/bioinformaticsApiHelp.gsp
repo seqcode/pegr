@@ -42,7 +42,7 @@
             </pre>
             and send a POST request to the url
             <pre>
-https://thanos.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=
+https://vesta.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=
             </pre> 
             Once the request is authenticated by the user's email and API key, the samples that match all the property values in the query will be returned in the following JSON format.
             <pre>
@@ -123,13 +123,13 @@ https://thanos.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=
     
             <p>The API can be simply called through curl</p>
             <pre>
-curl -X POST -H "Content-Type: application/json" -d '{"id": 11690, "userEmail": "xxxx@psu.edu"}' https://thanos.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=XXXXXXX -o output
+curl -X POST -H "Content-Type: application/json" -d '{"id": 11690, "userEmail": "xxxx@psu.edu"}' https://vesta.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=XXXXXXX -o output
             </pre>
 
             <p>The following is an example in Python.</p>
             <pre>
 import requests
-url = "https://thanos.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=XXXXXXX"
+url = "https://vesta.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=XXXXXXX"
 data = {"userEmail": "xxxx@psu.edu",
         "preferredOnly": "true",
         "target": "CTCF",
@@ -166,7 +166,7 @@ public class FetchSampleDataFromPegr {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {          
             // create a http post request
-            HttpPost httpPost = new HttpPost("https://thanos.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=XXXXXXXXX);
+            HttpPost httpPost = new HttpPost("https://vesta.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=XXXXXXXXX);
             
             // construct the data in JSON format 
             JsonObject object = Json.createObjectBuilder()
@@ -229,12 +229,12 @@ public class FetchSampleDataFromPegr {
             <p>PEGR will return the results in the same format as above.</p>
             <p>The API can be simply called through curl</p>
             <pre>
-curl  -X POST -H "Content-Type: application/json" -d '{"runId": 215, "userEmail": "xxxx@psu.edu"}' https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX -o output
+curl  -X POST -H "Content-Type: application/json" -d '{"runId": 215, "userEmail": "xxxx@psu.edu"}' https://vesta.vmhost.psu.edu/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX -o output
             </pre>
             <p>The following is an example in Python.</p>
             <pre>
 import requests
-url = "https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX"
+url = "https://vesta.vmhost.psu.edu/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX"
 query = {"userEmail": "xxxxx@psu.edu", "runId": 212, "preferredOnly": "true"}
 r = requests.post(url, json=query)
 results = r.json()
@@ -261,7 +261,7 @@ public class FetchSequenceRunDataFromPegr {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {
             // create a http post request
-            HttpPost httpPost = new HttpPost("https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX");
+            HttpPost httpPost = new HttpPost("https://vesta.vmhost.psu.edu/pegr/api/fetchSequenceRunData?apiKey=XXXXXXX");
                         
             // construct the data in JSON format 
             JsonObject object = Json.createObjectBuilder()
@@ -324,12 +324,12 @@ public class FetchSequenceRunDataFromPegr {
             <p>PEGR will return the results in the same format as above.</p>
             <p>The API can be simply called through curl</p>
             <pre>
-curl  -X POST -H "Content-Type: application/json" -d '{"projectId": 215, "userEmail": "xxxx@psu.edu"}' https://thanos.vmhost.psu.edu/pegr/api/fetchProjectData?apiKey=XXXXXXX -o output
+curl  -X POST -H "Content-Type: application/json" -d '{"projectId": 215, "userEmail": "xxxx@psu.edu"}' https://vesta.vmhost.psu.edu/pegr/api/fetchProjectData?apiKey=XXXXXXX -o output
             </pre>
             <p>The following is an example in Python.</p>
             <pre>
 import requests
-url = "https://thanos.vmhost.psu.edu/pegr/api/fetchProjectData?apiKey=XXXXXXX"
+url = "https://vesta.vmhost.psu.edu/pegr/api/fetchProjectData?apiKey=XXXXXXX"
 query = {"userEmail": "xxxxx@psu.edu", "projectId": 212, "preferredOnly": "true"}
 r = requests.post(url, json=query)
 results = r.json()
@@ -356,7 +356,7 @@ public class FetchProjectDataFromPegr {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {
             // create a http post request
-            HttpPost httpPost = new HttpPost("https://thanos.vmhost.psu.edu/pegr/api/fetchProjectData?apiKey=XXXXXXX");
+            HttpPost httpPost = new HttpPost("https://vesta.vmhost.psu.edu/pegr/api/fetchProjectData?apiKey=XXXXXXX");
                         
             // construct the data in JSON format 
             JsonObject object = Json.createObjectBuilder()
@@ -406,7 +406,7 @@ public class FetchProjectDataFromPegr {
           <div>
             <p>PEGR accepts POST request at </p>
             <pre>
-https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=
+https://vesta.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=
             </pre>
             <p>The data sent to PEGR should be in the following JSON format:</p>
             <pre>
@@ -434,6 +434,7 @@ https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=
               <li>treatments (the "newValue" can take in multiple treatments, and it should be in the format of a list of strings enclosed in single quotation marks, e.g. '["treatment1", "treatment2"]')</li>
               <li>assay</li>
               <li>naturalId</li>
+              <li>requestedGenomes (if multiple genomes are requested, use comma "," to deliminate the strings, e.g. "hg19,hg38")</li>
             </ol>
               
             <p>After a request is posted, PEGR will return the status code and a message as below</p>
@@ -448,13 +449,13 @@ https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=
             </pre>
             <p>The API can be simply called through curl</p>
             <pre>
-curl  -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxxx@psu.edu", "sampleList":[{"sampleID":31308,"field":"geneticModification","newValue":"Gcn5-Dtag"},{"sampleID": 31309,"field":"geneticModification","newValue":"Spt20-D-tag"}]}' https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=XXXXXX
+curl  -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxxx@psu.edu", "sampleList":[{"sampleID":31308,"field":"geneticModification","newValue":"Gcn5-Dtag"},{"sampleID": 31309,"field":"geneticModification","newValue":"Spt20-D-tag"}]}' https://vesta.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=XXXXXX
             </pre>
             <p>Here is a Python example</p>
             <pre>
 import requests
 
-url = "https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=XXXXXX"
+url = "https://vesta.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=XXXXXX"
 data = {
             "userEmail": "xxxx@psu.edu", 
             "sampleList":[
@@ -482,7 +483,7 @@ print(results["message"])
           <div>
             <p>PEGR accepts GET request at </p>
             <pre>
-https://thanos.vmhost.psu.edu/pegr/api/getSampleNote?apiKey=
+https://vesta.vmhost.psu.edu/pegr/api/getSampleNote?apiKey=
             </pre>
             <p>The data sent to PEGR should be in the following JSON format:</p>
             <pre>
@@ -508,13 +509,13 @@ https://thanos.vmhost.psu.edu/pegr/api/getSampleNote?apiKey=
             </pre>
             <p>The API can be simply called through curl</p>
             <pre>
-curl  -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxxx@psu.edu", "sampleID":321}' https://thanos.vmhost.psu.edu/pegr/api/getSampleNote?apiKey=XXXXXX
+curl  -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxxx@psu.edu", "sampleID":321}' https://vesta.vmhost.psu.edu/pegr/api/getSampleNote?apiKey=XXXXXX
             </pre>
             <p>Here is a Python example</p>
             <pre>
 import requests
 
-url = "https://thanos.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=XXXXXX"
+url = "https://vesta.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=XXXXXX"
 data = {
             "userEmail": "xxxx@psu.edu", 
             "sampleID": 321
@@ -529,7 +530,7 @@ print(results)
           <div>
             <p>PEGR accepts POST request at </p>
             <pre>
-https://thanos.vmhost.psu.edu/pegr/api/updateSampleNote?apiKey=
+https://vesta.vmhost.psu.edu/pegr/api/updateSampleNote?apiKey=
             </pre>
             <p>The data sent to PEGR should be in the following JSON format:</p>
             <pre>
@@ -551,13 +552,13 @@ https://thanos.vmhost.psu.edu/pegr/api/updateSampleNote?apiKey=
             </pre>
             <p>The API can be simply called through curl</p>
             <pre>
-curl  -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxxx@psu.edu", "sampleID": 321, "note: "string"}' https://thanos.vmhost.psu.edu/pegr/api/updateSampleNote?apiKey=XXXXXX
+curl  -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxxx@psu.edu", "sampleID": 321, "note: "string"}' https://vesta.vmhost.psu.edu/pegr/api/updateSampleNote?apiKey=XXXXXX
             </pre>
             <p>Here is a Python example</p>
             <pre>
 import requests
 
-url = "https://thanos.vmhost.psu.edu/pegr/api/updateSampleNote?apiKey=XXXXXX"
+url = "https://vesta.vmhost.psu.edu/pegr/api/updateSampleNote?apiKey=XXXXXX"
 data = {
             "userEmail": "xxxx@psu.edu", 
             "sampleID": 321
@@ -575,7 +576,7 @@ print(results)
         <div>
             <p>PEGR accepts POST request at </p>
             <pre>
-https://thanos.vmhost.psu.edu/pegr/api/stats?apiKey=
+https://vesta.vmhost.psu.edu/pegr/api/stats?apiKey=
             </pre>
             <p>The data sent to PEGR should be in the following JSON format:</p>
             <pre>
@@ -644,13 +645,13 @@ https://thanos.vmhost.psu.edu/pegr/api/stats?apiKey=
             </pre>
             <p>The API can be simply called through curl</p>
             <pre>
-curl  -X POST -H "Content-Type: application/json" -d '{"run": 1, "sample": 1, "genome": "sacCer3_cegr", "workflowId": "b266c9aed69b2935", "historyId": "58d3202e3", "history_url": "https://somepath/hisotry?id=58d3202e3", "toolCategory": "output_tagPileup", "statsToolId": "tag_pileup_frequency_output_stats", "workflowStepId": "10a140b06", "userEmail": "xxxx@psu.edu", "statistics": [{}, {}], "parameters": {}, "toolId": "sometool", "datasets": [{"type": "tabular", "id": "e4f3485fe716bd91", "uri": "someuri"}, {"type": "tabular", "id": "55f6655ba0a1f0ca", "uri": "someuri"}]}' https://thanos.vmhost.psu.edu/pegr/api/stats?apiKey=XXXXXX
+curl  -X POST -H "Content-Type: application/json" -d '{"run": 1, "sample": 1, "genome": "sacCer3_cegr", "workflowId": "b266c9aed69b2935", "historyId": "58d3202e3", "history_url": "https://somepath/hisotry?id=58d3202e3", "toolCategory": "output_tagPileup", "statsToolId": "tag_pileup_frequency_output_stats", "workflowStepId": "10a140b06", "userEmail": "xxxx@psu.edu", "statistics": [{}, {}], "parameters": {}, "toolId": "sometool", "datasets": [{"type": "tabular", "id": "e4f3485fe716bd91", "uri": "someuri"}, {"type": "tabular", "id": "55f6655ba0a1f0ca", "uri": "someuri"}]}' https://vesta.vmhost.psu.edu/pegr/api/stats?apiKey=XXXXXX
             </pre>
             <p>Here is a Python example</p>
             <pre>
 import requests
 
-url = "https://thanos.vmhost.psu.edu/pegr/api/stats?apiKey=XXXXXX"
+url = "https://vesta.vmhost.psu.edu/pegr/api/stats?apiKey=XXXXXX"
 data = {"userEmail": "xxxx@psu.edu", 
         "run": 1, 
         "sample": 1, 
@@ -695,7 +696,7 @@ public class PostDataToPegr {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {            
             // create a http post request
-            HttpPost httpPost = new HttpPost("https://thanos.vmhost.psu.edu/pegr/api/stats?apiKey=XXXXXXX");
+            HttpPost httpPost = new HttpPost("https://vesta.vmhost.psu.edu/pegr/api/stats?apiKey=XXXXXXX");
             
             // construct the data in JSON format 
             JsonObject object = Json.createObjectBuilder()
@@ -771,18 +772,18 @@ public class PostDataToPegr {
             </pre>
             and send a POST request to the url
             <pre>
-https://thanos.vmhost.psu.edu/pegr/api/deleteSampleList?apiKey=
+https://vesta.vmhost.psu.edu/pegr/api/deleteSampleList?apiKey=
             </pre> 
     
             <p>The API can be simply called through curl</p>
             <pre>
-curl -X POST -H "Content-Type: application/json" -d '{"sampleIds": [123, 456], "userEmail": "xxxx@psu.edu"}' https://thanos.vmhost.psu.edu/pegr/api/deleteSampleList?apiKey=XXXXXXX -o output
+curl -X POST -H "Content-Type: application/json" -d '{"sampleIds": [123, 456], "userEmail": "xxxx@psu.edu"}' https://vesta.vmhost.psu.edu/pegr/api/deleteSampleList?apiKey=XXXXXXX -o output
             </pre>
 
             <p>The following is an example in Python.</p>
             <pre>
 import requests
-url = "https://thanos.vmhost.psu.edu/pegr/api/deleteSampleList?apiKey=XXXXXXX"
+url = "https://vesta.vmhost.psu.edu/pegr/api/deleteSampleList?apiKey=XXXXXXX"
 data = {"userEmail": "xxxx@psu.edu",
         "sampleIds": [123, 456]
        }
@@ -809,18 +810,18 @@ print(results["message"])
             </pre>
             and send a POST request to the url
             <pre>
-https://thanos.vmhost.psu.edu/pegr/api/deleteAnalysisHistories?apiKey=
+https://vesta.vmhost.psu.edu/pegr/api/deleteAnalysisHistories?apiKey=
             </pre> 
     
             <p>The API can be simply called through curl</p>
             <pre>
-curl -X POST -H "Content-Type: application/json" -d '{"historyIds": ["abc123", "def456"], "userEmail": "xxxx@psu.edu"}' https://thanos.vmhost.psu.edu/pegr/api/deleteAnalysisHistories?apiKey=XXXXXXX -o output
+curl -X POST -H "Content-Type: application/json" -d '{"historyIds": ["abc123", "def456"], "userEmail": "xxxx@psu.edu"}' https://vesta.vmhost.psu.edu/pegr/api/deleteAnalysisHistories?apiKey=XXXXXXX -o output
             </pre>
 
             <p>The following is an example in Python.</p>
             <pre>
 import requests
-url = "https://thanos.vmhost.psu.edu/pegr/api/deleteAnalysisHistories?apiKey=XXXXXXX"
+url = "https://vesta.vmhost.psu.edu/pegr/api/deleteAnalysisHistories?apiKey=XXXXXXX"
 data = {"userEmail": "xxxx@psu.edu",
         "historyIds": ["abc123", "def456"]
        }
@@ -851,18 +852,18 @@ print(results["message"])
             </pre>
             and send a POST request to the url
             <pre>
-https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunInfo?apiKey=
+https://vesta.vmhost.psu.edu/pegr/api/fetchSequenceRunInfo?apiKey=
             </pre> 
     
             <p>The API can be simply called through curl</p>
             <pre>
-curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "directory": "xxxxxx", "remoteRoot":"/some/path/", "userEmail": "xxx@xxx.xxx"}' --output FILENAME https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunInfo?apiKey=XXXXXXX
+curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "directory": "xxxxxx", "remoteRoot":"/some/path/", "userEmail": "xxx@xxx.xxx"}' --output FILENAME https://vesta.vmhost.psu.edu/pegr/api/fetchSequenceRunInfo?apiKey=XXXXXXX
             </pre>
 
             <p>The following is an example in Python.</p>
             <pre>
 import requests
-url = "https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunInfo?apiKey=XXXXXXX"
+url = "https://vesta.vmhost.psu.edu/pegr/api/fetchSequenceRunInfo?apiKey=XXXXXXX"
 data = {
         "runId": 518, 
         "directory": "xxxxxx",
@@ -895,18 +896,18 @@ f.close()
             </pre>
             and send a POST request to the url
             <pre>
-https://thanos.vmhost.psu.edu/pegr/api/getSequenceRunStatus?apiKey=
+https://vesta.vmhost.psu.edu/pegr/api/getSequenceRunStatus?apiKey=
             </pre> 
     
             <p>The API can be simply called through curl</p>
             <pre>
-curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "directory": "xxxxxx", "userEmail": "xxx@xxx.xxx"}' https://thanos.vmhost.psu.edu/pegr/api/getSequenceRunStatus?apiKey=XXXXXXX
+curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "directory": "xxxxxx", "userEmail": "xxx@xxx.xxx"}' https://vesta.vmhost.psu.edu/pegr/api/getSequenceRunStatus?apiKey=XXXXXXX
             </pre>
 
             <p>The following is an example in Python.</p>
             <pre>
 import requests
-url = "https://thanos.vmhost.psu.edu/pegr/api/getSequenceRunStatus?apiKey=XXXXXXX"
+url = "https://vesta.vmhost.psu.edu/pegr/api/getSequenceRunStatus?apiKey=XXXXXXX"
 data = {
         "runId": 518, 
         "directory": "xxxxxx",
@@ -937,18 +938,18 @@ print(results["status"])
             </pre>
             and send a POST request to the url
             <pre>
-https://thanos.vmhost.psu.edu/pegr/api/setSequenceRunStatus?apiKey=
+https://vesta.vmhost.psu.edu/pegr/api/setSequenceRunStatus?apiKey=
             </pre> 
     
             <p>The API can be simply called through curl</p>
             <pre>
-curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "directory": "xxxxxx", "userEmail": "xxx@xxx.xxx", "status": "COMPLETED"}' https://thanos.vmhost.psu.edu/pegr/api/setSequenceRunStatus?apiKey=XXXXXXX
+curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "directory": "xxxxxx", "userEmail": "xxx@xxx.xxx", "status": "COMPLETED"}' https://vesta.vmhost.psu.edu/pegr/api/setSequenceRunStatus?apiKey=XXXXXXX
             </pre>
 
             <p>The following is an example in Python.</p>
             <pre>
 import requests
-url = "https://thanos.vmhost.psu.edu/pegr/api/setSequenceRunStatus?apiKey=XXXXXXX"
+url = "https://vesta.vmhost.psu.edu/pegr/api/setSequenceRunStatus?apiKey=XXXXXXX"
 data = {
         "runId": 518, 
         "directory": "xxxxxx", 
@@ -977,18 +978,18 @@ print(results["message"])
             </pre>
             and send a POST request to the url
             <pre>
-https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunSummary?apiKey=
+https://vesta.vmhost.psu.edu/pegr/api/fetchSequenceRunSummary?apiKey=
             </pre> 
     
             <p>The API can be simply called through curl</p>
             <pre>
-curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "directory": "xxxxxx", "userEmail": "xxx@xxx.xxx"}' https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunSummary?apiKey=XXXXXXX
+curl -X POST -H "Content-Type: application/json" -d '{"runId": 518, "directory": "xxxxxx", "userEmail": "xxx@xxx.xxx"}' https://vesta.vmhost.psu.edu/pegr/api/fetchSequenceRunSummary?apiKey=XXXXXXX
             </pre>
 
             <p>The following is an example in Python.</p>
             <pre>
 import requests
-url = "https://thanos.vmhost.psu.edu/pegr/api/fetchSequenceRunSummary?apiKey=XXXXXXX"
+url = "https://vesta.vmhost.psu.edu/pegr/api/fetchSequenceRunSummary?apiKey=XXXXXXX"
 data = {
         "runId": 518, 
         "directory": "xxxxxx",
@@ -1045,18 +1046,18 @@ results = r.json()
             </pre>
             and send a POST request to the url
             <pre>
-https://thanos.vmhost.psu.edu/pegr/api/updateSequenceRunSummary?apiKey=
+https://vesta.vmhost.psu.edu/pegr/api/updateSequenceRunSummary?apiKey=
             </pre> 
     
             <p>The API can be simply called through curl</p>
             <pre>
-curl -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxx@xxx.xxx", "runId": 518, "directoryName": "xxxxxx", "fcId": "xxx"}' https://thanos.vmhost.psu.edu/pegr/api/updateSequenceRunSummary?apiKey=XXXXXXX
+curl -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxx@xxx.xxx", "runId": 518, "directoryName": "xxxxxx", "fcId": "xxx"}' https://vesta.vmhost.psu.edu/pegr/api/updateSequenceRunSummary?apiKey=XXXXXXX
             </pre>
 
             <p>The following is an example in Python.</p>
             <pre>
 import requests
-url = "https://thanos.vmhost.psu.edu/pegr/api/updateSequenceRunSummary?apiKey=XXXXXXX"
+url = "https://vesta.vmhost.psu.edu/pegr/api/updateSequenceRunSummary?apiKey=XXXXXXX"
 data = {"userEmail": "xxx@xxx.xxx",
         "runId": 518, 
         "directoryName": "xxxxxx", 

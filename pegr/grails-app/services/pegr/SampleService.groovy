@@ -471,6 +471,10 @@ class SampleService {
                 sample.requestedGenomes = value
                 sample.save(failOnError: true)
                 break
+            case "pipelines" :
+                sample.requestedPipelines = value
+                sample.save(failOnError: true)
+                break
             case "growthMedia" :
                 sample.growthMedia = getGrowthMedia(value)
                 sample.save(failOnError: true)

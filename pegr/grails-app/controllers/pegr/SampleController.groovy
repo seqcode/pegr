@@ -526,4 +526,9 @@ class SampleController {
         
         render(view: '/report/print', model: [ sampleList: samples, samplesOnly: true])
     }
+    
+    def fetchPipelineAjax() {
+        def pipelines = Pipeline.executeQuery("select concat(g.name, '-', g.pipelineVersion) from Pipeline g")
+        render utilityService.stringToSelect2Data(pipelines) as JSON
+    }
 }

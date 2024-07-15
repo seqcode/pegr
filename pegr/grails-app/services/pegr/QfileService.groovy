@@ -565,7 +565,10 @@ class QfileService {
             }
         }
         
-	    def s = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: sampleNotes, status: SampleStatus.PENDING, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes, assay: assay, growthMedia: growthMedia, naturalId: sampleId)
+        // TODO: input requested pipelines from Q-file
+        def requestedPipelines = Pipeline.findAllByIsDefault(true)*.toString().join(",")
+        
+	    def s = new Sample(cellSource: cellSource, antibody: antibody, target: target, requestedTagNumber: getFloat(requestedTagNum), chromosomeAmount: getFloat(chromAmount), cellNumber: getFloat(cellNum), volume: getFloat(volume), note: sampleNotes, status: SampleStatus.PENDING, date: date, sendDataTo: dataTo, invoice: invoice, prtclInstSummary: prtcl, sourceId: seqId, source: source, antibodyNotes: abNotes, assay: assay, growthMedia: growthMedia, naturalId: sampleId, requestedPipelines: requestedPipelines)
         
         s.save(flush: true, failOnError: true)
         

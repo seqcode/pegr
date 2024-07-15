@@ -7,6 +7,7 @@ class Pipeline {
     String note
     String steps
     String workflowUrl
+    boolean isDefault
     
     static constraints = {
         name unique: "pipelineVersion"

@@ -359,7 +359,9 @@ class SequenceRunService {
         def maxByte = 5 * 1024 * 1024 
         def allowedFileTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/tiff']
         try {
-            def filepath = utilityService.upload(mpr,fieldName, allowedFileTypes, type, maxByte) 
+            def mpf = mpr.getFile(fieldName)
+            def filename =  mpf.getOriginalFilename()
+            def filepath = utilityService.upload(mpf, allowedFileTypes, type, maxByte, filename) 
             def imageMap = utilityService.parseJson(cohort.images)
             if (!imageMap) {
                 imageMap = [:]

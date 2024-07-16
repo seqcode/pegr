@@ -449,6 +449,77 @@ class SequenceRunController {
         }
         redirect(action: "show", id: runId)
     }
+    
+    def uploadQualityControlFile(Long runId) {
+        def run = SequenceRun.get(runId)
+        
+        if (!run) {
+            render(view: "/404")
+            return
+        }
+        
+        try {            
+            def mpr = (MultipartHttpServletRequest)request
+            
+            def mpf = mpr.getFile("file")
+            
+            def filename = "quality_control_run${run.id}.pdf"
+            
+            def allowedFileTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/tiff']
+            
+            def folder = 'sequence_run_quality_control'
+            
+            def maxByte = 10 * 1024 * 1024 
+            
+            def filepath = utilityService.upload(mpf, allowedFileTypes, folder, maxByte, filename) 
+            
+            run.qualityControlFile = filepath
+            
+            run.save()
+        } catch(SequenceRunException e) {
+            flash.message = e.message
+        }
+        
+        redirect(action: "show", id: runId)
+    }
+    
+    
+    def downloadQuanlityControlFile(Long runId){        
+        def run = SequenceRun.get(runId)
+        
+        File file = new File(utilityService.getFilesRoot(), run.qualityControlFile)
+        
+        try {
+            response.setContentType("application/pdf")
+            response.setHeader("Content-disposition", "attachment;filename=\"quality_control_run${runId}.pdf\"")
+            response.outputStream <<  file.getBytes()
+            webRequest.renderView = false
+        } catch(Exception e) {
+            render "Error!"
+        } finally {
+            response.getOutputStream().flush()
+            response.getOutputStream().close()
+        }
+        
+    }
+    
+    
+    def removeQuanlityControlFileAjax(Long runId){        
+        def run = SequenceRun.get(runId)
+        
+        File file = new File(utilityService.getFilesRoot(), run.qualityControlFile)
+        
+        file.delete()
+        
+        run.qualityControlFile = null
+        
+        run.save()
+        
+        render ""
+        return
+        
+    }
+
 
     def uploadCohortImage(Long cohortId, String type) {
         def cohort = SequencingCohort.get(cohortId)
@@ -651,6 +722,7 @@ class SequenceRunController {
         }
 
     }
+    
 
     def editQueue() {
         def queue = ngsRepoService.getQueue()

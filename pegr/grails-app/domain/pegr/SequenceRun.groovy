@@ -12,6 +12,7 @@ class SequenceRun {
     RunStats runStats
     Item poolItem
     String runName
+    String qualityControlFile
 	
     List getExperiments() {
         return SequencingExperiment.where{sequenceRun == this}.list()
@@ -19,7 +20,7 @@ class SequenceRun {
     
     List getCohorts() {
         return SequencingCohort.findAllByRun(this)
-    }
+    }    
     
     static constraints = {
 		note nullable: true, blank: true
@@ -31,6 +32,7 @@ class SequenceRun {
         runStats nullable: true
         poolItem nullable: true
         runName unique: true, nullable: true
+        qualityControlFile nullable: true, blank: true
     }
 
 }

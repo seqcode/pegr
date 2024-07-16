@@ -77,6 +77,33 @@
     </div>
     <h3>Summary <g:if test="${editable}"> <g:link action="editInfo" params="[runId:run.id]"><span class="edit">Edit</span></g:link></g:if></h3>
     <g:render template="summaryDetails"></g:render>  
+    <h3>Sequence Run Quality Control</h3>
+    <div>
+      <g:if test="${run.qualityControlFile}">
+      <div>
+        <g:link action="downloadQuanlityControlFile" params="[runId:run.id]">quality_control_run${run.id}.pdf <span class="btn btn-primary">Download</span></g:link>
+        <g:if test="${editable}">
+        <input name="runId" type="hidden" value="${run.id}">
+        <span class="btn btn-warning" id="remove-qc-file">Remove</span>
+        </g:if>
+      </div>
+      <g:if test="${editable}">
+      <g:uploadForm controller="sequenceRun" action="uploadQualityControlFile" class="upload-qc-file" style="display:none">
+        <g:hiddenField name="runId" value="${run.id}"></g:hiddenField>
+        <input type="file" name="file"/>
+        <g:submitButton name="upload" value="Upload"/>
+      </g:uploadForm>
+      </g:if>
+      </g:if>
+      <g:elseif test="${editable}">
+      <g:uploadForm controller="sequenceRun" action="uploadQualityControlFile" class="upload-qc-file">
+        <g:hiddenField name="runId" value="${run.id}"></g:hiddenField>
+        <input type="file" name="file"/>
+        <g:submitButton name="upload" value="Upload"/>
+      </g:uploadForm>
+      </g:elseif>
+      <g:else>No file.</g:else>
+    </div>
     <h3>Projects 
         <g:if test="${editable}">
             <span class="edit add-project">Add</span>
@@ -348,6 +375,21 @@
                     toggleTd(td);
                 }
             });
+        });
+        
+        $("#remove-qc-file").on("click", function(){
+            if(confirm("Delete the quality control file?")) {
+                var parent = $(this).parent();
+                var runId = parent.find("input[name=runId]").val();
+                $.ajax({
+                    url:"/pegr/sequenceRun/removeQuanlityControlFileAjax",
+                    type: "POST",
+                    data: { runId: runId },
+                    success: function(){
+                        parent.remove();
+                        $("form.upload-qc-file").show();
+                    }});
+            }
         });
         
         $(".remove-image").on("click", function(){

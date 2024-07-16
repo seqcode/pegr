@@ -188,10 +188,14 @@ class ItemController {
     def upload() {        
         try {
             def fieldName = "image"
+            def mpr = (MultipartHttpServletRequest)request
+            def mpf = mpr.getFile(fieldName)
+            def filename = mpf.getOriginalFilename()
             def maxByte = 5 * 1024 * 1024
             def folderName = "items" + File.separator + params.itemId
             def allowedFileTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif']
-            utilityService.upload((MultipartHttpServletRequest)request, fieldName, allowedFileTypes, folderName, maxByte)
+            
+            utilityService.upload(mpf, allowedFileTypes, folderName, maxByte, filename)
             flash.message = "Image uploaded!"
         } catch(UtilityException e) {
             flash.message = e.message

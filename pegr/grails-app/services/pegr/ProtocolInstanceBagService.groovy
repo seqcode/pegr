@@ -688,7 +688,9 @@ class ProtocolInstanceBagService {
         def folder = "protocolInstance"
         def maxByte = 5 * 1024 * 1024 
         def allowedFileTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif']
-        def filepath = utilityService.upload(mpr, fieldName, allowedFileTypes, folder, maxByte) 
+        def mpf = mpr.getFile(fieldName)
+        def filename = mpf.getOriginalFilename()
+        def filepath = utilityService.upload(mpf, allowedFileTypes, folder, maxByte, filename) 
         def imageMap = utilityService.parseJson(instance.images)
         if (!imageMap) {
             imageMap = [:]

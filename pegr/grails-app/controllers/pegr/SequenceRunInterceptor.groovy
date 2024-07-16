@@ -26,7 +26,10 @@ class SequenceRunInterceptor {
                            'addProject',
                            'removeProject',
                            'deleteSample',
-                           'deleteProject']) {
+                           'deleteProject',
+                           'uploadQualityControlFile',
+                           'removeQualityControlFileAjax',
+                          ]) {
             // get the sequence run
             def runId = params.long('runId')
             def run =  SequenceRun.get(runId)

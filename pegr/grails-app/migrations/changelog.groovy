@@ -2504,4 +2504,5 @@ databaseChangeLog = {
     inlcude file: 'change_lane_to_str.groovy'
     include file: 'add_requested_pipelines.groovy'
     include file: 'add_default_pipeline.groovy'
+    include file: 'add_quality_control_file.groovy'
 }

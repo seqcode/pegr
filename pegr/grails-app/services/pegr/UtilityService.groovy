@@ -347,8 +347,7 @@ class UtilityService {
         }
     }
     
-    def upload(MultipartHttpServletRequest mpr, String fileField, List allowedFileTypes, String folderName, Long maxByte) {
-        def mpf = mpr.getFile(fileField);
+    def upload(def mpf, List allowedFileTypes, String folderName, Long maxByte, String filename) {
         String fileType = mpf.getContentType();
         def filepath
         if(!mpf?.empty && mpf.size < maxByte && fileType in allowedFileTypes) {  
@@ -357,7 +356,7 @@ class UtilityService {
             if (!folder.exists()) { 
                 folder.mkdirs(); 
             } 
-            def filename =  mpf.getOriginalFilename();
+            
             File fileDest =  new File(folder, filename)
             if (fileDest.exists()) {
                 throw new UtilityException(message: "File already exists! You may change the file name and try again.")

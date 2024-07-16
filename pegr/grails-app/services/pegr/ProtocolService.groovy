@@ -70,11 +70,13 @@ class ProtocolService {
     
     @Transactional
     void uploadFile(MultipartHttpServletRequest mpr, Long protocolId, String fileField) {
+        def mpf = mpr.getFile(fileField)
+        def filename = mpf.getOriginalFilename()
         Long maxByte = 100 * 1024 * 1024
         List allowedFileTypes = ["application/pdf"]
         String folderName = "protocols"
         try {
-            def filepath = utilityService.upload(mpr, fileField, allowedFileTypes, folderName, maxByte)
+            def filepath = utilityService.upload(mpf, allowedFileTypes, folderName, maxByte, filename)
             def protocol = Protocol.get(protocolId)
             protocol.file = filepath
             protocol.save()     

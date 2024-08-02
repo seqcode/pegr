@@ -25,6 +25,141 @@
                     <li>Member: members have read access to all the projects, inventory, lab protocols, experiment records, sequencing run reports and samples. They will have additional write access based on their <a href="#project-role">project roles</a> and their ownership to specific inventory, protocols and experiment records. </li>
                     <li>Guest: guests are only able to see their personal information and the projects they have been assigned to (see <a href="#project-role">Project Roles</a>).</li>
                 </ol>
+                Permissions on the PEGR platform are defined at multiple levels, including group based permissions and fine-grained permissions at the object level.
+                <table class="table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Object</th>
+                            <th>Action</th>
+                            <th>Permission</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="2">User</td>
+                            <td>login</td>
+                            <td>all</td>
+                        </tr>
+                        <tr>
+                            <td>logout/profile/update</td>
+                            <td>all authenticated users</td>
+                        </tr>
+                        <tr>
+                            <td>Antibody</td>
+                            <td>update/delete</td>
+                            <td>admin or antibody's user</td>
+                        </tr>
+                        <tr>
+                            <td>Cell source</td>
+                            <td>update/delete</td>
+                            <td>admin or cell source's user</td>
+                        </tr>
+                        <tr>
+                            <td>Inventory</td>
+                            <td>update/delete</td>
+                            <td>admin or inventory item's user</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="5">Project</td>
+                            <td>all/search/create</td>
+                            <td>admin or member</td>
+                        </tr>
+                        <tr>
+                            <td>show</td>
+                            <td>admin, member or any projectRole*</td>
+                        </tr>
+                        <tr>
+                            <td>update/remove user</td>
+                            <td>admin or project owner*</td>
+                        </tr>
+                        <tr>
+                            <td>add/remove sample</td>
+                            <td>admin or project owner/parcitipant*</td>
+                        </tr>
+                        <tr>
+                            <td>merge projects</td>
+                            <td>admin or project owner*</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2">Protocol</td>
+                            <td>update/delete</td>
+                            <td>admin or protocol's user</td>
+                        </tr>
+                        <tr>
+                            <td>show</td>
+                            <td>admin or member</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="5">Experiment</td>
+                            <td>create/show</td>
+                            <td>admin or member</td>
+                        </tr>
+                        <tr>
+                            <td>reopen/delete</td>
+                            <td>admin</td>
+                        </tr>
+                        <tr>
+                            <td>add/remove sample</td>
+                            <td>admin or member before processing starts</td>
+                        </tr>
+                        <tr>
+                            <td>update</td>
+                            <td>admin or member before processing completes</td>
+                        </tr>
+                        <tr>
+                            <td>update each step</td>
+                            <td>admin or step's user</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="3">Report</td>
+                            <td>show</td>
+                            <td>admin, member or any projectRole*</td>
+                        </tr>
+                        <tr>
+                            <td>show unknown index/analysis status/
+                                notes/run status</td>
+                            <td>admin or member</td>
+                        </tr>
+                        <tr>
+                            <td>create/delete/update cohort report/
+                            delete sequence alignment/
+                            update run status/analysis notes</td>
+                            <td>admin</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="3">Sample</td>
+                            <td>show</td>
+                            <td>admin, member or any projectRole*</td>
+                        </tr>
+                        <tr>
+                            <td>update</td>
+                            <td>admin or project owner/participant*</td>
+                        </tr>
+                        <tr>
+                            <td>all/search</td>
+                            <td>admin or member</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="3">Sequence Run</td>
+                            <td>update</td>
+                            <td>admin or sequence run's user before run completes</td>
+                        </tr>
+                        <tr>
+                            <td>show</td>
+                            <td>admin or member</td>
+                        </tr> 
+                        <tr>
+                            <td>create/delete/upload/updateQueue</td>
+                            <td>admin</td>
+                        </tr>
+                        <tr>
+                            <td>Admin dashboard</td>
+                            <td>all</td>
+                            <td>admin</td>
+                        </tr> 
+                    </tbody>
+                </table>
+                <p>*: project roles(see below).</p>
             </div>
             <div id="project">
                 <h3>Project</h3>

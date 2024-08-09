@@ -1002,8 +1002,10 @@ results = r.json()
         </div>
         <div class="chapter">
         <h3 id="update-run-summary">Update Sequence Run Summary Information (Admin Only)</h3>
+        To update a sequence run's summary information, you need to supply either the run ID or run name.
+        <h4 id="update-run-summary-by-runid">By run ID</h4>
         <div>
-            <p>To update a sequence run's summary information, format your query in a JSON dictionary as follows
+            <p>To update a sequence run's summary information by run ID, format your query in a JSON dictionary as follows
             <pre>
 {    
     // required, combined with API key to authenticate user.
@@ -1018,7 +1020,7 @@ results = r.json()
     "runName": "string",
     "directoryName": "string",
     "fcId": "string",
-    "lane": 1,
+    "lane": "1",
     "note": "string",
     "libraryVolume": 1.2,
     "libraryStock": 1.2,
@@ -1047,6 +1049,72 @@ results = r.json()
             and send a POST request to the url
             <pre>
 https://vesta.vmhost.psu.edu/pegr/api/updateSequenceRunSummary?apiKey=
+            </pre> 
+    
+            <p>The API can be simply called through curl</p>
+            <pre>
+curl -X POST -H "Content-Type: application/json" -d '{"userEmail": "xxx@xxx.xxx", "runId": 518, "directoryName": "xxxxxx", "fcId": "xxx"}' https://vesta.vmhost.psu.edu/pegr/api/updateSequenceRunSummary?apiKey=XXXXXXX
+            </pre>
+
+            <p>The following is an example in Python.</p>
+            <pre>
+import requests
+url = "https://vesta.vmhost.psu.edu/pegr/api/updateSequenceRunSummary?apiKey=XXXXXXX"
+data = {"userEmail": "xxx@xxx.xxx",
+        "runId": 518, 
+        "directoryName": "xxxxxx", 
+        "fcId": "xxx"
+       }
+r = requests.post(url, json=data)
+results = r.json()
+print(results["message"])
+            </pre>
+        </div>
+        <h4 id="update-run-summary-by-runname">By run name</h4>
+        <div>
+            <p>To update a sequence run's summary information by run name, format your query in a JSON dictionary as follows
+            <pre>
+{    
+    // required, combined with API key to authenticate user.
+    "userEmail": "string", 
+    
+    // required
+    "runName": "string",
+    
+    // the following fields are optional
+    "fcId": "string",
+    "directoryName": "string",
+    "lane": "1",
+    "platformName": "string",
+    "date": "2021-10-10",   
+    "note": "string",
+    "libraryVolume": 1.2,
+    "libraryStock": 1.2,
+    "libraryStdDev": 0.3,
+    "pctLibraryStdDev": 0.1,
+    "cycles": "string",
+    "srOrPe": "string",
+    "seqCtrl": "string",
+    "pcrCycles": 1,
+    "qubitConc": 1.2,
+    "qPcrConc": 1.2,
+    "libraryLoadedPm": 1.2,
+    "phiXLoaded": 1.2,
+    "libraryLoadedFmol": 1.2,
+    "clusterDensity": 1.2,
+    "readsPassFilter": 1.2,
+    "pctClustersPassFilter": 1.2,
+    "pctQ30": 1.2,
+    "qidx": 1.2,
+    "totalReads": 1.2,
+    "readsFailedDemultiplex": 1.2,
+    "pctReadsFailedDemultiplex": 1.2,
+    "pctAlignedToPhiX": 1.2,
+}
+            </pre>
+            and send a POST request to the url
+            <pre>
+https://vesta.vmhost.psu.edu/pegr/api/updateSequenceRunSummaryByRunName?apiKey=
             </pre> 
     
             <p>The API can be simply called through curl</p>

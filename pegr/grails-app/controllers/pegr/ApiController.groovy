@@ -529,8 +529,54 @@ class ApiController {
             render text: results, contentType: "text/json", status: code
         }
     }
-
     
+    
+    def updateSequenceRunSummaryByRunName(String apiKey) {        
+        def query = request.JSON
+        
+        // get the user
+        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+
+        // only admin is allowed to use this API
+        if (apiUser && apiUser.isAdmin()) {
+            try {
+                def code = 200
+                def run = SequenceRun.findByRunName(query.runName)
+                
+                run.properties = query
+                
+                // update platform if its name is sent
+                if (query.containsKey("platformName")) {
+                    def platform = SequencingPlatform.findByName(query.platformName)
+                    if (platform) {
+                        run.platform = platform
+                    } else {
+                        throw new ApiException(message: "Sequencing platform ${query.platform} cannot be found!")
+                    }
+                }
+                
+                if (run.runStats) {
+                    run.runStats.properties = query
+                } else {
+                    run.runStats = new RunStats(query)
+                }
+                
+                sequenceRunService.update(run)
+                def results = [message: "Success!"] as JSON
+                render text: results, contentType: "text/json", status: code
+            } catch(Exception e) {
+                def code = 500
+                def results = [message: "Error! ${e.message}"] as JSON
+                render text: results, contentType: "text/json", status: code
+            }
+        } else {
+            def code = 401
+            def results = [message: "Not authorized! Only admin is allowed to use this API!"] as JSON
+            render text: results, contentType: "text/json", status: code
+        }
+    }
+
+
     def getSampleNote(String apiKey) {   
         def sample, result
         

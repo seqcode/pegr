@@ -24,7 +24,13 @@
                                 format: '#.##'
                         },
                         curveType: 'function',
-                        legend: { position: 'right' }
+                        legend: { position: 'right' },
+                        series: {
+                            0: { color: '#0000ff' },
+                            1: { color: '#ff0000' },  
+                            2: { color: '#00c9ff' },
+                            3: { color: '#ff00ff' },
+                        }
                     };
                     // Instantiate and draw our chart, passing in some options.
                     var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));

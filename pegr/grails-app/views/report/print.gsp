@@ -311,7 +311,13 @@
                                                     format: '#.##'
                                             },
                                             curveType: 'function',
-                                            legend: { position: 'top' }
+                                            legend: { position: 'top' },
+                                            series: {
+                                                0: { color: '#0000ff' },
+                                                1: { color: '#ff0000' },  
+                                                2: { color: '#00c9ff' },
+                                                3: { color: '#ff00ff' },
+                                            }
                                           };
                             google.visualization.events.addListener(chart, 'ready', function () {
                                 container.innerHTML = '<img src="' + chart.getImageURI() + '">';
@@ -360,7 +366,13 @@
                                                     format: '#.##'
                                             },
                                             curveType: 'function',
-                                            legend: { position: 'right' }
+                                            legend: { position: 'right' },
+                                            series: {
+                                                0: { color: '#0000ff' },
+                                                1: { color: '#ff0000' },  
+                                                2: { color: '#00c9ff' },
+                                                3: { color: '#ff00ff' },
+                                            }
                                           };                 
                             google.visualization.events.addListener(chart, 'ready', function () {
                                 container.innerHTML = '<img src="' + chart.getImageURI() + '">';

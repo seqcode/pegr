@@ -733,6 +733,7 @@ class ReportService {
         } catch(Exception e) {
             throw new ReportException(message: "Error fetching the data!")
         }
+        
         data.eachLine { line, lineNum ->
             def numbers = line.tokenize()
             if (lineNum == 0) {
@@ -750,7 +751,12 @@ class ReportService {
                 }
             }
         }
-        String s = '[["Position", "Forward","Reverse"]'
+        
+        String s = '[["Position", "R1 Forward", "R1 Reverse"]'            
+        if (results[0].size() == 5) {
+            s = '[["Position", "R1 Forward", "R1 Reverse", "R2 Forward", "R2 Reverse"]'
+        } 
+        
         results.each {
             def a = it.join(",")
             s += ",[${a}]"

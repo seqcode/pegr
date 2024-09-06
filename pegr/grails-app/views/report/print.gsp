@@ -190,10 +190,6 @@
                             <td class="meme-fig" style="width:350px">
                                 <i class="fa fa-spinner fa-spin"></i>
                                 <div class="preview_box">
-                                    <div class="preview_btn_box">
-                                        <div class="preview_btn plus active" tabindex="0">+</div>
-                                        <div class="preview_btn minus" tabindex="0">-</div>
-                                    </div>
                                     <div class="preview_logo_box">
                                         <div class="meme-svg meme-svg-forward">
                                             <span class="meme-fig-url-forward" hidden="hidden">${alignment.memeSvgForward[n]}</span>

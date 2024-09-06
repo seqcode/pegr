@@ -10,7 +10,7 @@
                       dataType: "json"
                 }).done(function(jsonData){
                     // Create our data table out of JSON data loaded from server.
-                    var data = new google.visualization.arrayToDataTable(jsonData);
+                    var data = new google.visualization.arrayToDataTable(jsonData["plus"]);
 
                     var options = {
                         title: '',

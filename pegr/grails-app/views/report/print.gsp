@@ -291,7 +291,7 @@
                             container.html(jsonData["error"]);
                         } else {
                             // Create our data table out of JSON data loaded from server.
-                            var data = new google.visualization.arrayToDataTable(jsonData);
+                            var data = new google.visualization.arrayToDataTable(jsonData["plus"]);
 
                             // Instantiate and draw our chart, passing in some options.
                             var chart = new google.visualization.LineChart(container);
@@ -345,7 +345,7 @@
                             $(compositeTd).html(jsonData["error"]);
                         } else {                   
                             // Create our data table out of JSON data loaded from server.
-                            var data = new google.visualization.arrayToDataTable(jsonData);
+                            var data = new google.visualization.arrayToDataTable(jsonData["plus"]);
 
                             // Instantiate and draw our chart, passing in some options.
                             var chart = new google.visualization.LineChart(container);

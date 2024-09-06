@@ -752,17 +752,36 @@ class ReportService {
             }
         }
         
-        String s = '[["Position", "R1 Forward", "R1 Reverse"]'            
+        String s = '[["Position", "R1 Forward", "R1 Reverse"]'
         if (results[0].size() == 5) {
             s = '[["Position", "R1 Forward", "R1 Reverse", "R2 Forward", "R2 Reverse"]'
         } 
         
+        def s_plus = s
+        def s_minus = s
+        
         results.each {
             def a = it.join(",")
-            s += ",[${a}]"
+            s_plus += ",[${a}]"
+            
+            def it_ = []
+            it_[0] = -utilityService.getFloat(it[0])
+            
+            def n = 1
+            while(n < it.size()) {
+                it_[n] = it[n+1]
+                it_[n+1] = it[n]
+                n = n+2
+            }
+            
+            def b = it_.join(",")
+            s_minus += ",[${b}]"
         }
-        s += "]"
-        return s
+        
+        s_plus += "]"
+        s_minus += "]"
+       
+        return '{"plus": ' + s_plus + ', "minus": '+ s_minus + '}'
     }
     
    /**

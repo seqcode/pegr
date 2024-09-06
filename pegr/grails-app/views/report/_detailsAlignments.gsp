@@ -101,7 +101,8 @@
                                     <g:link controller="report" action="composite" params="[url: alignment.composite[n]]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link>
                                     <i class="fa fa-spinner fa-spin"></i>
                                     <span class="composite-url" hidden="hidden">${alignment.composite[n]}</span>
-                                    <div class="composite-fig"></div>
+                                    <div class="composite-fig-plus"></div>
+                                    <div class="composite-fig-minus"></div>
                                   </g:if>
                                 </td>
                             </tr>
@@ -112,7 +113,7 @@
                 </div>
                 <g:each in="${0..<alignment.featureAnalysis.size()}" var="m">
                   <g:if test="${alignment.featureAnalysis[m]}">
-                    <div id="${alignment.id}-composite${m}" class="featureAnalysis tab-pane fade">
+                    <div id="${alignment.id}-composite${m}" class="featureAnalysis">
                       <i class="fa fa-spinner fa-spin"></i>
                       <span class="composite-url" hidden="hidden">${alignment.featureAnalysis[m].tabular}</span>
                       <span class="composite-plot-title" hidden="hidden">${alignment.featureAnalysis[m].plot_title}</span>
@@ -133,14 +134,21 @@
         $(".preview_btn").on("click", function(){
             $(this).addClass("active");
             var logo = $(this).parent().next();
+            var composite_plus = $(this).closest("tr").find(".composite-fig-plus");
+            var composite_minus = $(this).closest("tr").find(".composite-fig-minus");
+            
             if ($(this).hasClass("plus")) {
                 $(this).next().removeClass("active");
                 logo.find(".meme-svg-forward").show();
                 logo.find(".meme-svg-reverse").hide();
+                composite_plus.show();
+                composite_minus.hide();
             } else {
                 $(this).prev().removeClass("active");
                 logo.find(".meme-svg-forward").hide();
                 logo.find(".meme-svg-reverse").show();
+                composite_minus.show();
+                composite_plus.hide();
             }            
         });
         
@@ -261,7 +269,8 @@
             var compositeTd = $(this);
             var spinner = $(this).find("i");
             var compositeUrl = $(this).find(".composite-url").text();
-            var container = $(this).find(".composite-fig")[0];
+            var container_plus = $(this).find(".composite-fig-plus")[0];
+            var container_minus = $(this).find(".composite-fig-minus")[0];
             setTimeout(function(){
                 google.charts.setOnLoadCallback(function(){
                     $.ajax({
@@ -273,11 +282,6 @@
                             $(compositeTd).empty();
                             $(compositeTd).html(jsonData["error"]);
                         } else {
-                            // Create our data table out of JSON data loaded from server.
-                            var data = new google.visualization.arrayToDataTable(jsonData);
-
-                            // Instantiate and draw our chart, passing in some options.
-                            var chart = new google.visualization.LineChart(container);
                             var options = { width: 300, 
                                            height: 150, 
                                            legend: { position: 'bottom'}, 
@@ -289,10 +293,23 @@
                                              2: { color: '#00c9ff' },
                                              3: { color: '#ff00ff' },
                                            }};
-                            google.visualization.events.addListener(chart, 'ready', function () {
-                                container.innerHTML = '<img src="' + chart.getImageURI() + '">';
-                            });                 
-                            chart.draw(data, options);   
+                            
+                            // Create our data table out of JSON data loaded from server.
+                            var data_plus = new google.visualization.arrayToDataTable(jsonData["plus"]);
+                            
+                            // Instantiate and draw our chart, passing in some options.
+                            var chart_plus = new google.visualization.LineChart(container_plus); 
+                            
+                            chart_plus.draw(data_plus, options);   
+                            
+                            var data_minus = new google.visualization.arrayToDataTable(jsonData["minus"]);
+                            
+                            var chart_minus = new google.visualization.LineChart(container_minus); 
+                            
+                            chart_minus.draw(data_minus, options);   
+                            
+                            $(container_minus).hide();
+                            
                             $(spinner).remove();
                         }
                     });
@@ -321,7 +338,7 @@
                             $(compositeTd).html(jsonData["error"]);
                         } else {
                             // Create our data table out of JSON data loaded from server.
-                            var data = new google.visualization.arrayToDataTable(jsonData);
+                            var data = new google.visualization.arrayToDataTable(jsonData["plus"]);
 
                             // Instantiate and draw our chart, passing in some options.
                             var chart = new google.visualization.LineChart(container);
@@ -348,6 +365,7 @@
                                           };                            
                             chart.draw(data, options);   
                             $(spinner).remove();
+                            compositeTd.addClass("tab-pane fade");
                         }
                     });
                 });

@@ -307,7 +307,7 @@
                                                     format: '#.##'
                                             },
                                             curveType: 'function',
-                                            legend: { position: 'top' },
+                                            legend: { position: 'bottom' },
                                             series: {
                                                 0: { color: '#0000ff' },
                                                 1: { color: '#ff0000' },  
@@ -362,7 +362,7 @@
                                                     format: '#.##'
                                             },
                                             curveType: 'function',
-                                            legend: { position: 'right' },
+                                            legend: { position: 'bottom' },
                                             series: {
                                                 0: { color: '#0000ff' },
                                                 1: { color: '#ff0000' },  

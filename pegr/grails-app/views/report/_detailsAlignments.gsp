@@ -280,7 +280,7 @@
                             var chart = new google.visualization.LineChart(container);
                             var options = { width: 300, 
                                            height: 150, 
-                                           legend: { position: 'none'}, 
+                                           legend: { position: 'bottom'}, 
                                            vAxis: { gridlines: {count: 3 } },
                                            hAxis: { gridlines: {count: 3 } },
                                            series: {
@@ -338,7 +338,7 @@
                                                     format: '#.##'
                                             },
                                             curveType: 'function',
-                                            legend: { position: 'right' },
+                                            legend: { position: 'bottom' },
                                             series: {
                                                 0: { color: '#0000ff' },
                                                 1: { color: '#ff0000' },  

@@ -229,14 +229,10 @@ class AlignmentStatsService {
                 }
                 break
             case "output_meme":
-                // count the number of motifs
-                def motifCount = getMotifCountFromMeme(datasets)
-                    
-                // save the number of motifs as a statistics
-                analysis.statistics = JsonOutput.toJson([["motifCount":motifCount]])
-                    
-                // add message if no motif exists
-                if (motifCount == 0) {
+                // check the number of motifs
+                if (statistics.any {it -> it.containsKey("motifCount") && it["motifCount"] }) {
+                    // Do nothing
+                } else {
                     note.code = "Zero"
                     note.message = "No motifs."
                 }

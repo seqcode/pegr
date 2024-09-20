@@ -555,7 +555,7 @@ class ReportService {
                     def params = utilityService.queryJson(analysis.parameters, ["filter", "sigma", "exclusion"])
                     alignmentDTO.peakCallingParam = getPeakCallingParam(params.filter, params.exclusion, params.sigma)
                     break
-                case "output_bedtoolsIntersect": // GeneTrack
+                case "output_bedtoolsIntersect": // BedtoolsIntersect
                     def stats = utilityService.queryJson(analysis.statistics, ["numberOfPeaks", "singletons"])
                     alignmentDTO.peaks = stats.numberOfPeaks
                     alignmentDTO.singletons = stats.singletons

@@ -499,6 +499,10 @@ class ApiController {
                 
                 run.properties = query
                 
+                if (!run.date) {
+                    run.date = new Date()
+                }
+                
                 // update platform if its name is sent
                 if (query.containsKey("platformName")) {
                     def platform = SequencingPlatform.findByName(query.platformName)
@@ -544,6 +548,10 @@ class ApiController {
                 def run = SequenceRun.findByRunName(query.runName)
                 
                 run.properties = query
+                
+                if (!run.date) {
+                    run.date = new Date()
+                }
                 
                 // update platform if its name is sent
                 if (query.containsKey("platformName")) {

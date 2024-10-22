@@ -7,6 +7,7 @@ class Pipeline {
     String note
     String steps
     String workflowUrl
+    String reportModules
     boolean isDefault
     
     static constraints = {
@@ -15,6 +16,7 @@ class Pipeline {
         workflowId unique: true
         workflowUrl nullable: true, blank: true
         steps nullabel: false, blank: false, widget: 'textarea'
+        reportModules nullabel: true, blank: true, widget: 'textarea'
         note nullable: true, blank: true
     }
     

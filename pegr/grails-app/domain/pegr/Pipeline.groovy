@@ -14,7 +14,7 @@ class Pipeline {
         pipelineVersion nullable: false
         workflowId unique: true
         workflowUrl nullable: true, blank: true
-        steps nullabel: true, blank: true
+        steps nullabel: false, blank: false, widget: 'textarea'
         note nullable: true, blank: true
     }
     
@@ -26,6 +26,6 @@ class Pipeline {
     }
     
     String toString() {
-        "${name}-${pipelineVersion}"
+        "${name}_${pipelineVersion}"
 	}
 }

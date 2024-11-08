@@ -13,7 +13,7 @@
         <thead>
             <tr>
                 <th colspan="6" class="text-center group group-analysis">Analysis</th>
-                <th colspan="${runStatusMap.value.steps.size()-1}" class="text-center group group-pipeline">Pipeline</th>
+                <th colspan="${runStatusMap.value.steps.size()}" class="text-center group group-pipeline">Pipeline</th>
                 <th colspan="${qcSettings.general?.size() + 1}" class="text-center group group-qc">Quality Control</th>
                 <th colspan="2" class="text-center group group-operation">Operation</th>
             </tr>
@@ -26,9 +26,9 @@
                 <th class="col-date group-analysis">Date</th>
                 <g:if test="${runStatusMap.value.steps}">
                     <g:each in="${runStatusMap.value.steps}" var="step">
-						<g:if test="${step[0]!='repeatmasker_wrapper_output_stats2'}">
+						
 	                        <th class="step-header col-step-${step[0]}  group-pipeline"><div><span>${step[1]}</span></div></th>
-						</g:if>
+						
                     </g:each>
                 </g:if>
                 <th class="text-right col-tags group-qc">Requested Tags</th>
@@ -68,7 +68,6 @@
                     <td class="col-date group-analysis">${alignment.date}</td>
                     <g:each in="${alignment.status}" var="status" status="j">
 
-					<g:if test="${runStatusMap.value.steps[j][0]!='repeatmasker_wrapper_output_stats2'}">
                         <td class="analysis-status col-step-${runStatusMap.value.steps[j][0]} group-pipeline">
                             <input class="analysisId" type="hidden" name="analysisId" value="${status.analysisId}">
                             <div class="popover-wrapper">
@@ -99,7 +98,6 @@
                             </div>
                             </div>
                         </td>
-					</g:if>
                     </g:each>
 
                     <td class="text-right col-tags group-qc"><g:formatNumber number="${alignment.requestedTags}" format="###,###,###" /></td>

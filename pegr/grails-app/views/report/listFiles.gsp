@@ -4,7 +4,8 @@
     <asset:javascript src="exportCsv.js"/>
 </head>
 <body>
-<button class="btn btn-primary">Export CSV file</button>
+<button class="btn btn-primary" id="export-csv">Export CSV file</button>
+<g:link action="downloadScript" params="[reportId:reportId]" class="btn btn-primary" id="download-script">Download script</g:link>
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -57,9 +58,14 @@
     </tbody>
 </table>
 <script>
-    $("button").on("click", function () {
+    $("#export-csv").on("click", function () {
         var html = $("table").outerHTML;
         export_table_to_csv(html, "table.csv");
+    });
+    
+    $("#download-script").on("click", function () {
+        
+        
     });
 </script>
 </body>

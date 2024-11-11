@@ -250,7 +250,59 @@ class ReportController {
 
     def listFiles(Long id) {
         def samples = reportService.fetchDataForReport(id)
-        [samples: samples]
+        [samples: samples, reportId: id]
+    }
+    
+    def downloadScript(Long reportId) {
+        def samples = reportService.fetchDataForReport(reportId)
+        
+        def data = []
+        
+        samples.each { sample ->
+            sample.experiments.each { experiment ->
+                experiment.alignments.each { alignment ->
+                    if (experiment.fastq.read1) {
+                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_R1.fastq ${experiment.fastq.read1}") 
+                    }
+                     
+                    if (experiment.fastq.read2) {
+                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_R2.fastq ${experiment.fastq.read2} ")  
+                    }
+                    
+                    if (alignment.bamRaw) {
+                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_raw.bam ${alignment.bamRaw}")  
+                    }
+                    
+                    if (alignment.bam) {
+                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_filtered.bam ${alignment.bam} ")  
+                    }
+                    
+                    if (alignment.bigwigForwardFile) {
+                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_forward.bigwig ${alignment.bigwigForwardFile}")  
+                    }
+                    
+                    if (alignment.bigwigReverseFile) {
+                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_reverse.bigwig ${alignment.bigwigReverseFile} ") 
+                    }                    
+                }
+            }
+        }
+        
+        File file = File.createTempFile("download_script", ".sh")
+        file.deleteOnExit()
+        file.text= data.join(System.lineSeparator())
+        
+        try {
+            response.setContentType("application/csv")
+            response.setHeader("Content-disposition", "attachment;filename=\"download_script.sh\"")
+            response.outputStream <<  file.getBytes()
+            webRequest.renderView = false
+        } catch(Exception e) {
+            render "Error!"
+        } finally {
+            response.getOutputStream().flush()
+            response.getOutputStream().close()
+        }
     }
 }
 

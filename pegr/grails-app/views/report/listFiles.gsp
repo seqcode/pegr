@@ -22,7 +22,6 @@
             <th>Raw Bam</th>
             <th>Filtered Bam</th>
             <th>BigWig</th>
-            <th>Scidx</th>
         </tr>
     </thead>
     <tbody>
@@ -51,7 +50,6 @@
                             Reverse: <a href="${alignment.bigwigReverseFile}">${alignment.bigwigReverseFile}</a>
                           </g:if>
                         </td>
-                        <td><a href="${alignment.scidx}">${alignment.scidx}</a></td>
                     </tr>
                 </g:each>
             </g:each>

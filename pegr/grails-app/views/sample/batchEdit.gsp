@@ -30,7 +30,7 @@
                     <th class="nterm">N-Term</th>
                     <th class="index" colspan="2">Index</th>
                     <th class="genomes">Reference Genome(s)</th>
-                    <th class="genomes">Requested Pipeline(s)</th>
+                    <th class="pipelines">Requested Pipeline(s)</th>
                     <th class="growthMedia">Growth Media</th>
                     <th class="treatments">Treatments</th>
                     <th class="chromosomeAmount">Chrom.(ug)</th>

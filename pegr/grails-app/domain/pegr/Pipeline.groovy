@@ -16,7 +16,7 @@ class Pipeline {
         workflowId unique: true
         workflowUrl nullable: true, blank: true
         steps nullabel: false, blank: false, widget: 'textarea'
-        reportModules nullabel: true, blank: true, widget: 'textarea'
+        reportModules nullable: true, blank: true, widget: 'textarea'
         note nullable: true, blank: true
     }
     

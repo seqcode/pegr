@@ -332,6 +332,7 @@ class SampleDTO {
     String note
     String recommend
     List histories
+    List sampleModules
 }
 
 class ExperimentDTO {

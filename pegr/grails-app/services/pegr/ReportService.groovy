@@ -296,9 +296,11 @@ class ReportService {
     * or nothing if the sample is not found.
     */
     def fetchDataForSample(Long sampleId, Boolean preferredOnly=false) {
+        def jsonSlurper = new JsonSlurper()
         def sampleDTOs = []
         def sample = Sample.get(sampleId)
         if (sample) {
+            def modules = []
             def sampleDTO = getSampleDTO(sample)
             sample.sequencingExperiments.each { experiment ->
                 def expDTO = getExperimentDTO(experiment)
@@ -311,10 +313,12 @@ class ReportService {
                         def analysis = Analysis.findAllByAlignment(alignment)
                         def alignmentStatusDTO = getAlignmentStatusDTO(alignment, experiment, analysis)
                         sampleDTO.histories << alignmentStatusDTO.historyId
+                        modules << jsonSlurper.parseText(alignment.pipeline.sampleModules)
                     }
                 }
                 sampleDTO.experiments << expDTO
-            }
+            }            
+            sampleDTO.sampleModules = modules.unique()
             sampleDTOs << sampleDTO
         }
         return sampleDTOs

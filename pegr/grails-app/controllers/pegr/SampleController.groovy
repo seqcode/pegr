@@ -351,8 +351,12 @@ class SampleController {
 
     def fetchDataForCheckedSamplesAjax() {
         def sampleIds = session.checkedSample
+        
         def data = reportService.fetchDataForSamples(sampleIds)
-        render(template: '/report/details', model: [ sampleDTOs: data])
+        
+        def modules = data.collect { it.sampleModules }.flatten().unique()
+        
+        render(template: '/report/details', model: [ sampleDTOs: data, modules: modules])
     }
 
     def clearCheckedSampleAjax(){
@@ -416,7 +420,14 @@ class SampleController {
 
     def fetchDataForSampleAjax(Long id) {
         def data = reportService.fetchDataForSample(id)
-        render(template: '/sample/bioinformatics', model: [ sampleDTOs: data])
+        
+        def modules = []
+        
+        if (data.size() > 0) {
+            modules = data[0].sampleModules
+        }
+        
+        render(template: '/report/details', model: [ sampleDTOs: data, modules: modules])
     }
 
     def batchEdit() {

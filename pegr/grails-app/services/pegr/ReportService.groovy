@@ -318,7 +318,7 @@ class ReportService {
                 }
                 sampleDTO.experiments << expDTO
             }            
-            sampleDTO.sampleModules = modules.unique()
+            sampleDTO.sampleModules = modules.flatten().unique()
             sampleDTOs << sampleDTO
         }
         return sampleDTOs

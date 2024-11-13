@@ -1,5 +1,12 @@
-<div class="table-responsive">
-    <table class="table table-bordered">
+<h3>Downstream Analysis</h3>
+<ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#peak">Peak Statistics</a></li>
+</ul>
+
+<div class="tab-content">
+  <div id="peak" class="tab-pane fade in active">
+    <div class="table-responsive">
+      <table class="table table-bordered">
         <thead>
             <tr>
                 <th>Sample ID</th>
@@ -37,4 +44,6 @@
             </g:each>      
         </tbody>
       </table>
+    </div>     
+  </div>
 </div>

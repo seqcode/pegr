@@ -1,3 +1,4 @@
+<h3>Epitope Tags &amp; FastQC</h3>
 <div class="table-responsive">
     <table class="table table-bordered">
         <thead>

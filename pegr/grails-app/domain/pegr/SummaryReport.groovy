@@ -6,9 +6,11 @@ class SummaryReport {
     Date date
     ReportStatus status
     String note
+    Pipeline pipeline
     
     static constraints = {
         note nullable: true
+        pipeline nullable: true
     }
     
     SequencingCohort getCohort() {

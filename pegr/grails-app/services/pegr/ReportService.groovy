@@ -260,6 +260,10 @@ class ReportService {
             experiment.alignments.each { alignment ->
                 if (alignment.isPreferred) {
                     new ReportAlignments(report: report, alignment: alignment).save()
+                    if (!report.pipeline) {
+                        report.pipeline = alignment.pipeline
+                        report.save()
+                    }
                 }
             } 
         }

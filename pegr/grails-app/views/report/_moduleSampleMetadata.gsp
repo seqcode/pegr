@@ -1,3 +1,5 @@
+<h3>Samples</h3>
+<p>The number of Samples: ${sampleDTOs?.size()}</p>
 <div class="table-responsive">
     <table class="table table-bordered">
         <thead>
@@ -30,3 +32,4 @@
         </tbody>
       </table>
 </div>
+

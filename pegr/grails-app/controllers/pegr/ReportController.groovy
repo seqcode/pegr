@@ -112,7 +112,13 @@ class ReportController {
 
     def fetchDataForReportAjax(Long id) {
         def data = reportService.fetchDataForReport(id)
-        render(template: 'details', model: [ sampleDTOs: data])
+        def report = SummaryReport.get(id)
+        def imageMap = report.cohort?.imageMap
+        
+        def jsonSlurper = new JsonSlurper()
+        def modules = jsonSlurper.parseText(report.pipeline?.reportModules)
+        
+        render(template: 'details', model: [ sampleDTOs: data, imageMap:imageMap, modules: modules])
     }
 
     def fetchMemeDataAjax(String url) {

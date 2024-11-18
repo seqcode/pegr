@@ -267,12 +267,21 @@ class ReportController {
         samples.each { sample ->
             sample.experiments.each { experiment ->
                 experiment.alignments.each { alignment ->
-                    if (experiment.fastq.read1) {
-                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_R1.fastq ${experiment.fastq.read1}") 
+                    // TODO: hard-coded
+                    def path
+                    
+                    if (experiment.fastq.read1) {                        
+                        // replace "preview=False" with "to_ext=fastqsanger.gz"
+                        path = experiment.fastq.read1.replace("preview=False", "to_ext=fastqsanger.gz")
+                        
+                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_R1.fastq.gz ${path}") 
                     }
                      
                     if (experiment.fastq.read2) {
-                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_R2.fastq ${experiment.fastq.read2} ")  
+                        // replace "preview=False" with "to_ext=fastqsanger.gz"
+                        path = experiment.fastq.read2.replace("preview=False", "to_ext=fastqsanger.gz")
+                        
+                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_R2.fastq.gz ${path} ")  
                     }
                     
                     if (alignment.bamRaw) {
@@ -284,11 +293,17 @@ class ReportController {
                     }
                     
                     if (alignment.bigwigForwardFile) {
-                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_forward.bigwig ${alignment.bigwigForwardFile}")  
+                        // replace "preview=False" with "to_ext=bigwig"
+                        path = alignment.bigwigForwardFile.replace("preview=False", "to_ext=bigwig")
+                        
+                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_forward.bigwig ${path}")  
                     }
                     
                     if (alignment.bigwigReverseFile) {
-                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_reverse.bigwig ${alignment.bigwigReverseFile} ") 
+                        // replace "preview=False" with "to_ext=bigwig"
+                        path = alignment.bigwigReverseFile.replace("preview=False", "to_ext=bigwig")
+                        
+                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_reverse.bigwig ${path} ") 
                     }                    
                 }
             }

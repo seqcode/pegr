@@ -9,6 +9,7 @@ class Pipeline {
     String workflowUrl
     String reportModules
     String sampleModules
+    String printModules
     boolean isDefault
     
     static constraints = {
@@ -19,6 +20,7 @@ class Pipeline {
         steps nullabel: false, blank: false, widget: 'textarea'
         reportModules nullable: true, blank: true, widget: 'textarea'
         sampleModules nullable: true, blank: true, widget: 'textarea'
+        printModules nullable: true, blank: true, widget: 'textarea'
         note nullable: true, blank: true
     }
     

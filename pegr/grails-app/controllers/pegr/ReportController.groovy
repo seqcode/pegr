@@ -251,7 +251,11 @@ class ReportController {
         }
         def data = reportService.fetchDataForReport(id)
         def imageMap = report.cohort?.imageMap
-        [report: report, imageMap: imageMap, sampleList: data]
+        
+        def jsonSlurper = new JsonSlurper()
+        def modules = jsonSlurper.parseText(report.pipeline?.printModules)
+        
+        [report: report, imageMap: imageMap, sampleList: data, modules: modules]
     }
 
     def listFiles(Long id) {

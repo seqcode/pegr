@@ -539,7 +539,7 @@ class SampleController {
         
         def samples = reportService.fetchDataForSamples(sampleIds)
         
-        def modules = samples.collect { it.sampleModules }.flatten().unique()
+        def modules = samples.collect { it.printModules }.flatten().unique()
         
         if (modules.size() == 0) {
             modules = ["moduleSampleMetadata"]

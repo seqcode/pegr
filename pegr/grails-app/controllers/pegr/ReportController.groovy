@@ -370,6 +370,7 @@ class SampleDTO {
     String recommend
     List histories
     List sampleModules
+    List printModules
 }
 
 class ExperimentDTO {

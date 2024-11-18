@@ -1,3 +1,4 @@
+<g:if test="${imageMap}">
 <h3>Images</h3>
 <table class="table table-bordered" id="project-table">
     <thead>
@@ -29,3 +30,4 @@
         </tr>
     </tbody>
 </table>
+</g:if>

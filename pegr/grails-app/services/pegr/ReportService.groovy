@@ -300,7 +300,9 @@ class ReportService {
         def sampleDTOs = []
         def sample = Sample.get(sampleId)
         if (sample) {
-            def modules = []
+            def sampleModules = []
+            def printModules = []
+            
             def sampleDTO = getSampleDTO(sample)
             sample.sequencingExperiments.each { experiment ->
                 def expDTO = getExperimentDTO(experiment)
@@ -313,12 +315,14 @@ class ReportService {
                         def analysis = Analysis.findAllByAlignment(alignment)
                         def alignmentStatusDTO = getAlignmentStatusDTO(alignment, experiment, analysis)
                         sampleDTO.histories << alignmentStatusDTO.historyId
-                        modules << jsonSlurper.parseText(alignment.pipeline.sampleModules)
+                        sampleModules << jsonSlurper.parseText(alignment.pipeline.sampleModules)
+                        printModules << jsonSlurper.parseText(alignment.pipeline.printModules)
                     }
                 }
                 sampleDTO.experiments << expDTO
             }            
-            sampleDTO.sampleModules = modules.flatten().unique()
+            sampleDTO.sampleModules = sampleModules.flatten().unique()
+            sampleDTO.printModules = printModules.flatten().unique()
             sampleDTOs << sampleDTO
         }
         return sampleDTOs

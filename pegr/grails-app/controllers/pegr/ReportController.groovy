@@ -263,8 +263,16 @@ class ReportController {
         [samples: samples, reportId: id]
     }
     
-    def downloadScript(Long reportId) {
-        def samples = reportService.fetchDataForReport(reportId)
+    def downloadScript() {
+        def reportId = params.get("reportId")
+        
+        def samples
+        if (reportId) {
+            samples = reportService.fetchDataForReport(reportId.toLong())
+        } else {
+            def sampleIds = session.checkedSample
+            samples = reportService.fetchDataForSamples(sampleIds)
+        }
         
         def filetypes = params.list('filetypes') 
         

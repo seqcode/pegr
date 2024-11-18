@@ -27,7 +27,9 @@
 </head>
 <body>
 <main class="container">
+    <g:if test="${!samplesOnly}">
     <h2>${report.name}</h2>
+    </g:if>
     <g:each in="${modules}" var="module">
         <g:render template="/report/${module}" model="['sampleList':sampleList]" />
     </g:each>    

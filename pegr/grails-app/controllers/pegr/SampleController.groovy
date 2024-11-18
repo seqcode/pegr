@@ -356,6 +356,10 @@ class SampleController {
         
         def modules = data.collect { it.sampleModules }.flatten().unique()
         
+        if (modules.size() == 0) {
+            modules = ["moduleSampleMetadata"]
+        }
+        
         render(template: '/report/details', model: [ sampleDTOs: data, modules: modules])
     }
 

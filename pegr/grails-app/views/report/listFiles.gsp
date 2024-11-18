@@ -4,8 +4,29 @@
     <asset:javascript src="exportCsv.js"/>
 </head>
 <body>
-<button class="btn btn-primary" id="export-csv">Export CSV file</button>
-<g:link action="downloadScript" params="[reportId:reportId]" class="btn btn-primary" id="download-script">Download script</g:link>
+<div>  
+    <button class="btn btn-primary" id="export-csv">Export CSV file</button>
+    <button data-toggle="collapse" data-target="#select-files" aria-expanded="false" action="downloadScript" params="[reportId:reportId]" class="btn btn-primary" id="download-script">Download script</button>
+    <div id="select-files" class="collapse well">
+        <p>Please select the files to download.</p>
+        <g:form controller="report" action="downloadScript" method="post">
+            <input type="hidden" name="reportId" value="${reportId}">
+            <div class="form-group">
+                <input type="checkbox" name="filetypes" value="fastq"> <label>FASTQ</label>
+            </div>
+            <div class="form-group">
+                <input type="checkbox" name="filetypes" value="raw_bam"> <label>Raw BAM</label>
+            </div>
+            <div class="form-group">
+                <input type="checkbox" name="filetypes" value="filtered_bam"> <label>Filtered BAM</label>
+            </div>
+            <div class="form-group">
+                <input type="checkbox" name="filetypes" value="bigwig"> <label>bigWig</label>
+            </div>
+            <g:submitButton name="submit" value="Submit" class="edit"></g:submitButton>
+        </g:form>
+    </div>
+</div>    
 <table class="table table-bordered">
     <thead>
         <tr>

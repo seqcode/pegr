@@ -262,6 +262,8 @@ class ReportController {
     def downloadScript(Long reportId) {
         def samples = reportService.fetchDataForReport(reportId)
         
+        def filetypes = params.list('filetypes') 
+        
         def data = []
         
         samples.each { sample ->
@@ -270,41 +272,49 @@ class ReportController {
                     // TODO: hard-coded
                     def path
                     
-                    if (experiment.fastq.read1) {                        
-                        // replace "preview=False" with "to_ext=fastqsanger.gz"
-                        path = experiment.fastq.read1.replace("preview=False", "to_ext=fastqsanger.gz")
-                        
-                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_R1.fastq.gz ${path}") 
-                    }
-                     
-                    if (experiment.fastq.read2) {
-                        // replace "preview=False" with "to_ext=fastqsanger.gz"
-                        path = experiment.fastq.read2.replace("preview=False", "to_ext=fastqsanger.gz")
-                        
-                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_R2.fastq.gz ${path} ")  
-                    }
-                    
-                    if (alignment.bamRaw) {
-                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_raw.bam ${alignment.bamRaw}")  
+                    if (filetypes.contains('fastq')) {
+                        if (experiment.fastq.read1) {                        
+                            // replace "preview=False" with "to_ext=fastqsanger.gz"
+                            path = experiment.fastq.read1.replace("preview=False", "to_ext=fastqsanger.gz")
+
+                            data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_R1.fastq.gz ${path}") 
+                        }
+
+                        if (experiment.fastq.read2) {
+                            // replace "preview=False" with "to_ext=fastqsanger.gz"
+                            path = experiment.fastq.read2.replace("preview=False", "to_ext=fastqsanger.gz")
+
+                            data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_R2.fastq.gz ${path} ")  
+                        }
                     }
                     
-                    if (alignment.bam) {
-                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_filtered.bam ${alignment.bam} ")  
+                    if (filetypes.contains('raw_bam')) {
+                        if (alignment.bamRaw) {
+                            data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_raw.bam ${alignment.bamRaw}")  
+                        }
                     }
                     
-                    if (alignment.bigwigForwardFile) {
-                        // replace "preview=False" with "to_ext=bigwig"
-                        path = alignment.bigwigForwardFile.replace("preview=False", "to_ext=bigwig")
-                        
-                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_forward.bigwig ${path}")  
+                    if (filetypes.contains('filtered_bam')) {
+                        if (alignment.bam) {
+                            data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_filtered.bam ${alignment.bam} ")  
+                        }
                     }
                     
-                    if (alignment.bigwigReverseFile) {
-                        // replace "preview=False" with "to_ext=bigwig"
-                        path = alignment.bigwigReverseFile.replace("preview=False", "to_ext=bigwig")
-                        
-                        data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_reverse.bigwig ${path} ") 
-                    }                    
+                    if (filetypes.contains('bigwig')) {
+                        if (alignment.bigwigForwardFile) {
+                            // replace "preview=False" with "to_ext=bigwig"
+                            path = alignment.bigwigForwardFile.replace("preview=False", "to_ext=bigwig")
+
+                            data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_forward.bigwig ${path}")  
+                        }
+
+                        if (alignment.bigwigReverseFile) {
+                            // replace "preview=False" with "to_ext=bigwig"
+                            path = alignment.bigwigReverseFile.replace("preview=False", "to_ext=bigwig")
+
+                            data.add("curl -o ${sample.id}_${sample.target}_${sample.antibody}_${sample.strain}_reverse.bigwig ${path} ") 
+                        }          
+                    }
                 }
             }
         }

@@ -539,7 +539,13 @@ class SampleController {
         
         def samples = reportService.fetchDataForSamples(sampleIds)
         
-        render(view: '/report/print', model: [ sampleList: samples, samplesOnly: true])
+        def modules = samples.collect { it.sampleModules }.flatten().unique()
+        
+        if (modules.size() == 0) {
+            modules = ["moduleSampleMetadata"]
+        }
+        
+        render(view: '/report/print', model: [ sampleList: samples, samplesOnly: true, modules: modules])
     }
     
     def fetchPipelineAjax() {

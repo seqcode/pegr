@@ -109,9 +109,9 @@ environments:
     development:
         dataSource:
             dbCreate: none
-            url: jdbc:mysql://localhost/pegr?useUnicode=true&characterEncoding=UTF-8
-            username: sa
-            password: 
+            url: jdbc:mysql://localhost/pegr_prod?useUnicode=true&characterEncoding=UTF-8
+            username: pegr
+            password: Kenshin1
     test:
         dataSource:
             dbCreate: none

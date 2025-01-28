@@ -109,9 +109,6 @@ environments:
     development:
         dataSource:
             dbCreate: none
-            url: jdbc:mysql://localhost/pegr_prod?useUnicode=true&characterEncoding=UTF-8
-            username: pegr
-            password: Kenshin1
     test:
         dataSource:
             dbCreate: none
@@ -119,7 +116,6 @@ environments:
     production:
         dataSource:
             dbCreate: none
-            #url: jdbc:h2:./prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
             properties:
                 jmxEnabled: true
                 initialSize: 5

@@ -186,7 +186,7 @@ class UserService {
     def updatePassword(User user, PasswordRegistrationCommand urc) {
         urc.validate()
         if (urc.hasErrors()) {
-            throw new UserException(message: "Invalid input!")
+            throw new UserException(message: "Invalid password!")
         } else {                                   
             user.password = springSecurityService.encodePassword(urc.password)
             user.save()

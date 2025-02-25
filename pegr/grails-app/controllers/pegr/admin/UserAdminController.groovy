@@ -9,6 +9,7 @@ import pegr.UserException
 import grails.converters.*
 import grails.util.Holders
 import groovy.json.*
+import pegr.PasswordRegistrationCommand
 
 class UserAdminController {
 	public static AdminCategory category = AdminCategory.OTHER
@@ -254,6 +255,35 @@ class UserAdminController {
         outs.flush()
         outs.close()
 
+    }
+    
+    def updateUserPassword(Long userId) {
+        def user = User.get(userId)
+        render(view: "updateUserPassword", model: [user: user])
+    }
+    
+    def saveUserPassword() {
+        if(request.method=='POST') {
+            withForm {
+                def userId = params.userId as Long
+                def user = User.get(userId)
+                
+                if (user == null) {
+                    flash.message = "User not found!"
+                    redirect(controller: "userAdmin", action: "index")
+                }
+                
+                try {
+                    def urc = new PasswordRegistrationCommand(password: params.password, passwordRepeat: params.passwordRepeat) 
+                    userService.updatePassword(user, urc)
+                    flash.message = "The password for ${user.username} has been changed."
+                    redirect(controller: "userAdmin", action: "index")
+                } catch (Exception e) {
+                    request.message = e.message
+                    render(view: "updateUserPassword", model: [user: user])
+                }
+            }
+        } 
     }
 }
 

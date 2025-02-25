@@ -66,6 +66,7 @@
                             <th>Group</th>
                             <th>Status</th>
                             <th>Edit</th>
+                            <th>Reset password</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -85,6 +86,7 @@
                                     </g:else>
                                 </td>
                                 <td><g:link action="edit" params="[userId:it.id]">Edit</g:link></td>
+                                <td><g:link action="updateUserPassword" params="[userId:it.id]">Reset password</g:link></td>
                             </tr>
                         </g:each>
                     </tbody>

@@ -7,7 +7,9 @@ Platform for Epigenomic and Genomic Research (PEGR) is a web service platform th
 A tested stack of versions is listed below.
 
 1. Java 21.0.6-zulu
-   - MacOS: We recommend SDK to install and manage Java 21. SDK command to install and use Java 21:
+   
+   On MacOS, We recommend SDK to install and manage Java 21. SDK command to install and use Java 21:
+   
       ```
       $ sdk install <PACKAGE> <VERSION>
       ```
@@ -22,16 +24,19 @@ A tested stack of versions is listed below.
 
 2. MariaDB 11.7.2
    - Linux: https://mariadb.org/download/
-   - MacOS: We recommend Hombrew to install and manage MariaDB [link](https://mariadb.com/kb/en/installing-mariadb-on-macos-using-homebrew/)
+   - MacOS: We recommend Hombrew to install and manage MariaDB. See [link](https://mariadb.com/kb/en/installing-mariadb-on-macos-using-homebrew/) for details.
      ```
      $ brew install mariadb
      ```
 
+3. Groovy 3.0.21 and Grails 6.2.3
+   Groovy and Grails are only required if you need to develop and run the code, and they are not needed if you run the war file with Java.
+
+   On MacOS, We recommend SDK to install and manage Groovy and Grails.
+
 ### Quick start
 
-1. Download the latest release of PEGR
-
-   - https://github.com/seqcode/pegr/releases
+1. Turn on the MariaDB
 
    1.1 (MacOS only) Turn on MariaDB server
    ```
@@ -113,13 +118,12 @@ $ cp -r sample_files/protocols /tmp/
 
 </details>
 
-4. Create a config file 'pegr-config.properties' in the folder {userHome}/.grails/ for the environment variables, e.g. the information on database connection, NGS repository connection, email connection and Single Sign On.
+4. Create a config file 'pegr-config.properties' for the environment variables, e.g. the information on database connection, NGS repository connection, email connection and Single Sign On. Set the environment variable
+```
+$ export SPRING_CONFIG_ADDITIONAL_LOCATION=/Users/dshao/.grails/pegr-config.properties
+```
 
 A sample config file 'pegr-config.properties' is inlcuded in the sample_files folder https://github.com/seqcode/pegr/tree/master/sample_files. 
-```
-$ mkdir ~/.grails/
-$ cp sample_files/pegr-config.properties ~/.grails/
-```
 
 Not all pegr-config.properites need to be filled out for PEGR to function. Below are the minimum properties needed to be set.
 Generic 'pegr-config.properties':
@@ -143,15 +147,28 @@ sso.type=none
 sso.principle=none
 filesroot=/tmp
 ```
+
 More detailed instructions on the config file are provided at https://github.com/seqcode/pegr/wiki/Configurations.
 
 5. Start PEGR.
 
-```
-$ java -Dgrails.env=prod -jar pegr.war
-```
+    5.1 Start PEGR with war file
 
-6. Go to http://localhost:8080/pegr/ in your browser to see the PEGR login page.
+      Download the latest release of PEGR at https://github.com/seqcode/pegr/releases.
+      
+      ```
+      $ java -Dgrails.env=prod -jar pegr.war
+      ```
+      
+   5.2 Start PEGR with the codes
+      Clone the repository and run   
+      ```
+      $ git clone https://github.com/seqcode/pegr.git
+      $ cd pegr/pegr/
+      $ ./gradlew bootRun 
+      ```
+
+7. Go to http://localhost:8080/pegr/ in your browser to see the PEGR login page.
 
 Default login is user name "labadmin" and password "labadmin". **Change the password right away at the user's profile page.**
 

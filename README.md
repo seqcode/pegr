@@ -6,24 +6,26 @@ Platform for Epigenomic and Genomic Research (PEGR) is a web service platform th
 
 A tested stack of versions is listed below.
 
-1. OpenJDK 11.0.12
-   - MacOS: We recommend Homebrew to install and manage Java 11
-      - Homebrew command to install and use Java 11:
+1. Java 21.0.6-zulu
+   - MacOS: We recommend SDK to install and manage Java 21. SDK command to install and use Java 21:
       ```
-      brew tap adoptopenjdk/openjdk
-      brew install --cask adoptopenjdk8
+      $ sdk install <PACKAGE> <VERSION>
       ```
-      - Java 11 executable is now located here:
+    Also, you can check the available versions for a package, what have been installed, what's the default version:
       ```
-      /Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home/bin/java
+      $ sdk list <PACKAGE>
       ```
-2. MariaDB 10.5.5
+    To switch the default version:
+      ```
+      $ sdk default <PACKAGE> <VERSION>
+      ```
+
+2. MariaDB 11.7.2
    - Linux: https://mariadb.org/download/
-   - MacOS: We recommend Hombrew to install and manage MariaDB
-   - https://mariadb.com/kb/en/installing-mariadb-on-macos-using-homebrew/
-   ```
-   $ brew install mariadb
-   ```
+   - MacOS: We recommend Hombrew to install and manage MariaDB [link](https://mariadb.com/kb/en/installing-mariadb-on-macos-using-homebrew/)
+     ```
+     $ brew install mariadb
+     ```
 
 ### Quick start
 

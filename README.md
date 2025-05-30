@@ -29,8 +29,9 @@ A tested stack of versions is listed below.
      $ brew install mariadb
      ```
 
-3. Groovy 3.0.21 and Grails 6.2.3
-   Groovy and Grails are only required if you need to develop and run the code, and they are not needed if you run the war file with Java.
+3. Groovy 3.0.21 and Grails 6.2.3 (development only)
+   
+   Groovy and Grails are only required if you need to develop and run the code, and they are not needed in production if you run the war file with Java.
 
    On MacOS, We recommend SDK to install and manage Groovy and Grails.
 
@@ -120,7 +121,7 @@ $ cp -r sample_files/protocols /tmp/
 
 4. Create a config file 'pegr-config.properties' for the environment variables, e.g. the information on database connection, NGS repository connection, email connection and Single Sign On. Set the environment variable
 ```
-$ export SPRING_CONFIG_ADDITIONAL_LOCATION=/Users/dshao/.grails/pegr-config.properties
+$ export SPRING_CONFIG_ADDITIONAL_LOCATION=/PATH/TO/pegr-config.properties
 ```
 
 A sample config file 'pegr-config.properties' is inlcuded in the sample_files folder https://github.com/seqcode/pegr/tree/master/sample_files. 
@@ -152,25 +153,32 @@ More detailed instructions on the config file are provided at https://github.com
 
 5. Start PEGR.
 
-    5.1 Start PEGR with war file
-
-      Download the latest release of PEGR at https://github.com/seqcode/pegr/releases.
+   There are two ways to run PEGR:
+   
+   (1) For development, download the codes and run with Grails. 
+    
+   ```
+   $ git clone https://github.com/seqcode/pegr.git
+   $ cd pegr/pegr/
+   $ ./gradlew bootRun 
+   ```
+   
+   (2) For production, download the war file from the latest release of PEGR at https://github.com/seqcode/pegr/releases and run the war file with java. 
       
       ```
       $ java -Dgrails.env=prod -jar pegr.war
       ```
-      
-   5.2 Start PEGR with the codes
-      Clone the repository and run   
-      ```
-      $ git clone https://github.com/seqcode/pegr.git
-      $ cd pegr/pegr/
-      $ ./gradlew bootRun 
-      ```
 
-7. Go to http://localhost:8080/pegr/ in your browser to see the PEGR login page.
+   Go to http://localhost:8080/pegr/ in your browser to see the PEGR login page.
 
-Default login is user name "labadmin" and password "labadmin". **Change the password right away at the user's profile page.**
+   Default login is user name "labadmin" and password "labadmin". **Change the password right away at the user's profile page.**
+
+7. Generate a war file.
+   
+   ```
+   $ ./gradlew clean build
+   ```
+   The generated war file pegr-0.1.war can be found in folder build/libs/ and is ready to deploy.      
 
 For more information, please visit https://github.com/seqcode/pegr/wiki.
 

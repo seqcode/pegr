@@ -11,7 +11,7 @@ class StrainAdminController {
     def utilityService
     
     def index(Integer max, String str) {
-        if (str && Strain.hasProperty("name")) {
+        if (str) {
             def c = Strain.createCriteria()
             def listParams = [
                     max: max ?: 25,
@@ -23,6 +23,17 @@ class StrainAdminController {
             def items = c.list(listParams) {
                 or {
                     ilike "name", likeStr
+                    species {
+                        or {
+                            ilike "name", likeStr
+                            ilike "genusName", likeStr
+                        }                        
+                    }                  
+                    parent {
+                        ilike "name", likeStr
+                    }                    
+                    ilike "genotype", likeStr
+                    ilike "geneticModification", likeStr
                 }
             }
             respond items, model:[strainCount: items.totalCount, str: str]

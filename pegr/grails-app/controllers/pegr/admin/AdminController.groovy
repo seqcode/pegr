@@ -13,16 +13,25 @@ class AdminController {
 		def controllerGroups = [:]
 		
 		for (AdminCategory v : AdminCategory.values()) {
-			controllerGroups[v] = [:]
+			controllerGroups[v] = []
 		}
 		
-	    grailsApplication.controllerClasses.each{ controller ->
+	    grailsApplication.controllerClasses.each { controller ->
 	        def name = controller.name
 	        if(name.endsWith('Admin') && name != 'Admin') {
 				def key = controller.getStaticPropertyValue('category', AdminCategory) ?: AdminCategory.OTHER
-				controllerGroups[key][controller.logicalPropertyName] = controller.naturalName.replace('Admin Controller', '')
+                
+				controllerGroups[key] << [
+                    key: controller.logicalPropertyName, 
+                    value: controller.naturalName.replace('Admin Controller', '')
+                ]
 	        }
         }
+        
+        for (AdminCategory v : AdminCategory.values()) {
+            controllerGroups[v] = controllerGroups[v].sort { it.key }
+		}
+        
         [controllerGroups: controllerGroups]
 	}
     

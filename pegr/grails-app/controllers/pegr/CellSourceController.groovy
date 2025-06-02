@@ -157,7 +157,17 @@ class CellSourceController {
         }        
     }
         
-    /* ----------------------------- Ajax ----------------------*/    
+    /* ----------------------------- Ajax ----------------------*/   
+    // this is for the batchEdit page
+    def fetchStrainAjax() {
+        def result = [
+            names: utilityService.stringToSelect2Data(Strain.list(sort:"name").collect{it.name}),
+            genotypes: utilityService.stringToSelect2Data(Strain.list(sort:"genotype").collect{it.genotype}.unique()),
+            geneticModifications: utilityService.stringToSelect2Data(Strain.list(sort:"geneticModification").collect{it.geneticModification}.unique())
+        ]
+        render result as JSON
+    }
+    
     def fetchGenusAjax() {
         def genusList = Species.executeQuery("select distinct s.genusName from Species s")
         render utilityService.stringToSelect2Data(genusList) as JSON

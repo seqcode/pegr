@@ -456,6 +456,17 @@ class SampleService {
                 }
                 sample.save(failOnError: true)
                 break
+            case "strain" :
+                def data = utilityService.parseJson(value)
+                
+                try {
+                    sample.cellSource.strain = cellSourceService.getStrain(sample.cellSource.strain?.species, data.strain, sample.cellSource.strain?.parent?.name, data.genotype, data.geneticModification) 
+                } catch(Exception e) {
+                    throw new SampleException(message: e.message)
+                }
+            
+                sample.cellSource.save(failOnError: true)
+                break
             case "index" :
                 if (sample.sequenceIndicesIdString != value && sample.sequenceIndicesString != value) {
                     cleanIndices(sample)

@@ -23,6 +23,7 @@
                     <th class="barcode">Barcode</th>
                     <th class="strain">Strain</th>
                     <th class="genotype">Genotype</th>
+                    <th class="genetic-modification">Genetic Modification</th>
                     <th class="antibody">Antibody</th>
                     <th class="target-type">Target Type</th>
                     <th class="target">Target</th>
@@ -48,8 +49,9 @@
                         <td class="sampleId"><g:link controller="sample" action="show" id="${sample.id}" class="sample-id">${sample.id}</g:link></td>
                         <td class="naturalId"><span class="value">${sample.naturalId}</span></td>
                         <td class="barcode">${sample.item?.barcode}</td>
-                        <td class="strain">${sample.cellSource?.strain?.name}</td>
-                        <td class="genotype">${sample.cellSource?.strain?.genotype}</td>
+                        <td class="group-strain strain"><span class="value">${sample.cellSource?.strain?.name}</span></td>
+                        <td class="group-strain genotype"><span class="value">${sample.cellSource?.strain?.genotype}</span></td>
+                        <td class="group-strain genetic-modification"><span class="value">${sample.cellSource?.strain?.geneticModification}</span></td>
                         <td class="antibody">${sample.antibody}</td>
                         <td class="group-target target-type"><span class="value">${sample.target?.targetType}</span></td>
                         <td class="group-target target"><span class="value">${sample.target?.name}</span></td>
@@ -93,6 +95,10 @@
 
         $.ajax({url: "/pegr/antibody/fetchTargetAjax", success: function(result){
             targets = result;
+        }});
+        
+        $.ajax({url: "/pegr/cellSource/fetchStrainAjax", success: function(result){
+            strains = result;
         }});
 
         $("th").each(function(){
@@ -166,11 +172,76 @@
             })
         });
 
+        $("td.group-strain").on("click", ".value", function(){
+            var tr = $(this).closest("tr");
+            createSelect(tr, ".strain", strains.names);
+            createSelect(tr, ".genotype", strains.genotypes);
+            createSelect(tr, ".genetic-modification", strains.geneticModifications);
+            var $save = "<button class='btn btn-primary save'>Save</button>";
+            var $cancel = "<button class='btn btn-default cancel-strain'>Cancel</button>";
+            var td = tr.find(".strain");
+            td.append($save);
+            td.append($cancel);
+        });
+
+        $("td").on("click", ".cancel-strain", function() {
+            var tr = $(this).closest("tr");
+            tr.find(".group-strain .value").show();
+            tr.find(".group-strain .input").remove();
+            tr.find(".group-strain .cancel-strain").remove();
+            tr.find(".group-strain .save").remove();
+        });
+
+        $("td.group-strain").on("click", ".save", function(){
+            var tr = $(this).closest("tr");
+            var sampleId = tr.find(".sampleId").val();
+            
+            var strain = tr.find(".strain select").val();
+            var genotype = tr.find(".genotype select").val();
+            var geneticModification = tr.find(".genetic-modification select").val();
+            
+            var map = {
+                "strain": strain,
+                "genotype": genotype,
+                "geneticModification": geneticModification
+            };
+            
+            $.ajax({
+                type: "POST",
+                url: "/pegr/sample/updateAjax",
+                data: {sampleId: sampleId, name: "strain", value: JSON.stringify(map)},
+                success: function(result) {
+                    if (!strain) {
+                        strain = s0;
+                    }
+                    tr.find(".strain .value").text(strain);
+                    
+                    if (!genotype) {
+                        genotype = s0;
+                    }
+                    tr.find(".genotype .value").text(genotype);
+                    
+                    if (!geneticModification) {
+                        geneticModification = s0;
+                    }
+                    tr.find(".genetic-modification .value").text(geneticModification);
+
+                    tr.find(".group-strain .value").show();
+                    tr.find(".group-strain .input").remove();
+                    tr.find(".group-strain .cancel-strain").remove();
+                    tr.find(".group-strain .save").remove();
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    alert(xhr.responseText);
+                }
+            })
+        });
+        
         $("td.index").on("click", ".value", function(){
             var oldValue = $(this).text();
             var edit = "<input class='input' value='" + oldValue + "'>";
             appendEdit(this, edit);
-        });
+        });    
 
         $("td.index").on("click", ".save", function() {
             var td = $(this).parent();

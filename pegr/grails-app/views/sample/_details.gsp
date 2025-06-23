@@ -238,6 +238,7 @@
         </h4>
         <table class="table table-bordered">
             <tbody>
+            <tr><td>Sample Natural ID</td><td> ${sample.naturalId}</td></tr>
             <tr><td>Index</td><td> ${sample.sequenceIndicesString} (${sample.sequenceIndicesIdString})</td></tr>
 
             <tr><td>Chromatin (ug)</td><td> <g:if test="${sample?.chromosomeAmount}">${sample.chromosomeAmount}</g:if></td></tr>

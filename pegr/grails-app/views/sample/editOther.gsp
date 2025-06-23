@@ -12,6 +12,10 @@
         <g:form action="updateOther" class="fields">
             <g:hiddenField name="sampleId" value="${sample.id}"></g:hiddenField>
             <div>
+                <label>Sample Natural ID</label>
+                <input name="naturalId" size="40" value="${sample.naturalId}">
+            </div>
+            <div>
                 <label>Index <a href="#" onclick="window.open('/pegr/help/sequenceIndexHelp#sequence-index', 'Help: Sample Submission', 'width=600,height=400' )"><span class="glyphicon glyphicon-question-sign"></span></a> </label>
                 <g:textField name="indices" style="width:200px" value="${sample.sequenceIndicesString}"></g:textField>
                 

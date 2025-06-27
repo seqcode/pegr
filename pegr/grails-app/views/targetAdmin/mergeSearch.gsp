@@ -7,6 +7,10 @@
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
+    <g:form action="mergeSearch" class="pull-right" style="padding:3px 0px">
+        <input name="str">
+        <g:submitButton class="edit" name="submit" value="Search"></g:submitButton>
+    </g:form>
     <div>
         <g:link action="showChecked" class="btn btn-default">Merge Checked Target (<span id="checked-count">${checkedCount}</span>)</g:link>
         <g:link action="cancelMerge" class="btn btn-default">Cancel</g:link>

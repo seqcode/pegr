@@ -23,7 +23,7 @@ class RoleAdminController {
             def likeStr = "%" + str + "%"
             def items = c.list(listParams) {
                 or {
-                    ilike "name", likeStr
+                    ilike "authority", likeStr
                 }
             }
             respond items, model:[roleCount: items.totalCount, str: str]

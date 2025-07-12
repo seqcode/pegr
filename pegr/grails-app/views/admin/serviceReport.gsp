@@ -16,8 +16,21 @@
     </g:form>
 	<div>
         <g:if test="${cohort_count && cohort_count.size()}">
-        <h4>Total samples: ${sample_count[0].total_sample_count}</h4>	
-            
+        <h4>Total samples: ${total_sample_count[0].total_sample_count}</h4>	
+        <table class="table table-bordered">
+            <thead>
+                <th>Assay</th>                
+                <th>Sample count</th>
+            </thead>
+            <tbody>
+                <g:each in="${assay_sample_count}">
+                <tr>
+                    <td>${it.assay}</td>
+                    <td>${it.assay_sample_count}</td>
+                </tr>
+                </g:each> 
+            </tbody>
+        </table>
         <h4>Average samples per sequence run and project: <g:formatNumber number="${avg_samples_per_run[0].average_sample_per_run}" type="number" maxFractionDigits="1" /></h4>
         <h4>Samples per sequence run:</h4>
         <table class="table table-bordered">

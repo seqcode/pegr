@@ -552,4 +552,39 @@ class SampleController {
         def pipelines = Pipeline.executeQuery("select concat(g.name, '-', g.pipelineVersion) from Pipeline g")
         render utilityService.stringToSelect2Data(pipelines) as JSON
     }
+    
+    def previewSamplesToProject() {
+        def sampleIds = session.checkedSample
+        
+        if (sampleIds) {
+            def samples = Sample.findAllByIdInList(sampleIds)
+        
+            render(view: '/sample/previewSamplesToProject', model: [samples: samples])
+            
+        } else {
+            flash.message = "No samples were selected!"
+            redirect(action: "all")
+        }
+    }
+    
+    def saveSamplesToProject(Long projectId) {
+        def project = Project.get(projectId)
+        
+        def sampleIds = session.checkedSample
+        
+        if (project && sampleIds) {
+            sampleIds.each {
+                def sample = Sample.get(it)
+                
+                if (sample) {
+                    sampleService.addSampleToProject(project, sample)
+                }                
+            }            
+            flash.message = "Success adding the samples to project!"
+        } else {
+            flash.message = "Project was not found or no samples were selected!"
+        }
+        
+        redirect(action: "all")
+    }
 }

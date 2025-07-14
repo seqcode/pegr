@@ -91,6 +91,8 @@ grails.plugin.springsecurity.interceptUrlMap = [
     [pattern: '/sample/saveBarcode/**',     access: ['ROLE_MEMBER', 'ROLE_ADMIN']],
     [pattern: '/sample/all/**',             access: ['ROLE_MEMBER', 'ROLE_ADMIN']],
     [pattern: '/sample/search/**',          access: ['ROLE_MEMBER', 'ROLE_ADMIN']],
+    [pattern: '/sample/previewSamplesToProject',      access: ['ROLE_ADMIN']],
+    [pattern: '/sample/saveSamplesToProject',         access: ['ROLE_ADMIN']],
     [pattern: '/sequenceRun/upload/**',     access: ['ROLE_ADMIN']],
     [pattern: '/sequenceRun/updateQueue/**',access: ['ROLE_ADMIN']],
     [pattern: '/sequenceRun/convertCsv/**', access: ['ROLE_ADMIN']],

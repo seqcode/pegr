@@ -8,6 +8,12 @@
 </head>
 <body>
   <div class="container-fluid">
+    <g:if test="${flash.message}">
+      <div class="message" role="status">${flash.message}</div>
+    </g:if>
+    <sec:ifAnyGranted roles="ROLE_ADMIN">
+      <g:link action="previewSamplesToProject" class="pull-right btn btn-primary">Add Samples to Project</g:link>
+    </sec:ifAnyGranted>
     <h2>Samples</h2>
     <p><span id="checked-count">${checkedCount}</span> sample(s) selected</p>
     <div style="padding:6px">

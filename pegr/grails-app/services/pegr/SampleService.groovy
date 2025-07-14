@@ -296,7 +296,7 @@ class SampleService {
 
     @Transactional
     def addSampleToProject(Project project, Sample sample) {
-	    if(project && sample) {
+	    if(project && sample && !ProjectSamples.findByProjectAndSample(project, sample)) {
 	        new ProjectSamples(project: project, sample: sample).save( failOnError: true)
 	    }
 	}

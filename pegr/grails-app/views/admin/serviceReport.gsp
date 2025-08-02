@@ -16,8 +16,8 @@
     </g:form>
 	<div>
         <g:if test="${cohort_count && cohort_count.size()}">
-        <h4>Total samples: ${total_sample_count[0].total_sample_count}</h4>	
-        <table class="table table-bordered">
+        <h4>Total samples: <span id="total-samples">${total_sample_count[0].total_sample_count}</span></h4>	
+        <table class="table table-bordered" id="assay-counts">
             <thead>
                 <th>Assay</th>                
                 <th>Sample count</th>
@@ -57,5 +57,27 @@
         </table>
         </g:if>
     </div>
+    <script type="application/javascript">
+        let sum = 0;
+        $('#assay-counts tbody tr').each(function() {
+          let val = parseInt($(this).find('td:eq(1)').text());
+          if (!isNaN(val)) {
+            sum += val;
+          }
+        });
+        
+        let totalSamples = parseInt($('#total-samples').text());
+        
+        if (!isNaN(totalSamples) && !isNaN(sum)) {
+            let unknownSamples = totalSamples - sum;
+            
+            if (unknownSamples > 0) {
+                // Append new row with the sum
+                $('#assay-counts tbody').append(
+                  '<tr><td>Unknown</td><td>' + unknownSamples + '</td></tr>'
+                );
+            }
+        }
+    </script>
 </body>
 </html>

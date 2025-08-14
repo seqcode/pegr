@@ -15,6 +15,7 @@ class UserAdminController {
 	public static AdminCategory category = AdminCategory.OTHER
 
     def userService
+    def springSecurityService
 
 	def index() {
         def query
@@ -285,6 +286,52 @@ class UserAdminController {
             }
         } 
     }
+    
+    // This method is used to confirm the deletion of a user.
+    def confirmDeleteUser(Long userId) {
+        def user = User.get(userId)
+        
+        if (user == null) {
+            flash.message = "User not found!"
+            redirect(controller: "userAdmin", action: "index")
+        } else {
+            render(view: "confirmDeleteUser", model: [user: user])
+        }
+        
+    }
+
+    // This method is used to delete a user.
+    def deleteUser(Long userId) {
+        def currUser = springSecurityService.currentUser
+
+        if (currUser.id == userId) {
+            flash.message = "You cannot delete your own account!"
+            redirect(controller: "userAdmin", action: "index")
+            return
+        }
+
+        def user = User.get(userId)
+        
+        if (user == null) {
+            flash.message = "User not found!"
+            redirect(controller: "userAdmin", action: "index")
+            return
+        } else if (user.isAdmin()) {
+            flash.message = "You cannot delete the admin user!"
+            redirect(controller: "userAdmin", action: "index")
+            return
+        }
+        
+        try {
+            userService.deleteUser(user)
+            flash.message = "User ${user.username} has been deleted successfully."
+        } catch (UserException e) {
+            flash.message = e.message
+        }
+        
+        redirect(controller: "userAdmin", action: "index")
+    }
+
 }
 
 class CreateUserCommand implements grails.validation.Validateable {

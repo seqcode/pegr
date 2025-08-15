@@ -6,7 +6,7 @@ class HelpController {
     }
     
     def sequenceIndexHelp() {
-        def allIndices = SequenceIndex.findAllByStatus(DictionaryStatus.Y).groupBy({ it -> it.indexVersion })
+        def allIndices = SequenceIndex.findAllByStatus(DictionaryStatus.Y)
         [allIndices: allIndices]
     }
     

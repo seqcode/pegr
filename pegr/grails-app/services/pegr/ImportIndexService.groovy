@@ -21,7 +21,7 @@ class ImportIndexService {
 		    }
             try {
                 def data = getNamedData(rawdata)
-                def index = new SequenceIndex(indexId: data.indexId, sequence: data.sequence, status: status, indexVersion: version).save()
+                def index = new SequenceIndex(indexId: data.indexId, sequence: data.sequence, status: status).save()
 		 	}catch(Exception e) {
 		        log.error "Error: line ${lineNo}. " + e
 		        continue

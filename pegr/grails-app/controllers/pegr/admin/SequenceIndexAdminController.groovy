@@ -25,7 +25,6 @@ class SequenceIndexAdminController {
                 ]
             def indexes = c.list(listParams) {
                     or {
-                        ilike "indexVersion", "%${str}%"
                         ilike "sequence", "%${str}%"
                         ilike "indexId", "%${str}%"
                     }
@@ -122,7 +121,6 @@ class SequenceIndexAdminController {
             }
         }
         [indexId: rawdata[0],
-         indexVersion: rawdata[1],
          sequence: rawdata[2],
          oligo: rawdata[3],
         ]
@@ -153,8 +151,6 @@ class SequenceIndexAdminController {
                     
                     if (data.indexId == null) {
                         messages.push("Line ${lineNo} is skipped: no index ID!")
-                    } else if (data.indexVersion == null) {
-                        messages.push("Line ${lineNo} is skipped: no index version!")
                     } else if (data.sequence == null) {
                         messages.push("Line ${lineNo} is skipped: no sequence!")
                     } else if (SequenceIndex.findByIndexId(data.indexId)) {
@@ -162,8 +158,7 @@ class SequenceIndexAdminController {
                         messages.push("Line ${lineNo} indexId ${data.indexId} already exists!")
                     } else {
                         try {       
-                            new SequenceIndex(indexVersion: data.indexVersion, 
-                                              indexId: data.indexId, 
+                            new SequenceIndex(indexId: data.indexId, 
                                               sequence: data.sequence,
                                               oligo: data.oligo,
                                               status: DictionaryStatus.Y
@@ -193,7 +188,6 @@ class SequenceIndexAdminController {
         final String filename = 'SequenceIndex.csv'
         def lines = SequenceIndex.findAll().collect { [
             it.id, 
-            it.indexVersion?it.indexVersion:"", 
             it.indexId?it.indexId:"", 
             it.sequence?it.sequence:"", 
             it.oligo?it.oligo:"", 

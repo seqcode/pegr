@@ -2505,4 +2505,5 @@ databaseChangeLog = {
     include file: 'add_requested_pipelines.groovy'
     include file: 'add_default_pipeline.groovy'
     include file: 'add_quality_control_file.groovy'
+    include file: 'remove_index_version.groovy'
 }

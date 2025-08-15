@@ -67,7 +67,6 @@
             <table class="table-bordered">
                 <thead>
                     <g:sortableColumn property="indexId" title="Index ID"></g:sortableColumn>
-                    <g:sortableColumn property="indexVersion" title="Index Version"></g:sortableColumn>
                     <th>Sequence</th>
                     <th>Oligo</th>
                     <g:sortableColumn property="status" title="Status"></g:sortableColumn>
@@ -76,7 +75,6 @@
                     <g:each in="${sequenceIndexInstanceList}">
                         <tr>
                             <td><g:link action="show" id="${it.id}">${it.indexId}</g:link></td>
-                            <td>${it.indexVersion}</td>
                             <td>${it.sequence}</td>
                             <td>${it.oligo}</td>
                             <td>${it.status}</td>

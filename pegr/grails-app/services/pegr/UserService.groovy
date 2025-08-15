@@ -267,4 +267,47 @@ class UserService {
             throw new UserException(message: "Error merging user ${fromUsername} to user ${toUsername}!")
         }
     }
+    
+    @Transactional
+    def deleteUser(User user) {
+        // check if the user is linked to any tables
+        def references = [
+            [CellSource,         "providerUser", "Cell Source"],
+            [CellSource,         "prepUser",     "Cell Source"],
+            [Lab,                "billingContact", "Organization"],
+            [Lab,                "pi",           "Organization"],
+            [ProtocolGroup,      "user",         "Protocol Group"],
+            [SequenceRun,        "user",         "Sequence Run"],
+            [Analysis,           "user",         "Sequencing Analysis"],
+            [Item,               "user",         "Item"],
+            [Sample,             "sendDataTo",   "Sample"],
+            [ProtocolInstanceSummary, "user",    "Protocol Instance Summary"],
+            [History,            "user",         "History"],
+            [RunStats,           "technician",   "Run Stats"],
+            [Inventory,          "receivingUser","Inventory"],
+            [ProtocolInstance,   "user",         "Protocol Instance"],
+            [CellSourceBatch,    "user",         "Cell Source Batch"],
+            [Protocol,           "user",         "Protocol"],
+            [ProjectUser,        "user",         "Project User"]
+        ]
+
+        references.each { domainClass, field, label ->
+            def record = domainClass."findBy${field.capitalize()}"(user)
+            if (record) {
+                throw new UserException(message: "User ${user} is referenced in ${label} ${record}!")
+            }
+        }
+        
+        // remove token
+        Token.where { user == user }.deleteAll()
+        
+        
+        // remove roles and role groups
+        UserRole.removeAll(user, true)
+        UserRoleGroup.removeAll(user, true)
+        
+        // delete user
+        user.delete(flush: true)
+        return user
+    }   
 }

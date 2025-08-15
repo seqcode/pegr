@@ -67,6 +67,7 @@
                             <th>Status</th>
                             <th>Edit</th>
                             <th>Reset password</th>
+                            <th>Delete</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -87,6 +88,7 @@
                                 </td>
                                 <td><g:link action="edit" params="[userId:it.id]">Edit</g:link></td>
                                 <td><g:link action="updateUserPassword" params="[userId:it.id]">Reset password</g:link></td>
+                                <td><g:link action="confirmDeleteUser" params="[userId:it.id]" class="label label-danger">Delete</g:link></td>
                             </tr>
                         </g:each>
                     </tbody>

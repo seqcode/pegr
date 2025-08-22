@@ -324,11 +324,11 @@ class SampleService {
                     index = SequenceIndex.findByIndexIdAndStatus(it, DictionaryStatus.Y)
                 }
                 if (!index) {
-                    index = SequenceIndex.findBySequenceAndIndexId(it, "0")
+                    index = SequenceIndex.findBySequenceAndIndexId(it, it)
                 }
                 if (!index) {
                     if (it ==~ /[ACGT]+/) {
-                        index = new SequenceIndex(indexId: "0", sequence: it, indexVersion: "UNKNOWN").save(failOnError: true)
+                        index = new SequenceIndex(indexId: it, sequence: it).save(failOnError: true)
                     } else {
                         throw new SampleException(message: "Index is wrong for sample ${sample.id}")
                     }

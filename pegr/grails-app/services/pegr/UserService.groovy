@@ -294,7 +294,7 @@ class UserService {
         references.each { domainClass, field, label ->
             def record = domainClass."findBy${field.capitalize()}"(user)
             if (record) {
-                throw new UserException(message: "User ${user} is referenced in ${label} ${record}!")
+                throw new UserException(message: "Failed to delete user ${user}! User ${user} is referenced in ${label} ${record}!")
             }
         }
         

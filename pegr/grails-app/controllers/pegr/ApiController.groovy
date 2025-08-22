@@ -716,6 +716,9 @@ class ApiController {
                         case "requestedPipelines":
                             sampleService.update(sample.id, "pipelines", sampleDict.newValue)
                             break
+                        case "status":
+                            sampleService.updateSampleStatus(sample.id, sampleDict.newValue)
+                            break
                         default:
                             messages.push("Error: Sample ${sample.id}. Field ${sampleDict.field} cannot be edited.")
                             break

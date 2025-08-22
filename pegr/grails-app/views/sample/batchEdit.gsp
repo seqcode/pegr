@@ -237,11 +237,33 @@
             })
         });
         
-        $("td.index").on("click", ".value", function(){
+        $("td.index-sequence").on("click", ".value", function(){
+            // if index-id is already on edit
+            var index_id_edit = $(this).closest("tr").find("td.index-id input");
+            
+            if (index_id_edit.length > 0) {
+                alert("You cannot edit both index sequence and index id at the same time!");
+                return;
+            }
+            
             var oldValue = $(this).text();
             var edit = "<input class='input' value='" + oldValue + "'>";
             appendEdit(this, edit);
-        });    
+        }); 
+        
+        $("td.index-id").on("click", ".value", function(){
+            // if index-sequence is already on edit
+            var index_sequence_edit = $(this).closest("tr").find("td.index-sequence input");
+            
+            if (index_sequence_edit.length > 0) {
+                alert("You cannot edit both index sequence and index id at the same time!");
+                return;
+            }
+            
+            var oldValue = $(this).text();
+            var edit = "<input class='input' value='" + oldValue + "'>";
+            appendEdit(this, edit);
+        }); 
 
         $("td.index").on("click", ".save", function() {
             var td = $(this).parent();

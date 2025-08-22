@@ -436,6 +436,7 @@ https://vesta.vmhost.psu.edu/pegr/api/updateSampleData?apiKey=
               <li>naturalId</li>
               <li>requestedGenomes (if multiple genomes are requested, use comma "," to deliminate the strings, e.g. "hg19,hg38")</li>
               <li>requestedPipelines (if multiple pipelines are requested, use comma "," to deliminate the strings, e.g. "paired-004,fastq-001")</li>
+              <li>status</li>
             </ol>
               
             <p>After a request is posted, PEGR will return the status code and a message as below</p>

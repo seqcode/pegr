@@ -8,6 +8,7 @@ public enum SampleStatus {
     SEQUENCING,
     PENDING,
     COMPLETED,
-    FAILED
+    FAILED,
+    LITE
 	;
 }

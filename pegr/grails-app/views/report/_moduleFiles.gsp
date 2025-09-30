@@ -46,7 +46,11 @@
                 <g:each in="${experiment.alignments}" var="alignment" status="nAli">
                 <g:if test="${nAli>0}"><tr></g:if>
                 <td>${alignment.genome}</td>
-                <td><a href="${alignment.bam}">Bam</a></td>
+                <td>
+                <g:if test="${alignment.bam}">
+                    <a href="${alignment.bam}">Bam</a>
+                </g:if>
+                </td>
                 <td>
                 <g:if test="${alignment.bigwigForwardFile}">
                     <a href="${alignment.bigwigForwardFile}">Forward</a>

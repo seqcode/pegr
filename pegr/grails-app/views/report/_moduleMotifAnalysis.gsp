@@ -61,7 +61,11 @@
                                 <td class="meme-evalue" style="width:100px"></td>
                                 <td class="meme-sites" style="width:100px"></td>
                                 <td class="meme-width" style="width:100px"></td>
-                                <td style="width:100px"><a href="${alignment.fourColor[n]}" target="_blank"><span class="glyphicon glyphicon-picture" style="font-size: 2em"></span></a></td>
+                                <td style="width:100px">
+                                    <g:if test="${alignment.fourColor[n]}">
+                                    <a href="${alignment.fourColor[n]}" target="_blank"><span class="glyphicon glyphicon-picture" style="font-size: 2em"></span></a>
+                                    </g:if>
+                                </td>
                                 <td class="composite" style="width:320px">
                                   <g:if test="${alignment.composite[n]}">
                                     <g:link controller="report" action="composite" params="[url: alignment.composite[n]]" target="_blank" class="pull-right"><span class="glyphicon glyphicon-fullscreen" style="z-index: 100"></span></g:link>

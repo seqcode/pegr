@@ -14,7 +14,7 @@
                 <tr>
                     <td class="col-sm-2" rowspan="${Math.max(1, run.cohorts.size())}"><g:link controller="sequenceRun" action="show" id="${run.id}">Run ID: ${run.id} </g:link><g:if test="${run.runName}"><br>Run Name: ${run.runName}</g:if><br><i>Sequencer: ${run.platform}</i></td>
                     <td class="col-sm-1" rowspan="${Math.max(1, run.cohorts.size())}"><g:formatDate format="yyyy-MM-dd" date="${run.date}"/></td>
-                    <td class="col-sm-2" rowspan="${Math.max(1, run.cohorts.size())}"><span class="label">${run.status}</span><g:link controller="report" action="runStatus"  params="[runId: run.id]"><br>Details</g:link></td>
+                    <td class="col-sm-2" rowspan="${Math.max(1, run.cohorts.size())}"><span class="run-status-label label">${run.status}</span><g:link controller="report" action="runStatus"  params="[runId: run.id]"><br>Details</g:link></td>
                     <g:each in="${run.cohorts}" var="cohort" status="n">
                     <g:if test="${n>0}"><tr></g:if>
                     <td class="col-sm-2"><g:link controller="project" action="show" id="${cohort.project.id}">${cohort.project}</g:link></td>
@@ -28,7 +28,7 @@
 </div>
 
 <script>
-    $(".label").each(function() {
+    $(".run-status-label").each(function() {
         if ($(this).text() == "ANALYZING") {
             $(this).addClass("label-info");
         } else if ($(this).text() == "COMPLETED") {

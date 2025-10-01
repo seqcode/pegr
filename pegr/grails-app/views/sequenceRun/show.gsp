@@ -35,7 +35,7 @@
             </small>
         </g:if>)
         <small>
-            <span id="run-status-show" class="label label-default">${run.status}</span>
+            <span id="run-status-show" class="run-status-label label">${run.status}</span>
             <sec:ifAnyGranted roles="ROLE_ADMIN">
             <span id="run-status-select" style="display:none">
                 <g:select name="runStatus" from="${pegr.RunStatus}" value="${run.status}" style="width:10em"></g:select>
@@ -311,6 +311,24 @@
     <script>
         $("#nav-sequencing").addClass("active");
         
+        function updateRunStatusLabel(elem) {
+            if ($(elem).text() == "ANALYZING") {
+                $(elem).addClass("label-info");
+            } else if ($(elem).text() == "COMPLETED") {
+                $(elem).addClass("label-success");
+            } else if ($(elem).text() == "QUEUE") {
+                $(elem).addClass("label-warning");
+            } else if ($(elem).text() == "FAILED") {
+                $(elem).addClass("label-danger");
+            } else if ($(elem).text() == "ARCHIVE") {
+                $(elem).addClass("label-archive");
+            } else {
+                $(elem).addClass("label-default");
+            }
+        }
+        
+        updateRunStatusLabel($(".run-status-label"));
+        
         $(".confirm").confirm();
         $(".confirm-remove-sample").confirm({text: "Remove the sample from this sequence run. All the analysis data will be removed, but the sample itself remains."});
         $(".confirm-delete-sample").confirm({text: "Delete the sample and all the related data."});
@@ -421,6 +439,7 @@
                     $("#run-status-select").val(result);
                     $("#run-status-show").show();
                     $("#run-status-select").hide();
+                    updateRunStatusLabel($(".run-status-label"));
                 }                
             });
         });

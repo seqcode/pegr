@@ -77,6 +77,81 @@ class ApiController {
     }
     
     /**
+     * Accept post request, authenticate by the API Key, to delete links to the datasets.
+     * @param datasets list of dataset links to be deleted
+     * @param apiKey API Key used to authenticate the user
+     * @return response in the format of JSON dictionary, including a response_code and a message. 
+     * @return status code
+     */
+    def deleteDatasetLinks(String apiKey) {
+        def query = request.JSON
+        // get the user
+        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        
+        // check if the user is an admin
+        if (apiUser && apiUser.isAdmin()) {          
+            def messages = []
+            for (def dataset in query.datasets) {
+                try {
+                    def analysis = Analysis.findByDatasetsLike("%" + dataset + "%")
+                    
+                    if (analysis) {
+                        analysis.datasets = analysis.datasets.replace("\"${dataset}\"", 'null')
+                        analysis.save(failOnError: true)
+                        
+                        def alignment = analysis.alignment
+                        
+                        def experiment = alignment.sequencingExperiment
+                        
+                        switch (analysis.category) {
+                            case ["output_fastqRead1", "output_fastqRead2"]: // fastq
+                                experiment.fastqFile = experiment.fastqFile.replace("\"${dataset}\"", 'null')
+                                experiment.save(failOnError: true)
+                                break
+                            case "output_fastqc": // fastqc report
+                                experiment.fastqcReport = experiment.fastqcReport.replace("\"${dataset}\"", 'null')
+                                experiment.save(failOnError: true)
+                                break
+                            case "output_samtoolFilter": // bam
+                                alignment.bamFile = null
+                                alignment.save(failOnError: true)
+                                break
+                            case "output_bigwigForward": // bigwig_forward
+                                alignment.bigwigForwardFile = null
+                                alignment.save(failOnError: true)
+                                break
+                            case "output_bigwigReverse": // bigwig_reverse
+                                alignment.bigwigReverseFile = null
+                                alignment.save(failOnError: true)
+                                break
+                            case "output_peHistogram": //pe histogram
+                                alignment.peHistogram = null
+                                alignment.save(failOnError: true)
+                                break
+                        }
+                    } else {
+                        messages.push("Cannot find dataset ${dataset}!")
+                    }
+                } catch(Exception e) {
+                    messages.push("Error deleting dataset ${dataset}. ${e.message}")
+                }
+            }    
+               
+            if (messages.size() > 0) {
+                def results = [message: messages] as JSON
+                render text: results, contentType: "text/json", status: 500
+            } else {
+                def results = [message: "Success!"] as JSON
+                render text: results, contentType: "text/json", status: 200
+            }
+        } else {
+            def code = 401
+            def results = [message: "Not authorized!"] as JSON
+            render text: results, contentType: "text/json", status: code
+        }        
+    }
+    
+    /**
      * Accept post request, authenticate by the API Key, to query sample data.
      * @param query in the format of JSON dictionary
      * @param apiKey API Key used to authenticate the user

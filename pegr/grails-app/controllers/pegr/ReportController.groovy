@@ -366,6 +366,7 @@ class SampleDTO {
     String assay
     List experiments
     Integer alignmentCount
+    String status
     String note
     String recommend
     List histories

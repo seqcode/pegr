@@ -1139,6 +1139,25 @@ print(results["message"])
             </pre>
         </div>
         </div>
+        <div class="chapter">
+        <h3 id="delete-dataset">Delete Dataset links (Admin Only)</h3>
+        <div>
+            <p>You can delete obsolete dataset links. The request JSON should be in the following format</p>
+            <pre>
+{
+    // required, combined with API key to authenticate user.
+    "userEmail": "string", 
+    
+    // required
+    "datasets": ["https://xxx.xxx.xxx", "https://xxx.xxx.xxx", ...]
+}
+            </pre>
+            and send a POST request to the url
+            <pre>
+https://vesta.vmhost.psu.edu/pegr/api/deleteDatasetLinks?apiKey=
+            </pre> 
+        </div>
+        </div>
         </div>
         <nav class="col-sm-3">
             <h4>Menu</h4>

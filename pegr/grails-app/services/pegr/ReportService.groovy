@@ -494,6 +494,7 @@ class ReportService {
           experiments: [],
           alignmentCount: 0,
           note: sample.note, 
+          status: sample.status, 
           recommend: sample.recommend,
           histories: []
          )

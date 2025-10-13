@@ -229,6 +229,7 @@
                 <th>Genome Build</th>
                 <th>Pipeline</th>
                 <th>Project</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
@@ -246,6 +247,7 @@
                     <td>${it.sample?.requestedGenomes}</td>
                     <td>${it.sample?.requestedPipelines}</td>
                     <td class="project"><span class="value">${it.cohort?.project ?: "NONE"}</span></td>
+                    <td><span class="sample-status-${it.sample?.status}">${it.sample?.status}</span></td>
                 </tr>
             </g:each>              
             <tr>

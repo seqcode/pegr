@@ -1140,7 +1140,7 @@ print(results["message"])
         </div>
         </div>
         <div class="chapter">
-        <h3 id="delete-dataset">Delete Dataset links (Admin Only)</h3>
+        <h3 id="delete-dataset">Delete Dataset Links (Admin Only)</h3>
         <div>
             <p>You can delete obsolete dataset links. The request JSON should be in the following format</p>
             <pre>

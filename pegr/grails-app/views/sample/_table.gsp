@@ -26,7 +26,7 @@
                     <td>${sample.prtclInstSummary?.protocol?.assay}</td>
                     <td>${sample.source} </td>
                     <td>${sample.treatments} </td>
-                    <td>${sample.status}</td>
+                    <td><span class="sample-status-${sample.status}">${sample.status}</span></td>
                 </tr>
             </g:each>
         </tbody>

@@ -245,3 +245,67 @@ div.spacer
 button[aria-expanded='false'] > .expand_caret {
     transform: scale(1.6) rotate(-90deg);
 }
+
+.sample-status-CREATED {
+    background-color: #777;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.sample-status-PREP {
+    background-color: #777; 
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.sample-status-READY {
+    background-color: #f0ad4e; 
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.sample-status-SEQUENCING {
+    background-color: #f0ad4e; 
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.sample-status-PENDING {
+    background-color: #5bc0de; 
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.sample-status-COMPLETED {
+    background-color: #5cb85c;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.sample-status-FAILED {
+    background-color: #d9534f;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.sample-status-ARCHIVE {
+    background-color: #8A2BE2;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+}    
+
+.sample-status-LITE {
+    background-color: #370269;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;    
+}
+	

@@ -23,7 +23,7 @@
                     <td>${sample.target}</td>
                     <td>${sample.assay}</td>
                     <td>${sample.requestedGenomes}</td>
-                    <td>${sample.status}</td>
+                    <td><span class="sample-status-${sample.status}">${sample.status}</span></td>
                     <td><g:if test="${sampleEditAuth && removable}"><g:link action="removeSample" params="[sampleId:sample.id, projectId:project?.id]" class="confirm"><span class="glyphicon glyphicon-remove"></span></g:link></g:if></td>
                 </tr>
             </g:each>              

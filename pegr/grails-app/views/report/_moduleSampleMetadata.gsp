@@ -27,7 +27,7 @@
                     <td>${sample.growthMedia}</td>
                     <td>${sample.treatments}</td>
                     <td>${sample.assay}</td>
-                    <td>${sample.status}</td>
+                    <td><span class="sample-status-${sample.status}">${sample.status}</span></td>
                     <td>${sample.note}</td>
                 </tr>
             </g:each>              

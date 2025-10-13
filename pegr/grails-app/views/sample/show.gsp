@@ -19,7 +19,7 @@
         <h3>
             Sample ${sample.id} ${sample.naturalId} <g:if test="${sample.sourceId}">(${sample.source}#${sample.sourceId})</g:if><g:if test="${editAuth && sample.item}"><g:link controller="sample" action="showItem" params="[sampleId:sample?.id]"><span class="glyphicon glyphicon-qrcode"></span></g:link></g:if>
             <small>
-                <span id="sample-status-show" class="label label-default">${sample.status}</span>
+                <span id="sample-status-show" class="sample-status-${sample.status}">${sample.status}</span>
                 <g:if test="${editAuth}">
                 <span id="sample-status-select" style="display:none">
                     <g:select name="sampleStatus" from="${pegr.SampleStatus}" value="${sample.status}" style="width:10em"></g:select>
@@ -86,6 +86,8 @@
                         $("#sample-status-show").text(result);
                         $("#sample-status-select").val(result);
                         $("#sample-status-show").show();
+                        $("#sample-status-show").removeClass();
+                        $("#sample-status-show").addClass("sample-status-" + status);
                         $("#sample-status-select").hide();
                     }                
                 });

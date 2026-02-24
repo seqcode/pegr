@@ -12,7 +12,7 @@
         <g:form action="updateOther" class="fields">
             <g:hiddenField name="sampleId" value="${sample.id}"></g:hiddenField>
             <div>
-                <label>Sample Natural ID</label>
+                <label>Sample natural ID</label>
                 <input name="naturalId" size="40" value="${sample.naturalId}">
             </div>
             <div>
@@ -33,7 +33,7 @@
                 <input name="volume" class="isnumber" value="${sample.volume}">
             </div>
             <div>
-                <label>Requested Tags (M)</label>
+                <label>Requested tags (M)</label>
                 <input name="requestedTagNumber" class="isnumber" value="${sample.requestedTagNumber}">
             </div>
             <div>
@@ -46,12 +46,16 @@
                 <g:select class="sendTo no-tag-select2" name="sendToId" from="${pegr.User.list()}" optionKey="id" style="width: 150px" value="${sample.sendDataTo}"></g:select>
             </div>
             <div>
-                <label>Publication Reference</label>
+                <label>Publication reference</label>
                 <input name="publicationReference" value="${sample.publicationReference}">
             </div>
             <div>
                 <label>Notes</label>
                 <textarea name="note" cols="60" rows="4">${sample.note}</textarea>
+            </div>
+            <div>
+                <label>GEO Accession</label>
+                <input name="geoAccession" value="${sample.geoAccession}">
             </div>
             <div>
                 <g:submitButton name="save" value="Save" class="btn btn-primary"></g:submitButton>

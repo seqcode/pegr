@@ -2506,4 +2506,5 @@ databaseChangeLog = {
     include file: 'add_default_pipeline.groovy'
     include file: 'add_quality_control_file.groovy'
     include file: 'remove_index_version.groovy'
+    include file: 'add_geo.groovy'
 }

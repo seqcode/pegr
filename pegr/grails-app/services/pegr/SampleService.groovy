@@ -229,8 +229,14 @@ class SampleService {
 
     @Transactional
     def updateOther(Sample sample, String indexType, String indices) {
-        try {
-            sample.save()
+        try {    
+            sample.save(flush: true, failOnError: true)
+        } catch (grails.validation.ValidationException e) {
+            def errorMsg = sample.errors.fieldErrors
+                .collect { it.field  }
+                .join("; ")
+
+            throw new SampleException(message: "Error in " + errorMsg)
         } catch (Exception e) {
             throw new SampleException(message: "Error saving the sample!")
         }

@@ -27,6 +27,7 @@ class Sample {
     String recommend
     GrowthMedia growthMedia
     String naturalId 
+    String geoAccession
     
     List getRuns() {
         return SequencingExperiment.where{sample == this}.collect{it.sequenceRun}
@@ -87,6 +88,7 @@ class Sample {
         recommend nullable: true
         growthMedia nullable: true
         naturalId nullable: true
+        geoAccession nullable: true, blank: true,unique: true
     }
     
     static mapping = {

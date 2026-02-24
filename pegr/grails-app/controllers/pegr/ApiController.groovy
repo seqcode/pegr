@@ -794,12 +794,15 @@ class ApiController {
                         case "status":
                             sampleService.updateSampleStatus(sample.id, sampleDict.newValue)
                             break
+                        case "geoAccession":
+                            sampleService.update(sample.id, "geoAccession", sampleDict.newValue)
+                            break
                         default:
                             messages.push("Error: Sample ${sample.id}. Field ${sampleDict.field} cannot be edited.")
                             break
                     }
                 } catch(Exception e) {
-                    messages.push("Error: sample=${sampleDict.sampleID} and field=${sampleDict.field}. ${e.message}")
+                    messages.push("Error: sample=${sampleDict.sampleID} and field=${sampleDict.field}. ")
                 }
             }    
                

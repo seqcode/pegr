@@ -515,6 +515,10 @@ class SampleService {
                 sample.assay = getAssay(value)
                 sample.save(faileOnError: true)
                 break
+            case "geoAccession" :
+                sample.geoAccession = value
+                sample.save(failOnError: true)
+                break
             default:
                 sample[field] = utilityService.getFloat(value)
                 sample.save(failOnError: true)

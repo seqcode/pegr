@@ -1,6 +1,7 @@
 <h3>Files</h3>
 <table class="table table-bordered">
     <thead>
+        <th>Sample ID</th>
         <th>Sequence Run</th>
         <th>Fastq Files</th>
         <th>Fastqc Reports</th>
@@ -12,6 +13,7 @@
     <g:each in="${sampleDTOs}" var="sample">
         <g:each in="${sample.experiments}" var="experiment">
             <tr>
+                <td rowspan="${Math.max(1,experiment.alignments.size())}"><g:link controller="sample" action="show" id="${sample.id}">${sample.id}</g:link> ${sample.naturalId}</td>
                 <td rowspan="${Math.max(1,experiment.alignments.size())}">Run${experiment.runId}</td>
                 <td rowspan="${Math.max(1,experiment.alignments.size())}">
                 <g:if test="${experiment.fastq?.read1}">

@@ -229,8 +229,14 @@ class SampleService {
 
     @Transactional
     def updateOther(Sample sample, String indexType, String indices) {
-        try {
-            sample.save()
+        try {    
+            sample.save(flush: true, failOnError: true)
+        } catch (grails.validation.ValidationException e) {
+            def errorMsg = sample.errors.fieldErrors
+                .collect { it.field  }
+                .join("; ")
+
+            throw new SampleException(message: "Error in " + errorMsg)
         } catch (Exception e) {
             throw new SampleException(message: "Error saving the sample!")
         }
@@ -508,6 +514,10 @@ class SampleService {
             case "assay" :
                 sample.assay = getAssay(value)
                 sample.save(faileOnError: true)
+                break
+            case "geoAccession" :
+                sample.geoAccession = value
+                sample.save(failOnError: true)
                 break
             default:
                 sample[field] = utilityService.getFloat(value)

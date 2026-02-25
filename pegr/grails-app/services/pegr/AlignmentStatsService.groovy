@@ -244,7 +244,7 @@ class AlignmentStatsService {
     }
 
    /**
-    * Get the motif count from meme file
+    * Get the motif count from meme file. Obsolete.
     * @param datasets a list of maps
     * @return motifCount
     */

@@ -1,9 +1,22 @@
 <g:each in="${modules}" var="module">
     <g:render template="/report/${module}" model="['sampleList':sampleDTOs]" />
 </g:each>
-
 <script>
     $(function() {
+    
+    // plot ligation histograms inline in the table
+    $('.ligation-plot').each(function() {
+        var plotstr = $(this).find('span').text().trim();
+        var plotDiv = $(this).find('.ligation-plot-fig')[0];
+        if (!plotstr || !plotDiv) return;
+        try {
+            var plotjson = JSON.parse(plotstr);
+            Plotly.newPlot(plotDiv, plotjson.data, plotjson.layout);
+        } catch(e) {
+            $(plotDiv).text('Error rendering ligation plot: ' + e.message);
+        }
+    });
+    
         // plot meme
         $(".preview_btn").on("click", function(){
             $(this).addClass("active");

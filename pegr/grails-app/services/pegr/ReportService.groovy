@@ -589,7 +589,19 @@ class ReportService {
                 case "output_fourColorPlot": // four color plot
                     alignmentDTO.fourColor = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "png")
                     break
-                case "output_tagPileup": //composite 
+                case "output_ligation": // ligation statistics and plot
+                    def stats = utilityService.queryJson(analysis.statistics, ["trans", "cis_1kb", "cis_2kb", "cis_4kb", "cis_10kb", "cis_20kb", "cis_40kb", "total_dedup", "ligation_plot"])
+                    alignmentDTO.trans = stats.trans
+                    alignmentDTO.cis1kb = stats.cis_1kb
+                    alignmentDTO.cis2kb = stats.cis_2kb
+                    alignmentDTO.cis4kb = stats.cis_4kb
+                    alignmentDTO.cis10kb = stats.cis_10kb
+                    alignmentDTO.cis20kb = stats.cis_20kb
+                    alignmentDTO.cis40kb = stats.cis_40kb
+                    alignmentDTO.totalDedup = stats.total_dedup
+                    alignmentDTO.ligationPlot = stats.ligation_plot ? JsonOutput.toJson(stats.ligation_plot) : null
+                    break
+                case "output_tagPileup": //composite
                     def tabulars = alignmentStatsService.queryDatasetsUriList(analysis.datasets, "tabular")                
                     if (tabulars && tabulars.size() > 0) {
                         def identifier = utilityService.queryJson(analysis.parameters, "input2X__identifier__")

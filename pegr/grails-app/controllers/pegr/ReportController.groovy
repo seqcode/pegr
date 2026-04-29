@@ -433,6 +433,16 @@ class AlignmentDTO {
     Integer motifCount
     List composite
     List featureAnalysis
+
+    Long trans
+    Long cis1kb
+    Long cis2kb
+    Long cis4kb
+    Long cis10kb
+    Long cis20kb
+    Long cis40kb
+    Long totalDedup
+    String ligationPlot
 }
 
 class RunStatusDTO {

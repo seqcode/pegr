@@ -27,8 +27,7 @@
                     <f:field bean="genomeInstance" property="name"/>
                     <div class="fieldcontain">
                       <label for="species">Species</label>
-                      <g:select name="species.id" id="species" from="${pegr.Species.list().sort { a,b ->
-a.genusName.toLowerCase() <=> b.genusName.toLowerCase() ?: a.name.toLowerCase() <=> b.name.toLowerCase() }}" noSelection="['null':'']" optionKey="id"></g:select>
+                      <g:select name="species.id" id="species" from="${pegr.Species.list().sort { (it.genusName ?: '').toLowerCase() + ' ' + (it.name ?: '').toLowerCase() }}" noSelection="['null':'']" optionKey="id"></g:select>
                     </div>
                     <f:field bean="genomeInstance" property="url"/>
                     <f:field bean="genomeInstance" property="status"/>

@@ -15,24 +15,33 @@ class GenomeAdminController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max, String str) {
+        def sortField = params.sort ?: "id"
+        def sortOrder = params.order ?: "desc"
         if (str && Genome.hasProperty("name")) {
-            def c = Genome.createCriteria()
-            def listParams = [
-                    max: max ?: 25,
-                    sort: params.sort ?: "id",
-                    order: params.order ?: "desc",
-                    offset: params.offset
-                ]
             def likeStr = "%" + str + "%"
-            def items = c.list(listParams) {
+            def c = Genome.createCriteria()
+            def items = c.list(max: max ?: 25, offset: params.offset) {
                 or {
                     ilike "name", likeStr
                 }
+                if (sortField == "species") {
+                    // sort by the species' displayed name, keeping genomes with no species
+                    createAlias("species", "sp", org.hibernate.criterion.CriteriaSpecification.LEFT_JOIN)
+                    order("sp.genusName", sortOrder)
+                    order("sp.name", sortOrder)
+                } else {
+                    order(sortField, sortOrder)
+                }
             }
             respond items, model:[genomeCount: items.totalCount, str: str]
-        } else {       
-            params.max = Math.min(max ?: 25, 100)
-            respond Genome.list(params), model:[genomeCount: Genome.count()]
+        } else {
+            def queryParams = new LinkedHashMap(params)
+            queryParams.max = Math.min(max ?: 25, 100)
+            if (queryParams.sort == "species") {
+                // the species association sorts by FK id by default; sort by name instead
+                queryParams.sort = "species.genusName"
+            }
+            respond Genome.list(queryParams), model:[genomeCount: Genome.count()]
         }
     }
 

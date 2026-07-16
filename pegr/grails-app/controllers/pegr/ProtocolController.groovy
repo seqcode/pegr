@@ -195,7 +195,7 @@ class ProtocolController {
         [protocolList: protocols, protocolCount: protocols.totalCount, str: str]        
     }
     
-    def getNamedData(String[] rawdata) {
+    private getNamedData(String[] rawdata) {
         rawdata.eachWithIndex{ d, idx -> 
             def td = d.trim()
             if(td == "") {

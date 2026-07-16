@@ -6,7 +6,8 @@ class SequenceIndex {
 	String oligo
 	DictionaryStatus status
     
-    static constraints = {    
+    static constraints = {
+		indexId unique: true
 		oligo nullable: true, blank: true
         status nullable: true
 	}

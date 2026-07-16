@@ -2501,10 +2501,12 @@ databaseChangeLog = {
     include file: 'add_bigwig.groovy'
     include file: 'add_read2.groovy'
     include file: 'rename_run_stats.groovy'
-    inlcude file: 'change_lane_to_str.groovy'
+    include file: 'change_lane_to_str.groovy'
     include file: 'add_requested_pipelines.groovy'
     include file: 'add_default_pipeline.groovy'
     include file: 'add_quality_control_file.groovy'
     include file: 'remove_index_version.groovy'
     include file: 'add_geo.groovy'
+    include file: 'add_genome_reffeature_unique.groovy'
+    include file: 'add_sequence_index_unique.groovy'
 }

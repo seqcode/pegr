@@ -11,7 +11,7 @@ class ReferenceFeature {
 	}
 	
     static constraints = {
-		filename unqiue: true
+		filename unique: true
         genome nullable: true
         summary nullable: true, blank: true
         url nullable: true, blank: true

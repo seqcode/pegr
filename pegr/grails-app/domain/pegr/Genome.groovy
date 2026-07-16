@@ -12,7 +12,7 @@ class Genome {
 	}
 	
     static constraints = {
-		name unqiue: true
+		name unique: true
         species nullable: true
         url nullable: true, blank: true
         status nullable: true

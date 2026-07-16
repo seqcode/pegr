@@ -109,7 +109,7 @@ class AssayAdminController {
     }
     
     
-    def getNamedData(String[] rawdata) {
+    private getNamedData(String[] rawdata) {
         rawdata.eachWithIndex{ d, idx -> 
             def td = d.trim()
             if(td == "") {

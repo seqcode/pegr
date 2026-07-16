@@ -9,7 +9,7 @@ class Sample {
 	Double requestedTagNumber
 	Double chromosomeAmount // in ug
 	Double cellNumber // in M
-	Double volume //ul per aliqu used for the assay
+	Double volume //ul per aliquot used for the assay
 	String publicationReference
     SampleStatus status
     Date date

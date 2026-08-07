@@ -400,6 +400,46 @@ public class FetchProjectDataFromPegr {
 }
             </pre>
         </div>
+        <h4 id="query-sample-ids">Query Sample IDs by Index or Genome Build</h4>
+        <div>
+            <p>If you only need the IDs of the samples that carry a certain sequence index or that requested a certain genome build, format your query in a JSON dictionary as follows
+            <pre>
+{
+    // required, combined with API key to authenticate user.
+    "userEmail": "string",
+
+    // at least one of the following needs to be provided. If several of them
+    // are provided, only the samples that match all of them will be returned.
+    "indexSequence": "string",
+    "indexId": "string",
+    "genome": "string"
+}
+            </pre>
+            and send a POST request to the url
+            <pre>
+https://vesta.vmhost.psu.edu/pegr/api/fetchSampleIds?apiKey=
+            </pre>
+            Once the request is authenticated by the user's email and API key, the IDs of the matching samples will be returned in the following JSON format.
+            <pre>
+{ message: "string",
+  data: { "sampleIds": [long, long, ...] }
+}
+            </pre>
+            <p>If no sample matches the query, the status code 404 will be returned, together with the message "No sample has been found!".</p>
+            <p>The API can be simply called through curl</p>
+            <pre>
+curl -X POST -H "Content-Type: application/json" -d '{"genome": "sacCer3", "userEmail": "xxxx@psu.edu"}' https://vesta.vmhost.psu.edu/pegr/api/fetchSampleIds?apiKey=XXXXXXX
+            </pre>
+            <p>The following is an example in Python, which queries the samples that carry the index and requested the genome build at the same time.</p>
+            <pre>
+import requests
+url = "https://vesta.vmhost.psu.edu/pegr/api/fetchSampleIds?apiKey=XXXXXXX"
+query = {"userEmail": "xxxx@psu.edu", "indexId": "TruSeq_01", "genome": "sacCer3"}
+r = requests.post(url, json=query)
+results = r.json()
+print(results["data"]["sampleIds"])
+            </pre>
+        </div>
         </div>
         <div class="chapter">
           <h3 id="update-sample">Update Sample Metadata in PEGR</h3>

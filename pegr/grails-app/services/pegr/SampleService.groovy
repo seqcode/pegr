@@ -112,6 +112,87 @@ class SampleService {
         return samples
     }
 
+   /**
+    * Search samples by their sequence index and/or their requested genome build.
+    * At least one of the criteria needs to be provided. When several of them are
+    * provided, only the samples that match all of them are returned.
+    * @param sequence the index's sequence
+    * @param indexId the index's ID
+    * @param genome the name of the requested genome build
+    * @return a sorted list of sample IDs
+    */
+    def searchSampleIds(String _sequence, String _indexId, String _genome) {
+        def sequence = utilityService.cleanString(_sequence)
+        def indexId = utilityService.cleanString(_indexId)
+        def genome = utilityService.cleanString(_genome)
+        if (!sequence && !indexId && !genome) {
+            throw new SampleException(message: "Please provide an index sequence, an index ID or a genome build!")
+        }
+
+        def sampleIds = null
+
+        if (sequence || indexId) {
+            sampleIds = searchIdsByIndex(sequence, indexId)
+        }
+
+        if (genome && (sampleIds == null || sampleIds.size() > 0)) {
+            def idsByGenome = searchIdsByGenome(genome)
+            sampleIds = (sampleIds == null) ? idsByGenome : sampleIds.intersect(idsByGenome)
+        }
+
+        return sampleIds.sort()
+    }
+
+   /**
+    * Search samples that carry a given sequence index. Note that several sequence
+    * indices can share the same sequence, so a sequence can match more than one
+    * index ID, and the samples of all of them are returned.
+    * @param sequence the index's sequence
+    * @param indexId the index's ID
+    * @return a list of sample IDs
+    */
+    def searchIdsByIndex(String sequence, String indexId) {
+        def i = SequenceIndex.createCriteria()
+        def indices = i.list {
+            and {
+                if (sequence) {
+                    eq "sequence", sequence, [ignoreCase: true]
+                }
+                if (indexId) {
+                    eq "indexId", indexId, [ignoreCase: true]
+                }
+            }
+        }
+        if (indices.size() == 0) {
+            return []
+        }
+
+        def c = SampleSequenceIndices.createCriteria()
+        return c.list {
+            'in' "index", indices
+            projections {
+                distinct("sample.id")
+            }
+        }
+    }
+
+   /**
+    * Search samples that requested a given genome build. The requested genomes are
+    * stored as a comma separated string of genome names, so the "like" query is only
+    * used to narrow down the candidates, and each genome name is then matched exactly.
+    * @param genome the name of the requested genome build
+    * @return a list of sample IDs
+    */
+    def searchIdsByGenome(String genome) {
+        // "lower" is used so that the search does not depend on the database's collation.
+        // The wildcards that the genome name may contain only widen the candidates,
+        // which are filtered by the exact match below.
+        def candidates = Sample.executeQuery("select s.id, s.requestedGenomes from Sample s where lower(s.requestedGenomes) like :pattern", [pattern: "%${genome.toLowerCase()}%"])
+        return candidates.findAll { candidate ->
+            candidate[1].split(",").any { it.trim().equalsIgnoreCase(genome) }
+        }.collect { it[0] }
+    }
+
     def getSampleDetails(Sample sample) {
         def jsonSlurper = new JsonSlurper()
         def notes = [:]

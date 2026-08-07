@@ -30,6 +30,7 @@ class ApiController {
                             fetchSequenceRunSummary: 'POST',
                             updateSequenceRunSummary: 'POST',
                             fetchProjectData: 'POST',
+                            fetchSampleIds: 'POST',
                             ]
     
     /**
@@ -184,6 +185,46 @@ class ApiController {
         render text: results, contentType: "text/json", status: code
     }
     
+    /**
+     * Accept post request, authenticate by the API Key, to query the samples
+     * that carry a given sequence index or that requested a given genome build.
+     * @param query in the format of JSON dictionary, containing the index's
+     * sequence, the index's ID and/or the genome build's name
+     * @param apiKey API Key used to authenticate the user
+     * @return response in the format of JSON dictionary, including the list of
+     * sample IDs and a message.
+     * @return status code
+     */
+    def fetchSampleIds(QuerySampleIdsCommand query, String apiKey) {
+        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        def message, data, code
+        if (apiUser) {
+            try {
+                def sampleIds = sampleService.searchSampleIds(query.indexSequence, query.indexId, query.genome)
+                if (sampleIds.size() == 0) {
+                    code = 404
+                    message = "No sample has been found!"
+                    // help the user tell a typo from a genuine miss
+                    if (query.genome && !Genome.findByName(query.genome.trim())) {
+                        message += " Genome build ${query.genome} is not registered in PEGR!"
+                    }
+                } else {
+                    data = [sampleIds: sampleIds]
+                    code = 200
+                    message = "Success!"
+                }
+            } catch(SampleException e) {
+                code = 500
+                message = e.message
+            }
+        } else {
+            code = 401
+            message = "Not authorized!"
+        }
+        def results = [data: data, message: message] as JSON
+        render text: results, contentType: "text/json", status: code
+    }
+
     /*
      * Accept post request, authenticate by the API Key, to query sample
      * data in a sequence run.
@@ -869,6 +910,13 @@ class QuerySampleRegistrationCommand implements grails.validation.Validateable {
     String sendDataTo
     String treatment
     SampleStatus status
+}
+
+class QuerySampleIdsCommand implements grails.validation.Validateable {
+    String userEmail // required
+    String indexSequence // at least one of indexSequence, indexId and genome needs to be provided
+    String indexId
+    String genome
 }
 
 class QueryRunRegistrationCommand implements grails.validation.Validateable {

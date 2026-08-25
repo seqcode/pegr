@@ -154,6 +154,9 @@ class ApiController {
     
     /**
      * Accept post request, authenticate by the API Key, to query sample data.
+     * Only one page of samples is returned at a time, so the response also reports
+     * the total number of matches together with the 'max' and 'offset' that were
+     * applied, to let the caller page through the rest of them.
      * @param query in the format of JSON dictionary
      * @param apiKey API Key used to authenticate the user
      * @return response in the format of JSON dictionary, including a response_code and a message. 
@@ -162,12 +165,19 @@ class ApiController {
     def fetchSampleData(QuerySampleRegistrationCommand cmd, String apiKey) {
         def apiUser = User.findByEmailAndApiKey(cmd.userEmail, apiKey)
         def message, data, code
+        def total = 0
+        def max = 0
+        def offset = 0
         if (apiUser) {
             def sampleIds = []
+            // the samples of the given IDs are all returned, whereas a search
+            // returns only the page of samples defined by 'max' and 'offset'
+            def samples = null
             if (cmd.ids && cmd.ids.size() > 0) {
                 sampleIds = cmd.ids
             } else {
-                sampleIds = sampleService.search(cmd).collect {it.id}.toList()
+                samples = sampleService.search(cmd)
+                sampleIds = samples.collect {it.id}.toList()
             }
             if (sampleIds.size() == 0) {
                 code = 404
@@ -175,13 +185,25 @@ class ApiController {
             } else {
                 data = reportService.fetchDataForSamples(sampleIds, cmd.preferredOnly)     
                 code = 200
-                message = "Success!"
+                if (samples == null) {
+                    total = sampleIds.size()
+                    max = total
+                } else {
+                    total = samples.totalCount
+                    max = cmd.max ?: SampleService.DEFAULT_MAX
+                    offset = cmd.offset ?: 0
+                }
+                if (offset + sampleIds.size() < total) {
+                    message = "Success! Returning ${sampleIds.size()} of ${total} samples. Use 'max' and 'offset' to retrieve the rest."
+                } else {
+                    message = "Success!"
+                }
             }
         } else {
             code = 401
             message = "Not authorized!" 
         }   
-        def results = [data: data, message: message] as JSON
+        def results = [data: data, total: total, max: max, offset: offset, message: message] as JSON
         render text: results, contentType: "text/json", status: code
     }
     

@@ -49,7 +49,7 @@
                 <g:textField name="antibody" class="form-control" value="${searchParams.antibody}"/>
             </div>               
             <div class="form-group">
-                <label>Target</label>
+                <label>Target/TAG</label>
                 <g:textField name="target" class="form-control" value="${searchParams.target}"/>
             </div>
             <div class="form-group">

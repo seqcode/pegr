@@ -20,7 +20,9 @@
     // optional, default is false
     "preferredOnly": "true/false", 
     
-    // optional, parameters to specify which batch of data to return. "max" is limited to 1000.
+    // optional, parameters to specify which batch of data to return.
+    // "max" defaults to 50, so only the first 50 matching samples are
+    // returned unless a larger "max" is given.
     "max": integer, 
     "offset": integer,
     "sort": "string",
@@ -34,7 +36,7 @@
     "species": "string",
     "strain": "string",
     "antibody": "string",    
-    "target": "string",
+    "target": "string",  // matched against the target's name, N-term tag and C-term tag
     "assay": "string",
     "sendDataTo": "string",
     "treatment": "string"
@@ -47,6 +49,15 @@ https://vesta.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=
             Once the request is authenticated by the user's email and API key, the samples that match all the property values in the query will be returned in the following JSON format.
             <pre>
 { message: "string",
+
+  // the total number of samples that match the query, and the "max" and
+  // "offset" that were applied to produce this batch. When "total" is
+  // greater than the number of samples in "data", there are more samples
+  // to fetch: raise "max", or step "offset" through the results.
+  total: integer,
+  max: integer,
+  offset: integer,
+
   data: [{
         "id": long,
         "source": "string",
@@ -119,7 +130,9 @@ https://vesta.vmhost.psu.edu/pegr/api/fetchSampleData?apiKey=
   ]
 }
             </pre>
-            The max number of samples returned is limit to 1000. You can also provide <i>max, offset, sort, order</i> to specify which batch of data you want. If you set <i>preferredOnly</i> to be true, then only the results that have passed the lab quality control will be returned.</p>
+            Only one batch of samples is returned at a time. <i>max</i> defaults to <b>50</b>, so a query that matches more than 50 samples returns just the first 50 of them. Compare <i>total</i> with the number of samples in <i>data</i> to tell whether anything was left behind, then either raise <i>max</i> or step <i>offset</i> through the results to fetch the rest. You can also provide <i>sort</i> and <i>order</i> to specify how the samples are ordered before they are batched. If you set <i>preferredOnly</i> to be true, then only the results that have passed the lab quality control will be returned.</p>
+
+            <p>Note that <i>max</i> and <i>offset</i> are not applied when the query provides <i>ids</i>: the samples of all the given IDs are returned, and <i>total</i> is their count.</p>
     
             <p>The API can be simply called through curl</p>
             <pre>
@@ -142,7 +155,8 @@ r = requests.post(url, json=data)
 results = r.json()
 print(r.status_code)
 print(results["message"])
-print(len(results["data"]))
+# how many samples came back, out of how many matched the query
+print(len(results["data"]), "of", results["total"])
             </pre>
             <p>Here is a java example</p>
             <pre>

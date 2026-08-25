@@ -10,7 +10,7 @@ class Target {
     DictionaryStatus status
 
 	String toString() {
-		name
+		[nTermTag, name, cTermTag].findAll { it?.trim() }.join("-")
 	}
 	
     static constraints = {

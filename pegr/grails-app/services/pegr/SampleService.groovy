@@ -8,6 +8,9 @@ class SampleException extends RuntimeException {
 }
 
 class SampleService {
+    /** Default number of samples returned by a search when the query does not set 'max' */
+    static final int DEFAULT_MAX = 50
+
     def dataSource
     def springSecurityService
     def antibodyService
@@ -36,7 +39,7 @@ class SampleService {
         
         def c = Sample.createCriteria()
         def listParams = [
-                max: query.max ?: 50,
+                max: query.max ?: DEFAULT_MAX,
                 sort: query.sort ?: "id",
                 order: query.order ?: "desc",
                 offset: query.offset
@@ -88,7 +91,11 @@ class SampleService {
                 }
                 if (query.target) {
                     target {
-                        ilike "name", query.target
+                        or {
+                            ilike "name", query.target
+                            ilike "nTermTag", query.target
+                            ilike "cTermTag", query.target
+                        }
                     }
                 }
                 if (query.assayId) {

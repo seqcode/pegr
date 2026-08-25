@@ -1,5 +1,6 @@
 <html>
     <head>
+        <title>${title ?: "Composite"}</title>
         <asset:javascript src="jquery.js"/>
         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script type="text/javascript">
@@ -13,8 +14,8 @@
                     var data = new google.visualization.arrayToDataTable(jsonData["plus"]);
 
                     var options = {
-                        title: '',
-                        hAxis: { title: 'Distance from MEME motif (bp)', 
+                        title: '${(title ?: "").encodeAsJavaScript()}',
+                        hAxis: { title: '${(xlabel ?: "Distance from MEME motif (bp)").encodeAsJavaScript()}', 
                                titleTextStyle: {fontSize:25,italic:false},
                                gridlines: { color: '#DDDDDD', count:11 },
                         },

@@ -137,8 +137,16 @@ class ReportController {
         render result
     }
 
-    def composite(String url) {
-        [url: url]
+    /**
+     * Show a composite plot on a full page. Used by both the MEME motif composite
+     * plots and the feature analysis plots (e.g. TSS), which share the same data
+     * format but label their x axis differently.
+     * @param url the url of the tabular data to plot
+     * @param title the plot's title, empty for the MEME motif composite plots
+     * @param xlabel the x axis' label, defaults to the MEME motif's one
+     */
+    def composite(String url, String title, String xlabel) {
+        [url: url, title: title, xlabel: xlabel]
     }
 
     def fetchCompositeDataAjax(String url) {

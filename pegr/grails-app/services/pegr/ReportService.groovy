@@ -621,7 +621,7 @@ class ReportService {
                             if (!xlabel) {
                                 xlabel = "Distance from MEME motif (bp)"
                             }
-                            alignmentDTO.featureAnalysis << ['title': title, 'xlabel': xlabel, 'tabular': tabulars.last()]
+                            alignmentDTO.featureAnalysis << ['title': title, 'plot_title': plot_title, 'xlabel': xlabel, 'tabular': tabulars.last()]
                         }                           
                     }
                     break

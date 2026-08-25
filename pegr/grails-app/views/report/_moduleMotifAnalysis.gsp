@@ -88,7 +88,8 @@
                       <span class="composite-url" hidden="hidden">${alignment.featureAnalysis[m].tabular}</span>
                       <span class="composite-plot-title" hidden="hidden">${alignment.featureAnalysis[m].plot_title}</span>
                       <span class="composite-xlabel" hidden="hidden">${alignment.featureAnalysis[m].xlabel}</span>
-                      <div class="composite-fig" style="width: 512px; height: 300px"></div>
+                      <div class="composite-fig" style="width: 512px; height: 300px; display: inline-block; vertical-align: top"></div>
+                      <g:link controller="report" action="composite" params="[url: alignment.featureAnalysis[m].tabular, title: alignment.featureAnalysis[m].plot_title, xlabel: alignment.featureAnalysis[m].xlabel]" target="_blank"><span class="glyphicon glyphicon-fullscreen"></span></g:link>
                     </div>
                   </g:if>
                 </g:each>

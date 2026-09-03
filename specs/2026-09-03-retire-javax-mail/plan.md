@@ -10,18 +10,19 @@ already resolves JavaMail 1.6.2 from Maven. That shape gets its first real exerc
 discipline — capture the classpath before, delete, compare after, QA only the paths the
 jar touches.
 
-## 1. Capture the before state
+## 1. Capture the before state — **done 2026-09-03**
 
-- [ ] `./gradlew dependencies --configuration runtimeClasspath > before.txt` and keep it
-      outside the repo. This is the baseline every later branch diffs against.
-- [ ] Record which JavaMail copy actually wins today. `fileTree` entries do not appear in
-      the dependency report, so the report alone cannot answer this — inspect the real
-      classpath ordering, e.g. print `javax.mail.Session`'s code source at runtime from
-      the Grails console, or check the assembled WAR's `WEB-INF/lib`.
-- [ ] Ask whether the 2020 vendoring was deliberate (requirements → open questions).
+- [x] Baseline dependency report saved outside the repo (879 lines).
+- [x] Established which JavaMail copy wins. `fileTree` entries never appear in the
+      dependency report, and Gradle init scripts will not compile under 7.6.3 on Java 21
+      ("Unsupported class file major version 65"), so the order came from the
+      `application` plugin's generated start script: `javax.mail.jar` is entry 3 of 222,
+      the 1.6.2 pair 168/169. Confirmed by probing the real `installDist` classpath.
+- [x] Vendoring intent closed as moot — see requirements → open questions.
 
-**Done when:** the baseline is saved and it is known whether 1.5.6 or 1.6.2 is live, so
-the effect of the deletion can be stated rather than guessed.
+**Result:** the vendored **1.5.6 is live**, so this branch is a 1.5.6 → 1.6.2 upgrade, not
+a no-op. `getTransport("smtp")` resolves to `com.sun.mail.smtp.SMTPTransport` both before
+and after.
 
 ## 2. Delete the jar
 
@@ -40,14 +41,14 @@ the build is green, and the module dependency report is byte-identical to the ba
 
 - [ ] Restart `bootRun` — `UserController` holds one of the two send sites and controllers
       do not hot-reload.
-- [ ] Exercise both mail paths (validation steps 3 and 4).
+- [ ] Exercise both mail paths (validation steps 4 and 5).
 
 **Done when:** both emails send against a real SMTP host with no `NoClassDefFoundError`.
 
 ## 4. Close out
 
-- [ ] Note in the PR whether the deletion was a true no-op or an effective 1.5.6 → 1.6.2
-      upgrade, based on group 1's finding.
+- [ ] State in the PR that this is an effective JavaMail 1.5.6 → 1.6.2 upgrade (group 1),
+      so it is reviewed as a version change rather than a file cleanup.
 - [ ] Leave `specs/roadmap.md` alone — the Phase 0 bullet is not complete until all four
       branches have merged into `grails7`.
 

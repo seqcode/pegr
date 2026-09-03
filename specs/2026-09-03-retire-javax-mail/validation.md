@@ -8,11 +8,11 @@ in question and are not tested here.
 
 - [ ] `./gradlew clean build` green from `pegr/`.
 - [ ] `./gradlew test` green. *(One spec exists in `pegr/src/test/`; this proves the build
-      compiles, not that mail works. Steps 3–4 are the real check.)*
+      compiles, not that mail works. Steps 4–5 are the real check.)*
 - [ ] `./gradlew bootRun` starts and serves the login page.
 - [ ] `git ls-files pegr/libs` no longer lists `javax.mail.jar`.
 - [ ] `build.gradle` is **unchanged** — no dependency added, `fileTree` line still present.
-- [ ] Both mail paths send successfully (steps 3–4).
+- [ ] Both mail paths send successfully (steps 4–5).
 - [ ] The PR states this is an effective JavaMail 1.5.6 → 1.6.2 upgrade (established in
       group 1) and not a redundant-file cleanup.
 - [ ] Staging's pre-deletion JavaMail version is recorded, so it is known whether
@@ -39,7 +39,7 @@ worked — only the assembled artifact shows the duplicate is gone.
 Environment: `./gradlew bootRun` on dev. Mail needs real SMTP settings — `grails.mail.host`,
 `grails.mail.port`, `grails.mail.username`, `grails.mail.password` in the external
 `pegr-config.properties` (they are in `sample_files/pegr-config.properties` as empty keys).
-**A dev config with blank mail settings makes steps 3–4 vacuous**; point them at a real or
+**A dev config with blank mail settings makes steps 4–5 vacuous**; point them at a real or
 catcher SMTP host before starting.
 
 Restart `bootRun` first — `UserController` does not hot-reload.
@@ -53,15 +53,15 @@ Restart `bootRun` first — `UserController` does not hot-reload.
    `com.sun.mail.*` and the provider registry from `javax.mail-1.6.2.jar`, both at 1.6.2.
    The probe confirmed `getTransport("smtp")` still resolves to
    `com.sun.mail.smtp.SMTPTransport`.
-2b. **Check the deployed WAR, not just `bootRun`.** All three jars ship in `WEB-INF/lib`
+3. **Check the deployed WAR, not just `bootRun`.** All three jars ship in `WEB-INF/lib`
    and the servlet spec leaves that directory's ordering to the container, so production
    may already be on 1.6.2 while dev runs 1.5.6. Print the same code-source location on
    **staging** before and after. If staging already reports 1.6.2, this branch is a no-op
    there and a real upgrade only for developers.
-3. **Password-reset email** — `UserController.sendResetPasswordEmail`: use the forgot-
+4. **Password-reset email** — `UserController.sendResetPasswordEmail`: use the forgot-
    password flow for a test user. *Expected:* the `[PEGR] Reset password` email arrives
    with a working reset link, and following the link reaches the reset form.
-4. **Account-creation email** — `UserService`, the `[PEGR] Account Information` mail: create
+5. **Account-creation email** — `UserService`, the `[PEGR] Account Information` mail: create
    a new user as an admin. *Expected:* the email arrives with a working registration link.
    Note this path wraps the send in `catch (Exception e)` and rethrows
    `UserException("Error sending the email!")`, so an SMTP misconfiguration shows as that
@@ -74,11 +74,11 @@ Restart `bootRun` first — `UserController` does not hot-reload.
 
 - **Low overall.** One deleted file, nothing added, no source change, no config change.
 - **The real risk is the inverse of the usual one, and it is confirmed.** 1.5.6 *is*
-  winning the classpath, so this branch moves mail from 1.5.6 to 1.6.2 — a six-year version
-  jump arriving as a *deletion*, exactly the change that gets reviewed as trivial. Review it
-  as an upgrade. 1.5.6 → 1.6.2 is a maintenance range with no intentional API break, but the
-  SMTP/TLS defaults moved over that span; if step 3 or 4 fails against a host that worked
-  before, suspect the TLS handshake first.
+  winning the classpath, so this branch moves mail from 1.5.6 to 1.6.2 — a two-year version
+  jump (2016 → 2018) arriving as a *deletion*, exactly the change that gets reviewed as
+  trivial. Review it as an upgrade. This is a maintenance range with no intentional API
+  break, but the SMTP/TLS defaults moved over that span; if step 4 or 5 fails against a
+  host that worked before, suspect the TLS handshake first.
 - **Split packages across two jars.** After the deletion `javax.mail.*` resolves from the
   api jar and `com.sun.mail.*` from the impl jar. Verified working for SMTP, but it is a
   more fragile arrangement than one self-contained jar — a future dependency change that

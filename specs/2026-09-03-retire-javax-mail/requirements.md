@@ -7,13 +7,13 @@ the `javax.mail.jar` row of the bundled-jars table
 
 ## Context
 
-`pegr/libs/` holds five jars dropped in on 2020-05-26, pulled onto the classpath by a
-blanket `implementation fileTree(dir: 'libs', include: '*.jar')`. This is the first of
+`pegr/libs/` holds five jars added in `daefca6d` (2019-07-24), pulled onto the classpath
+by a blanket `implementation fileTree(dir: 'libs', include: '*.jar')`. This is the first of
 four branches retiring them, one library per branch.
 
-**The dependency tree changes what this branch is.** Running
-`./gradlew dependencies --configuration runtimeClasspath` on `master` shows the `mail`
-plugin 3.0.0 already resolving JavaMail from Maven:
+**This branch is a JavaMail upgrade wearing the costume of a file deletion.**
+
+The `mail` plugin 3.0.0 already resolves JavaMail from Maven:
 
 ```
 +--- org.grails.plugins:mail:3.0.0
@@ -22,35 +22,29 @@ plugin 3.0.0 already resolving JavaMail from Maven:
 |    |    \--- javax.activation:activation:1.1
 ```
 
-The vendored jar is `com.sun.mail:javax.mail` **1.5.6** (from its manifest:
-`Bundle-SymbolicName: com.sun.mail.javax.mail`, `Implementation-Version: 1.5.6`, built
-Aug 2016). It is the full implementation jar, not just the API — 202 `com/sun/mail/*`
-entries.
+The vendored jar is `com.sun.mail:javax.mail` **1.5.6** — from its manifest,
+`Implementation-Version: 1.5.6`, built 2016-08-09. It is the full implementation, not just
+the API: 202 `com/sun/mail/*` entries. So the classpath carries two JavaMail copies and
+ordering picks the winner. Nothing in `grails-app/` or `src/` imports `javax.mail`.
 
-So the classpath currently carries **two copies of JavaMail at different versions**, and
-which one wins is decided by classpath ordering. Nothing in `grails-app/` or `src/`
-imports `javax.mail` directly, so no code depends on either.
-
-This branch therefore adds **no dependency**. It deletes a duplicate.
-
-**Group 1 finding (2026-09-03): it is not a redundant duplicate — the vendored 1.5.6 is
-the copy that wins.** The `application` plugin's generated start script gives the resolved
-classpath in order: `javax.mail.jar` is entry **3 of 222**, `javax.mail-api-1.6.2.jar` is
-**168**, `javax.mail-1.6.2.jar` is **169**. Probed on the real `installDist` classpath:
+Group 1 measured which copy wins. The `application` plugin's generated start script gives
+the resolved order: `javax.mail.jar` is entry **3 of 222**, `javax.mail-api-1.6.2.jar`
+**168**, `javax.mail-1.6.2.jar` **169**. Probed on the real `installDist` classpath:
 
 | | `javax.mail.Session` loads from | `getTransport("smtp")` |
 |---|---|---|
-| Today | `javax.mail.jar` (**1.5.6**) | `com.sun.mail.smtp.SMTPTransport` |
-| After deletion | `javax.mail-api-1.6.2.jar` | `com.sun.mail.smtp.SMTPTransport` |
+| Today | `javax.mail.jar` (**1.5.6**, 2016) | `com.sun.mail.smtp.SMTPTransport` |
+| After deletion | `javax.mail-api-1.6.2.jar` (2018) | `com.sun.mail.smtp.SMTPTransport` |
 
-So this branch is **an effective JavaMail 1.5.6 → 1.6.2 upgrade arriving as a file
-deletion**, not a no-op. It must be reviewed and released as a version change.
+The vendored 1.5.6 is live, so deleting it moves mail to 1.6.2 — a two-year version jump
+that must be reviewed and released as a version change, not a redundant-file cleanup. The
+branch still adds no dependency.
 
-The provider registry survives: `javax.mail-api-1.6.2.jar` carries `javax/mail/*` but no
-`com/sun/mail/*` and no `META-INF/javamail.default.providers`. After deletion the API
-classes come from the api jar and the implementation plus provider registry from
-`javax.mail-1.6.2.jar` — both at 1.6.2, and `getResources` finds the registry classpath-wide.
-This was verified by running the probe, not inferred.
+The provider registry survives the split: `javax.mail-api-1.6.2.jar` carries `javax/mail/*`
+but no `com/sun/mail/*` and no `META-INF/javamail.default.providers`. After deletion the API
+comes from the api jar and the implementation plus registry from `javax.mail-1.6.2.jar`,
+both 1.6.2, with `getResources` finding the registry classpath-wide. Verified by running the
+probe, not inferred.
 
 ## In scope
 
@@ -77,7 +71,7 @@ That is the entire change.
 | Decision | Choice | Rationale |
 |---|---|---|
 | Add a Maven dep? | **No** | Already resolved transitively at 1.6.2 by the `mail` plugin. Verified in the runtime classpath tree, not assumed. |
-| Delete or pin to 1.5.6? | Delete | 1.5.6 is older than what the plugin already provides and predates it by six years. Confirmed in group 1 that it is not merely masked — it is the copy actually in use, so deleting it is the upgrade. |
+| Delete or pin to 1.5.6? | Delete | 1.5.6 (2016) is two years older than the 1.6.2 the plugin already provides. Group 1 confirmed it is not merely masked — it is the copy in use, so deleting it *is* the upgrade. |
 | Branch base | `grails7` | Per the agreed structure: `grails7` is the integration line, features merge into it. |
 | Splitting per library | One jar per branch | Each jar has a different blast radius; bundling them was the reason the first attempt at this spec was too large. |
 
@@ -92,10 +86,12 @@ That is the entire change.
   filename, `javax.mail-1.6.2.jar` sorts ahead of `javax.mail.jar`, which would mean
   production is *already* on 1.6.2 while dev runs 1.5.6. Unverified. It changes who is
   affected by this branch, so confirm against staging before release.
-- **Was the vendoring deliberate?** The jars share a date with the abandoned jQuery/
-  Bootstrap bundles (2020-05-26), which the roadmap reads as a stalled upgrade attempt.
-  If anyone recalls a reason JavaMail was vendored over the plugin's own copy, that reason
-  may still apply. Cheap to ask; cheap to revert if it turns out to matter.
+- ~~**Was the vendoring deliberate?**~~ **Closed — it does not matter.** The jars landed
+  in `daefca6d` (2019-07-24) when the project ran Grails 3.3.10 and `mail` plugin **2.0.0**;
+  the plugin went to 3.0.0 in `7551e65e` (2021-08-09), and 3.0.0 is what supplies JavaMail
+  transitively today. So the likely reason for vendoring expired in 2021 rather than being a
+  deliberate version pin. Either way group 1 measured the outcome directly, and a `javax.*`
+  jar cannot survive Phase 1's Jakarta migration.
 
 ## Constraints
 

@@ -13,7 +13,10 @@ in question and are not tested here.
 - [ ] `git ls-files pegr/libs` no longer lists `javax.mail.jar`.
 - [ ] `build.gradle` is **unchanged** — no dependency added, `fileTree` line still present.
 - [ ] Both mail paths send successfully (steps 3–4).
-- [ ] The PR states whether this was a no-op or an effective 1.5.6 → 1.6.2 upgrade.
+- [ ] The PR states this is an effective JavaMail 1.5.6 → 1.6.2 upgrade (established in
+      group 1) and not a redundant-file cleanup.
+- [ ] Staging's pre-deletion JavaMail version is recorded, so it is known whether
+      production changes version at all.
 
 ## Automated
 
@@ -23,7 +26,8 @@ in question and are not tested here.
 | Unit tests | `cd pegr && ./gradlew test` | BUILD SUCCESSFUL |
 | JavaMail still resolves | `cd pegr && ./gradlew dependencies --configuration runtimeClasspath \| grep -A2 'plugins:mail'` | `com.sun.mail:javax.mail:1.6.2` and `javax.activation:activation:1.1` still present |
 | Dependency report unchanged | diff the report against the pre-deletion baseline | No difference — `fileTree` jars never appeared in it |
-| Jar gone from the WAR | `unzip -l pegr/build/libs/pegr-0.1.war \| grep -i mail` | Exactly one JavaMail jar, at 1.6.2 |
+| Jar gone from the WAR | `unzip -l pegr/build/libs/pegr-0.1.war \| grep -i mail` | `javax.mail.jar` absent; `javax.mail-api-1.6.2.jar` and `javax.mail-1.6.2.jar` remain (both expected) |
+| Classpath order | `./gradlew installDist` then `grep -o 'CLASSPATH=.*' build/scripts/pegr \| tr ':' '\n' \| grep -n mail` | No `javax.mail.jar` entry; the 1.6.2 pair unchanged in position |
 | Nothing imports it | `grep -rn 'javax\.mail' pegr/grails-app pegr/src` | No matches |
 
 The WAR check is the one that actually proves the point. The module dependency report
@@ -40,12 +44,20 @@ catcher SMTP host before starting.
 
 Restart `bootRun` first — `UserController` does not hot-reload.
 
-1. **Establish which copy is live** *(before deleting)* — from the Grails console or a
-   scratch action, print
-   `javax.mail.Session.class.protectionDomain.codeSource.location`. *Expected:* a path
-   naming either the vendored `javax.mail.jar` or the Maven `javax.mail-1.6.2.jar`. Record
-   which. This determines whether the branch is a no-op or a version upgrade.
-2. **Repeat after deleting.** *Expected:* now unambiguously `javax.mail-1.6.2.jar`.
+1. ~~**Establish which copy is live**~~ — **done in group 1.** On the `bootRun` classpath
+   the vendored 1.5.6 wins (entry 3 of 222, versus 168/169 for the 1.6.2 pair). Confirm in
+   the running app if you want belt and braces: print
+   `javax.mail.Session.class.protectionDomain.codeSource.location` from the Grails console.
+2. **Repeat after deleting.** *Expected:* `javax.mail-api-1.6.2.jar` — the **api** jar, not
+   the impl. That is correct and not a defect: `javax.mail.*` comes from the api jar,
+   `com.sun.mail.*` and the provider registry from `javax.mail-1.6.2.jar`, both at 1.6.2.
+   The probe confirmed `getTransport("smtp")` still resolves to
+   `com.sun.mail.smtp.SMTPTransport`.
+2b. **Check the deployed WAR, not just `bootRun`.** All three jars ship in `WEB-INF/lib`
+   and the servlet spec leaves that directory's ordering to the container, so production
+   may already be on 1.6.2 while dev runs 1.5.6. Print the same code-source location on
+   **staging** before and after. If staging already reports 1.6.2, this branch is a no-op
+   there and a real upgrade only for developers.
 3. **Password-reset email** — `UserController.sendResetPasswordEmail`: use the forgot-
    password flow for a test user. *Expected:* the `[PEGR] Reset password` email arrives
    with a working reset link, and following the link reaches the reset form.
@@ -61,12 +73,17 @@ Restart `bootRun` first — `UserController` does not hot-reload.
 ## Regression risk
 
 - **Low overall.** One deleted file, nothing added, no source change, no config change.
-- **The real risk is the inverse of the usual one:** if 1.5.6 was winning the classpath,
-  this branch silently moves mail from 1.5.6 to 1.6.2. That is a six-year version jump
-  arriving as a *deletion*, which is exactly the kind of change that gets reviewed as
-  trivial. Step 1 exists to catch it. 1.5.6 → 1.6.2 is a maintenance range with no
-  intentional API break, but the SMTP/TLS defaults did move over that span — if step 3 or 4
-  fails against a host that worked before, suspect the TLS handshake first.
+- **The real risk is the inverse of the usual one, and it is confirmed.** 1.5.6 *is*
+  winning the classpath, so this branch moves mail from 1.5.6 to 1.6.2 — a six-year version
+  jump arriving as a *deletion*, exactly the change that gets reviewed as trivial. Review it
+  as an upgrade. 1.5.6 → 1.6.2 is a maintenance range with no intentional API break, but the
+  SMTP/TLS defaults moved over that span; if step 3 or 4 fails against a host that worked
+  before, suspect the TLS handshake first.
+- **Split packages across two jars.** After the deletion `javax.mail.*` resolves from the
+  api jar and `com.sun.mail.*` from the impl jar. Verified working for SMTP, but it is a
+  more fragile arrangement than one self-contained jar — a future dependency change that
+  drops or reorders either half breaks mail in a way that looks unrelated. Worth revisiting
+  when the `mail` plugin is rebuilt for Jakarta in Phase 1.
 - **`javax.activation` on Java 21.** JAF was removed from the JDK in Java 11, and the
   vendored jar does not bundle it. The plugin supplies `javax.activation:activation:1.1`
   transitively, which is why mail works today. Deleting the mail jar does not touch that,

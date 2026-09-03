@@ -52,7 +52,7 @@ from `pegr/build.gradle`.
 
 ### Bundled jars in `libs/` — retire these first
 
-`pegr/libs/` contains five jars dropped in around 2020 and pulled in via
+`pegr/libs/` contains five jars added in `daefca6d` (2019-07-24) and pulled in via
 `fileTree(dir: 'libs')`:
 
 - `javax.mail.jar` — **must become `jakarta.mail`**. Direct Jakarta blocker.
@@ -84,9 +84,9 @@ for Bootstrap: the manifest loads `bootstrap.js` = **Bootstrap 3.3.6**, while
 | `jquery.dataTables.min.js` | 1.10.13 | live |
 | `select2.js` | 4.0.2 | live |
 
-The dead files are dated 2020-05-26: **an earlier upgrade attempt was abandoned without
-flipping the manifest.** Find out why before repeating it. Meanwhile ~1.5 MB of unused
-assets ship in every build.
+The dead files came in with the `libs/` jars in `daefca6d` (2019-07-24); the live
+`jquery.js` and `bootstrap.js` date from 2015. **An upgrade attempt was abandoned without
+flipping the manifest.** Meanwhile ~1.5 MB of unused assets ship in every build.
 
 **Why this is not decoupled from Bootstrap.** jQuery 3 support landed in Bootstrap 3.4.0,
 so 3.3.6 cannot stay. The minimum unit of work is jQuery + Bootstrap + the plugin set

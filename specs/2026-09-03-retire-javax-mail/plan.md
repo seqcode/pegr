@@ -24,15 +24,20 @@ jar touches.
 a no-op. `getTransport("smtp")` resolves to `com.sun.mail.smtp.SMTPTransport` both before
 and after.
 
-## 2. Delete the jar
+## 2. Delete the jar — **done 2026-09-03**
 
-- [ ] `git rm pegr/libs/javax.mail.jar`.
-- [ ] Leave `fileTree(dir: 'libs', include: '*.jar')` in `build.gradle` — three jars
-      remain and the glob still needs it. `feature/retire-opencsv` removes the line.
-- [ ] `./gradlew clean build`.
-- [ ] `./gradlew dependencies --configuration runtimeClasspath` and diff against
-      `before.txt`. Expect **no change**: the plugin's 1.6.2 was already listed, and the
-      vendored jar never appeared in the report to begin with.
+- [x] `git rm pegr/libs/javax.mail.jar`.
+- [x] Left `fileTree(dir: 'libs', include: '*.jar')` in `build.gradle` — four jars remain
+      and the glob still needs it. `feature/retire-opencsv` removes the line.
+- [x] `./gradlew clean build` — BUILD SUCCESSFUL in 2m31s, `test` included.
+- [x] Dependency report diffed against the baseline: identical but for the build-time
+      line, as expected — `fileTree` jars never appeared in it.
+- [x] WAR now ships `javax.mail-api-1.6.2.jar` and `javax.mail-1.6.2.jar` only;
+      `javax.mail.jar` is gone.
+- [x] Classpath re-probed on the real post-deletion `installDist` output. Entries shifted
+      3→gone and 168/169→167/168; `Session` now loads from `javax.mail-api-1.6.2.jar`,
+      providers from `javax.mail-1.6.2.jar`, and `getTransport("smtp")` still resolves to
+      `com.sun.mail.smtp.SMTPTransport` — matching the group 1 prediction exactly.
 
 **Done when:** `pegr/libs/javax.mail.jar` is gone from the working tree and `git ls-files`,
 the build is green, and the module dependency report is byte-identical to the baseline.

@@ -19,7 +19,7 @@ move to 8.0.0 once it reaches GA.
 
 | Hop | What changes | Difficulty |
 |-----|--------------|------------|
-| **6 → 7** | `javax.*` → `jakarta.*`, Spring Boot 2 → 3.4, Spring Framework 6, Groovy 3 → 4, Gradle 7 → 8, SiteMesh 2 → 3 | **This is where nearly all the work is** |
+| **6 → 7** | `javax.*` → `jakarta.*`, Spring Boot 2 → 3.4, Spring Framework 6, Groovy 3 → 4, Gradle 7 → 8(done in Phase 0), SiteMesh 2 → 3 | **This is where nearly all the work is** |
 | **7 → 8** | Spring Boot 3.5 → 4.1, Spring Framework 7, Groovy 4 → 5, Gradle 8 → 9.6, Jackson 2 → 3, Spring Security 7.1 | Smaller, but blocked on release timing |
 
  **Every Grails plugin must be rebuilt for 7+.** Plugins compiled against `javax.*`
@@ -46,7 +46,7 @@ from `pegr/build.gradle`.
 | `external-config` | 2.0.0 | Compatibility unknown; without it `pegr-config.properties` loading breaks in every environment. |
 | `mysql-connector-java` | 5.1.29 | Long past end of life. Replace with MariaDB Connector/J — this was already on the roadmap and is now a hard blocker. |
 | `javax.annotation-api` | 1.3.2 | → `jakarta.annotation-api`. |
-| Gradle wrapper | 7.6.3 | → 8.x for Grails 7, → 9.6 for Grails 8. |
+| Gradle wrapper | 7.6.3 | → 8.x for Grails 7, → 9.6 for Grails 8, but `clean build` already warns of features incompatible with Gradle 9.0; source unidentified, not in our own scripts. |
 | Groovy | 3.0.21 | → 4 (Grails 7) → 5.0.x (Grails 8). |
 | Spock / Geb / Selenium | Spock (BOM), Geb, Selenium 4.19.1 | Spock moves to `2.4-groovy-5.0` under Grails 8; Geb needs a matching build. |
 
@@ -135,6 +135,16 @@ currently clean — good timing for this. Constraints that must hold through the
 ### Phases
 
 **Phase 0 — De-risk on Grails 6** *(no framework change; ship incrementally)*
+- **Gradle 7.6.3 → 8.5 — do this first; everything else is blocked on it.** Gradle 7.6.3
+  bundles Groovy 3.0.13, which cannot compile a build script on Java 21
+  (`Unsupported class file major version 65`). The build only worked because a compiled
+  script cached under an older JDK was still valid, so *any* edit to `build.gradle` broke
+  it — and every remaining Phase 0 item needs one. Gradle added Java 21 support in 8.5.
+  Done on `feature/enable-junit-platform`.
+- Enable the JUnit Platform. `./gradlew test` ran **zero tests and reported success**:
+  Spock 2.3 discovers specs through the JUnit Platform and `useJUnitPlatform()` was never
+  set, so the one existing spec had never executed. Same branch as the Gradle move, which
+  is what unblocked it.
 - Replace `libs/` jars with Maven dependencies; delete `grails-wrapper.jar`.
 - Swap `mysql-connector-java` 5.1.29 for MariaDB Connector/J.
 - Raise test coverage on `ApiController` + the services behind it, and on the report
@@ -146,11 +156,13 @@ currently clean — good timing for this. Constraints that must hold through the
   above. Safe to run on a **parallel branch** — it touches `assets/` and GSPs, not the
   build's framework wiring — so it need not block the Grails work if Phase 0 slips. The
   requirement is that it not land *inside* the Grails branch.
-- **Exit:** clean `libs/`, current DB driver, green test suite, written go/no-go on every
-  plugin, jQuery 3 + Bootstrap 3.4.1 live with the dead bundles removed.
+- **Exit:** Gradle 8.5 building on Java 21, a test suite that actually executes specs
+  (a non-zero test count, not merely `BUILD SUCCESSFUL`), clean `libs/`, current DB driver,
+  written go/no-go on every plugin, jQuery 3 + Bootstrap 3.4.1 live with the dead bundles
+  removed.
 
 **Phase 1 — Grails 6 → 7 (latest stable 7.x)**
-- Branch. Gradle 7.6.3 → 8, Groovy 3 → 4, Spring Boot 2 → 3.4.
+- Branch. Groovy 3 → 4, Spring Boot 2 → 3.4. (Gradle 8.5 already landed in Phase 0.)
 - Jakarta namespace migration (consider the Nebula `jakartaeeMigration` Gradle plugin for
   any dependency that resists).
 - Upgrade each plugin to its 7.x build; SiteMesh 2 → 3 affects GSP layouts.

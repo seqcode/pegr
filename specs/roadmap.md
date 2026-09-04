@@ -135,17 +135,25 @@ currently clean — good timing for this. Constraints that must hold through the
 ### Phases
 
 **Phase 0 — De-risk on Grails 6** *(no framework change; ship incrementally)*
-- **Gradle 7.6.3 → 8.5 — do this first; everything else is blocked on it.** Gradle 7.6.3
-  bundles Groovy 3.0.13, which cannot compile a build script on Java 21
+
+*Status: 2 of 7 items done, both merged to `grails7` only — none of Phase 0 has reached
+`master` or production yet.*
+
+- ✅ **Done (PR #373). Gradle 7.6.3 → 8.5** — do this first; everything else is blocked
+  on it. Gradle 7.6.3 bundles Groovy 3.0.13, which cannot compile a build script on Java 21
   (`Unsupported class file major version 65`). The build only worked because a compiled
   script cached under an older JDK was still valid, so *any* edit to `build.gradle` broke
   it — and every remaining Phase 0 item needs one. Gradle added Java 21 support in 8.5.
-  Done on `feature/enable-junit-platform`.
-- Enable the JUnit Platform. `./gradlew test` ran **zero tests and reported success**:
-  Spock 2.3 discovers specs through the JUnit Platform and `useJUnitPlatform()` was never
-  set, so the one existing spec had never executed. Same branch as the Gradle move, which
-  is what unblocked it.
-- Replace `libs/` jars with Maven dependencies; delete `grails-wrapper.jar`.
+- ✅ **Done (PR #373). Enable the JUnit Platform.** `./gradlew test` ran **zero tests and
+  reported success**: Spock 2.3 discovers specs through the JUnit Platform and
+  `useJUnitPlatform()` was never set, so the one existing spec had never executed. Landed
+  with the Gradle move, which is what unblocked it. `./gradlew clean build` now reports
+  12 tests, 0 failures.
+- 🔶 **In flight.** Replace `libs/` jars with Maven dependencies; delete
+  `grails-wrapper.jar`. One jar per branch. `javax.mail.jar` is done on
+  `feature/retire-javax-mail` but **not merged**, and that branch predates PR #373, so its
+  new spec does not yet run — it needs `grails7` merged into it first. ZXing, opencsv and
+  `grails-wrapper.jar` not started.
 - Swap `mysql-connector-java` 5.1.29 for MariaDB Connector/J.
 - Raise test coverage on `ApiController` + the services behind it, and on the report
   paths. This is the regression net for everything that follows — without it the upgrade

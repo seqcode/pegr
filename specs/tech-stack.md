@@ -11,7 +11,7 @@ Versions below are the tested stack. Authoritative sources: `pegr/build.gradle`,
 | Framework | Grails (on Spring Boot) | 6.2.3 |
 | JVM | Java (Zulu) | 21.0.6 |
 | Servlet container | Embedded Tomcat (`spring-boot-starter-tomcat`) | — |
-| Build | Gradle + `grails-gradle-plugin` | 6.2.4 |
+| Build | Gradle 8.5 + `grails-gradle-plugin` 6.2.4 | — |
 | Packaging | WAR (`pegr-0.1.war`), also runnable via `java -jar` | — |
 
 ## Persistence
@@ -62,8 +62,8 @@ DDL against a deployed database.
 
 | Kind | Tooling | Command |
 |------|---------|---------|
-| Unit | Spock, `grails-gorm-testing-support`, `grails-web-testing-support` | `./gradlew test` |
-| Integration / functional | Geb + Selenium 4.19.1 (Chrome/Firefox/Edge/Safari drivers) | `./gradlew integrationTest` |
+| Unit | Spock 2.3 (JUnit Platform), `grails-gorm-testing-support`, `grails-web-testing-support` | `./gradlew test` |
+| Integration / functional | Geb + Selenium 4.19.1, **configured but unused** — `src/integration-test/` holds only `GebConfig.groovy`, so the task is `NO-SOURCE` | `./gradlew integrationTest` |
 
 ## Configuration
 
@@ -83,7 +83,7 @@ Minimum keys: `dataSource.url`, `dataSource.username`, `dataSource.password`,
 cd pegr
 ./gradlew bootRun          # dev server at http://localhost:8080/pegr
 ./gradlew test             # unit tests
-./gradlew integrationTest  # Geb functional tests
+./gradlew integrationTest  # Geb functional tests (none exist yet)
 ./gradlew clean build      # WAR in build/libs/
 java -Dgrails.env=prod -jar pegr.war   # production run
 ```

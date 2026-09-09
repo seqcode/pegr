@@ -77,6 +77,38 @@ export SPRING_CONFIG_ADDITIONAL_LOCATION=/path/to/pegr-config.properties
 Minimum keys: `dataSource.url`, `dataSource.username`, `dataSource.password`,
 `sso.url`, `sso.type`, `sso.principle`, `filesroot`. Sample file in `sample_files/`.
 
+### Mail
+
+There is **no dev-specific mail handling** — every environment runs the same code path, and
+the repo contains no mail configuration at all. Behaviour is decided entirely by
+`grails.mail.*` in the external properties file, so two developers can differ.
+
+| Key | Notes |
+|-----|-------|
+| `grails.mail.host` / `.port` | Required to send anything. Present but blank in the sample file. |
+| `grails.mail.username` / `.password` | Blank is safe: `JavaMailSenderImpl.connectTransport()` maps `""` to `null` and skips SMTP AUTH. |
+| `grails.mail.overrideAddress` | Rewrites **every** recipient to one address. Use in dev — a dev database holds real user emails. |
+| `grails.mail.disabled` | Makes `sendMail` a no-op. |
+| `grails.mail.default.from` / `.to` | Defaults when a message omits them. |
+| `grails.mail.poolSize` | Async send pool. |
+
+All are supported by `mail` plugin 3.0.0, verified against the plugin bytecode. A dev setup
+pointing at a local catcher (`aiosmtpd`, MailHog, Mailpit):
+
+```properties
+grails.mail.host=localhost
+grails.mail.port=1025
+grails.mail.overrideAddress=you@example.com
+```
+
+Do not use `disabled=true` when the task is verifying that mail works — it makes the check
+pass without sending.
+
+The two send sites fail differently, which matters when testing: `UserService` (account
+creation) catches `Exception` and rethrows `UserException("Error sending the email!")`,
+while `UserController.sendResetPasswordEmail` catches only `UserException`, so a mail
+failure there escapes as a 500.
+
 ## Common commands
 
 ```bash

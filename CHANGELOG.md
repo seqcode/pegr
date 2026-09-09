@@ -5,7 +5,7 @@ branch (`grails7`), not when the work started.
 
 ## 2026-09-09
 
-- *(not yet merged to `grails7`)* Retired the vendored `pegr/libs/javax.mail.jar`. This is
+- Retired the vendored `pegr/libs/javax.mail.jar` (PR #374). This is
   effectively a **JavaMail 1.5.6 → 1.6.2 upgrade**, not a file cleanup: the vendored jar
   sat third on the runtime classpath, ahead of the 1.6.2 copy the `mail` plugin already
   resolved, so 1.5.6 was the version actually in use. No dependency was added — the plugin

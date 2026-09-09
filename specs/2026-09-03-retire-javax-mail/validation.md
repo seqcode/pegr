@@ -6,17 +6,24 @@ in question and are not tested here.
 
 ## Merge criteria
 
-- [ ] `./gradlew clean build` green from `pegr/`.
-- [ ] `./gradlew test` green. *(One spec exists in `pegr/src/test/`; this proves the build
-      compiles, not that mail works. Steps 4–5 are the real check.)*
-- [ ] `./gradlew bootRun` starts and serves the login page.
-- [ ] `git ls-files pegr/libs` no longer lists `javax.mail.jar`.
-- [ ] `build.gradle` is **unchanged** — no dependency added, `fileTree` line still present.
-- [ ] Both mail paths send successfully (steps 4–5).
-- [ ] The PR states this is an effective JavaMail 1.5.6 → 1.6.2 upgrade (established in
+Merged to `grails7` via PR #374 on 2026-09-09. Two criteria were **not** met at merge —
+both need a human and neither blocks the build. They are outstanding, not waived.
+
+- [x] `./gradlew clean build` green from `pegr/`.
+- [x] `./gradlew test` green — 16 tests, 0 failures (12 `SampleServiceSpec`,
+      4 `JavaMailClasspathSpec`). Since the JUnit Platform fix landed the suite actually
+      executes, so this is a real check rather than a formality.
+- [x] `./gradlew bootRun` starts and serves the login page.
+- [x] `git ls-files pegr/libs` no longer lists `javax.mail.jar`.
+- [x] `build.gradle` is **unchanged** — no dependency added, `fileTree` line still present.
+- [ ] **Outstanding.** Both mail paths send successfully (steps 4–5). Needs an SMTP host —
+      see `specs/tech-stack.md` → Configuration → Mail for a dev catcher setup. Do **not**
+      use `grails.mail.disabled=true` for this; it makes the check pass without sending.
+- [x] The PR states this is an effective JavaMail 1.5.6 → 1.6.2 upgrade (established in
       group 1) and not a redundant-file cleanup.
-- [ ] Staging's pre-deletion JavaMail version is recorded, so it is known whether
-      production changes version at all.
+- [ ] **Outstanding.** Staging's pre-deletion JavaMail version is recorded, so it is known
+      whether production changes version at all. Once staging redeploys past this merge the
+      pre-deletion state is no longer observable there.
 
 ## Automated
 

@@ -99,6 +99,8 @@ dependencies {
     implementation 'org.grails.plugins:external-config:2.0.0'
     implementation 'org.grails.plugins:excel-export:2.1'
     implementation fileTree(dir: 'libs', include: '*.jar')
+    implementation 'com.google.zxing:core:3.2.1'
+    implementation 'com.google.zxing:javase:3.2.1'
     implementation 'org.liquibase:liquibase-core:3.6.3'
     implementation 'com.github.jai-imageio:jai-imageio-core:1.4.0'
     implementation 'org.apache.poi:poi:5.2.3'

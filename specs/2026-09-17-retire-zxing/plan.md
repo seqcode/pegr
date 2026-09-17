@@ -39,23 +39,28 @@ exact. Decoding uses `PURE_BARCODE`. `./gradlew clean build`: **31 tests, 0 fail
 **Done when:** `BarcodeServiceSpec` passes against `libs/core-3.2.1.jar` +
 `libs/javase-3.2.1.jar`, and the build's reported test count includes it.
 
-## 2. Move ZXing to Maven, pinned at 3.2.1
+## 2. Move ZXing to Maven, pinned at 3.2.1 — **done 2026-09-17**
 
-- [ ] Add `implementation 'com.google.zxing:core:3.2.1'` and
+- [x] Add `implementation 'com.google.zxing:core:3.2.1'` and
       `implementation 'com.google.zxing:javase:3.2.1'` to `pegr/build.gradle`.
-- [ ] `git rm pegr/libs/core-3.2.1.jar pegr/libs/javase-3.2.1.jar`.
-- [ ] Keep the `fileTree` line: `opencsv-3.7.jar` still needs it.
-- [ ] `./gradlew clean build`. `BarcodeServiceSpec` should pass unchanged.
-- [ ] Diff the dependency report against the baseline. The only additions should be the two
-      `com.google.zxing` entries (3.2.1 `javase` has no transitive dependencies).
-- [ ] Check the WAR has exactly one copy of each: `core-3.2.1.jar` and `javase-3.2.1.jar`
-      from Maven. The file names are the same as before, so confirm they are the Maven
-      artifacts by comparing sha1 against the Gradle cache, or by `git ls-files pegr/libs`
-      showing them gone.
+- [x] `git rm pegr/libs/core-3.2.1.jar pegr/libs/javase-3.2.1.jar`.
+- [x] Keep the `fileTree` line: `opencsv-3.7.jar` still needs it.
+- [x] `./gradlew clean build`. `BarcodeServiceSpec` should pass unchanged. **31 tests, 0 failures.**
+- [x] Diff the dependency report against the baseline. **Correction to the original
+      prediction:** besides the two `com.google.zxing` entries, the report has one more
+      addition. `javase:3.2.1` depends on `com.beust:jcommander:1.48`. The bundled jars
+      hid this because the POM was never read. ZXing uses `jcommander` only for its
+      command-line decoder (`CommandLineRunner`), not for encoding, so it stays transitive
+      and is not excluded.
+- [x] Check the WAR has exactly one copy of each. The WAR jar list differs from the
+      baseline only by `jcommander-1.48.jar`. The sha1s of `core-3.2.1.jar`
+      (`2287494d…`) and `javase-3.2.1.jar` (`78e98099…`) match the bundled jars and the
+      Gradle cache, so the bundled copies were stock Maven Central artifacts and this step
+      changes no ZXing bytes.
 
 **Done when:** the two jars are gone from `git ls-files pegr/libs`, `build.gradle` declares
 both coordinates at 3.2.1, the build and spec are green, and the dependency diff shows only
-the two additions.
+the two ZXing entries plus `jcommander:1.48`.
 
 ## 3. Bump ZXing 3.2.1 → 3.5.4
 
@@ -67,7 +72,7 @@ the two additions.
 - [ ] `./gradlew clean build`. `BarcodeServiceSpec` passes **without edits**. If a
       dimension assertion fails, stop: it is a visible change to printed labels and goes
       back to the user, not into a spec fix.
-- [ ] Check the dependency report: `jcommander` newly transitive, and `jai-imageio-core`
+- [ ] Check the dependency report: `jcommander` bumped from 1.48 to the version 3.5.4 names, and `jai-imageio-core`
       still resolves to 1.4.0, not a conflicting version.
 - [ ] Check the WAR: `core-3.5.4.jar`, `javase-3.5.4.jar`, `jcommander-*.jar`, and one
       `jai-imageio-core-1.4.0.jar`. No 3.2.1 jar left.

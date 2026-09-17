@@ -39,8 +39,8 @@ ZXing and is out of the blast radius.
 driven through `./gradlew`, and no docs mention `grailsw`.
 
 **Version target.** On Maven Central, `com.google.zxing:javase` latest is **3.5.4**. The
-`javase` 3.5.x POM adds `com.beust:jcommander` and `com.github.jai-imageio:jai-imageio-core`
-as transitive dependencies. PEGR already declares `jai-imageio-core:1.4.0`, the version the
+`javase` 3.5.x POM lists `com.beust:jcommander` (already present at 1.48 through `javase` 3.2.1) and adds
+`com.github.jai-imageio:jai-imageio-core` as transitive dependencies. PEGR already declares `jai-imageio-core:1.4.0`, the version the
 3.5.3 POM names.
 
 **Roadmap is stale.** `specs/roadmap.md` still calls `javax.mail.jar` "not merged". PR #374

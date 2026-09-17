@@ -36,7 +36,7 @@ tested here.
 | No duplicate jai-imageio | same report, `grep jai-imageio` | Only `1.4.0`, and no `->` conflict arrow to another version |
 | libs/ contents | `git ls-files pegr/libs` | `pegr/libs/opencsv-3.7.jar` only |
 | WAR contents | `unzip -l pegr/build/libs/pegr-0.1.war \| grep -iE 'zxing\|core-3\|javase-\|jcommander\|jai-imageio\|grails-wrapper'` | `core-3.5.4.jar`, `javase-3.5.4.jar`, one `jcommander`, one `jai-imageio-core-1.4.0.jar`; no `*-3.2.1.jar`, no `grails-wrapper.jar` |
-| No stray wrapper refs | `grep -rn grailsw . --exclude-dir=build --exclude-dir=.gradle` (repo root) | No matches |
+| No stray wrapper refs | `grep -rn grailsw . --exclude-dir=build --exclude-dir=.gradle --exclude-dir=.git --exclude-dir=specs` (repo root) | No matches (the spec docs under `specs/` name it on purpose) |
 
 ## Manual QA
 

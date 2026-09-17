@@ -85,13 +85,18 @@ exactly three swaps: `core`, `javase`, `jcommander`. Nothing else in `WEB-INF/li
 **Done when:** the build is green at 3.5.4, the spec is unmodified since group 1, and the WAR
 contains only 3.5.4 ZXing jars.
 
-## 4. Delete `grails-wrapper.jar` and the `grailsw` scripts
+## 4. Delete `grails-wrapper.jar` and the `grailsw` scripts — **done 2026-09-17**
 
-- [ ] `grep -rn grailsw` across the repo (excluding `build/`, `.gradle/`) to confirm the only
-      references are the two scripts.
-- [ ] `git rm pegr/libs/grails-wrapper.jar pegr/grailsw pegr/grailsw.bat`.
-- [ ] `./gradlew clean build`. Confirm `grails-wrapper.jar` is absent from `WEB-INF/lib`.
+- [x] `grep -rn grailsw` across the repo (excluding `build/`, `.gradle/`) to confirm the only
+      references are the two scripts. Everything else that matched was documentation under
+      `specs/`.
+- [x] `git rm pegr/libs/grails-wrapper.jar pegr/grailsw pegr/grailsw.bat`.
+- [x] `./gradlew clean build`. Confirm `grails-wrapper.jar` is absent from `WEB-INF/lib`.
       Today it ships there through `fileTree`, even though nothing at runtime uses it.
+
+**Result:** 31 tests, 0 failures. The WAR differs from group 3 only by the missing
+`grails-wrapper.jar`. The dependency report is unchanged. `git ls-files pegr/libs` →
+`pegr/libs/opencsv-3.7.jar`.
 
 **Done when:** `git ls-files pegr/libs` lists only `opencsv-3.7.jar`, the scripts are gone,
 and the build is green.

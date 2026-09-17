@@ -65,14 +65,14 @@ the two ZXing entries plus `jcommander:1.48`.
 ## 3. Bump ZXing 3.2.1 → 3.5.4
 
 - [ ] Change both coordinates to `3.5.4`.
-- [ ] Read the ZXing release notes for 3.3.x–3.5.x. Look for changes to `Code39Writer`,
+- [x] Read the ZXing release notes for 3.3.x–3.5.x. **Done by diffing 3.2.1 vs 3.5.4 source jars instead; findings in `requirements.md` → Open questions.** Look for changes to `Code39Writer`,
       `QRCodeWriter` (default margin, error correction), `MatrixToImageWriter`, and
       `EncodeHintType.CHARACTER_SET`. Note anything relevant in `requirements.md` → Open
       questions.
 - [ ] `./gradlew clean build`. `BarcodeServiceSpec` passes **without edits**. If a
       dimension assertion fails, stop: it is a visible change to printed labels and goes
       back to the user, not into a spec fix.
-- [ ] Check the dependency report: `jcommander` bumped from 1.48 to the version 3.5.4 names, and `jai-imageio-core`
+- [ ] Check the dependency report: `com.beust:jcommander:1.48` gone and `org.jcommander:jcommander:1.85` present (group changed), and `jai-imageio-core`
       still resolves to 1.4.0, not a conflicting version.
 - [ ] Check the WAR: `core-3.5.4.jar`, `javase-3.5.4.jar`, `jcommander-*.jar`, and one
       `jai-imageio-core-1.4.0.jar`. No 3.2.1 jar left.

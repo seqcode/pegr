@@ -85,10 +85,29 @@ branch did: the Phase 0 bullet is not done until opencsv is also retired.
   agreed bar is a decode spec plus dev QA that includes one printed/scanned label. Whether
   the lab's scanner handles CODE_39 differently from ZXing's reader is unknown. *Owner:* lab
   manager. Answer before merge.
-- **Did Code 39 encoding change between 3.2.1 and 3.5.4?** Barcodes are uppercase
-  `P<digits>R`, which is plain Code 39. Encoding could differ for characters outside the
-  basic set. The spec should cover the real `P…R` shape, and group 3 checks the ZXing
-  release notes. *Owner:* implementer.
+- ~~**Did Code 39 encoding change between 3.2.1 and 3.5.4?**~~ **Answered 2026-09-17, from
+  source, not release notes.** Diffed the `core` and `javase` source jars from Maven Central
+  for the classes `renderImage` reaches. No change is expected for `P<digits>R`:
+  - `Code39Writer`: the width formula went from `25 + length + Σwidths` to
+    `25 + 13·length`. Every Code 39 character is 6 narrow + 3 wide = 12 modules, so the two
+    are equal. Characters outside the basic set used to throw `Bad contents`; they are now
+    rewritten into extended (full-ASCII) mode. Only barcodes with such characters would
+    encode differently, and those used to fail outright.
+  - `QRCodeWriter`: same default quiet zone (4) and error correction (L). Hint parsing is
+    now `toString()`-based.
+  - QR `Encoder`: an ECI segment is now added whenever `CHARACTER_SET` is present
+    (previously only when it differed from ISO-8859-1), but **only in BYTE mode**. `P<digits>R`
+    is uppercase + digits, so it encodes in ALPHANUMERIC mode and gets no ECI in either
+    version. A barcode with lowercase or other non-alphanumeric characters would gain an ECI
+    header under the `UTF8` hint, and could need a larger QR version.
+  - `MatrixToImageWriter`: fills a row at a time instead of a pixel at a time. Same pixels.
+  - `MultiFormatWriter`: only adds `UPC_E` and `CODE_93`.
+  - `javase` 3.5.4 POM: jcommander **changed group**, `com.beust:jcommander:1.48` →
+    `org.jcommander:jcommander:1.85`. Because the group differs, Gradle treats them as
+    different modules; check that 1.48 is not left behind by something else.
+    `jai-imageio-core:1.4.0` is `runtime` scope, the same version PEGR declares.
+
+  `BarcodeServiceSpec` checks all of this. *Owner:* implementer.
 - **Does anything outside the repo call `grailsw`?** No references in repo docs or scripts.
   Deployment tooling outside the repo is unknown. *Owner:* whoever deploys to staging.
 

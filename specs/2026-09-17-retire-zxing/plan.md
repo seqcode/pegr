@@ -62,20 +62,25 @@ exact. Decoding uses `PURE_BARCODE`. `./gradlew clean build`: **31 tests, 0 fail
 both coordinates at 3.2.1, the build and spec are green, and the dependency diff shows only
 the two ZXing entries plus `jcommander:1.48`.
 
-## 3. Bump ZXing 3.2.1 → 3.5.4
+## 3. Bump ZXing 3.2.1 → 3.5.4 — **done 2026-09-17**
 
-- [ ] Change both coordinates to `3.5.4`.
+- [x] Change both coordinates to `3.5.4`.
 - [x] Read the ZXing release notes for 3.3.x–3.5.x. **Done by diffing 3.2.1 vs 3.5.4 source jars instead; findings in `requirements.md` → Open questions.** Look for changes to `Code39Writer`,
       `QRCodeWriter` (default margin, error correction), `MatrixToImageWriter`, and
       `EncodeHintType.CHARACTER_SET`. Note anything relevant in `requirements.md` → Open
       questions.
-- [ ] `./gradlew clean build`. `BarcodeServiceSpec` passes **without edits**. If a
+- [x] `./gradlew clean build`. `BarcodeServiceSpec` passes **without edits**. **31 tests, 0 failures; the spec has one commit (`55c8da96`).** If a
       dimension assertion fails, stop: it is a visible change to printed labels and goes
       back to the user, not into a spec fix.
-- [ ] Check the dependency report: `com.beust:jcommander:1.48` gone and `org.jcommander:jcommander:1.85` present (group changed), and `jai-imageio-core`
+- [x] Check the dependency report: `com.beust:jcommander:1.48` gone and `org.jcommander:jcommander:1.85` present (group changed), and `jai-imageio-core`
       still resolves to 1.4.0, not a conflicting version.
-- [ ] Check the WAR: `core-3.5.4.jar`, `javase-3.5.4.jar`, `jcommander-*.jar`, and one
+- [x] Check the WAR: `core-3.5.4.jar`, `javase-3.5.4.jar`, `jcommander-*.jar`, and one
       `jai-imageio-core-1.4.0.jar`. No 3.2.1 jar left.
+
+**Result:** the dependency diff against group 2 is exactly the ZXing pair 3.2.1 → 3.5.4,
+`com.beust:jcommander:1.48` → `org.jcommander:jcommander:1.85`, and a new transitive edge to
+`jai-imageio-core:1.4.0` (the version PEGR already declares, so no conflict). The WAR diff is
+exactly three swaps: `core`, `javase`, `jcommander`. Nothing else in `WEB-INF/lib` moved.
 
 **Done when:** the build is green at 3.5.4, the spec is unmodified since group 1, and the WAR
 contains only 3.5.4 ZXing jars.

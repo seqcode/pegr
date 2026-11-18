@@ -111,7 +111,9 @@ class SampleService {
                     }
                 }
                 if (query.id) {
-                    sqlRestriction "cast({alias}.id AS char(256)) like '${query.id}'"
+                    // bind the ID as a parameter: it is user input, and may hold the
+                    // wildcard % (e.g. "3011%"), so it is matched with "like"
+                    sqlRestriction "cast({alias}.id AS char(256)) like ?", [query.id.trim()]
                 }
                 if (query.sourceId) {
                     ilike "sourceId", query.sourceId

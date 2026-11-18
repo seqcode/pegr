@@ -158,4 +158,89 @@ class SampleServiceSpec extends HibernateSpec {
         ""       | ""      | ""
         "  "     | null    | "   "
     }
+
+    private List searchIds(Map criteria) {
+        sampleService.search(new QuerySampleRegistrationCommand(criteria))*.id.sort()
+    }
+
+    void "search filters by a whole genome build name, not a substring of one"() {
+        given: "requested genomes whose names are prefixes or suffixes of each other"
+        def sample1 = newSample("hg19")
+        def sample2 = newSample("hg19,sacCer3")
+        def sample3 = newSample("hg19_cegr")
+        def sample4 = newSample("mm10")
+        newSample(null)
+
+        expect:
+        searchIds(genome: "hg19") == [sample1.id, sample2.id].sort()
+        searchIds(genome: "hg19_cegr") == [sample3.id]
+        searchIds(genome: "sacCer3") == [sample2.id]
+        searchIds(genome: "mm10") == [sample4.id]
+        searchIds(genome: "hg") == []
+    }
+
+    void "search matches the genome build regardless of case and of whitespace"() {
+        given:
+        def sample = newSample("hg19, sacCer3 , mm10")
+
+        expect:
+        searchIds(genome: "SACCER3") == [sample.id]
+        searchIds(genome: " mm10 ") == [sample.id]
+        searchIds(genome: "hg19") == [sample.id]
+    }
+
+    void "search ignores a blank genome build"() {
+        given:
+        def sample1 = newSample("hg19")
+        def sample2 = newSample(null)
+
+        expect:
+        searchIds(genome: genome) == [sample1.id, sample2.id].sort()
+
+        where:
+        genome << [null, "", "   "]
+    }
+
+    void "the web search and the API match genome '#genome' the same way"() {
+        given:
+        def samples = [
+            hg19   : newSample("hg19"),
+            both   : newSample("hg19, mm10"),
+            cegr   : newSample("hg19_cegr"),
+            cegrX  : newSample("hg19xcegr"),
+            bang   : newSample("dm6!test"),
+            spaced : newSample("sacCer3 ,  dm6"),
+            none   : newSample(null)
+        ]
+        def expectedIds = expected.collect { samples[it].id }.sort()
+
+        expect: "search, used by the web page and by fetchSampleData, and fetchSampleIds agree"
+        searchIds(genome: genome) == expectedIds
+        sampleService.searchSampleIds(null, null, genome) == expectedIds
+
+        where:
+        genome       || expected
+        "hg19"       || ["hg19", "both"]
+        "HG19"       || ["hg19", "both"]
+        " mm10 "     || ["both"]
+        "dm6"        || ["spaced"]
+        "hg19_cegr"  || ["cegr"]      // "_" is not a wildcard
+        "hg%"        || []            // "%" is not a wildcard
+        "%"          || []
+        "hg19,mm10"  || []            // one genome build per search
+        "dm6!test"   || ["bang"]      // the escape character itself is matched literally
+        "hg"         || []
+    }
+
+    void "search requires the genome build and the other filters to both match"() {
+        given:
+        def prep = newSample("hg19")
+        def created = new Sample(status: SampleStatus.CREATED, requestedGenomes: "hg19").save(failOnError: true)
+        newSample("mm10")
+
+        expect:
+        searchIds(genome: "hg19", status: SampleStatus.PREP) == [prep.id]
+        searchIds(genome: "hg19", status: SampleStatus.CREATED) == [created.id]
+        searchIds(genome: "mm10", status: SampleStatus.CREATED) == []
+    }
 }

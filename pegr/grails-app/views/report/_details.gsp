@@ -241,8 +241,8 @@
                                                    gridlines: { color: '#DDDDDD', count:7 },
                                                     format: '#.##'
                                             },
-                                            curveType: 'function',
-                                            legend: { position: 'bottom' },
+                                            chartArea: { left: 60, right: 15, top: 30, bottom: 70 },
+                                            legend: { position: 'bottom', textStyle: { fontSize: 11 } },
                                             series: {
                                                 0: { color: '#0000ff' },
                                                 1: { color: '#ff0000' },  

@@ -24,7 +24,7 @@
                                gridlines: { color: '#DDDDDD', count:10 },
                                 format: '#.##'
                         },
-                        curveType: 'function',
+                        chartArea: { left: 110, right: 30, top: 60, bottom: 120 },
                         legend: { position: 'bottom' },
                         series: {
                             0: { color: '#0000ff' },

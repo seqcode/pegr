@@ -11,6 +11,32 @@ class SampleService {
     /** Default number of samples returned by a search when the query does not set 'max' */
     static final int DEFAULT_MAX = 50
 
+    /**
+     * SQL restriction matching the samples that requested a given genome build, to be
+     * used with the pattern built by genomeMatchPattern. requestedGenomes is a comma
+     * separated list of genome names, so the list is wrapped in commas and stripped of
+     * its spaces, letting ",name," match a whole name, not a substring of one (e.g.
+     * "hg19" must not match "hg19_cegr"), regardless of case and of the spaces around
+     * the names. This is the one genome match shared by the web search and the API.
+     */
+    private static final String GENOME_MATCH_SQL =
+        "concat(',', replace(lower({alias}.requested_genomes), ' ', ''), ',') like ? escape '!'"
+
+    /**
+     * Build the "like" pattern for GENOME_MATCH_SQL. The genome name is matched
+     * exactly, so the "like" wildcards % and _ it may contain are escaped.
+     * @param genome the name of the requested genome build, trimmed and not blank
+     * @return the pattern, or null when the input is not a single genome name
+     */
+    private static String genomeMatchPattern(String genome) {
+        def name = genome.toLowerCase().replace(" ", "")
+        if (name.contains(",")) {
+            return null
+        }
+        name = name.replace("!", "!!").replace("%", "!%").replace("_", "!_")
+        return "%," + name + ",%"
+    }
+
     def dataSource
     def springSecurityService
     def antibodyService
@@ -35,8 +61,17 @@ class SampleService {
             if (sample_ids.size() == 0) {
                 return []
             }
-        } 
-        
+        }
+
+        def genomePattern = null
+        def genome = utilityService.cleanString(query.genome)
+        if (genome) {
+            genomePattern = genomeMatchPattern(genome)
+            if (!genomePattern) {
+                return []
+            }
+        }
+
         def c = Sample.createCriteria()
         def listParams = [
                 max: query.max ?: DEFAULT_MAX,
@@ -113,9 +148,12 @@ class SampleService {
                 if (query.status) {
                     eq "status", query.status
                 }
+                if (genomePattern) {
+                    sqlRestriction GENOME_MATCH_SQL, [genomePattern]
+                }
             }
         }
-        
+
         return samples
     }
 
@@ -184,20 +222,22 @@ class SampleService {
     }
 
    /**
-    * Search samples that requested a given genome build. The requested genomes are
-    * stored as a comma separated string of genome names, so the "like" query is only
-    * used to narrow down the candidates, and each genome name is then matched exactly.
-    * @param genome the name of the requested genome build
+    * Search samples that requested a given genome build, with the same exact match
+    * as the genome filter of search (see GENOME_MATCH_SQL).
+    * @param genome the name of the requested genome build, trimmed and not blank
     * @return a list of sample IDs
     */
     def searchIdsByGenome(String genome) {
-        // "lower" is used so that the search does not depend on the database's collation.
-        // The wildcards that the genome name may contain only widen the candidates,
-        // which are filtered by the exact match below.
-        def candidates = Sample.executeQuery("select s.id, s.requestedGenomes from Sample s where lower(s.requestedGenomes) like :pattern", [pattern: "%${genome.toLowerCase()}%"])
-        return candidates.findAll { candidate ->
-            candidate[1].split(",").any { it.trim().equalsIgnoreCase(genome) }
-        }.collect { it[0] }
+        def pattern = genomeMatchPattern(genome)
+        if (!pattern) {
+            return []
+        }
+        return Sample.createCriteria().list {
+            sqlRestriction GENOME_MATCH_SQL, [pattern]
+            projections {
+                property "id"
+            }
+        }
     }
 
     def getSampleDetails(Sample sample) {

@@ -39,7 +39,8 @@
     "target": "string",  // matched against the target's name, N-term tag and C-term tag
     "assay": "string",
     "sendDataTo": "string",
-    "treatment": "string"
+    "treatment": "string",
+    "genome": "string"  // a requested genome build, matched exactly (case insensitive, no wildcards)
 }
             </pre>
             and send a POST request to the url
@@ -426,7 +427,7 @@ public class FetchProjectDataFromPegr {
     // are provided, only the samples that match all of them will be returned.
     "indexSequence": "string",
     "indexId": "string",
-    "genome": "string"
+    "genome": "string"  // a requested genome build, matched exactly (case insensitive, no wildcards)
 }
             </pre>
             and send a POST request to the url

@@ -41,6 +41,10 @@
                 <g:select id="species" name="speciesId" from="${pegr.Species.list().sort {it.genusName.toLowerCase()+it.name.toLowerCase()}}" optionKey="id" value="${searchParams.speciesId}" noSelection="['null': '']" class="select"/>
             </div>
             <div class="form-group">
+                <label>Genome</label>
+                <g:select id="genome" name="genome" from="${pegr.Genome.list()}" optionKey="name" optionValue="name" value="${searchParams.genome}" noSelection="['': '']" class="select"/>
+            </div>
+            <div class="form-group">
                 <label>Strain</label>
                 <g:textField name="strain" class="form-control" value="${searchParams.strain}"/>
             </div>

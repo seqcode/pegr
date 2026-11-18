@@ -932,6 +932,7 @@ class QuerySampleRegistrationCommand implements grails.validation.Validateable {
     String sendDataTo
     String treatment
     SampleStatus status
+    String genome
 }
 
 class QuerySampleIdsCommand implements grails.validation.Validateable {

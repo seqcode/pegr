@@ -40,7 +40,7 @@
     "assay": "string",
     "sendDataTo": "string",
     "treatment": "string",
-    "genome": "string"  // a requested genome build, matched exactly (case insensitive, no wildcards)
+    "genome": "string"  // a requested genome build, e.g. "hg19", matched as is (case insensitive, no wildcards); "hg19,hg38" matches samples whose requested genomes list hg19 then hg38, next to each other
 }
             </pre>
             and send a POST request to the url
@@ -427,7 +427,7 @@ public class FetchProjectDataFromPegr {
     // are provided, only the samples that match all of them will be returned.
     "indexSequence": "string",
     "indexId": "string",
-    "genome": "string"  // a requested genome build, matched exactly (case insensitive, no wildcards)
+    "genome": "string"  // a requested genome build, e.g. "hg19", matched as is (case insensitive, no wildcards); "hg19,hg38" matches samples whose requested genomes list hg19 then hg38, next to each other
 }
             </pre>
             and send a POST request to the url

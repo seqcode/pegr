@@ -32,6 +32,39 @@ class SampleServiceSpec extends HibernateSpec {
         new SequenceIndex(indexId: indexId, sequence: sequence, status: DictionaryStatus.Y).save(failOnError: true)
     }
 
+    private List searchIdsById(String id) {
+        sampleService.search(new QuerySampleRegistrationCommand(id: id))*.id.sort()
+    }
+
+    void "search by sample ID matches the ID exactly, or with the wildcard %"() {
+        given:
+        def sample1 = newSample()
+        def sample2 = newSample()
+
+        expect:
+        searchIdsById("${sample1.id}") == [sample1.id]
+        searchIdsById(" ${sample2.id} ") == [sample2.id]
+        searchIdsById("%") == [sample1.id, sample2.id].sort()
+        searchIdsById("999999") == []
+    }
+
+    void "search by sample ID does not run SQL injected through the ID: #id"() {
+        given:
+        newSample()
+        newSample()
+
+        expect: "the input is matched as an ID, so nothing is found and nothing fails"
+        searchIdsById(id) == []
+
+        where:
+        id << [
+            "x' or '1'='1",
+            "1' or 1=1 -- ",
+            "1') or ('1'='1",
+            "1'; drop table sample; --"
+        ]
+    }
+
     void "searchSampleIds finds samples by index sequence, including indices that share a sequence"() {
         given: "two indices sharing a sequence, each used by a different sample"
         def index1 = newIndex("IDX1", "ACGT")

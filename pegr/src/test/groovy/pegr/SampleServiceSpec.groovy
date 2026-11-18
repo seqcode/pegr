@@ -243,6 +243,7 @@ class SampleServiceSpec extends HibernateSpec {
             cegrX  : newSample("hg19xcegr"),
             bang   : newSample("dm6!test"),
             spaced : newSample("sacCer3 ,  dm6"),
+            three  : newSample("hg19,hg38,mm10"),
             none   : newSample(null)
         ]
         def expectedIds = expected.collect { samples[it].id }.sort()
@@ -252,17 +253,26 @@ class SampleServiceSpec extends HibernateSpec {
         sampleService.searchSampleIds(null, null, genome) == expectedIds
 
         where:
-        genome       || expected
-        "hg19"       || ["hg19", "both"]
-        "HG19"       || ["hg19", "both"]
-        " mm10 "     || ["both"]
-        "dm6"        || ["spaced"]
-        "hg19_cegr"  || ["cegr"]      // "_" is not a wildcard
-        "hg%"        || []            // "%" is not a wildcard
-        "%"          || []
-        "hg19,mm10"  || []            // one genome build per search
-        "dm6!test"   || ["bang"]      // the escape character itself is matched literally
-        "hg"         || []
+        genome            || expected
+        "hg19"            || ["hg19", "both", "three"]
+        "HG19"            || ["hg19", "both", "three"]
+        " mm10 "          || ["both", "three"]
+        "hg38"            || ["three"]                 // in the middle of the list
+        "dm6"             || ["spaced"]
+        "hg19_cegr"       || ["cegr"]                  // "_" is not a wildcard
+        "hg%"             || []                        // "%" is not a wildcard
+        "%"               || []
+        "dm6!test"        || ["bang"]                  // the escape character itself is matched literally
+        "hg"              || []
+        // a comma separated text is matched as is: those names, next to each other, in that order
+        "hg19,mm10"       || ["both"]
+        "HG19, MM10"      || ["both"]
+        "hg19,hg38"       || ["three"]
+        "hg38,mm10"       || ["three"]
+        "hg19,hg38,mm10"  || ["three"]
+        "mm10,hg19"       || []                        // order matters
+        "hg19,mm10,hg38"  || []
+        "hg19,,mm10"      || []
     }
 
     void "search requires the genome build and the other filters to both match"() {

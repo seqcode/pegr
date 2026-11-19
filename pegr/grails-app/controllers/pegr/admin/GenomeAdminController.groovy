@@ -15,12 +15,14 @@ class GenomeAdminController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max, String str) {
+        // g:paginate builds its page links from params.max (default 10), so set it here
+        params.max = Math.min(max ?: 25, 100)
         def sortField = params.sort ?: "id"
         def sortOrder = params.order ?: "desc"
         if (str && Genome.hasProperty("name")) {
             def likeStr = "%" + str + "%"
             def c = Genome.createCriteria()
-            def items = c.list(max: max ?: 25, offset: params.offset) {
+            def items = c.list(max: params.max, offset: params.offset) {
                 or {
                     ilike "name", likeStr
                 }
@@ -36,7 +38,6 @@ class GenomeAdminController {
             respond items, model:[genomeCount: items.totalCount, str: str]
         } else {
             def queryParams = new LinkedHashMap(params)
-            queryParams.max = Math.min(max ?: 25, 100)
             if (queryParams.sort == "species") {
                 // the species association sorts by FK id by default; sort by name instead
                 queryParams.sort = "species.genusName"

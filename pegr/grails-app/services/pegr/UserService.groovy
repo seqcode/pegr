@@ -8,6 +8,9 @@ class UserException extends RuntimeException {
 }
 
 class UserService {
+    // Account activation and password reset links stop working after this many hours.
+    static final int TOKEN_EXPIRY_HOURS = 72
+
     def springSecurityService
     def utilityService
     def mailService
@@ -109,10 +112,7 @@ class UserService {
     
     @Transactional
     def unlockAccount(UserRegistrationCommand urc) {
-        def userToken = Token.findByToken(urc.token)
-        if (!userToken) {
-            throw new UserException(message: "Invalid link!")
-        }
+        def userToken = findValidToken(urc.token)
         def user = userToken.user
         userToken.delete()
         if (urc.email != user.email) {
@@ -205,12 +205,24 @@ class UserService {
         return token
     }
     
-    @Transactional
-    def resetPasswordByToken(String token, PasswordRegistrationCommand urc) {
-        def userToken = Token.findByToken(token)
+    /**
+     * Find the token, rejecting a missing, unknown or expired one.
+     */
+    private Token findValidToken(String token) {
+        def userToken = token ? Token.findByToken(token) : null
         if (!userToken) {
             throw new UserException(message: "Invalid link!")
         }
+        def expiresAt = new Date(userToken.date.time + TOKEN_EXPIRY_HOURS * 60L * 60L * 1000L)
+        if (new Date().after(expiresAt)) {
+            throw new UserException(message: "This link has expired! Please request a new one.")
+        }
+        return userToken
+    }
+
+    @Transactional
+    def resetPasswordByToken(String token, PasswordRegistrationCommand urc) {
+        def userToken = findValidToken(token)
         updatePassword(userToken.user, urc)
         userToken.delete()
     }

@@ -12,10 +12,12 @@ class SequencingPlatformAdminController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max, String str) {
+        // g:paginate builds its page links from params.max (default 10), so set it here
+        params.max = Math.min(max ?: 25, 100)
         if (str && SequencingPlatform.hasProperty("name")) {
             def c = SequencingPlatform.createCriteria()
             def listParams = [
-                    max: max ?: 25,
+                    max: params.max,
                     sort: params.sort ?: "id",
                     order: params.order ?: "desc",
                     offset: params.offset
@@ -28,7 +30,6 @@ class SequencingPlatformAdminController {
             }
             respond items, model:[sequencingPlatformCount: items.totalCount, str: str]
         } else {       
-            params.max = Math.min(max ?: 25, 100)
             respond SequencingPlatform.list(params), model:[sequencingPlatformCount: SequencingPlatform.count()]
         }
     }

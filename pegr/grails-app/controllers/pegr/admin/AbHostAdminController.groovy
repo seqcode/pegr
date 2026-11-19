@@ -18,10 +18,12 @@ class AbHostAdminController {
      * @param str search string
      */
     def index(Integer max, String str) {
+        // g:paginate builds its page links from params.max (default 10), so set it here
+        params.max = Math.min(max ?: 25, 100)
         if (str && AbHost.hasProperty("name")) {
             def c = AbHost.createCriteria()
             def listParams = [
-                    max: max ?: 25,
+                    max: params.max,
                     sort: params.sort ?: "id",
                     order: params.order ?: "desc",
                     offset: params.offset
@@ -32,10 +34,9 @@ class AbHostAdminController {
                     ilike "name", likeStr
                 }
             }
-            respond items, model:[AbHostCount: items.totalCount, str: str]
+            respond items, model:[abHostCount: items.totalCount, str: str]
         } else {       
-            params.max = Math.min(max ?: 25, 100)
-            respond AbHost.list(params), model:[AbHostCount: AbHost.count()]
+            respond AbHost.list(params), model:[abHostCount: AbHost.count()]
         }
     }
 

@@ -3,7 +3,7 @@ import grails.gorm.transactions.Transactional
 import groovy.json.*
 import groovy.sql.Sql
 import org.springframework.web.multipart.MultipartHttpServletRequest 
-import org.apache.commons.lang.RandomStringUtils
+import java.security.SecureRandom
 
 import java.io.File
 import java.io.FileInputStream
@@ -369,9 +369,19 @@ class UtilityService {
         return filepath
     }
 
+    private static final String RANDOM_CHARSET = (('A'..'Z') + ('a'..'z') + ('0'..'9')).join()
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom()
+
+    /**
+     * Random alphanumeric string from a cryptographically secure generator,
+     * used for API keys, account and password reset tokens, and initial passwords.
+     */
     def getRandomString(int length) {
-        String charset = (('A'..'Z') + ('a'..'z') + ('0'..'9')).join()
-        return RandomStringUtils.random(length, charset.toCharArray())
+        def sb = new StringBuilder(length)
+        for (int i = 0; i < length; ++i) {
+            sb.append(RANDOM_CHARSET.charAt(SECURE_RANDOM.nextInt(RANDOM_CHARSET.length())))
+        }
+        return sb.toString()
     }
     
     def convertSelectedSheetInXLXSFileToCSV(File xlsxFile, String sheetName, String csvFilepath) { 

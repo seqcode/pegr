@@ -139,7 +139,7 @@ class UserService {
         // get the current user
         def user = springSecurityService.currentUser
         if (!user) {
-            throw new UserException("Not logged in!")
+            throw new UserException(message: "Not logged in!")
         }
         
         // API key configs       
@@ -148,16 +148,17 @@ class UserService {
         
         // generate a random string as the API key
         String randomString
+        boolean generated = false
         for (int i=0; i< maxAttempt; ++i) {
             randomString = utilityService.getRandomString(length)
             // avoid duplicate API keys
             if (!User.findByApiKey(randomString)) {
                 user.apiKey = randomString
-                user.save()
+                generated = user.save() != null
                 break
             }
         }
-        if (!user.apiKey) {
+        if (!generated) {
             throw new UserException(message: "Error generating the API key!")
         }
         

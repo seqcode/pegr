@@ -4,7 +4,7 @@ import grails.converters.*
 
 class UserController {
 
-    static allowedMethods = [deleteAddress: 'POST', generateApiKey: 'POST']
+    static allowedMethods = [deleteAddress: 'POST', generateApiKey: 'POST', selfRegister: 'POST']
 
 	def springSecurityService
 	def userService
@@ -113,11 +113,15 @@ class UserController {
     }
 
     def selfRegister(User user) {
-        try {
-            userService.create(user.username, user.email, [], false, user.fullName)
-            flash.message = "You have registered with PEGR. Please login."
-        } catch (UserException e) {
-            flash.error = e.message            
+        withForm {
+            try {
+                userService.create(user.username, user.email, [], false, user.fullName)
+                flash.message = "You have registered with PEGR. Please login."
+            } catch (UserException e) {
+                flash.error = e.message
+            }
+        }.invalidToken {
+            flash.error = "Invalid request, please try again!"
         }
         redirect(url: '/login/auth')
     }
@@ -145,6 +149,15 @@ class UserController {
     }
 
     def sendResetPasswordEmail(String email){
+        // Without grails.serverURL, an absolute link is built from the request's
+        // Host header, which the requester controls. Refuse rather than email
+        // a reset token linked to an arbitrary host.
+        if (!grailsApplication.config.getProperty('grails.serverURL', String)) {
+            log.error "grails.serverURL is not configured; cannot send password reset emails."
+            flash.message = "Password reset is not available. Please contact the administrator."
+            redirect(action: "forgetPassword")
+            return
+        }
         try {
             def token = userService.getToken(email)
             def url = g.createLink(action: "resetPassword", params: [token: token], absolute: true)
@@ -154,8 +167,7 @@ class UserController {
                body 'Please follow the link ' + url + ' to reset your password.'
             }
         } catch (UserException e) {
-            flash.message = e.message
-            redirect(action: "forgetPassword")
+            // Respond the same way whether or not the email is registered.
         }
     }
 

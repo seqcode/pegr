@@ -39,7 +39,7 @@
         <p>Are you sure that you want to delete this address?</p>
       </div>
       <div class="modal-footer">
-          <g:link action='deleteAddress' id="${user.address.id}" class="btn btn-default">Yes, delete</g:link>
+          <g:form action='deleteAddress' useToken="true" style="display:inline"><button type="submit" class="btn btn-default">Yes, delete</button></g:form>
           <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
       </div>
     </div>
@@ -56,8 +56,8 @@
         <g:link action='updatePassword' class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil">Change</span></g:link>
         </ul>
         <h3>API Key</h3>
-        <g:if test="${user?.apiKey}">${user.apiKey} <g:link onclick='return confirm("Re-generate your API key?")' controller="user" action="generateApiKey" class="btn btn-primary">Re-generate</g:link></g:if>
-        <g:else><g:link controller="user" action="generateApiKey" class="btn btn-primary">Generate</g:link></g:else>
+        <g:if test="${user?.apiKey}">${user.apiKey} <g:form controller="user" action="generateApiKey" useToken="true" style="display:inline" onsubmit='return confirm("Re-generate your API key?")'><button type="submit" class="btn btn-primary">Re-generate</button></g:form></g:if>
+        <g:else><g:form controller="user" action="generateApiKey" useToken="true" style="display:inline"><button type="submit" class="btn btn-primary">Generate</button></g:form></g:else>
     </div>
 </body>
 </html>

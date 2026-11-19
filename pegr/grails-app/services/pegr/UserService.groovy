@@ -139,7 +139,7 @@ class UserService {
         // get the current user
         def user = springSecurityService.currentUser
         if (!user) {
-            throw new UserException("Not logged in!")
+            throw new UserException(message: "Not logged in!")
         }
         
         // API key configs       
@@ -148,16 +148,17 @@ class UserService {
         
         // generate a random string as the API key
         String randomString
+        boolean generated = false
         for (int i=0; i< maxAttempt; ++i) {
             randomString = utilityService.getRandomString(length)
             // avoid duplicate API keys
             if (!User.findByApiKey(randomString)) {
                 user.apiKey = randomString
-                user.save()
+                generated = user.save() != null
                 break
             }
         }
-        if (!user.apiKey) {
+        if (!generated) {
             throw new UserException(message: "Error generating the API key!")
         }
         
@@ -177,9 +178,22 @@ class UserService {
     
     @Transactional
     def deleteAddress(User user) {
-        user.address.delete()
-        user.address = null
-        user.save()
+        if (!user.address) {
+            throw new UserException(message: "No address to delete!")
+        }
+        // Unlink the address with a direct update rather than user.save(): save
+        // silently does nothing if a legacy user row fails validation, and the
+        // delete then violates the user.address_id foreign key.
+        def addressId = user.address.id
+        User.executeUpdate("update User u set u.address = null where u.id = :userId", [userId: user.id])
+        user.refresh()
+
+        // Delete the address only if no other user or organization still uses it.
+        def usedByUsers = User.executeQuery("select count(u) from User u where u.address.id = :id", [id: addressId])[0]
+        def usedByOrgs = Organization.executeQuery("select count(o) from Organization o where o.address.id = :id", [id: addressId])[0]
+        if (usedByUsers == 0 && usedByOrgs == 0) {
+            Address.executeUpdate("delete from Address a where a.id = :id", [id: addressId])
+        }
     }
     
     @Transactional

@@ -4,6 +4,8 @@ import grails.converters.*
 
 class UserController {
 
+    static allowedMethods = [deleteAddress: 'POST', generateApiKey: 'POST', selfRegister: 'POST']
+
 	def springSecurityService
 	def userService
     def utilityService
@@ -65,11 +67,16 @@ class UserController {
     }
 
     def deleteAddress() {
-        try {
-            def user = springSecurityService.currentUser
-            userService.deleteAddress(user)
-        } catch (UserException e) {
-            flash.message = "Your address has been deleted!"
+        withForm {
+            try {
+                def user = springSecurityService.currentUser
+                userService.deleteAddress(user)
+                flash.message = "Your address has been deleted!"
+            } catch (UserException e) {
+                flash.message = e.message
+            }
+        }.invalidToken {
+            flash.message = "Invalid request, please try again!"
         }
         redirect(action: "profile")
     }
@@ -106,20 +113,28 @@ class UserController {
     }
 
     def selfRegister(User user) {
-        try {
-            userService.create(user.username, user.email, [], false, user.fullName)
-            flash.message = "You have registered with PEGR. Please login."
-        } catch (UserException e) {
-            flash.error = e.message            
+        withForm {
+            try {
+                userService.create(user.username, user.email, [], false, user.fullName)
+                flash.message = "You have registered with PEGR. Please login."
+            } catch (UserException e) {
+                flash.error = e.message
+            }
+        }.invalidToken {
+            flash.error = "Invalid request, please try again!"
         }
         redirect(url: '/login/auth')
     }
     
     def generateApiKey() {
-        try {
-            userService.generateApiKey()
-        } catch (UserException e) {
-            flash.message = e.message
+        withForm {
+            try {
+                userService.generateApiKey()
+            } catch (UserException e) {
+                flash.message = e.message
+            }
+        }.invalidToken {
+            flash.message = "Invalid request, please try again!"
         }
         redirect(action: "profile")
     }
@@ -134,6 +149,15 @@ class UserController {
     }
 
     def sendResetPasswordEmail(String email){
+        // Without grails.serverURL, an absolute link is built from the request's
+        // Host header, which the requester controls. Refuse rather than email
+        // a reset token linked to an arbitrary host.
+        if (!grailsApplication.config.getProperty('grails.serverURL', String)) {
+            log.error "grails.serverURL is not configured; cannot send password reset emails."
+            flash.message = "Password reset is not available. Please contact the administrator."
+            redirect(action: "forgetPassword")
+            return
+        }
         try {
             def token = userService.getToken(email)
             def url = g.createLink(action: "resetPassword", params: [token: token], absolute: true)
@@ -143,8 +167,7 @@ class UserController {
                body 'Please follow the link ' + url + ' to reset your password.'
             }
         } catch (UserException e) {
-            flash.message = e.message
-            redirect(action: "forgetPassword")
+            // Respond the same way whether or not the email is registered.
         }
     }
 

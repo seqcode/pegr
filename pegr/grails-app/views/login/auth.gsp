@@ -44,7 +44,7 @@
                 </g:form>
             </div>
             <div class="tab-pane" id="register">
-                <g:form uri="/user/selfRegister" method="POST" role="form">
+                <g:form uri="/user/selfRegister" method="POST" role="form" useToken="true">
                     <p>* Single Sign-On users only</p>
                     <div class="form-group">
                         <label for="fullName">Full Name </label> 

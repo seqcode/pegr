@@ -474,20 +474,6 @@ class SampleController {
         }
     }
 
-    def updateListAjax(String sampleList) {
-        def slurper = new JsonSlurper()
-        def samples = slurper.parseText(sampleList)
-        samples.each { sample ->
-            if (!editAuth(sample)) {
-                throw new SampleException(message: "Not authorized!")
-            }
-            sampleService.update(sample.sampleId, sample.name, sample.value)
-        }
-
-        render ""
-        return
-    }
-
     def showFilesForCheckedSamples() {
         def sampleIds = session.checkedSample
         def samples = reportService.fetchDataForSamples(sampleIds)

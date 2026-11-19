@@ -36,19 +36,7 @@ class AdminController {
 	}
     
     def mergeForm(String table) {
-        def tables = ['ab_host', 
-                      'growth_media',
-                      'histology',
-                      'ig_type',
-                      'sex',
-                      'species',
-                      'strain',
-                      'target',
-                      'target_type',
-                      'tissue',
-                      'assay'
-                     ] 
-        [tables: tables, table: table]
+        [tables: UtilityService.MERGEABLE_TABLES, table: table]
     }
     
     def merge(String table, Long fromId, Long toId) {

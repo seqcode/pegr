@@ -177,6 +177,9 @@ class UserService {
     
     @Transactional
     def deleteAddress(User user) {
+        if (!user.address) {
+            throw new UserException(message: "No address to delete!")
+        }
         user.address.delete()
         user.address = null
         user.save()

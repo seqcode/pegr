@@ -23,6 +23,22 @@ class UtilityException extends RuntimeException {
 * Shared services
 */
 class UtilityService {
+    // Tables whose rows can be merged with mergeRowsInDb. The table name is
+    // put into SQL text, so it must come from this list.
+    static final List MERGEABLE_TABLES = [
+        'ab_host',
+        'growth_media',
+        'histology',
+        'ig_type',
+        'sex',
+        'species',
+        'strain',
+        'target',
+        'target_type',
+        'tissue',
+        'assay'
+    ]
+
     def dataSource
     def grailsApplication
     
@@ -269,6 +285,9 @@ class UtilityService {
     def mergeRowsInDb(String tableName, Long fromId, Long toId) {
         if (!tableName || tableName == "") {
             throw new UtilityException(message: "Table not selected!")
+        }
+        if (!(tableName in MERGEABLE_TABLES)) {
+            throw new UtilityException(message: "Merging table ${tableName} is not allowed!")
         }
         if (!fromId) {
             throw new UtilityException(message: "From ID is missing!")

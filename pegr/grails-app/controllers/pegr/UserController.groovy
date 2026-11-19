@@ -4,6 +4,8 @@ import grails.converters.*
 
 class UserController {
 
+    static allowedMethods = [deleteAddress: 'POST', generateApiKey: 'POST']
+
 	def springSecurityService
 	def userService
     def utilityService
@@ -65,11 +67,16 @@ class UserController {
     }
 
     def deleteAddress() {
-        try {
-            def user = springSecurityService.currentUser
-            userService.deleteAddress(user)
-        } catch (UserException e) {
-            flash.message = "Your address has been deleted!"
+        withForm {
+            try {
+                def user = springSecurityService.currentUser
+                userService.deleteAddress(user)
+                flash.message = "Your address has been deleted!"
+            } catch (UserException e) {
+                flash.message = e.message
+            }
+        }.invalidToken {
+            flash.message = "Invalid request, please try again!"
         }
         redirect(action: "profile")
     }
@@ -116,10 +123,14 @@ class UserController {
     }
     
     def generateApiKey() {
-        try {
-            userService.generateApiKey()
-        } catch (UserException e) {
-            flash.message = e.message
+        withForm {
+            try {
+                userService.generateApiKey()
+            } catch (UserException e) {
+                flash.message = e.message
+            }
+        }.invalidToken {
+            flash.message = "Invalid request, please try again!"
         }
         redirect(action: "profile")
     }

@@ -32,7 +32,22 @@ class ApiController {
                             fetchProjectData: 'POST',
                             fetchSampleIds: 'POST',
                             ]
-    
+
+    /**
+     * Find the user authenticated by the given email and API key.
+     * A blank email or API key never authenticates: GORM turns a null
+     * argument into "is null", which would otherwise match every user
+     * who has not generated an API key.
+     * @return the user, or null if not authenticated
+     */
+    private User findApiUser(def email, String apiKey) {
+        // email may come from request.JSON, where a missing value is JSONObject.NULL
+        if (!(email instanceof CharSequence) || !email.toString().trim() || !apiKey?.trim()) {
+            return null
+        }
+        return User.findByEmailAndApiKey(email.toString(), apiKey)
+    }
+
     /**
      * Accept post request, authenticate by the API Key, to save data into Analysis, 
      * and parse data prior to and including the Alignment.
@@ -49,7 +64,7 @@ class ApiController {
             code = 500
             message = "Error parsing the JSON data!"
         } else {
-            def apiUser = User.findByEmailAndApiKey(data.userEmail, apiKey)
+            def apiUser = findApiUser(data.userEmail, apiKey)
             if (apiUser) {
                 try {
                     analysis = alignmentStatsService.save(data, apiUser)
@@ -87,7 +102,7 @@ class ApiController {
     def deleteDatasetLinks(String apiKey) {
         def query = request.JSON
         // get the user
-        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        def apiUser = findApiUser(query.userEmail, apiKey)
         
         // check if the user is an admin
         if (apiUser && apiUser.isAdmin()) {          
@@ -163,7 +178,7 @@ class ApiController {
      * @return status code
      */
     def fetchSampleData(QuerySampleRegistrationCommand cmd, String apiKey) {
-        def apiUser = User.findByEmailAndApiKey(cmd.userEmail, apiKey)
+        def apiUser = findApiUser(cmd.userEmail, apiKey)
         def message, data, code
         def total = 0
         def max = 0
@@ -218,7 +233,7 @@ class ApiController {
      * @return status code
      */
     def fetchSampleIds(QuerySampleIdsCommand query, String apiKey) {
-        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        def apiUser = findApiUser(query.userEmail, apiKey)
         def message, data, code
         if (apiUser) {
             try {
@@ -256,7 +271,7 @@ class ApiController {
      * @return status code
      */
     def fetchSequenceRunData(QueryRunRegistrationCommand query, String apiKey) {
-        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        def apiUser = findApiUser(query.userEmail, apiKey)
         def message, data, code
         if (apiUser) {
             if (query.runId) {
@@ -290,7 +305,7 @@ class ApiController {
      * @return status code
      */
     def fetchProjectData(QueryProjectRegistrationCommand query, String apiKey) {
-        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        def apiUser = findApiUser(query.userEmail, apiKey)
         def message, data, code
         if (apiUser) {
             if (query.projectId) {
@@ -332,7 +347,7 @@ class ApiController {
         def code = 200
         
         // get the user
-        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        def apiUser = findApiUser(query.userEmail, apiKey)
 
         // only admin is allowed to use this API
         if (apiUser && apiUser.isAdmin()) {
@@ -378,7 +393,7 @@ class ApiController {
         def code = 200
         
         // get the user
-        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        def apiUser = findApiUser(query.userEmail, apiKey)
 
         // only admin is allowed to use this API
         if (apiUser && apiUser.isAdmin()) {
@@ -461,7 +476,7 @@ class ApiController {
         def timeout = 300 * 1000
         
         // get the user
-        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        def apiUser = findApiUser(query.userEmail, apiKey)
         def runId = query.runId
         
         if (apiUser) {
@@ -526,7 +541,7 @@ class ApiController {
     
     def getSequenceRunStatus(GetSequenceRunInfoCmd query, String apiKey) {
         // get the user
-        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        def apiUser = findApiUser(query.userEmail, apiKey)
 
         if (apiUser) {
             try {
@@ -548,7 +563,7 @@ class ApiController {
     
     def setSequenceRunStatus(SetSequenceRunStatusCmd query, String apiKey) {
         // get the user
-        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        def apiUser = findApiUser(query.userEmail, apiKey)
 
         // only admin is allowed to use this API
         if (apiUser && apiUser.isAdmin()) {
@@ -572,7 +587,7 @@ class ApiController {
     
     
     def fetchSequenceRunSummary(GetSequenceRunInfoCmd query, String apiKey) {
-        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        def apiUser = findApiUser(query.userEmail, apiKey)
 
         if (apiUser) {
             try {
@@ -627,7 +642,7 @@ class ApiController {
         def query = request.JSON
         
         // get the user
-        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        def apiUser = findApiUser(query.userEmail, apiKey)
 
         // only admin is allowed to use this API
         if (apiUser && apiUser.isAdmin()) {
@@ -677,7 +692,7 @@ class ApiController {
         def query = request.JSON
         
         // get the user
-        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        def apiUser = findApiUser(query.userEmail, apiKey)
 
         // only admin is allowed to use this API
         if (apiUser && apiUser.isAdmin()) {
@@ -730,7 +745,7 @@ class ApiController {
             def query = request.JSON   
             
             // get the user
-            def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+            def apiUser = findApiUser(query.userEmail, apiKey)
             if (apiUser) {
                 // get the sample
                 sample = Sample.get(query.sampleID)
@@ -765,7 +780,7 @@ class ApiController {
             def query = request.JSON   
             
             // get the user
-            def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+            def apiUser = findApiUser(query.userEmail, apiKey)
             if (apiUser) {
                 // get the sample
                 sample = Sample.get(query.sampleID)
@@ -798,7 +813,7 @@ class ApiController {
     def updateSampleData(String apiKey) {        
         def query = request.JSON
         // get the user
-        def apiUser = User.findByEmailAndApiKey(query.userEmail, apiKey)
+        def apiUser = findApiUser(query.userEmail, apiKey)
         if (apiUser) {          
             def messages = []
             for (def sampleDict in query.sampleList) {

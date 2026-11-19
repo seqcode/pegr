@@ -15,10 +15,12 @@ class OrganizationAdminController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max, String str) {
+        // g:paginate builds its page links from params.max (default 10), so set it here
+        params.max = Math.min(max ?: 25, 100)
         if (str && Organization.hasProperty("name")) {
             def c = Organization.createCriteria()
             def listParams = [
-                    max: max ?: 25,
+                    max: params.max,
                     sort: params.sort ?: "id",
                     order: params.order ?: "desc",
                     offset: params.offset
@@ -31,7 +33,6 @@ class OrganizationAdminController {
             }
             [organizationInstanceList: items, organizationCount: items.totalCount, str: str]
         } else {       
-            params.max = Math.min(max ?: 25, 100)
             [organizationInstanceList: Organization.list(params), organizationCount: Organization.count()]
         }
     }

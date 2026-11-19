@@ -12,10 +12,12 @@ class HistologyAdminController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max, String str) {
+        // g:paginate builds its page links from params.max (default 10), so set it here
+        params.max = Math.min(max ?: 25, 100)
         if (str && Histology.hasProperty("name")) {
             def c = Histology.createCriteria()
             def listParams = [
-                    max: max ?: 25,
+                    max: params.max,
                     sort: params.sort ?: "id",
                     order: params.order ?: "desc",
                     offset: params.offset
@@ -28,7 +30,6 @@ class HistologyAdminController {
             }
             respond items, model:[histologyCount: items.totalCount, str: str]
         } else {       
-            params.max = Math.min(max ?: 25, 100)
             respond Histology.list(params), model:[histologyCount: Histology.count()]
         }
     }

@@ -694,7 +694,13 @@ class QfileService {
 	}
 	        
 	def saveRequestedGenome(List genomeBuilds, Sample sample, Species species) {
-        genomeBuilds.removeAll {it == null}
+        // Each genome build cell (BB, BC, BD) may hold a comma separated list,
+        // so split them into individual genome names before saving.
+        genomeBuilds = genomeBuilds.findAll { it != null }
+            .collectMany { it.toString().split(",").toList() }
+            *.trim()
+            .findAll { it }
+            .unique()
         genomeBuilds.each { genomeBuild ->
             getGenome(genomeBuild, species)
         }

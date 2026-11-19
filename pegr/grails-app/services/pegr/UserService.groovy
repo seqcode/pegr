@@ -181,9 +181,13 @@ class UserService {
         if (!user.address) {
             throw new UserException(message: "No address to delete!")
         }
-        user.address.delete()
+        // Unlink the address before deleting it: User cascades saves to its
+        // address, so deleting it while still referenced fails with
+        // "deleted object would be re-saved by cascade".
+        def address = user.address
         user.address = null
-        user.save()
+        user.save(flush: true)
+        address.delete()
     }
     
     @Transactional

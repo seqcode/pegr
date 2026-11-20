@@ -58,7 +58,6 @@ grails.plugin.springsecurity.interceptUrlMap = [
     // public user actions; every other /user action requires login (see '/**' below)
     [pattern: '/user/afterLogout/**',            access: ['permitAll']],
     [pattern: '/user/register/**',               access: ['permitAll']],
-    [pattern: '/user/selfRegister/**',           access: ['permitAll']],
     [pattern: '/user/forgetPassword/**',         access: ['permitAll']],
     [pattern: '/user/sendResetPasswordEmail/**', access: ['permitAll']],
     [pattern: '/user/resetPassword/**',          access: ['permitAll']],

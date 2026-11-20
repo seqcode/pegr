@@ -20,9 +20,6 @@
         	<li class="nav-item">
                 <a class="nav-link" href="${grailsApplication.config.getProperty('sso.url')}">Single Sign-On</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#register">Register</a>
-            </li>
         </ul>
         <div class="tab-content" style="padding-top:10px">
             <div class="tab-pane active" id="password-login">
@@ -40,22 +37,6 @@
                     </div>
                     <div class="form-group">
                         <g:submitButton name="signIn" value="Sign in" class="btn btn-primary"/>
-                    </div>
-                </g:form>
-            </div>
-            <div class="tab-pane" id="register">
-                <g:form uri="/user/selfRegister" method="POST" role="form" useToken="true">
-                    <p>* Single Sign-On users only</p>
-                    <div class="form-group">
-                        <label for="fullName">Full Name </label> 
-                        <g:textField class="form-control" name="fullName" value="${fullName}" placeholder="Enter Full Name"/>
-                        <label for="username">Username </label> 
-                        <g:textField class="form-control" name="username" value="${username}" placeholder="Enter Username"/>
-                        <label for="email">Email </label> 
-                        <g:textField class="form-control" name="email" value="${email}" placeholder="Enter Email"/>
-                    </div>
-                    <div class="form-group">
-                        <g:submitButton name="signIn" value="Register" class="btn btn-primary"/>
                     </div>
                 </g:form>
             </div>

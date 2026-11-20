@@ -4,7 +4,7 @@ import grails.converters.*
 
 class UserController {
 
-    static allowedMethods = [deleteAddress: 'POST', generateApiKey: 'POST', selfRegister: 'POST']
+    static allowedMethods = [deleteAddress: 'POST', generateApiKey: 'POST']
 
 	def springSecurityService
 	def userService
@@ -112,20 +112,6 @@ class UserController {
         }
     }
 
-    def selfRegister(User user) {
-        withForm {
-            try {
-                userService.create(user.username, user.email, [], false, user.fullName)
-                flash.message = "You have registered with PEGR. Please login."
-            } catch (UserException e) {
-                flash.error = e.message
-            }
-        }.invalidToken {
-            flash.error = "Invalid request, please try again!"
-        }
-        redirect(url: '/login/auth')
-    }
-    
     def generateApiKey() {
         withForm {
             try {
